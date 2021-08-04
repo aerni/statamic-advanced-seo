@@ -7,7 +7,7 @@ return [
     | Favicons
     |--------------------------------------------------------------------------
     |
-    | Configure the options for your favicons
+    | Do you want to enable the Favicon settings?
     |
     */
 
