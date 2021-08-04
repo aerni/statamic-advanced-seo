@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Statamic\Facades\Site;
-use Illuminate\Console\Command;
-use Statamic\Facades\GlobalSet;
 use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
 
 class SetupSeo extends Command
 {

@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Listeners;
 
-use Statamic\Events\EntryBlueprintFound;
 use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SeoEntrySection;
+use Statamic\Events\EntryBlueprintFound;
 
 class AppendEntryBlueprint
 {

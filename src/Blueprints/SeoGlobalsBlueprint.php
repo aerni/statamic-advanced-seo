@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\FaviconsSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SitemapSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\TrackersSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\GeneralSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SocialSection;
 use Aerni\AdvancedSeo\Contracts\Blueprint;
+use Facades\Aerni\AdvancedSeo\Blueprints\Sections\FaviconsSection;
+use Facades\Aerni\AdvancedSeo\Blueprints\Sections\GeneralSection;
+use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SitemapSection;
+use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SocialSection;
+use Facades\Aerni\AdvancedSeo\Blueprints\Sections\TrackersSection;
 
 class SeoGlobalsBlueprint implements Blueprint
 {

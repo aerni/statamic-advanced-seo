@@ -8,7 +8,7 @@ use Statamic\Providers\AddonServiceProvider;
 class ServiceProvider extends AddonServiceProvider
 {
     protected $commands = [
-        SetupSeo::class
+        SetupSeo::class,
     ];
 
     protected $listen = [
@@ -17,6 +17,6 @@ class ServiceProvider extends AddonServiceProvider
         ],
         'Statamic\Events\GlobalVariablesBlueprintFound' => [
             'Aerni\AdvancedSeo\Listeners\AppendSeoGlobalsBlueprint',
-        ]
+        ],
     ];
 }
