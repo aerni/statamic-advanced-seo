@@ -1,0 +1,16 @@
+{{# hreflang Links #}}
+{{ if ! seo_noindex && seo_canonical_type === 'entry' && current_full_url === permalink }}
+    {{ locales }}
+        <link rel="alternate" hreflang="{{ locale:full replace="_|-" }}" href="{{ permalink }}">
+    {{ /locales }}
+{{ /if }}
+
+{{ if ! seo_noindex }}
+    {{ if seo_canonical_type === 'current' }}
+        <link rel="canonical" href="{{ config:app:url }}{{ seo_canonical_current | url }}">
+    {{ elseif seo_canonical_type === 'external' }}
+        <link rel="canonical" href="{{ seo_canonical_external }}">
+    {{ elseif seo_canonical_type === 'entry' }}
+        <link rel="canonical" href="{{ permalink }}">
+    {{ /if }}
+{{ /if }}

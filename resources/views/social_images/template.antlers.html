@@ -1,0 +1,14 @@
+<div
+    id="{{ selector }}"
+    class="flex items-center justify-center p-20 bg-peach-light"
+
+    {{ if selector === 'og' }}
+        style="width: 1200px; height: 630px;"
+    {{ elseif selector === 'twitter' }}
+        style="width: 1200px; height: 600px;"
+    {{ /if }}
+>
+    <div class="w-[28rem] text-petrol">
+        {{ svg src="logo-primary.svg" a11y="Apotheker" class="fill-current" }}
+    </div>
+</div>

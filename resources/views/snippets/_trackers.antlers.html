@@ -1,0 +1,41 @@
+{{ if environment === "production" }}
+
+    {{# Google Site Verification #}}
+    {{ if seo:use_google_site_verification }}
+        <meta name="google-site-verification" content="{{ seo:site_verification_code }}" />
+    {{ /if }}
+
+    {{# Fathom #}}
+    {{ if seo:use_fathom }}
+        <script
+            defer
+
+            {{ if seo:fathom_domain }}
+                src="https://{{ seo:fathom_domain }}/script.js"
+            {{ else }}
+                src="https://cdn.usefathom.com/script.js"
+            {{ /if }}
+
+            {{ if seo:fathom_spa }}
+                data-spa='auto'
+            {{ /if }}
+
+            data-site="{{ seo:fathom_id }}"></script>
+    {{ /if }}
+
+    {{# Cloudflare Web Analytics #}}
+    {{ if seo:use_cloudflare_web_analytics }}
+        <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ seo:cloudflare_web_analytics }}"}'></script>
+    {{ /if }}
+
+    {{# Google Tag Manager #}}
+    {{ if seo:use_google_tag_manager }}
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ seo:google_tag_manager }}');</script>
+
+        {{# Yield this section in all your layouts after the opening <body> #}}
+        {{ section:seo_body }}
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ seo:google_tag_manager }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        {{ /section:seo_body }}
+    {{ /if }}
+
+{{ /if }}

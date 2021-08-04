@@ -1,0 +1,12 @@
+{{# Meta Title #}}
+<title>
+    {{ yield:seo_title }}
+    {{ seo_title ?? title }}
+    {{ seo:title_separator ?? " &#124; " }}
+    {{ seo:site_name ?? config:app:name }}
+</title>
+
+{{# Meta Description #}}
+{{ if seo_description }}
+    <meta name="description" content="{{ seo_description }}">
+{{ /if }}

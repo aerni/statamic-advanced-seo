@@ -1,0 +1,12 @@
+<meta property="og:site_name" content="{{ seo:site_name ?? config:app:name }}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="{{ site:locale }}">
+<meta property="og:title" content="{{ og_title ?? seo_title ?? title }}">
+
+{{ if og_description or seo_description }}
+    <meta property="og:description" content="{{ og_description ?? seo_description }}">
+{{ /if }}
+
+{{ if og_image or seo:og_image }}
+    <meta property="og:image" content="{{ glide src="{og_image or seo:og_image}" width='1200' height='630' fit='crop_focal' absolute="true" }}">
+{{ /if }}

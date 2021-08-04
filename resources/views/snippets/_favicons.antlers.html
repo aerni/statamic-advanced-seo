@@ -1,0 +1,25 @@
+{{#
+	@name Favicons
+	@desc The favicons snippet for the `<head>` to include Peak generated favicons.
+#}}
+
+{{ if seo:generate_favicons }}
+    {{# The main favicon SVG #}}
+    <link rel="icon" href="{{ seo:favicon_svg }}">
+
+    {{# Single color Safari mask-icon #}}
+    <link rel="mask-icon" href="{{ seo:favicon_safari_override ?? seo:favicon_svg }}" color="{{ seo:favicon_safari_color }}">
+
+    {{# The 180x180px PNG favicon for iOS devices #}}
+    {{ if seo:favicon_ios_override }}
+        <link rel="apple-touch-icon" href="{{ glide:seo:favicon_ios_override width='180' height='180' fit='crop_focal' }}">
+    {{ else }}
+        <link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png">
+    {{ /if }}
+
+    {{# The manifest.json that includes the 512x512px PNG favicon for Android devices #}}
+    <link rel="manifest" href="/site.webmanifest">
+
+    {{# The background color for Android Chrome #}}
+    <meta name="theme-color" content="{{ seo:favicon_android_chrome_color }}">
+{{ /if }}

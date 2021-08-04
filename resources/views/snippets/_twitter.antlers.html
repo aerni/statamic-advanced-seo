@@ -1,0 +1,26 @@
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ twitter_title ?? seo_title ?? title }}">
+
+{{ if twitter_description or seo_description }}
+    <meta name="twitter:description" content="{{ twitter_description ?? seo_description }}">
+{{ /if }}
+
+{{ if seo:twitter_handle }}
+    <meta name="twitter:site" content="{{ seo:twitter_handle }}">
+{{ /if }}
+
+{{ if twitter_image }}
+    {{ twitter_image }}
+        <meta name="twitter:image" content="{{ glide:url width='1200' height='600' fit='crop_focal' absolute="true" }}">
+        {{ if alt }}
+            <meta name="twitter:image:alt" content="{{ alt }}">
+        {{ /if }}
+    {{ /twitter_image }}
+{{ elseif seo:twitter_image }}
+    {{ seo:twitter_image }}
+        <meta name="twitter:image" content="{{ glide:url width='1200' height='600' fit='crop_focal' absolute="true" }}">
+        {{ if alt }}
+            <meta name="twitter:image:alt" content="{{ alt }}">
+        {{ /if }}
+    {{ /seo:twitter_image }}
+{{ /if }}
