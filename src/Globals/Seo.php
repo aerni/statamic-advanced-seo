@@ -2,8 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Globals;
 
+use Statamic\Facades\Fieldset;
 use Aerni\AdvancedSeo\Contracts\Globals;
 use Facades\Aerni\AdvancedSeo\Blueprints\SeoGlobalsBlueprint;
+use Illuminate\Support\Collection;
 
 class Seo implements Globals
 {
@@ -23,5 +25,16 @@ class Seo implements Globals
     public function blueprint(): array
     {
         return SeoGlobalsBlueprint::contents();
+    }
+
+    public function fieldset(string $handle): Collection
+    {
+        return Fieldset::setDirectory(__DIR__ . '/../../resources/fieldsets/')
+            ->find($handle)
+            ->fields()
+            ->all()
+            ->map(function ($field) {
+                return $field->config();
+            });
     }
 }
