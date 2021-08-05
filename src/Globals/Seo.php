@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Globals;
 
-use Statamic\Facades\Fieldset;
 use Aerni\AdvancedSeo\Contracts\Globals;
 use Facades\Aerni\AdvancedSeo\Blueprints\SeoGlobalsBlueprint;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Fieldset;
 
 class Seo implements Globals
 {

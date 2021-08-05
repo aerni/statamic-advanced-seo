@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fieldsets;
 
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Contracts\Fieldset;
 use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Illuminate\Support\Collection;
 
 class TrackersFieldset implements Fieldset
 {

@@ -3,13 +3,11 @@
 namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Contracts\Blueprint;
-use Facades\Aerni\AdvancedSeo\Fieldsets\GeneralFieldset;
-use Facades\Aerni\AdvancedSeo\Fieldsets\TrackersFieldset;
 use Facades\Aerni\AdvancedSeo\Blueprints\Sections\FaviconsSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\GeneralSection;
 use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SitemapSection;
 use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SocialSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\TrackersSection;
+use Facades\Aerni\AdvancedSeo\Fieldsets\GeneralFieldset;
+use Facades\Aerni\AdvancedSeo\Fieldsets\TrackersFieldset;
 use Statamic\Facades\Blueprint as FacadesBlueprint;
 
 class SeoGlobalsBlueprint implements Blueprint
