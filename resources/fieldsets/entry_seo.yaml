@@ -21,8 +21,9 @@ fields:
         - 'max:60'
   -
     handle: seo_description
-    field: common.text_plain
-    config:
+    field:
+      type: textarea
+      localizable: true
       listable: hidden
       display: 'Meta Description'
       character_limit: 160
@@ -50,8 +51,9 @@ fields:
         - 'max:70'
   -
     handle: og_description
-    field: common.text_plain
-    config:
+    field:
+      type: textarea
+      localizable: true
       listable: hidden
       display: 'Open Graph Description'
       character_limit: '200'
@@ -61,10 +63,13 @@ fields:
         - 'max:200'
   -
     handle: og_image
-    field: common.image
-    config:
+    field:
+      type: assets
+      mode: list
       container: seo
       restrict: true
+      allow_uploads: true
+      max_files: 1
       localizable: true
       listable: hidden
       display: 'Open Graph Image'
@@ -94,8 +99,9 @@ fields:
         - 'max:70'
   -
     handle: twitter_description
-    field: common.text_plain
-    config:
+    field:
+      type: textarea
+      localizable: true
       listable: hidden
       display: 'Twitter Description'
       character_limit: '200'
@@ -105,10 +111,13 @@ fields:
         - 'max:200'
   -
     handle: twitter_image
-    field: common.image
-    config:
+    field:
+      type: assets
+      mode: list
       container: seo
       restrict: true
+      allow_uploads: true
+      max_files: 1
       localizable: true
       listable: hidden
       display: 'Twitter Image'
@@ -139,8 +148,9 @@ fields:
       listable: hidden
   -
     handle: seo_canonical_current
-    field: common.entry
-    config:
+    field:
+      max_items: 1
+      type: entries
       mode: select
       localizable: true
       listable: hidden

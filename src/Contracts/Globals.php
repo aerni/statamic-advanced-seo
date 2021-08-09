@@ -7,6 +7,4 @@ interface Globals
     public function handle(): string;
 
     public function title(): string;
-
-    public function blueprint(): array;
 }

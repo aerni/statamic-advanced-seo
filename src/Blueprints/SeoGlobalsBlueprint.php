@@ -2,29 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Contracts\Blueprint;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\FaviconsSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SitemapSection;
-use Facades\Aerni\AdvancedSeo\Blueprints\Sections\SocialSection;
-use Facades\Aerni\AdvancedSeo\Fieldsets\GeneralFieldset;
-use Facades\Aerni\AdvancedSeo\Fieldsets\TrackersFieldset;
-use Statamic\Facades\Blueprint as FacadesBlueprint;
+use Aerni\AdvancedSeo\Blueprints\BaseBlueprint;
+use Aerni\AdvancedSeo\Fieldsets\SocialFieldset;
+use Aerni\AdvancedSeo\Fieldsets\GeneralFieldset;
+use Aerni\AdvancedSeo\Fieldsets\SitemapFieldset;
+use Aerni\AdvancedSeo\Fieldsets\FaviconsFieldset;
+use Aerni\AdvancedSeo\Fieldsets\TrackersFieldset;
 
-class SeoGlobalsBlueprint implements Blueprint
+class SeoGlobalsBlueprint extends BaseBlueprint
 {
-    public function contents(): array
-    {
-        return FacadesBlueprint::makeFromSections($this->sections())->contents();
-    }
-
-    public function sections(): array
-    {
-        return array_filter([
-            'general' => GeneralFieldset::contents(),
-            // 'favicons' => FaviconsSection::contents(),
-            // 'social' => SocialSection::contents(),
-            'trackers' => TrackersFieldset::contents(),
-            // 'sitemap' => SitemapSection::contents(),
-        ]);
-    }
+    protected array $sections = [
+        'general' => GeneralFieldset::class,
+        'favicons' => FaviconsFieldset::class,
+        'social' => SocialFieldset::class,
+        'trackers' => TrackersFieldset::class,
+        'sitemap' => SitemapFieldset::class,
+    ];
 }

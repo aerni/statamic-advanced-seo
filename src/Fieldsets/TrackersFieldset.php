@@ -2,46 +2,49 @@
 
 namespace Aerni\AdvancedSeo\Fieldsets;
 
-use Aerni\AdvancedSeo\Contracts\Fieldset;
-use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Aerni\AdvancedSeo\Facades\Fieldset;
+use Aerni\AdvancedSeo\Fieldsets\BaseFieldset;
 use Illuminate\Support\Collection;
 
-class TrackersFieldset implements Fieldset
+class TrackersFieldset extends BaseFieldset
 {
-    public function contents(): ?array
-    {
-        if ($this->fields()->isEmpty()) {
-            return null;
-        }
+    protected string $display = 'Trackers';
 
+    protected function sections(): array
+    {
         return [
-            'display' => 'Trackers',
-            'fields' => $this->fields(),
+            $this->siteVerification(),
+            $this->fathom(),
+            $this->cloudflareAnalytics(),
+            $this->GoogleTagManager(),
         ];
-    }
-
-    public function fields(): Collection
-    {
-        return collect()
-            ->merge($this->siteVerification())
-            ->merge($this->fathom());
     }
 
     protected function siteVerification(): ?Collection
     {
-        if (! config('advanced-seo.trackers.site_verification', true)) {
-            return null;
-        }
-
-        return SeoGlobals::fieldset('site_verification');
+        return config('advanced-seo.trackers.site_verification', true)
+            ? Fieldset::find('trackers/site_verification')
+            : null;
     }
 
     protected function fathom(): ?Collection
     {
-        if (! config('advanced-seo.trackers.fathom', true)) {
-            return null;
-        }
+        return config('advanced-seo.trackers.fathom', true)
+            ? Fieldset::find('trackers/fathom')
+            : null;
+    }
 
-        return SeoGlobals::fieldset('fathom');
+    protected function cloudflareAnalytics(): ?Collection
+    {
+        return config('advanced-seo.trackers.cloudflare_analytics', true)
+            ? Fieldset::find('trackers/cloudflare_analytics')
+            : null;
+    }
+
+    protected function GoogleTagManager(): ?Collection
+    {
+        return config('advanced-seo.trackers.google_tag_manager', true)
+            ? Fieldset::find('trackers/google_tag_manager')
+            : null;
     }
 }

@@ -6,19 +6,19 @@ use Aerni\AdvancedSeo\Facades\Fieldset;
 use Aerni\AdvancedSeo\Fieldsets\BaseFieldset;
 use Illuminate\Support\Collection;
 
-class GeneralFieldset extends BaseFieldset
+class SeoEntryFieldset extends BaseFieldset
 {
-    protected string $display = 'General';
+    protected string $display = 'Seo';
 
     protected function sections(): array
     {
         return [
-            $this->general(),
+            $this->entrySeo(),
         ];
     }
 
-    protected function general(): Collection
+    protected function entrySeo(): Collection
     {
-        return Fieldset::find('general');
+        return Fieldset::find('entry_seo');
     }
 }

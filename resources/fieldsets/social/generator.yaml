@@ -1,0 +1,30 @@
+title: 'Social Images Generator'
+fields:
+  -
+    handle: section_social_images
+    field:
+      type: section
+      instructions: 'Automatically generate your social images. This required [Puppeteer](https://github.com/puppeteer/puppeteer) and [Browsershot](https://github.com/spatie/browsershot).'
+      display: 'Generate Social Images'
+  -
+    handle: generate_social_images
+    field:
+      display: 'Generate Social Images'
+      type: toggle
+      icon: toggle
+      instructions: 'Activate to generate your social images.'
+      listable: hidden
+  -
+    handle: social_images_collections
+    field:
+      mode: select
+      display: Collections
+      type: collections
+      icon: collections
+      instructions: 'Select the collections you want to generate images for.'
+      listable: hidden
+      width: 50
+      if:
+        generate_social_images: 'equals true'
+      validate:
+        - 'required_if:generate_social_images,true'

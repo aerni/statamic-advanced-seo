@@ -13,7 +13,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $listen = [
         'Statamic\Events\EntryBlueprintFound' => [
-            'Aerni\AdvancedSeo\Listeners\AppendEntryBlueprint',
+            'Aerni\AdvancedSeo\Listeners\AppendSeoEntryBlueprint',
         ],
         'Statamic\Events\GlobalVariablesBlueprintFound' => [
             'Aerni\AdvancedSeo\Listeners\AppendSeoGlobalsBlueprint',
