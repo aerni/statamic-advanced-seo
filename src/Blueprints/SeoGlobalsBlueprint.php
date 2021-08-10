@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Blueprints\BaseBlueprint;
-use Aerni\AdvancedSeo\Fieldsets\SocialFieldset;
+use Aerni\AdvancedSeo\Fieldsets\FaviconsFieldset;
 use Aerni\AdvancedSeo\Fieldsets\GeneralFieldset;
 use Aerni\AdvancedSeo\Fieldsets\SitemapFieldset;
-use Aerni\AdvancedSeo\Fieldsets\FaviconsFieldset;
+use Aerni\AdvancedSeo\Fieldsets\SocialFieldset;
 use Aerni\AdvancedSeo\Fieldsets\TrackersFieldset;
 
 class SeoGlobalsBlueprint extends BaseBlueprint

@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Fieldsets;
 
 use Aerni\AdvancedSeo\Facades\Fieldset;
-use Aerni\AdvancedSeo\Fieldsets\BaseFieldset;
 use Illuminate\Support\Collection;
 
 class TrackersFieldset extends BaseFieldset
