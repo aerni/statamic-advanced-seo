@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Statamic\Events\EntrySaved;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\EntrySaved;
 
 class GenerateSocialImage implements ShouldQueue
 {

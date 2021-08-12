@@ -2,22 +2,22 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Statamic\Facades\Entry;
-use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Browsershot\Browsershot;
+use Statamic\Facades\Entry;
 
 class SocialImageRepository
 {
     protected array $types = [
         'og' => [
-            'prefix'  => 'og',
-            'width'   => 1200,
-            'height'  => 630,
+            'prefix' => 'og',
+            'width' => 1200,
+            'height' => 630,
         ],
         'twitter' => [
-            'prefix'  => 'twitter',
-            'width'   => 600,
-            'height'  => 335,
+            'prefix' => 'twitter',
+            'width' => 600,
+            'height' => 335,
         ],
     ];
 
