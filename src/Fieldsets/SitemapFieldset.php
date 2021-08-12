@@ -19,7 +19,7 @@ class SitemapFieldset extends BaseFieldset
     protected function sitemap(): ?Collection
     {
         return config('advanced-seo.sitemap', true)
-            ? Fieldset::find('sitemap')
+            ? Fieldset::find('globals/sitemap')
             : null;
     }
 }

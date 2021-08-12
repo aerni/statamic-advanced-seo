@@ -22,28 +22,28 @@ class TrackersFieldset extends BaseFieldset
     protected function siteVerification(): ?Collection
     {
         return config('advanced-seo.trackers.site_verification', true)
-            ? Fieldset::find('trackers/site_verification')
+            ? Fieldset::find('globals/site_verification')
             : null;
     }
 
     protected function fathom(): ?Collection
     {
         return config('advanced-seo.trackers.fathom', true)
-            ? Fieldset::find('trackers/fathom')
+            ? Fieldset::find('globals/fathom')
             : null;
     }
 
     protected function cloudflareAnalytics(): ?Collection
     {
         return config('advanced-seo.trackers.cloudflare_analytics', true)
-            ? Fieldset::find('trackers/cloudflare_analytics')
+            ? Fieldset::find('globals/cloudflare_analytics')
             : null;
     }
 
     protected function GoogleTagManager(): ?Collection
     {
         return config('advanced-seo.trackers.google_tag_manager', true)
-            ? Fieldset::find('trackers/google_tag_manager')
+            ? Fieldset::find('globals/google_tag_manager')
             : null;
     }
 }

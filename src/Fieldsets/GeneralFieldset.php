@@ -18,6 +18,6 @@ class GeneralFieldset extends BaseFieldset
 
     protected function general(): Collection
     {
-        return Fieldset::find('general');
+        return Fieldset::find('globals/general');
     }
 }

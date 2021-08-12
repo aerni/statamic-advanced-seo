@@ -19,7 +19,7 @@ class FaviconsFieldset extends BaseFieldset
     protected function favicons(): ?Collection
     {
         return config('advanced-seo.favicons', true)
-            ? Fieldset::find('favicons')
+            ? Fieldset::find('globals/favicons')
             : null;
     }
 }

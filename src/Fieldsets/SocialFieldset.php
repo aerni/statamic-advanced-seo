@@ -21,21 +21,21 @@ class SocialFieldset extends BaseFieldset
     protected function generator(): ?Collection
     {
         return config('advanced-seo.social_images.generator.enabled', true)
-            ? Fieldset::find('social/generator')
+            ? Fieldset::find('globals/social_images_generator')
             : null;
     }
 
     protected function openGraph(): ?Collection
     {
         return config('advanced-seo.social_images.open_graph', true)
-            ? Fieldset::find('social/open_graph')
+            ? Fieldset::find('globals/open_graph')
             : null;
     }
 
     protected function twitter(): ?Collection
     {
         return config('advanced-seo.social_images.twitter', true)
-            ? Fieldset::find('social/twitter')
+            ? Fieldset::find('globals/twitter')
             : null;
     }
 }
