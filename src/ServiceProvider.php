@@ -15,8 +15,19 @@ class ServiceProvider extends AddonServiceProvider
         'Statamic\Events\EntryBlueprintFound' => [
             'Aerni\AdvancedSeo\Listeners\AppendSeoEntryBlueprint',
         ],
+        'Statamic\Events\EntrySaved' => [
+            'Aerni\AdvancedSeo\Listeners\GenerateSocialImage',
+        ],
         'Statamic\Events\GlobalVariablesBlueprintFound' => [
             'Aerni\AdvancedSeo\Listeners\AppendSeoGlobalsBlueprint',
         ],
+    ];
+
+    protected $tags = [
+        Tags\SocialImageTag::class,
+    ];
+
+    protected $routes = [
+        'web' => __DIR__.'/../routes/web.php',
     ];
 }

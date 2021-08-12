@@ -20,7 +20,7 @@ class SocialFieldset extends BaseFieldset
 
     protected function generator(): ?Collection
     {
-        return config('advanced-seo.social_images.generator', true)
+        return config('advanced-seo.social_images.generator.enabled', true)
             ? Fieldset::find('social/generator')
             : null;
     }

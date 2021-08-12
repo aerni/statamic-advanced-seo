@@ -62,6 +62,15 @@ fields:
       validate:
         - 'max:200'
   -
+    handle: generate_og_image
+    field:
+      display: 'Generate Open Graph Image'
+      type: toggle
+      icon: toggle
+      instructions: 'Activate to automatically generate the Open Graph Image of this entry.'
+      listable: hidden
+      default: true
+  -
     handle: og_image
     field:
       type: assets
@@ -75,6 +84,8 @@ fields:
       display: 'Open Graph Image'
       folder: social_images
       instructions: 'Add an Open Graph Image for this entry. The recommended size is `1200x630px`.'
+      if:
+        generate_og_image: 'equals false'
       validate:
         - image
         - 'mimes:jpg,png'
@@ -110,6 +121,15 @@ fields:
       validate:
         - 'max:200'
   -
+    handle: generate_twitter_image
+    field:
+      display: 'Generate Twitter Image'
+      type: toggle
+      icon: toggle
+      instructions: 'Activate to automatically generate the Twitter Image of this entry.'
+      listable: hidden
+      default: true
+  -
     handle: twitter_image
     field:
       type: assets
@@ -123,6 +143,8 @@ fields:
       display: 'Twitter Image'
       folder: social_images
       instructions: 'Add a Twitter Image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.'
+      if:
+        generate_twitter_image: 'equals false'
       validate:
         - image
         - 'mimes:jpg,png'
