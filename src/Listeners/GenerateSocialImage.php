@@ -12,9 +12,6 @@ class GenerateSocialImage implements ShouldQueue
     {
         if (SocialImage::shouldGenerate($event->entry->id())) {
             SocialImage::make('og', $event->entry->id());
-        }
-
-        if (SocialImage::shouldGenerate($event->entry->id())) {
             SocialImage::make('twitter', $event->entry->id());
         }
     }
