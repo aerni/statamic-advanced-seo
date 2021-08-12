@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Fieldsets;
 
 use Aerni\AdvancedSeo\Facades\Fieldset;
 use Aerni\AdvancedSeo\Facades\SeoGlobals;
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Illuminate\Support\Collection;
 use Statamic\Facades\GlobalSet;
 

@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
+use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Browsershot\Browsershot;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GlobalSet;
-use Spatie\Browsershot\Browsershot;
-use Illuminate\Support\Facades\Storage;
-use Aerni\AdvancedSeo\Facades\SeoGlobals;
 
 class SocialImageRepository
 {
