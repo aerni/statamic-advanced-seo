@@ -25,7 +25,6 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $tags = [
         Tags\AdvancedSeoTags::class,
-        Tags\SocialImageTag::class,
     ];
 
     protected $routes = [

@@ -7,8 +7,6 @@
     <meta property="og:description" content="{{ og_description ?? seo_description }}">
 {{ /if }}
 
-{{ if {social_image:og} }}
-    <meta property="og:image" content="{{ social_image:og }}">
-{{ elseif og_image or seo:og_image }}
+{{ if og_image or seo:og_image }}
     <meta property="og:image" content="{{ glide src="{og_image or seo:og_image}" width='1200' height='630' fit='crop_focal' absolute="true" }}">
 {{ /if }}

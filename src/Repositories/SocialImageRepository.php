@@ -2,59 +2,41 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Aerni\AdvancedSeo\Facades\SeoGlobals;
-use Illuminate\Support\Facades\Storage;
 use Spatie\Browsershot\Browsershot;
-use Statamic\Facades\Entry;
 use Statamic\Facades\GlobalSet;
+use Illuminate\Support\Facades\File;
+use Statamic\Facades\AssetContainer;
+use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Statamic\Entries\Entry;
 
 class SocialImageRepository
 {
-    protected array $types = [
-        'og' => [
-            'prefix' => 'og',
-            'width' => 1200,
-            'height' => 630,
-        ],
-        'twitter' => [
-            'prefix' => 'twitter',
-            'width' => 600,
-            'height' => 335,
-        ],
-    ];
-
-    public function find(string $type, string $id): ?string
+    public function make(Entry $entry)
     {
-        $entry = Entry::find($id);
-        $type = $this->types[$type];
+        File::ensureDirectoryExists(AssetContainer::find('seo')->disk()->path('social_images'));
 
-        $fileName = "{$entry->slug()}-{$type['prefix']}.png";
+        $ogTemplateUrl = config('app.url') . '/seo/social-images/og/' . $entry->id();
+        $ogPath = 'social_images/' . $entry->slug() . '-og.png';
 
-        return Storage::disk('assets')->exists($fileName)
-            ? Storage::disk('assets')->url($fileName)
-            : null;
+        $twitterTemplateUrl = config('app.url') . '/seo/social-images/twitter/' . $entry->id();
+        $twitterPath = 'social_images/' . $entry->slug() . '-twitter.png';
+
+        Browsershot::url($ogTemplateUrl)
+            ->windowSize(1200, 630)
+            ->save(AssetContainer::find('seo')->disk()->path($ogPath));
+
+        Browsershot::url($twitterTemplateUrl)
+            ->windowSize(1200, 600)
+            ->save(AssetContainer::find('seo')->disk()->path($twitterPath));
+
+        $entry
+            ->set('og_image', $ogPath)
+            ->set('twitter_image', $twitterPath)
+            ->saveQuietly();
     }
 
-    public function make(string $type, string $id): string
+    public function shouldGenerate(Entry $entry): bool
     {
-        $entry = Entry::find($id);
-        $type = $this->types[$type];
-
-        $baseUrl = config('app.url');
-        $templateUrl = "{$baseUrl}/seo/social-images/{$type['prefix']}/{$entry->id()}";
-        $fileName = "{$entry->slug()}-{$type['prefix']}.png";
-
-        Browsershot::url($templateUrl)
-            ->windowSize($type['width'], $type['height'])
-            ->save(Storage::disk('assets')->path($fileName));
-
-        return Storage::disk('assets')->url($fileName);
-    }
-
-    public function shouldGenerate(string $id): bool
-    {
-        $entry = Entry::find($id);
-
         // Shouldn't generate if the generator was disabled in the config.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
             return false;

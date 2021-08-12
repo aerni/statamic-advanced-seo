@@ -45,8 +45,6 @@ fields:
       display: 'Twitter Image'
       folder: social_images
       instructions: 'Add a Twitter Image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.'
-      if:
-        generate_social_images: 'not true'
       validate:
         - image
         - 'mimes:jpg,png'

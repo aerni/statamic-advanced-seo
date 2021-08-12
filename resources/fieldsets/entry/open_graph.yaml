@@ -45,8 +45,6 @@ fields:
       display: 'Open Graph Image'
       folder: social_images
       instructions: 'Add an Open Graph Image for this entry. The recommended size is `1200x630px`.'
-      if:
-        generate_social_images: 'not true'
       validate:
         - image
         - 'mimes:jpg,png'
