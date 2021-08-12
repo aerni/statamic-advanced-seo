@@ -24,10 +24,29 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $tags = [
+        Tags\AdvancedSeoTags::class,
         Tags\SocialImageTag::class,
     ];
 
     protected $routes = [
         'web' => __DIR__.'/../routes/web.php',
     ];
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        $this->bootAddonViews();
+    }
+
+    protected function bootAddonViews(): self
+    {
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'advanced-seo');
+
+        $this->publishes([
+            __DIR__.'/../resources/views' => resource_path('views/vendor/advanced-seo'),
+        ], 'advanced-seo-views');
+
+        return $this;
+    }
 }
