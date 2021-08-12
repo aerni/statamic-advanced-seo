@@ -8,14 +8,17 @@ use Statamic\Facades\Fieldset;
 
 class FieldsetRepository implements Contract
 {
-    public function find(string $handle): Collection
+    public function find(string $handle): ?Collection
     {
-        return Fieldset::setDirectory(__DIR__ . '/../../resources/fieldsets/')
-            ->find($handle)
-            ->fields()
-            ->all()
-            ->map(function ($field) {
-                return $field->config();
-            });
+        $fieldset = Fieldset::setDirectory(resource_path('fieldsets'))->find($handle)
+            ?? Fieldset::setDirectory(__DIR__ . '/../../resources/fieldsets/')->find($handle);
+
+        if (! $fieldset) {
+            return null;
+        }
+
+        return $fieldset->fields()->all()->map(function ($field) {
+            return $field->config();
+        });
     }
 }

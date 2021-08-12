@@ -6,5 +6,5 @@ use Illuminate\Support\Collection;
 
 interface FieldsetRepository
 {
-    public function find(string $handle): Collection;
+    public function find(string $handle): ?Collection;
 }
