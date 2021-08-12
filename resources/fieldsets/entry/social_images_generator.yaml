@@ -1,0 +1,18 @@
+title: 'Social Images Generator'
+fields:
+  -
+    handle: section_social_images
+    field:
+      type: section
+      instructions: 'Automatically generate your social images.'
+      display: 'Generate Social Images'
+      listable: hidden
+  -
+    handle: generate_social_images
+    field:
+      display: 'Generate Social Images'
+      type: toggle
+      icon: toggle
+      instructions: 'Activate to automatically generate the Open Graph and Twitter Images of this entry.'
+      listable: hidden
+      default: true

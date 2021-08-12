@@ -1,0 +1,53 @@
+title: Twitter
+fields:
+  -
+    handle: section_twitter
+    field:
+      type: section
+      instructions: 'Configure the Twitter settings of this entry.'
+      display: Twitter
+  -
+    handle: twitter_title
+    field:
+      input_type: text
+      type: text
+      localizable: true
+      listable: hidden
+      display: 'Twitter Title'
+      instructions: 'Set the Twitter Title of this entry. Defaults to the entry''s `Meta Title` or `Title`.'
+      character_limit: 70
+      antlers: false
+      validate:
+        - 'max:70'
+  -
+    handle: twitter_description
+    field:
+      type: textarea
+      localizable: true
+      listable: hidden
+      display: 'Twitter Description'
+      character_limit: '200'
+      instructions: 'Set the Twitter Description of this entry. Defaults to the entry''s `Meta Description`.'
+      width: 100
+      validate:
+        - 'max:200'
+  -
+    handle: twitter_image
+    field:
+      type: assets
+      mode: list
+      container: seo
+      restrict: true
+      allow_uploads: true
+      max_files: 1
+      localizable: true
+      listable: hidden
+      display: 'Twitter Image'
+      folder: social_images
+      instructions: 'Add a Twitter Image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.'
+      if:
+        generate_social_images: 'not true'
+      validate:
+        - image
+        - 'mimes:jpg,png'
+        - 'dimensions:min_width=300,min_height=157'
