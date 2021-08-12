@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Spatie\Browsershot\Browsershot;
-use Statamic\Facades\GlobalSet;
-use Illuminate\Support\Facades\File;
-use Statamic\Facades\AssetContainer;
 use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Illuminate\Support\Facades\File;
+use Spatie\Browsershot\Browsershot;
 use Statamic\Entries\Entry;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\GlobalSet;
 
 class SocialImageRepository
 {
