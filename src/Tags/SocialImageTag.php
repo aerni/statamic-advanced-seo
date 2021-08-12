@@ -23,7 +23,7 @@ class SocialImageTag extends Tags
     {
         $id = $this->context->get('id');
 
-        if (SocialImage::shouldGenerate($type, $id)) {
+        if (SocialImage::shouldGenerate($id)) {
             return SocialImage::find($type, $id) ?? SocialImage::make($type, $id);
         }
 

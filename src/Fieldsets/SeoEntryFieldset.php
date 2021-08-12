@@ -3,7 +3,10 @@
 namespace Aerni\AdvancedSeo\Fieldsets;
 
 use Aerni\AdvancedSeo\Facades\Fieldset;
+use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Illuminate\Support\Collection;
+use Statamic\Facades\GlobalSet;
 
 class SeoEntryFieldset extends BaseFieldset
 {
@@ -31,14 +34,14 @@ class SeoEntryFieldset extends BaseFieldset
 
     protected function socialImagesGenerator(): ?Collection
     {
-        return config('advanced-seo.social_images.generator.enabled', true)
+        return $this->shouldShowSocialImagesGenerator()
             ? Fieldset::find('entry/social_images_generator')
             : null;
     }
 
     protected function socialImagesGeneratorFields(): ?Collection
     {
-        return config('advanced-seo.social_images.generator.enabled', true)
+        return $this->shouldShowSocialImagesGenerator()
             ? Fieldset::find('social_images_generator_fields')
             : null;
     }
@@ -71,5 +74,25 @@ class SeoEntryFieldset extends BaseFieldset
     protected function jsonLd(): Collection
     {
         return Fieldset::find('entry/json_ld');
+    }
+
+    public function shouldShowSocialImagesGenerator(): bool
+    {
+        // Don't show if the generator was disabled in the config.
+        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
+        $globals = GlobalSet::find(SeoGlobals::handle())
+            ->inSelectedSite()
+            ->data()
+            ->get('social_images_collections', []);
+
+        // Don't show if the entry's collection is not selected.
+        if (! in_array($this->data->collection()->handle(), $globals)) {
+            return false;
+        }
+
+        return true;
     }
 }

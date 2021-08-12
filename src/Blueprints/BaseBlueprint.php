@@ -7,7 +7,15 @@ use Statamic\Facades\Blueprint;
 
 class BaseBlueprint implements Contract
 {
+    protected mixed $data;
     protected array $sections;
+
+    public function for(mixed $data): self
+    {
+        $this->data = $data;
+
+        return $this;
+    }
 
     public function contents(): array
     {
@@ -17,7 +25,7 @@ class BaseBlueprint implements Contract
     protected function sections(): array
     {
         return collect($this->sections)->map(function ($section) {
-            return resolve($section)->contents();
+            return resolve($section)->for($this->data)->contents();
         })->filter()->all();
     }
 }

@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Contracts;
 
 interface BlueprintRepository
 {
-    public function seoEntryContents(): array;
+    public function for(mixed $data): self;
 
-    public function seoGlobalsContents(): array;
+    public function contents(): ?array;
 }

@@ -11,7 +11,7 @@ class AppendSeoGlobalsBlueprint
     public function handle(GlobalVariablesBlueprintFound $event): void
     {
         if ($event->globals->id() === SeoGlobals::handle()) {
-            $event->blueprint->setContents(Blueprint::seoGlobalsContents());
+            $event->blueprint->setContents(Blueprint::for($event->globals)->contents());
         }
     }
 }

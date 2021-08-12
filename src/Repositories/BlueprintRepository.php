@@ -8,13 +8,25 @@ use Facades\Aerni\AdvancedSeo\Blueprints\SeoGlobalsBlueprint;
 
 class BlueprintRepository implements Contract
 {
-    public function seoEntryContents(): array
+    protected mixed $data;
+
+    public function for(mixed $data): self
     {
-        return SeoEntryBlueprint::contents();
+        $this->data = $data;
+
+        return $this;
     }
 
-    public function seoGlobalsContents(): array
+    public function contents(): ?array
     {
-        return SeoGlobalsBlueprint::contents();
+        if ($this->data instanceof \Statamic\Entries\Entry) {
+            return SeoEntryBlueprint::for($this->data)->contents();
+        }
+
+        if ($this->data instanceof \Statamic\Globals\Variables) {
+            return SeoGlobalsBlueprint::for($this->data)->contents();
+        }
+
+        return null;
     }
 }

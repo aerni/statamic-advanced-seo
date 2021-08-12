@@ -2,9 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Illuminate\Support\Facades\Storage;
-use Spatie\Browsershot\Browsershot;
 use Statamic\Facades\Entry;
+use Statamic\Facades\GlobalSet;
+use Spatie\Browsershot\Browsershot;
+use Illuminate\Support\Facades\Storage;
+use Aerni\AdvancedSeo\Facades\SeoGlobals;
 
 class SocialImageRepository
 {
@@ -49,15 +51,27 @@ class SocialImageRepository
         return Storage::disk('assets')->url($fileName);
     }
 
-    public function shouldGenerate(string $type, string $id): bool
+    public function shouldGenerate(string $id): bool
     {
         $entry = Entry::find($id);
 
+        // Shouldn't generate if the generator was disabled in the config.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
             return false;
         }
 
-        if (! $entry->get("generate_{$type}_image")) {
+        $globals = GlobalSet::find(SeoGlobals::handle())
+            ->inSelectedSite()
+            ->data()
+            ->get('social_images_collections', []);
+
+        // Shouldn't generate if the entry's collection is not selected.
+        if (! in_array($entry->collection()->handle(), $globals)) {
+            return false;
+        }
+
+        // Shouldn't generate if the entry's generator toggle is off.
+        if (! $entry->get('generate_social_images')) {
             return false;
         }
 

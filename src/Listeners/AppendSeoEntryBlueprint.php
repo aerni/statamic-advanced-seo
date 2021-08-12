@@ -10,8 +10,11 @@ class AppendSeoEntryBlueprint
     public function handle(EntryBlueprintFound $event): void
     {
         $blueprint = $event->blueprint->contents();
-        $blueprint['sections']['seo'] = Blueprint::seoEntryContents()['sections']['seo'];
+        $seoBlueprint = Blueprint::for($event->entry)->contents();
 
-        $event->blueprint->setContents($blueprint);
+        if ($seoBlueprint) {
+            $blueprint['sections']['seo'] = $seoBlueprint['sections']['seo'];
+            $event->blueprint->setContents($blueprint);
+        }
     }
 }

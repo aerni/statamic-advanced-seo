@@ -7,7 +7,15 @@ use Illuminate\Support\Collection;
 
 abstract class BaseFieldset implements Contract
 {
+    protected mixed $data;
     protected string $display;
+
+    public function for(mixed $data): self
+    {
+        $this->data = $data;
+
+        return $this;
+    }
 
     public function contents(): ?array
     {
