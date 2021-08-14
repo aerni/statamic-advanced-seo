@@ -2,9 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Traits\HasAssetField;
-use Aerni\AdvancedSeo\Fields\BaseFields;
 use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\GlobalSet;
 
@@ -72,7 +71,7 @@ class OnPageSeoFields extends BaseFields
     {
         $fields = collect([
             $this->openGraphImage(),
-            $this->twitterImage()
+            $this->twitterImage(),
         ]);
 
         if ($this->displaySocialImagesGenerator()) {

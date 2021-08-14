@@ -27,7 +27,7 @@ class Blueprint
         $this->blueprint->ensureFieldInSection('seo', [
             'type' => 'advanced_seo',
             'listable' => false,
-            'display' => 'Advanced SEO'
+            'display' => 'Advanced SEO',
         ], 'SEO');
     }
 

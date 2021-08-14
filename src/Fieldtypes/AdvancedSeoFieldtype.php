@@ -2,13 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
-use Statamic\Facades\GlobalSet;
 use Statamic\Support\Arr;
 
 class AdvancedSeoFieldtype extends Fieldtype
