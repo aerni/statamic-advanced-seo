@@ -31,6 +31,7 @@ class SetupSeo extends Command
 
     protected function setupAssetContainers(): void
     {
+        // TODO: This should probably be dynamic depending on the config.
         $this->makeAssetContainer('seo', 'SEO');
     }
 
