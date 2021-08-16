@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;

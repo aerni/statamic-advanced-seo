@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Content;
 
-use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\File;
+use Spatie\Browsershot\Browsershot;
 use Statamic\Contracts\Assets\AssetContainer as Container;
 use Statamic\Facades\AssetContainer;
 
@@ -20,7 +20,7 @@ class SocialImage
         'twitter' => [
             'width' => 1200,
             'height' => 600,
-        ]
+        ],
     ];
 
     public function id(string $id): self

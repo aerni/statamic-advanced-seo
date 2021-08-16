@@ -2,19 +2,22 @@
 
 namespace Aerni\AdvancedSeo\Jobs;
 
-use Statamic\Support\Arr;
-use Illuminate\Bus\Queueable;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Facades\Storage;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Facades\Storage;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Support\Arr;
 
 class GenerateSocialImageJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     private Entry $entry;
 

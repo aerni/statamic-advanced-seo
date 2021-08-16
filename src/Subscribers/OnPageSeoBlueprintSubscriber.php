@@ -3,9 +3,9 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Illuminate\Events\Dispatcher;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Illuminate\Events\Dispatcher;
 
 class OnPageSeoBlueprintSubscriber
 {

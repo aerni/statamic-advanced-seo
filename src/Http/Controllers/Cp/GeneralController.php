@@ -3,15 +3,11 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\Facades\Blueprint;
-use Statamic\SeoPro\SiteDefaults;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Facades\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Arr;
 
 class GeneralController extends CpController
 {

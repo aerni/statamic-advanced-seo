@@ -2,11 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Statamic\Facades\Fieldset;
-use Statamic\Facades\GlobalSet;
 use Aerni\AdvancedSeo\Facades\Storage;
-use Aerni\AdvancedSeo\Facades\SeoGlobals;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
+use Statamic\Facades\Fieldset;
 
 class OnPageSeoFields extends BaseFields
 {
