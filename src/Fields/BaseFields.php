@@ -2,24 +2,28 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-abstract class BaseFields
-{
-    protected mixed $data;
+use Aerni\AdvancedSeo\Contracts\Fields;
 
-    public function __construct(mixed $data)
+abstract class BaseFields implements Fields
+{
+    protected $data;
+
+    public static function make(): self
+    {
+        return new static();
+    }
+
+    public function data($data): self
     {
         $this->data = $data;
+
+        return $this;
     }
 
-    public static function data(mixed $data): self
-    {
-        return new static($data);
-    }
-
-    public function getConfig(): array
+    public function get(): array
     {
         return array_flatten($this->sections(), 1);
     }
 
-    abstract public function sections(): array;
+    abstract protected function sections(): array;
 }

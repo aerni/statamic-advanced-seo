@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
@@ -46,10 +47,10 @@ class AdvancedSeoFieldtype extends Fieldtype
             $data = $this->field()->parent();
         }
 
-        return OnPageSeoFields::data($data ?? null)->getConfig();
+        return OnPageSeoFields::make()->data($data)->get();
     }
 
-    public function augment($data): mixed
+    public function augment($data)
     {
         if (! is_iterable($data)) {
             return $data;

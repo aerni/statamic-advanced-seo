@@ -2,29 +2,17 @@
 
 namespace Aerni\AdvancedSeo;
 
+use Statamic\Facades\CP\Nav;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    protected $commands = [
-        Commands\SetupSeo::class,
-    ];
-
     protected $fieldtypes = [
         Fieldtypes\AdvancedSeoFieldtype::class,
     ];
 
-    protected $listen = [
-        'Statamic\Events\EntrySaved' => [
-            'Aerni\AdvancedSeo\Listeners\GenerateSocialImage',
-        ],
-        'Statamic\Events\GlobalVariablesBlueprintFound' => [
-            'Aerni\AdvancedSeo\Listeners\AppendSeoGlobalsBlueprint',
-        ],
-    ];
-
     protected $subscribe = [
-        'Aerni\AdvancedSeo\Subscribers\BlueprintSubscriber',
+        'Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber',
     ];
 
     protected $tags = [
@@ -32,6 +20,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $routes = [
+        'cp' => __DIR__.'/../routes/cp.php',
         'web' => __DIR__.'/../routes/web.php',
     ];
 
@@ -43,7 +32,9 @@ class ServiceProvider extends AddonServiceProvider
     {
         parent::boot();
 
-        $this->bootAddonViews();
+        $this
+            ->bootAddonViews()
+            ->bootAddonNav();
     }
 
     protected function bootAddonViews(): self
@@ -53,6 +44,18 @@ class ServiceProvider extends AddonServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views' => resource_path('views/vendor/advanced-seo'),
         ], 'advanced-seo-views');
+
+        return $this;
+    }
+
+    protected function bootAddonNav()
+    {
+        Nav::extend(function ($nav) {
+            $nav->tools('SEO')
+                ->route('advanced-seo.general.index')
+                ->icon('seo-search-graph')
+                ->active('advanced-seo');
+        });
 
         return $this;
     }

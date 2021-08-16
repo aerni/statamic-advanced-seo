@@ -2,13 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Statamic\Fields\Blueprint as BlueprintFields;
-
-interface Blueprint
+interface Fields
 {
     public static function make(): self;
 
     public function data($data): self;
 
-    public function get(): BlueprintFields;
+    public function get(): array;
 }

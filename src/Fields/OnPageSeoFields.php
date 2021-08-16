@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Facades\SeoGlobals;
-use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\GlobalSet;
+use Aerni\AdvancedSeo\Facades\Storage;
+use Aerni\AdvancedSeo\Facades\SeoGlobals;
+use Aerni\AdvancedSeo\Traits\HasAssetField;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -450,13 +451,12 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
-        $globals = GlobalSet::find(SeoGlobals::handle())
-            ->inSelectedSite()
-            ->data()
-            ->get('social_images_collections', []);
+        $enabledCollections = Storage::inSelectedSite()
+            ->get('general')
+            ->get('social_images_generator_collections', []);
 
         // Don't show the generator section if the entry's collection is not configured.
-        if (! in_array($this->data->collection()->handle(), $globals)) {
+        if (! in_array($this->data->collection()->handle(), $enabledCollections)) {
             return false;
         }
 
