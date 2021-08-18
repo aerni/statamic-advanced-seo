@@ -2,8 +2,12 @@
 
 namespace Aerni\AdvancedSeo;
 
+use Statamic\Statamic;
+use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
+use Aerni\AdvancedSeo\Stache\SeoStore;
 use Statamic\Providers\AddonServiceProvider;
+use Aerni\AdvancedSeo\Contracts\SeoRepository;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -32,9 +36,21 @@ class ServiceProvider extends AddonServiceProvider
     {
         parent::boot();
 
-        $this
-            ->bootAddonViews()
-            ->bootAddonNav();
+        Statamic::booted(function () {
+            $this
+                ->bootAddonViews()
+                ->bootAddonNav()
+                ->bootAddonStores();
+        });
+    }
+
+    public function register(): void
+    {
+        $this->app->singleton(SeoRepository::class, function () {
+            $class = \Aerni\AdvancedSeo\Stache\SeoRepository::class;
+
+            return new $class($this->app['stache']);
+        });
     }
 
     protected function bootAddonViews(): self
@@ -56,6 +72,16 @@ class ServiceProvider extends AddonServiceProvider
                 ->icon('seo-search-graph')
                 ->active('advanced-seo');
         });
+
+        return $this;
+    }
+
+    protected function bootAddonStores(): self
+    {
+        $seoStore = new SeoStore();
+        $seoStore->directory(base_path('content/seo'));
+
+        app(Stache::class)->registerStore($seoStore);
 
         return $this;
     }
