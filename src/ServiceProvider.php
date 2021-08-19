@@ -7,7 +7,7 @@ use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Statamic\Providers\AddonServiceProvider;
-use Aerni\AdvancedSeo\Contracts\SeoRepository;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -46,8 +46,8 @@ class ServiceProvider extends AddonServiceProvider
 
     public function register(): void
     {
-        $this->app->singleton(SeoRepository::class, function () {
-            $class = \Aerni\AdvancedSeo\Stache\SeoRepository::class;
+        $this->app->singleton(SeoDefaultsRepository::class, function () {
+            $class = \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class;
 
             return new $class($this->app['stache']);
         });

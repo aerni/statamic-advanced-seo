@@ -8,6 +8,6 @@ class Seo extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Aerni\AdvancedSeo\Contracts\SeoRepository::class;
+        return \Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class;
     }
 }

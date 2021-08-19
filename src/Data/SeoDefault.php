@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
@@ -10,19 +9,22 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Seo
+class SeoDefault
 {
-    use ContainsData, FluentlyGetsAndSets, ExistsAsFile, TracksQueriedColumns;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns;
 
-    protected $id;
     protected $handle;
     protected $type;
     protected $locale;
-    // protected $localizations;
 
-    public function id($id = null)
+    public function __construct()
     {
-        return $this->fluentlyGetOrSet('id')->args(func_get_args());
+        $this->data = collect();
+    }
+
+    public function id()
+    {
+        return $this->handle();
     }
 
     public function handle($handle = null)
