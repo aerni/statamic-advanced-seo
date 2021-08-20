@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Stache;
 
 use Statamic\Stache\Stache;
-use Aerni\AdvancedSeo\Data\SeoDefault;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Statamic\Data\DataCollection;
 use Statamic\Stache\Stores\Store;
 use Aerni\AdvancedSeo\Stache\SeoQueryBuilder;
@@ -20,9 +20,9 @@ class SeoDefaultsRepository implements Contract
         $this->store = $stache->store('seo');
     }
 
-    public function make(): SeoDefault
+    public function make(): SeoDefaultSet
     {
-        return app(SeoDefault::class);
+        return app(SeoDefaultSet::class);
     }
 
     public function all(): DataCollection
@@ -30,29 +30,21 @@ class SeoDefaultsRepository implements Contract
         return $this->query()->get();
     }
 
-    public function find(string $type, string $handle): ?SeoDefault
+    public function find(string $type, string $id): ?SeoDefaultSet
     {
-        return $this->query()
-            ->where('type', $type)
-            ->where('handle', $handle)
-            ->first();
+        return $this->store->getItem("$type::$id");
     }
 
-    public function whereType(string $handle): DataCollection
+    public function save(SeoDefaultSet $set): self
     {
-        return $this->query()->where('type', $handle)->get();
-    }
-
-    public function save(SeoDefault $default): self
-    {
-        $this->store->store($default->type())->save($default);
+        $this->store->save($set);
 
         return $this;
     }
 
-    public function delete($seo): bool
+    public function delete(SeoDefaultSet $set): bool
     {
-        $this->store->delete($seo);
+        $this->store->delete($set);
 
         return true;
     }
