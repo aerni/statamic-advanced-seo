@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Statamic;
-use Statamic\Stache\Stache;
-use Statamic\Facades\CP\Nav;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Statamic\Providers\AddonServiceProvider;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Facades\CP\Nav;
+use Statamic\Providers\AddonServiceProvider;
+use Statamic\Stache\Stache;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {

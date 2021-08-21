@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Stache;
 
-use Statamic\Support\Arr;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Stache\Stores\ChildStore;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Support\Arr;
 use Symfony\Component\Finder\SplFileInfo;
 
 class SeoDefaultsStore extends ChildStore

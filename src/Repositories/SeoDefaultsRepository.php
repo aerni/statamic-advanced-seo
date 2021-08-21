@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Statamic\Stache\Stache;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Statamic\Data\DataCollection;
-use Statamic\Stache\Stores\Store;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Illuminate\Support\Collection;
+use Statamic\Data\DataCollection;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\Store;
 
 class SeoDefaultsRepository implements Contract
 {

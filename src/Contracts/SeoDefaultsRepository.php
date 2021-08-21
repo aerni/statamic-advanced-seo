@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Statamic\Data\DataCollection;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Illuminate\Support\Collection;
+use Statamic\Data\DataCollection;
 
 interface SeoDefaultsRepository
 {

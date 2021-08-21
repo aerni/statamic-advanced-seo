@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Stache;
 
 use Statamic\Stache\Stores\AggregateStore;
-use Aerni\AdvancedSeo\Stache\SeoDefaultsStore;
 
 class SeoStore extends AggregateStore
 {
