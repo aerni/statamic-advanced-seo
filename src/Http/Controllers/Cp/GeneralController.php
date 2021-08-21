@@ -2,12 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use Aerni\AdvancedSeo\Facades\Storage;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+use Statamic\Facades\Site;
+use Illuminate\Http\Request;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Facades\Storage;
+use Statamic\Http\Controllers\CP\CpController;
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
 
 class GeneralController extends CpController
 {
@@ -49,11 +51,27 @@ class GeneralController extends CpController
 
     public function getData(): Collection
     {
-        return Storage::inSelectedSite()->get('general');
+        $set = Seo::find('site', 'general');
+
+        if (! $set) {
+            return collect();
+        }
+
+        return $set->inSelectedSite()->data();
     }
 
     public function storeData(array $data): void
     {
-        Storage::inSelectedSite()->store('general', $data);
+        $set = Seo::find('site', 'general');
+
+        if ($set) {
+            $set->inDefaultSite()->data($data);
+        } else {
+            $set = Seo::make()->type('site')->handle('general');
+            $localization = $set->makeLocalization(Site::default()->handle())->data($data);
+            $set->addLocalization($localization);
+        }
+
+        $set->save();
     }
 }
