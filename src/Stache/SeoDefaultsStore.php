@@ -25,8 +25,6 @@ class SeoDefaultsStore extends ChildStore
     {
         $data = YAML::file($path)->parse($contents);
 
-        // TODO: Deal with single sites. See GlobalsStore.
-
         return Site::hasMultiple()
             ? $this->makeMultiSiteDefaultFromFile($path)
             : $this->makeSingleSiteDefaultFromFile($path, $data);
@@ -38,7 +36,8 @@ class SeoDefaultsStore extends ChildStore
 
         return Seo::make()
             ->handle($handle)
-            ->type($type);
+            ->type($type)
+            ->initialPath($path);
     }
 
     protected function makeSingleSiteDefaultFromFile(string $path, array $data): SeoDefaultSet
