@@ -2,15 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Data\ExistsAsFile;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 
 class SeoDefaultSet implements Contract
 {
-    use FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $handle;
     protected $type;
@@ -38,10 +40,20 @@ class SeoDefaultSet implements Contract
 
     public function path()
     {
-        return vsprintf('%s/%s/', [
+        return vsprintf('%s/%s/%s.yaml', [
             rtrim(Stache::store('seo')->directory(), '/'),
             $this->type(),
+            $this->handle(),
         ]);
+    }
+
+    public function fileData()
+    {
+        if (! Site::hasMultiple()) {
+            return Arr::removeNullValues(
+                $this->in(Site::default()->handle())->data()->all()
+            );
+        }
     }
 
     public function makeLocalization($site)

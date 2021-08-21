@@ -2,15 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Facades\Site;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Contracts\Data\Localization;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class SeoVariables implements Localization
+class SeoVariables
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasOrigin;
 
