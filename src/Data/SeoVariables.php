@@ -79,9 +79,13 @@ class SeoVariables implements Localization
 
     public function fileData(): array
     {
-        return array_merge([
-            'origin' => $this->hasOrigin() ? $this->origin()->locale() : null,
-        ], $this->data()->all());
+        $data = $this->data();
+
+        if (Site::hasMultiple() && $this->hasOrigin()) {
+            $data->set('origin', $this->origin()->locale());
+        }
+
+        return $data->all();
     }
 
     protected function getOriginByString(string $origin): ?self
