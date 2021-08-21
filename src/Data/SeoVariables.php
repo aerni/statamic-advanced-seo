@@ -90,7 +90,7 @@ class SeoVariables implements Localization
         return $data->all();
     }
 
-    protected function getOriginByString(string $origin): ?self
+    protected function getOriginByString($origin)
     {
         return $this->seoSet()->in($origin);
     }
