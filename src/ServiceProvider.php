@@ -47,7 +47,7 @@ class ServiceProvider extends AddonServiceProvider
     public function register(): void
     {
         $this->app->singleton(SeoDefaultsRepository::class, function () {
-            $class = \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class;
+            $class = \Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository::class;
 
             return new $class($this->app['stache']);
         });

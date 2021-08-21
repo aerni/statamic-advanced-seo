@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Stache;
+namespace Aerni\AdvancedSeo\Repositories;
 
 use Statamic\Stache\Stache;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
