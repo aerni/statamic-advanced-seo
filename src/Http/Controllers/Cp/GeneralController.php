@@ -50,24 +50,23 @@ class GeneralController extends CpController
 
     public function getData(): Collection
     {
-        $set = Seo::find('site', 'general');
+        $set = Seo::find('site', 'general')->inSelectedSite();
 
         if (! $set) {
             return collect();
         }
 
-        return $set->inSelectedSite()->data();
+        return $set->data();
     }
 
     public function storeData(array $data): void
     {
-        $set = Seo::find('site', 'general');
+        $set = Seo::find('site', 'general') ?? Seo::make()->type('site')->handle('general');
 
-        if ($set) {
-            $set->inDefaultSite()->data($data);
+        if ($localization = $set->inSelectedSite()) {
+            $localization->data($data);
         } else {
-            $set = Seo::make()->type('site')->handle('general');
-            $localization = $set->makeLocalization(Site::default()->handle())->data($data);
+            $localization = $set->makeLocalization(Site::selected()->handle())->data($data);
             $set->addLocalization($localization);
         }
 
