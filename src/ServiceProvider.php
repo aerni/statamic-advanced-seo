@@ -78,8 +78,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootAddonStores(): self
     {
-        $seoStore = new SeoStore();
-        $seoStore->directory(base_path('content/seo'));
+        $seoStore = app(SeoStore::class)->directory(base_path('content/seo'));
 
         app(Stache::class)->registerStore($seoStore);
 

@@ -2,19 +2,21 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Statamic\Facades\Site;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class SeoVariables
+class SeoVariables implements Localization
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasOrigin;
 
-    protected $set;
-    protected $locale;
+    protected SeoDefaultSet $set;
+    protected string $locale;
 
     public function __construct()
     {
@@ -31,32 +33,31 @@ class SeoVariables
         return $this->fluentlyGetOrSet('locale')->args(func_get_args());
     }
 
-    public function id()
+    public function id(): string
     {
         return $this->seoSet()->id();
     }
 
-    public function handle()
+    public function handle(): string
     {
         return $this->seoSet()->handle();
     }
 
-    public function type()
+    public function type(): string
     {
         return $this->seoSet()->type();
     }
 
-    public function path()
+    public function path(): string
     {
-        return vsprintf('%s/%s/%s%s.yaml', [
-            rtrim(Stache::store('seo')->directory(), '/'),
-            $this->type(),
+        return vsprintf('%s/%s%s.yaml', [
+            Stache::store('seo')->store($this->type())->directory(),
             Site::hasMultiple() ? $this->locale(). '/' : '',
             $this->handle(),
         ]);
     }
 
-    public function save()
+    public function save(): self
     {
         $this
             ->seoSet()
@@ -66,19 +67,24 @@ class SeoVariables
         return $this;
     }
 
-    public function site()
+    public function delete(): self
     {
-        return Site::get($this->locale());
+        $this
+            ->seoSet()
+            ->removeLocalization($this)
+            ->save();
+
+        return $this;
     }
 
-    public function fileData()
+    public function fileData(): array
     {
         return array_merge([
             'origin' => $this->hasOrigin() ? $this->origin()->locale() : null,
         ], $this->data()->all());
     }
 
-    protected function getOriginByString($origin)
+    protected function getOriginByString(string $origin): ?self
     {
         return $this->seoSet()->in($origin);
     }

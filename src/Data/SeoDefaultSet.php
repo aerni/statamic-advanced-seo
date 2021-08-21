@@ -3,9 +3,11 @@
 namespace Aerni\AdvancedSeo\Data;
 
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
@@ -14,11 +16,11 @@ class SeoDefaultSet implements Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
-    protected $handle;
-    protected $type;
-    protected $localizations;
+    protected string $handle;
+    protected string $type;
+    protected array $localizations;
 
-    public function id()
+    public function id(): string
     {
         return $this->handle();
     }
@@ -33,37 +35,47 @@ class SeoDefaultSet implements Contract
         return $this->fluentlyGetOrSet('type')->args(func_get_args());
     }
 
-    public function localizations()
+    public function localizations(): Collection
     {
         return collect($this->localizations);
     }
 
-    public function path()
+    public function title(): string
     {
-        return vsprintf('%s/%s/%s.yaml', [
-            rtrim(Stache::store('seo')->directory(), '/'),
-            $this->type(),
+        return Str::slugToTitle($this->handle());
+    }
+
+    public function path(): string
+    {
+        return vsprintf('%s/%s.yaml', [
+            Stache::store('seo')->store($this->type())->directory(),
             $this->handle(),
         ]);
     }
 
-    public function fileData()
+    public function fileData(): array
     {
+        $data = [
+            'title' => $this->title(),
+        ];
+
         if (! Site::hasMultiple()) {
-            return Arr::removeNullValues(
+            $data['data'] = Arr::removeNullValues(
                 $this->in(Site::default()->handle())->data()->all()
             );
         }
+
+        return $data;
     }
 
-    public function makeLocalization($site)
+    public function makeLocalization(string $site): SeoVariables
     {
         return (new SeoVariables)
             ->seoSet($this)
             ->locale($site);
     }
 
-    public function addLocalization($localization)
+    public function addLocalization(SeoVariables $localization): self
     {
         $localization->seoSet($this);
 
@@ -72,34 +84,34 @@ class SeoDefaultSet implements Contract
         return $this;
     }
 
-    public function removeLocalization($localization)
+    public function removeLocalization(SeoVariables $localization): self
     {
         unset($this->localizations[$localization->locale()]);
 
         return $this;
     }
 
-    public function in($locale)
+    public function in(string $locale): ?SeoVariables
     {
         return $this->localizations[$locale] ?? null;
     }
 
-    public function inSelectedSite()
+    public function inSelectedSite(): ?SeoVariables
     {
         return $this->in(Site::selected()->handle());
     }
 
-    public function inCurrentSite()
+    public function inCurrentSite(): ?SeoVariables
     {
         return $this->in(Site::current()->handle());
     }
 
-    public function inDefaultSite()
+    public function inDefaultSite(): ?SeoVariables
     {
         return $this->in(Site::default()->handle());
     }
 
-    public function existsIn($locale)
+    public function existsIn(string $locale): bool
     {
         return $this->in($locale) !== null;
     }
@@ -116,5 +128,10 @@ class SeoDefaultSet implements Contract
         \Aerni\AdvancedSeo\Facades\Seo::delete($this);
 
         return true;
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return \Aerni\AdvancedSeo\Facades\Seo::{$method}(...$parameters);
     }
 }

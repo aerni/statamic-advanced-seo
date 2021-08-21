@@ -6,10 +6,10 @@ use Statamic\Stache\Stache;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Statamic\Data\DataCollection;
 use Statamic\Stache\Stores\Store;
-use Aerni\AdvancedSeo\Stache\SeoQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
+use Illuminate\Support\Collection;
 
-class SeoDefaultsRepository
+class SeoDefaultsRepository implements Contract
 {
     protected Stache $stache;
     protected Store $store;
@@ -25,16 +25,23 @@ class SeoDefaultsRepository
         return app(SeoDefaultSet::class);
     }
 
+    public function find(string $type, string $id): ?SeoDefaultSet
+    {
+        return $this->store->store($type)->getItem($id);
+    }
+
+    public function all(): Collection
+    {
+        return $this->store->discoverStores()->map(function ($store, $type) {
+            return $this->allOfType($type);
+        });
+    }
+
     public function allOfType(string $type): DataCollection
     {
         $keys = $this->store->store($type)->paths()->keys();
 
         return DataCollection::make($this->store->store($type)->getItems($keys));
-    }
-
-    public function find(string $type, string $id): ?SeoDefaultSet
-    {
-        return $this->store->store($type)->getItem($id);
     }
 
     public function save(SeoDefaultSet $set): self
@@ -49,10 +56,5 @@ class SeoDefaultsRepository
         $this->store->store($set->type())->delete($set);
 
         return true;
-    }
-
-    public function query(): SeoQueryBuilder
-    {
-        return new SeoQueryBuilder($this->store);
     }
 }

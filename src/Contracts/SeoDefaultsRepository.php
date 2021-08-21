@@ -2,21 +2,21 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Aerni\AdvancedSeo\Stache\SeoQueryBuilder;
 use Statamic\Data\DataCollection;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 
 interface SeoDefaultsRepository
 {
     public function make(): SeoDefaultSet;
 
-    public function all(): DataCollection;
+    public function find(string $type, string $id): ?SeoDefaultSet;
 
-    public function find(string $type, string $handle): ?SeoDefaultSet;
+    public function all(): Collection;
 
-    public function save(SeoDefaultSet $default): self;
+    public function allOfType(string $type): DataCollection;
 
-    public function delete(SeoDefaultSet $default): bool;
+    public function save(SeoDefaultSet $set): self;
 
-    public function query(): SeoQueryBuilder;
+    public function delete(SeoDefaultSet $set): bool;
 }
