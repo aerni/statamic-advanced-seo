@@ -100,17 +100,22 @@ class SeoDefaultsStore extends ChildStore
     {
         parent::save($set);
 
-        $set->localizations()->each(function ($localization) {
-            $localization->writeFile();
-        });
+        if (Site::hasMultiple()) {
+            Site::all()->each(function ($site) use ($set) {
+                $site = $site->handle();
+                $set->existsIn($site) ? $set->in($site)->writeFile() : $set->makeLocalization($site)->deleteFile();
+            });
+        }
     }
 
     public function delete($set): void
     {
         parent::delete($set);
 
-        $set->localizations()->each(function ($localization) {
-            $localization->deleteFile();
-        });
+        if (Site::hasMultiple()) {
+            $set->localizations()->each(function ($localization) {
+                $localization->deleteFile();
+            });
+        }
     }
 }
