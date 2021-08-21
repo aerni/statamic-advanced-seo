@@ -47,7 +47,7 @@ class SeoDefaultsStore extends ChildStore
 
         $localization = $set->makeLocalization(Site::default()->handle())
             ->initialPath($path)
-            ->data($data);
+            ->data($data['data'] ?? []);
 
         return $set->addLocalization($localization);
     }
