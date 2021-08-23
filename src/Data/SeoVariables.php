@@ -84,7 +84,7 @@ class SeoVariables implements Localization
         $data = $this->data();
 
         if (Site::hasMultiple() && $this->hasOrigin()) {
-            $data->set('origin', $this->origin()->locale());
+            $data->put('origin', $this->origin()->locale());
         }
 
         return $data->all();
