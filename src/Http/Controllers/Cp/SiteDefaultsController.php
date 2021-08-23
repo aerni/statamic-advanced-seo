@@ -22,9 +22,9 @@ class SiteDefaultsController extends CpController
             ->addValues($siteDefaults)
             ->preProcess();
 
-        return view('advanced-seo::cp/general', [
+        return view('advanced-seo::cp/edit', [
             'title' => 'General SEO Settings',
-            'action' => cp_route('advanced-seo.site.update'),
+            'action' => cp_route('advanced-seo.site.general.update'),
             'blueprint' => $blueprint->toPublishArray(),
             'meta' => $fields->meta(),
             'values' => $fields->values(),

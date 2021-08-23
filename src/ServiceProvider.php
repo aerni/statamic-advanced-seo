@@ -72,7 +72,7 @@ class ServiceProvider extends AddonServiceProvider
                 ->icon('seo-search-graph')
                 ->active('advanced-seo')
                 ->children([
-                    $nav->item('Site Defaults')->route('advanced-seo.site.edit'),
+                    $nav->item('Site Defaults')->route('advanced-seo.site.general.edit'),
                     $nav->item('Content Defaults')->route('advanced-seo.content.index'),
                 ]);
         });

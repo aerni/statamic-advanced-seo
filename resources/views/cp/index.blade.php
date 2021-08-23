@@ -10,7 +10,7 @@
         </div>
         <div class="flex flex-wrap p-2">
             @can('edit seo site defaults')
-                <a href="{{ cp_route('advanced-seo.site.edit') }}" class="flex items-start w-full p-2 rounded-md lg:w-1/2 hover:bg-grey-20 group">
+                <a href="{{ cp_route('advanced-seo.site.general.edit') }}" class="flex items-start w-full p-2 rounded-md lg:w-1/2 hover:bg-grey-20 group">
                     <div class="w-8 h-8 mr-2 text-grey-80">
                         @cp_svg('earth')
                     </div>
