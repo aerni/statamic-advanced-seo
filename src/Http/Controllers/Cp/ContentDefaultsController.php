@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Statamic\Facades\Site;
 use Illuminate\Http\Request;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
 
 abstract class ContentDefaultsController extends CpController

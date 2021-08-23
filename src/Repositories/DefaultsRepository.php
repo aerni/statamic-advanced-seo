@@ -3,10 +3,10 @@
 namespace Aerni\AdvancedSeo\Repositories;
 
 use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Statamic\Fields\Blueprint;
 
 class DefaultsRepository

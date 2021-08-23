@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Fieldset;
-use Aerni\AdvancedSeo\Facades\Storage;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Facades\Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\Site;
 
 class OnPageSeoFields extends BaseFields
 {
