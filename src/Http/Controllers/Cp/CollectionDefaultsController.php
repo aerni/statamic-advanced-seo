@@ -9,8 +9,6 @@ use Aerni\AdvancedSeo\Http\Controllers\Cp\ContentDefaultsController;
 
 class CollectionDefaultsController extends ContentDefaultsController
 {
-    protected string $contentType = 'collections';
-
     protected function getContentItem(string $handle): StatamicCollection
     {
         return Collection::find($handle);

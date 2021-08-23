@@ -8,8 +8,6 @@ use Statamic\Http\Controllers\CP\CpController;
 
 abstract class ContentDefaultsController extends CpController
 {
-    protected string $contentType;
-
     abstract protected function getContentItem(string $handle);
 
     abstract protected function getContentRepository(string $handle);
@@ -34,7 +32,7 @@ abstract class ContentDefaultsController extends CpController
             'breadcrumbTitle' => __('advanced-seo::messages.content'),
             'breadcrumbUrl' => cp_route('advanced-seo.content.index'),
             'title' => $item->title().' SEO',
-            'action' => cp_route("advanced-seo.content.{$this->contentType}.update", $item),
+            'action' => cp_route("advanced-seo.content.{$repository->contentType}.update", $item),
             'blueprint' => $blueprint->toPublishArray(),
             'meta' => $fields->meta(),
             'values' => $fields->values(),

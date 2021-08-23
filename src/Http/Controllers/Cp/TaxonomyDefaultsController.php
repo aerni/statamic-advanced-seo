@@ -9,8 +9,6 @@ use Aerni\AdvancedSeo\Http\Controllers\Cp\ContentDefaultsController;
 
 class TaxonomyDefaultsController extends ContentDefaultsController
 {
-    protected string $contentType = 'taxonomies';
-
     protected function getContentItem(string $handle): StatamicTaxonomy
     {
         return Taxonomy::find($handle);
