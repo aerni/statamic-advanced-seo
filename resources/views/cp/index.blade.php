@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', 'Advanced SEO')
+@section('title', __('advanced-seo::messages.getting_started_title'))
 
 @section('content')
 

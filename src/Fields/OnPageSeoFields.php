@@ -2,9 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Statamic\Facades\Site;
+use Statamic\Facades\Fieldset;
 use Aerni\AdvancedSeo\Facades\Storage;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
-use Statamic\Facades\Fieldset;
+use Facades\Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -449,13 +451,15 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
-        $enabledCollections = Storage::inSelectedSite()
-            ->get('general')
-            ->get('social_images_generator_collections', []);
+        // Only perform this check if we're on an entry.
+        if ($this->data) {
+            $enabledCollections = SiteDefaultsRepository::get(Site::selected()->handle())
+                ->get('social_images_generator_collections', []);
 
-        // Don't show the generator section if the entry's collection is not configured.
-        if (! in_array($this->data->collection()->handle(), $enabledCollections)) {
-            return false;
+            // Don't show the generator section if the entry's collection is not configured.
+            if (! in_array($this->data->collection()->handle(), $enabledCollections)) {
+                return false;
+            }
         }
 
         return true;

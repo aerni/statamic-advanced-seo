@@ -13,7 +13,7 @@ class SiteDefaultsController extends CpController
     {
         $site = $request->site ?? Site::selected()->handle();
 
-        $siteDefaults = SiteDefaultsRepository::get($site);
+        $siteDefaults = SiteDefaultsRepository::get($site)->all();
 
         $blueprint = SiteDefaultsRepository::blueprint();
 
