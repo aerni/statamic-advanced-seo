@@ -68,9 +68,13 @@ class ServiceProvider extends AddonServiceProvider
     {
         Nav::extend(function ($nav) {
             $nav->tools('SEO')
-                ->route('advanced-seo.general.index')
+                ->route('advanced-seo.index')
                 ->icon('seo-search-graph')
-                ->active('advanced-seo');
+                ->active('advanced-seo')
+                ->children([
+                    $nav->item('Site Defaults')->route('advanced-seo.site.edit'),
+                    $nav->item('Content Defaults')->route('advanced-seo.content.index'),
+                ]);
         });
 
         return $this;
