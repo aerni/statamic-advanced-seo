@@ -42,7 +42,7 @@ class SiteDefaultsController extends CpController
         return view('advanced-seo::cp/edit', [
             'breadcrumbTitle' => __('advanced-seo::messages.site'),
             'breadcrumbUrl' => cp_route('advanced-seo.site.index'),
-            'title' => 'General SEO Settings',
+            'title' => 'Global ' . ucfirst($handle) . ' Defaults',
             'action' => cp_route('advanced-seo.site.update', $handle),
             'blueprint' => $blueprint->toPublishArray(),
             'meta' => $fields->meta(),

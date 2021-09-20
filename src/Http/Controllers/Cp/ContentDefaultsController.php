@@ -3,8 +3,10 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Illuminate\Http\Request;
+use Statamic\Entries\Collection;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Taxonomies\Taxonomy;
 
 abstract class ContentDefaultsController extends CpController
 {
@@ -31,7 +33,7 @@ abstract class ContentDefaultsController extends CpController
         return view('advanced-seo::cp/edit', [
             'breadcrumbTitle' => __('advanced-seo::messages.content'),
             'breadcrumbUrl' => cp_route('advanced-seo.content.index'),
-            'title' => $item->title().' SEO',
+            'title' => "Defaults for {$item->title()} {$this->itemType($item)}",
             'action' => cp_route("advanced-seo.content.{$repository->contentType}.update", $item),
             'blueprint' => $blueprint->toPublishArray(),
             'meta' => $fields->meta(),
@@ -53,5 +55,16 @@ abstract class ContentDefaultsController extends CpController
         $values = $fields->process()->values();
 
         $repository->save($site, $values);
+    }
+
+    protected function itemType(mixed $item): string
+    {
+        if ($item instanceof Collection) {
+            return 'Collection';
+        }
+
+        if ($item instanceof Taxonomy) {
+            return 'Taxonomy';
+        }
     }
 }
