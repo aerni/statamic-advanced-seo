@@ -13,6 +13,7 @@ use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Facades\Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
 use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\MarketingBlueprint;
 
 class SeoDefaultSet implements Contract
 {
@@ -119,14 +120,16 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
-    // TODO: This has to be dynamic to correctly augment the data. Maybe add a blueprint repository.
+    // TODO: Maybe add a blueprint repository to make this dynamic.
     public function blueprint()
     {
-        if ($this->type === 'site') {
-            return GeneralBlueprint::make()->get();
-        }
+        $blueprints = [
+            'general' => GeneralBlueprint::make()->get(),
+            'marketing' => MarketingBlueprint::make()->get(),
+            'content' => ContentDefaultsBlueprint::make()->get(),
+        ];
 
-        return ContentDefaultsBlueprint::make()->get();
+        return $blueprints[$this->handle];
     }
 
     public function save(): self
