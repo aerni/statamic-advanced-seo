@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Statamic\Facades\Site;
+use Illuminate\Support\Str;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -57,7 +58,9 @@ class Cascade
 
     protected function onPageSeo(): array
     {
-        return $this->context->get('seo')->value();
+        return $this->context->filter(function ($value, $key) {
+            return Str::contains($key, 'seo_');
+        })->all();
     }
 
     protected function siteDefaults(): array
