@@ -7,54 +7,9 @@ class TrackersFields extends BaseFields
     public function sections(): array
     {
         return [
-            $this->siteVerification(),
             $this->fathom(),
             $this->cloudflare(),
             $this->googleTagManager(),
-        ];
-    }
-
-    protected function siteVerification(): array
-    {
-        if (! config('advanced-seo.trackers.site_verification', true)) {
-            return [];
-        }
-
-        return [
-            [
-                'handle' => 'section_verification',
-                'field' => [
-                    'type' => 'section',
-                    'instructions' => 'Verify your site ownership.',
-                    'display' => 'Site verifications',
-                ],
-            ],
-            [
-                'handle' => 'use_google_site_verification',
-                'field' => [
-                    'type' => 'toggle',
-                    'instructions' => 'Add the `google-site-verification` meta tag to your head.',
-                    'listable' => false,
-                    'display' => 'Google Site Verification',
-                ],
-            ],
-            [
-                'handle' => 'site_verification_code',
-                'field' => [
-                    'input_type' => 'text',
-                    'type' => 'text',
-                    'listable' => 'hidden',
-                    'width' => 50,
-                    'display' => 'Verification Code',
-                    'instructions' => 'Add your site verification code.',
-                    'validate' => [
-                        'required_if:use_google_site_verification,true',
-                    ],
-                    'if' => [
-                        'use_google_site_verification' => 'equals true',
-                    ],
-                ],
-            ],
         ];
     }
 

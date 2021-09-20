@@ -47,7 +47,7 @@ class ServiceProvider extends AddonServiceProvider
     public function register(): void
     {
         $this->app->singleton(SeoDefaultsRepository::class, function () {
-            $class = \Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository::class;
+            $class = \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class;
 
             return new $class($this->app['stache']);
         });
@@ -72,7 +72,7 @@ class ServiceProvider extends AddonServiceProvider
                 ->icon('seo-search-graph')
                 ->active('advanced-seo')
                 ->children([
-                    $nav->item('Site Defaults')->route('advanced-seo.site.general.edit'),
+                    $nav->item('Site Defaults')->route('advanced-seo.site.index'),
                     $nav->item('Content Defaults')->route('advanced-seo.content.index'),
                 ]);
         });

@@ -2,30 +2,34 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Fields\Blueprint;
 
-class DefaultsRepository
+abstract class BaseDefaultsRepository
 {
     public string $contentType;
     public string $handle;
     protected SeoDefaultSet $set;
 
-    public function __construct(string $handle = null)
+    public function __construct(string $handle)
     {
-        // Only assign the handle if none was set by default.
-        $this->handle = $this->handle ?? $handle;
-
+        $this->handle = $handle;
         $this->set = $this->findOrMakeSeoSet($this->handle);
     }
+
+    abstract public function blueprint(): Blueprint;
 
     public function get(string $site): Collection
     {
         return $this->findOrMakeSeoVariables($site)->values();
+    }
+
+    public function toAugmentedArray(string $site): array
+    {
+        return $this->findOrMakeSeoVariables($site)->toAugmentedArray();
     }
 
     public function save(string $site, Collection $data): void
@@ -40,18 +44,15 @@ class DefaultsRepository
         $variables->data($data)->save();
     }
 
-    public function blueprint(): Blueprint
-    {
-        return ContentDefaultsBlueprint::make()->get();
-    }
-
     protected function findOrMakeSeoSet(): SeoDefaultSet
     {
-        return Seo::find($this->contentType, $this->handle) ?? Seo::make()->type($this->contentType)->handle($this->handle);
+        return Seo::find($this->contentType, $this->handle)
+            ?? Seo::make()->type($this->contentType)->handle($this->handle);
     }
 
     protected function findOrMakeSeoVariables(string $site): SeoVariables
     {
-        return $this->set->in($site) ?? $this->set->makeLocalization($site);
+        return $this->set->in($site)
+            ?? $this->set->makeLocalization($site);
     }
 }

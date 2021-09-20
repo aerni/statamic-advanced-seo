@@ -2,10 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
-use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -24,11 +26,16 @@ class OnPageSeoBlueprintSubscriber
 
     public function addFieldsToBlueprint(Event $event): void
     {
-        $event->blueprint->ensureFieldInSection('seo', [
-            'type' => 'advanced_seo',
-            'listable' => false,
-            'display' => 'Advanced SEO',
-        ], 'SEO');
+        if (Str::contains(request()->path(), '/blueprints/' . $event->blueprint->handle()) || app()->runningInConsole()) {
+            return;
+        }
+
+        $contents = array_merge_recursive(
+            $event->blueprint->contents(),
+            OnPageSeoBlueprint::make()->get()->contents()
+        );
+
+        $event->blueprint->setContents($contents);
     }
 
     public function generateSocialImage(Event $event): void

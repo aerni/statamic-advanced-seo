@@ -16,7 +16,7 @@ class SeoDefaultsStore extends ChildStore
 {
     public function getItemFilter(SplFileInfo $file): bool
     {
-        // Only get the Seo Sets that exists in the root. Don't get the Seo Defaults files.
+        // Only get the SeoDefaultSet that exists in the root. Don't get the SeoVariables.
         return substr_count($file->getRelativePathname(), '/') === 0
             && $file->getExtension() === 'yaml';
     }

@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Data\ExistsAsFile;
@@ -10,6 +11,8 @@ use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Facades\Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
 
 class SeoDefaultSet implements Contract
 {
@@ -114,6 +117,16 @@ class SeoDefaultSet implements Contract
     public function existsIn(string $locale): bool
     {
         return $this->in($locale) !== null;
+    }
+
+    // TODO: This has to be dynamic to correctly augment the data. Maybe add a blueprint repository.
+    public function blueprint()
+    {
+        if ($this->type === 'site') {
+            return GeneralBlueprint::make()->get();
+        }
+
+        return ContentDefaultsBlueprint::make()->get();
     }
 
     public function save(): self

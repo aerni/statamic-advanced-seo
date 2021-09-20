@@ -3,45 +3,57 @@
 
 @section('content')
 
-    <div class="flex items-center mb-3">
-        <h1 class="flex-1">{{ __('advanced-seo::messages.content') }}</h1>
+    <div class="mb-3">
+        <h1>{{ __('advanced-seo::messages.content') }}</h1>
     </div>
 
-    <h3 class="pl-0 mb-1 little-heading">{{ __('Collections') }}</h3>
-    <div class="p-0 mb-2 card">
-        <table class="data-table">
-            @foreach (Statamic\Facades\Collection::all() as $collection)
-                    <tr>
-                        <td>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 mr-2">@cp_svg('content-writing')</div>
-                                <a href="{{ cp_route('advanced-seo.content.collections.edit', $collection) }}">{{ $collection->title() }}</a>
-                            </div>
-                        </td>
-                    </tr>
-            @endforeach
-        </table>
-    </div>
-
-    <h3 class="pl-0 mb-1 little-heading">{{ __('Taxonomies') }}</h3>
-    <div class="p-0 mb-2 card">
-        <table class="data-table">
-            @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
-                <tr>
-                    <td>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 mr-2">@cp_svg('tags')</div>
-                            <a href="{{ cp_route('advanced-seo.content.taxonomies.edit', $taxonomy) }}">{{ $taxonomy->title() }}</a>
+    <div class="flex flex-wrap -mx-2 widgets">
+        @if (Statamic\Facades\Collection::all()->count() > 0)
+            <div class="w-full px-2 mb-4 lg:w-1/2 widget">
+                <div class="p-0 card content">
+                    <div class="flex items-start p-3 border-b">
+                        <div class="w-8 h-8 mr-3 text-blue">
+                            @cp_svg('content-writing')
                         </div>
-                    </td>
-                </tr>
-            @endforeach
-        </table>
+                        <div class="flex-1 mt-sm">
+                            <h2 class="mb-0">{{ __('Collections') }}</h2>
+                        </div>
+                    </div>
+                    <div class="p-1.5">
+                        @foreach (Statamic\Facades\Collection::all() as $collection)
+                            <a href="{{ cp_route('advanced-seo.content.collections.edit', $collection) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $collection->title() }}</a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if (Statamic\Facades\Taxonomy::all()->count() > 0)
+            <div class="w-full px-2 mb-4 lg:w-1/2 widget">
+                <div class="p-0 card content">
+                    <div class="flex items-start p-3 border-b">
+                        <div class="w-8 h-8 mr-3 text-blue">
+                            @cp_svg('tags')
+                        </div>
+                        <div class="flex-1 mt-sm">
+                            <h2 class="mb-0">{{ __('Taxonomies') }}</h2>
+                        </div>
+                    </div>
+                    <div class="p-1.5">
+                        @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
+                            <a href="{{ cp_route('advanced-seo.content.taxonomies.edit', $taxonomy) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $taxonomy->title() }}</a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => 'Advanced SEO',
-        'url' => 'https://statamic.com/addons/aerni/advanced-seo'
-    ])
+    <div class="-my-4">
+        @include('statamic::partials.docs-callout', [
+            'topic' => 'Advanced SEO',
+            'url' => 'https://statamic.com/addons/aerni/advanced-seo'
+        ])
+    </div>
 
 @stop

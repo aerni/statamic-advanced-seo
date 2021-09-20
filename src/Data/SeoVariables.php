@@ -2,19 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Contracts\Data\Localization;
+use Statamic\Facades\Site;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Aerni\AdvancedSeo\Data\AugmentedVariables;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class SeoVariables implements Localization
+class SeoVariables implements Localization, Augmentable
 {
     use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
+    use HasAugmentedInstance;
     use HasOrigin;
 
     protected SeoDefaultSet $set;
@@ -90,8 +95,18 @@ class SeoVariables implements Localization
         return $data->all();
     }
 
+    public function blueprint()
+    {
+        return $this->seoSet()->blueprint();
+    }
+
     protected function getOriginByString($origin)
     {
         return $this->seoSet()->in($origin);
+    }
+
+    public function newAugmentedInstance(): Augmented
+    {
+        return new AugmentedVariables($this);
     }
 }

@@ -2,13 +2,18 @@
 
 return [
 
-    'getting_started_title' => 'Advanced SEO',
-    'getting_started_intro' => 'This is the cockpit of your SEO settings',
+    'dashboard_title' => 'Advanced SEO',
 
     'site' => 'Site Defaults',
-    'site_description' => 'Configure the site defaults.',
+    'site_description' => 'Site-wide defaults and settings like site name, favicon, sitemap, and more.',
 
     'content' => 'Content Defaults',
-    'content_description' => 'Configure the content defaults.',
+    'content_description' => 'On-page defaults for specific collections and taxonomies.',
+
+    'general' => 'General',
+    'general_description' => 'Configure general site settings, e.g. site name.',
+
+    'marketing' => 'Marketing',
+    'marketing_description' => 'Configure your analytics trackers and site verifications.',
 
 ];

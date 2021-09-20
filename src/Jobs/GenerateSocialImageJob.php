@@ -53,15 +53,16 @@ class GenerateSocialImageJob implements ShouldQueue
             return false;
         }
 
-        // Get the collections that are allowed to generate social images.
-        $enabledCollections = Storage::inSelectedSite()
-            ->get('general')
-            ->get('social_images_generator_collections', []);
+        // TODO: Make this work with new Stache Store. And do we really need this functionality?
+        // // Get the collections that are allowed to generate social images.
+        // $enabledCollections = Storage::inSelectedSite()
+        //     ->get('general')
+        //     ->get('social_images_generator_collections', []);
 
-        // Shouldn't generate if the entry's collection is not selected.
-        if (! in_array($this->entry->collection()->handle(), $enabledCollections)) {
-            return false;
-        }
+        // // Shouldn't generate if the entry's collection is not selected.
+        // if (! in_array($this->entry->collection()->handle(), $enabledCollections)) {
+        //     return false;
+        // }
 
         // Shouldn't generate if the entry's generator toggle is off.
         if (! Arr::get($this->entry->get('seo'), 'generate_social_images')) {

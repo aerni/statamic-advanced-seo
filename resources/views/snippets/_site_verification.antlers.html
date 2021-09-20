@@ -1,0 +1,13 @@
+{{ if environment === "local" }}
+
+    {{# Google Site Verification #}}
+    {{ if google_site_verification_code }}
+        <meta name="google-site-verification" content="{{ google_site_verification_code }}" />
+    {{ /if }}
+
+    {{# Bing Site Verification #}}
+    {{ if bing_site_verification_code }}
+        <meta name="msvalidate.01" content="{{ bing_site_verification_code }}" />
+    {{ /if }}
+
+{{ /if }}

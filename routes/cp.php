@@ -7,8 +7,9 @@ use Aerni\AdvancedSeo\Http\Controllers\Cp\TaxonomyDefaultsController;
 
 Route::view('advanced-seo', 'advanced-seo::cp.index')->name('advanced-seo.index');
 
-Route::get('advanced-seo/site/general', [SiteDefaultsController::class, 'edit'])->name('advanced-seo.site.general.edit');
-Route::post('advanced-seo/site/general', [SiteDefaultsController::class, 'update'])->name('advanced-seo.site.general.update');
+Route::view('advanced-seo/site', 'advanced-seo::cp.site')->name('advanced-seo.site.index');
+Route::get('advanced-seo/site/{default}', [SiteDefaultsController::class, 'edit'])->name('advanced-seo.site.edit');
+Route::post('advanced-seo/site/{default}', [SiteDefaultsController::class, 'update'])->name('advanced-seo.site.update');
 
 Route::view('advanced-seo/content', 'advanced-seo::cp.content')->name('advanced-seo.content.index');
 Route::get('advanced-seo/content/collections/{collection}', [CollectionDefaultsController::class, 'edit'])->name('advanced-seo.content.collections.edit');

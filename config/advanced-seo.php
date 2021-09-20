@@ -57,7 +57,7 @@ return [
         */
 
         'generator' => [
-            'enabled' => true,
+            'enabled' => false,
             'queue' => 'default',
         ],
 

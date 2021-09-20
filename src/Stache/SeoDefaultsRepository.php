@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Repositories;
+namespace Aerni\AdvancedSeo\Stache;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;

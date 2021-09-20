@@ -2,20 +2,37 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Facades\Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
 use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
 
 class SiteDefaultsController extends CpController
 {
-    public function edit(Request $request)
+    const DEFAULTS = [
+        'general',
+        'marketing',
+    ];
+
+    protected function getSiteRepository(string $handle): SiteDefaultsRepository
     {
+        return new SiteDefaultsRepository($handle);
+    }
+
+    public function edit(Request $request, string $handle)
+    {
+        // We only want to continue if the requested default should exist.
+        if (! in_array($handle, self::DEFAULTS)) {
+            return $this->pageNotFound();
+        }
+
+        $repository = $this->getSiteRepository($handle);
+
         $site = $request->site ?? Site::selected()->handle();
 
-        $siteDefaults = SiteDefaultsRepository::get($site)->all();
+        $siteDefaults = $repository->get($site)->all();
 
-        $blueprint = SiteDefaultsRepository::blueprint();
+        $blueprint = $repository->blueprint();
 
         $fields = $blueprint
             ->fields()
@@ -23,19 +40,22 @@ class SiteDefaultsController extends CpController
             ->preProcess();
 
         return view('advanced-seo::cp/edit', [
+            'breadcrumbTitle' => __('advanced-seo::messages.site'),
+            'breadcrumbUrl' => cp_route('advanced-seo.site.index'),
             'title' => 'General SEO Settings',
-            'action' => cp_route('advanced-seo.site.general.update'),
+            'action' => cp_route('advanced-seo.site.update', $handle),
             'blueprint' => $blueprint->toPublishArray(),
             'meta' => $fields->meta(),
             'values' => $fields->values(),
         ]);
     }
 
-    public function update(Request $request)
+    public function update(string $handle, Request $request)
     {
         $site = $request->site ?? Site::selected()->handle();
 
-        $blueprint = SiteDefaultsRepository::blueprint();
+        $repository = $this->getSiteRepository($handle);
+        $blueprint = $repository->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -43,6 +63,6 @@ class SiteDefaultsController extends CpController
 
         $values = $fields->process()->values();
 
-        SiteDefaultsRepository::save($site, $values);
+        $repository->save($site, $values);
     }
 }

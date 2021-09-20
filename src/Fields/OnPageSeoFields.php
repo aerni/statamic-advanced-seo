@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Traits\HasAssetField;
-use Facades\Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
 
@@ -27,7 +27,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_meta_tags',
+                'handle' => 'seo_section_meta_tags',
                 'field' => [
                     'type' => 'section',
                     'display' => 'Meta Tags',
@@ -35,7 +35,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'title',
+                'handle' => 'seo_title',
                 'field' => [
                     'type' => 'text',
                     'display' => 'Meta Title',
@@ -51,12 +51,12 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'description',
+                'handle' => 'seo_description',
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Meta Description',
                     'instructions' => 'Set the Meta Description of this entry.',
-                    'localizable' => true,
+                    'localizable' => false,
                     'listable' => 'hidden',
                     'character_limit' => 160,
                     'validate' => [
@@ -86,7 +86,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_social_images_generator',
+                'handle' => 'seo_section_social_images_generator',
                 'field' => [
                     'type' => 'section',
                     'display' => 'Generate Social Images',
@@ -95,7 +95,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'generate_social_images',
+                'handle' => 'seo_generate_social_images',
                 'field' => [
                     'type' => 'toggle',
                     'icon' => 'toggle',
@@ -118,12 +118,12 @@ class OnPageSeoFields extends BaseFields
 
         return collect($fieldset->contents()['fields'])->map(function ($field) {
             // Prefix the field handles to avoid naming conflicts.
-            $field['handle'] = "social_images_{$field['handle']}";
+            $field['handle'] = "seo_social_images_{$field['handle']}";
 
             // TODO: This doesn't yet work. Why?!
             // Hide the fields if the toggle is of.
             $field['field']['if'] = [
-                'generate_social_images' => 'equals true',
+                'seo_generate_social_images' => 'equals true',
             ];
 
             return $field;
@@ -134,7 +134,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_og',
+                'handle' => 'seo_section_og',
                 'field' => [
                     'type' => 'section',
                     'display' => 'Open Graph',
@@ -142,7 +142,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'og_title',
+                'handle' => 'seo_og_title',
                 'field' => [
                     'type' => 'text',
                     'display' => 'Open Graph Title',
@@ -158,7 +158,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'og_description',
+                'handle' => 'seo_og_description',
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Open Graph Description',
@@ -173,7 +173,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'og_image',
+                'handle' => 'seo_og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
                     'instructions' => 'Add an Open Graph Image for this entry. The recommended size is `1200x630px`.',
@@ -190,7 +190,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_twitter',
+                'handle' => 'seo_section_twitter',
                 'field' => [
                     'type' => 'section',
                     'display' => 'Twitter',
@@ -198,7 +198,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'twitter_title',
+                'handle' => 'seo_twitter_title',
                 'field' => [
                     'type' => 'text',
                     'display' => 'Twitter Title',
@@ -214,7 +214,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'twitter_description',
+                'handle' => 'seo_twitter_description',
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Twitter Description',
@@ -229,7 +229,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'twitter_image',
+                'handle' => 'seo_twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
                     'instructions' => 'Add a Twitter Image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.',
@@ -247,7 +247,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_canonical_url',
+                'handle' => 'seo_section_canonical_url',
                 'field' => [
                     'type' => 'section',
                     'display' => 'Canonical URL',
@@ -255,7 +255,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'canonical_type',
+                'handle' => 'seo_canonical_type',
                 'field' => [
                     'type' => 'button_group',
                     'icon' => 'button_group',
@@ -271,7 +271,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'canonical_current',
+                'handle' => 'seo_canonical_current',
                 'field' => [
                     'type' => 'entries',
                     'display' => 'Canonical URL',
@@ -282,15 +282,15 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'listable' => 'hidden',
                     'validate' => [
-                        'required_if:canonical_type,current',
+                        'required_if:seo_canonical_type,current',
                     ],
                     'if' => [
-                        'canonical_type' => 'equals current',
+                        'seo_canonical_type' => 'equals current',
                     ],
                 ],
             ],
             [
-                'handle' => 'canonical_external',
+                'handle' => 'seo_canonical_external',
                 'field' => [
                     'type' => 'text',
                     'display' => 'Canonical URL',
@@ -298,10 +298,10 @@ class OnPageSeoFields extends BaseFields
                     'icon' => 'text',
                     'listable' => 'hidden',
                     'validate' => [
-                        'required_if:canonical_type,external',
+                        'required_if:seo_canonical_type,external',
                     ],
                     'if' => [
-                        'canonical_type' => 'equals external',
+                        'seo_canonical_type' => 'equals external',
                     ],
                 ],
             ],
@@ -312,7 +312,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_indexing',
+                'handle' => 'seo_section_indexing',
                 'field' => [
                     'type' => 'section',
                     'display' => 'Indexing',
@@ -320,7 +320,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'noindex',
+                'handle' => 'seo_noindex',
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Noindex',
@@ -330,7 +330,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'nofollow',
+                'handle' => 'seo_nofollow',
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Nofollow',
@@ -346,7 +346,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_sitemap',
+                'handle' => 'seo_section_sitemap',
                 'field' => [
                     'type' => 'section',
                     'display' => 'Sitemap',
@@ -354,7 +354,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'sitemap_priority',
+                'handle' => 'seo_sitemap_priority',
                 'field' => [
                     'type' => 'select',
                     'display' => 'Priority',
@@ -384,7 +384,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'sitemap_change_frequency',
+                'handle' => 'seo_sitemap_change_frequency',
                 'field' => [
                     'type' => 'select',
                     'display' => 'Change Frequency',
@@ -416,7 +416,7 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_json_ld',
+                'handle' => 'seo_section_json_ld',
                 'field' => [
                     'type' => 'section',
                     'display' => 'JSON-ld Schema',
@@ -424,7 +424,7 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'json_ld',
+                'handle' => 'seo_json_ld',
                 'field' => [
                     'type' => 'code',
                     'icon' => 'code',
@@ -452,7 +452,7 @@ class OnPageSeoFields extends BaseFields
 
         // Only perform this check if we're on an entry.
         if ($this->data) {
-            $enabledCollections = SiteDefaultsRepository::get(Site::selected()->handle())
+            $enabledCollections = (new SiteDefaultsRepository('general'))->get(Site::selected()->handle())
                 ->get('social_images_generator_collections', []);
 
             // Don't show the generator section if the entry's collection is not configured.
