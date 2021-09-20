@@ -11,10 +11,6 @@ use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    protected $fieldtypes = [
-        Fieldtypes\AdvancedSeoFieldtype::class,
-    ];
-
     protected $subscribe = [
         'Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber',
     ];
