@@ -37,7 +37,7 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_title',
                 'field' => [
-                    'type' => 'text',
+                    'type' => 'seo_meta_title',
                     'display' => 'Meta Title',
                     'instructions' => 'Set the Meta Title of this entry. Defaults to the entry\'s `Title`.',
                     'localizable' => true,
