@@ -57,7 +57,7 @@ abstract class ContentDefaultsController extends CpController
         $repository->save($site, $values);
     }
 
-    protected function itemType(mixed $item): string
+    protected function itemType($item): string
     {
         if ($item instanceof Collection) {
             return 'Collection';
