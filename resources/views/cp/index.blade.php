@@ -7,34 +7,37 @@
         <h1>{{ __('advanced-seo::messages.dashboard_title') }}</h1>
     </div>
 
-    {{-- Links to Site Defaults subpage --}}
     <div class="flex flex-wrap -mx-2 widgets">
-        <div class="w-full px-2 mb-4 lg:w-1/2 widget">
-            <div class="h-full p-0 overflow-hidden card content">
-                <a href="{{ cp_route('advanced-seo.site.index') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
-                    <div class="w-8 h-8 mr-3 text-blue">
-                        @cp_svg('sites')
-                    </div>
-                    <div class="flex-1 mt-sm">
-                        <h2>{{ __('advanced-seo::messages.site') }}</h2>
-                        <p>{{ __('advanced-seo::messages.site_description') }}</p>
-                    </div>
-                </a>
+        @can('siteDefaultsIndex', Aerni\AdvancedSeo\Data\SeoVariables::class)
+            <div class="w-full px-2 mb-4 lg:w-1/2 widget">
+                <div class="h-full p-0 overflow-hidden card content">
+                    <a href="{{ cp_route('advanced-seo.show', 'site') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
+                        <div class="w-8 h-8 mr-3 text-blue">
+                            @cp_svg('sites')
+                        </div>
+                        <div class="flex-1 mt-sm">
+                            <h2>{{ __('advanced-seo::messages.site') }}</h2>
+                            <p>{{ __('advanced-seo::messages.site_description') }}</p>
+                        </div>
+                    </a>
+                </div>
             </div>
-        </div>
-        <div class="w-full px-2 mb-4 lg:w-1/2 widget">
-            <div class="h-full p-0 overflow-hidden card content">
-                <a href="{{ cp_route('advanced-seo.content.index') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
-                    <div class="w-8 h-8 mr-3 text-blue">
-                        @cp_svg('content-writing')
-                    </div>
-                    <div class="flex-1 mt-sm">
-                        <h2>{{ __('advanced-seo::messages.content') }}</h2>
-                        <p>{{ __('advanced-seo::messages.content_description') }}</p>
-                    </div>
-                </a>
+        @endcan
+        @can('contentDefaultsIndex', Aerni\AdvancedSeo\Data\SeoVariables::class)
+            <div class="w-full px-2 mb-4 lg:w-1/2 widget">
+                <div class="h-full p-0 overflow-hidden card content">
+                    <a href="{{ cp_route('advanced-seo.show', 'content') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
+                        <div class="w-8 h-8 mr-3 text-blue">
+                            @cp_svg('content-writing')
+                        </div>
+                        <div class="flex-1 mt-sm">
+                            <h2>{{ __('advanced-seo::messages.content') }}</h2>
+                            <p>{{ __('advanced-seo::messages.content_description') }}</p>
+                        </div>
+                    </a>
+                </div>
             </div>
-        </div>
+        @endcan
     </div>
 
     {{-- <div class="flex flex-wrap -mx-2 widgets">
@@ -145,11 +148,6 @@
         @endif
     </div> --}}
 
-    <div class="-my-4">
-        @include('statamic::partials.docs-callout', [
-            'topic' => 'Advanced SEO',
-            'url' => 'https://statamic.com/addons/aerni/advanced-seo'
-        ])
-    </div>
+    @include('advanced-seo::cp/_docs_callout')
 
 @endsection

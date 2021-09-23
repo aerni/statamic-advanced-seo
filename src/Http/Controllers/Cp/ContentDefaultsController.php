@@ -2,50 +2,85 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Illuminate\Http\Request;
-use Statamic\Entries\Collection;
 use Statamic\Facades\Site;
-use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Taxonomies\Taxonomy;
+use Statamic\Facades\User;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\BaseDefaultsController;
 
-abstract class ContentDefaultsController extends CpController
+abstract class ContentDefaultsController extends BaseDefaultsController
 {
-    abstract protected function getContentItem(string $handle);
-
-    abstract protected function getContentRepository(string $handle);
-
     public function edit(Request $request, string $handle)
     {
-        $item = $this->getContentItem($handle);
-        $repository = $this->getContentRepository($handle);
+        $this->authorize("view $this->type defaults");
+
+        // TODO: Should we check here if the $handle is an collection/taxonomy collection and return if not?
+
+        $repository = $this->repository($handle);
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $collectionDefaults = $repository->get($site)->all();
+        $set = $repository->findOrMakeSeoSet();
 
-        $blueprint = $repository->blueprint();
+        $variables = $repository->ensureSeoVariables()->get($site);
 
-        $fields = $blueprint
-            ->fields()
-            ->addValues($collectionDefaults)
-            ->preProcess();
+        $blueprint = $variables->blueprint();
 
-        return view('advanced-seo::cp/edit', [
-            'breadcrumbTitle' => __('advanced-seo::messages.content'),
-            'breadcrumbUrl' => cp_route('advanced-seo.content.index'),
-            'title' => "Defaults for {$item->title()} {$this->itemType($item)}",
-            'action' => cp_route("advanced-seo.content.{$repository->contentType}.update", $item),
+        [$values, $meta] = $this->extractFromFields($variables, $blueprint);
+
+        if ($hasOrigin = $variables->hasOrigin()) {
+            [$originValues, $originMeta] = $this->extractFromFields($variables->origin(), $blueprint);
+        }
+
+        $user = User::fromUser($request->user());
+
+        $viewData = [
+            'defaultsUrl' => cp_route('advanced-seo.show', 'content'),
+            'defaultsTitle' => __('advanced-seo::messages.content') . ' / ' . str_plural(Str::title($this->type)),
+            'reference' => $variables->reference(),
+            'editing' => true,
+            'actions' => [
+                'save' => $variables->updateUrl(),
+            ],
+            'values' => $values,
+            'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
-            'meta' => $fields->meta(),
-            'values' => $fields->values(),
-        ]);
+            'locale' => $variables->locale(),
+            'localizedFields' => $variables->data()->keys()->all(),
+            'isRoot' => $variables->isRoot(),
+            'hasOrigin' => $hasOrigin,
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
+            'localizations' => $variables->seoSet()->localizations()->map(function ($localized) use ($variables) {
+                return [
+                    'handle' => $localized->locale(),
+                    'name' => $localized->site()->name(),
+                    'active' => $localized->locale() === $variables->locale(),
+                    'origin' => ! $localized->hasOrigin(),
+                    'url' => $localized->editUrl(),
+                ];
+            })->values()->all(),
+            'canEdit' => $user->can("edit $this->type defaults"),
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('advanced-seo::cp/edit', array_merge($viewData, [
+            'set' => $set,
+            'variables' => $variables,
+        ]));
     }
 
     public function update(string $handle, Request $request)
     {
+        $this->authorize("edit $this->type defaults");
+
         $site = $request->site ?? Site::selected()->handle();
 
-        $repository = $this->getContentRepository($handle);
+        $repository = $this->repository($handle);
+
         $blueprint = $repository->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
@@ -57,14 +92,5 @@ abstract class ContentDefaultsController extends CpController
         $repository->save($site, $values);
     }
 
-    protected function itemType($item): string
-    {
-        if ($item instanceof Collection) {
-            return 'Collection';
-        }
-
-        if ($item instanceof Taxonomy) {
-            return 'Taxonomy';
-        }
-    }
+    abstract protected function repository(string $handle);
 }

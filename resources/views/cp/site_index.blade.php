@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex flex-wrap -mx-2 widgets">
-        @can('edit seo site defaults')
+        @can('view general defaults')
             <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                 <div class="h-full p-0 overflow-hidden card content">
                     <a href="{{ cp_route('advanced-seo.site.edit', 'general') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
@@ -23,7 +23,7 @@
                 </div>
             </div>
         @endcan
-        @can('edit seo general defaults')
+        @can('view marketing defaults')
             <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                 <div class="h-full p-0 overflow-hidden card content">
                     <a href="{{ cp_route('advanced-seo.site.edit', 'marketing') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
@@ -40,11 +40,6 @@
         @endcan
     </div>
 
-    <div class="-my-4">
-        @include('statamic::partials.docs-callout', [
-            'topic' => 'Advanced SEO',
-            'url' => 'https://statamic.com/addons/aerni/advanced-seo'
-        ])
-    </div>
+    @include('advanced-seo::cp/_docs_callout')
 
 @endsection

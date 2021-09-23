@@ -8,6 +8,11 @@ use Aerni\AdvancedSeo\Fields\SiteVerificationFields;
 
 class MarketingBlueprint extends BaseBlueprint
 {
+    protected function handle(): string
+    {
+        return 'marketing';
+    }
+
     protected function sections(): array
     {
         return [

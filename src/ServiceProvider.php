@@ -2,12 +2,16 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Statamic\Facades\CP\Nav;
-use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
 use Statamic\Statamic;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Permission;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Providers\AddonServiceProvider;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -32,6 +36,10 @@ class ServiceProvider extends AddonServiceProvider
         __DIR__.'/../resources/dist/js/cp.js',
     ];
 
+    protected $policies = [
+        \Aerni\AdvancedSeo\Data\SeoVariables::class => \Aerni\AdvancedSeo\Policies\SeoVariablesPolicy::class,
+    ];
+
     public function boot(): void
     {
         parent::boot();
@@ -40,7 +48,8 @@ class ServiceProvider extends AddonServiceProvider
             $this
                 ->bootAddonViews()
                 ->bootAddonNav()
-                ->bootAddonStores();
+                ->bootAddonStores()
+                ->bootAddonPermissions();
         });
     }
 
@@ -68,12 +77,17 @@ class ServiceProvider extends AddonServiceProvider
     {
         Nav::extend(function ($nav) {
             $nav->tools('SEO')
+                ->can('index', SeoVariables::class)
                 ->route('advanced-seo.index')
                 ->icon('seo-search-graph')
                 ->active('advanced-seo')
                 ->children([
-                    $nav->item('Site Defaults')->route('advanced-seo.site.index'),
-                    $nav->item('Content Defaults')->route('advanced-seo.content.index'),
+                    $nav->item('Site Defaults')
+                        ->route('advanced-seo.show', 'site')
+                        ->can('siteDefaultsIndex', SeoVariables::class),
+                    $nav->item('Content Defaults')
+                        ->route('advanced-seo.show', 'content')
+                        ->can('contentDefaultsIndex', SeoVariables::class),
                 ]);
         });
 
@@ -85,6 +99,78 @@ class ServiceProvider extends AddonServiceProvider
         $seoStore = app(SeoStore::class)->directory(base_path('content/seo'));
 
         app(Stache::class)->registerStore($seoStore);
+
+        return $this;
+    }
+
+    protected function bootAddonPermissions(): self
+    {
+        // TODO: This could maybe be dynamic with a repository.
+
+        $siteGroup = collect([
+            [
+                'value' => 'general',
+                'label' => 'General',
+            ],
+            [
+                'value' => 'marketing',
+                'label' => 'Marketing',
+            ],
+        ]);
+
+        $contentGroup = collect([
+            [
+                'value' => 'collection',
+                'label' => 'Collection',
+            ],
+            [
+                'value' => 'taxonomy',
+                'label' => 'Taxonomy',
+            ],
+        ]);
+
+        Permission::group('seo', 'SEO', function () use ($siteGroup, $contentGroup) {
+            Permission::register('view site defaults', function ($permission) use ($siteGroup) {
+                $permission
+                    ->label('View Site Defaults')
+                    ->children([
+                        Permission::make('view {group} defaults')
+                            ->label('View :group Defaults')
+                            ->replacements('group', function () use ($siteGroup) {
+                                return $siteGroup->map(function ($item) {
+                                    return [
+                                        'value' => $item['value'],
+                                        'label' => $item['label'],
+                                    ];
+                                });
+                            })
+                            ->children([
+                                Permission::make('edit {group} defaults')
+                                    ->label('Edit :group Defaults')
+                            ])
+                    ]);
+            });
+            Permission::register('view content defaults', function ($permission) use ($contentGroup) {
+                $permission
+                    ->label('View Content Defaults')
+                    ->children([
+                        Permission::make('view {group} defaults')
+                            ->label('View :group Defaults')
+                            ->replacements('group', function () use ($contentGroup) {
+                                return $contentGroup->map(function ($item) {
+                                    return [
+                                        'value' => $item['value'],
+                                        'label' => $item['label'],
+                                    ];
+                                });
+                            })
+                            ->children([
+                                Permission::make('edit {group} defaults')
+                                    ->label('Edit :group Defaults')
+                            ])
+                    ]);
+            });
+        });
 
         return $this;
     }

@@ -25,7 +25,9 @@ abstract class BaseBlueprint implements Contract
 
     public function get(): BlueprintFields
     {
-        return Blueprint::make()->setContents(['sections' => $this->processSections()]);
+        return Blueprint::make()
+            ->setHandle($this->handle())
+            ->setContents(['sections' => $this->processSections()]);
     }
 
     protected function processSections(): array
@@ -41,4 +43,6 @@ abstract class BaseBlueprint implements Contract
     }
 
     abstract protected function sections(): array;
+
+    abstract protected function handle(): string;
 }

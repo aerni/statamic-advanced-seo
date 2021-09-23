@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 
 abstract class BaseDefaultsRepository
@@ -44,7 +45,7 @@ abstract class BaseDefaultsRepository
         $variables->data($data)->save();
     }
 
-    protected function findOrMakeSeoSet(): SeoDefaultSet
+    public function findOrMakeSeoSet(): SeoDefaultSet
     {
         return Seo::find($this->contentType, $this->handle)
             ?? Seo::make()->type($this->contentType)->handle($this->handle);
@@ -54,5 +55,23 @@ abstract class BaseDefaultsRepository
     {
         return $this->set->in($site)
             ?? $this->set->makeLocalization($site);
+    }
+
+    public function ensureSeoVariables(): Collection
+    {
+        return Site::all()->map(function ($site) {
+            return $this->set->in($site) ?? $this->makeLocalization($site);
+        });
+    }
+
+    protected function makeLocalization(string $site): SeoVariables
+    {
+        $defaultSite = Site::default()->handle();
+
+        if ($site === $defaultSite) {
+            return $this->set->makeLocalization($site)->save();
+        }
+
+        return $this->set->makeLocalization($site)->origin($defaultSite)->save();
     }
 }

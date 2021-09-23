@@ -9,6 +9,11 @@ use Aerni\AdvancedSeo\Fields\SocialFields;
 
 class GeneralBlueprint extends BaseBlueprint
 {
+    protected function handle(): string
+    {
+        return 'general';
+    }
+
     protected function sections(): array
     {
         return [

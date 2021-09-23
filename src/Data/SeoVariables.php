@@ -50,6 +50,11 @@ class SeoVariables implements Localization, Augmentable
         return $this->seoSet()->handle();
     }
 
+    public function title(): string
+    {
+        return $this->seoSet()->title();
+    }
+
     public function type(): string
     {
         return $this->seoSet()->type();
@@ -62,6 +67,35 @@ class SeoVariables implements Localization, Augmentable
             Site::hasMultiple() ? $this->locale(). '/' : '',
             $this->handle(),
         ]);
+    }
+
+    public function editUrl()
+    {
+        return [
+            'site' => $this->cpUrl('advanced-seo.site.edit'),
+            'collections' => $this->cpUrl('advanced-seo.content.collections.edit'),
+            'taxonomies' => $this->cpUrl('advanced-seo.content.taxonomies.edit'),
+        ][$this->type()];
+    }
+
+    public function updateUrl()
+    {
+        return [
+            'site' => $this->cpUrl('advanced-seo.site.update'),
+            'collections' => $this->cpUrl('advanced-seo.content.collections.update'),
+            'taxonomies' => $this->cpUrl('advanced-seo.content.taxonomies.update'),
+        ][$this->type()];
+    }
+
+    protected function cpUrl($route)
+    {
+        $params = [$this->handle()];
+
+        if (Site::hasMultiple()) {
+            $params['site'] = $this->locale();
+        }
+
+        return cp_route($route, $params);
     }
 
     public function save(): self
@@ -93,6 +127,16 @@ class SeoVariables implements Localization, Augmentable
         }
 
         return $data->all();
+    }
+
+    public function site()
+    {
+        return Site::get($this->locale());
+    }
+
+    public function reference(): string
+    {
+        return "seo::{$this->id()}";
     }
 
     public function blueprint()

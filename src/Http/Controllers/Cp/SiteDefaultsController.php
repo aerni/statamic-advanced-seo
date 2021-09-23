@@ -2,59 +2,93 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
-use Illuminate\Http\Request;
 use Statamic\Facades\Site;
-use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Facades\User;
+use Illuminate\Http\Request;
+use Aerni\AdvancedSeo\Traits\ValidateType;
+use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\BaseDefaultsController;
 
-class SiteDefaultsController extends CpController
+class SiteDefaultsController extends BaseDefaultsController
 {
-    const DEFAULTS = [
-        'general',
-        'marketing',
-    ];
+    use ValidateType;
 
-    protected function getSiteRepository(string $handle): SiteDefaultsRepository
-    {
-        return new SiteDefaultsRepository($handle);
-    }
+    // TODO: This should probably be put in a repository.
+    protected array $allowedTypes = ['general', 'marketing'];
 
     public function edit(Request $request, string $handle)
     {
-        // We only want to continue if the requested default should exist.
-        if (! in_array($handle, self::DEFAULTS)) {
-            return $this->pageNotFound();
-        }
+        $this->authorize("view $handle defaults");
 
-        $repository = $this->getSiteRepository($handle);
+        if (! $this->isValidType($handle)) {
+            return $this->pageNotFound();
+        };
+
+        $repository = $this->repository($handle);
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $siteDefaults = $repository->get($site)->all();
+        $set = $repository->findOrMakeSeoSet();
 
-        $blueprint = $repository->blueprint();
+        $variables = $repository->ensureSeoVariables()->get($site);
 
-        $fields = $blueprint
-            ->fields()
-            ->addValues($siteDefaults)
-            ->preProcess();
+        $blueprint = $variables->blueprint();
 
-        return view('advanced-seo::cp/edit', [
-            'breadcrumbTitle' => __('advanced-seo::messages.site'),
-            'breadcrumbUrl' => cp_route('advanced-seo.site.index'),
-            'title' => 'Global ' . ucfirst($handle) . ' Defaults',
-            'action' => cp_route('advanced-seo.site.update', $handle),
+        [$values, $meta] = $this->extractFromFields($variables, $blueprint);
+
+        if ($hasOrigin = $variables->hasOrigin()) {
+            [$originValues, $originMeta] = $this->extractFromFields($variables->origin(), $blueprint);
+        }
+
+        $user = User::fromUser($request->user());
+
+        $viewData = [
+            'defaultsUrl' => cp_route('advanced-seo.show', 'site'),
+            'defaultsTitle' => __('advanced-seo::messages.site'),
+            'reference' => $variables->reference(),
+            'editing' => true,
+            'actions' => [
+                'save' => $variables->updateUrl(),
+            ],
+            'values' => $values,
+            'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
-            'meta' => $fields->meta(),
-            'values' => $fields->values(),
-        ]);
+            'locale' => $variables->locale(),
+            'localizedFields' => $variables->data()->keys()->all(),
+            'isRoot' => $variables->isRoot(),
+            'hasOrigin' => $hasOrigin,
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
+            'localizations' => $variables->seoSet()->localizations()->map(function ($localized) use ($variables) {
+                return [
+                    'handle' => $localized->locale(),
+                    'name' => $localized->site()->name(),
+                    'active' => $localized->locale() === $variables->locale(),
+                    'origin' => ! $localized->hasOrigin(),
+                    'url' => $localized->editUrl(),
+                ];
+            })->values()->all(),
+            'canEdit' => $user->can("edit $handle defaults"),
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('advanced-seo::cp/edit', array_merge($viewData, [
+            'set' => $set,
+            'variables' => $variables,
+        ]));
     }
 
     public function update(string $handle, Request $request)
     {
+        $this->authorize("edit $handle defaults");
+
         $site = $request->site ?? Site::selected()->handle();
 
-        $repository = $this->getSiteRepository($handle);
+        $repository = $this->repository($handle);
+
         $blueprint = $repository->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
@@ -64,5 +98,10 @@ class SiteDefaultsController extends CpController
         $values = $fields->process()->values();
 
         $repository->save($site, $values);
+    }
+
+    protected function repository(string $handle): SiteDefaultsRepository
+    {
+        return new SiteDefaultsRepository($handle);
     }
 }

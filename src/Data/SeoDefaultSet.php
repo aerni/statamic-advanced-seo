@@ -2,18 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Globals\GlobalSet as Contract;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Facades\Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
-use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\MarketingBlueprint;
+use Statamic\Contracts\Globals\GlobalSet as Contract;
 
 class SeoDefaultSet implements Contract
 {
@@ -124,10 +120,15 @@ class SeoDefaultSet implements Contract
     public function blueprint()
     {
         $blueprints = [
-            'general' => GeneralBlueprint::make()->get(),
-            'marketing' => MarketingBlueprint::make()->get(),
-            'content' => ContentDefaultsBlueprint::make()->get(),
+            'general' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::make()->get(),
+            'marketing' => \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::make()->get(),
+            'collections' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->get(),
+            'taxonomies' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->get(),
         ];
+
+        if (in_array($this->type(), ['collections', 'taxonomies'])) {
+            return $blueprints[$this->type()];
+        }
 
         return $blueprints[$this->handle];
     }

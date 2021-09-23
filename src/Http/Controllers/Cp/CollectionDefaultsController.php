@@ -3,17 +3,12 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
-use Statamic\Entries\Collection as StatamicCollection;
-use Statamic\Facades\Collection;
 
 class CollectionDefaultsController extends ContentDefaultsController
 {
-    protected function getContentItem(string $handle): StatamicCollection
-    {
-        return Collection::find($handle);
-    }
+    protected string $type = 'collection';
 
-    protected function getContentRepository(string $handle): CollectionDefaultsRepository
+    protected function repository(string $handle): CollectionDefaultsRepository
     {
         return new CollectionDefaultsRepository($handle);
     }
