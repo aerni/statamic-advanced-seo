@@ -2,10 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Statamic\Fields\Blueprint;
 use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
 use Aerni\AdvancedSeo\Blueprints\MarketingBlueprint;
-use Aerni\AdvancedSeo\Repositories\BaseDefaultsRepository;
+use Statamic\Fields\Blueprint;
 
 class SiteDefaultsRepository extends BaseDefaultsRepository
 {

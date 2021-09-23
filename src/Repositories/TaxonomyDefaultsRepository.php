@@ -2,9 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Statamic\Fields\Blueprint;
 use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
-use Aerni\AdvancedSeo\Repositories\BaseDefaultsRepository;
+use Statamic\Fields\Blueprint;
 
 class TaxonomyDefaultsRepository extends BaseDefaultsRepository
 {

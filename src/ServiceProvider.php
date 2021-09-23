@@ -2,21 +2,19 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Statamic;
-use Statamic\Stache\Stache;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Stache\SeoStore;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Stache\SeoStore;
 use Statamic\Providers\AddonServiceProvider;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Stache\Stache;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
     protected $fieldtypes = [
-        Fieldtypes\SeoMetaTitleFieldtype::class
+        Fieldtypes\SeoMetaTitleFieldtype::class,
     ];
 
     protected $subscribe = [
@@ -146,8 +144,8 @@ class ServiceProvider extends AddonServiceProvider
                             })
                             ->children([
                                 Permission::make('edit {group} defaults')
-                                    ->label('Edit :group Defaults')
-                            ])
+                                    ->label('Edit :group Defaults'),
+                            ]),
                     ]);
             });
             Permission::register('view content defaults', function ($permission) use ($contentGroup) {
@@ -166,8 +164,8 @@ class ServiceProvider extends AddonServiceProvider
                             })
                             ->children([
                                 Permission::make('edit {group} defaults')
-                                    ->label('Edit :group Defaults')
-                            ])
+                                    ->label('Edit :group Defaults'),
+                            ]),
                     ]);
             });
         });

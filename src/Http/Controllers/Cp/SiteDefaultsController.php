@@ -2,12 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Traits\ValidateType;
+use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Aerni\AdvancedSeo\Traits\ValidateType;
-use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\BaseDefaultsController;
 
 class SiteDefaultsController extends BaseDefaultsController
 {

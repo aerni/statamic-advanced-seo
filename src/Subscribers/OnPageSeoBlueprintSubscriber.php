@@ -3,11 +3,11 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Illuminate\Support\Str;
-use Illuminate\Events\Dispatcher;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
 
 class OnPageSeoBlueprintSubscriber
 {

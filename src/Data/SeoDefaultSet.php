@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Globals\GlobalSet as Contract;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Collection;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Globals\GlobalSet as Contract;
 
 class SeoDefaultSet implements Contract
 {

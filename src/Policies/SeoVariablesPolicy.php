@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
-use Statamic\Facades\User as UserFacade;
 use Statamic\Contracts\Auth\User;
+use Statamic\Facades\User as UserFacade;
 
 class SeoVariablesPolicy
 {

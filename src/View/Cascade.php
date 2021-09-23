@@ -2,17 +2,16 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\Site;
-use Illuminate\Support\Str;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Sites\Site as StatamicSite;
-use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
-use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
 use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
+use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
+use Statamic\Sites\Site as StatamicSite;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Cascade
 {

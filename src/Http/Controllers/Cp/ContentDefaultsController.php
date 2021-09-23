@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\BaseDefaultsController;
 
 abstract class ContentDefaultsController extends BaseDefaultsController
 {

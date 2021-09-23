@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
-use Aerni\AdvancedSeo\Facades\Seo;
 
 class SeoMetaTitleFieldtype extends Fieldtype
 {

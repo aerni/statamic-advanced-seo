@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
 

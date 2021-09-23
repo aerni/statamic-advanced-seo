@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Fields\IndexingFields;
-use Aerni\AdvancedSeo\Fields\TrackersFields;
 use Aerni\AdvancedSeo\Fields\SiteVerificationFields;
+use Aerni\AdvancedSeo\Fields\TrackersFields;
 
 class MarketingBlueprint extends BaseBlueprint
 {
