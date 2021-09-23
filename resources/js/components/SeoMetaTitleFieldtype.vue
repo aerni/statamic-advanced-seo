@@ -23,7 +23,10 @@
             },
 
             siteName() {
-                return `${this.siteDefaults.title_separator} ${this.siteDefaults.site_name}`
+                let titleSeparator = this.siteDefaults.title_separator ?? ''
+                let siteName = this.siteDefaults.site_name ?? ''
+
+                return `${titleSeparator} ${siteName}`
             },
 
             siteDefaults() {
