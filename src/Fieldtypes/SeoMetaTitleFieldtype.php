@@ -24,7 +24,7 @@ class SeoMetaTitleFieldtype extends Fieldtype
         // Load the localized content defaults if we're on an entry.
         if ($this->field->parent()) {
             $contentDefaults = Site::all()->map(function ($site) {
-                return Seo::find('collections', $this->collectionHandle())
+                return Seo::find($this->type(), $this->typeHandle())
                     ->in($site->handle())
                     ->values()
                     ->only('seo_title')
@@ -37,12 +37,45 @@ class SeoMetaTitleFieldtype extends Fieldtype
         return $defaults;
     }
 
-    protected function collectionHandle(): string
+    protected function type(): string
     {
         $parent = $this->field->parent();
 
-        return $parent instanceof \Statamic\Entries\Collection
-            ? $parent->handle()
-            : $parent->collection()->handle();
+        if ($parent instanceof \Statamic\Entries\Collection) {
+            return 'collections';
+        }
+
+        if ($parent instanceof \Statamic\Entries\Entry) {
+            return 'collections';
+        }
+
+        if ($parent instanceof \Statamic\Taxonomies\Taxonomy) {
+            return 'taxonomies';
+        }
+
+        if ($parent instanceof \Statamic\Taxonomies\Term) {
+            return 'taxonomies';
+        }
+    }
+
+    protected function typeHandle(): string
+    {
+        $parent = $this->field->parent();
+
+        if ($parent instanceof \Statamic\Entries\Collection) {
+            return $parent->handle();
+        }
+
+        if ($parent instanceof \Statamic\Entries\Entry) {
+            return $parent->collection()->handle();
+        }
+
+        if ($parent instanceof \Statamic\Taxonomies\Taxonomy) {
+            return $parent->handle();
+        }
+
+        if ($parent instanceof \Statamic\Taxonomies\Term) {
+            return $parent->taxonomy()->handle();
+        }
     }
 }
