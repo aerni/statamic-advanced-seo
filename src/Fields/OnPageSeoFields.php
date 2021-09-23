@@ -56,7 +56,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'textarea',
                     'display' => 'Meta Description',
                     'instructions' => 'Set the Meta Description of this entry.',
-                    'localizable' => false,
+                    'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => 160,
                     'validate' => [
@@ -268,6 +268,7 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'default' => 'entry',
                     'listable' => 'hidden',
+                    'localizable' => true,
                 ],
             ],
             [
@@ -297,6 +298,7 @@ class OnPageSeoFields extends BaseFields
                     'input_type' => 'url',
                     'icon' => 'text',
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'validate' => [
                         'required_if:seo_canonical_type,external',
                     ],
@@ -326,6 +328,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Noindex',
                     'instructions' => 'Prevent this entry from being indexed by search engines.',
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'width' => 50,
                 ],
             ],
@@ -336,6 +339,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Nofollow',
                     'instructions' => 'Prevent site crawlers from following links in this entry.',
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'width' => 50,
                 ],
             ],
@@ -381,6 +385,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'default' => '0.5',
                     'listable' => 'hidden',
+                    'localizable' => true,
                 ],
             ],
             [
@@ -407,6 +412,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'default' => 'weekly',
                     'listable' => 'hidden',
+                    'localizable' => true,
                 ],
             ],
         ];
@@ -438,6 +444,7 @@ class OnPageSeoFields extends BaseFields
                     'line_numbers' => true,
                     'line_wrapping' => true,
                     'listable' => 'hidden',
+                    'localizable' => true,
                 ],
             ],
         ];
@@ -450,6 +457,7 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
+        // TODO: $this->data is not used anymore. Fix it.
         // Only perform this check if we're on an entry.
         if ($this->data) {
             $enabledCollections = (new SiteDefaultsRepository('general'))->get(Site::selected()->handle())
