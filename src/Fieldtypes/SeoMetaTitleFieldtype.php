@@ -24,7 +24,7 @@ class SeoMetaTitleFieldtype extends Fieldtype
         // Load the localized content defaults if we're on an entry.
         if ($this->field->parent()) {
             $contentDefaults = Site::all()->map(function ($site) {
-                return Seo::find('collections', $this->field->parent()->collection()->handle())
+                return Seo::find('collections', $this->collectionHandle())
                     ->in($site->handle())
                     ->values()
                     ->only('seo_title')
@@ -35,5 +35,14 @@ class SeoMetaTitleFieldtype extends Fieldtype
         }
 
         return $defaults;
+    }
+
+    protected function collectionHandle(): string
+    {
+        $parent = $this->field->parent();
+
+        return $parent instanceof \Statamic\Entries\Collection
+            ? $parent->handle()
+            : $parent->collection()->handle();
     }
 }
