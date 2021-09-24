@@ -1,18 +1,18 @@
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ twitter_title ?? title }}">
+<meta name="twitter:title" content="{{ seo:twitter_title }}">
 
-{{ if twitter_description or description }}
-    <meta name="twitter:description" content="{{ twitter_description ?? description }}">
+{{ if seo:twitter_description }}
+    <meta name="twitter:description" content="{{ seo:twitter_description }}">
 {{ /if }}
 
-{{ if twitter_handle }}
-    <meta name="twitter:site" content="{{ twitter_handle }}">
+{{ if seo:twitter_handle }}
+    <meta name="twitter:site" content="{{ seo:twitter_handle }}">
 {{ /if }}
 
-{{ if twitter_image }}
-    <meta name="twitter:image" content="{{ glide :src="twitter_image" width='1200' height='600' fit='crop_focal' absolute="true" }}">
+{{ if seo:twitter_image }}
+    <meta name="twitter:image" content="{{ glide :src="seo:twitter_image" width='1200' height='600' fit='crop_focal' absolute="true" }}">
 
-    {{ if twitter_image:alt }}
-        <meta name="twitter:image:alt" content="{{ twitter_image:alt }}">
+    {{ if seo:twitter_image:alt }}
+        <meta name="twitter:image:alt" content="{{ seo:twitter_image:alt }}">
     {{ /if }}
 {{ /if }}

@@ -1,7 +1,7 @@
 {{# Meta Title #}}
-<title>{{ compiled_title }}</title>
+<title>{{ seo:title }}</title>
 
 {{# Meta Description #}}
-{{ if description }}
-    <meta name="description" content="{{ description }}">
+{{ if seo:description }}
+    <meta name="description" content="{{ seo:description }}">
 {{ /if }}

@@ -1,15 +1,3 @@
-{{ if environment === "local" }}
-{{ dump }}
-    {{ if noindex && nofollow }}
-        <meta name="robots" content="noindex, nofollow">
-    {{ elseif nofollow }}
-        <meta name="robots" content="nofollow">
-    {{ elseif noindex }}
-        <meta name="robots" content="noindex">
-    {{ /if }}
-
-{{ else }}
-
-    <meta name="robots" content="noindex, nofollow">
-
+{{ if seo:indexing }}
+    <meta name="robots" content="{{ seo:indexing }}">
 {{ /if }}

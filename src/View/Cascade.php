@@ -34,12 +34,15 @@ class Cascade
 
     public function data(): Collection
     {
-        return $this->defaultsOfType('site')
+        $data = $this->defaultsOfType('site')
             ->merge($this->contentDefaults())
             ->merge($this->onPageSeo())
             ->mapWithKeys(function ($item, $key) {
                 return [Str::remove('seo_', $key) => $item];
-            });
+            })
+            ->sortKeys();
+
+        return $this->ensureOverrides($data);
     }
 
     protected function computedContext(): Collection
@@ -58,7 +61,12 @@ class Cascade
     protected function computedData(): array
     {
         return [
-            'compiled_title' => $this->compiledTitle(),
+            'title' => $this->compiledTitle(),
+            'og_title' => $this->ogTitle(),
+            'og_description' => $this->ogDescription(),
+            'twitter_title' => $this->twitterTitle(),
+            'twitter_description' => $this->twitterDescription(),
+            'indexing' => $this->indexing(),
             'locale' => $this->locale(),
         ];
     }
@@ -94,6 +102,16 @@ class Cascade
         return null;
     }
 
+    protected function ensureOverrides($data): Collection
+    {
+        $siteDefaults = $this->defaultsOfType('site');
+
+        return $data->merge([
+            'noindex' => $siteDefaults->get('noindex')->value() ?: $data->get('noindex')->value(),
+            'nofollow' => $siteDefaults->get('nofollow')->value() ?: $data->get('nofollow')->value(),
+        ]);
+    }
+
     protected function compiledTitle(): string
     {
         return "{$this->title()} {$this->titleSeparator()} {$this->siteName()}";
@@ -101,7 +119,7 @@ class Cascade
 
     protected function title(): string
     {
-        return $this->data->get('title') ?? $this->data->get('title');
+        return $this->data->get('title') ?? $this->context->get('title');
     }
 
     protected function titleSeparator(): string
@@ -112,6 +130,34 @@ class Cascade
     protected function siteName(): string
     {
         return $this->data->get('site_name') ?? config('app.name');
+    }
+
+    protected function ogTitle(): string
+    {
+        return $this->data->get('og_title') ?? $this->title();
+    }
+
+    protected function ogDescription(): ?string
+    {
+        return $this->data->get('og_description') ?? $this->data->get('description');
+    }
+
+    protected function twitterTitle(): string
+    {
+        return $this->data->get('twitter_title') ?? $this->title();
+    }
+
+    protected function twitterDescription(): ?string
+    {
+        return $this->data->get('twitter_description') ?? $this->data->get('description');
+    }
+
+    protected function indexing(): string
+    {
+        return collect([
+            'noindex' => $this->data->get('noindex'),
+            'nofollow' => $this->data->get('nofollow'),
+        ])->filter()->keys()->implode(', ');
     }
 
     protected function locale(): string
