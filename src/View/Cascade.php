@@ -3,15 +3,10 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
-use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 use Statamic\Sites\Site as StatamicSite;
-use Statamic\Taxonomies\LocalizedTerm;
 
 class Cascade
 {
@@ -31,64 +26,69 @@ class Cascade
         return new static($context);
     }
 
+    // TODO: I need a smart way of handling default settings when they are booleans.
     public function get(): Collection
     {
-        $data = $this->data->merge([
-            'compiled_title' => $this->compiledTitle(),
-            'locale' => $this->locale(),
-        ]);
-
-        // TODO: I need a smart way of handling default settings when they are booleans.
-        dd($this->indexing());
-
-        dd($data);
-
-        return $data;
+        return $this->computedContext();
     }
 
     public function data(): Collection
     {
-        return collect()
-            ->merge($this->context)
-            ->merge($this->siteDefaults())
+        return $this->defaultsOfType('site')
             ->merge($this->contentDefaults())
-            ->merge($this->onPageSeo());
+            ->merge($this->onPageSeo())
+            ->mapWithKeys(function ($item, $key) {
+                return [Str::remove('seo_', $key) => $item];
+            });
     }
 
-    protected function onPageSeo(): array
+    protected function computedContext(): Collection
+    {
+        // Remove all seo variables from context.
+        $contextWithoutSeoVariables = $this->context->filter(function ($value, $key) {
+            return ! Str::contains($key, 'seo_');
+        });
+
+        $seoVariables = $this->data->merge($this->computedData())->all();
+
+        // Return new context with all seo variables in an seo key.
+        return $contextWithoutSeoVariables->merge(['seo' => $seoVariables]);
+    }
+
+    protected function computedData(): array
+    {
+        return [
+            'compiled_title' => $this->compiledTitle(),
+            'locale' => $this->locale(),
+        ];
+    }
+
+    protected function onPageSeo(): Collection
     {
         return $this->context->filter(function ($value, $key) {
             return Str::contains($key, 'seo_');
-        })->all();
+        })->filter(function ($item) {
+            return $item->raw();
+        });
     }
 
-    protected function siteDefaults(): array
+    protected function defaultsOfType(string $type): Collection
     {
-        return Seo::allOfType('site')->flatMap(function ($defaults) {
+        return Seo::allOfType($type)->flatMap(function ($defaults) {
             return $defaults->in($this->site->handle())->toAugmentedArray();
-        })->all();
+        });
     }
 
-    protected function collectionDefaults(string $handle): array
+    protected function contentDefaults(): ?Collection
     {
-        return (new CollectionDefaultsRepository($handle))->toAugmentedArray($this->site->handle());
-    }
+        $parent = $this->context->get('collection') ?? $this->context->get('taxonomy');
 
-    protected function taxonomyDefaults(string $handle): array
-    {
-        return (new TaxonomyDefaultsRepository($handle))->toAugmentedArray($this->site->handle());
-    }
-
-    protected function contentDefaults(): ?array
-    {
-        $parent = optional($this->context->get('seo'))->augmentable();
-
-        if ($parent instanceof Entry) {
-            return $this->collectionDefaults($parent->collection()->handle());
+        if ($parent instanceof \Statamic\Entries\Collection) {
+            return $this->defaultsOfType('collections');
         }
 
-        if ($parent instanceof Term || $parent instanceof LocalizedTerm) {
-            return $this->taxonomyDefaults($parent->taxonomy()->handle());
+        if ($parent instanceof \Statamic\Taxonomies\Taxonomy) {
+            return $this->defaultsOfType('taxonomies');
         }
 
         return null;
@@ -101,7 +101,7 @@ class Cascade
 
     protected function title(): string
     {
-        return $this->data->get('title');
+        return $this->data->get('title') ?? $this->data->get('title');
     }
 
     protected function titleSeparator(): string
@@ -117,17 +117,5 @@ class Cascade
     protected function locale(): string
     {
         return $this->site->locale();
-    }
-
-    protected function indexing()
-    {
-        $siteDefaults = collect($this->siteDefaults());
-
-        $noindex = $siteDefaults->get('noindex') ? $siteDefaults->get('noindex') : $this->data->get('noindex');
-        dd($noindex);
-        $noindex = $siteDefaults->get('noindex') ?? $this->data->get('noindex');
-        $nofollow = $siteDefaults['nofollow'] ?? $this->data->get('nofollow');
-
-        dd($noindex, $nofollow);
     }
 }

@@ -2,41 +2,46 @@
 
 namespace Aerni\AdvancedSeo\Tags;
 
-use Aerni\AdvancedSeo\View\Cascade;
 use Statamic\Tags\Tags;
+use Illuminate\Support\Arr;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Collection;
+use Illuminate\View\View;
 
 class AdvancedSeoTags extends Tags
 {
     protected static $handle = 'advanced_seo';
 
-    public function head()
+    /**
+     * Gets a specific key from the seo cascade by wildcard method.
+     * This lets you access seo data from anywhere, e.g. {{ advanced_seo:site_name }}
+     */
+    public function wildcard(): mixed
     {
-        $data = Cascade::make($this->context)->get();
-
-        return $this->view('advanced-seo::head', $data);
+        return Arr::get($this->cascade()->get('seo'), $this->method);
     }
 
-    public function body()
+    /**
+     * Renders the head view with the seo cascade.
+     */
+    public function head(): View
     {
-        $data = Cascade::make($this->context)->get();
-
-        return $this->view('advanced-seo::body', $data);
+        return view('advanced-seo::head', $this->cascade());
     }
 
-    protected function view(...$args): string
+    /**
+     * Renders the body view with the seo cascade.
+     */
+    public function body(): View
     {
-        // Render view.
-        $html = view(...$args)->render();
+        return view('advanced-seo::body', $this->cascade());
+    }
 
-        // Remove new lines.
-        $html = str_replace(["\n", "\r"], '', $html);
-
-        // Remove whitespace between elements.
-        $html = preg_replace('/(>)\s*(<)/', '$1$2', $html);
-
-        // Add cleaner line breaks.
-        $html = preg_replace('/(<[^\/])/', "\n$1", $html);
-
-        return trim($html);
+    /**
+     * Builds the seo cascade from the context.
+     */
+    protected function cascade(): Collection
+    {
+        return Cascade::make($this->context)->get();
     }
 }
