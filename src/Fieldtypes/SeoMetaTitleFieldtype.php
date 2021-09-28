@@ -3,6 +3,8 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 
@@ -10,28 +12,58 @@ class SeoMetaTitleFieldtype extends Fieldtype
 {
     protected $selectable = false;
 
-    public function preload()
+    protected function fallbackSiteDefaults(): array
     {
-        // Load the localized site defaults.
-        $defaults = Site::all()->map(function ($site) {
-            return Seo::find('site', 'general')
-                ->in($site->handle())
-                ->values()
-                ->only(['site_name', 'title_separator'])
-                ->all();
+        return [
+            'site_name' => config('app.name'),
+            'title_separator' => '|',
+        ];
+    }
+
+    protected function siteDefaults(): Collection
+    {
+        $sites = Site::all()->map->handle();
+
+        $repository = new SiteDefaultsRepository('general', $sites);
+
+        $set = $repository->ensureLocalizations($sites)->set();
+
+        $fallback = collect([
+            'site_name' => config('app.name'),
+            'title_separator' => '|',
+        ]);
+
+        $siteDefaults = $set->localizations()->map(function ($localization) use ($fallback) {
+            return $fallback->merge(
+                $localization->values()->only(['site_name', 'title_separator'])->all()
+            )->all();
         });
 
-        // Load the localized content defaults if we're on an entry.
-        if ($this->field->parent()) {
-            $contentDefaults = Site::all()->map(function ($site) {
-                return Seo::find($this->type(), $this->typeHandle())
-                    ->in($site->handle())
-                    ->values()
-                    ->only('seo_title')
-                    ->all();
-            });
+        return $siteDefaults;
+    }
 
-            $defaults = $defaults->mergeRecursive($contentDefaults);
+    protected function contentDefaults(): Collection
+    {
+        $sites = Site::all()->map->handle();
+
+        $sites = $this->field->parent()->sites();
+
+        $contentDefaults = $sites->mapWithKeys(function ($site) {
+            if ($set = Seo::find($this->type(), $this->typeHandle())) {
+                return [$site => $set->in($site)->values()->only('seo_title')->all()];
+            }
+        });
+
+        return $contentDefaults;
+    }
+
+    public function preload(): Collection
+    {
+        $defaults = $this->siteDefaults();
+
+        // Load the localized content defaults if we're on an entry or term.
+        if ($this->field->parent()) {
+            $defaults = $defaults->mergeRecursive($this->contentDefaults());
         }
 
         return $defaults;
