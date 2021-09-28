@@ -30,7 +30,7 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $sites = Site::all()->map->handle();
 
-        $set = $repository->ensureLocalizations($sites)->set();
+        $set = $repository->createLocalizations($sites);
 
         $localization = $set->in($site);
 
@@ -123,6 +123,6 @@ class SiteDefaultsController extends BaseDefaultsController
 
     protected function repository(string $handle): SiteDefaultsRepository
     {
-        return new SiteDefaultsRepository($handle);
+        return new SiteDefaultsRepository($handle, Site::all()->map->handle());
     }
 }

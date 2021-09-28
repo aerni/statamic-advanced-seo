@@ -148,6 +148,11 @@ class SeoVariables implements Localization, Augmentable
         return $this->seoSet()->in($origin);
     }
 
+    public function removeOrigin(): void
+    {
+        $this->origin = null;
+    }
+
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedVariables($this);

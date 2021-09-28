@@ -11,7 +11,7 @@ class TaxonomyDefaultsController extends ContentDefaultsController
 
     protected function repository(string $handle): TaxonomyDefaultsRepository
     {
-        return new TaxonomyDefaultsRepository($handle);
+        return new TaxonomyDefaultsRepository($handle, $this->content($handle)->sites());
     }
 
     protected function content(string $handle): mixed
