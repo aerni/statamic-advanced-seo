@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
+use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Illuminate\Support\Str;
-use Illuminate\Events\Dispatcher;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
-use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
 
 class OnPageSeoBlueprintSubscriber
 {
