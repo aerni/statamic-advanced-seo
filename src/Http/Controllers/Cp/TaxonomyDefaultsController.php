@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
+use Statamic\Facades\Taxonomy;
 
 class TaxonomyDefaultsController extends ContentDefaultsController
 {
@@ -11,5 +12,10 @@ class TaxonomyDefaultsController extends ContentDefaultsController
     protected function repository(string $handle): TaxonomyDefaultsRepository
     {
         return new TaxonomyDefaultsRepository($handle);
+    }
+
+    protected function content(string $handle): mixed
+    {
+        return Taxonomy::find($handle);
     }
 }

@@ -2,11 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
-use Aerni\AdvancedSeo\Traits\ValidateType;
-use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Aerni\AdvancedSeo\Traits\ValidateType;
+use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
 
 class SiteDefaultsController extends BaseDefaultsController
 {
@@ -15,7 +17,7 @@ class SiteDefaultsController extends BaseDefaultsController
     // TODO: This should probably be put in a repository.
     protected array $allowedTypes = ['general', 'marketing'];
 
-    public function edit(Request $request, string $handle)
+    public function edit(Request $request, string $handle): mixed
     {
         $this->authorize("view $handle defaults");
 
@@ -27,47 +29,58 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $set = $repository->findOrMakeSeoSet();
+        $sites = Site::all()->map->handle();
 
-        $variables = $repository->ensureSeoVariables()->get($site);
+        $set = $repository->ensureLocalizations($sites)->set();
 
-        $blueprint = $variables->blueprint();
+        $localization = $set->in($site);
 
-        [$values, $meta] = $this->extractFromFields($variables, $blueprint);
+        $blueprint = $localization->blueprint();
 
-        if ($hasOrigin = $variables->hasOrigin()) {
-            [$originValues, $originMeta] = $this->extractFromFields($variables->origin(), $blueprint);
+        [$values, $meta] = $this->extractFromFields($localization, $blueprint);
+
+        if ($hasOrigin = $localization->hasOrigin()) {
+            [$originValues, $originMeta] = $this->extractFromFields($localization->origin(), $blueprint);
         }
 
         $user = User::fromUser($request->user());
 
+        // This variable solely exists to prevent variable conflict in $viewData['localizations'].
+        $requestLocalization = $localization;
+
         $viewData = [
-            'defaultsUrl' => cp_route('advanced-seo.show', 'site'),
-            'defaultsTitle' => __('advanced-seo::messages.site'),
-            'reference' => $variables->reference(),
+            'title' => $set->title(),
+            'reference' => $localization->reference(),
             'editing' => true,
             'actions' => [
-                'save' => $variables->updateUrl(),
+                'save' => $localization->updateUrl(),
             ],
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
-            'locale' => $variables->locale(),
-            'localizedFields' => $variables->data()->keys()->all(),
-            'isRoot' => $variables->isRoot(),
+            'locale' => $localization->locale(),
+            'localizedFields' => $localization->data()->keys()->all(),
+            'isRoot' => $localization->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'localizations' => $variables->seoSet()->localizations()->map(function ($localized) use ($variables) {
+            'localizations' => $sites->map(function ($site) use ($set, $requestLocalization) {
+                $localization = $set->in($site);
+                $exists = $localization !== null;
+
                 return [
-                    'handle' => $localized->locale(),
-                    'name' => $localized->site()->name(),
-                    'active' => $localized->locale() === $variables->locale(),
-                    'origin' => ! $localized->hasOrigin(),
-                    'url' => $localized->editUrl(),
+                    'handle' => $site,
+                    'name' => Site::get($site)->name(),
+                    'active' => $site === $requestLocalization->locale(),
+                    'exists' => $exists,
+                    'root' => $exists ? $localization->isRoot() : false,
+                    'origin' => $exists ? $localization->locale() === optional($requestLocalization->origin())->locale() : null,
+                    'url' => $exists ? $localization->editUrl() : null,
                 ];
-            })->values()->all(),
-            'canEdit' => $user->can("edit $handle defaults"),
+            })->sortBy('handle')->values()->all(),
+            'breadcrumbs' => $this->breadcrumbs($handle),
+            'readOnly' => $user->cant("edit $handle defaults"),
+            'contentType' => 'site',
         ];
 
         if ($request->wantsJson()) {
@@ -76,11 +89,11 @@ class SiteDefaultsController extends BaseDefaultsController
 
         return view('advanced-seo::cp/edit', array_merge($viewData, [
             'set' => $set,
-            'variables' => $variables,
+            'variables' => $localization,
         ]));
     }
 
-    public function update(string $handle, Request $request)
+    public function update(string $handle, Request $request): void
     {
         $this->authorize("edit $handle defaults");
 
@@ -97,6 +110,16 @@ class SiteDefaultsController extends BaseDefaultsController
         $values = $fields->process()->values();
 
         $repository->save($site, $values);
+    }
+
+    protected function breadcrumbs(string $handle): Breadcrumbs
+    {
+        return new Breadcrumbs([
+            [
+                'text' => __('advanced-seo::messages.site'),
+                'url' => cp_route('advanced-seo.show', 'site'),
+            ]
+        ]);
     }
 
     protected function repository(string $handle): SiteDefaultsRepository

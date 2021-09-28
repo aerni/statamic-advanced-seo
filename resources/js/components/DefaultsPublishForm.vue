@@ -1,26 +1,18 @@
 <template>
 
-    <div>
+    <div class="remove-border-bottom">
         <header class="mb-3">
-            <breadcrumb :url="defaultsUrl" :title="defaultsTitle" />
+            <breadcrumb :url="computedBreadcrumbs.url" :title="computedBreadcrumbs.text" />
 
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <div class="pt-px text-2xs text-grey-60 flex" v-if="! canEdit">
+                <div class="pt-px text-2xs text-grey-60 flex" v-if="readOnly">
                     <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
                 </div>
 
-                <site-selector
-                    v-if="localizations.length > 1"
-                    class="ml-2"
-                    :sites="localizations"
-                    :value="site"
-                    @input="localizationSelected"
-                />
-
                 <button
-                    v-if="canEdit"
+                    v-if="!readOnly"
                     class="btn-primary min-w-100 ml-2"
                     :class="{ 'opacity-25': !canSave }"
                     :disabled="!canSave"
@@ -51,31 +43,52 @@
                     v-bind="component.props"
                 />
                 <publish-sections
-                    :read-only="! canEdit"
+                    :read-only="readOnly"
                     :syncable="hasOrigin"
                     :can-toggle-labels="true"
-                    :enable-sidebar="false"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
                     @synced="syncField"
                     @desynced="desyncField"
                     @focus="container.$emit('focus', $event)"
                     @blur="container.$emit('blur', $event)"
-                />
+                >
+                    <template #actions="{ shouldShowSidebar }">
+                        <div class="p-2">
+                            <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
+                            <div
+                                v-for="option in localizations"
+                                :key="option.handle"
+                                class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer"
+                                :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
+                                @click="localizationSelected(option)"
+                            >
+                                <div class="flex-1 flex items-center">
+                                    {{ option.name }}
+                                    <loading-graphic :size="14" text="" class="ml-1 flex items-center" style="padding-bottom: 0.05em;" v-if="localizing === option.handle"/>
+                                </div>
+                                <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
+                                <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
+                                <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                            </div>
+                        </div>
+                    </template>
+                </publish-sections>
             </div>
+
         </publish-container>
     </div>
 
 </template>
 
+<style scoped>
+.remove-border-bottom >>> .publish-sidebar .publish-section-actions {
+    border-bottom-width: 0;
+}
+</style>
+
 <script>
-import SiteSelector from '../../../vendor/statamic/cms/resources/js/components/SiteSelector.vue'
-
 export default {
-
-    components: {
-        SiteSelector
-    },
 
     props: {
         publishContainer: String,
@@ -84,22 +97,19 @@ export default {
         initialValues: Object,
         initialMeta: Object,
         initialTitle: String,
-        initialHandle: String,
-        initialBlueprintHandle: String,
         initialLocalizations: Array,
         initialLocalizedFields: Array,
         initialHasOrigin: Boolean,
         initialOriginValues: Object,
         initialOriginMeta: Object,
         initialSite: String,
-        defaultsUrl: String,
-        defaultsTitle: String,
+        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         isCreating: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
-        canEdit: Boolean,
+        contentType: String,
     },
 
     data() {
@@ -120,6 +130,7 @@ export default {
             error: null,
             errors: {},
             isRoot: this.initialIsRoot,
+            readOnly: this.initialReadOnly,
         }
     },
 
@@ -134,7 +145,7 @@ export default {
         },
 
         canSave() {
-            return this.canEdit && this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
         },
 
         isBase() {
@@ -151,6 +162,19 @@ export default {
 
         originLocalization() {
             return _.findWhere(this.localizations, { origin: true });
+        },
+
+        computedBreadcrumbs() {
+            let breadcrumbs = {
+                'url': this.breadcrumbs[0].url,
+                'text': this.breadcrumbs[0].text
+            }
+
+            if (this.contentType !== 'site') {
+                breadcrumbs.text = `${this.breadcrumbs[0].text} (${this.breadcrumbs[1].text})`
+            }
+
+            return breadcrumbs
         }
 
     },
@@ -191,6 +215,7 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
+
             if (e.response && e.response.status === 422) {
                 const { message, errors } = e.response.data;
                 this.error = message;
@@ -210,9 +235,11 @@ export default {
                 }
             }
 
+            this.$dirty.remove(this.publishContainer);
+
             this.localizing = localization.handle;
 
-            if (this.publishContainer === 'base') {
+            if (this.isBase) {
                 window.history.replaceState({}, '', localization.url);
             }
 
@@ -220,6 +247,7 @@ export default {
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
+                this.originMeta = data.originMeta;
                 this.meta = data.meta;
                 this.localizations = data.localizations;
                 this.localizedFields = data.localizedFields;
@@ -231,12 +259,6 @@ export default {
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
             })
-        },
-
-        localizationStatusText(localization) {
-            return localization.exists
-                ? 'This global set exists in this site.'
-                : 'This global set does not exist for this site.';
         },
 
         setFieldValue(handle, value) {

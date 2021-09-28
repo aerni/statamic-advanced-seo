@@ -1,5 +1,7 @@
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', $variables->title())
+@section('title', $breadcrumbs->title($title))
+@section('wrapper_class', 'max-w-3xl')
 
 @section('content')
 
@@ -7,9 +9,7 @@
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
         method="patch"
-        defaults-url="{{ $defaultsUrl }}"
-        defaults-title="{{ $defaultsTitle }}"
-        initial-title="{{ $variables->title() }}"
+        initial-title="{{ $title }}"
         initial-handle="{{ $variables->handle() }}"
         initial-reference="{{ $reference }}"
         initial-blueprint-handle="{{ $variables->blueprint()->handle() }}"
@@ -21,8 +21,10 @@
         :initial-has-origin="{{ Statamic\Support\Str::bool($hasOrigin) }}"
         :initial-is-root="{{ Statamic\Support\Str::bool($isRoot) }}"
         :initial-origin-values="{{ json_encode($originValues) }}"
+        :initial-read-only="{{ $str::bool($readOnly) }}"
         initial-site="{{ $locale }}"
-        :can-edit="{{ json_encode($canEdit) }}"
+        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
+        content-type="{{ $contentType }}"
     ></defaults-publish-form>
 
     @include('advanced-seo::cp/_docs_callout')
