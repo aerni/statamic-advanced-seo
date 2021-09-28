@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Statamic\Facades\Collection;
 use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
+use Statamic\Facades\Collection;
 
 class CollectionDefaultsController extends ContentDefaultsController
 {

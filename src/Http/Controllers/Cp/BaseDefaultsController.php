@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Illuminate\Http\Request;
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
