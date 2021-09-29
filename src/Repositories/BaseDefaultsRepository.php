@@ -33,7 +33,9 @@ abstract class BaseDefaultsRepository
         return $this->set;
     }
 
-    // TODO: Is still still in use anywhere?
+    /**
+     * Returns the augmented data of a specific site.
+     */
     public function toAugmentedArray(string $site): array
     {
         return $this->findOrMakeLocalization($site)->toAugmentedArray();
