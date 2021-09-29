@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Statamic;
+use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -45,8 +45,8 @@ class ServiceProvider extends AddonServiceProvider
         Statamic::booted(function () {
             $this
                 ->bootAddonViews()
-                ->bootAddonNav()
                 ->bootAddonStores()
+                ->bootAddonNav()
                 ->bootAddonPermissions();
         });
     }
@@ -71,6 +71,15 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
+    protected function bootAddonStores(): self
+    {
+        $seoStore = app(SeoStore::class)->directory(base_path('content/seo'));
+
+        app(Stache::class)->registerStore($seoStore);
+
+        return $this;
+    }
+
     protected function bootAddonNav()
     {
         Nav::extend(function ($nav) {
@@ -88,15 +97,6 @@ class ServiceProvider extends AddonServiceProvider
                         ->can('contentDefaultsIndex', SeoVariables::class),
                 ]);
         });
-
-        return $this;
-    }
-
-    protected function bootAddonStores(): self
-    {
-        $seoStore = app(SeoStore::class)->directory(base_path('content/seo'));
-
-        app(Stache::class)->registerStore($seoStore);
 
         return $this;
     }
