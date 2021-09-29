@@ -2,17 +2,17 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\Site;
-use Statamic\Tags\Context;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Statamic\Facades\Entry;
-use Spatie\SchemaOrg\Schema;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Sites\Site as StatamicSite;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Spatie\SchemaOrg\Schema;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Sites\Site as StatamicSite;
+use Statamic\Tags\Context;
 
 class Cascade
 {

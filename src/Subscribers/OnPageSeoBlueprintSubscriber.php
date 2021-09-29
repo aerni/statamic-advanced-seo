@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
 use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
 use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
