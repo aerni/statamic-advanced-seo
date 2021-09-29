@@ -11,4 +11,6 @@ interface Blueprint
     public function data($data): self;
 
     public function get(): BlueprintFields;
+
+    public function items(): array;
 }

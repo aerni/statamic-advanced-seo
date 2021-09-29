@@ -9,4 +9,6 @@ interface Fields
     public function data($data): self;
 
     public function get(): array;
+
+    public function items(): array;
 }

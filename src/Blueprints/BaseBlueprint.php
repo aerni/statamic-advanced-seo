@@ -30,6 +30,13 @@ abstract class BaseBlueprint implements Contract
             ->setContents(['sections' => $this->processSections()]);
     }
 
+    public function items(): array
+    {
+        return $this->get()->fields()->all()->mapWithKeys(function ($field, $handle) {
+            return [$handle => $field->config()];
+        })->toArray();
+    }
+
     protected function processSections(): array
     {
         return collect($this->sections())->map(function ($section, $handle) {

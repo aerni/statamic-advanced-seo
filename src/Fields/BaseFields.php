@@ -25,5 +25,12 @@ abstract class BaseFields implements Fields
         return array_flatten($this->sections(), 1);
     }
 
+    public function items(): array
+    {
+        return collect($this->get())->mapWithKeys(function ($field) {
+            return [$field['handle'] => $field['field']];
+        })->toArray();
+    }
+
     abstract protected function sections(): array;
 }

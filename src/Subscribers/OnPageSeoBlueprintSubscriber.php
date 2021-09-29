@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
 use Aerni\AdvancedSeo\Repositories\CollectionDefaultsRepository;
 use Aerni\AdvancedSeo\Repositories\TaxonomyDefaultsRepository;
@@ -36,12 +37,7 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
-        $contents = array_merge_recursive(
-            $event->blueprint->contents(),
-            OnPageSeoBlueprint::make()->get()->contents()
-        );
-
-        $event->blueprint->setContents($contents);
+        $event->blueprint->ensureFieldsInSection(OnPageSeoBlueprint::make()->items(), 'SEO');
     }
 
     public function createOrDeleteLocalizations(Event $event): void
