@@ -74,16 +74,15 @@ class GeneralFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'json_ld_type',
+                'handle' => 'site_json_ld_type',
                 'field' => [
                     'options' => [
-                        'none' => 'None',
                         'organization' => 'Organization',
                         'person' => 'Person',
                         'custom' => 'Custom',
                     ],
-                    'default' => 'none',
-                    'localizable' => true,
+                    'default' => 'organization',
+                    'localizable' => false,
                     'type' => 'button_group',
                     'instructions' => 'The type of content this website represents.',
                     'listable' => false,
@@ -102,10 +101,10 @@ class GeneralFields extends BaseFields
                     'instructions' => 'Set the name of the organization.',
                     'width' => 50,
                     'if' => [
-                        'json_ld_type' => 'equals organization',
+                        'site_json_ld_type' => 'equals organization',
                     ],
                     'validate' => [
-                        'required_if:json_ld_type,organization',
+                        'required_if:site_json_ld_type,organization',
                     ],
                 ],
             ],
@@ -126,7 +125,7 @@ class GeneralFields extends BaseFields
                         'image',
                     ],
                     'if' => [
-                        'json_ld_type' => 'equals organization',
+                        'site_json_ld_type' => 'equals organization',
                     ],
                 ],
             ],
@@ -141,15 +140,15 @@ class GeneralFields extends BaseFields
                     'type' => 'text',
                     'localizable' => true,
                     'if' => [
-                        'json_ld_type' => 'equals person',
+                        'site_json_ld_type' => 'equals person',
                     ],
                     'validate' => [
-                        'required_if:json_ld_type,person',
+                        'required_if:site_json_ld_type,person',
                     ],
                 ],
             ],
             [
-                'handle' => 'json_ld',
+                'handle' => 'site_json_ld',
                 'field' => [
                     'theme' => 'material',
                     'mode' => 'javascript',
@@ -164,10 +163,10 @@ class GeneralFields extends BaseFields
                     'icon' => 'code',
                     'listable' => 'hidden',
                     'if' => [
-                        'json_ld_type' => 'equals custom',
+                        'site_json_ld_type' => 'equals custom',
                     ],
                     'validate' => [
-                        'required_if:json_ld_type,custom',
+                        'required_if:site_json_ld_type,custom',
                     ],
                 ],
             ],

@@ -7,6 +7,7 @@ use Statamic\Tags\Context;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Statamic\Facades\Entry;
+use Spatie\SchemaOrg\Schema;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -81,6 +82,7 @@ class Cascade
             'locale' => $this->locale(),
             'hreflang' => $this->hreflang(),
             'canonical' => $this->canonical(),
+            'schema' => $this->schema(),
         ];
     }
 
@@ -213,5 +215,54 @@ class Cascade
         $currentUrl = $this->context->get('permalink');
 
         return $page ? "{$currentUrl}?page={$page}" : $currentUrl;
+    }
+
+    protected function schema(): string
+    {
+        return $this->siteSchema() . $this->entrySchema();
+    }
+
+    protected function siteSchema(): ?string
+    {
+        $type = optional($this->data->get('site_json_ld_type'))->raw();
+
+        if (empty($type)) {
+            return null;
+        }
+
+        if ($type === 'custom') {
+            $data = $this->data->get('site_json_ld')->value();
+
+            return "<script type=\"application/ld+json\">{$data}</script>";
+        }
+
+        if ($type === 'organization') {
+            $schema = Schema::organization()
+                ->name($this->data->get('organization_name')->value())
+                ->url(config('app.url') . $this->context->get('homepage'));
+
+            if ($logo = optional($this->data->get('organization_logo'))->value()) {
+                $schema->logo($logo->absoluteUrl());
+            }
+        }
+
+        if ($type === 'person') {
+            $schema = Schema::person()
+                ->name($this->data->get('person_name')->value())
+                ->url(config('app.url') . $this->context->get('homepage'));
+        }
+
+        return $schema->toScript();
+    }
+
+    protected function entrySchema(): ?string
+    {
+        $data = optional($this->data->get('json_ld'))->value();
+
+        if ($data) {
+            return "<script type=\"application/ld+json\">{$data}</script>";
+        }
+
+        return null;
     }
 }
