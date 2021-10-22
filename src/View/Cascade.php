@@ -32,8 +32,6 @@ class Cascade
         return new static($context);
     }
 
-    // TODO: I need a smart way of handling default settings when they are booleans.
-    // TODO: Filter out data that has no corresponding field in the blueprint.
     public function get(): Collection
     {
         return $this->computedContext();
@@ -84,6 +82,10 @@ class Cascade
         ];
     }
 
+    /**
+     * Only return values that are not empty and whose keys exists in the Blueprint.
+     * This makes sure that we don't return any data of fields that were disabled in the config, e.g. OG Image Generator
+     */
     protected function onPageSeo(): Collection
     {
         return $this->context
@@ -93,6 +95,10 @@ class Cascade
             });
     }
 
+    /**
+     * Get the augmented site defaults and filter out any values that shouldn't be there
+     * like features that were disabled in the config.
+     */
     protected function siteDefaults(): Collection
     {
         return Seo::allOfType('site')->flatMap(function ($defaults) {

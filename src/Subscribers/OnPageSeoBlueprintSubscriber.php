@@ -81,6 +81,10 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
+    /**
+     * Create or delete a localization when the corresponding site
+     * was added or removed from a Collection or Taxonomy.
+     */
     public function createOrDeleteLocalizations(Event $event): void
     {
         $property = $this->determineProperty($event);
