@@ -42,11 +42,9 @@ class Cascade
     public function data(): Collection
     {
         $this->siteDefaults = $this->siteDefaults();
-        $this->contentDefaults = $this->contentDefaults();
         $this->onPageSeo = $this->onPageSeo();
 
         $data = $this->siteDefaults
-            ->merge($this->contentDefaults)
             ->merge($this->onPageSeo)
             ->mapWithKeys(function ($item, $key) {
                 return [Str::remove('seo_', $key) => $item];
@@ -102,21 +100,6 @@ class Cascade
         })->filter(function ($item) {
             return $item instanceof \Statamic\Fields\Value;
         });
-    }
-
-    protected function contentDefaults(): Collection
-    {
-        $defaultsType = $this->context->get('collection') ?? $this->context->get('taxonomy');
-
-        if ($defaultsType instanceof \Statamic\Entries\Collection) {
-            $data = Seo::find('collections', $defaultsType->handle())->in($this->site)->toAugmentedArray();
-        }
-
-        if ($defaultsType instanceof \Statamic\Taxonomies\Taxonomy) {
-            $data = Seo::find('taxonomies', $defaultsType->handle())->in($this->site)->toAugmentedArray();
-        }
-
-        return collect($data ?? []);
     }
 
     protected function ensureOverrides(Collection $data): Collection
