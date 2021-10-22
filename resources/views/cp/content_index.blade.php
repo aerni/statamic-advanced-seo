@@ -21,7 +21,7 @@
                             </div>
                         </div>
                         <div class="p-1.5">
-                            @foreach (Statamic\Facades\Collection::all() as $collection)
+                            @foreach (Statamic\Facades\Collection::all()->sort() as $collection)
                                 <a href="{{ cp_route('advanced-seo.content.collections.edit', $collection) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $collection->title() }}</a>
                             @endforeach
                         </div>
@@ -43,7 +43,7 @@
                             </div>
                         </div>
                         <div class="p-1.5">
-                            @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
+                            @foreach (Statamic\Facades\Taxonomy::all()->sort() as $taxonomy)
                                 <a href="{{ cp_route('advanced-seo.content.taxonomies.edit', $taxonomy) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $taxonomy->title() }}</a>
                             @endforeach
                         </div>
