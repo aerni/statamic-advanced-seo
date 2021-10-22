@@ -50,8 +50,10 @@ class SeoDefaultsRepository
         $localization = $this->findOrMakeLocalization($site);
 
         if ($localization->hasOrigin()) {
-            // Only save the data that is different to the origin.
-            $data = $data->diffAssoc($localization->origin()->data())->all();
+            $data = collect(array_map(
+                'unserialize',
+                array_diff(array_map('serialize', $data->toArray()), array_map('serialize', $localization->origin()->data()->toArray()))
+            ));
         }
 
         return $localization->data($data)->save();
