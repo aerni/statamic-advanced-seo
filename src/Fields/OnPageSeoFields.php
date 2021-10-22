@@ -120,7 +120,6 @@ class OnPageSeoFields extends BaseFields
             // Prefix the field handles to avoid naming conflicts.
             $field['handle'] = "seo_social_images_{$field['handle']}";
 
-            // TODO: This doesn't yet work. Why?!
             // Hide the fields if the toggle is of.
             $field['field']['if'] = [
                 'seo_generate_social_images' => 'equals true',
