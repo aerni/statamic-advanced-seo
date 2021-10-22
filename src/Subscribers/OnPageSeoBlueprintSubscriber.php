@@ -15,6 +15,7 @@ class OnPageSeoBlueprintSubscriber
 {
     protected array $events = [
         Events\EntryBlueprintFound::class => 'addFieldsToBlueprint',
+        Events\EntrySaving::class => 'removeDefaultDataFromEntry',
         Events\TermBlueprintFound::class => 'addFieldsToBlueprint',
         Events\CollectionSaved::class => 'createOrDeleteLocalizations',
         Events\TaxonomySaved::class => 'createOrDeleteLocalizations',
@@ -37,6 +38,47 @@ class OnPageSeoBlueprintSubscriber
         }
 
         $event->blueprint->ensureFieldsInSection(OnPageSeoBlueprint::make()->items(), 'SEO');
+
+        $this->addDefaultDataToEntry($event);
+    }
+
+    /**
+     * TODO: This has to also work with Terms.
+     * Makes sure that we only save data that is different to the default data.
+     * This ensures that the blueprint always loads the latest default data if no other value has been set on the entry.
+     */
+    public function removeDefaultDataFromEntry(Event $event): void
+    {
+        if ($event->entry) {
+            $collection = $event->entry->collection();
+            $defaults = (new CollectionDefaultsRepository($collection->handle(), $collection->sites()))->set()->in($event->entry->locale())->data();
+
+            $diffed = $event->entry->data()->filter(function ($value, $key) use ($defaults) {
+                return $value !== $defaults->get($key);
+            });
+
+            $event->entry->data($diffed);
+        }
+    }
+
+    /**
+     * TODO: This has to also work with Terms.
+     * Adds the content defaults to the entry.
+     * It only adds values if they have not already been set on the entry.
+     */
+    protected function addDefaultDataToEntry(Event $event): void
+    {
+        if ($event->entry) {
+            $collection = $event->entry->collection();
+            $defaults = (new CollectionDefaultsRepository($collection->handle(), $collection->sites()))->set()->in($event->entry->locale())->data();
+
+            // We only want to set the defaults that were not changed on the entry.
+            $entryData = $event->entry->data();
+            $defaultsToSet = $defaults->diffKeys($entryData);
+            $newValues = $entryData->merge($defaultsToSet)->toArray();
+
+            $event->entry->data($newValues);
+        }
     }
 
     public function createOrDeleteLocalizations(Event $event): void
