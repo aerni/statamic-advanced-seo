@@ -24,6 +24,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
         // or fall back to the origin if it doesn't.
         $site = $repository->determineOrigin($content->sites(), $site);
 
+        // This will find existing localization or create new ones. It will always trigger a save on the set.
         $set = $repository->createLocalizations($content->sites());
 
         $localization = $set->in($site);
