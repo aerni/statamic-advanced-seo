@@ -99,6 +99,8 @@ class Cascade
     {
         return Seo::allOfType('site')->flatMap(function ($defaults) {
             return $defaults->in($this->site->handle())->toAugmentedArray();
+        })->filter(function ($item) {
+            return $item instanceof \Statamic\Fields\Value;
         });
     }
 
