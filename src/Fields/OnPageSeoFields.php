@@ -461,7 +461,7 @@ class OnPageSeoFields extends BaseFields
         // TODO: $this->data is not used anymore. Fix it.
         // Only perform this check if we're on an entry.
         if ($this->data) {
-            $enabledCollections = (new SiteDefaultsRepository('general'))->get(Site::selected()->handle())
+            $enabledCollections = (new SeoDefaultsRepository('site', 'general'))->get(Site::selected()->handle())
                 ->get('social_images_generator_collections', []);
 
             // Don't show the generator section if the entry's collection is not configured.

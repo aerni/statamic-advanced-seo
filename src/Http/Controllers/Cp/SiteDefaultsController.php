@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Traits\ValidateType;
 use Illuminate\Http\Request;
 use Statamic\CP\Breadcrumbs;
@@ -121,8 +121,8 @@ class SiteDefaultsController extends BaseDefaultsController
         ]);
     }
 
-    protected function repository(string $handle): SiteDefaultsRepository
+    protected function repository(string $handle): SeoDefaultsRepository
     {
-        return new SiteDefaultsRepository($handle, Site::all()->map->handle());
+        return new SeoDefaultsRepository('site', $handle, Site::all()->map->handle());
     }
 }

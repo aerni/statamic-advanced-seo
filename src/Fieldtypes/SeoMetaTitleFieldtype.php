@@ -2,8 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
@@ -24,7 +23,7 @@ class SeoMetaTitleFieldtype extends Fieldtype
     {
         $sites = Site::all()->map->handle();
 
-        $repository = new SiteDefaultsRepository('general', $sites);
+        $repository = new SeoDefaultsRepository('site', 'general', $sites);
 
         $set = $repository->ensureLocalizations($sites)->set();
 
@@ -44,14 +43,19 @@ class SeoMetaTitleFieldtype extends Fieldtype
 
     protected function contentDefaults(): Collection
     {
-        $sites = Site::all()->map->handle();
-
         $sites = $this->field->parent()->sites();
 
-        $contentDefaults = $sites->mapWithKeys(function ($site) {
-            if ($set = Seo::find($this->type(), $this->typeHandle())) {
-                return [$site => $set->in($site)->values()->only('seo_title')->all()];
+        // TODO: Have to make this work for taxonomies as well.
+        $repository = new SeoDefaultsRepository('collections', $this->typeHandle(), $sites);
+
+        $contentDefaults = $sites->mapWithKeys(function ($site) use ($repository) {
+            $localization = $repository->set()->in($site);
+
+            if ($localization) {
+                return [$site => $localization->values()->only('seo_title')->all()];
             }
+
+            return [];
         });
 
         return $contentDefaults;

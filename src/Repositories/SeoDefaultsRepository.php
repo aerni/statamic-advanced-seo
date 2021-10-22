@@ -9,17 +9,18 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 
-abstract class BaseDefaultsRepository
+class SeoDefaultsRepository
 {
-    public string $contentType;
+    public string $type;
     public string $handle;
     protected Collection $sites;
     protected SeoDefaultSet $set;
 
-    public function __construct(string $handle, Collection $sites)
+    public function __construct(string $type, string $handle, Collection $sites)
     {
+        $this->type = $type;
         $this->handle = $handle;
-        $this->sites = $sites;
+        $this->sites = $sites; // TODO: Do I really need the sites in the constructor?
         $this->set = $this->findOrMakeSeoSet();
     }
 
@@ -154,14 +155,17 @@ abstract class BaseDefaultsRepository
         return $sites->first();
     }
 
-    abstract public function blueprint(): Blueprint;
+    public function blueprint(): Blueprint
+    {
+        return $this->set->blueprint();
+    }
 
     /**
      * Make an SEO set if it doesn't already exist.
      */
     protected function findOrMakeSeoSet(): SeoDefaultSet
     {
-        return Seo::find($this->contentType, $this->handle)
-            ?? Seo::make()->type($this->contentType)->handle($this->handle);
+        return Seo::find($this->type, $this->handle)
+            ?? Seo::make()->type($this->type)->handle($this->handle);
     }
 }
