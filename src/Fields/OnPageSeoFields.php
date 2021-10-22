@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Repositories\SiteDefaultsRepository;
+use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
@@ -37,13 +37,13 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_title',
                 'field' => [
-                    'type' => 'seo_meta_title',
+                    'type' => 'text',
                     'display' => 'Meta Title',
                     'instructions' => 'Set the Meta Title of this entry. Defaults to the entry\'s `Title`.',
+                    'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => 60,
-                    'input_type' => 'text',
                     'antlers' => false,
                     'validate' => [
                         'max:60',
