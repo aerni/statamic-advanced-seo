@@ -126,19 +126,26 @@ class OnPageSeoBlueprintSubscriber
     public function createOrDeleteLocalizations(Event $event): void
     {
         $property = $this->determineProperty($event);
-        $repository = $this->determineRepository($event);
+        $type = $this->determineRepositoryType($event);
 
         $handle = $property->handle();
         $sites = $property->sites();
 
-        (new $repository($handle, $sites))->createOrDeleteLocalizations($sites);
+        (new SeoDefaultsRepository($type, $handle, $sites))->createOrDeleteLocalizations($sites);
     }
 
+    /**
+     * Deletes a whole Seo Defaults Set.
+     */
     public function deleteDefaults(Event $event): void
     {
-        $repository = $this->determineRepository($event);
+        $property = $this->determineProperty($event);
+        $type = $this->determineRepositoryType($event);
 
-        $repository->delete();
+        $handle = $property->handle();
+        $sites = $property->sites();
+
+        (new SeoDefaultsRepository($type, $handle, $sites))->delete();
     }
 
     public function generateSocialImage(Event $event): void
@@ -146,11 +153,11 @@ class OnPageSeoBlueprintSubscriber
         GenerateSocialImageJob::dispatch($event->entry);
     }
 
-    protected function determineRepository(Event $event): mixed
+    protected function determineRepositoryType(Event $event): mixed
     {
         return property_exists($event, 'taxonomy')
-            ? TaxonomyDefaultsRepository::class
-            : CollectionDefaultsRepository::class;
+            ? 'taxonomies'
+            : 'collections';
     }
 
     protected function determineProperty(Event $event): mixed
