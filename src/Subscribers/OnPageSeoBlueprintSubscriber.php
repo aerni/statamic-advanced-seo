@@ -34,15 +34,28 @@ class OnPageSeoBlueprintSubscriber
 
     public function addFieldsToBlueprint(Event $event): void
     {
+        // Don't add fields in the blueprint builder.
         if (Str::contains(request()->path(), '/blueprints/' . $event->blueprint->handle()) || app()->runningInConsole()) {
             return;
         }
 
-        $event->blueprint->ensureFieldsInSection(OnPageSeoBlueprint::make()->items(), 'SEO');
+        // Don't add fields on any custom view.
+        if (Str::contains(request()->path(), '/advanced-seo/') || app()->runningInConsole()) {
+            return;
+        }
+
+        $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
 
         property_exists($event, 'entry')
             ? $this->addDefaultDataToEntry($event)
             : $this->addDefaultDataToTerm($event);
+    }
+
+    protected function blueprint(Event $event): OnPageSeoBlueprint
+    {
+        $data = property_exists($event, 'entry') ? $event->entry : $event->taxonomy;
+
+        return OnPageSeoBlueprint::make()->data($data);
     }
 
     /**

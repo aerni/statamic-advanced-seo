@@ -2,10 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Traits\HasAssetField;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
+use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Traits\HasAssetField;
+use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
+use Statamic\Contracts\Entries\Entry;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -457,17 +459,21 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
-        // TODO: $this->data is not used anymore. Fix it.
-        // Only perform this check if we're on an entry.
-        if ($this->data) {
-            $enabledCollections = (new SeoDefaultsRepository('site', 'general'))->get(Site::selected()->handle())
-                ->get('social_images_generator_collections', []);
+        $enabledCollections = Seo::find('site', 'general')
+            ->in(Site::selected()->handle())
+            ->value('social_images_generator_collections') ?? [];
 
-            // Don't show the generator section if the entry's collection is not configured.
-            if (! in_array($this->data->collection()->handle(), $enabledCollections)) {
-                return false;
-            }
+        // Don't show the generator section if the entry's collection is not configured.
+        if ($this->data instanceof Entry && ! in_array($this->data->collection()->handle(), $enabledCollections)) {
+            return false;
         }
+
+        // Don't show the generator section if the entry's collection is not configured.
+        if (is_array($this->data) && array_key_exists('collection', $this->data) && ! in_array($this->data['collection'], $enabledCollections)) {
+            return false;
+        }
+
+        // TODO: Make this work with Taxonomies.
 
         return true;
     }

@@ -119,18 +119,21 @@ class SeoDefaultSet implements Contract
     // TODO: Maybe add a blueprint repository to make this dynamic.
     public function blueprint()
     {
-        $blueprints = [
-            'general' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::make()->get(),
-            'marketing' => \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::make()->get(),
-            'collections' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->get(),
-            'taxonomies' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->get(),
-        ];
-
-        if (in_array($this->type(), ['collections', 'taxonomies'])) {
-            return $blueprints[$this->type()];
+        if ($this->type() === 'site' && $this->handle === 'general') {
+            return \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::make()->get();
         }
 
-        return $blueprints[$this->handle];
+        if ($this->type() === 'site' && $this->handle === 'marketing') {
+            return \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::make()->get();
+        }
+
+        if ($this->type() === 'collections') {
+            return \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->data(['collection' => $this->handle])->get();
+        }
+
+        if ($this->type() === 'taxonomies') {
+            return \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->data(['taxonomy' => $this->handle])->get();
+        }
     }
 
     public function save(): self
