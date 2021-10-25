@@ -38,9 +38,11 @@ class GenerateSocialImageJob implements ShouldQueue
             ->generate()
             ->toArray();
 
-        $data = array_merge($this->entry->get('seo'), $images);
+        $images = collect($images)->mapWithKeys(function ($image, $key) {
+            return ["seo_$key" => $image];
+        })->toArray();
 
-        $this->entry->set('seo', $data)->saveQuietly();
+        $this->entry->merge($images)->saveQuietly();
 
         // TODO: Check if this is really needed. It might be when the job is queued.
         // Stache::clear();
