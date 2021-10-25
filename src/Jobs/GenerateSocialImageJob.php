@@ -2,15 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Jobs;
 
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Facades\Storage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Support\Arr;
 
 class GenerateSocialImageJob implements ShouldQueue
 {
@@ -21,6 +20,7 @@ class GenerateSocialImageJob implements ShouldQueue
 
     private Entry $entry;
 
+    // TODO: Have to make this work with Taxonomies as well.
     public function __construct(Entry $entry)
     {
         $this->entry = $entry;
@@ -53,19 +53,26 @@ class GenerateSocialImageJob implements ShouldQueue
             return false;
         }
 
-        // TODO: Make this work with new Stache Store. And do we really need this functionality?
-        // // Get the collections that are allowed to generate social images.
-        // $enabledCollections = Storage::inSelectedSite()
-        //     ->get('general')
-        //     ->get('social_images_generator_collections', []);
+        // Get the collections that are allowed to generate social images.
+        $enabledCollections = Seo::find('site', 'general')
+            ->in($this->entry->site()->handle())
+            ->value('social_images_generator_collections') ?? [];
 
-        // // Shouldn't generate if the entry's collection is not selected.
-        // if (! in_array($this->entry->collection()->handle(), $enabledCollections)) {
-        //     return false;
-        // }
+        // Shouldn't generate if the entry's collection is not selected.
+        if (! in_array($this->entry->collection()->handle(), $enabledCollections)) {
+            return false;
+        }
+
+        $enabledByDefault = Seo::find('collections', $this->entry->collection()->handle())
+            ->in($this->entry->site()->handle())
+            ->value('seo_generate_social_images');
+
+        $enabledOnEntry = $this->entry->get('seo_generate_social_images');
+
+        $enabled = $enabledOnEntry ?? $enabledByDefault;
 
         // Shouldn't generate if the entry's generator toggle is off.
-        if (! Arr::get($this->entry->get('seo'), 'generate_social_images')) {
+        if (! $enabled) {
             return false;
         }
 
