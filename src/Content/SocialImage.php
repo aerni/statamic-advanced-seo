@@ -11,6 +11,7 @@ class SocialImage
 {
     protected string $id;
     protected string $basename;
+    protected string $timestamp;
 
     protected array $types = [
         'og' => [
@@ -22,6 +23,11 @@ class SocialImage
             'height' => 600,
         ],
     ];
+
+    public function __construct()
+    {
+        $this->timestamp = time();
+    }
 
     public function id(string $id): self
     {
@@ -68,7 +74,7 @@ class SocialImage
 
     public function path(string $type): string
     {
-        return "social_images/{$this->basename}-{$type}.png";
+        return "social_images/{$this->basename}-{$type}-{$this->timestamp}.png";
     }
 
     protected function ensureDirectoryExists(): void
