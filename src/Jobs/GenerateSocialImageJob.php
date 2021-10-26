@@ -49,7 +49,7 @@ class GenerateSocialImageJob implements ShouldQueue
     {
         $oldImages = [
             $this->entry->get('seo_og_image'),
-            $this->entry->get('seo_twitter_image')
+            $this->entry->get('seo_twitter_image'),
         ];
 
         foreach ($oldImages as $key => $path) {
