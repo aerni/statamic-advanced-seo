@@ -54,6 +54,11 @@ class Cascade
 
     protected function computedContext(): Collection
     {
+        // Handle 404 error pages.
+        if ($this->context->get('response_code') === 404) {
+            return $this->context->merge(['seo' => ['title' => $this->compiled404Title()]]);
+        }
+
         // Remove all seo variables from the context.
         $contextWithoutSeoVariables = $this->context->filter(function ($value, $key) {
             return ! Str::contains($key, 'seo_');
@@ -114,6 +119,11 @@ class Cascade
             'noindex' => optional($this->siteDefaults->get('noindex'))->value() ?: optional($data->get('noindex'))->value(),
             'nofollow' => optional($this->siteDefaults->get('nofollow'))->value() ?: optional($data->get('nofollow'))->value(),
         ]);
+    }
+
+    protected function compiled404Title(): string
+    {
+        return "404 {$this->titleSeparator()} {$this->siteName()}";
     }
 
     protected function compiledTitle(): string
