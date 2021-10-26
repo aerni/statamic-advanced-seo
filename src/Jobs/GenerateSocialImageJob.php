@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\File;
 use Statamic\Contracts\Entries\Entry;
 
 class GenerateSocialImageJob implements ShouldQueue
@@ -32,20 +33,32 @@ class GenerateSocialImageJob implements ShouldQueue
             return;
         }
 
-        $images = SocialImage::make()
+        $images = $this->generateNewImages();
+
+        $this->deleteOldImages();
+
+        $this->entry->merge($images)->saveQuietly();
+    }
+
+    protected function generateNewImages(): array
+    {
+        return SocialImage::make()
             ->id($this->entry->id())
             ->basename($this->entry->slug())
             ->generate()
             ->toArray();
+    }
 
-        $images = collect($images)->mapWithKeys(function ($image, $key) {
-            return ["seo_$key" => $image];
-        })->toArray();
+    protected function deleteOldImages(): void
+    {
+        $oldImages = [
+            $this->entry->get('seo_og_image'),
+            $this->entry->get('seo_twitter_image')
+        ];
 
-        $this->entry->merge($images)->saveQuietly();
-
-        // TODO: Check if this is really needed. It might be when the job is queued.
-        // Stache::clear();
+        foreach ($oldImages as $key => $path) {
+            File::delete(SocialImage::make()->container()->disk()->path($path));
+        }
     }
 
     protected function shouldGenerate(): bool

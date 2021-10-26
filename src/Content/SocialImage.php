@@ -61,7 +61,7 @@ class SocialImage
         $images = [];
 
         foreach ($this->types as $type => $item) {
-            $images["{$type}_image"] = $this->path($type);
+            $images["seo_{$type}_image"] = $this->path($type);
         }
 
         return $images;
