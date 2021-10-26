@@ -42,11 +42,7 @@ class GenerateSocialImageJob implements ShouldQueue
 
     protected function generateNewImages(): array
     {
-        return SocialImage::make()
-            ->id($this->entry->id())
-            ->basename($this->entry->slug())
-            ->generate()
-            ->toArray();
+        return SocialImage::make()->entry($this->entry)->generate()->toArray();
     }
 
     protected function deleteOldImages(): void

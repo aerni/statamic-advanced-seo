@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Content;
 
-use Illuminate\Support\Facades\File;
 use Spatie\Browsershot\Browsershot;
-use Statamic\Contracts\Assets\AssetContainer as Container;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\AssetContainer;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Assets\AssetContainer as Container;
 
 class SocialImage
 {
-    protected string $id;
-    protected string $basename;
+    protected Entry $entry;
     protected string $timestamp;
 
     protected array $types = [
@@ -29,16 +29,9 @@ class SocialImage
         $this->timestamp = time();
     }
 
-    public function id(string $id): self
+    public function entry(Entry $entry): self
     {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    public function basename(string $basename): self
-    {
-        $this->basename = $basename;
+        $this->entry = $entry;
 
         return $this;
     }
@@ -69,12 +62,12 @@ class SocialImage
 
     public function templateUrl(string $type): string
     {
-        return config('app.url') . "/seo/social-images/{$type}/" . $this->id;
+        return "{$this->entry->site()->absoluteUrl()}/seo/social-images/{$type}/{$this->entry->id()}";
     }
 
     public function path(string $type): string
     {
-        return "social_images/{$this->basename}-{$type}-{$this->timestamp}.png";
+        return "social_images/{$this->entry->slug()}-{$type}-{$this->timestamp}.png";
     }
 
     protected function ensureDirectoryExists(): void
