@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "spatie/browsershot": "^3.52",
         "spatie/laravel-ray": "^1.26",
         "spatie/schema-org": "^3.8",
