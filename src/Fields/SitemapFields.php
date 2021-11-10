@@ -15,21 +15,32 @@ class SitemapFields extends BaseFields
     {
         return [
             [
-                'handle' => 'section_sitemap',
+                'handle' => 'section_collections',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Configure your `sitemap.xml`',
-                    'display' => 'Sitemap',
+                    'instructions' => 'Select the collections and taxonomies you want to `exclude` from your sitemap.',
+                    'display' => 'Excluded Content',
                 ],
             ],
             [
-                'handle' => 'sitemap_collections',
+                'handle' => 'excluded_collections',
                 'field' => [
-                    'mode' => 'select',
+                    'mode' => 'stack',
                     'type' => 'collections',
-                    'instructions' => 'Select the collections you want to include in your sitemap.',
                     'listable' => 'hidden',
                     'display' => 'Collections',
+                    'localizable' => true,
+                    'width' => 50,
+                ],
+            ],
+            [
+                'handle' => 'excluded_taxonomies',
+                'field' => [
+                    'mode' => 'stack',
+                    'type' => 'taxonomies',
+                    'listable' => 'hidden',
+                    'display' => 'Taxonomies',
+                    'localizable' => true,
                     'width' => 50,
                 ],
             ],
