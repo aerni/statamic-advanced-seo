@@ -15,7 +15,7 @@ class SiteDefaultsController extends BaseDefaultsController
     use ValidateType;
 
     // TODO: This should probably be put in a repository.
-    protected array $allowedTypes = ['general', 'marketing'];
+    protected array $allowedTypes = ['general', 'marketing', 'sitemap'];
 
     public function edit(Request $request, string $handle): mixed
     {

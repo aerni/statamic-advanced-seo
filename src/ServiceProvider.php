@@ -114,6 +114,10 @@ class ServiceProvider extends AddonServiceProvider
                 'value' => 'marketing',
                 'label' => 'Marketing',
             ],
+            [
+                'value' => 'sitemap',
+                'label' => 'Sitemap',
+            ],
         ]);
 
         $contentGroup = collect([

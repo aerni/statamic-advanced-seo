@@ -16,4 +16,7 @@ return [
     'marketing' => 'Marketing',
     'marketing_description' => 'Configure your analytics trackers and site verifications.',
 
+    'sitemap' => 'Sitemap',
+    'sitemap_description' => 'Configure the general sitemap settings.',
+
 ];

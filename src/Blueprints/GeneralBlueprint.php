@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Fields\FaviconsFields;
 use Aerni\AdvancedSeo\Fields\GeneralFields;
-use Aerni\AdvancedSeo\Fields\SitemapFields;
 use Aerni\AdvancedSeo\Fields\SocialFields;
 
 class GeneralBlueprint extends BaseBlueprint
@@ -20,7 +19,6 @@ class GeneralBlueprint extends BaseBlueprint
             'general' => GeneralFields::class,
             'favicons' => FaviconsFields::class,
             'social' => SocialFields::class,
-            'sitemap' => SitemapFields::class,
         ];
     }
 }
