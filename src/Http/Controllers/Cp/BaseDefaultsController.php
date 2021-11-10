@@ -13,7 +13,7 @@ abstract class BaseDefaultsController extends CpController
 
     abstract public function update(string $handle, Request $request): void;
 
-    abstract protected function repository(string $handle): mixed;
+    abstract protected function set(string $handle): mixed;
 
     protected function extractFromFields(SeoVariables $localization, Blueprint $blueprint): array
     {

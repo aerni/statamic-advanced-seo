@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
-use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -68,8 +68,13 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
-        $collection = $event->entry->collection();
-        $defaults = (new SeoDefaultsRepository('collections', $collection->handle(), $collection->sites()))->set()->in($event->entry->locale())->data();
+        $defaults = Seo::find('collections', $event->entry->collection()->handle())
+            ?->in($event->entry->locale())
+            ?->data();
+
+        if (is_null($defaults)) {
+            return;
+        }
 
         // We only want to set the defaults that were not changed on the entry.
         $entryData = $event->entry->data();
@@ -89,8 +94,13 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
-        $taxonomy = $event->term->taxonomy();
-        $defaults = (new SeoDefaultsRepository('taxonomies', $taxonomy->handle(), $taxonomy->sites()))->set()->in($event->term->locale())->data();
+        $defaults = Seo::find('taxonomies', $event->term->taxonomy()->handle())
+            ?->in($event->term->locale())
+            ?->data();
+
+        if (is_null($defaults)) {
+            return;
+        }
 
         // We only want to set the defaults that were not changed on the entry.
         $termData = $event->term->data();
@@ -106,8 +116,13 @@ class OnPageSeoBlueprintSubscriber
      */
     public function removeDefaultDataFromEntry(Event $event): void
     {
-        $collection = $event->entry->collection();
-        $defaults = (new SeoDefaultsRepository('collections', $collection->handle(), $collection->sites()))->set()->in($event->entry->locale())->data();
+        $defaults = Seo::find('collections', $event->entry->collection()->handle())
+            ?->in($event->entry->locale())
+            ?->data();
+
+        if (is_null($defaults)) {
+            return;
+        }
 
         $dataWithoutDefaults = $event->entry->data()->filter(function ($value, $key) use ($defaults) {
             return $value !== $defaults->get($key);
@@ -122,8 +137,13 @@ class OnPageSeoBlueprintSubscriber
      */
     public function removeDefaultDataFromTerm(Event $event): void
     {
-        $taxonomy = $event->term->taxonomy();
-        $defaults = (new SeoDefaultsRepository('taxonomies', $taxonomy->handle(), $taxonomy->sites()))->set()->in($event->term->locale())->data();
+        $defaults = Seo::find('taxonomies', $event->term->taxonomy()->handle())
+            ?->in($event->term->locale())
+            ?->data();
+
+        if (is_null($defaults)) {
+            return;
+        }
 
         $dataWithoutDefaults = $event->term->data()->filter(function ($value, $key) use ($defaults) {
             return $value !== $defaults->get($key);
@@ -144,7 +164,7 @@ class OnPageSeoBlueprintSubscriber
         $handle = $property->handle();
         $sites = $property->sites();
 
-        (new SeoDefaultsRepository($type, $handle, $sites))->createOrDeleteLocalizations($sites);
+        Seo::findOrMake($type, $handle)->createOrDeleteLocalizations($sites);
     }
 
     /**
@@ -155,10 +175,7 @@ class OnPageSeoBlueprintSubscriber
         $property = $this->determineProperty($event);
         $type = $this->determineRepositoryType($event);
 
-        $handle = $property->handle();
-        $sites = $property->sites();
-
-        (new SeoDefaultsRepository($type, $handle, $sites))->delete();
+        Seo::find($type, $property->handle())?->delete();
     }
 
     public function generateSocialImage(Event $event): void

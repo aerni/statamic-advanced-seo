@@ -2,11 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Illuminate\Support\Collection;
 
 abstract class ContentDefaultsController extends BaseDefaultsController
 {
@@ -14,18 +15,17 @@ abstract class ContentDefaultsController extends BaseDefaultsController
     {
         $this->authorize("view $this->type defaults");
 
-        $repository = $this->repository($handle);
-
+        $set = $this->set($handle);
         $content = $this->content($handle);
 
-        $site = $request->site ?? Site::selected()->handle();
+        $requestedSite = $request->site ?? Site::selected()->handle();
 
-        // Select the requested site if it exists in the sites configuration of the content
-        // or fall back to the origin if it doesn't.
-        $site = $repository->determineOrigin($content->sites(), $site);
+        // Select the requested site if it exists in the sites configuration of the collection/taxonomy.
+        // Fall back to the default site or first site in the array.
+        $site = $this->evaluateSite($content->sites(), $requestedSite);
 
-        // This will find existing localization or create new ones. It will always trigger a save on the set.
-        $set = $repository->createLocalizations($content->sites());
+        // Create a localization for each of the provided sites. This triggers a save on the set.
+        $set = $set->createLocalizations($content->sites());
 
         $localization = $set->in($site);
 
@@ -91,11 +91,12 @@ abstract class ContentDefaultsController extends BaseDefaultsController
     {
         $this->authorize("edit $this->type defaults");
 
-        $repository = $this->repository($handle);
+        $set = $this->set($handle);
+        $content = $this->content($handle);
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $blueprint = $repository->blueprint();
+        $blueprint = $set->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -103,7 +104,16 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
         $values = $fields->process()->values();
 
-        $repository->save($site, $values);
+        $localization = $set->in($site)->determineOrigin($content->sites());
+
+        if ($localization->hasOrigin()) {
+            $values = collect(array_map(
+                'unserialize',
+                array_diff(array_map('serialize', $values->toArray()), array_map('serialize', $localization->origin()->data()->toArray()))
+            ));
+        }
+
+        $localization->data($values)->save();
     }
 
     protected function breadcrumbs(): Breadcrumbs
@@ -120,7 +130,18 @@ abstract class ContentDefaultsController extends BaseDefaultsController
         ]);
     }
 
-    abstract protected function repository(string $handle): mixed;
+    protected function evaluateSite(Collection $sites, string $site): string
+    {
+        if ($sites->contains($site)) {
+            return $site;
+        }
+
+        $defaultSite = Site::default()->handle();
+
+        return $sites->contains($defaultSite) ? $defaultSite : $sites->first();
+    }
+
+    abstract protected function set(string $handle): mixed;
 
     abstract protected function content(string $handle): mixed;
 }

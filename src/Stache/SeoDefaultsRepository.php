@@ -30,6 +30,11 @@ class SeoDefaultsRepository implements Contract
         return $this->store->store($type)->getItem($id);
     }
 
+    public function findOrMake(string $type, string $id): SeoDefaultSet
+    {
+        return $this->find($type, $id) ?? $this->make()->type($type)->handle($id);
+    }
+
     public function all(): Collection
     {
         return $this->store->discoverStores()->map(function ($store, $type) {

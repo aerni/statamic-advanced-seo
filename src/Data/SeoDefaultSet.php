@@ -75,6 +75,46 @@ class SeoDefaultSet implements Contract
             ->locale($site);
     }
 
+    public function createLocalizations(Collection $sites): self
+    {
+        return $this->ensureLocalizations($sites)->save();
+    }
+
+    public function createOrDeleteLocalizations(Collection $sites): self
+    {
+        return $this
+            ->ensureLocalizations($sites)
+            ->removeLocalizations($sites)
+            ->save();
+    }
+
+    public function ensureLocalizations(Collection $sites): self
+    {
+        // We only want to handle sites that are configured in Statamic's sites config.
+        $sites = $sites->intersect(Site::all()->keys());
+
+        // Make a localization for each site if it doesn't already exist.
+        $sites->each(function ($site) {
+            $this->in($site) ?? $this->addLocalization($this->makeLocalization($site));
+        });
+
+        // Determine the origin for each localization based on the provided sites.
+        $this->localizations()->each->determineOrigin($sites);
+
+        return $this;
+    }
+
+    public function removeLocalizations(Collection $sites): self
+    {
+        $localizationsToDelete = $this->localizations()->map->locale()->diff($sites);
+
+        $localizationsToDelete->each(function ($localization) {
+            $this->removeLocalization($this->localizations()->get($localization));
+        });
+
+        return $this;
+    }
+
     public function addLocalization(SeoVariables $localization): self
     {
         $localization->seoSet($this);

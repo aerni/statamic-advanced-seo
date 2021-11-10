@@ -2,15 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Data\Localization;
+use Statamic\Facades\Site;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoVariables implements Localization, Augmentable
@@ -148,9 +149,19 @@ class SeoVariables implements Localization, Augmentable
         return $this->seoSet()->in($origin);
     }
 
-    public function removeOrigin(): void
+    public function determineOrigin(Collection $sites): self
     {
-        $this->origin = null;
+        $defaultSite = Site::default()->handle();
+
+        $origin = $sites->contains($defaultSite)
+            ? $defaultSite
+            : $sites->first();
+
+        $this->locale === $origin
+            ? $this->origin(null)
+            : $this->origin($origin);
+
+        return $this;
     }
 
     public function newAugmentedInstance(): Augmented

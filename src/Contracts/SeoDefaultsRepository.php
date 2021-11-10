@@ -12,6 +12,8 @@ interface SeoDefaultsRepository
 
     public function find(string $type, string $id): ?SeoDefaultSet;
 
+    public function findOrMake(string $type, string $id): SeoDefaultSet;
+
     public function all(): Collection;
 
     public function allOfType(string $type): DataCollection;

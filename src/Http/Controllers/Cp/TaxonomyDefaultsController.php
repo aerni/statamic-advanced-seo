@@ -2,16 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
 use Statamic\Facades\Taxonomy;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 
 class TaxonomyDefaultsController extends ContentDefaultsController
 {
     protected string $type = 'taxonomy';
 
-    protected function repository(string $handle): SeoDefaultsRepository
+    protected function set(string $handle): SeoDefaultSet
     {
-        return new SeoDefaultsRepository('taxonomies', $handle, $this->content($handle)->sites());
+        return Seo::findOrMake('taxonomies', $handle);
     }
 
     protected function content(string $handle): mixed

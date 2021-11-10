@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Repositories\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Traits\ValidateType;
-use Illuminate\Http\Request;
-use Statamic\CP\Breadcrumbs;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Traits\ValidateType;
 
 class SiteDefaultsController extends BaseDefaultsController
 {
@@ -24,13 +25,13 @@ class SiteDefaultsController extends BaseDefaultsController
             return $this->pageNotFound();
         };
 
-        $repository = $this->repository($handle);
+        $set = $this->set($handle);
 
         $site = $request->site ?? Site::selected()->handle();
 
         $sites = Site::all()->map->handle();
 
-        $set = $repository->createLocalizations($sites);
+        $set = $set->createLocalizations($sites);
 
         $localization = $set->in($site);
 
@@ -77,7 +78,7 @@ class SiteDefaultsController extends BaseDefaultsController
                     'url' => $exists ? $localization->editUrl() : null,
                 ];
             })->sortBy('handle')->values()->all(),
-            'breadcrumbs' => $this->breadcrumbs($handle),
+            'breadcrumbs' => $this->breadcrumbs(),
             'readOnly' => $user->cant("edit $handle defaults"),
             'contentType' => 'site',
         ];
@@ -98,9 +99,10 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $repository = $this->repository($handle);
+        $set = $this->set($handle);
+        $sites = Site::all()->map->handle();
 
-        $blueprint = $repository->blueprint();
+        $blueprint = $set->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -108,10 +110,19 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $values = $fields->process()->values();
 
-        $repository->save($site, $values);
+        $localization = $set->in($site)->determineOrigin($sites);
+
+        if ($localization->hasOrigin()) {
+            $values = collect(array_map(
+                'unserialize',
+                array_diff(array_map('serialize', $values->toArray()), array_map('serialize', $localization->origin()->data()->toArray()))
+            ));
+        }
+
+        $localization->data($values)->save();
     }
 
-    protected function breadcrumbs(string $handle): Breadcrumbs
+    protected function breadcrumbs(): Breadcrumbs
     {
         return new Breadcrumbs([
             [
@@ -121,8 +132,8 @@ class SiteDefaultsController extends BaseDefaultsController
         ]);
     }
 
-    protected function repository(string $handle): SeoDefaultsRepository
+    protected function set(string $handle): SeoDefaultSet
     {
-        return new SeoDefaultsRepository('site', $handle, Site::all()->map->handle());
+        return Seo::findOrMake('site', $handle);
     }
 }
