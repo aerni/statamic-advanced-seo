@@ -53,7 +53,7 @@ class OnPageSeoBlueprintSubscriber
 
     protected function blueprint(Event $event): OnPageSeoBlueprint
     {
-        $data = property_exists($event, 'entry') ? $event->entry : $event->taxonomy;
+        $data = property_exists($event, 'entry') ? $event->entry : $event->term;
 
         return OnPageSeoBlueprint::make()->data($data);
     }
