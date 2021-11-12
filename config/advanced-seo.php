@@ -18,11 +18,14 @@ return [
     | Sitemap
     |--------------------------------------------------------------------------
     |
-    | Do you want to enable the Sitemap settings?
+    | Configure the Sitemap settings.
     |
     */
 
-    'sitemap' => true,
+    'sitemap' => [
+        'enabled' => true,
+        'expiry' => 60,
+    ],
 
     /*
     |--------------------------------------------------------------------------

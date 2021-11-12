@@ -19,6 +19,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $subscribe = [
         'Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber',
+        'Aerni\AdvancedSeo\Subscribers\SitemapInvalidationSubscriber',
     ];
 
     protected $tags = [
