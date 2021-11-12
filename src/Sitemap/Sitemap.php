@@ -2,17 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Entries\Entry;
-use Statamic\Facades\Taxonomy;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Sitemap\Item;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Entries\Entry;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Sitemap
 {
@@ -85,6 +84,7 @@ class Sitemap
                     ->get()->map->collection($taxonomy->collection());
             })->filter(function ($term) {
                 $termIsLinkedInAnEntry = $term->queryEntries()->where('site', Site::current()->handle())->get()->isNotEmpty();
+
                 return $termIsLinkedInAnEntry && $term->published() && view()->exists($term->template()) && ! $this->noindex($term);
             });
 

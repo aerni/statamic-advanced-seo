@@ -4,9 +4,9 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Traits\GetsEventData;
+use Illuminate\Events\Dispatcher;
 use Statamic\Events\Event;
 use Statamic\Facades\Site;
-use Illuminate\Events\Dispatcher;
 
 class SitemapInvalidationSubscriber
 {

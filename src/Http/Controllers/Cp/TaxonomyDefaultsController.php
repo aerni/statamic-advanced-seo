@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Statamic\Facades\Taxonomy;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Facades\Taxonomy;
 
 class TaxonomyDefaultsController extends ContentDefaultsController
 {
