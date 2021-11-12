@@ -9,9 +9,12 @@ use Illuminate\Events\Dispatcher;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Traits\GetsEventData;
 
 class OnPageSeoBlueprintSubscriber
 {
+    use GetsEventData;
+
     protected array $events = [
         Events\EntryBlueprintFound::class => 'addFieldsToBlueprint',
         Events\TermBlueprintFound::class => 'addFieldsToBlueprint',
@@ -158,7 +161,7 @@ class OnPageSeoBlueprintSubscriber
      */
     public function createOrDeleteLocalizations(Event $event): void
     {
-        $property = $this->determineProperty($event);
+        $property = $this->getProperty($event);
         $type = $this->determineRepositoryType($event);
 
         $handle = $property->handle();
@@ -172,7 +175,7 @@ class OnPageSeoBlueprintSubscriber
      */
     public function deleteDefaults(Event $event): void
     {
-        $property = $this->determineProperty($event);
+        $property = $this->getProperty($event);
         $type = $this->determineRepositoryType($event);
 
         Seo::find($type, $property->handle())?->delete();
@@ -181,19 +184,5 @@ class OnPageSeoBlueprintSubscriber
     public function generateSocialImage(Event $event): void
     {
         GenerateSocialImageJob::dispatch($event->entry);
-    }
-
-    protected function determineRepositoryType(Event $event): mixed
-    {
-        return property_exists($event, 'taxonomy')
-            ? 'taxonomies'
-            : 'collections';
-    }
-
-    protected function determineProperty(Event $event): mixed
-    {
-        return property_exists($event, 'taxonomy')
-            ? $event->taxonomy
-            : $event->collection;
     }
 }
