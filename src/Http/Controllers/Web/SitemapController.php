@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Addon;
+use Aerni\AdvancedSeo\Facades\Sitemap;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
-use Aerni\AdvancedSeo\Facades\Sitemap;
+use Statamic\Facades\Addon;
+use Statamic\Facades\Site;
 
 class SitemapController extends Controller
 {
@@ -21,7 +21,7 @@ class SitemapController extends Controller
             return view('advanced-seo::sitemaps.index', [
                 'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
                 'xslLink' => '<?xml-stylesheet type="text/xsl" href="' . $site->absoluteUrl() . '/sitemap.xsl"?>',
-                'sitemaps' =>  Sitemap::all(),
+                'sitemaps' => Sitemap::all(),
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ])->render();
         });
@@ -51,6 +51,7 @@ class SitemapController extends Controller
     public function xsl(): Response
     {
         $path = __DIR__ . '/../../../../resources/xsl/sitemap.xsl';
+
         return response(file_get_contents($path))->header('Content-Type', 'text/xsl');
     }
 }

@@ -3,12 +3,12 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\CP\Breadcrumbs;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Traits\ValidateType;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
 
 class SiteDefaultsController extends BaseDefaultsController
 {

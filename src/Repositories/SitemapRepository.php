@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Statamic\Facades\Site;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Sitemap\Sitemap;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Statamic\Facades\Collection as CollectionFacade;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Sitemap\Sitemap;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as EntriesCollection;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class SitemapRepository
 {

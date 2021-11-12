@@ -2,13 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Tags\Taxonomy\Taxonomy as TaxonomyTaxonomy;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Item
 {
@@ -53,6 +52,7 @@ class Item
 
         if ($canonicalType === 'other') {
             $entryId = $this->content->get('seo_canonical_entry') ?? $defaults?->get('seo_canonical_entry');
+
             return Data::find($entryId)->absoluteUrl();
         }
 

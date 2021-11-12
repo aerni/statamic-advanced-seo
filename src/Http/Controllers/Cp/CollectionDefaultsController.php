@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Statamic\Facades\Collection;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Facades\Collection;
 
 class CollectionDefaultsController extends ContentDefaultsController
 {
