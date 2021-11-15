@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Events\SeoDefaultsSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Traits\ValidateType;
 use Illuminate\Http\Request;
@@ -119,7 +120,9 @@ class SiteDefaultsController extends BaseDefaultsController
             ));
         }
 
-        $localization->data($values)->save();
+        $localization = $localization->data($values)->save();
+
+        SeoDefaultsSaved::dispatch($localization);
     }
 
     protected function breadcrumbs(): Breadcrumbs

@@ -15,7 +15,7 @@ trait GetsEventData
 
     protected function determineProperty(Event $event): string
     {
-        return collect(['collection', 'entry', 'taxonomy', 'term'])
+        return collect(['collection', 'entry', 'taxonomy', 'term', 'defaults'])
             ->first(function ($property) use ($event) {
                 return property_exists($event, $property);
             });

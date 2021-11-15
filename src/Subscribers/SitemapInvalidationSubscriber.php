@@ -15,6 +15,7 @@ class SitemapInvalidationSubscriber
         \Statamic\Events\TaxonomySaved::class => 'clearCache',
         \Statamic\Events\TermSaved::class => 'clearCache',
         \Statamic\Events\TermDeleted::class => 'clearCache',
+        \Aerni\AdvancedSeo\Events\SeoDefaultsSaved::class => 'clearCache',
     ];
 
     public function subscribe(Dispatcher $events): void
