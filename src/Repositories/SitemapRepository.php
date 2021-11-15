@@ -101,8 +101,8 @@ class SitemapRepository
         $config = $this->config();
 
         $excluded = $data instanceof EntriesCollection
-            ? $config->get('excluded_collections') ?? []
-            : $config->get('excluded_taxonomies') ?? [];
+            ? $config->value('excluded_collections') ?? []
+            : $config->value('excluded_taxonomies') ?? [];
 
         return in_array($data->handle(), $excluded);
     }
@@ -110,7 +110,7 @@ class SitemapRepository
     protected function config(): SeoVariables
     {
         return Seo::findOrMake('site', 'sitemap')
-            // ->createLocalizations(Site::all()->map->handle()) // TODO: Only create if it doesn't exist. See Tinkerwell error.
+            ->createLocalizations(Site::all()->map->handle()) // TODO: Only create if it doesn't exist. See Tinkerwell error.
             ->in(Site::current());
     }
 }
