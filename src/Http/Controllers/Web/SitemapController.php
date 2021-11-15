@@ -21,7 +21,7 @@ class SitemapController extends Controller
             return view('advanced-seo::sitemaps.index', [
                 'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
                 'xslLink' => '<?xml-stylesheet type="text/xsl" href="' . $site->absoluteUrl() . '/sitemap.xsl"?>',
-                'sitemaps' => Sitemap::all(),
+                'sitemaps' => Sitemap::whereSite($site->handle()),
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ])->render();
         });
@@ -32,9 +32,10 @@ class SitemapController extends Controller
     public function show(string $type, string $handle): Response
     {
         abort_unless(config('advanced-seo.sitemap.enabled'), 404);
-        abort_unless($sitemap = Sitemap::find($type, $handle), 404);
 
         $site = Site::current();
+
+        abort_unless($sitemap = Sitemap::find($type, $handle, $site->handle()), 404);
 
         $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}::{$type}::{$handle}", config('advanced-seo.sitemap.expiry'), function () use ($site, $sitemap) {
             return view('advanced-seo::sitemaps.show', [

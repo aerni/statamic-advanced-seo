@@ -15,9 +15,14 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class Sitemap
 {
-    public function __construct(protected string $type, protected string $handle)
+    public function __construct(protected string $type, protected string $handle, protected string $site)
     {
         //
+    }
+
+    public function site(): string
+    {
+        return $this->site;
     }
 
     public function type(): string
@@ -45,7 +50,7 @@ class Sitemap
     {
         return EntryFacade::query()
             ->where('collection', $this->handle)
-            ->where('site', Site::current()->handle())
+            ->where('site', $this->site)
             ->get()
             ->filter(function ($entry) {
                 return $entry->published() && $entry->uri() && ! $this->noindex($entry);
@@ -60,7 +65,7 @@ class Sitemap
 
         $terms = Term::query()
             ->where('taxonomy', $this->handle)
-            ->where('site', Site::current()->handle())
+            ->where('site', $this->site)
             ->get()
             ->filter(function ($term) {
                 return $term->published() && view()->exists($term->template()) && ! $this->noindex($term);
@@ -80,10 +85,10 @@ class Sitemap
         $collectionTerms = $collectionTaxonomies
             ->flatMap(function ($taxonomy) {
                 return $taxonomy->queryTerms()
-                    ->where('site', Site::current()->handle())
+                    ->where('site', $this->site)
                     ->get()->map->collection($taxonomy->collection());
             })->filter(function ($term) {
-                $termIsLinkedInAnEntry = $term->queryEntries()->where('site', Site::current()->handle())->get()->isNotEmpty();
+                $termIsLinkedInAnEntry = $term->queryEntries()->where('site', $this->site)->get()->isNotEmpty();
 
                 return $termIsLinkedInAnEntry && $term->published() && view()->exists($term->template()) && ! $this->noindex($term);
             });
@@ -98,8 +103,8 @@ class Sitemap
             : $data->taxonomyHandle();
 
         $defaultNoindex = Seo::find(str_plural($this->type), $handle)
-            ?->in(Site::current())
-            ?->get('seo_noindex');
+            ?->in($this->site)
+            ?->value('seo_noindex');
 
         $contentNoindex = $data->get('seo_noindex');
 
@@ -108,7 +113,7 @@ class Sitemap
 
     public function url(): string
     {
-        $siteUrl = Site::current()->absoluteUrl();
+        $siteUrl = Site::get($this->site)->absoluteUrl();
         $filename = "sitemap_{$this->type}_{$this->handle}.xml";
 
         return $siteUrl . '/' . $filename;
@@ -119,9 +124,9 @@ class Sitemap
         return $this->items()->sortByDesc('lastmod')->first()['lastmod'];
     }
 
-    public function clearCache(string $site): void
+    public function clearCache(): void
     {
-        Cache::forget("advanced-seo::sitemaps::{$site}");
-        Cache::forget("advanced-seo::sitemaps::{$site}::{$this->type}::{$this->handle}");
+        Cache::forget("advanced-seo::sitemaps::{$this->site}");
+        Cache::forget("advanced-seo::sitemaps::{$this->site}::{$this->type}::{$this->handle}");
     }
 }

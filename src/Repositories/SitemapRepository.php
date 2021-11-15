@@ -14,15 +14,17 @@ use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class SitemapRepository
 {
-    public function make(string $type, string $handle): Sitemap
+    public function make(string $type, string $handle, string $site): Sitemap
     {
-        return new Sitemap($type, $handle);
+        return new Sitemap($type, $handle, $site);
     }
 
-    public function find(string $type, string $handle): ?Sitemap
+    public function find(string $type, string $handle, string $site): ?Sitemap
     {
-        return $this->all()->first(function ($sitemap) use ($type, $handle) {
-            return $sitemap->type() === $type && $sitemap->handle() === $handle;
+        return $this->all()->first(function ($sitemap) use ($type, $handle, $site) {
+            return $sitemap->type() === $type
+                && $sitemap->handle() === $handle
+                && $sitemap->site() === $site;
         });
     }
 
@@ -31,18 +33,31 @@ class SitemapRepository
         return $this->collectionSitemaps()->merge($this->taxonomySitemaps());
     }
 
-    public function clearCache(string $site, string $type, string $handle): void
+    public function whereSite(string $site): Collection
     {
-        $this->find($type, $handle)->clearCache($site);
+        return $this->all()->filter(function ($sitemap) use ($site) {
+            return $sitemap->site() === $site;
+        });
+    }
+
+    public function clearCache(string $type = null, string $handle = null, string $site = null): bool
+    {
+        empty(func_get_args())
+            ? $this->all()->each->clearCache()
+            : $this->find($type, $handle, $site)->clearCache();
+
+        return true;
     }
 
     protected function collectionSitemaps(): Collection
     {
         return CollectionFacade::all()
-            ->filter(function ($collection) {
-                return $this->hasRoute($collection) && ! $this->excludeFromSitemap($collection);
-            })->map(function ($collection) {
-                return $this->make('collections', $collection->handle());
+            ->flatMap(function ($collection) {
+                return $collection->sites()->map(function ($site) use ($collection) {
+                    if ($this->hasRoute($collection, $site) && ! $this->excludeFromSitemap($collection, $site)) {
+                        return $this->make('collections', $collection->handle(), $site);
+                    }
+                })->filter();
             });
     }
 
@@ -51,15 +66,17 @@ class SitemapRepository
         return TaxonomyFacade::all()
             ->filter(function ($taxonomy) {
                 return $this->hasRoute($taxonomy) && ! $this->excludeFromSitemap($taxonomy);
-            })->map(function ($taxonomy) {
-                return $this->make('taxonomies', $taxonomy->handle());
+            })->flatMap(function ($taxonomy) {
+                return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
+                    return $this->make('taxonomies', $taxonomy->handle(), $site);
+                });
             });
     }
 
-    protected function hasRoute(EntriesCollection|Taxonomy $data): bool
+    protected function hasRoute(EntriesCollection|Taxonomy $data, string $site = null): bool
     {
         return $data instanceof EntriesCollection
-            ? ! is_null($data->route(Site::current()->handle()))
+            ? ! is_null($data->route($site))
             : $this->taxonomyRoutes($data)->isNotEmpty();
     }
 
@@ -96,21 +113,18 @@ class SitemapRepository
         return $templateViews;
     }
 
-    protected function excludeFromSitemap(EntriesCollection|Taxonomy $data): bool
+    protected function excludeFromSitemap(EntriesCollection|Taxonomy $data, string $site = null): bool
     {
-        $config = $this->config();
+        $site = Site::get($site) ?? Site::current();
+
+        $config = Seo::findOrMake('site', 'sitemap')
+            ->createLocalizations(Site::all()->map->handle())
+            ->in($site);
 
         $excluded = $data instanceof EntriesCollection
             ? $config->value('excluded_collections') ?? []
             : $config->value('excluded_taxonomies') ?? [];
 
         return in_array($data->handle(), $excluded);
-    }
-
-    protected function config(): SeoVariables
-    {
-        return Seo::findOrMake('site', 'sitemap')
-            ->createLocalizations(Site::all()->map->handle()) // TODO: Only create if it doesn't exist. See Tinkerwell error.
-            ->in(Site::current());
     }
 }
