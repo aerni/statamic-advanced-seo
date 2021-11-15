@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Facades\Sitemap;
 use Illuminate\Events\Dispatcher;
 use Statamic\Events\Event;
 
-class SitemapInvalidationSubscriber
+class SitemapCacheSubscriber
 {
     protected array $events = [
         \Statamic\Events\CollectionSaved::class => 'clearCache',
