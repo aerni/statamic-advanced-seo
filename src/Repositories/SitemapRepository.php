@@ -77,6 +77,8 @@ class SitemapRepository
             : $this->taxonomyRoutes($data)->isNotEmpty();
     }
 
+    // You can't configure routes per site like you can with collections.
+    // So we just check the routes for the default site.
     protected function taxonomyRoutes(Taxonomy $taxonomy): Collection
     {
         $globalTaxonomyTemplates = $taxonomy->template();
