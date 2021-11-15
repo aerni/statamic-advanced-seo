@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Events\SeoDefaultsSaved;
 
 abstract class ContentDefaultsController extends BaseDefaultsController
 {
@@ -113,7 +114,9 @@ abstract class ContentDefaultsController extends BaseDefaultsController
             ));
         }
 
-        $localization->data($values)->save();
+        $localization = $localization->data($values)->save();
+
+        SeoDefaultsSaved::dispatch($localization);
     }
 
     protected function breadcrumbs(): Breadcrumbs
