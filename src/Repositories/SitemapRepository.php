@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Sitemap\Sitemap;
 use Illuminate\Support\Collection;
@@ -40,11 +39,9 @@ class SitemapRepository
         });
     }
 
-    public function clearCache(string $type = null, string $handle = null, string $site = null): bool
+    public function clearCache(): bool
     {
-        empty(func_get_args())
-            ? $this->all()->each->clearCache()
-            : $this->find($type, $handle, $site)->clearCache();
+        $this->all()->each->clearCache();
 
         return true;
     }
