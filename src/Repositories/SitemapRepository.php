@@ -61,12 +61,12 @@ class SitemapRepository
     protected function taxonomySitemaps(): Collection
     {
         return TaxonomyFacade::all()
-            ->filter(function ($taxonomy) {
-                return $this->hasRoute($taxonomy) && ! $this->excludeFromSitemap($taxonomy);
-            })->flatMap(function ($taxonomy) {
+            ->flatMap(function ($taxonomy) {
                 return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
-                    return $this->make('taxonomies', $taxonomy->handle(), $site);
-                });
+                    if ($this->hasRoute($taxonomy) && ! $this->excludeFromSitemap($taxonomy, $site)) {
+                        return $this->make('taxonomies', $taxonomy->handle(), $site);
+                    }
+                })->filter();
             });
     }
 
