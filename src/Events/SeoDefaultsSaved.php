@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Events;
 
-use Statamic\Events\Event;
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Events\Event;
 
 class SeoDefaultsSaved extends Event
 {
