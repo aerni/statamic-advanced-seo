@@ -13,10 +13,10 @@ class SitemapInvalidationSubscriber
     use GetsEventData;
 
     protected array $events = [
-        \Statamic\Events\EntrySaved::class => 'invalidateContentSitemaps',
-        \Statamic\Events\EntryDeleted::class => 'invalidateContentSitemaps',
-        \Statamic\Events\TermSaved::class => 'invalidateContentSitemaps',
-        \Statamic\Events\TermDeleted::class => 'invalidateContentSitemaps',
+        \Statamic\Events\EntrySaved::class => 'invalidateSitemaps',
+        \Statamic\Events\EntryDeleted::class => 'invalidateSitemaps',
+        \Statamic\Events\TermSaved::class => 'invalidateSitemaps',
+        \Statamic\Events\TermDeleted::class => 'invalidateSitemaps',
     ];
 
     public function subscribe(Dispatcher $events): void
@@ -26,7 +26,7 @@ class SitemapInvalidationSubscriber
         }
     }
 
-    public function invalidateContentSitemaps(Event $event)
+    public function invalidateSitemaps(Event $event): void
     {
         if ($this->determineProperty($event) === 'entry') {
             $site = $event->entry->locale();
