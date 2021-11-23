@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
+use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
 
 class ContentDefaultsBlueprint extends BaseBlueprint
 {
@@ -14,7 +14,7 @@ class ContentDefaultsBlueprint extends BaseBlueprint
     protected function sections(): array
     {
         return [
-            'main' => OnPageSeoFields::class,
+            'main' => ContentDefaultsFields::class,
         ];
     }
 }
