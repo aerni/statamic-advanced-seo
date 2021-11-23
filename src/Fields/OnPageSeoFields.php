@@ -459,8 +459,8 @@ class OnPageSeoFields extends BaseFields
         }
 
         $enabledCollections = Seo::find('site', 'general')
-            ->in(Site::selected()->handle())
-            ->value('social_images_generator_collections') ?? [];
+            ?->in(Site::selected()->handle())
+            ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the entry's collection is not configured.
         if ($this->data instanceof Entry && ! in_array($this->data->collection()->handle(), $enabledCollections)) {
