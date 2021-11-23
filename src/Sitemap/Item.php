@@ -2,21 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class Item
 {
     const DEFAULT_CHANGEFREQ = 'daily';
     const DEFAULT_PRIORITY = '0.5';
 
+    protected ?SeoVariables $defaults;
+
     public function __construct(protected Entry|Taxonomy|LocalizedTerm $content)
     {
-        //
+        $this->defaults = Seo::find($this->type(), $this->handle())?->in(Site::current());
     }
 
     public function type(): string
@@ -46,18 +49,16 @@ class Item
 
     public function loc(): string
     {
-        $defaults = Seo::find(str_plural($this->type()), $this->handle())?->in(Site::current());
-
-        $canonicalType = $this->content->get('seo_canonical_type') ?? $defaults?->get('seo_canonical_type');
+        $canonicalType = $this->content->get('seo_canonical_type') ?? $this->defaults?->get('seo_canonical_type');
 
         if ($canonicalType === 'other') {
-            $entryId = $this->content->get('seo_canonical_entry') ?? $defaults?->get('seo_canonical_entry');
+            $entryId = $this->content->get('seo_canonical_entry') ?? $this->defaults?->get('seo_canonical_entry');
 
             return Data::find($entryId)->absoluteUrl();
         }
 
         if ($canonicalType === 'custom') {
-            return $this->content->get('seo_canonical_custom') ?? $defaults?->get('seo_canonical_custom');
+            return $this->content->get('seo_canonical_custom') ?? $this->defaults?->get('seo_canonical_custom');
         }
 
         return $this->content->absoluteUrl();
@@ -73,12 +74,16 @@ class Item
 
     public function changefreq(): string
     {
-        return $this->content->get('seo_sitemap_change_frequency') ?? self::DEFAULT_CHANGEFREQ;
+        return $this->content->get('seo_sitemap_change_frequency')
+            ?? $this->defaults?->get('seo_sitemap_change_frequency')
+            ?? self::DEFAULT_CHANGEFREQ;
     }
 
     public function priority(): string
     {
-        return $this->content->get('seo_sitemap_priority') ?: self::DEFAULT_PRIORITY;
+        return $this->content->get('seo_sitemap_priority')
+            ?? $this->defaults?->get('seo_sitemap_priority')
+            ?? self::DEFAULT_PRIORITY;
     }
 
     public function toArray(): array

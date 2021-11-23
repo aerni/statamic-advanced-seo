@@ -411,7 +411,7 @@ class OnPageSeoFields extends BaseFields
                     'push_tags' => false,
                     'cast_booleans' => false,
                     'width' => 50,
-                    'default' => 'weekly',
+                    'default' => 'daily',
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
