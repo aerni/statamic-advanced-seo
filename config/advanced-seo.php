@@ -18,7 +18,8 @@ return [
     | Sitemap
     |--------------------------------------------------------------------------
     |
-    | Configure the Sitemap settings.
+    | Choose to enable or disable the Sitemap functionality
+    | and configure the cache expiry in minutes.
     |
     */
 
