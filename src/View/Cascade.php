@@ -245,7 +245,12 @@ class Cascade
                 ->url(config('app.url') . $this->context->get('homepage'));
 
             if ($logo = optional($this->data->get('organization_logo'))->value()) {
-                $schema->logo($logo->absoluteUrl());
+                $logo = Schema::imageObject()
+                    ->url($logo->absoluteUrl())
+                    ->width($logo->width())
+                    ->height($logo->height());
+
+                $schema->logo($logo);
             }
         }
 
