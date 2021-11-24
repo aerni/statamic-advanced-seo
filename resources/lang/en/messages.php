@@ -14,9 +14,9 @@ return [
     'general_description' => 'Configure general site settings, e.g. site name.',
 
     'marketing' => 'Marketing',
-    'marketing_description' => 'Configure your analytics trackers and site verifications.',
+    'marketing_description' => 'Configure your analytics trackers.',
 
     'indexing' => 'Indexing',
-    'indexing_description' => 'Configure the crawling and indexing settings.',
+    'indexing_description' => 'Configure indexing settings like noindex and sitemap.',
 
 ];

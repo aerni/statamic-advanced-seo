@@ -2,18 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
-use Aerni\AdvancedSeo\Facades\Sitemap;
+use Statamic\Facades\Site;
+use Statamic\Facades\Addon;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Facades\Addon;
-use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Facades\Sitemap;
+use Statamic\Exceptions\NotFoundHttpException;
 
 class SitemapController extends Controller
 {
     public function index(): Response
     {
-        abort_unless(config('advanced-seo.sitemap.enabled'), 404);
+        throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
         $site = Site::current();
 
@@ -31,11 +32,11 @@ class SitemapController extends Controller
 
     public function show(string $type, string $handle): Response
     {
-        abort_unless(config('advanced-seo.sitemap.enabled'), 404);
+        throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
         $site = Site::current();
 
-        abort_unless($sitemap = Sitemap::find($type, $handle, $site->handle()), 404);
+        throw_unless($sitemap = Sitemap::find($type, $handle, $site->handle()), new NotFoundHttpException);
 
         $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}::{$type}::{$handle}", config('advanced-seo.sitemap.expiry'), function () use ($site, $sitemap) {
             return view('advanced-seo::sitemaps.show', [
