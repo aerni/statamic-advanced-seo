@@ -13,7 +13,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 
 class SiteDefaultsController extends BaseDefaultsController
 {
-    const DEFAULTS = ['general', 'indexing', 'marketing', 'sitemap'];
+    const DEFAULTS = ['general', 'indexing', 'marketing'];
 
     public function edit(Request $request, string $handle): mixed
     {

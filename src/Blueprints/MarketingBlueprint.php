@@ -2,8 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\IndexingFields;
-use Aerni\AdvancedSeo\Fields\SiteVerificationFields;
 use Aerni\AdvancedSeo\Fields\TrackersFields;
 
 class MarketingBlueprint extends BaseBlueprint
@@ -17,8 +15,6 @@ class MarketingBlueprint extends BaseBlueprint
     {
         return [
             'trackers' => TrackersFields::class,
-            'indexing' => IndexingFields::class,
-            'site_verification' => SiteVerificationFields::class,
         ];
     }
 }

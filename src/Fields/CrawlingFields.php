@@ -2,24 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-class IndexingFields extends BaseFields
+class CrawlingFields extends BaseFields
 {
     public function sections(): array
     {
         return [
-            $this->indexing(),
+            $this->crawling(),
         ];
     }
 
-    public function indexing(): array
+    public function crawling(): array
     {
         return [
             [
-                'handle' => 'section_indexing',
+                'handle' => 'section_crawling',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Indexing',
-                    'instructions' => 'Configure the indexing settings for your site.',
+                    'display' => 'Crawling',
+                    'instructions' => 'Configure the crawling settings for your site.',
                 ],
             ],
             [
@@ -29,6 +29,7 @@ class IndexingFields extends BaseFields
                     'display' => 'Noindex',
                     'instructions' => 'Prevent this site from being indexed by search engines.',
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'width' => 50,
                 ],
             ],
@@ -39,6 +40,7 @@ class IndexingFields extends BaseFields
                     'display' => 'Nofollow',
                     'instructions' => 'Prevent site crawlers from following links on your site.',
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'width' => 50,
                 ],
             ],

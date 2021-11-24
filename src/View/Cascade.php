@@ -227,7 +227,7 @@ class Cascade
     {
         $type = optional($this->data->get('site_json_ld_type'))->raw();
 
-        if (empty($type)) {
+        if (empty($type) || $type === 'none') {
             return null;
         }
 

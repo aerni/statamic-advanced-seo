@@ -167,8 +167,8 @@ class SeoDefaultSet implements Contract
             return \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::make()->get();
         }
 
-        if ($this->type() === 'site' && $this->handle === 'sitemap') {
-            return \Aerni\AdvancedSeo\Blueprints\SitemapBlueprint::make()->get();
+        if ($this->type() === 'site' && $this->handle === 'indexing') {
+            return \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::make()->get();
         }
 
         if ($this->type() === 'collections') {

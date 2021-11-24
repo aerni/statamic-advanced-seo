@@ -116,7 +116,7 @@ class SitemapRepository
     {
         $site = Site::get($site) ?? Site::current();
 
-        $config = Seo::findOrMake('site', 'sitemap')
+        $config = Seo::findOrMake('site', 'indexing')
             ->createLocalizations(Site::all()->map->handle())
             ->in($site);
 

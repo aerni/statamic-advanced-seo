@@ -116,8 +116,8 @@ class ServiceProvider extends AddonServiceProvider
                 'label' => 'Marketing',
             ],
             [
-                'value' => 'sitemap',
-                'label' => 'Sitemap',
+                'value' => 'indexing',
+                'label' => 'Indexing',
             ],
         ]);
 
