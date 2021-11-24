@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\FaviconsFields;
-use Aerni\AdvancedSeo\Fields\GeneralFields;
 use Aerni\AdvancedSeo\Fields\SocialFields;
+use Aerni\AdvancedSeo\Fields\GeneralFields;
+use Aerni\AdvancedSeo\Fields\FaviconsFields;
 
 class GeneralBlueprint extends BaseBlueprint
 {

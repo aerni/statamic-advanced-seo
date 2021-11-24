@@ -2,10 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\SitemapFields;
-use Aerni\AdvancedSeo\Fields\CrawlingFields;
-use Aerni\AdvancedSeo\Fields\KnowledgeGraphFields;
-use Aerni\AdvancedSeo\Fields\SiteVerificationFields;
+use Aerni\AdvancedSeo\Fields\IndexingFields;
 
 class IndexingBlueprint extends BaseBlueprint
 {
@@ -17,10 +14,7 @@ class IndexingBlueprint extends BaseBlueprint
     protected function sections(): array
     {
         return [
-            'crawling' => CrawlingFields::class,
-            'sitemap' => SitemapFields::class,
-            'knowledge_graph' => KnowledgeGraphFields::class,
-            'site_verification' => SiteVerificationFields::class,
+            'indexing' => IndexingFields::class,
         ];
     }
 }
