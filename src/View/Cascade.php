@@ -234,7 +234,9 @@ class Cascade
         if ($type === 'custom') {
             $data = $this->data->get('site_json_ld')->value();
 
-            return "<script type=\"application/ld+json\">{$data}</script>";
+            return $data
+                ? '<script type="application/ld+json">' . json_encode(json_decode($data)) . '</script>'
+                : null;
         }
 
         if ($type === 'organization') {
@@ -260,10 +262,8 @@ class Cascade
     {
         $data = optional($this->data->get('json_ld'))->value();
 
-        if ($data) {
-            return "<script type=\"application/ld+json\">{$data}</script>";
-        }
-
-        return null;
+        return $data
+            ? '<script type="application/ld+json">' . json_encode(json_decode($data)) . '</script>'
+            : null;
     }
 }
