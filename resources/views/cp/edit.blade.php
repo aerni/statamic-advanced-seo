@@ -27,6 +27,4 @@
         content-type="{{ $contentType }}"
     ></defaults-publish-form>
 
-    @include('advanced-seo::cp/_docs_callout')
-
 @stop
