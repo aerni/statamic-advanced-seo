@@ -102,7 +102,6 @@ class ContentDefaultsFields extends BaseFields
                     'display' => 'Generate Social Images',
                     'instructions' => 'Activate to automatically generate the Open Graph and Twitter Images of this entry.',
                     'listable' => 'hidden',
-                    'default' => true,
                 ],
             ],
         ];
