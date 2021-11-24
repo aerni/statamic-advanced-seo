@@ -2,29 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Aerni\AdvancedSeo\Events\SeoDefaultsSaved;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Traits\ValidateType;
-use Illuminate\Http\Request;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Events\SeoDefaultsSaved;
+use Statamic\Exceptions\NotFoundHttpException;
 
 class SiteDefaultsController extends BaseDefaultsController
 {
-    use ValidateType;
-
-    // TODO: This should probably be put in a repository.
-    protected array $allowedTypes = ['general', 'marketing', 'sitemap'];
+    const DEFAULTS = ['general', 'indexing', 'marketing', 'sitemap'];
 
     public function edit(Request $request, string $handle): mixed
     {
-        $this->authorize("view $handle defaults");
+        throw_unless(in_array($handle, self::DEFAULTS), new NotFoundHttpException);
 
-        if (! $this->isValidType($handle)) {
-            return $this->pageNotFound();
-        };
+        $this->authorize("view $handle defaults");
 
         $set = $this->set($handle);
 

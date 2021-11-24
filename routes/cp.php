@@ -9,7 +9,7 @@ use Aerni\AdvancedSeo\Http\Controllers\Cp\OverviewController;
 // TODO: Use route group.
 
 Route::get('advanced-seo', [OverviewController::class, 'index'])->name('advanced-seo.index');
-Route::get('advanced-seo/{type}', [OverviewController::class, 'show'])->name('advanced-seo.show');
+Route::get('advanced-seo/{group}', [OverviewController::class, 'show'])->name('advanced-seo.show');
 
 Route::get('advanced-seo/site/{default}', [SiteDefaultsController::class, 'edit'])->name('advanced-seo.site.edit');
 Route::patch('advanced-seo/site/{default}', [SiteDefaultsController::class, 'update'])->name('advanced-seo.site.update');

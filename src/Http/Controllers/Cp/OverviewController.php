@@ -2,17 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Illuminate\View\View;
+use Illuminate\Http\Response;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Traits\ValidateType;
-use Illuminate\View\View;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
 class OverviewController extends CpController
 {
-    use ValidateType;
-
-    // TODO: This should probably be put in a repository.
-    protected array $allowedTypes = ['site', 'content'];
+    const GROUPS = ['site', 'content'];
 
     public function index(): View
     {
@@ -21,14 +20,12 @@ class OverviewController extends CpController
         return view('advanced-seo::cp.index');
     }
 
-    public function show(string $type): View
+    public function show(string $group): View|Response
     {
-        $this->authorize($type . 'DefaultsIndex', SeoVariables::class);
+        throw_unless(in_array($group, self::GROUPS), new NotFoundHttpException);
 
-        if (! $this->isValidType($type)) {
-            return $this->pageNotFound();
-        };
+        $this->authorize($group . 'DefaultsIndex', SeoVariables::class);
 
-        return view("advanced-seo::cp.{$type}_index");
+        return view("advanced-seo::cp.{$group}_index");
     }
 }
