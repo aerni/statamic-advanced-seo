@@ -18,6 +18,12 @@ class ServiceProvider extends AddonServiceProvider
         Fieldtypes\SeoMetaTitleFieldtype::class,
     ];
 
+    protected $listen = [
+        \Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class => [
+            \Aerni\AdvancedSeo\Listeners\GenerateFavicons::class,
+        ],
+    ];
+
     protected $subscribe = [
         'Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber',
         'Aerni\AdvancedSeo\Subscribers\SitemapCacheSubscriber',
