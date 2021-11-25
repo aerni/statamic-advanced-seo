@@ -13,11 +13,9 @@ use Statamic\Exceptions\NotFoundHttpException;
 
 class SiteDefaultsController extends BaseDefaultsController
 {
-    const DEFAULTS = ['favicons', 'general', 'indexing', 'marketing', 'social'];
-
     public function edit(Request $request, string $handle): mixed
     {
-        throw_unless(in_array($handle, self::DEFAULTS), new NotFoundHttpException);
+        throw_unless(in_array($handle, $this->defaults()), new NotFoundHttpException);
 
         $this->authorize("view $handle defaults");
 
@@ -128,6 +126,17 @@ class SiteDefaultsController extends BaseDefaultsController
                 'url' => cp_route('advanced-seo.show', 'site'),
             ],
         ]);
+    }
+
+    protected function defaults(): array
+    {
+        $defaults = ['general', 'indexing', 'marketing', 'social'];
+
+        if (config('advanced-seo.favicons', false)) {
+            $defaults[] = 'favicons';
+        }
+
+        return $defaults;
     }
 
     protected function set(string $handle): SeoDefaultSet

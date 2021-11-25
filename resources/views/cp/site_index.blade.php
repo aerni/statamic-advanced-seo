@@ -68,21 +68,23 @@
                 </div>
             </div>
         @endcan
-        @can('view favicons defaults')
-            <div class="w-full px-2 mb-4 lg:w-1/2 widget">
-                <div class="h-full p-0 overflow-hidden card content">
-                    <a href="{{ cp_route('advanced-seo.site.edit', 'favicons') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
-                        <div class="w-8 h-8 mr-3 text-blue">
-                            @cp_svg('color')
-                        </div>
-                        <div class="flex-1 mt-sm">
-                            <h2>{{ __('advanced-seo::messages.favicons') }}</h2>
-                            <p>{{ __('advanced-seo::messages.favicons_description') }}</p>
-                        </div>
-                    </a>
+        @if (config('advanced-seo.favicons', false))
+            @can('view favicons defaults')
+                <div class="w-full px-2 mb-4 lg:w-1/2 widget">
+                    <div class="h-full p-0 overflow-hidden card content">
+                        <a href="{{ cp_route('advanced-seo.site.edit', 'favicons') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
+                            <div class="w-8 h-8 mr-3 text-blue">
+                                @cp_svg('color')
+                            </div>
+                            <div class="flex-1 mt-sm">
+                                <h2>{{ __('advanced-seo::messages.favicons') }}</h2>
+                                <p>{{ __('advanced-seo::messages.favicons_description') }}</p>
+                            </div>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        @endcan
+            @endcan
+        @endif
     </div>
 
     @include('advanced-seo::cp/_docs_callout')
