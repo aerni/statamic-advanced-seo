@@ -16,8 +16,8 @@ return [
     'favicons' => 'Favicons',
     'favicons_description' => 'Add and configure the favicon.',
 
-    'social' => 'Social',
-    'social_description' => 'Configure the social media settings.',
+    'social_media' => 'Social Media',
+    'social_media_description' => 'Configure the social media settings.',
 
     'marketing' => 'Marketing',
     'marketing_description' => 'Configure your analytics trackers.',

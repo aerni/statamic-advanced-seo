@@ -53,16 +53,16 @@
                 </div>
             </div>
         @endcan
-        @can('view social defaults')
+        @can('view social_media defaults')
             <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                 <div class="h-full p-0 overflow-hidden card content">
-                    <a href="{{ cp_route('advanced-seo.site.edit', 'social') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
+                    <a href="{{ cp_route('advanced-seo.site.edit', 'social_media') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
                         <div class="w-8 h-8 mr-3 text-blue">
                             @cp_svg('assets')
                         </div>
                         <div class="flex-1 mt-sm">
-                            <h2>{{ __('advanced-seo::messages.social') }}</h2>
-                            <p>{{ __('advanced-seo::messages.social_description') }}</p>
+                            <h2>{{ __('advanced-seo::messages.social_media') }}</h2>
+                            <p>{{ __('advanced-seo::messages.social_media_description') }}</p>
                         </div>
                     </a>
                 </div>

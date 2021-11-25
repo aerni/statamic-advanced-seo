@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Traits\HasAssetField;
 
-class SocialFields extends BaseFields
+class SocialMediaFields extends BaseFields
 {
     use HasAssetField;
 

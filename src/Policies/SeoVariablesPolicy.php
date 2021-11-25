@@ -3,18 +3,16 @@
 namespace Aerni\AdvancedSeo\Policies;
 
 use Statamic\Contracts\Auth\User;
+use Aerni\AdvancedSeo\Facades\Defaults;
 use Statamic\Facades\User as UserFacade;
 
 class SeoVariablesPolicy
 {
-    protected $siteDefaults = ['general', 'marketing'];
-    protected $contentDefaults = ['collection', 'taxonomy'];
-
     public function index(User $user): bool
     {
         $user = UserFacade::fromUser($user);
 
-        $allTypes = collect($this->siteDefaults)->merge($this->contentDefaults);
+        $allTypes = Defaults::all()->map->handle;
 
         $permissions = $allTypes->filter(function ($type) use ($user) {
             return $this->view($user, $type);
@@ -27,7 +25,7 @@ class SeoVariablesPolicy
     {
         $user = UserFacade::fromUser($user);
 
-        $permissions = collect($this->siteDefaults)->filter(function ($type) use ($user) {
+        $permissions = Defaults::site()->map->handle->filter(function ($type) use ($user) {
             return $this->view($user, $type);
         });
 
@@ -38,7 +36,7 @@ class SeoVariablesPolicy
     {
         $user = UserFacade::fromUser($user);
 
-        $permissions = collect($this->contentDefaults)->filter(function ($type) use ($user) {
+        $permissions = Defaults::content()->map->handle->filter(function ($type) use ($user) {
             return $this->view($user, $type);
         });
 

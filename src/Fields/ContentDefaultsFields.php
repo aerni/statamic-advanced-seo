@@ -392,13 +392,13 @@ class ContentDefaultsFields extends BaseFields
             ?->in(Site::selected()->handle())
             ?->value('social_images_generator_collections') ?? [];
 
-        // Don't show the generator section if the entry's collection is not configured.
+        // This check works on the Entry itself. Don't show the generator section if the entry's collection is not configured.
         if ($this->data instanceof Entry && ! in_array($this->data->collection()->handle(), $enabledCollections)) {
             return false;
         }
 
-        // Don't show the generator section if the entry's collection is not configured.
-        if (is_array($this->data) && array_key_exists('collection', $this->data) && ! in_array($this->data['collection'], $enabledCollections)) {
+        // This check works on the custom Collections and Taxonomies Defaults view. Don't show the generator section if the entry's collection is not configured.
+        if (is_array($this->data) && array_key_exists('handle', $this->data) && ! in_array($this->data['handle'], $enabledCollections)) {
             return false;
         }
 

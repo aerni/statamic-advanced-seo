@@ -2,11 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Facades\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Blueprint;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -156,36 +158,24 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
-    // TODO: Maybe add a blueprint repository to make this dynamic.
-    public function blueprint()
+    public function blueprint(): Blueprint
     {
-        if ($this->type() === 'site' && $this->handle === 'favicons') {
-            return \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::make()->get();
+        // Get the blueprint for the site defaults like general, sitemap, favicons, etc.
+        if ($this->type() === 'site') {
+            $blueprint = Defaults::site()->first(function ($default) {
+                return $default['handle'] === $this->handle;
+            })['blueprint'];
+
+            return resolve($blueprint)->make()->get();
         }
 
-        if ($this->type() === 'site' && $this->handle === 'general') {
-            return \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::make()->get();
-        }
+        // Get the blueprint for the content defaults like collections and taxonomies.
+        $blueprint = Defaults::content()->first(function ($default) {
+            return $default['handle'] === $this->type;
+        })['blueprint'];
 
-        if ($this->type() === 'site' && $this->handle === 'indexing') {
-            return \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::make()->get();
-        }
-
-        if ($this->type() === 'site' && $this->handle === 'marketing') {
-            return \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::make()->get();
-        }
-
-        if ($this->type() === 'site' && $this->handle === 'social') {
-            return \Aerni\AdvancedSeo\Blueprints\SocialBlueprint::make()->get();
-        }
-
-        if ($this->type() === 'collections') {
-            return \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->data(['collection' => $this->handle])->get();
-        }
-
-        if ($this->type() === 'taxonomies') {
-            return \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::make()->data(['taxonomy' => $this->handle])->get();
-        }
+        // We are passing some data because we are doing conditionally showing/hiding fields based on it.
+        return resolve($blueprint)->make()->data(['handle' => $this->handle])->get();
     }
 
     public function save(): self

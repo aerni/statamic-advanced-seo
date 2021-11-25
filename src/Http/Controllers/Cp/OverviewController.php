@@ -4,15 +4,13 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Illuminate\View\View;
 use Illuminate\Http\Response;
+use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Traits\ValidateType;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
 class OverviewController extends CpController
 {
-    const GROUPS = ['site', 'content'];
-
     public function index(): View
     {
         $this->authorize('index', SeoVariables::class);
@@ -22,7 +20,9 @@ class OverviewController extends CpController
 
     public function show(string $group): View|Response
     {
-        throw_unless(in_array($group, self::GROUPS), new NotFoundHttpException);
+        $validGroup = Defaults::groups()->contains($group);
+
+        throw_unless($validGroup, new NotFoundHttpException);
 
         $this->authorize($group . 'DefaultsIndex', SeoVariables::class);
 

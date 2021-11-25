@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex flex-wrap -mx-2 widgets">
-        @can('view collection defaults')
+        @can('view collections defaults')
             @if (Statamic\Facades\Collection::all()->count() > 0)
                 <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                     <div class="p-0 card content">
@@ -30,7 +30,7 @@
             @endif
         @endcan
 
-        @can('view taxonomy defaults')
+        @can('view taxonomies defaults')
             @if (Statamic\Facades\Taxonomy::all()->count() > 0)
                 <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                     <div class="p-0 card content">

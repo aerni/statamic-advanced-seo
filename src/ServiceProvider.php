@@ -2,14 +2,15 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Statamic;
+use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -104,54 +105,18 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootAddonPermissions(): self
     {
-        // TODO: This could maybe be dynamic with a repository.
-
-        $siteGroup = collect([
-            [
-                'value' => 'favicons',
-                'label' => 'Favicons',
-            ],
-            [
-                'value' => 'general',
-                'label' => 'General',
-            ],
-            [
-                'value' => 'indexing',
-                'label' => 'Indexing',
-            ],
-            [
-                'value' => 'marketing',
-                'label' => 'Marketing',
-            ],
-            [
-                'value' => 'social',
-                'label' => 'Social',
-            ],
-        ]);
-
-        $contentGroup = collect([
-            [
-                'value' => 'collection',
-                'label' => 'Collection',
-            ],
-            [
-                'value' => 'taxonomy',
-                'label' => 'Taxonomy',
-            ],
-        ]);
-
-        Permission::group('seo', 'SEO', function () use ($siteGroup, $contentGroup) {
-            Permission::register('view site defaults', function ($permission) use ($siteGroup) {
+        Permission::group('seo', 'SEO', function () {
+            Permission::register('view site defaults', function ($permission) {
                 $permission
                     ->label('View Site Defaults')
                     ->children([
                         Permission::make('view {group} defaults')
                             ->label('View :group Defaults')
-                            ->replacements('group', function () use ($siteGroup) {
-                                return $siteGroup->map(function ($item) {
+                            ->replacements('group', function () {
+                                return Defaults::site()->map(function ($item) {
                                     return [
-                                        'value' => $item['value'],
-                                        'label' => $item['label'],
+                                        'value' => $item['handle'],
+                                        'label' => $item['title'],
                                     ];
                                 });
                             })
@@ -161,17 +126,18 @@ class ServiceProvider extends AddonServiceProvider
                             ]),
                     ]);
             });
-            Permission::register('view content defaults', function ($permission) use ($contentGroup) {
+
+            Permission::register('view content defaults', function ($permission) {
                 $permission
                     ->label('View Content Defaults')
                     ->children([
                         Permission::make('view {group} defaults')
                             ->label('View :group Defaults')
-                            ->replacements('group', function () use ($contentGroup) {
-                                return $contentGroup->map(function ($item) {
+                            ->replacements('group', function () {
+                                return Defaults::content()->map(function ($item) {
                                     return [
-                                        'value' => $item['value'],
-                                        'label' => $item['label'],
+                                        'value' => $item['handle'],
+                                        'label' => $item['title'],
                                     ];
                                 });
                             })

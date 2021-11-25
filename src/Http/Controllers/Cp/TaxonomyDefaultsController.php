@@ -8,7 +8,7 @@ use Statamic\Facades\Taxonomy;
 
 class TaxonomyDefaultsController extends ContentDefaultsController
 {
-    protected string $type = 'taxonomy';
+    protected string $type = 'taxonomies';
 
     protected function set(string $handle): SeoDefaultSet
     {

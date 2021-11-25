@@ -7,6 +7,7 @@ use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\CP\Breadcrumbs;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Events\SeoDefaultsSaved;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -15,7 +16,9 @@ class SiteDefaultsController extends BaseDefaultsController
 {
     public function edit(Request $request, string $handle): mixed
     {
-        throw_unless(in_array($handle, $this->defaults()), new NotFoundHttpException);
+        $validDefault = Defaults::site()->map->handle->contains($handle);
+
+        throw_unless($validDefault, new NotFoundHttpException);
 
         $this->authorize("view $handle defaults");
 
@@ -126,17 +129,6 @@ class SiteDefaultsController extends BaseDefaultsController
                 'url' => cp_route('advanced-seo.show', 'site'),
             ],
         ]);
-    }
-
-    protected function defaults(): array
-    {
-        $defaults = ['general', 'indexing', 'marketing', 'social'];
-
-        if (config('advanced-seo.favicons', false)) {
-            $defaults[] = 'favicons';
-        }
-
-        return $defaults;
     }
 
     protected function set(string $handle): SeoDefaultSet

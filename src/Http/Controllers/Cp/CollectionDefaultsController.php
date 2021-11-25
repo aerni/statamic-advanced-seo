@@ -8,7 +8,7 @@ use Statamic\Facades\Collection;
 
 class CollectionDefaultsController extends ContentDefaultsController
 {
-    protected string $type = 'collection';
+    protected string $type = 'collections';
 
     protected function set(string $handle): SeoDefaultSet
     {

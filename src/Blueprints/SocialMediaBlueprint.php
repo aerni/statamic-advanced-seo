@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\SocialFields;
+use Aerni\AdvancedSeo\Fields\SocialMediaFields;
 
-class SocialBlueprint extends BaseBlueprint
+class SocialMediaBlueprint extends BaseBlueprint
 {
     protected function handle(): string
     {
@@ -14,7 +14,7 @@ class SocialBlueprint extends BaseBlueprint
     protected function sections(): array
     {
         return [
-            'social' => SocialFields::class,
+            'social' => SocialMediaFields::class,
         ];
     }
 }
