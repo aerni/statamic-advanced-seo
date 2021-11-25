@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Traits\HasAssetField;
 
 class GeneralFields extends BaseFields
 {
-    // TODO: Actually make use of this in the sections below.
     use HasAssetField;
 
     public function sections(): array
@@ -110,25 +109,18 @@ class GeneralFields extends BaseFields
             ],
             [
                 'handle' => 'organization_logo',
-                'field' => [
-                    'mode' => 'list',
-                    'container' => 'seo',
-                    'restrict' => false,
-                    'allow_uploads' => true,
-                    'max_files' => 1,
-                    'type' => 'assets',
-                    'localizable' => true,
-                    'listable' => 'hidden',
+                'field' => $this->getAssetFieldConfig([
                     'display' => 'Organization Logo',
                     'instructions' => 'Add an optional logo with a minimum size of `112x112px`.',
                     'width' => 50,
+                    'folder' => null,
                     'validate' => [
                         'image',
                     ],
                     'if' => [
                         'site_json_ld_type' => 'equals organization',
                     ],
-                ],
+                ]),
             ],
             [
                 'handle' => 'person_name',

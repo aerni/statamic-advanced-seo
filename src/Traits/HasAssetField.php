@@ -14,6 +14,7 @@ trait HasAssetField
             'mode' => 'list',
             'allow_uploads' => true,
             'localizable' => true,
+            'restrict' => false,
             'listable' => 'hidden',
         ], $config);
     }

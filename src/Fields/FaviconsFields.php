@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Traits\HasAssetField;
 
 class FaviconsFields extends BaseFields
 {
-    // TODO: Actually make use of this in the sections below.
     use HasAssetField;
 
     public function sections(): array
@@ -44,19 +43,13 @@ class FaviconsFields extends BaseFields
             ],
             [
                 'handle' => 'favicon_svg',
-                'field' => [
-                    'mode' => 'list',
-                    'container' => 'seo',
-                    'restrict' => true,
-                    'allow_uploads' => true,
-                    'max_files' => 1,
-                    'type' => 'assets',
-                    'localizable' => false,
-                    'listable' => 'hidden',
-                    'folder' => 'favicons',
+                'field' => $this->getAssetFieldConfig([
                     'display' => 'Favicon (SVG)',
                     'instructions' => 'Add your favicon as SVG file.',
                     'width' => 50,
+                    'restrict' => true,
+                    'folder' => 'favicons',
+                    'localizable' => false,
                     'validate' => [
                         'required_if:generate_favicons,true',
                         'image',
@@ -65,7 +58,7 @@ class FaviconsFields extends BaseFields
                     'if' => [
                         'generate_favicons' => 'equals true',
                     ],
-                ],
+                ]),
             ],
             [
                 'handle' => 'section_favicon_colors',
@@ -162,43 +155,31 @@ class FaviconsFields extends BaseFields
             ],
             [
                 'handle' => 'favicon_safari_override',
-                'field' => [
-                    'mode' => 'list',
-                    'container' => 'seo',
-                    'restrict' => true,
-                    'allow_uploads' => true,
-                    'max_files' => 1,
-                    'type' => 'assets',
-                    'localizable' => false,
-                    'listable' => 'hidden',
-                    'folder' => 'favicons',
+                'field' => $this->getAssetFieldConfig([
                     'display' => 'Safari (mask-icon)',
                     'instructions' => 'A single color and as flattened as possible SVG. This will use the `Safari` color defined above.',
                     'width' => 50,
-                    'if' => [
-                        'generate_favicons' => 'equals true',
-                    ],
+                    'restrict' => true,
+                    'folder' => 'favicons',
+                    'localizable' => false,
                     'validate' => [
                         'image',
                         'mimes:svg',
                     ],
-                ],
+                    'if' => [
+                        'generate_favicons' => 'equals true',
+                    ],
+                ]),
             ],
             [
                 'handle' => 'favicon_ios_override',
-                'field' => [
-                    'mode' => 'list',
-                    'container' => 'seo',
-                    'restrict' => true,
-                    'allow_uploads' => true,
-                    'max_files' => 1,
-                    'type' => 'assets',
-                    'localizable' => false,
-                    'listable' => 'hidden',
-                    'folder' => 'favicons',
+                'field' => $this->getAssetFieldConfig([
                     'display' => 'iOS (apple-touch-icon)',
                     'instructions' => 'A `180x180px` PNG for iOS devices.',
                     'width' => 50,
+                    'restrict' => true,
+                    'folder' => 'favicons',
+                    'localizable' => false,
                     'validate' => [
                         'image',
                         'mimes:png',
@@ -207,23 +188,17 @@ class FaviconsFields extends BaseFields
                     'if' => [
                         'generate_favicons' => 'equals true',
                     ],
-                ],
+                ]),
             ],
             [
                 'handle' => 'favicon_android_chrome_override',
-                'field' => [
-                    'mode' => 'list',
-                    'container' => 'seo',
-                    'restrict' => true,
-                    'allow_uploads' => true,
-                    'max_files' => 1,
-                    'type' => 'assets',
-                    'localizable' => false,
-                    'listable' => 'hidden',
-                    'folder' => 'favicons',
+                'field' => $this->getAssetFieldConfig([
                     'display' => 'Android Chrome',
                     'instructions' => 'A `512x512px` PNG for Android devices.',
                     'width' => 50,
+                    'restrict' => true,
+                    'folder' => 'favicons',
+                    'localizable' => false,
                     'validate' => [
                         'image',
                         'mimes:png',
@@ -232,7 +207,7 @@ class FaviconsFields extends BaseFields
                     'if' => [
                         'generate_favicons' => 'equals true',
                     ],
-                ],
+                ]),
             ],
         ];
     }
