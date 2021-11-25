@@ -2,10 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Illuminate\View\View;
-use Illuminate\Http\Response;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Traits\ValidateType;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 

@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Addon;
+use Aerni\AdvancedSeo\Facades\Sitemap;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
-use Aerni\AdvancedSeo\Facades\Sitemap;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Addon;
+use Statamic\Facades\Site;
 
 class SitemapController extends Controller
 {

@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Item
 {
