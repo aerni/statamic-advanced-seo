@@ -388,7 +388,7 @@ class ContentDefaultsFields extends BaseFields
             return false;
         }
 
-        $enabledCollections = Seo::find('site', 'social')
+        $enabledCollections = Seo::find('site', 'social_media')
             ?->in(Site::selected()->handle())
             ?->value('social_images_generator_collections') ?? [];
 

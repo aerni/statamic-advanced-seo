@@ -65,7 +65,7 @@ class GenerateSocialImageJob implements ShouldQueue
         }
 
         // Get the collections that are allowed to generate social images.
-        $enabledCollections = Seo::find('site', 'social')
+        $enabledCollections = Seo::find('site', 'social_media')
             ?->in($this->entry->site()->handle())
             ?->value('social_images_generator_collections') ?? [];
 
