@@ -457,7 +457,7 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
-        $enabledCollections = Seo::find('site', 'general')
+        $enabledCollections = Seo::find('site', 'social')
             ?->in(Site::selected()->handle())
             ?->value('social_images_generator_collections') ?? [];
 

@@ -159,16 +159,24 @@ class SeoDefaultSet implements Contract
     // TODO: Maybe add a blueprint repository to make this dynamic.
     public function blueprint()
     {
+        if ($this->type() === 'site' && $this->handle === 'favicons') {
+            return \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::make()->get();
+        }
+
         if ($this->type() === 'site' && $this->handle === 'general') {
             return \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::make()->get();
+        }
+
+        if ($this->type() === 'site' && $this->handle === 'indexing') {
+            return \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::make()->get();
         }
 
         if ($this->type() === 'site' && $this->handle === 'marketing') {
             return \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::make()->get();
         }
 
-        if ($this->type() === 'site' && $this->handle === 'indexing') {
-            return \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::make()->get();
+        if ($this->type() === 'site' && $this->handle === 'social') {
+            return \Aerni\AdvancedSeo\Blueprints\SocialBlueprint::make()->get();
         }
 
         if ($this->type() === 'collections') {

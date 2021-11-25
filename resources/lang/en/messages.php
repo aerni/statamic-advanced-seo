@@ -13,6 +13,12 @@ return [
     'general' => 'General',
     'general_description' => 'Configure general site settings, e.g. site name.',
 
+    'favicons' => 'Favicons',
+    'favicons_description' => 'Add and configure the favicon.',
+
+    'social' => 'Social',
+    'social_description' => 'Configure the social media settings.',
+
     'marketing' => 'Marketing',
     'marketing_description' => 'Configure your analytics trackers.',
 

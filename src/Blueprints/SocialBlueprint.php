@@ -2,19 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\GeneralFields;
+use Aerni\AdvancedSeo\Fields\SocialFields;
 
-class GeneralBlueprint extends BaseBlueprint
+class SocialBlueprint extends BaseBlueprint
 {
     protected function handle(): string
     {
-        return 'general';
+        return 'social';
     }
 
     protected function sections(): array
     {
         return [
-            'general' => GeneralFields::class,
+            'social' => SocialFields::class,
         ];
     }
 }

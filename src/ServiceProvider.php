@@ -108,16 +108,24 @@ class ServiceProvider extends AddonServiceProvider
 
         $siteGroup = collect([
             [
+                'value' => 'favicons',
+                'label' => 'Favicons',
+            ],
+            [
                 'value' => 'general',
                 'label' => 'General',
+            ],
+            [
+                'value' => 'indexing',
+                'label' => 'Indexing',
             ],
             [
                 'value' => 'marketing',
                 'label' => 'Marketing',
             ],
             [
-                'value' => 'indexing',
-                'label' => 'Indexing',
+                'value' => 'social',
+                'label' => 'Social',
             ],
         ]);
 

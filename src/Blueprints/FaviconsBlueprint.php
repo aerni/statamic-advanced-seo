@@ -2,19 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\GeneralFields;
+use Aerni\AdvancedSeo\Fields\FaviconsFields;
 
-class GeneralBlueprint extends BaseBlueprint
+class FaviconsBlueprint extends BaseBlueprint
 {
     protected function handle(): string
     {
-        return 'general';
+        return 'favicons';
     }
 
     protected function sections(): array
     {
         return [
-            'general' => GeneralFields::class,
+            'favicons' => FaviconsFields::class,
         ];
     }
 }
