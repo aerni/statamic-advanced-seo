@@ -18,9 +18,8 @@ class OnPageSeoBlueprintSubscriber
     protected array $events = [
         Events\EntryBlueprintFound::class => 'addFieldsToBlueprint',
         Events\TermBlueprintFound::class => 'addFieldsToBlueprint',
-        Events\EntrySaving::class => 'removeDefaultDataFromEntry',
-        // TODO: This event does not currently exist but will be added with an open PR.
-        // Events\TermSaving::class => 'removeDefaultDataFromEntry',
+        // Events\EntrySaving::class => 'removeDefaultDataFromEntry',
+        // Events\TermSaving::class => 'removeDefaultDataFromEntry', // TODO: This event does not currently exist but will be added with an open PR.
         Events\CollectionSaved::class => 'createOrDeleteLocalizations',
         Events\TaxonomySaved::class => 'createOrDeleteLocalizations',
         Events\CollectionDeleted::class => 'deleteDefaults',
@@ -117,43 +116,43 @@ class OnPageSeoBlueprintSubscriber
      * Makes sure that we only save data that is different to the default data.
      * This ensures that the blueprint always loads the latest default data if no other value has been set on the entry.
      */
-    public function removeDefaultDataFromEntry(Event $event): void
-    {
-        $defaults = Seo::find('collections', $event->entry->collection()->handle())
-            ?->in($event->entry->locale())
-            ?->data();
+    // public function removeDefaultDataFromEntry(Event $event): void
+    // {
+    //     $defaults = Seo::find('collections', $event->entry->collection()->handle())
+    //         ?->in($event->entry->locale())
+    //         ?->data();
 
-        if (is_null($defaults)) {
-            return;
-        }
+    //     if (is_null($defaults)) {
+    //         return;
+    //     }
 
-        $dataWithoutDefaults = $event->entry->data()->filter(function ($value, $key) use ($defaults) {
-            return $value !== $defaults->get($key);
-        });
+    //     $dataWithoutDefaults = $event->entry->data()->filter(function ($value, $key) use ($defaults) {
+    //         return $value !== $defaults->get($key);
+    //     });
 
-        $event->entry->data($dataWithoutDefaults);
-    }
+    //     $event->entry->data($dataWithoutDefaults);
+    // }
 
     /**
      * Makes sure that we only save data that is different to the default term.
      * This ensures that the blueprint always loads the latest default data if no other value has been set on the term.
      */
-    public function removeDefaultDataFromTerm(Event $event): void
-    {
-        $defaults = Seo::find('taxonomies', $event->term->taxonomy()->handle())
-            ?->in($event->term->locale())
-            ?->data();
+    // public function removeDefaultDataFromTerm(Event $event): void
+    // {
+    //     $defaults = Seo::find('taxonomies', $event->term->taxonomy()->handle())
+    //         ?->in($event->term->locale())
+    //         ?->data();
 
-        if (is_null($defaults)) {
-            return;
-        }
+    //     if (is_null($defaults)) {
+    //         return;
+    //     }
 
-        $dataWithoutDefaults = $event->term->data()->filter(function ($value, $key) use ($defaults) {
-            return $value !== $defaults->get($key);
-        });
+    //     $dataWithoutDefaults = $event->term->data()->filter(function ($value, $key) use ($defaults) {
+    //         return $value !== $defaults->get($key);
+    //     });
 
-        $event->term->data($dataWithoutDefaults);
-    }
+    //     $event->term->data($dataWithoutDefaults);
+    // }
 
     /**
      * Create or delete a localization when the corresponding site
