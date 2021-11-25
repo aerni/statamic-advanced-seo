@@ -8,7 +8,7 @@ trait HasAssetField
     {
         return array_merge([
             'type' => 'assets',
-            'container' => config('advanced-seo.social-images.container', 'seo'),
+            'container' => config('advanced-seo.social_images.container', 'assets'),
             'folder' => 'social_images',
             'max_files' => 1,
             'mode' => 'list',

@@ -79,7 +79,7 @@ class SocialImage
 
     public function container(): Container
     {
-        $container = config('advanced-seo.social-images.container', 'assets');
+        $container = config('advanced-seo.social_images.container', 'assets');
 
         return AssetContainer::find($container);
     }
