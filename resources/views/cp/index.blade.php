@@ -13,7 +13,7 @@
                 <div class="h-full p-0 overflow-hidden card content">
                     <a href="{{ cp_route('advanced-seo.show', 'site') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
                         <div class="w-8 h-8 mr-3 text-blue">
-                            @cp_svg('sites')
+                            @cp_svg('earth')
                         </div>
                         <div class="flex-1 mt-sm">
                             <h2>{{ __('advanced-seo::messages.site') }}</h2>
