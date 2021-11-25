@@ -4,22 +4,54 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Favicons
+    | Social Images
     |--------------------------------------------------------------------------
     |
-    | Do you want to enable the Favicon settings?
+    | Configure the Social Images feature to your liking.
+    | The generator requires Puppeteer: https://github.com/spatie/browsershot#requirements
     |
     */
 
-    'favicons' => true,
+    'social_images' => [
+
+        'container' => 'assets',
+
+        'generator' => [
+            'enabled' => false,
+            'queue' => 'default',
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Favicons
+    |--------------------------------------------------------------------------
+    |
+    | Configure the Favicons feature to your liking.
+    | The generator requires the Imagick PHP extension.
+    |
+    */
+
+    'favicons' => [
+
+        'enabled' => true,
+        'container' => 'assets',
+
+        'generator' => [
+            'enabled' => false,
+            'queue' => 'default',
+        ],
+
+    ],
 
     /*
     |--------------------------------------------------------------------------
     | Sitemap
     |--------------------------------------------------------------------------
     |
-    | Choose to enable or disable the Sitemap functionality
-    | and configure the cache expiry in minutes.
+    | Configure the Sitemap feature to your liking.
+    | The default cache expiry is 60 minutes.
     |
     */
 
@@ -30,120 +62,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Social Images
+    | Analytics Trackers
     |--------------------------------------------------------------------------
     |
-    | Configure the options for your social images.
-    |
-    */
-
-    'social_images' => [
-
-        /*
-        |--------------------------------------------------------------------------
-        | Assets Container
-        |--------------------------------------------------------------------------
-        |
-        | Specify the container you want to use for your social images.
-        |
-        */
-
-        'container' => 'assets',
-
-        /*
-        |--------------------------------------------------------------------------
-        | Social Images Generator
-        |--------------------------------------------------------------------------
-        |
-        | Do you want to enable the Social Images Generator?
-        | This requires Puppeteer and Browsershot.
-        |
-        */
-
-        'generator' => [
-            'enabled' => false,
-            'queue' => 'default',
-        ],
-
-        /*
-        |--------------------------------------------------------------------------
-        | Open Graph Images
-        |--------------------------------------------------------------------------
-        |
-        | Do you want to enable the Open Graph Images settings?
-        |
-        */
-
-        'open_graph' => true,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Twitter Images
-        |--------------------------------------------------------------------------
-        |
-        | Do you want to enable the Twitter Images settings?
-        |
-        */
-
-        'twitter' => true,
-
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Trackers
-    |--------------------------------------------------------------------------
-    |
-    | Configure the options for your trackers
+    | Choose the analytics trackers you want to enable/disable.
     |
     */
 
     'trackers' => [
-
-        /*
-        |--------------------------------------------------------------------------
-        | Site Verification
-        |--------------------------------------------------------------------------
-        |
-        | Do you want to enable the Site Verification settings?
-        |
-        */
-
-        'site_verification' => true,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Fathom Analytics
-        |--------------------------------------------------------------------------
-        |
-        | Do you want to enable the Fathom Analytics settings?
-        |
-        */
-
         'fathom' => true,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cloudflare Analytics
-        |--------------------------------------------------------------------------
-        |
-        | Do you want to enable the Cloudflare Analytics settings?
-        |
-        */
-
         'cloudflare_analytics' => true,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Google Tag Manager
-        |--------------------------------------------------------------------------
-        |
-        | Do you want to enable the Google Tag Manager settings?
-        |
-        */
-
         'google_tag_manager' => true,
-
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Site Verification
+    |--------------------------------------------------------------------------
+    |
+    | Choose to enable/disable the Site Verification feature.
+    |
+    */
+
+    'site_verification' => true,
 
 ];

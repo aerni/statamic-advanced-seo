@@ -279,6 +279,10 @@ class ContentDefaultsFields extends BaseFields
 
     public function sitemap(): array
     {
+        if (! config('advanced-seo.sitemap.enabled', true)) {
+            return [];
+        }
+
         return [
             [
                 'handle' => 'seo_section_sitemap',

@@ -42,12 +42,6 @@ class DefaultsRepository
             ],
             [
                 'group' => 'site',
-                'handle' => 'marketing',
-                'title' => 'Marketing',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::class,
-            ],
-            [
-                'group' => 'site',
                 'handle' => 'social_media',
                 'title' => 'Social Media',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint::class,
@@ -66,7 +60,16 @@ class DefaultsRepository
             ],
         ]);
 
-        if (config('advanced-seo.favicons', false)) {
+        if (! empty(array_filter(config('advanced-seo.trackers')))) {
+            $defaults->push([
+                'group' => 'site',
+                'handle' => 'marketing',
+                'title' => 'Marketing',
+                'blueprint' => \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::class,
+            ]);
+        }
+
+        if (config('advanced-seo.favicons.enabled', false)) {
             $defaults->push([
                 'group' => 'site',
                 'handle' => 'favicons',

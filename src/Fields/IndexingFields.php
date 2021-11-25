@@ -51,6 +51,10 @@ class IndexingFields extends BaseFields
 
     protected function sitemap(): array
     {
+        if (! config('advanced-seo.sitemap.enabled', true)) {
+            return [];
+        }
+
         return [
             [
                 'handle' => 'section_sitemap',
@@ -89,7 +93,7 @@ class IndexingFields extends BaseFields
 
     protected function siteVerification(): array
     {
-        if (! config('advanced-seo.trackers.site_verification', true)) {
+        if (! config('advanced-seo.site_verification', true)) {
             return [];
         }
 

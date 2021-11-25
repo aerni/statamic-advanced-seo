@@ -12,33 +12,24 @@ class FaviconsFields extends BaseFields
     {
         return [
             $this->favicons(),
+            $this->faviconsGenerator(),
         ];
     }
 
     public function favicons(): array
     {
-        if (! config('advanced-seo.favicons', false)) {
+        if (! config('advanced-seo.favicons.enabled', true)) {
             return [];
         }
 
         return [
             [
-                'handle' => 'section_favicons',
+                'handle' => 'section_favicon',
                 'field' => [
                     'type' => 'section',
                     'listable' => 'hidden',
-                    'display' => 'Favicons',
-                    'instructions' => 'Automatically generate favicons for different devices. This requires the [PHP Imagick Extension](https://github.com/Imagick/imagick).',
-                ],
-            ],
-            [
-                'handle' => 'generate_favicons',
-                'field' => [
-                    'display' => 'Generate Favicons',
-                    'type' => 'toggle',
-                    'icon' => 'toggle',
-                    'instructions' => 'Activate to generate favicons.',
-                    'listable' => 'hidden',
+                    'display' => 'Favicon',
+                    'instructions' => 'The favicon of your site.',
                 ],
             ],
             [
@@ -46,20 +37,26 @@ class FaviconsFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Favicon (SVG)',
                     'instructions' => 'Add your favicon as SVG file.',
-                    'width' => 50,
+                    'container' => config('advanced-seo.favicons.container', 'assets'),
                     'restrict' => true,
                     'folder' => 'favicons',
                     'localizable' => false,
                     'validate' => [
-                        'required_if:generate_favicons,true',
                         'image',
                         'mimes:svg',
                     ],
-                    'if' => [
-                        'generate_favicons' => 'equals true',
-                    ],
                 ]),
             ],
+        ];
+    }
+
+    public function faviconsGenerator(): array
+    {
+        if (! config('advanced-seo.favicons.enabled', true) || ! config('advanced-seo.favicons.generator.enabled', false)) {
+            return [];
+        }
+
+        return [
             [
                 'handle' => 'section_favicon_colors',
                 'field' => [
@@ -67,9 +64,6 @@ class FaviconsFields extends BaseFields
                     'listable' => 'hidden',
                     'display' => 'Favicon Colors',
                     'instructions' => 'Configure your favicon colors.',
-                    'if' => [
-                        'generate_favicons' => 'equals true',
-                    ],
                 ],
             ],
             [
@@ -88,10 +82,7 @@ class FaviconsFields extends BaseFields
                     'instructions' => 'The color of your favicon in Safari.',
                     'width' => 50,
                     'validate' => [
-                        'required_if:generate_favicons,true',
-                    ],
-                    'if' => [
-                        'generate_favicons' => 'equals true',
+                        'required',
                     ],
                 ],
             ],
@@ -111,10 +102,7 @@ class FaviconsFields extends BaseFields
                     'instructions' => 'The background color of your favicon on iOS.',
                     'width' => 50,
                     'validate' => [
-                        'required_if:generate_favicons,true',
-                    ],
-                    'if' => [
-                        'generate_favicons' => 'equals true',
+                        'required',
                     ],
                 ],
             ],
@@ -134,10 +122,7 @@ class FaviconsFields extends BaseFields
                     'instructions' => 'The background color of your favicon on Android Chrome.',
                     'width' => 50,
                     'validate' => [
-                        'required_if:generate_favicons,true',
-                    ],
-                    'if' => [
-                        'generate_favicons' => 'equals true',
+                        'required',
                     ],
                 ],
             ],
@@ -148,9 +133,6 @@ class FaviconsFields extends BaseFields
                     'listable' => 'hidden',
                     'display' => 'Favicon Overrides',
                     'instructions' => 'You may override the automatically generated favicons with your own.',
-                    'if' => [
-                        'generate_favicons' => 'equals true',
-                    ],
                 ],
             ],
             [
@@ -158,6 +140,7 @@ class FaviconsFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Safari (mask-icon)',
                     'instructions' => 'A single color and as flattened as possible SVG. This will use the `Safari` color defined above.',
+                    'container' => config('advanced-seo.favicons.container', 'assets'),
                     'width' => 50,
                     'restrict' => true,
                     'folder' => 'favicons',
@@ -166,9 +149,6 @@ class FaviconsFields extends BaseFields
                         'image',
                         'mimes:svg',
                     ],
-                    'if' => [
-                        'generate_favicons' => 'equals true',
-                    ],
                 ]),
             ],
             [
@@ -176,6 +156,7 @@ class FaviconsFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'iOS (apple-touch-icon)',
                     'instructions' => 'A `180x180px` PNG for iOS devices.',
+                    'container' => config('advanced-seo.favicons.container', 'assets'),
                     'width' => 50,
                     'restrict' => true,
                     'folder' => 'favicons',
@@ -185,9 +166,6 @@ class FaviconsFields extends BaseFields
                         'mimes:png',
                         'dimensions:width=180,height=180',
                     ],
-                    'if' => [
-                        'generate_favicons' => 'equals true',
-                    ],
                 ]),
             ],
             [
@@ -195,6 +173,7 @@ class FaviconsFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Android Chrome',
                     'instructions' => 'A `512x512px` PNG for Android devices.',
+                    'container' => config('advanced-seo.favicons.container', 'assets'),
                     'width' => 50,
                     'restrict' => true,
                     'folder' => 'favicons',
@@ -203,9 +182,6 @@ class FaviconsFields extends BaseFields
                         'image',
                         'mimes:png',
                         'dimensions:width=512,height=512',
-                    ],
-                    'if' => [
-                        'generate_favicons' => 'equals true',
                     ],
                 ]),
             ],

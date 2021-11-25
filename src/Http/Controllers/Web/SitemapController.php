@@ -18,7 +18,7 @@ class SitemapController extends Controller
 
         $site = Site::current();
 
-        $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}", config('advanced-seo.sitemap.expiry'), function () use ($site) {
+        $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}", config('advanced-seo.sitemap.expiry', 60), function () use ($site) {
             return view('advanced-seo::sitemaps.index', [
                 'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
                 'xslLink' => '<?xml-stylesheet type="text/xsl" href="' . $site->absoluteUrl() . '/sitemap.xsl"?>',
@@ -38,7 +38,7 @@ class SitemapController extends Controller
 
         throw_unless($sitemap = Sitemap::find($type, $handle, $site->handle()), new NotFoundHttpException);
 
-        $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}::{$type}::{$handle}", config('advanced-seo.sitemap.expiry'), function () use ($site, $sitemap) {
+        $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 60), function () use ($site, $sitemap) {
             return view('advanced-seo::sitemaps.show', [
                 'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
                 'xslLink' => '<?xml-stylesheet type="text/xsl" href="' . $site->absoluteUrl() . '/sitemap.xsl"?>',
