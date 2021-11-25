@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Illuminate\Events\Dispatcher;
-use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Facades\Sitemap;
+use Illuminate\Events\Dispatcher;
 
 class SitemapCacheSubscriber
 {
