@@ -57,7 +57,7 @@ return [
     | Analytics Trackers
     |--------------------------------------------------------------------------
     |
-    | Choose the analytics trackers you want to enable/disable.
+    | Choose to enable/disable specific analytics trackers.
     |
     */
 
