@@ -5,24 +5,24 @@ return [
     'dashboard_title' => 'Advanced SEO',
 
     'site' => 'Site Defaults',
-    'site_description' => 'Site-wide defaults and settings like site name, favicon, sitemap, and more.',
+    'site_description' => 'Site-wide defaults and settings like website name, sitemap, analytics, and more.',
 
     'content' => 'Content Defaults',
-    'content_description' => 'On-page defaults for specific collections and taxonomies.',
+    'content_description' => 'On-page defaults for your collections and taxonomies.',
 
     'general' => 'General',
-    'general_description' => 'Configure general site settings, e.g. site name.',
-
-    'favicons' => 'Favicons',
-    'favicons_description' => 'Add and configure the favicon.',
-
-    'social_media' => 'Social Media',
-    'social_media_description' => 'Configure the social media settings.',
-
-    'analytics' => 'Analytics',
-    'analytics_description' => 'Configure your analytics trackers.',
+    'general_description' => 'Add basic information about your website.',
 
     'indexing' => 'Indexing',
-    'indexing_description' => 'Configure indexing settings like noindex and sitemap.',
+    'indexing_description' => 'Configure settings like crawling and sitemap.',
+
+    'social_media' => 'Social Media',
+    'social_media_description' => 'Add fallback images and profile information.',
+
+    'analytics' => 'Analytics',
+    'analytics_description' => 'Configure trackers like Google Tag Manager.',
+
+    'favicons' => 'Favicons',
+    'favicons_description' => 'Add a favicon for your website.',
 
 ];
