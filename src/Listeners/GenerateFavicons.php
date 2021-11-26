@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Listeners;
 
-use Statamic\Facades\File;
-use Statamic\Facades\Path;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
 
 class GenerateFavicons implements ShouldQueue
 {
