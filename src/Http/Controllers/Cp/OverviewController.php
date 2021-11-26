@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Defaults;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Statamic\CP\Breadcrumbs;
+use Illuminate\Http\Response;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -26,6 +27,19 @@ class OverviewController extends CpController
 
         $this->authorize($group . 'DefaultsIndex', SeoVariables::class);
 
-        return view("advanced-seo::cp.{$group}_index");
+        return view("advanced-seo::cp.{$group}_index", [
+            'breadcrumb_title' => $this->breadcrumbs()->title(),
+            'breadcrumb_url' => $this->breadcrumbs()->toArray()[0]['url'],
+        ]);
+    }
+
+    protected function breadcrumbs(): Breadcrumbs
+    {
+        return new Breadcrumbs([
+            [
+                'text' => __('advanced-seo::messages.dashboard_title'),
+                'url' => cp_route('advanced-seo.index'),
+            ],
+        ]);
     }
 }

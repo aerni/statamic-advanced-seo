@@ -3,6 +3,8 @@
 
 @section('content')
 
+    <breadcrumb :title='@json($breadcrumb_title)' :url='@json($breadcrumb_url)'></breadcrumb>
+
     <div class="mb-3">
         <h1>{{ __('advanced-seo::messages.content') }}</h1>
     </div>
