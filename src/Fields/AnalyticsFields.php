@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-class TrackersFields extends BaseFields
+class AnalyticsFields extends BaseFields
 {
     public function sections(): array
     {
@@ -15,7 +15,7 @@ class TrackersFields extends BaseFields
 
     protected function fathom(): array
     {
-        if (! config('advanced-seo.trackers.fathom', true)) {
+        if (! config('advanced-seo.analytics.fathom', true)) {
             return [];
         }
 
@@ -91,7 +91,7 @@ class TrackersFields extends BaseFields
 
     protected function cloudflare(): array
     {
-        if (! config('advanced-seo.trackers.cloudflare_analytics', true)) {
+        if (! config('advanced-seo.analytics.cloudflare_analytics', true)) {
             return [];
         }
 
@@ -135,7 +135,7 @@ class TrackersFields extends BaseFields
 
     protected function googleTagManager(): array
     {
-        if (! config('advanced-seo.trackers.google_tag_manager', true)) {
+        if (! config('advanced-seo.analytics.google_tag_manager', true)) {
             return [];
         }
 

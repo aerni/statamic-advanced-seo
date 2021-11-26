@@ -61,7 +61,7 @@ return [
     |
     */
 
-    'trackers' => [
+    'analytics' => [
         'fathom' => true,
         'cloudflare_analytics' => true,
         'google_tag_manager' => true,

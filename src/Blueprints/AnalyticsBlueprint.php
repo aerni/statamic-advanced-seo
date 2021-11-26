@@ -2,19 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\TrackersFields;
+use Aerni\AdvancedSeo\Fields\AnalyticsFields;
 
-class MarketingBlueprint extends BaseBlueprint
+class AnalyticsBlueprint extends BaseBlueprint
 {
     protected function handle(): string
     {
-        return 'marketing';
+        return 'analytics';
     }
 
     protected function sections(): array
     {
         return [
-            'trackers' => TrackersFields::class,
+            'analytics' => AnalyticsFields::class,
         ];
     }
 }

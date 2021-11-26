@@ -53,17 +53,17 @@
                 </div>
             </div>
         @endcan
-        @if (! empty(array_filter(config('advanced-seo.trackers'))))
-            @can('view marketing defaults')
+        @if (! empty(array_filter(config('advanced-seo.analytics'))))
+            @can('view analytics defaults')
                 <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                     <div class="h-full p-0 overflow-hidden card content">
-                        <a href="{{ cp_route('advanced-seo.site.edit', 'marketing') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
+                        <a href="{{ cp_route('advanced-seo.site.edit', 'analytics') }}" class="flex items-start h-full p-3 hover:bg-blue-100">
                             <div class="w-8 h-8 mr-3 text-blue">
                                 @cp_svg('charts')
                             </div>
                             <div class="flex-1 mt-sm">
-                                <h2>{{ __('advanced-seo::messages.marketing') }}</h2>
-                                <p>{{ __('advanced-seo::messages.marketing_description') }}</p>
+                                <h2>{{ __('advanced-seo::messages.analytics') }}</h2>
+                                <p>{{ __('advanced-seo::messages.analytics_description') }}</p>
                             </div>
                         </a>
                     </div>

@@ -19,8 +19,8 @@ return [
     'social_media' => 'Social Media',
     'social_media_description' => 'Configure the social media settings.',
 
-    'marketing' => 'Marketing',
-    'marketing_description' => 'Configure your analytics trackers.',
+    'analytics' => 'Analytics',
+    'analytics_description' => 'Configure your analytics trackers.',
 
     'indexing' => 'Indexing',
     'indexing_description' => 'Configure indexing settings like noindex and sitemap.',

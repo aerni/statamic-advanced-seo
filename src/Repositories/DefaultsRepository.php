@@ -60,12 +60,12 @@ class DefaultsRepository
             ],
         ]);
 
-        if (! empty(array_filter(config('advanced-seo.trackers')))) {
+        if (! empty(array_filter(config('advanced-seo.analytics')))) {
             $defaults->push([
                 'group' => 'site',
-                'handle' => 'marketing',
-                'title' => 'Marketing',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\MarketingBlueprint::class,
+                'handle' => 'analytics',
+                'title' => 'Analytics',
+                'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
             ]);
         }
 
