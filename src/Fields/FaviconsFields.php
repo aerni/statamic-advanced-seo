@@ -12,7 +12,7 @@ class FaviconsFields extends BaseFields
     {
         return [
             $this->favicons(),
-            $this->faviconsGenerator(),
+            // $this->faviconsGenerator(),
         ];
     }
 

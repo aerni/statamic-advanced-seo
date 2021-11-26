@@ -29,20 +29,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the Favicons feature to your liking.
-    | The generator requires the Imagick PHP extension.
     |
     */
 
     'favicons' => [
-
         'enabled' => true,
         'container' => 'assets',
-
-        'generator' => [
-            'enabled' => false,
-            'queue' => 'default',
-        ],
-
     ],
 
     /*
