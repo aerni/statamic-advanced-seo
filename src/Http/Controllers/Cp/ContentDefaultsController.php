@@ -107,14 +107,11 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
         $localization = $set->in($site)->determineOrigin($content->sites());
 
-        if ($localization->hasOrigin()) {
-            $values = collect(array_map(
-                'unserialize',
-                array_diff(array_map('serialize', $values->toArray()), array_map('serialize', $localization->origin()->data()->toArray()))
-            ));
-        }
+        $localization->hasOrigin()
+            ? $localization->data($values->only($request->input('_localized')))
+            : $localization->merge($values);
 
-        $localization = $localization->data($values)->save();
+        $localization = $localization->save();
 
         SeoDefaultSetSaved::dispatch($localization->seoSet());
     }

@@ -2,16 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Data\Localization;
+use Statamic\Support\Arr;
+use Statamic\Facades\Site;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoVariables implements Localization, Augmentable
@@ -120,13 +121,22 @@ class SeoVariables implements Localization, Augmentable
 
     public function fileData(): array
     {
-        $data = $this->data();
+        $data = $this->data()->all();
 
         if (Site::hasMultiple() && $this->hasOrigin()) {
-            $data->put('origin', $this->origin()->locale());
+            $data['origin'] = $this->origin()->locale();
         }
 
-        return $data->all();
+        if ($this->isRoot()) {
+            $data = Arr::removeNullValues($data);
+        }
+
+        return $data;
+    }
+
+    protected function shouldRemoveNullsFromFileData()
+    {
+        return false;
     }
 
     public function site()
