@@ -8,7 +8,7 @@ return [
     'site_description' => 'Site-wide defaults and settings like website name, sitemap, analytics, and more.',
 
     'content' => 'Content Defaults',
-    'content_description' => 'On-page defaults for your collections and taxonomies.',
+    'content_description' => 'On-page defaults for your collection entries and taxonomy terms.',
 
     'general' => 'General',
     'general_description' => 'Add basic information about your website.',
@@ -24,5 +24,9 @@ return [
 
     'favicons' => 'Favicons',
     'favicons_description' => 'Add a favicon for your website.',
+
+    'collections_description' => 'Set default data for your collection entries.',
+
+    'taxonomies_description' => 'Set default data for your taxonomy terms.',
 
 ];

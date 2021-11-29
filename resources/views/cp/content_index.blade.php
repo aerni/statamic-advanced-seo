@@ -14,15 +14,16 @@
             @if (Statamic\Facades\Collection::all()->count() > 0)
                 <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                     <div class="p-0 card content">
-                        <div class="flex items-start p-3 border-b">
-                            <div class="w-8 h-8 mr-3 text-blue">
+                        <div class="flex items-start p-4 border-b">
+                            <div class="w-8 h-8 mr-2 text-blue">
                                 @cp_svg('content-writing')
                             </div>
                             <div class="flex-1 mt-sm">
-                                <h2 class="mb-0">{{ __('Collections') }}</h2>
+                                <h2>{{ __('Collections') }}</h2>
+                                <p>{{ __('advanced-seo::messages.collections_description') }}</p>
                             </div>
                         </div>
-                        <div class="p-1.5">
+                        <div class="p-2">
                             @foreach (Statamic\Facades\Collection::all()->sort() as $collection)
                                 <a href="{{ cp_route('advanced-seo.content.collections.edit', $collection) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $collection->title() }}</a>
                             @endforeach
@@ -36,15 +37,16 @@
             @if (Statamic\Facades\Taxonomy::all()->count() > 0)
                 <div class="w-full px-2 mb-4 lg:w-1/2 widget">
                     <div class="p-0 card content">
-                        <div class="flex items-start p-3 border-b">
-                            <div class="w-8 h-8 mr-3 text-blue">
+                        <div class="flex items-start p-4 border-b">
+                            <div class="w-8 h-8 mr-2 text-blue">
                                 @cp_svg('tags')
                             </div>
                             <div class="flex-1 mt-sm">
-                                <h2 class="mb-0">{{ __('Taxonomies') }}</h2>
+                                <h2>{{ __('Taxonomies') }}</h2>
+                                <p>{{ __('advanced-seo::messages.taxonomies_description') }}</p>
                             </div>
                         </div>
-                        <div class="p-1.5">
+                        <div class="p-2">
                             @foreach (Statamic\Facades\Taxonomy::all()->sort() as $taxonomy)
                                 <a href="{{ cp_route('advanced-seo.content.taxonomies.edit', $taxonomy) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $taxonomy->title() }}</a>
                             @endforeach
