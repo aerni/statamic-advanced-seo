@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
 
