@@ -2,17 +2,21 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Facades\Entry;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
+use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Sites\Site as StatamicSite;
+use Statamic\Facades\Term;
 use Statamic\Tags\Context;
+use Illuminate\Support\Arr;
+use Statamic\Facades\Entry;
+use Spatie\SchemaOrg\Schema;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Sites\Site as StatamicSite;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Statamic\Taxonomies\Taxonomy;
 
 class Cascade
 {
@@ -84,6 +88,7 @@ class Cascade
             'hreflang' => $this->hreflang(),
             'canonical' => $this->canonical(),
             'schema' => $this->schema(),
+            'breadcrumbs' => $this->breadcrumbs(),
         ];
     }
 
@@ -270,5 +275,52 @@ class Cascade
         return $data
             ? '<script type="application/ld+json">' . json_encode(json_decode($data)) . '</script>'
             : null;
+    }
+
+    protected function breadcrumbs(): ?string
+    {
+        $enabled = optional($this->data->get('breadcrumbs'))->value();
+        $isHome = $this->context->get('url', '') === '/';
+
+        if ($enabled && ! $isHome) {
+            $listItems = $this->breadcrumbsListItems()->map(function ($crumb, $key) {
+                $item = Schema::thing()->setProperty('id', $crumb->absoluteUrl());
+
+                if ($crumb instanceof Taxonomy) {
+                    $item->name($crumb->title());
+                } elseif ($title = $crumb->get('title') ?? $crumb->origin()?->get('title')) {
+                    $item->name($title);
+                }
+
+                return Schema::listItem()->position($key + 1)->item($item);
+            });
+
+            return Schema::breadcrumbList()->itemListElement($listItems);
+        }
+
+        return null;
+    }
+
+    public function breadcrumbsListItems(): Collection
+    {
+        $url = URL::makeAbsolute(URL::getCurrent());
+        $url = Str::removeLeft($url, Site::current()->absoluteUrl());
+        $url = Str::ensureLeft($url, '/');
+
+        $segments = explode('/', $url);
+        $segments[0] = '/';
+
+        $crumbs = collect($segments)->map(function () use (&$segments) {
+            $uri = URL::tidy(join('/', $segments));
+            array_pop($segments);
+
+            return $uri;
+        })->mapWithKeys(function ($uri) {
+            $uri = Str::ensureLeft($uri, '/');
+
+            return [$uri => Data::findByUri($uri, Site::current()->handle())];
+        })->filter();
+
+        return $crumbs->reverse()->values();
     }
 }

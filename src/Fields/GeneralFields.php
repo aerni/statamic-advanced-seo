@@ -167,7 +167,7 @@ class GeneralFields extends BaseFields
                 'handle' => 'section_breadcrumbs',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your entries.',
+                    'instructions' => "Help your users understand your site's hierarchy by indicating each page's position.",
                     'display' => 'Breadcrumbs',
                 ],
             ],
@@ -175,7 +175,7 @@ class GeneralFields extends BaseFields
                 'handle' => 'breadcrumbs',
                 'field' => [
                     'type' => 'toggle',
-                    'instructions' => 'Add breadcrumbs',
+                    'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your pages.',
                     'listable' => false,
                     'display' => 'Breadcrumbs',
                 ],
