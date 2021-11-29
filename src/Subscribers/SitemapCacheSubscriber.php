@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Facades\Sitemap;
+use Statamic\Events\Event;
 use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Facades\Sitemap;
 
 class SitemapCacheSubscriber
 {
@@ -25,7 +25,7 @@ class SitemapCacheSubscriber
         }
     }
 
-    public function clearCache(SeoDefaultSetSaved $event): void
+    public function clearCache(Event $event): void
     {
         Sitemap::clearCache();
     }
