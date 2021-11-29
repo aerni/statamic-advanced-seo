@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Statamic\CP\Breadcrumbs;
-use Illuminate\Http\Response;
-use Aerni\AdvancedSeo\Facades\Defaults;
-use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
