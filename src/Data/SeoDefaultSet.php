@@ -177,7 +177,7 @@ class SeoDefaultSet implements Contract
         // We are passing some data because we are doing conditionally showing/hiding fields based on it.
         return resolve($blueprint)->make()->data([
             'type' => $this->type,
-            'handle' => $this->handle
+            'handle' => $this->handle,
         ])->get();
     }
 
