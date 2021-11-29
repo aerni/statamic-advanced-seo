@@ -462,21 +462,17 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
+        // Terms are not yet supported.
+        if ($this->data instanceof Term) {
+            return false;
+        }
+
         $enabledCollections = Seo::find('site', 'social_media')
             ?->in(Site::selected()->handle())
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the entry's collection is not configured.
         if ($this->data instanceof Entry && ! in_array($this->data->collection()->handle(), $enabledCollections)) {
-            return false;
-        }
-
-        $enabledTaxonomies = Seo::find('site', 'social_media')
-            ?->in(Site::selected()->handle())
-            ?->value('social_images_generator_taxonomies') ?? [];
-
-        // Don't show the generator section if the terms's taxonomy is not configured.
-        if ($this->data instanceof Term && ! in_array($this->data->taxonomy()->handle(), $enabledTaxonomies)) {
             return false;
         }
 
