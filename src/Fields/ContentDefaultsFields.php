@@ -396,17 +396,19 @@ class ContentDefaultsFields extends BaseFields
             ?->in(Site::selected()->handle())
             ?->value('social_images_generator_collections') ?? [];
 
-        // This check works on the Entry itself. Don't show the generator section if the entry's collection is not configured.
-        if ($this->data instanceof Entry && ! in_array($this->data->collection()->handle(), $enabledCollections)) {
+        // Don't show the generator section if the collection is not configured.
+        if ($this->data['type'] === 'collections' && ! in_array($this->data['handle'], $enabledCollections)) {
             return false;
         }
 
-        // This check works on the custom Collections and Taxonomies Defaults view. Don't show the generator section if the entry's collection is not configured.
-        if (is_array($this->data) && array_key_exists('handle', $this->data) && ! in_array($this->data['handle'], $enabledCollections)) {
+        $enabledTaxonomies = Seo::find('site', 'social_media')
+            ?->in(Site::selected()->handle())
+            ?->value('social_images_generator_taxonomies') ?? [];
+
+        // Don't show the generator section if the taxonomy is not configured.
+        if ($this->data['type'] === 'taxonomies' && ! in_array($this->data['handle'], $enabledTaxonomies)) {
             return false;
         }
-
-        // TODO: Make this work with Taxonomies.
 
         return true;
     }

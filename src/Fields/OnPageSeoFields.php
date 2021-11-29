@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
+use Statamic\Taxonomies\Term;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -470,12 +471,14 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
-        // Don't show the generator section if the entry's collection is not configured.
-        if (is_array($this->data) && array_key_exists('collection', $this->data) && ! in_array($this->data['collection'], $enabledCollections)) {
+        $enabledTaxonomies = Seo::find('site', 'social_media')
+            ?->in(Site::selected()->handle())
+            ?->value('social_images_generator_taxonomies') ?? [];
+
+        // Don't show the generator section if the terms's taxonomy is not configured.
+        if ($this->data instanceof Term && ! in_array($this->data->taxonomy()->handle(), $enabledTaxonomies)) {
             return false;
         }
-
-        // TODO: Make this work with Taxonomies.
 
         return true;
     }

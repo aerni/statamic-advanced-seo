@@ -40,8 +40,21 @@ class SocialMediaFields extends BaseFields
                     'icon' => 'collections',
                     'mode' => 'select',
                     'display' => 'Collections',
-                    'instructions' => 'Select the collections you want to generate images for.',
+                    'instructions' => 'Enable the generator for the selected collections.',
                     'listable' => 'hidden',
+                    'width' => 50,
+                ],
+            ],
+            [
+                'handle' => 'social_images_generator_taxonomies',
+                'field' => [
+                    'type' => 'taxonomies',
+                    'icon' => 'taxonomy',
+                    'mode' => 'select',
+                    'display' => 'Taxonomies',
+                    'instructions' => 'Enable the generator for the selected taxonomies.',
+                    'listable' => 'hidden',
+                    'width' => 50,
                 ],
             ],
         ];
