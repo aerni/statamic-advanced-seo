@@ -16,7 +16,7 @@ class OnPageSeoFields extends BaseFields
     public function sections(): array
     {
         return [
-            $this->metaTags(),
+            $this->titleAndDescription(),
             $this->socialImages(),
             $this->canonicalUrl(),
             $this->indexing(),
@@ -25,15 +25,15 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
-    public function metaTags(): array
+    public function titleAndDescription(): array
     {
         return [
             [
-                'handle' => 'seo_section_meta_tags',
+                'handle' => 'seo_section_title_description',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Meta Tags',
-                    'instructions' => 'Configure the basic Meta Tags of this entry.',
+                    'display' => 'Title & Description',
+                    'instructions' => 'Set the title and description of this entry.',
                 ],
             ],
             [
@@ -41,7 +41,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Meta Title',
-                    'instructions' => 'Set the Meta Title of this entry. Defaults to the entry\'s `Title`.',
+                    'instructions' => 'Set the meta title of this entry. This defaults to the entry\'s title.',
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -57,7 +57,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Meta Description',
-                    'instructions' => 'Set the Meta Description of this entry.',
+                    'instructions' => 'Set the meta description of this entry.',
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => 160,
@@ -91,7 +91,7 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Generate Social Images',
+                    'display' => 'Social Images Generator',
                     'instructions' => 'Automatically generate your social images.',
                     'listable' => 'hidden',
                 ],
@@ -102,7 +102,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
-                    'instructions' => 'Activate to automatically generate the Open Graph and Twitter Images of this entry.',
+                    'instructions' => 'Activate to automatically generate the Open Graph and Twitter images of this entry.',
                     'listable' => 'hidden',
                 ],
             ],
@@ -146,7 +146,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Open Graph Title',
-                    'instructions' => 'Set the Open Graph Title of this entry. Defaults to the entry\'s `Meta Title` or `Title`.',
+                    'instructions' => 'Set the Open Graph title of this entry. This defaults to the entry\'s meta title.',
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -162,7 +162,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Open Graph Description',
-                    'instructions' => 'Set the Open Graph Description of this entry. Defaults to the entry\'s `Meta Description`.',
+                    'instructions' => 'Set the Open Graph description of this entry. This defaults to the entry\'s meta description.',
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -176,7 +176,7 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add an Open Graph Image for this entry. The recommended size is `1200x630px`.',
+                    'instructions' => 'Add an Open Graph image for this entry. The recommended size is `1200x630px`.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -202,7 +202,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Twitter Title',
-                    'instructions' => 'Set the Twitter Title of this entry. Defaults to the entry\'s `Meta Title` or `Title`.',
+                    'instructions' => 'Set the Twitter title of this entry. This defaults to the entry\'s meta title.',
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -218,7 +218,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Twitter Description',
-                    'instructions' => 'Set the Twitter Description of this entry. Defaults to the entry\'s `Meta Description`.',
+                    'instructions' => 'Set the Twitter description of this entry. This defaults to the entry\'s meta description.',
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -232,7 +232,7 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a Twitter Image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.',
+                    'instructions' => 'Add a Twitter image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -276,7 +276,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'entries',
                     'display' => 'Entry',
-                    'instructions' => 'If this is an entry with duplicate content, link to the entry with the original content.',
+                    'instructions' => 'Link to the entry with the original content.',
                     'component' => 'relationship',
                     'mode' => 'stack',
                     'max_items' => 1,
@@ -338,7 +338,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Nofollow',
-                    'instructions' => 'Prevent site crawlers from following links in this entry.',
+                    'instructions' => 'Prevent site crawlers from following links on this entry\'s page.',
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -431,7 +431,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'JSON-ld Schema',
-                    'instructions' => 'Configure custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this entry.',
+                    'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this entry.',
                 ],
             ],
             [
@@ -440,7 +440,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'code',
                     'icon' => 'code',
                     'display' => 'JSON-LD Schema',
-                    'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this entry. This will be wrapped in the appropriate script tag.',
+                    'instructions' => 'Structured data for this entry. This will be wrapped in the appropriate script tag.',
                     'theme' => 'material',
                     'mode' => 'javascript',
                     'indent_type' => 'tabs',

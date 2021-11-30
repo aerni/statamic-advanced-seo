@@ -83,7 +83,7 @@ class GeneralFields extends BaseFields
                 'handle' => 'section_knowledge_graph',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Add basic [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) information about this website.',
+                    'instructions' => 'Add basic [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) information about this site.',
                     'display' => 'Basic Information',
                 ],
             ],
@@ -99,9 +99,9 @@ class GeneralFields extends BaseFields
                     'default' => 'none',
                     'localizable' => false,
                     'type' => 'button_group',
-                    'instructions' => 'The type of content this website represents.',
+                    'instructions' => 'The type of content this site represents.',
                     'listable' => false,
-                    'display' => 'Type',
+                    'display' => 'Content Type',
                 ],
             ],
             [
@@ -112,7 +112,7 @@ class GeneralFields extends BaseFields
                     'localizable' => true,
                     'listable' => 'hidden',
                     'display' => 'Organization Name',
-                    'instructions' => 'Set the name of the organization.',
+                    'instructions' => 'The name of this site\'s organization.',
                     'width' => 50,
                     'if' => [
                         'site_json_ld_type' => 'equals organization',
@@ -126,7 +126,7 @@ class GeneralFields extends BaseFields
                 'handle' => 'organization_logo',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Organization Logo',
-                    'instructions' => 'Add an optional logo with a minimum size of `112x112px`.',
+                    'instructions' => 'Add the logo with a minimum size of `112x112px`.',
                     'width' => 50,
                     'folder' => null,
                     'validate' => [
@@ -142,7 +142,7 @@ class GeneralFields extends BaseFields
                 'field' => [
                     'listable' => 'hidden',
                     'display' => 'Person Name',
-                    'instructions' => 'Set the name of the person.',
+                    'instructions' => 'The name of this site\'s person.',
                     'width' => 50,
                     'input_type' => 'text',
                     'type' => 'text',
@@ -166,7 +166,7 @@ class GeneralFields extends BaseFields
                     'line_numbers' => true,
                     'line_wrapping' => true,
                     'display' => 'JSON-LD Schema',
-                    'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) you want to add to each entry. This will be wrapped in the appropriate script tag.',
+                    'instructions' => 'Structured data that will be added to every page. This will be wrapped in the appropriate script tag.',
                     'type' => 'code',
                     'icon' => 'code',
                     'listable' => 'hidden',
@@ -182,7 +182,7 @@ class GeneralFields extends BaseFields
                 'handle' => 'section_breadcrumbs',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => "Help your users understand your site's hierarchy by indicating each page's position.",
+                    'instructions' => "Help your users understand your site by indicating each page's position in the hierarchy.",
                     'display' => 'Breadcrumbs',
                 ],
             ],

@@ -28,7 +28,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'section_social_images_generator',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Generate Social Images',
+                    'display' => 'Social Images Generator',
                     'instructions' => 'Automatically generate your social images.',
                     'listable' => 'hidden',
                 ],
@@ -75,7 +75,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add a default Open Graph Image. The recommended size is `1200x630px`.',
+                    'instructions' => 'Add a default Open Graph image. The recommended size is `1200x630px`.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -92,7 +92,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'section_twitter',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Configure your default Twitter settings.',
+                    'instructions' => 'Configure the default Twitter settings.',
                     'display' => 'Twitter',
                 ],
             ],
@@ -113,7 +113,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a default Twitter Image with an aspect ratio of `2:1` and minimum size of `300x157px`.',
+                    'instructions' => 'Add a default Twitter image with an aspect ratio of `2:1` and minimum size of `300x157px`.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',

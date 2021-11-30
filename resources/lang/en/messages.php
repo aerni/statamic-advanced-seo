@@ -5,13 +5,13 @@ return [
     'dashboard_title' => 'Advanced SEO',
 
     'site' => 'Site Defaults',
-    'site_description' => 'Site-wide defaults and settings like website name, sitemap, analytics, and more.',
+    'site_description' => 'Site-wide defaults and settings like site name, sitemap, analytics, and more.',
 
     'content' => 'Content Defaults',
     'content_description' => 'On-page defaults for your collection entries and taxonomy terms.',
 
     'general' => 'General',
-    'general_description' => 'Add basic information about your website.',
+    'general_description' => 'Add general information about your site.',
 
     'indexing' => 'Indexing',
     'indexing_description' => 'Configure settings like crawling and sitemap.',
@@ -23,7 +23,7 @@ return [
     'analytics_description' => 'Configure trackers like Google Tag Manager.',
 
     'favicons' => 'Favicons',
-    'favicons_description' => 'Add a favicon for your website.',
+    'favicons_description' => 'Add a favicon for your site.',
 
     'collections_description' => 'Set default data for your collection entries.',
 

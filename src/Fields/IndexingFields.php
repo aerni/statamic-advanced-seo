@@ -29,7 +29,7 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Noindex',
-                    'instructions' => 'Prevent this site from being indexed by search engines.',
+                    'instructions' => 'Prevent the site from being indexed by search engines.',
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -40,7 +40,7 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Nofollow',
-                    'instructions' => 'Prevent site crawlers from following links on your site.',
+                    'instructions' => 'Prevent site crawlers from following any links.',
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
