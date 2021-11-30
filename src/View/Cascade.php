@@ -129,12 +129,16 @@ class Cascade
 
     protected function compiled404Title(): string
     {
-        return "404 {$this->titleSeparator()} {$this->siteName()}";
+        return $this->titlePosition() === 'before'
+            ? "404 {$this->titleSeparator()} {$this->siteName()}"
+            : "{$this->siteName()} {$this->titleSeparator()} 404";
     }
 
     protected function compiledTitle(): string
     {
-        return "{$this->title()} {$this->titleSeparator()} {$this->siteName()}";
+        return $this->titlePosition() === 'before'
+            ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
+            : "{$this->siteName()} {$this->titleSeparator()} {$this->title()}";
     }
 
     protected function title(): string
@@ -145,6 +149,11 @@ class Cascade
     protected function titleSeparator(): string
     {
         return $this->data->get('title_separator') ?? '|';
+    }
+
+    protected function titlePosition(): string
+    {
+        return $this->data->get('title_position') ?? 'before';
     }
 
     protected function siteName(): string
