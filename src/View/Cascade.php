@@ -95,7 +95,7 @@ class Cascade
 
     /**
      * Only return values that are not empty and whose keys exists in the Blueprint.
-     * This makes sure that we don't return any data of fields that were disabled in the config, e.g. OG Image Generator
+     * This makes sure that we don't return any data of fields that were disabled in the config, e.g. Social Images Generator
      */
     protected function onPageSeo(): Collection
     {
