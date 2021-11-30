@@ -14,6 +14,10 @@ use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    protected $actions = [
+        Actions\GenerateSocialImages::class,
+    ];
+
     protected $fieldtypes = [
         Fieldtypes\SeoMetaTitleFieldtype::class,
     ];
