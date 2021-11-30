@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Actions\Action;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
+use Statamic\Actions\Action;
+use Statamic\Contracts\Entries\Entry;
 
 class GenerateSocialImages extends Action
 {

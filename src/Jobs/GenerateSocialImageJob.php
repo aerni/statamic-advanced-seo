@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Jobs;
 
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
