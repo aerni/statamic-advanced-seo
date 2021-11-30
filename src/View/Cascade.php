@@ -208,7 +208,7 @@ class Cascade
         if ($this->context->has('segment_1') && $this->context->get('terms') instanceof TermQueryBuilder) {
             $taxonomy = $this->context->get('terms')->first()->taxonomy();
 
-            return $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
+            $data = $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
                 // Set the current site so we can get the localized absolute URLs of the taxonomy.
                 Site::setCurrent($locale);
 
@@ -217,6 +217,12 @@ class Cascade
                     'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
                 ];
             })->toArray();
+
+
+            // Reset the site to the original.
+            Site::setCurrent($this->site->handle());
+
+            return $data;
         }
 
         // Handle entries and global term details page.
