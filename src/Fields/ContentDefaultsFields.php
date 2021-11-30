@@ -16,6 +16,7 @@ class ContentDefaultsFields extends BaseFields
         return [
             $this->titleAndDescription(),
             $this->socialImages(),
+            $this->canonicalUrl(),
             $this->indexing(),
             $this->sitemap(),
             $this->jsonLd(),
@@ -30,7 +31,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Title & Description',
-                    'instructions' => 'Set the title and description of this entry.',
+                    'instructions' => $this->trans('seo_section_title_description', 'default_instructions'),
                 ],
             ],
             [
@@ -38,7 +39,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Meta Title',
-                    'instructions' => 'Set the meta title of this entry. This defaults to the entry\'s title.',
+                    'instructions' => $this->trans('seo_title', 'default_instructions'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -54,7 +55,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Meta Description',
-                    'instructions' => 'Set the meta description of this entry.',
+                    'instructions' => $this->trans('seo_description', 'default_instructions'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => 160,
@@ -89,7 +90,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Social Images Generator',
-                    'instructions' => 'Automatically generate your social images.',
+                    'instructions' => $this->trans('seo_section_social_images_generator', 'default_instructions'),
                     'listable' => 'hidden',
                 ],
             ],
@@ -99,7 +100,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'toggle',
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
-                    'instructions' => 'Activate to automatically generate the Open Graph and Twitter images of this entry.',
+                    'instructions' => $this->trans('seo_generate_social_images', 'default_instructions'),
                     'listable' => 'hidden',
                 ],
             ],
@@ -135,7 +136,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Open Graph',
-                    'instructions' => 'Configure the Open Graph settings of this entry.',
+                    'instructions' => $this->trans('seo_section_og', 'default_instructions'),
                 ],
             ],
             [
@@ -143,7 +144,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Open Graph Title',
-                    'instructions' => 'Set the Open Graph title of this entry. This defaults to the entry\'s meta title.',
+                    'instructions' => $this->trans('seo_og_title', 'default_instructions'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -159,7 +160,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Open Graph Description',
-                    'instructions' => 'Set the Open Graph description of this entry. This defaults to the entry\'s meta description.',
+                    'instructions' => $this->trans('seo_og_description', 'default_instructions'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -173,7 +174,7 @@ class ContentDefaultsFields extends BaseFields
                 'handle' => 'seo_og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add an Open Graph image for this entry. The recommended size is `1200x630px`.',
+                    'instructions' => $this->trans('seo_og_image', 'default_instructions'),
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -191,7 +192,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Twitter',
-                    'instructions' => 'Configure the Twitter settings of this entry.',
+                    'instructions' => $this->trans('seo_section_twitter', 'default_instructions'),
                 ],
             ],
             [
@@ -199,7 +200,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Twitter Title',
-                    'instructions' => 'Set the Twitter title of this entry. This defaults to the entry\'s meta title.',
+                    'instructions' => $this->trans('seo_twitter_title', 'default_instructions'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -215,7 +216,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Twitter Description',
-                    'instructions' => 'Set the Twitter description of this entry. This defaults to the entry\'s meta description.',
+                    'instructions' => $this->trans('seo_twitter_description', 'default_instructions'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -229,13 +230,81 @@ class ContentDefaultsFields extends BaseFields
                 'handle' => 'seo_twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a Twitter image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.',
+                    'instructions' => $this->trans('seo_twitter_image', 'default_instructions'),
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
                         'dimensions:min_width=300,min_height=157',
                     ],
                 ]),
+            ],
+        ];
+    }
+
+    public function canonicalUrl(): array
+    {
+        return [
+            [
+                'handle' => 'seo_section_canonical_url',
+                'field' => [
+                    'type' => 'section',
+                    'display' => 'Canonical URL',
+                    'instructions' => $this->trans('seo_section_canonical_url', 'default_instructions'),
+                ],
+            ],
+            [
+                'handle' => 'seo_canonical_type',
+                'field' => [
+                    'type' => 'button_group',
+                    'icon' => 'button_group',
+                    'display' => 'Canonical URL',
+                    'instructions' => $this->trans('seo_canonical_type', 'default_instructions'),
+                    'options' => [
+                        'current' => 'Current ' . ucfirst(str_singular($this->type())),
+                        'other' => 'Other Entry',
+                        'custom' => 'Custom URL',
+                    ],
+                    'default' => 'current',
+                    'listable' => 'hidden',
+                    'localizable' => true,
+                ],
+            ],
+            [
+                'handle' => 'seo_canonical_entry',
+                'field' => [
+                    'type' => 'entries',
+                    'display' => 'Entry',
+                    'instructions' => $this->trans('seo_canonical_entry', 'default_instructions'),
+                    'component' => 'relationship',
+                    'mode' => 'stack',
+                    'max_items' => 1,
+                    'localizable' => true,
+                    'listable' => 'hidden',
+                    'validate' => [
+                        'required_if:seo_canonical_type,other',
+                    ],
+                    'if' => [
+                        'seo_canonical_type' => 'equals other',
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_canonical_custom',
+                'field' => [
+                    'type' => 'text',
+                    'display' => 'URL',
+                    'instructions' => $this->trans('seo_canonical_custom', 'default_instructions'),
+                    'input_type' => 'url',
+                    'icon' => 'text',
+                    'listable' => 'hidden',
+                    'localizable' => true,
+                    'validate' => [
+                        'required_if:seo_canonical_type,custom',
+                    ],
+                    'if' => [
+                        'seo_canonical_type' => 'equals custom',
+                    ],
+                ],
             ],
         ];
     }
@@ -248,7 +317,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Indexing',
-                    'instructions' => 'Configure the indexing settings for this entry.',
+                    'instructions' => $this->trans('seo_section_indexing', 'default_instructions'),
                 ],
             ],
             [
@@ -256,7 +325,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Noindex',
-                    'instructions' => 'Prevent this entry from being indexed by search engines.',
+                    'instructions' => $this->trans('seo_noindex', 'default_instructions'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -267,7 +336,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Nofollow',
-                    'instructions' => 'Prevent site crawlers from following links on this entry\'s page.',
+                    'instructions' => $this->trans('seo_nofollow', 'default_instructions'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -288,7 +357,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Sitemap',
-                    'instructions' => 'Configure the sitemap settings for this entry.',
+                    'instructions' => $this->trans('seo_section_sitemap', 'default_instructions'),
                 ],
             ],
             [
@@ -296,7 +365,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'select',
                     'display' => 'Priority',
-                    'instructions' => 'Choose the priorty of this entry in the sitemap. `1.0` is the most important.',
+                    'instructions' => $this->trans('seo_sitemap_priority', 'default_instructions'),
                     'options' => [
                         '0.0' => '0.0',
                         '0.1' => '0.1',
@@ -327,7 +396,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'select',
                     'display' => 'Change Frequency',
-                    'instructions' => 'Choose the frequency in which search engines should crawl this entry.',
+                    'instructions' => $this->trans('seo_sitemap_change_frequency', 'default_instructions'),
                     'options' => [
                         'always' => 'Always',
                         'hourly' => 'Hourly',
@@ -360,7 +429,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'JSON-ld Schema',
-                    'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this entry.',
+                    'instructions' => $this->trans('seo_section_json_ld', 'default_instructions'),
                 ],
             ],
             [
@@ -369,7 +438,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'code',
                     'icon' => 'code',
                     'display' => 'JSON-LD Schema',
-                    'instructions' => 'Structured data for this entry. This will be wrapped in the appropriate script tag.',
+                    'instructions' => $this->trans('seo_json_ld', 'default_instructions'),
                     'theme' => 'material',
                     'mode' => 'javascript',
                     'indent_type' => 'tabs',

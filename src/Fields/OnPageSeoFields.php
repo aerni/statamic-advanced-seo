@@ -33,7 +33,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Title & Description',
-                    'instructions' => 'Set the title and description of this entry.',
+                    'instructions' => $this->trans('seo_section_title_description', 'instructions'),
                 ],
             ],
             [
@@ -41,7 +41,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Meta Title',
-                    'instructions' => 'Set the meta title of this entry. This defaults to the entry\'s title.',
+                    'instructions' => $this->trans('seo_title', 'instructions'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -57,7 +57,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Meta Description',
-                    'instructions' => 'Set the meta description of this entry.',
+                    'instructions' => $this->trans('seo_description', 'instructions'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => 160,
@@ -92,7 +92,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Social Images Generator',
-                    'instructions' => 'Automatically generate your social images.',
+                    'instructions' => $this->trans('seo_section_social_images_generator', 'instructions'),
                     'listable' => 'hidden',
                 ],
             ],
@@ -102,7 +102,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
-                    'instructions' => 'Activate to automatically generate the Open Graph and Twitter images of this entry.',
+                    'instructions' => $this->trans('seo_generate_social_images', 'instructions'),
                     'listable' => 'hidden',
                 ],
             ],
@@ -138,7 +138,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Open Graph',
-                    'instructions' => 'Configure the Open Graph settings of this entry.',
+                    'instructions' => $this->trans('seo_section_og', 'instructions'),
                 ],
             ],
             [
@@ -146,7 +146,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Open Graph Title',
-                    'instructions' => 'Set the Open Graph title of this entry. This defaults to the entry\'s meta title.',
+                    'instructions' => $this->trans('seo_og_title', 'instructions'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -162,7 +162,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Open Graph Description',
-                    'instructions' => 'Set the Open Graph description of this entry. This defaults to the entry\'s meta description.',
+                    'instructions' => $this->trans('seo_og_description', 'instructions'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -176,7 +176,7 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add an Open Graph image for this entry. The recommended size is `1200x630px`.',
+                    'instructions' => $this->trans('seo_og_image', 'instructions'),
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -194,7 +194,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Twitter',
-                    'instructions' => 'Configure the Twitter settings of this entry.',
+                    'instructions' => $this->trans('seo_section_twitter', 'instructions'),
                 ],
             ],
             [
@@ -202,7 +202,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'Twitter Title',
-                    'instructions' => 'Set the Twitter title of this entry. This defaults to the entry\'s meta title.',
+                    'instructions' => $this->trans('seo_twitter_title', 'instructions'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -218,7 +218,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'textarea',
                     'display' => 'Twitter Description',
-                    'instructions' => 'Set the Twitter description of this entry. This defaults to the entry\'s meta description.',
+                    'instructions' => $this->trans('seo_twitter_description', 'instructions'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -232,7 +232,7 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a Twitter image for this entry with an aspect ratio of `2:1` and minimum size of `300x157px`.',
+                    'instructions' => $this->trans('seo_twitter_image', 'instructions'),
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -251,7 +251,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Canonical URL',
-                    'instructions' => 'Configure the canonical URL settings for this entry.',
+                    'instructions' => $this->trans('seo_section_canonical_url', 'instructions'),
                 ],
             ],
             [
@@ -260,9 +260,9 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'button_group',
                     'icon' => 'button_group',
                     'display' => 'Canonical URL',
-                    'instructions' => 'Where should the canonical URL for this entry point to.',
+                    'instructions' => $this->trans('seo_canonical_type', 'instructions'),
                     'options' => [
-                        'current' => 'Current Entry',
+                        'current' => 'Current ' . ucfirst(str_singular($this->type())),
                         'other' => 'Other Entry',
                         'custom' => 'Custom URL',
                     ],
@@ -276,7 +276,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'entries',
                     'display' => 'Entry',
-                    'instructions' => 'Link to the entry with the original content.',
+                    'instructions' => $this->trans('seo_canonical_entry', 'instructions'),
                     'component' => 'relationship',
                     'mode' => 'stack',
                     'max_items' => 1,
@@ -295,7 +295,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'text',
                     'display' => 'URL',
-                    'instructions' => 'A fully qualified URL starting with `https://`. Use this if the original content is on a different domain.',
+                    'instructions' => $this->trans('seo_canonical_custom', 'instructions'),
                     'input_type' => 'url',
                     'icon' => 'text',
                     'listable' => 'hidden',
@@ -319,7 +319,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Indexing',
-                    'instructions' => 'Configure the indexing settings for this entry.',
+                    'instructions' => $this->trans('seo_section_indexing', 'instructions'),
                 ],
             ],
             [
@@ -327,7 +327,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Noindex',
-                    'instructions' => 'Prevent this entry from being indexed by search engines.',
+                    'instructions' => $this->trans('seo_noindex', 'instructions'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -338,7 +338,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Nofollow',
-                    'instructions' => 'Prevent site crawlers from following links on this entry\'s page.',
+                    'instructions' => $this->trans('seo_nofollow', 'instructions'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -359,7 +359,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Sitemap',
-                    'instructions' => 'Configure the sitemap settings for this entry.',
+                    'instructions' => $this->trans('seo_section_sitemap', 'instructions'),
                 ],
             ],
             [
@@ -367,7 +367,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'select',
                     'display' => 'Priority',
-                    'instructions' => 'Choose the priorty of this entry in the sitemap. `1.0` is the most important.',
+                    'instructions' => $this->trans('seo_sitemap_priority', 'instructions'),
                     'options' => [
                         '0.0' => '0.0',
                         '0.1' => '0.1',
@@ -398,7 +398,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'select',
                     'display' => 'Change Frequency',
-                    'instructions' => 'Choose the frequency in which search engines should crawl this entry.',
+                    'instructions' => $this->trans('seo_sitemap_change_frequency', 'instructions'),
                     'options' => [
                         'always' => 'Always',
                         'hourly' => 'Hourly',
@@ -431,7 +431,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'JSON-ld Schema',
-                    'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this entry.',
+                    'instructions' => $this->trans('seo_section_json_ld', 'instructions'),
                 ],
             ],
             [
@@ -440,7 +440,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'code',
                     'icon' => 'code',
                     'display' => 'JSON-LD Schema',
-                    'instructions' => 'Structured data for this entry. This will be wrapped in the appropriate script tag.',
+                    'instructions' => $this->trans('seo_json_ld', 'instructions'),
                     'theme' => 'material',
                     'mode' => 'javascript',
                     'indent_type' => 'tabs',
