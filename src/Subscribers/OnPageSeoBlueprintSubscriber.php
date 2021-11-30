@@ -2,14 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
-use Aerni\AdvancedSeo\Traits\GetsEventData;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Traits\GetsEventData;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -182,6 +183,38 @@ class OnPageSeoBlueprintSubscriber
 
     public function generateSocialImage(Event $event): void
     {
+        if (! $this->shouldGenerateSocialImage($event->entry)) {
+            return;
+        }
+
         GenerateSocialImageJob::dispatch($event->entry);
+    }
+
+    protected function shouldGenerateSocialImage(Entry $entry): bool
+    {
+        // Shouldn't generate if the generator was disabled in the config.
+        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
+        // Get the collections that are allowed to generate social images.
+        $enabledCollections = Seo::find('site', 'social_media')
+            ?->in($entry->site()->handle())
+            ?->value('social_images_generator_collections') ?? [];
+
+        // Shouldn't generate if the entry's collection is not selected.
+        if (! in_array($entry->collectionHandle(), $enabledCollections)) {
+            return false;
+        }
+
+        $enabledByDefault = Seo::find('collections', $entry->collection()->handle())
+            ?->in($entry->site()->handle())
+            ?->value('seo_generate_social_images');
+
+        $enabledOnEntry = $entry->get('seo_generate_social_images');
+
+        $enabled = $enabledOnEntry ?? $enabledByDefault;
+
+        return $enabled ? true : false;
     }
 }

@@ -30,10 +30,6 @@ class GenerateSocialImageJob implements ShouldQueue
 
     public function handle()
     {
-        if (! $this->shouldGenerate()) {
-            return;
-        }
-
         $images = $this->generateNewImages();
 
         $this->deleteOldImages();
@@ -56,38 +52,5 @@ class GenerateSocialImageJob implements ShouldQueue
         foreach ($oldImages as $key => $path) {
             File::delete(SocialImage::make()->container()->disk()->path($path));
         }
-    }
-
-    protected function shouldGenerate(): bool
-    {
-        // Shouldn't generate if the generator was disabled in the config.
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return false;
-        }
-
-        // Get the collections that are allowed to generate social images.
-        $enabledCollections = Seo::find('site', 'social_media')
-            ?->in($this->entry->site()->handle())
-            ?->value('social_images_generator_collections') ?? [];
-
-        // Shouldn't generate if the entry's collection is not selected.
-        if (! in_array($this->entry->collection()->handle(), $enabledCollections)) {
-            return false;
-        }
-
-        $enabledByDefault = Seo::find('collections', $this->entry->collection()->handle())
-            ?->in($this->entry->site()->handle())
-            ?->value('seo_generate_social_images');
-
-        $enabledOnEntry = $this->entry->get('seo_generate_social_images');
-
-        $enabled = $enabledOnEntry ?? $enabledByDefault;
-
-        // Shouldn't generate if the entry's generator toggle is off.
-        if (! $enabled) {
-            return false;
-        }
-
-        return true;
     }
 }
