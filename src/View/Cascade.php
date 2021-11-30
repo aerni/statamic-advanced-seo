@@ -9,7 +9,6 @@ use Statamic\Facades\Site;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;
 use Illuminate\Support\Arr;
-use Statamic\Facades\Entry;
 use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Facades\Seo;
@@ -17,6 +16,8 @@ use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Sites\Site as StatamicSite;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Statamic\Entries\Entry;
+use Statamic\Stache\Query\TermQueryBuilder;
 
 class Cascade
 {
@@ -184,22 +185,59 @@ class Cascade
         return Helpers::parseLocale($this->site->locale());
     }
 
+    // TODO: Support collection taxonomy details page and collection term details page.
     protected function hreflang(): array
     {
-        $entry = Entry::find($this->context->get('id'));
-
-        if (! $entry) {
+        /*
+        Return if we're on a collection taxonomy details page.
+        Statamic has yet to provide a way to get the URLs of collection taxonomies.
+        */
+        if ($this->context->has('segment_2') && $this->context->get('terms') instanceof TermQueryBuilder) {
             return [];
         }
 
-        // Get all published entry localizations.
-        $alternates = $entry->sites()->filter(function ($locale) use ($entry) {
-            return optional($entry->in($locale))->published();
+        /*
+        Return if we're on a collection term details page.
+        Statamic has yet to provide a way to get the URLs of collection terms.
+        */
+        if ($this->context->has('segment_3') && $this->context->bool('is_term')) {
+            return [];
+        }
+
+        // Handles global taxonomy details page.
+        if ($this->context->has('segment_1') && $this->context->get('terms') instanceof TermQueryBuilder) {
+            $taxonomy = $this->context->get('terms')->first()->taxonomy();
+
+            return $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
+                // Set the current site so we can get the localized absolute URLs of the taxonomy.
+                Site::setCurrent($locale);
+
+                return [
+                    'url' => $taxonomy->absoluteUrl(),
+                    'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+                ];
+            })->toArray();
+        }
+
+        // Handle entries and global term details page.
+        $data = Data::find($this->context->get('id'));
+
+        if (! $data) {
+            return [];
+        }
+
+        $sites = $data instanceof Entry
+            ? $data->sites()
+            : $data->taxonomy()->sites();
+
+        // We only want to return data for published entries and terms.
+        $alternates = $sites->filter(function ($locale) use ($data) {
+            return optional($data->in($locale))->published();
         })->values();
 
-        return $alternates->map(function ($locale) use ($entry) {
+        return $alternates->map(function ($locale) use ($data) {
             return [
-                'url' => $entry->in($locale)->absoluteUrl(),
+                'url' => $data->in($locale)->absoluteUrl(),
                 'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
             ];
         })->toArray();
