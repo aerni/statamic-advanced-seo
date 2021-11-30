@@ -2,22 +2,22 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
+use Statamic\Entries\Entry;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Tags\Context;
-use Illuminate\Support\Arr;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Taxonomies\Taxonomy;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Sites\Site as StatamicSite;
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Statamic\Entries\Entry;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Support\Str;
+use Statamic\Tags\Context;
+use Statamic\Taxonomies\Taxonomy;
 
 class Cascade
 {

@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Aerni\AdvancedSeo\Traits\GetsEventData;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Illuminate\Support\Str;
-use Illuminate\Events\Dispatcher;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Traits\GetsEventData;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
