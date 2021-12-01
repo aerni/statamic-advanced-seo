@@ -10,7 +10,6 @@ use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Stache\Stache;
-use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -50,17 +49,13 @@ class ServiceProvider extends AddonServiceProvider
         \Aerni\AdvancedSeo\Data\SeoVariables::class => \Aerni\AdvancedSeo\Policies\SeoVariablesPolicy::class,
     ];
 
-    public function boot(): void
+    public function bootAddon(): void
     {
-        parent::boot();
-
-        Statamic::booted(function () {
-            $this
-                ->bootAddonViews()
-                ->bootAddonStores()
-                ->bootAddonNav()
-                ->bootAddonPermissions();
-        });
+        $this
+            ->bootAddonViews()
+            ->bootAddonStores()
+            ->bootAddonNav()
+            ->bootAddonPermissions();
     }
 
     public function register(): void

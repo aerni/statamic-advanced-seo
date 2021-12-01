@@ -43,8 +43,8 @@ return [
     ],
 
     'seo_og_image' => [
-        'instructions' => 'Add an Open Graph image for this :type. The recommended size is `1200x630px`.',
-        'default_instructions' => 'Add a default Open Graph image for your :type. The recommended size is `1200x630px`.',
+        'instructions' => 'Add an Open Graph image for this :type. The image will be cropped to 1200 x 628 pixels.',
+        'default_instructions' => 'Add a default Open Graph image for your :type. The image will be cropped to 1200 x 628 pixels.',
     ],
 
     'seo_section_twitter' => [
@@ -63,8 +63,8 @@ return [
     ],
 
     'seo_twitter_image' => [
-        'instructions' => 'Add a Twitter image for this :type with an aspect ratio of `2:1` and minimum size of `300x157px`.',
-        'default_instructions' => 'Add a default Twitter image for your :type with an aspect ratio of `2:1` and minimum size of `300x157px`.',
+        'instructions' => 'Add a Twitter image for this :type. The image will be cropped to 1200 x 628 pixels.',
+        'default_instructions' => 'Add a default Twitter image for your :type. The image will be cropped to 1200 x 628 pixels.',
     ],
 
     'seo_section_canonical_url' => [
