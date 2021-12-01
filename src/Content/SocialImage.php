@@ -16,11 +16,11 @@ class SocialImage
     protected array $types = [
         'og' => [
             'width' => 1200,
-            'height' => 630,
+            'height' => 628,
         ],
         'twitter' => [
             'width' => 1200,
-            'height' => 600,
+            'height' => 628,
         ],
     ];
 
