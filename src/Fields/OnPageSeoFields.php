@@ -106,6 +106,14 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                 ],
             ],
+            [
+                'handle' => 'seo_social_images_preview',
+                'field' => [
+                    'type' => 'social_images_preview',
+                    'display' => 'Social Images Preview',
+                    'listable' => 'hidden',
+                ],
+            ],
         ];
     }
 

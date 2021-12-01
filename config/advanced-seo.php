@@ -17,7 +17,7 @@ return [
         'container' => 'assets',
 
         'generator' => [
-            'enabled' => false,
+            'enabled' => true,
             'queue' => 'default',
         ],
 
