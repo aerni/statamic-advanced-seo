@@ -130,7 +130,7 @@ class ContentDefaultsFields extends BaseFields
 
     public function openGraphImage(): array
     {
-        return [
+        $fields = [
             [
                 'handle' => 'seo_section_og',
                 'field' => [
@@ -182,11 +182,17 @@ class ContentDefaultsFields extends BaseFields
                 ]),
             ],
         ];
+
+        if ($this->displaySocialImagesGenerator()) {
+            $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
+        }
+
+        return $fields;
     }
 
     public function twitterImage(): array
     {
-        return [
+        $fields = [
             [
                 'handle' => 'seo_section_twitter',
                 'field' => [
@@ -238,6 +244,12 @@ class ContentDefaultsFields extends BaseFields
                 ]),
             ],
         ];
+
+        if ($this->displaySocialImagesGenerator()) {
+            $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
+        }
+
+        return $fields;
     }
 
     public function canonicalUrl(): array
