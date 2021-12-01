@@ -507,12 +507,24 @@ class OnPageSeoFields extends BaseFields
             return false;
         }
 
+        // Terms are not yet supported.
+        // This is the check for the "Create Term" view. Because the data won't yet be an instance a Term.
+        if (is_array($this->data) && $this->data['type'] === 'taxonomies') {
+            return false;
+        }
+
         $enabledCollections = Seo::find('site', 'social_media')
             ?->in(Site::selected()->handle())
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the entry's collection is not configured.
         if ($this->data instanceof Entry && ! in_array($this->data->collection()->handle(), $enabledCollections)) {
+            return false;
+        }
+
+        // This is the check for the "Create Entry" view. Because the data won't yet be an instance of Entry.
+        // Don't show the generator section if the collection is not configured.
+        if (is_array($this->data) && $this->data['type'] === 'collections' && ! in_array($this->data['handle'], $enabledCollections)) {
             return false;
         }
 

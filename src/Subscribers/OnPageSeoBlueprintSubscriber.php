@@ -57,6 +57,13 @@ class OnPageSeoBlueprintSubscriber
     {
         $data = property_exists($event, 'entry') ? $event->entry : $event->term;
 
+        if (! $data) {
+            $data = [
+                'type' => Str::before($event->blueprint->namespace(), '.'),
+                'handle' => Str::after($event->blueprint->namespace(), '.'),
+            ];
+        }
+
         return OnPageSeoBlueprint::make()->data($data);
     }
 

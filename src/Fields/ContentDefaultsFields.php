@@ -472,7 +472,7 @@ class ContentDefaultsFields extends BaseFields
         }
 
         // Terms are not yet supported.
-        if ($this->data['type'] === 'taxonomies') {
+        if (is_array($this->data) && $this->data['type'] === 'taxonomies') {
             return false;
         }
 
@@ -481,7 +481,7 @@ class ContentDefaultsFields extends BaseFields
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the collection is not configured.
-        if ($this->data['type'] === 'collections' && ! in_array($this->data['handle'], $enabledCollections)) {
+        if (is_array($this->data) && $this->data['type'] === 'collections' && ! in_array($this->data['handle'], $enabledCollections)) {
             return false;
         }
 
