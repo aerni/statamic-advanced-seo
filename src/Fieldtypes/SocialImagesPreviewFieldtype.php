@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Fields\Fieldtype;
 
 class SocialImagesPreviewFieldtype extends Fieldtype
@@ -10,10 +11,13 @@ class SocialImagesPreviewFieldtype extends Fieldtype
 
     public function preload(): array
     {
-        $type = $this->config()['image_type'];
+        $specs = SocialImage::types()[$this->config()['image_type']];
 
         return [
-            'image' => $this->field->parent()->augmentedValue("seo_{$type}_image")->value()?->absoluteUrl(),
+            'image' => $this->field->parent()->augmentedValue($specs['field'])->value()?->absoluteUrl(),
+            'width' => $specs['width'],
+            'height' => $specs['height'],
+            'title' => $this->field->display(),
         ];
     }
 }

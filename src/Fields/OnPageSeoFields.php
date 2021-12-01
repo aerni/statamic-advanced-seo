@@ -112,6 +112,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'social_images_preview',
                     'image_type' => 'og',
                     'display' => 'Open Graph',
+                    'instructions' => 'Reload the page after save to update the preview.',
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
@@ -125,6 +126,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'social_images_preview',
                     'image_type' => 'twitter',
                     'display' => 'Twitter',
+                    'instructions' => 'Reload the page after save to update the preview.',
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
@@ -207,6 +209,9 @@ class OnPageSeoFields extends BaseFields
                         'image',
                         'mimes:jpg,png',
                     ],
+                    'if' => [
+                        'seo_generate_social_images' => 'equals false',
+                    ],
                 ]),
             ],
         ];
@@ -262,6 +267,9 @@ class OnPageSeoFields extends BaseFields
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
+                    ],
+                    'if' => [
+                        'seo_generate_social_images' => 'equals false',
                     ],
                 ]),
             ],
