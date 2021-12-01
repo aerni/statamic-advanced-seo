@@ -18,10 +18,6 @@ class ServiceProvider extends AddonServiceProvider
         Actions\GenerateSocialImages::class,
     ];
 
-    protected $fieldtypes = [
-        Fieldtypes\SeoMetaTitleFieldtype::class,
-    ];
-
     // protected $listen = [
     //     \Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class => [
     //         \Aerni\AdvancedSeo\Listeners\GenerateFavicons::class,
