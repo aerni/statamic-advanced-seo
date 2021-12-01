@@ -16,11 +16,8 @@ class GenerateSocialImagesJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    private Collection $items;
-
-    public function __construct(Collection $items)
+    public function __construct(protected Collection $items)
     {
-        $this->items = $items;
         $this->queue = config('advanced-seo.social_images.generator.queue');
     }
 

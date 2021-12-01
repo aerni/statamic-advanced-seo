@@ -10,77 +10,43 @@ use Statamic\Facades\AssetContainer;
 
 class SocialImage
 {
-    protected Entry $entry;
-    protected string $timestamp;
-
-    protected array $types = [
-        'og' => [
-            'width' => 1200,
-            'height' => 628,
-        ],
-        'twitter' => [
-            'width' => 1200,
-            'height' => 628,
-        ],
-    ];
-
-    public function __construct()
+    public function __construct(protected Entry $entry, protected array $specs)
     {
-        $this->timestamp = time();
+        //
     }
 
-    public function entry(Entry $entry): self
-    {
-        $this->entry = $entry;
-
-        return $this;
-    }
-
-    public function generate(): self
+    public function generate(): array
     {
         $this->ensureDirectoryExists();
 
-        foreach ($this->types as $type => $item) {
-            Browsershot::url($this->templateUrl($type))
-                ->windowSize($item['width'], $item['height'])
-                ->save($this->container()->disk()->path($this->path($type)));
-        }
+        Browsershot::url($this->templateUrl())
+            ->windowSize($this->specs['width'], $this->specs['height'])
+            ->save($this->absolutePath());
 
-        return $this;
+        return [$this->specs['field'] => $this->path()];
     }
 
-    public function toArray(): array
+    protected function templateUrl(): string
     {
-        $images = [];
-
-        foreach ($this->types as $type => $item) {
-            $images["seo_{$type}_image"] = $this->path($type);
-        }
-
-        return $images;
+        return "{$this->entry->site()->absoluteUrl()}/seo/social-images/{$this->specs['type']}/{$this->entry->id()}";
     }
 
-    public function templateUrl(string $type): string
+    protected function path(): string
     {
-        return "{$this->entry->site()->absoluteUrl()}/seo/social-images/{$type}/{$this->entry->id()}";
+        return "social_images/{$this->entry->slug()}-{$this->specs['type']}.png";
     }
 
-    public function path(string $type): string
+    protected function absolutePath($path = null): string
     {
-        return "social_images/{$this->entry->slug()}-{$type}-{$this->timestamp}.png";
+        $container = config('advanced-seo.social_images.container', 'assets');
+
+        return AssetContainer::find($container)->disk()->path($path ?? $this->path());
     }
 
     protected function ensureDirectoryExists(): void
     {
-        $directory = $this->container()->disk()->path('social_images');
+        $directory = $this->absolutePath(pathinfo($this->path(), PATHINFO_DIRNAME));
 
         File::ensureDirectoryExists($directory);
-    }
-
-    public function container(): Container
-    {
-        $container = config('advanced-seo.social_images.container', 'assets');
-
-        return AssetContainer::find($container);
     }
 }
