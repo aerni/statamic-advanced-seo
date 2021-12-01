@@ -14,7 +14,7 @@ class SocialImagesPreviewFieldtype extends Fieldtype
         $specs = SocialImage::types()[$this->config()['image_type']];
 
         return [
-            'image' => $this->field->parent()->augmentedValue($specs['field'])->value()?->absoluteUrl(),
+            'image' => $this->field->parent()->augmentedValue($specs['field'])?->value()?->absoluteUrl(),
             'width' => $specs['width'],
             'height' => $specs['height'],
             'title' => $this->field->display(),
