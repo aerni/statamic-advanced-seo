@@ -46,17 +46,13 @@ class ServiceProvider extends AddonServiceProvider
         \Aerni\AdvancedSeo\Data\SeoVariables::class => \Aerni\AdvancedSeo\Policies\SeoVariablesPolicy::class,
     ];
 
-    public function boot(): void
+    public function bootAddon(): void
     {
-        parent::boot();
-
-        Statamic::booted(function () {
-            $this
-                ->bootAddonViews()
-                ->bootAddonStores()
-                ->bootAddonNav()
-                ->bootAddonPermissions();
-        });
+        $this
+            ->bootAddonViews()
+            ->bootAddonStores()
+            ->bootAddonNav()
+            ->bootAddonPermissions();
     }
 
     public function register(): void
