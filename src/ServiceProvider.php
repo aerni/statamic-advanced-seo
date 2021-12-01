@@ -30,6 +30,7 @@ class ServiceProvider extends AddonServiceProvider
     protected $subscribe = [
         'Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber',
         'Aerni\AdvancedSeo\Subscribers\SitemapCacheSubscriber',
+        'Aerni\AdvancedSeo\Subscribers\SocialImagesGeneratorSubscriber',
     ];
 
     protected $tags = [
