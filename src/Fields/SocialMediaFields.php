@@ -75,7 +75,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add a default Open Graph image. The recommended size is `1200x630px`.',
+                    'instructions' => 'Add a default Open Graph image. The image will be cropped to 1200 x 628 pixels',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -113,11 +113,10 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a default Twitter image with an aspect ratio of `2:1` and minimum size of `300x157px`.',
+                    'instructions' => 'Add a default Twitter image. The image will be cropped to 1200 x 628 pixels',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
-                        'dimensions:min_width=300,min_height=157',
                     ],
                 ]),
             ],

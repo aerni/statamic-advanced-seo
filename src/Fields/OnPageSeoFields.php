@@ -236,7 +236,6 @@ class OnPageSeoFields extends BaseFields
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
-                        'dimensions:min_width=300,min_height=157',
                     ],
                 ]),
             ],
