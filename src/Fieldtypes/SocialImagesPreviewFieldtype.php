@@ -13,7 +13,7 @@ class SocialImagesPreviewFieldtype extends Fieldtype
         $type = $this->config()['image_type'];
 
         return [
-            'image' => $this->field->parent()->augmentedValue("seo_{$type}_image")->value()->absoluteUrl(),
+            'image' => $this->field->parent()->augmentedValue("seo_{$type}_image")->value()?->absoluteUrl(),
         ];
     }
 }
