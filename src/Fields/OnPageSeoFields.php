@@ -112,7 +112,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'social_images_preview',
                     'image_type' => 'og',
                     'display' => 'Open Graph',
-                    'instructions' => 'Reload the page after save to update the preview.',
+                    'instructions' => $this->trans('seo_og_image_preview', 'instructions'),
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
@@ -126,7 +126,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'social_images_preview',
                     'image_type' => 'twitter',
                     'display' => 'Twitter',
-                    'instructions' => 'Reload the page after save to update the preview.',
+                    'instructions' => $this->trans('seo_twitter_image_preview', 'instructions'),
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [

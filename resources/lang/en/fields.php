@@ -27,6 +27,14 @@ return [
         'default_instructions' => 'Activate to generate the :type\' Open Graph and Twitter images by default.',
     ],
 
+    'seo_og_image_preview' => [
+        'instructions' => 'Reload the page after save to update the preview.',
+    ],
+
+    'seo_twitter_image_preview' => [
+        'instructions' => 'Reload the page after save to update the preview.',
+    ],
+
     'seo_section_og' => [
         'instructions' => 'Configure the Open Graph settings of this :type.',
         'default_instructions' => 'Configure the default Open Graph settings of your :type.',
