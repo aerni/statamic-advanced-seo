@@ -10,7 +10,6 @@ use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Stache\Stache;
-use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
