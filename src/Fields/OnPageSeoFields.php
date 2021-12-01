@@ -107,11 +107,29 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'seo_social_images_preview',
+                'handle' => 'seo_og_image_preview',
                 'field' => [
                     'type' => 'social_images_preview',
-                    'display' => 'Social Images Preview',
+                    'image_type' => 'og',
+                    'display' => 'Open Graph',
                     'listable' => 'hidden',
+                    'width' => 50,
+                    'if' => [
+                        'seo_generate_social_images' => 'equals true',
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_twitter_image_preview',
+                'field' => [
+                    'type' => 'social_images_preview',
+                    'image_type' => 'twitter',
+                    'display' => 'Twitter',
+                    'listable' => 'hidden',
+                    'width' => 50,
+                    'if' => [
+                        'seo_generate_social_images' => 'equals true',
+                    ],
                 ],
             ],
         ];
