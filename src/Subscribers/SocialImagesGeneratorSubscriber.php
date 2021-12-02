@@ -53,7 +53,7 @@ class SocialImagesGeneratorSubscriber
             ?->in($entry->site()->handle())
             ?->value('seo_generate_social_images');
 
-        $enabledOnEntry = $entry->get('seo_generate_social_images');
+        $enabledOnEntry = $entry->value('seo_generate_social_images');
 
         $enabled = $enabledOnEntry ?? $enabledByDefault;
 
