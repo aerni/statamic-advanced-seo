@@ -276,9 +276,11 @@ class Cascade
         return $page ? "{$currentUrl}?page={$page}" : $currentUrl;
     }
 
-    protected function schema(): string
+    protected function schema(): ?string
     {
-        return $this->siteSchema() . $this->entrySchema();
+        $schema = $this->siteSchema() . $this->entrySchema();
+
+        return ! empty($schema) ? $schema : null;
     }
 
     protected function siteSchema(): ?string
