@@ -5,13 +5,14 @@ namespace Aerni\AdvancedSeo;
 use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
-use Facades\Statamic\View\Cascade;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Providers\AddonServiceProvider;
-use Aerni\AdvancedSeo\View\Cascade as SeoCascade;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Facades\View;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
+use Statamic\Facades\Blink;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -73,9 +74,32 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootCascade(): self
     {
-        Cascade::hydrated(function ($cascade) {
-            $contextWithSeoData = SeoCascade::make($cascade->toArray())->toArray();
-            $cascade->data($contextWithSeoData);
+        View::composer('*', function ($view) {
+            $currentRoute = request()->route()->getName();
+            $allowedRoutes = ['statamic.site', 'advanced-seo.social_images.show'];
+
+            // We only want to add data to the views that need it.
+            if (! in_array($currentRoute, $allowedRoutes)) {
+                return;
+            }
+
+            $viewData = $view->getData();
+
+            /*
+            Cache the cascade because we are removing all `seo_` keys at the end of the callback.
+            This means that we only have the necesarry data available to construct the cascade in the first loop iteration.
+            */
+            $cascade = Blink::once('cascade', function () use ($viewData) {
+                return Cascade::make($viewData)->get();
+            });
+
+            // Add the seo cascade to the view.
+            $view->with('seo', $cascade);
+
+            // Clean up the view data by removing all initial seo keys.
+            foreach ($viewData as $key => $value) {
+                $view->offsetUnset(str_start($key, 'seo_'));
+            }
         });
 
         return $this;

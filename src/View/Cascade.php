@@ -37,14 +37,9 @@ class Cascade
         return new static($context);
     }
 
-    public function get(): Collection
+    public function get(): array
     {
-        return $this->computedContext();
-    }
-
-    public function toArray(): array
-    {
-        return $this->get()->all();
+        return $this->data->merge($this->computedData())->sortKeys()->all();
     }
 
     public function data(): Collection
@@ -56,29 +51,9 @@ class Cascade
             ->merge($this->onPageSeo)
             ->mapWithKeys(function ($item, $key) {
                 return [Str::remove('seo_', $key) => $item];
-            })
-            ->sortKeys();
+            });
 
         return $this->ensureOverrides($data);
-    }
-
-    protected function computedContext(): Collection
-    {
-        // Handle 404 error pages.
-        if ($this->context->get('response_code') === 404) {
-            return $this->context->merge(['seo' => ['title' => $this->compiled404Title()]]);
-        }
-
-        // Remove all seo variables from the context.
-        $contextWithoutSeoVariables = $this->context->filter(function ($value, $key) {
-            return ! Str::contains($key, 'seo_');
-        });
-
-        // Add the computed data to the data.
-        $seoVariables = $this->data->merge($this->computedData())->all();
-
-        // Return the new context with all seo variables in an seo key.
-        return $contextWithoutSeoVariables->merge(['seo' => $seoVariables]);
     }
 
     protected function computedData(): array
@@ -134,13 +109,6 @@ class Cascade
         ]);
     }
 
-    protected function compiled404Title(): string
-    {
-        return $this->titlePosition() === 'before'
-            ? "404 {$this->titleSeparator()} {$this->siteName()}"
-            : "{$this->siteName()} {$this->titleSeparator()} 404";
-    }
-
     protected function compiledTitle(): string
     {
         return $this->titlePosition() === 'before'
@@ -150,6 +118,10 @@ class Cascade
 
     protected function title(): string
     {
+        if ($this->context->get('response_code') === 404) {
+            return '404';
+        }
+
         return $this->data->get('title') ?? $this->context->get('title');
     }
 
@@ -216,22 +188,22 @@ class Cascade
     }
 
     // TODO: Support collection taxonomy details page and collection term details page.
-    protected function hreflang(): array
+    protected function hreflang(): ?array
     {
         /*
         Return if we're on a collection taxonomy details page.
         Statamic has yet to provide a way to get the URLs of collection taxonomies.
         */
         if ($this->context->has('segment_2') && $this->context->get('terms') instanceof TermQueryBuilder) {
-            return [];
+            return null;
         }
 
         /*
         Return if we're on a collection term details page.
         Statamic has yet to provide a way to get the URLs of collection terms.
         */
-        if ($this->context->has('segment_3') && $this->context->bool('is_term')) {
-            return [];
+        if ($this->context->has('segment_3') && $this->context->get('is_term') === true) {
+            return null;
         }
 
         // Handles global taxonomy details page.
@@ -259,7 +231,7 @@ class Cascade
         $data = Data::find($this->context->get('id'));
 
         if (! $data) {
-            return [];
+            return null;
         }
 
         $sites = $data instanceof Entry
@@ -279,7 +251,7 @@ class Cascade
         })->toArray();
     }
 
-    protected function canonical(): string
+    protected function canonical(): ?string
     {
         $type = optional($this->data->get('canonical_type'))->raw();
 
@@ -292,7 +264,7 @@ class Cascade
         }
 
         $page = Arr::get($this->context->get('get'), 'page');
-        $currentUrl = $this->context->get('permalink');
+        $currentUrl = $this->context->get('current_url');
 
         return $page ? "{$currentUrl}?page={$page}" : $currentUrl;
     }
