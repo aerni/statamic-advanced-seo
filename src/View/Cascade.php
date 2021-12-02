@@ -2,22 +2,23 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Entries\Entry;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Sites\Site as StatamicSite;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Illuminate\Support\Arr;
+use Statamic\Entries\Entry;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Sites\Site as StatamicSite;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class Cascade
 {
@@ -82,8 +83,10 @@ class Cascade
             'title' => $this->compiledTitle(),
             'og_title' => $this->ogTitle(),
             'og_description' => $this->ogDescription(),
+            'og_image_size' => $this->ogImageSize(),
             'twitter_title' => $this->twitterTitle(),
             'twitter_description' => $this->twitterDescription(),
+            'twitter_image_size' => $this->twitterImageSize(),
             'indexing' => $this->indexing(),
             'locale' => $this->locale(),
             'hreflang' => $this->hreflang(),
@@ -171,6 +174,13 @@ class Cascade
         return $this->data->get('og_description') ?? $this->data->get('description');
     }
 
+    protected function ogImageSize(): array
+    {
+        return collect(SocialImage::types()->get('og'))
+            ->only(['width', 'height'])
+            ->all();
+    }
+
     protected function twitterTitle(): string
     {
         return $this->data->get('twitter_title') ?? $this->title();
@@ -179,6 +189,13 @@ class Cascade
     protected function twitterDescription(): ?string
     {
         return $this->data->get('twitter_description') ?? $this->data->get('description');
+    }
+
+    protected function twitterImageSize(): array
+    {
+        return collect(SocialImage::types()->get('twitter'))
+            ->only(['width', 'height'])
+            ->all();
     }
 
     protected function indexing(): string
