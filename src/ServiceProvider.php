@@ -2,14 +2,16 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
+use Facades\Statamic\View\Cascade;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
+use Aerni\AdvancedSeo\View\Cascade as SeoCascade;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -53,6 +55,7 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
+            ->bootCascade()
             ->bootAddonViews()
             ->bootAddonStores()
             ->bootAddonNav()
@@ -66,6 +69,16 @@ class ServiceProvider extends AddonServiceProvider
 
             return new $class($this->app['stache']);
         });
+    }
+
+    protected function bootCascade(): self
+    {
+        Cascade::hydrated(function ($cascade) {
+            $contextWithSeoData = SeoCascade::make($cascade->toArray())->toArray();
+            $cascade->data($contextWithSeoData);
+        });
+
+        return $this;
     }
 
     protected function bootAddonViews(): self

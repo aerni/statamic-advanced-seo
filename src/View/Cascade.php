@@ -7,7 +7,6 @@ use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Fields\Value;
-use Statamic\Tags\Context;
 use Illuminate\Support\Arr;
 use Statamic\Entries\Entry;
 use Spatie\SchemaOrg\Schema;
@@ -22,18 +21,18 @@ use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class Cascade
 {
-    protected Context $context;
+    protected Collection $context;
     protected StatamicSite $site;
     protected Collection $data;
 
-    public function __construct(Context $context)
+    public function __construct(array $context)
     {
-        $this->context = $context;
+        $this->context = collect($context);
         $this->site = Site::current();
         $this->data = $this->data();
     }
 
-    public static function make(Context $context): self
+    public static function make(array $context): self
     {
         return new static($context);
     }
@@ -41,6 +40,11 @@ class Cascade
     public function get(): Collection
     {
         return $this->computedContext();
+    }
+
+    public function toArray(): array
+    {
+        return $this->get()->all();
     }
 
     public function data(): Collection
