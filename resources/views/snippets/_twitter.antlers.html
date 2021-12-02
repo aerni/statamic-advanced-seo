@@ -10,7 +10,11 @@
 {{ /if }}
 
 {{ if seo:twitter_image }}
-    <meta name="twitter:image" content="{{ glide :src="seo:twitter_image" :width="seo:twitter_image_size:width" :height="seo:twitter_image_size:height" fit="crop_focal" absolute="true" }}">
+    {{ if seo:generate_social_images }}
+        <meta name="twitter:image" content="{{ seo:twitter_image:permalink }}">
+    {{ else }}
+        <meta name="twitter:image" content="{{ glide :src="seo:twitter_image" :width="seo:twitter_image_size:width" :height="seo:twitter_image_size:height" fit="crop_focal" absolute="true" }}">
+    {{ /if }}
 
     {{ if seo:twitter_image:alt }}
         <meta name="twitter:image:alt" content="{{ seo:twitter_image:alt }}">
