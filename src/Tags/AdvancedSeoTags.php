@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Tags;
 
-use Statamic\Tags\Tags;
 use Illuminate\View\View;
+use Statamic\Tags\Tags;
 
 class AdvancedSeoTags extends Tags
 {

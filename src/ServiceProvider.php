@@ -2,17 +2,17 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Stache\Stache;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Permission;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Providers\AddonServiceProvider;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Support\Facades\View;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 use Statamic\Facades\Blink;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Permission;
+use Statamic\Providers\AddonServiceProvider;
+use Statamic\Stache\Stache;
 
 class ServiceProvider extends AddonServiceProvider
 {

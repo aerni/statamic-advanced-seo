@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
 use Aerni\AdvancedSeo\Traits\GetsEventData;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
