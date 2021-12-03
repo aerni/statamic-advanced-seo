@@ -10,12 +10,13 @@ class AdvancedSeoTags extends Tags
     protected static $handle = 'seo';
 
     /**
-     * This method simply returns an seo value by key. It prevents edge case errors
-     * where the {{ seo }} tag takes precedence over the {{ seo }} variable in the context.
+     * The {{ seo }} variable takes precedence over the {{ seo }} tag.
+     * If the requested variable key, e.g. {{ seo:hreflang }} returns nothing, this wildcard method will be run instead.
+     * We simply want to return nothing as well.
      */
-    public function wildcard(string $key): mixed
+    public function wildcard(): mixed
     {
-        return $this->context->get("seo.$key");
+        return null;
     }
 
     /**
