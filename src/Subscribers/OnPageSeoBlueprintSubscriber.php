@@ -116,11 +116,11 @@ class OnPageSeoBlueprintSubscriber
         }
 
         // We only want to set the defaults that were not changed on the entry.
-        $termData = $event->term->data();
+        $termData = $event->term->in($locale)->data();
         $defaultsToSet = $defaults->diffKeys($termData);
         $mergedData = $termData->merge($defaultsToSet)->toArray();
 
-        $event->term->data($mergedData);
+        $event->term->in($locale)->merge($mergedData);
     }
 
     /**
