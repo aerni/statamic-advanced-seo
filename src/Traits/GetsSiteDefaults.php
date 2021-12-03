@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Traits;
 
-use Statamic\Fields\Value;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
+use Statamic\Fields\Value;
 
 trait GetsSiteDefaults
 {

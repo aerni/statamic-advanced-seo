@@ -10,6 +10,7 @@ trait GetsFieldsWithDefault
     {
         return collect($fields)->mapWithKeys(function ($config, $handle) {
             $field = new Field($handle, $config);
+
             return [$field->handle() => $field->preProcess()->value()];
         })->filter();
     }

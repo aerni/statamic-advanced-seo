@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Traits;
 
-use Statamic\Facades\Site;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
 
 trait GetsLocale
 {
