@@ -3,12 +3,12 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Statamic\View\View;
-use Statamic\Facades\Data;
 use Illuminate\Routing\Controller;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Data;
 use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\View\View;
 
 class SocialImagesController extends Controller
 {
