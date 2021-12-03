@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Traits\GetsEventData;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Statamic\Facades\Site;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Traits\GetsEventData;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -102,8 +102,13 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
+        // A fancy way to get the current locale because you can't get it from the term.
+        $locale = str_contains(request()->path(), config('cp.route', 'cp'))
+            ? basename(request()->path())
+            : Site::current()->handle();
+
         $defaults = Seo::find('taxonomies', $event->term->taxonomy()->handle())
-            ?->in($event->term->locale())
+            ?->in($locale)
             ?->data();
 
         if (is_null($defaults)) {
