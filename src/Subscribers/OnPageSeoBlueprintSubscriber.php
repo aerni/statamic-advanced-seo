@@ -2,22 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Traits\GetsEventData;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
 use Statamic\Facades\Site;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Traits\GetsEventData;
+use Aerni\AdvancedSeo\Traits\GetsFieldsWithDefault;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
     use GetsEventData;
+    use GetsFieldsWithDefault;
 
     protected array $events = [
-        Events\EntryBlueprintFound::class => 'addFieldsToBlueprint',
-        Events\TermBlueprintFound::class => 'addFieldsToBlueprint',
+        Events\EntryBlueprintFound::class => 'addFieldsToEntryBlueprint',
+        Events\TermBlueprintFound::class => 'addFieldsToTermBlueprint',
         // Events\EntrySaving::class => 'removeDefaultDataFromEntry',
         // Events\TermSaving::class => 'removeDefaultDataFromEntry', // TODO: This event does not currently exist but will be added with an open PR.
         Events\CollectionSaved::class => 'createOrDeleteLocalizations',
@@ -33,23 +35,73 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
-    public function addFieldsToBlueprint(Event $event): void
+    protected function shouldHandleBlueprintEvents(Event $event): bool
     {
         // Don't add fields in the blueprint builder.
         if (Str::contains(request()->path(), '/blueprints/' . $event->blueprint->handle()) || app()->runningInConsole()) {
-            return;
+            return false;
         }
 
         // Don't add fields on any custom view.
         if (Str::contains(request()->path(), '/advanced-seo/') || app()->runningInConsole()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function addFieldsToEntryBlueprint(Event $event): void
+    {
+        if (! $this->shouldHandleBlueprintEvents($event)) {
             return;
         }
 
-        $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
+        /**
+         * Add the fields to the entry blueprint in the CP. But only for the current localized entry.
+         * This is to prevent that every localization adds fields to the blueprint.
+         * If we don't do this check, we can't add the localized content defaults correctly.
+         */
+        if (Str::containsAll(request()->path(), [$event->entry?->id(), 'cp', 'collections', 'entries'])) {
+            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
+        }
 
-        property_exists($event, 'entry')
-            ? $this->addDefaultDataToEntry($event)
-            : $this->addDefaultDataToTerm($event);
+        // TODO: Maybe move this out of the BlueprintFound event.
+        // Add the data to the entry if we're on the frontend.
+        if (request()->route()->getName() === 'statamic.site') {
+            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
+
+            $this->addDefaultDataToEntry($event);
+        }
+
+        // TODO: Remove those values (or maybe also just the default key from blueprint) in the entry in EntrySaving event.
+        // dd($this->getFieldsWithDefault($blueprint));
+    }
+
+    public function addFieldsToTermBlueprint(Event $event): void
+    {
+        if (! $this->shouldHandleBlueprintEvents($event)) {
+            return;
+        }
+
+        /**
+         * Add the fields to the term blueprint in the CP. But only for the current localized term.
+         * This is to prevent that every localization adds fields to the blueprint.
+         * If we don't do this check, we can't add the localized content defaults correctly.
+         */
+        if (Str::containsAll(request()->path(), [$event->term?->slug(), 'cp', 'taxonomies', 'terms'])) {
+            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
+        }
+
+        // TODO: Maybe move this out of the BlueprintFound event.
+        // Add the data for the frontend.
+        if (request()->route()->getName() === 'statamic.site') {
+            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
+
+            $this->addDefaultDataToTerm($event);
+        }
+
+        // TODO: Remove those values (or maybe also just the default key from blueprint) in the entry in TermSaving event.
+        // dd($this->getFieldsWithDefault($blueprint));
     }
 
     protected function blueprint(Event $event): OnPageSeoBlueprint

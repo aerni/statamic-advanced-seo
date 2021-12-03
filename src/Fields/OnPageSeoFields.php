@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Traits\GetsFieldsWithDefault;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Fieldset;
@@ -12,6 +13,7 @@ use Statamic\Taxonomies\Term;
 class OnPageSeoFields extends BaseFields
 {
     use HasAssetField;
+    use GetsFieldsWithDefault;
 
     public function sections(): array
     {
@@ -42,6 +44,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'text',
                     'display' => 'Meta Title',
                     'instructions' => $this->trans('seo_title', 'instructions'),
+                    'placeholder' => $this->getValueFromCascade('seo_title'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -58,6 +61,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'textarea',
                     'display' => 'Meta Description',
                     'instructions' => $this->trans('seo_description', 'instructions'),
+                    'placeholder' => $this->getValueFromCascade('seo_description'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => 160,
@@ -103,6 +107,7 @@ class OnPageSeoFields extends BaseFields
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
                     'instructions' => $this->trans('seo_generate_social_images', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_generate_social_images'),
                     'listable' => 'hidden',
                 ],
             ],
@@ -175,6 +180,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'text',
                     'display' => 'Open Graph Title',
                     'instructions' => $this->trans('seo_og_title', 'instructions'),
+                    'placeholder' => $this->getValueFromCascade('seo_og_title'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -191,6 +197,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'textarea',
                     'display' => 'Open Graph Description',
                     'instructions' => $this->trans('seo_og_description', 'instructions'),
+                    'placeholder' => $this->getValueFromCascade('seo_og_description'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -237,6 +244,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'text',
                     'display' => 'Twitter Title',
                     'instructions' => $this->trans('seo_twitter_title', 'instructions'),
+                    'placeholder' => $this->getValueFromCascade('seo_twitter_title'),
                     'input_type' => 'text',
                     'localizable' => true,
                     'listable' => 'hidden',
@@ -253,6 +261,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'textarea',
                     'display' => 'Twitter Description',
                     'instructions' => $this->trans('seo_twitter_description', 'instructions'),
+                    'placeholder' => $this->getValueFromCascade('seo_twitter_description'),
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => '200',
@@ -306,7 +315,7 @@ class OnPageSeoFields extends BaseFields
                         'other' => 'Other Entry',
                         'custom' => 'Custom URL',
                     ],
-                    'default' => 'current',
+                    'default' => $this->getValueFromCascade('seo_canonical_type'),
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -317,6 +326,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'entries',
                     'display' => 'Entry',
                     'instructions' => $this->trans('seo_canonical_entry', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_canonical_entry'),
                     'component' => 'relationship',
                     'mode' => 'stack',
                     'max_items' => 1,
@@ -336,6 +346,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'text',
                     'display' => 'URL',
                     'instructions' => $this->trans('seo_canonical_custom', 'instructions'),
+                    'placeholder' => $this->getValueFromCascade('seo_canonical_custom'),
                     'input_type' => 'url',
                     'icon' => 'text',
                     'listable' => 'hidden',
@@ -368,6 +379,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Noindex',
                     'instructions' => $this->trans('seo_noindex', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_noindex'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -379,6 +391,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Nofollow',
                     'instructions' => $this->trans('seo_nofollow', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_nofollow'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -408,6 +421,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'select',
                     'display' => 'Priority',
                     'instructions' => $this->trans('seo_sitemap_priority', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_sitemap_priority'),
                     'options' => [
                         '0.0' => '0.0',
                         '0.1' => '0.1',
@@ -428,7 +442,6 @@ class OnPageSeoFields extends BaseFields
                     'push_tags' => false,
                     'cast_booleans' => false,
                     'width' => 50,
-                    'default' => '0.5',
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -448,6 +461,7 @@ class OnPageSeoFields extends BaseFields
                         'yearly' => 'Yearly',
                         'never' => 'Never',
                     ],
+                    'default' => $this->getValueFromCascade('seo_sitemap_change_frequency'),
                     'clearable' => false,
                     'multiple' => false,
                     'searchable' => false,
@@ -455,7 +469,6 @@ class OnPageSeoFields extends BaseFields
                     'push_tags' => false,
                     'cast_booleans' => false,
                     'width' => 50,
-                    'default' => 'daily',
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -481,6 +494,7 @@ class OnPageSeoFields extends BaseFields
                     'icon' => 'code',
                     'display' => 'JSON-LD Schema',
                     'instructions' => $this->trans('seo_json_ld', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_json_ld'),
                     'theme' => 'material',
                     'mode' => 'javascript',
                     'indent_type' => 'tabs',

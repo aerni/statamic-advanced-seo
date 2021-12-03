@@ -2,11 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Contracts\Fields;
 use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Contracts\Fields;
+use Aerni\AdvancedSeo\Traits\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
 
 abstract class BaseFields implements Fields
 {
+    use GetsContentDefaults;
+    use GetsSiteDefaults;
+
     protected $data;
 
     public static function make(): self
@@ -49,6 +54,22 @@ abstract class BaseFields implements Fields
     protected function trans(string $parent, string $key): string
     {
         return __("advanced-seo::fields.$parent.$key", ['type' => $this->type()]);
+    }
+
+    // TODO: Refactor this to use a new cascade class.
+    protected function getValueFromCascade($handle): ?string
+    {
+        // We can't get any defaults with no data.
+        if (! $this->data) {
+            return null;
+        }
+
+        $siteDefaults = $this->getSiteDefaults($this->data);
+        $contentDefaults = $this->getContentDefaults($this->data);
+
+        $cascade = $siteDefaults->merge($contentDefaults);
+
+        return $cascade->get($handle)?->raw();
     }
 
     abstract protected function sections(): array;
