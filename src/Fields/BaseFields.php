@@ -64,6 +64,11 @@ abstract class BaseFields implements Fields
             return null;
         }
 
+        // We only need this data for the blueprints in the CP.
+        if (! str_contains(request()->path(), config('cp.route', 'cp'))) {
+            return null;
+        }
+
         $siteDefaults = $this->getSiteDefaults($this->data);
         $contentDefaults = $this->getContentDefaults($this->data);
 
