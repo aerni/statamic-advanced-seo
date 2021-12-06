@@ -61,11 +61,12 @@ class OnPageSeoBlueprintSubscriber
          * This is to prevent that every localization adds fields to the blueprint.
          * If we don't do this check, we can't add the localized content defaults correctly.
          */
-        if (Str::containsAll(request()->path(), [$event->entry?->id(), 'cp', 'collections', 'entries'])) {
+        if (Str::containsAll(request()->path(), [$event->entry?->id(), config('cp.route', 'cp'), 'collections', 'entries'])) {
             $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
         }
 
-        // TODO: Maybe move this out of the BlueprintFound event.
+        // TODO: We don't need this if we decide to add the defaults in the ServiceProvider bootCascade()
+        // using the new GetsContentDefaults and GetsSiteDefaults traits.
         // Add the data to the entry if we're on the frontend.
         if (request()->route()->getName() === 'statamic.site') {
             $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
@@ -88,11 +89,12 @@ class OnPageSeoBlueprintSubscriber
          * This is to prevent that every localization adds fields to the blueprint.
          * If we don't do this check, we can't add the localized content defaults correctly.
          */
-        if (Str::containsAll(request()->path(), [$event->term?->slug(), 'cp', 'taxonomies', 'terms'])) {
+        if (Str::containsAll(request()->path(), [$event->term?->slug(), config('cp.route', 'cp'), 'taxonomies', 'terms'])) {
             $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
         }
 
-        // TODO: Maybe move this out of the BlueprintFound event.
+        // TODO: We don't need this if we decide to add the defaults in the ServiceProvider bootCascade()
+        // using the new GetsContentDefaults and GetsSiteDefaults traits.
         // Add the data for the frontend.
         if (request()->route()->getName() === 'statamic.site') {
             $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
