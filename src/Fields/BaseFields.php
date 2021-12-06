@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Contracts\Fields;
-use Aerni\AdvancedSeo\Traits\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
+use Aerni\AdvancedSeo\Traits\GetsSiteDefaults;
+use Statamic\Contracts\Entries\Entry;
 
 abstract class BaseFields implements Fields
 {

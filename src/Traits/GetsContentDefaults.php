@@ -2,14 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Traits;
 
-use Statamic\Facades\Blink;
-use Statamic\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Traits\GetsLocale;
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Taxonomies\Taxonomy;
 
 trait GetsContentDefaults
 {
