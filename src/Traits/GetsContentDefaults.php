@@ -21,14 +21,14 @@ trait GetsContentDefaults
             return [];
         }
 
-        return Blink::once($this->getCacheKey($parent, $data), function () use ($parent, $data) {
+        return Blink::once($this->getContentCacheKey($parent, $data), function () use ($parent, $data) {
             return Seo::find($this->getContentType($parent), $parent->handle())
                 ?->in($this->getLocale($data))
                 ?->toAugmentedArray();
         });
     }
 
-    protected function getCacheKey($parent, $data): string
+    protected function getContentCacheKey($parent, $data): string
     {
         return "advanced-seo::{$this->getContentType($parent)}::{$parent->handle()}::{$this->getLocale($data)}";
     }
