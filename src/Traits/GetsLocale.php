@@ -2,13 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Traits;
 
+use Illuminate\Support\Arr;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 
 trait GetsLocale
 {
-    protected function getLocale($data): ?string
+    protected function getLocale(Entry|Term|array $data): ?string
     {
         if ($data instanceof Entry) {
             return $data->locale();
@@ -20,6 +21,6 @@ trait GetsLocale
                 : Site::current()->handle();
         }
 
-        return null;
+        return Arr::get($data, 'locale');
     }
 }

@@ -66,7 +66,8 @@ class OnPageSeoBlueprintSubscriber
          * This is to prevent that every localization adds fields to the blueprint.
          * If we don't do this check, we can't add the localized content defaults correctly.
          */
-        if (Str::containsAll(request()->path(), [$event->entry?->id(), config('cp.route', 'cp'), 'collections', 'entries'])) {
+
+        if (Str::containsAll(request()->path(), [$event->entry?->id() ?? 'create', config('cp.route', 'cp'), 'collections', 'entries'])) {
             $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
         }
 
@@ -89,12 +90,15 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
+        // TODO: What if we constructed the cascade once in a BlueprintFound event,
+        // then cache it with Blink an use it everywhere else? Like in the ServiceProvider bootCascade() method.
+
         /**
          * Add the fields to the term blueprint in the CP. But only for the current localized term.
          * This is to prevent that every localization adds fields to the blueprint.
          * If we don't do this check, we can't add the localized content defaults correctly.
          */
-        if (Str::containsAll(request()->path(), [$event->term?->slug(), config('cp.route', 'cp'), 'taxonomies', 'terms'])) {
+        if (Str::containsAll(request()->path(), [$event->term?->slug() ?? 'create', config('cp.route', 'cp'), 'taxonomies', 'terms'])) {
             $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
         }
 
@@ -119,6 +123,7 @@ class OnPageSeoBlueprintSubscriber
             $data = [
                 'type' => Str::before($event->blueprint->namespace(), '.'),
                 'handle' => Str::after($event->blueprint->namespace(), '.'),
+                'locale' => basename(request()->path()),
             ];
         }
 
