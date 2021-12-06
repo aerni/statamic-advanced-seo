@@ -11,7 +11,6 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Statamic\Facades\Site;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -20,10 +19,8 @@ class OnPageSeoBlueprintSubscriber
     use GetsContentDefaults;
 
     protected array $events = [
-        Events\EntryBlueprintFound::class => 'addFieldsToEntryBlueprint',
-        Events\TermBlueprintFound::class => 'addFieldsToTermBlueprint',
-        // Events\EntrySaving::class => 'removeDefaultDataFromEntry',
-        // Events\TermSaving::class => 'removeDefaultDataFromEntry', // TODO: This event does not currently exist but will be added with an open PR.
+        Events\EntryBlueprintFound::class => 'handleEntryBlueprintFound',
+        Events\TermBlueprintFound::class => 'handleTermBlueprintFound',
         Events\CollectionSaved::class => 'createOrDeleteLocalizations',
         Events\TaxonomySaved::class => 'createOrDeleteLocalizations',
         Events\CollectionDeleted::class => 'deleteDefaults',
@@ -37,194 +34,108 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
-    protected function shouldHandleBlueprintEvents(Event $event): bool
+    protected function shouldHandleBlueprintEvents(): bool
     {
-        // Don't add fields in the blueprint builder.
-        if (Str::contains(request()->path(), '/blueprints/' . $event->blueprint->handle()) || app()->runningInConsole()) {
+        // Don't add any fields in the blueprint builder.
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'blueprints']) || app()->runningInConsole()) {
             return false;
         }
 
-        // Don't add fields on any custom view.
-        if (Str::contains(request()->path(), '/advanced-seo/') || app()->runningInConsole()) {
+        // Don't add any fields on custom views.
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'advanced-seo']) || app()->runningInConsole()) {
             return false;
         }
 
         return true;
     }
 
-    public function addFieldsToEntryBlueprint(Event $event): void
+    public function handleEntryBlueprintFound(Event $event): void
     {
-        if (! $this->shouldHandleBlueprintEvents($event)) {
-            return;
+        if ($this->shouldHandleBlueprintEvents()) {
+            $this->addEntryDefaultsInCp($event);
+            $this->addEntryDefaultsToCascade($event);
         }
+    }
 
-        // TODO: What if we constructed the cascade once in a BlueprintFound event,
-        // then cache it with Blink an use it everywhere else? Like in the ServiceProvider bootCascade() method.
-
+    protected function addEntryDefaultsInCp(Event $event): void
+    {
         /**
          * Add the fields to the entry blueprint in the CP. But only for the current localized entry.
          * This is to prevent that every localization adds fields to the blueprint.
          * If we don't do this check, we can't add the localized content defaults correctly.
          */
-
-        if (Str::containsAll(request()->path(), [$event->entry?->id() ?? 'create', config('cp.route', 'cp'), 'collections', 'entries'])) {
-            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'collections', 'entries', $event->entry?->id() ?? 'create'])) {
+            $this->extendBlueprint($event);
         }
-
-        // TODO: We don't need this if we decide to add the defaults in the ServiceProvider bootCascade()
-        // using the new GetsContentDefaults and GetsSiteDefaults traits.
-        // Add the data to the entry if we're on the frontend.
-        if (request()->route()->getName() === 'statamic.site') {
-            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
-
-            $this->addDefaultDataToEntry($event);
-        }
-
-        // TODO: Remove those values (or maybe also just the default key from blueprint) in the entry in EntrySaving event.
-        // dd($this->getFieldsWithDefault($blueprint));
     }
 
-    public function addFieldsToTermBlueprint(Event $event): void
+    protected function addEntryDefaultsToCascade(Event $event): void
     {
-        if (! $this->shouldHandleBlueprintEvents($event)) {
-            return;
+        // We only want to add data if we're on a Statamic frontend route.
+        if (request()->route()->getName() === 'statamic.site') {
+            $this->extendBlueprint($event);
+
+            $defaults = collect($this->getContentDefaults($event->entry))->map->raw();
+
+            // We only want to set a default value if its key doesn't exist on the entry.
+            $defaultsToSet = $defaults->diffKeys($event->entry->data());
+
+            $event->entry->merge($defaultsToSet->toArray());
         }
+    }
 
-        // TODO: What if we constructed the cascade once in a BlueprintFound event,
-        // then cache it with Blink an use it everywhere else? Like in the ServiceProvider bootCascade() method.
+    public function handleTermBlueprintFound(Event $event): void
+    {
+        if ($this->shouldHandleBlueprintEvents()) {
+            $this->addTermDefaultsInCp($event);
+            $this->addTermDefaultsToCascade($event);
+        }
+    }
 
+    protected function addTermDefaultsInCp(Event $event): void
+    {
         /**
          * Add the fields to the term blueprint in the CP. But only for the current localized term.
          * This is to prevent that every localization adds fields to the blueprint.
          * If we don't do this check, we can't add the localized content defaults correctly.
          */
-        if (Str::containsAll(request()->path(), [$event->term?->slug() ?? 'create', config('cp.route', 'cp'), 'taxonomies', 'terms'])) {
-            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'taxonomies', 'terms', $event->term?->slug() ?? 'create'])) {
+            $this->extendBlueprint($event);
         }
-
-        // TODO: We don't need this if we decide to add the defaults in the ServiceProvider bootCascade()
-        // using the new GetsContentDefaults and GetsSiteDefaults traits.
-        // Add the data for the frontend.
-        if (request()->route()->getName() === 'statamic.site') {
-            $event->blueprint->ensureFieldsInSection($this->blueprint($event)->items(), 'SEO');
-
-            $this->addDefaultDataToTerm($event);
-        }
-
-        // TODO: Remove those values (or maybe also just the default key from blueprint) in the entry in TermSaving event.
-        // dd($this->getFieldsWithDefault($blueprint));
     }
 
-    protected function blueprint(Event $event): OnPageSeoBlueprint
+    protected function addTermDefaultsToCascade(Event $event): void
+    {
+        // We only want to add data if we're on a Statamic frontend route.
+        if (request()->route()->getName() === 'statamic.site') {
+            $this->extendBlueprint($event);
+
+            $defaults = collect($this->getContentDefaults($event->term))->map->raw();
+
+            $locale = $this->getLocale($event->term);
+
+            // We only want to set a default value if its key doesn't exist on the term.
+            $defaultsToSet = $defaults->diffKeys($event->term->in($locale)->data());
+
+            $event->term->in($locale)->merge($defaultsToSet->toArray());
+        }
+    }
+
+    protected function extendBlueprint(Event $event): void
     {
         $data = property_exists($event, 'entry') ? $event->entry : $event->term;
 
-        if (! $data) {
-            $data = [
-                'type' => Str::before($event->blueprint->namespace(), '.'),
-                'handle' => Str::after($event->blueprint->namespace(), '.'),
-                'locale' => basename(request()->path()),
-            ];
-        }
+        // This data is used on "Create Entry" and "Create Term" views so that we can get the content defaults.
+        $fallbackData = [
+            'type' => Str::before($event->blueprint->namespace(), '.'),
+            'handle' => Str::after($event->blueprint->namespace(), '.'),
+            'locale' => basename(request()->path()),
+        ];
 
-        return OnPageSeoBlueprint::make()->data($data);
+        $blueprint = OnPageSeoBlueprint::make()->data($data ?? $fallbackData)->items();
+
+        $event->blueprint->ensureFieldsInSection($blueprint, 'SEO');
     }
-
-    /**
-     * Adds the content defaults to the entry.
-     * It only adds values if they have not already been set on the entry.
-     */
-    protected function addDefaultDataToEntry(Event $event): void
-    {
-        if (! $event->entry) {
-            return;
-        }
-
-        $defaults = Seo::find('collections', $event->entry->collection()->handle())
-            ?->in($event->entry->locale())
-            ?->data();
-
-        if (is_null($defaults)) {
-            return;
-        }
-
-        // We only want to set the defaults that were not changed on the entry.
-        $entryData = $event->entry->data();
-        $defaultsToSet = $defaults->diffKeys($entryData);
-        $mergedData = $entryData->merge($defaultsToSet)->toArray();
-
-        $event->entry->data($mergedData);
-    }
-
-    /**
-     * Adds the content defaults to the term.
-     * It only adds values if they have not already been set on the term.
-     */
-    protected function addDefaultDataToTerm(Event $event): void
-    {
-        if (! $event->term) {
-            return;
-        }
-
-        // A fancy way to get the current locale because you can't get it from the term.
-        $locale = str_contains(request()->path(), config('cp.route', 'cp'))
-            ? basename(request()->path())
-            : Site::current()->handle();
-
-        $defaults = Seo::find('taxonomies', $event->term->taxonomy()->handle())
-            ?->in($locale)
-            ?->data();
-
-        if (is_null($defaults)) {
-            return;
-        }
-
-        // We only want to set the defaults that were not changed on the entry.
-        $termData = $event->term->in($locale)->data();
-        $defaultsToSet = $defaults->diffKeys($termData);
-        $mergedData = $termData->merge($defaultsToSet)->toArray();
-
-        $event->term->in($locale)->merge($mergedData);
-    }
-
-    /**
-     * TODO: It's bad UX to remove the data from the entry, because the user has no indicator if a value is saved on the entry or comes from the defaults.
-     * TODO: Revisit this as soon as we find a nice way to indicate default data in the CP.
-     * Makes sure that we only save data that is different to the content defaults.
-     * This ensures that the blueprint always loads the latest default data if no other value has been set on the entry.
-     */
-    // public function removeDefaultDataFromEntry(Event $event): void
-    // {
-    //     $defaults = collect($this->getContentDefaults($event->entry))->map->raw();
-
-    //     // We only want to keep data that is different to the content defaults.
-    //     $dataWithoutDefaults = $event->entry->data()->map(function ($value, $key) use ($defaults) {
-    //         return $value !== $defaults->get($key) ? $value : null;
-    //     });
-
-    //     $event->entry->data($dataWithoutDefaults);
-    // }
-
-    /**
-     * Makes sure that we only save data that is different to the default term.
-     * This ensures that the blueprint always loads the latest default data if no other value has been set on the term.
-     */
-    // public function removeDefaultDataFromTerm(Event $event): void
-    // {
-    //     $defaults = Seo::find('taxonomies', $event->term->taxonomy()->handle())
-    //         ?->in($event->term->locale())
-    //         ?->data();
-
-    //     if (is_null($defaults)) {
-    //         return;
-    //     }
-
-    //     $dataWithoutDefaults = $event->term->data()->filter(function ($value, $key) use ($defaults) {
-    //         return $value !== $defaults->get($key);
-    //     });
-
-    //     $event->term->data($dataWithoutDefaults);
-    // }
 
     /**
      * Create or delete a localization when the corresponding site
