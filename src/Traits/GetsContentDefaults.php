@@ -30,7 +30,7 @@ trait GetsContentDefaults
 
     protected function getCacheKey($parent, $data): string
     {
-        return "advanced-seo::{$this->getContentType($parent)}::{$parent->handle()}::{$data->locale()}";
+        return "advanced-seo::{$this->getContentType($parent)}::{$parent->handle()}::{$this->getLocale($data)}";
     }
 
     protected function getContentParent($data): Collection|Taxonomy|Null
