@@ -74,6 +74,11 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootCascade(): self
     {
+        // Don't do anything if we're in the CP.
+        if (str_contains(request()->path(), config('cp.route', 'cp'))) {
+            return $this;
+        }
+
         View::composer('*', function ($view) {
             $currentRoute = request()->route()->getName();
             $allowedRoutes = ['statamic.site', 'advanced-seo.social_images.show'];
