@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Traits;
 
+use Statamic\Fields\Value;
 use Illuminate\Support\Arr;
 use Statamic\Facades\Blink;
 use Statamic\Taxonomies\Taxonomy;
@@ -10,19 +11,25 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Entries\Collection;
+use Illuminate\Support\Collection as LaravelCollection;
 
 trait GetsContentDefaults
 {
     use GetsLocale;
 
-    public function getContentDefaults($data): ?array
+    public function getContentDefaults($data): LaravelCollection
     {
         $parent = $this->getContentParent($data);
 
         return Blink::once($this->getContentCacheKey($parent, $data), function () use ($parent, $data) {
-            return Seo::find($this->getContentType($parent), $this->getContentHandle($parent))
+            $defaults = Seo::find($this->getContentType($parent), $this->getContentHandle($parent))
                 ?->in($this->getLocale($data))
                 ?->toAugmentedArray();
+
+            return collect($defaults)->filter(function ($item) {
+                // Only return values that have a corresponding field in the blueprint.
+                return $item instanceof Value;
+            });
         });
     }
 

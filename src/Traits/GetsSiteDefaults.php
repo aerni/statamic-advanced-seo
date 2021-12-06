@@ -17,6 +17,7 @@ trait GetsSiteDefaults
             return Seo::allOfType('site')->flatMap(function ($defaults) use ($data) {
                 return $defaults->in($this->getLocale($data))->toAugmentedArray();
             })->filter(function ($item) {
+                // Only return values that have a corresponding field in the blueprint.
                 return $item instanceof Value;
             });
         });
