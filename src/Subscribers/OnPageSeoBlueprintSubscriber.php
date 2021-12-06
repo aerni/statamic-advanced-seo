@@ -11,11 +11,13 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Traits\GetsEventData;
 use Aerni\AdvancedSeo\Traits\GetsFieldsWithDefault;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
 
 class OnPageSeoBlueprintSubscriber
 {
     use GetsEventData;
     use GetsFieldsWithDefault;
+    use GetsContentDefaults;
 
     protected array $events = [
         Events\EntryBlueprintFound::class => 'addFieldsToEntryBlueprint',
@@ -55,6 +57,9 @@ class OnPageSeoBlueprintSubscriber
         if (! $this->shouldHandleBlueprintEvents($event)) {
             return;
         }
+
+        // TODO: What if we constructed the cascade once in a BlueprintFound event,
+        // then cache it with Blink an use it everywhere else? Like in the ServiceProvider bootCascade() method.
 
         /**
          * Add the fields to the entry blueprint in the CP. But only for the current localized entry.
@@ -178,21 +183,18 @@ class OnPageSeoBlueprintSubscriber
     }
 
     /**
-     * Makes sure that we only save data that is different to the default data.
+     * TODO: It's bad UX to remove the data from the entry, because the user has no indicator if a value is saved on the entry or comes from the defaults.
+     * TODO: Revisit this as soon as we find a nice way to indicate default data in the CP.
+     * Makes sure that we only save data that is different to the content defaults.
      * This ensures that the blueprint always loads the latest default data if no other value has been set on the entry.
      */
     // public function removeDefaultDataFromEntry(Event $event): void
     // {
-    //     $defaults = Seo::find('collections', $event->entry->collection()->handle())
-    //         ?->in($event->entry->locale())
-    //         ?->data();
+    //     $defaults = collect($this->getContentDefaults($event->entry))->map->raw();
 
-    //     if (is_null($defaults)) {
-    //         return;
-    //     }
-
-    //     $dataWithoutDefaults = $event->entry->data()->filter(function ($value, $key) use ($defaults) {
-    //         return $value !== $defaults->get($key);
+    //     // We only want to keep data that is different to the content defaults.
+    //     $dataWithoutDefaults = $event->entry->data()->map(function ($value, $key) use ($defaults) {
+    //         return $value !== $defaults->get($key) ? $value : null;
     //     });
 
     //     $event->entry->data($dataWithoutDefaults);
