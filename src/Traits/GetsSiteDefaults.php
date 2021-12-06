@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Traits;
 
-use Statamic\Fields\Value;
-use Statamic\Facades\Blink;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
+use Statamic\Fields\Value;
 
 trait GetsSiteDefaults
 {

@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Traits;
 
 use Illuminate\Support\Arr;
-use Statamic\Fields\Blueprint;
 use Illuminate\Support\Collection;
+use Statamic\Fields\Blueprint;
 
 trait GetsFieldsWithDefault
 {
