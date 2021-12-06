@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
 use Aerni\AdvancedSeo\Traits\GetsEventData;
 use Aerni\AdvancedSeo\Traits\GetsFieldsWithDefault;
@@ -21,10 +20,6 @@ class OnPageSeoBlueprintSubscriber
     protected array $events = [
         Events\EntryBlueprintFound::class => 'handleEntryBlueprintFound',
         Events\TermBlueprintFound::class => 'handleTermBlueprintFound',
-        Events\CollectionSaved::class => 'createOrDeleteLocalizations',
-        Events\TaxonomySaved::class => 'createOrDeleteLocalizations',
-        Events\CollectionDeleted::class => 'deleteDefaults',
-        Events\TaxonomyDeleted::class => 'deleteDefaults',
     ];
 
     public function subscribe(Dispatcher $events): void
@@ -123,7 +118,7 @@ class OnPageSeoBlueprintSubscriber
 
     protected function extendBlueprint(Event $event): void
     {
-        $data = property_exists($event, 'entry') ? $event->entry : $event->term;
+        $data = $this->getProperty($event);
 
         // This data is used on "Create Entry" and "Create Term" views so that we can get the content defaults.
         $fallbackData = [
@@ -135,31 +130,5 @@ class OnPageSeoBlueprintSubscriber
         $blueprint = OnPageSeoBlueprint::make()->data($data ?? $fallbackData)->items();
 
         $event->blueprint->ensureFieldsInSection($blueprint, 'SEO');
-    }
-
-    /**
-     * Create or delete a localization when the corresponding site
-     * was added or removed from a Collection or Taxonomy.
-     */
-    public function createOrDeleteLocalizations(Event $event): void
-    {
-        $property = $this->getProperty($event);
-        $type = $this->determineRepositoryType($event);
-
-        $handle = $property->handle();
-        $sites = $property->sites();
-
-        Seo::findOrMake($type, $handle)->createOrDeleteLocalizations($sites);
-    }
-
-    /**
-     * Deletes a whole Seo Defaults Set.
-     */
-    public function deleteDefaults(Event $event): void
-    {
-        $property = $this->getProperty($event);
-        $type = $this->determineRepositoryType($event);
-
-        Seo::find($type, $property->handle())?->delete();
     }
 }
