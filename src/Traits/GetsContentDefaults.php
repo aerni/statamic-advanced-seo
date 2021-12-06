@@ -15,10 +15,10 @@ trait GetsContentDefaults
 {
     use GetsLocale;
 
-    public function getContentDefaults($data): array
+    public function getContentDefaults($data): ?array
     {
         if (! $parent = $this->getContentParent($data)) {
-            return [];
+            return null;
         }
 
         return Blink::once($this->getContentCacheKey($parent, $data), function () use ($parent, $data) {
