@@ -3,17 +3,17 @@
 namespace Aerni\AdvancedSeo\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Statamic\Fields\Blueprint;
+use Illuminate\Support\Collection;
 
-trait GetsFieldsWithDefault
+trait GetsFieldDefaults
 {
     use GetsContentDefaults;
 
     /**
      * Use the $localized argument to return the localized blueprint values.
      */
-    public function getFieldsWithDefault(Blueprint $blueprint, $localized = false, string $locale = null): Collection
+    public function getFieldDefaults(Blueprint $blueprint, $localized = false, string $locale = null): Collection
     {
         // Get the fields that have a default value set.
         $fieldsWithDefaults = $blueprint->fields()->resolveFields()->mapWithKeys(function ($field) {

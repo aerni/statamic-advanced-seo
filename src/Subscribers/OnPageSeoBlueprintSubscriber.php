@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Subscribers;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
 use Aerni\AdvancedSeo\Traits\GetsEventData;
-use Aerni\AdvancedSeo\Traits\GetsFieldsWithDefault;
+use Aerni\AdvancedSeo\Traits\GetsFieldDefaults;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Statamic\Events;
@@ -15,7 +15,7 @@ use Statamic\Fields\Blueprint;
 class OnPageSeoBlueprintSubscriber
 {
     use GetsEventData;
-    use GetsFieldsWithDefault;
+    use GetsFieldDefaults;
     use GetsContentDefaults;
 
     protected array $events = [
@@ -106,7 +106,7 @@ class OnPageSeoBlueprintSubscriber
         $blueprint = $this->extendBlueprint($event);
 
         // Get the entry's blueprint defaults.
-        $defaults = $this->getFieldsWithDefault($blueprint, true);
+        $defaults = $this->getFieldDefaults($blueprint, true);
 
         // Get the entry's data.
         $data = $event->entry->data();
@@ -185,7 +185,7 @@ class OnPageSeoBlueprintSubscriber
 
         $localizations = $event->term->localizations()->map(function ($localization) use ($blueprint) {
             // Get the localized term's blueprint defaults.
-            $defaults = $this->getFieldsWithDefault($blueprint, true, $localization->locale());
+            $defaults = $this->getFieldDefaults($blueprint, true, $localization->locale());
 
             // Get the localized term's values (term + origin). Use a fresh copy of the origin so that we don't work with previously added data.
             $freshOriginData = $localization->term()->origin()->fresh()->data();
