@@ -11,7 +11,8 @@ trait GetsFieldDefaults
     use GetsContentDefaults;
 
     /**
-     * Use the $localized argument to return the localized blueprint values.
+     * Use the $localized parameter to automatically get the field defaults by the blueprint parent's locale.
+     * Use the $locale parameter to get the defaults of a specific locale.
      */
     public function getFieldDefaults(Blueprint $blueprint, $localized = false, string $locale = null): Collection
     {
