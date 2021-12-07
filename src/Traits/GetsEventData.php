@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Traits;
 
 use Statamic\Events\Event;
+use Statamic\Fields\Blueprint;
 
 trait GetsEventData
 {
@@ -26,5 +27,12 @@ trait GetsEventData
         $property = $this->determineProperty($event);
 
         return $event->$property;
+    }
+
+    protected function getBlueprintFromEvent(Event $event): Blueprint
+    {
+        return property_exists($event, 'blueprint')
+            ? $event->blueprint
+            : $this->getProperty($event)->blueprint();
     }
 }

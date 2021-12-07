@@ -10,6 +10,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Statamic\Fields\Blueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -19,7 +20,9 @@ class OnPageSeoBlueprintSubscriber
 
     protected array $events = [
         Events\EntryBlueprintFound::class => 'handleEntryBlueprintFound',
+        Events\EntrySaved::class => 'handleEntrySaved',
         Events\TermBlueprintFound::class => 'handleTermBlueprintFound',
+        Events\TermSaved::class => 'handleTermSaved',
     ];
 
     public function subscribe(Dispatcher $events): void
@@ -52,6 +55,15 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
+    public function handleEntrySaved(Event $event): void
+    {
+        /**
+         * This is a workaround to save the Blueprint Fields defaults to the entry when first creating it.
+         * See issue here: https://github.com/statamic/cms/issues/4867
+         */
+        $this->saveEntryDefaults($event);
+    }
+
     protected function addEntryDefaultsInCp(Event $event): void
     {
         /**
@@ -64,7 +76,6 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
-    // TODO: Check how this behaves for toggles.
     protected function addEntryDefaultsToCascade(Event $event): void
     {
         // We only want to add data if we're on a Statamic frontend route.
@@ -89,12 +100,43 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
+    protected function saveEntryDefaults(Event $event): void
+    {
+        // Extend the blueprint so that we can add data.
+        $blueprint = $this->extendBlueprint($event);
+
+        // Get the entry's blueprint defaults.
+        $defaults = $this->getFieldsWithDefault($blueprint, true);
+
+        // Get the entry's data.
+        $data = $event->entry->data();
+
+        // We only want to set a default value if its key doesn't exist on the entry.
+        $defaultsToSet = $defaults->diffKeys($data);
+
+        // Don't save if the data already exists on the entry.
+        if ($defaultsToSet->isEmpty()) {
+            return;
+        }
+
+        $event->entry->merge($defaultsToSet)->saveQuietly();
+    }
+
     public function handleTermBlueprintFound(Event $event): void
     {
         if ($this->shouldHandleBlueprintEvents()) {
             $this->addTermDefaultsInCp($event);
             $this->addTermDefaultsToCascade($event);
         }
+    }
+
+    public function handleTermSaved(Event $event): void
+    {
+        /**
+         * This is a workaround to save the Blueprint Fields defaults to the term when first creating it.
+         * See issue here: https://github.com/statamic/cms/issues/4867
+         */
+        $this->saveTermDefaults($event);
     }
 
     protected function addTermDefaultsInCp(Event $event): void
@@ -109,7 +151,6 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
-    // TODO: Check how this behaves for toggles.
     protected function addTermDefaultsToCascade(Event $event): void
     {
         // We only want to add data if we're on a Statamic frontend route.
@@ -121,6 +162,7 @@ class OnPageSeoBlueprintSubscriber
             // Get the term's defaults.
             $defaults = collect($this->getContentDefaults($event->term))->map->raw();
 
+            // Get the term's locale.
             $locale = $this->getLocale($event->term);
 
             // Get the term's values (localization + origin).
@@ -136,19 +178,53 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
-    protected function extendBlueprint(Event $event): void
+    protected function saveTermDefaults(Event $event): void
+    {
+        // Extend the blueprint so that we can add data.
+        $blueprint = $this->extendBlueprint($event);
+
+        $localizations = $event->term->localizations()->map(function ($localization) use ($blueprint) {
+            // Get the localized term's blueprint defaults.
+            $defaults = $this->getFieldsWithDefault($blueprint, true, $localization->locale());
+
+            // Get the localized term's values (term + origin). Use a fresh copy of the origin so that we don't work with previously added data.
+            $freshOriginData = $localization->term()->origin()->fresh()->data();
+            $data = $freshOriginData->merge($localization->data());
+
+            // We only want to set a default value if its key doesn't exist on the localized term.
+            $defaultsToSet = $defaults->diffKeys($data);
+
+            // Don't merge data that already exists on the localized term.
+            if ($defaultsToSet->isEmpty()) {
+                return false;
+            }
+
+            return $localization->merge($defaultsToSet);
+        })->filter();
+
+        // Only save if there are new values.
+        if ($localizations->isNotEmpty()) {
+            // TODO: Use saveQuietly() when it's available: https://github.com/statamic/cms/pull/3379
+            $event->term->save();
+        }
+    }
+
+    protected function extendBlueprint(Event $event): Blueprint
     {
         $data = $this->getProperty($event);
+        $blueprint = $this->getBlueprintFromEvent($event);
 
         // This data is used on "Create Entry" and "Create Term" views so that we can get the content defaults.
-        $fallbackData = [
-            'type' => Str::before($event->blueprint->namespace(), '.'),
-            'handle' => Str::after($event->blueprint->namespace(), '.'),
-            'locale' => basename(request()->path()),
-        ];
+        if (! $data) {
+            $data = [
+                'type' => Str::before($event->blueprint->namespace(), '.'),
+                'handle' => Str::after($event->blueprint->namespace(), '.'),
+                'locale' => basename(request()->path()),
+            ];
+        }
 
-        $blueprint = OnPageSeoBlueprint::make()->data($data ?? $fallbackData)->items();
+        $seoBlueprint = OnPageSeoBlueprint::make()->data($data)->items();
 
-        $event->blueprint->ensureFieldsInSection($blueprint, 'SEO');
+        return $blueprint->ensureFieldsInSection($seoBlueprint, 'SEO');
     }
 }
