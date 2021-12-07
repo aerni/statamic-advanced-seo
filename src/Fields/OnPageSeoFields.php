@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Traits\GetsFieldsWithDefault;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Fieldset;
@@ -13,7 +12,6 @@ use Statamic\Taxonomies\Term;
 class OnPageSeoFields extends BaseFields
 {
     use HasAssetField;
-    use GetsFieldsWithDefault;
 
     public function sections(): array
     {
