@@ -17,13 +17,14 @@ trait GetsContentDefaults
 {
     use GetsLocale;
 
-    public function getContentDefaults($data): LaravelCollection
+    public function getContentDefaults($data, string $locale = null): LaravelCollection
     {
         $parent = $this->getContentParent($data);
+        $locale = $locale ?? $this->getLocale($data);
 
-        return Blink::once($this->getContentCacheKey($parent, $data), function () use ($parent, $data) {
+        return Blink::once($this->getContentCacheKey($parent, $locale), function () use ($parent, $locale) {
             $defaults = Seo::find($this->getContentType($parent), $this->getContentHandle($parent))
-                ?->in($this->getLocale($data))
+                ?->in($locale)
                 ?->toAugmentedArray();
 
             return collect($defaults)->filter(function ($item) {
@@ -33,9 +34,9 @@ trait GetsContentDefaults
         });
     }
 
-    protected function getContentCacheKey($parent, $data): string
+    protected function getContentCacheKey($parent, string $locale): string
     {
-        return "advanced-seo::{$this->getContentType($parent)}::{$this->getContentHandle($parent)}::{$this->getLocale($data)}";
+        return "advanced-seo::{$this->getContentType($parent)}::{$this->getContentHandle($parent)}::{$locale}";
     }
 
     protected function getContentParent(Entry|Term|LocalizedTerm|array $data): Collection|Taxonomy|array
