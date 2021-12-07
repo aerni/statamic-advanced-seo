@@ -11,9 +11,9 @@ trait GetsFieldsWithDefault
     use GetsContentDefaults;
 
     /**
-     * Use the $getFresh argument if the blueprint fields don't return the localized values.
+     * Use the $localized argument to return the localized blueprint values.
      */
-    public function getFieldsWithDefault(Blueprint $blueprint, $getFresh = false): Collection
+    public function getFieldsWithDefault(Blueprint $blueprint, $localized = false, string $locale = null): Collection
     {
         // Get the fields that have a default value set.
         $fieldsWithDefaults = $blueprint->fields()->resolveFields()->mapWithKeys(function ($field) {
@@ -22,7 +22,7 @@ trait GetsFieldsWithDefault
             return $value !== null;
         });
 
-        if (! $getFresh) {
+        if (! $localized) {
             return $fieldsWithDefaults;
         }
 
