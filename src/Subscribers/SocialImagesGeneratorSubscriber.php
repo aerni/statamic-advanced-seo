@@ -34,6 +34,11 @@ class SocialImagesGeneratorSubscriber
 
     protected function shouldGenerateSocialImage(Entry $entry): bool
     {
+        // Don't generate if we're first localiting an entry.
+        if (str_contains(request()->path(), 'localize')) {
+            return false;
+        };
+
         // Shouldn't generate if the generator was disabled in the config.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
             return false;
