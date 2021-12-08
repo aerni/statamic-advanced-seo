@@ -2,16 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Traits;
 
-use Statamic\Fields\Value;
-use Illuminate\Support\Arr;
-use Statamic\Facades\Blink;
-use Statamic\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Contracts\Entries\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as LaravelCollection;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
+use Statamic\Fields\Value;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Taxonomies\Taxonomy;
 
 trait GetsContentDefaults
 {
