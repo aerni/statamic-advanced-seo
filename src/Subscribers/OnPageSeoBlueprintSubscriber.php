@@ -142,7 +142,14 @@ class OnPageSeoBlueprintSubscriber
 
     public function handleTermSaved(Event $event): void
     {
-        $this->saveTermDefaults($event);
+        /**
+         * Only save the defaults if we're creating a term.
+         * We need this because an term's origin data takes precedence over the field defaults in the blueprint.
+         * But we want to make sure to set the blueprint defaults when first creating a localized term.
+         */
+        if (Str::contains(url()->previous(), 'create')) {
+            $this->saveTermDefaults($event);
+        }
     }
 
     protected function addTermDefaultsInCp(Event $event): void
@@ -189,34 +196,26 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
+    // TODO: Creating a term on a localization rather than the origin will leave you with the localization defaults on the origin as well.
+    // But the origin should retain its values from the defaults.
     protected function saveTermDefaults(Event $event): void
     {
         // Get the term's blueprint.
         $blueprint = $event->term->blueprint();
 
+        // Get the defaults for each localization. If nothing gets returned, there is nothing to save.
         $localizations = $event->term->localizations()->map(function ($localization) use ($blueprint) {
             // TODO: BETTER LOCALIZING DEFAULTS: We could probably ommit the 'true' and 'locale' parameter if we made
             // defaults localization on extending blueprint work.
+
             // Get the localized term's blueprint defaults.
             $defaults = $this->getFieldDefaults($blueprint, true, $localization->locale());
 
-            // TODO: Find a better way than this. If we're syncing all the fields with the origin
-            // there's no 'seo_' key left on the entry and all the fields defaults will be saved to the entry again.
-            // Which means, that all the fields will be desynced again.
-            // Determine if we're saving the localized term for the first time.
-            $firstSave = $localization->data()->filter(function ($value, $key) {
-                return str_contains($key, 'seo_') && $value !== null;
-            })->isEmpty();
+            // Get the localized term data merged with the origin.
+            $data = $localization->values();
 
-            /**
-             * If we're saving the first time, we want to be able to get all the defaults.
-             * But on consecutive saves we want to get the localization + origin values so that
-             * we can sync or unsync fields in the CP.
-             */
-            $data = $firstSave ? $localization->data() : $localization->values();
-
-            // We only want to set a default value if its key doesn't exist on the localized term.
-            $defaultsToSet = $defaults->diffKeys($data);
+            // Retain field sync status by removing any defaults that already exist on the origin.
+            $defaultsToSet = $defaults->diffAssoc($data);
 
             // Don't merge data that already exists on the localized term.
             if ($defaultsToSet->isEmpty()) {
@@ -227,8 +226,8 @@ class OnPageSeoBlueprintSubscriber
         })->filter();
 
         // Only save if there are new values.
+        // TODO: This could probably be changed when saveQuietly() is available: https://github.com/statamic/cms/pull/3379
         if ($localizations->isNotEmpty()) {
-            // TODO: Use saveQuietly() when it's available: https://github.com/statamic/cms/pull/3379
             $event->term->save();
         }
     }
