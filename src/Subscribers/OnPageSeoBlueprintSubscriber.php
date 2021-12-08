@@ -59,7 +59,14 @@ class OnPageSeoBlueprintSubscriber
 
     public function handleEntrySaved(Event $event): void
     {
-        $this->saveEntryDefaults($event);
+        /**
+         * Only save the defaults if we're localizing an entry.
+         * We need this because an entry's origin data takes precedence over the field defaults in the blueprint.
+         * But we want to make sure to set the blueprint defaults when first creating the entry.
+         */
+        if (Str::contains(request()->path(), 'localize')) {
+            $this->saveEntryDefaults($event);
+        };
     }
 
     protected function addEntryDefaultsInCp(Event $event): void
@@ -112,26 +119,15 @@ class OnPageSeoBlueprintSubscriber
     {
         // TODO: BETTER LOCALIZING DEFAULTS: We could probably ommit the 'true' parameter if we made
         // defaults localization on extending blueprint work.
+
         // Get the entry's blueprint defaults.
         $defaults = $this->getFieldDefaults($event->entry->blueprint(), true);
 
-        // Determine if we're saving the entry for the first time.
-        $firstSave = Str::contains(request()->path(), 'localize');
+        // Get the data from the origin.
+        $data = $event->entry->origin()->data();
 
-        /**
-         * If we're saving the first time, we want to be able to get all the defaults.
-         * But on consecutive saves we want to get the localization + origin values so that
-         * we can sync or unsync fields in the CP.
-         */
-        $data = $firstSave ? $event->entry->data() : $event->entry->values();
-
-        // We only want to set a default value if its key doesn't exist on the entry.
-        $defaultsToSet = $defaults->diffKeys($data);
-
-        // Don't save if the data already exists on the entry.
-        if ($defaultsToSet->isEmpty()) {
-            return;
-        }
+        // Retain field sync status by removing any defaults that already exist on the origin.
+        $defaultsToSet = $defaults->diffAssoc($data);
 
         $event->entry->merge($defaultsToSet)->saveQuietly();
     }
