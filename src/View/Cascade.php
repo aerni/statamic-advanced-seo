@@ -285,10 +285,10 @@ class Cascade
         }
 
         if ($type === 'custom') {
-            $data = $this->data->get('site_json_ld')->value();
+            $data = $this->data->get('site_json_ld')->value()->value();
 
             return $data
-                ? '<script type="application/ld+json">' . json_encode(json_decode($data)) . '</script>'
+                ? '<script type="application/ld+json">' . $data . '</script>'
                 : null;
         }
 
@@ -318,10 +318,10 @@ class Cascade
 
     protected function entrySchema(): ?string
     {
-        $data = optional($this->data->get('json_ld'))->value();
+        $data = optional($this->data->get('json_ld'))->value()->value();
 
         return $data
-            ? '<script type="application/ld+json">' . json_encode(json_decode($data)) . '</script>'
+            ? '<script type="application/ld+json">' . $data . '</script>'
             : null;
     }
 
