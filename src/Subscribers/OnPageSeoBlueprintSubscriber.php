@@ -105,11 +105,8 @@ class OnPageSeoBlueprintSubscriber
 
     protected function saveEntryDefaults(Event $event): void
     {
-        // Extend the blueprint so that we can add data.
-        $blueprint = $this->extendBlueprint($event);
-
         // Get the entry's blueprint defaults.
-        $defaults = $this->getFieldDefaults($blueprint, true);
+        $defaults = $this->getFieldDefaults($event->entry->blueprint(), true);
 
         // Determine if we're saving the entry for the first time.
         $firstSave = $event->entry->data()->filter(function ($value, $key) {
