@@ -2,15 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
-use Aerni\AdvancedSeo\Traits\GetsEventData;
-use Aerni\AdvancedSeo\Traits\GetsFieldDefaults;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Statamic\Facades\Site;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Statamic\Fields\Blueprint;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Traits\GetsEventData;
+use Aerni\AdvancedSeo\Traits\GetsFieldDefaults;
+use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -57,21 +59,22 @@ class OnPageSeoBlueprintSubscriber
 
     public function handleEntrySaved(Event $event): void
     {
-        /**
-         * This is a workaround to save the Blueprint Fields defaults to the entry when first creating it.
-         * See issue here: https://github.com/statamic/cms/issues/4867
-         */
         $this->saveEntryDefaults($event);
     }
 
     protected function addEntryDefaultsInCp(Event $event): void
     {
+        $isEditingOrLocalizing = $event->entry?->id();
+        $isCreating = Arr::get(Site::all()->map->handle(), basename(request()->path()));
+
         /**
-         * Add the fields to the entry blueprint in the CP. But only for the current localized entry.
+         * We only want to add fields to the blueprint of the current localization.
          * This is to prevent that every localization adds fields to the blueprint.
-         * If we don't do this check, we can't add the localized content defaults correctly.
+         * The localized field placeholders and defaults won't be added correctly if we don't do this.
          */
-        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'collections', 'entries', $event->entry?->id() ?? 'create'])) {
+        $status = $isEditingOrLocalizing ?? $isCreating;
+
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'collections', 'entries', $status])) {
             $this->extendBlueprint($event);
         }
     }
@@ -141,21 +144,22 @@ class OnPageSeoBlueprintSubscriber
 
     public function handleTermSaved(Event $event): void
     {
-        /**
-         * This is a workaround to save the Blueprint Fields defaults to the term when first creating it.
-         * See issue here: https://github.com/statamic/cms/issues/4867
-         */
         $this->saveTermDefaults($event);
     }
 
     protected function addTermDefaultsInCp(Event $event): void
     {
+        $isEditingOrLocalizing = $event->term?->slug();
+        $isCreating = Arr::get(Site::all()->map->handle(), basename(request()->path()));
+
         /**
-         * Add the fields to the term blueprint in the CP. But only for the current localized term.
+         * We only want to add fields to the blueprint of the current localization.
          * This is to prevent that every localization adds fields to the blueprint.
-         * If we don't do this check, we can't add the localized content defaults correctly.
+         * The localized field placeholders and defaults won't be added correctly if we don't do this.
          */
-        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'taxonomies', 'terms', $event->term?->slug() ?? 'create'])) {
+        $status = $isEditingOrLocalizing ?? $isCreating;
+
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'taxonomies', 'terms', $status])) {
             $this->extendBlueprint($event);
         }
     }
