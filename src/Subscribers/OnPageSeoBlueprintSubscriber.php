@@ -108,8 +108,17 @@ class OnPageSeoBlueprintSubscriber
         // Get the entry's blueprint defaults.
         $defaults = $this->getFieldDefaults($blueprint, true);
 
-        // Get the entry's data.
-        $data = $event->entry->data();
+        // Determine if we're saving the entry for the first time.
+        $firstSave = $event->entry->data()->filter(function ($value, $key) {
+            return str_contains($key, 'seo_') && $value !== null;
+        })->isEmpty();
+
+        /**
+         * If we're saving the first time, we want to be able to get all the defaults.
+         * But on consecutive saves we want to get the localization + origin values so that
+         * we can sync or unsync fields in the CP.
+         */
+        $data = $firstSave ? $event->entry->data() : $event->entry->values();
 
         // We only want to set a default value if its key doesn't exist on the entry.
         $defaultsToSet = $defaults->diffKeys($data);
