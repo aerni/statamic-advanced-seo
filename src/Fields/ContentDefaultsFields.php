@@ -101,6 +101,7 @@ class ContentDefaultsFields extends BaseFields
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
                     'instructions' => $this->trans('seo_generate_social_images', 'default_instructions'),
+                    'localizable' => true,
                     'listable' => 'hidden',
                 ],
             ],

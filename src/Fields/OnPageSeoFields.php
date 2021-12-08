@@ -106,6 +106,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Generate Social Images',
                     'instructions' => $this->trans('seo_generate_social_images', 'instructions'),
                     'default' => (bool) $this->getValueFromCascade('seo_generate_social_images'),
+                    'localizable' => true,
                     'listable' => 'hidden',
                 ],
             ],
