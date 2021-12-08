@@ -196,8 +196,11 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
-    // TODO: Creating a term on a localization rather than the origin will leave you with the localization defaults on the origin as well.
-    // But the origin should retain its values from the defaults.
+    /**
+     * TODO: Creating a term on a locale other than the origin will leave you with unsynced fields on the locale.
+     * We would need some fancy workaround to make this work. The underlying issue is the core Statamic taxonomy concept.
+     * Probably a good idea to wait until some multi-site fixes get implemented. Like being able to set the origin.
+     */
     protected function saveTermDefaults(Event $event): void
     {
         // Get the term's blueprint.
