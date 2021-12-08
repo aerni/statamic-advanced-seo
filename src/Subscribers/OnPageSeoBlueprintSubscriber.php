@@ -74,6 +74,11 @@ class OnPageSeoBlueprintSubscriber
          */
         $status = $isEditingOrLocalizing ?? $isCreating;
 
+        // TODO: BETTER LOCALIZING DEFAULTS: When we're first localizing an entry we are getting its blueprint with $event->entry->blueprint().
+        // That method triggers the EntryBlueprintFound event, which in turn triggers this method here.
+        // The event's request is includes the entry's origin, which is why the returned blueprint includes the default data of it.
+        // We should find a way to get the localizing defaults instead.
+
         if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'collections', 'entries', $status])) {
             $this->extendBlueprint($event);
         }
@@ -105,6 +110,8 @@ class OnPageSeoBlueprintSubscriber
 
     protected function saveEntryDefaults(Event $event): void
     {
+        // TODO: BETTER LOCALIZING DEFAULTS: We could probably ommit the 'true' parameter if we made
+        // defaults localization on extending blueprint work.
         // Get the entry's blueprint defaults.
         $defaults = $this->getFieldDefaults($event->entry->blueprint(), true);
 
