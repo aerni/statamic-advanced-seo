@@ -28,7 +28,7 @@ trait GetsFieldDefaults
         }
 
         // Get the content defaults for the entry linked to the blueprint.
-        $contentDefaults = collect($this->getContentDefaults($blueprint->getParent(), $locale))->map->raw();
+        $contentDefaults = collect($this->getContentDefaults($blueprint->parent(), $locale))->map->raw();
 
         // Return the defaults for the current entry.
         return $contentDefaults->intersectByKeys($fieldsWithDefaults);
