@@ -211,6 +211,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
                     'instructions' => $this->trans('seo_og_image', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_og_image'),
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -275,6 +276,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
                     'instructions' => $this->trans('seo_twitter_image', 'instructions'),
+                    'default' => $this->getValueFromCascade('seo_twitter_image'),
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
