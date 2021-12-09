@@ -67,7 +67,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'section_og',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Configure the default Open Graph settings.',
+                    'instructions' => 'Configure the site-wide Open Graph settings.',
                     'display' => 'Open Graph',
                 ],
             ],
@@ -75,7 +75,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add a fallback Open Graph image. The image will be cropped to 1200 x 628 pixels',
+                    'instructions' => 'Add a global fallback Open Graph image. The image will be cropped to 1200 x 628 pixels',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -92,7 +92,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'section_twitter',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Configure the default Twitter settings.',
+                    'instructions' => 'Configure the site-wide Twitter settings.',
                     'display' => 'Twitter',
                 ],
             ],
@@ -113,7 +113,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a fallback Twitter image. The image will be cropped to 1200 x 628 pixels',
+                    'instructions' => 'Add a global fallback Twitter image. The image will be cropped to 1200 x 628 pixels',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',

@@ -21,7 +21,7 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Crawling',
-                    'instructions' => 'Configure the crawling settings for your site.',
+                    'instructions' => 'Configure the crawling settings for your site. Activated toggles override their counterpart on entries and terms.',
                 ],
             ],
             [
