@@ -11,10 +11,13 @@ class SocialImagesPreviewFieldtype extends Fieldtype
 
     public function preload(): array
     {
-        $specs = SocialImage::types()[$this->config()['image_type']];
+        $type = $this->config()['image_type'];
+        $entry = $this->field->parent();
+
+        $specs = SocialImage::specs($type, $entry);
 
         return [
-            'image' => $this->field->parent()->augmentedValue($specs['field'])?->value()?->absoluteUrl(),
+            'image' => $entry->augmentedValue($specs['field'])?->value()?->absoluteUrl(),
             'width' => $specs['width'],
             'height' => $specs['height'],
             'title' => $this->field->display(),
