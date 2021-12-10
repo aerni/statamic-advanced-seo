@@ -32,7 +32,7 @@ class SocialImage
 
     protected function path(): string
     {
-        return "social_images/{$this->entry->slug()}-{$this->specs['type']}.png";
+        return "social_images/{$this->entry->slug()}-{$this->entry->locale()}-{$this->specs['type']}.png";
     }
 
     protected function absolutePath($path = null): string
