@@ -349,7 +349,7 @@ class Cascade
         return null;
     }
 
-    public function breadcrumbsListItems(): Collection
+    protected function breadcrumbsListItems(): Collection
     {
         $url = URL::makeAbsolute(URL::getCurrent());
         $url = Str::removeLeft($url, Site::current()->absoluteUrl());
