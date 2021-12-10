@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Repositories;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Taxonomies\LocalizedTerm;
 use Aerni\AdvancedSeo\Content\SocialImage;
 
 class SocialImageRepository
@@ -26,14 +27,20 @@ class SocialImageRepository
 
     public function twitter(Entry $entry): array
     {
-        $cardType = $entry->value('seo_twitter_card', 'summary');
-
-        return (new SocialImage($entry, $this->specs("twitter.$cardType")))->generate();
+        return (new SocialImage($entry, $this->specs('twitter', $entry)))->generate();
     }
 
-    public function specs(string $type): ?array
+    public function specs(string $type, Entry|LocalizedTerm $data = null): ?array
     {
-        return Arr::get($this->types(), $type);
+        if (! $data) {
+            return Arr::get($this->types(), $type);
+        }
+
+        return match ($type) {
+            'og' => Arr::get($this->types(), $type),
+            'twitter' => Arr::get($this->types(), "twitter.{$data->value('seo_twitter_card', 'summary')}"),
+            default => null,
+        };
     }
 
     public function types(): Collection

@@ -24,20 +24,11 @@ class SocialImagesController extends Controller
         throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException());
 
         // Throw if the social image type is not supported.
-        throw_unless($specs = $this->specs($type, $data), new NotFoundHttpException);
+        throw_unless($specs = SocialImage::specs($type, $data), new NotFoundHttpException);
 
         return (new View)
             ->template($specs['template'])
             ->layout($specs['layout'])
             ->with($data->merge($specs)->toAugmentedArray());
-    }
-
-    protected function specs(string $type, Entry|LocalizedTerm $data): ?array
-    {
-        return match ($type) {
-            'og' => SocialImage::specs('og'),
-            'twitter' => SocialImage::specs("twitter.{$data->value('seo_twitter_card', 'summary')}"),
-            default => null,
-        };
     }
 }
