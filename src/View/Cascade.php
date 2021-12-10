@@ -51,7 +51,7 @@ class Cascade
             ->merge($this->onPageSeo)
             ->mapWithKeys(function ($item, $key) {
                 return [Str::remove('seo_', $key) => $item];
-            });
+            })->sortKeys();
 
         return $this->ensureOverrides($data);
     }
