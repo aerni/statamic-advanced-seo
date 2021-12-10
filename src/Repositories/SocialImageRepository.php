@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
+use Aerni\AdvancedSeo\Content\SocialImage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
-use Aerni\AdvancedSeo\Content\SocialImage;
 
 class SocialImageRepository
 {
