@@ -16,7 +16,7 @@ return [
 
         'container' => 'assets',
 
-        'sizes' => [
+        'presets' => [
             'open_graph' => ['width' => 1200, 'height' => 628],
             'twitter' => [
                 'summary' => ['width' => 240, 'height' => 240],
