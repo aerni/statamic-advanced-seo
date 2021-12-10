@@ -158,6 +158,9 @@ class OnPageSeoFields extends BaseFields
                 'seo_generate_social_images' => 'equals true',
             ];
 
+            // Add the placeholder values from the content defaults.
+            $field['field']['placeholder'] = $this->getValueFromCascade($field['handle']);
+
             return $field;
         })->toArray();
     }
