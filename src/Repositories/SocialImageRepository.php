@@ -2,9 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Aerni\AdvancedSeo\Content\SocialImage;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Content\SocialImage;
 
 class SocialImageRepository
 {
@@ -20,23 +21,19 @@ class SocialImageRepository
 
     public function openGraph(Entry $entry): array
     {
-        return (new SocialImage($entry, $this->specs('og', $entry)))->generate();
+        return (new SocialImage($entry, $this->specs('og')))->generate();
     }
 
     public function twitter(Entry $entry): array
     {
-        return (new SocialImage($entry, $this->specs('twitter', $entry)))->generate();
+        $cardType = $entry->value('seo_twitter_card', 'summary');
+
+        return (new SocialImage($entry, $this->specs("twitter.$cardType")))->generate();
     }
 
-    public function specs(string $type, Entry $entry): ?array
+    public function specs(string $type): ?array
     {
-        $specs = $this->types()->get($type);
-
-        return match ($type) {
-            'og' => $specs,
-            'twitter' => collect($specs)->firstWhere('card', $entry->value('seo_twitter_card', 'summary')),
-            default => null,
-        };
+        return Arr::get($this->types(), $type);
     }
 
     public function types(): Collection
@@ -51,18 +48,16 @@ class SocialImageRepository
                 'height' => config('advanced-seo.social_images.presets.open_graph.height', 628),
             ],
             'twitter' => [
-                [
+                'summary' => [
                     'type' => 'twitter',
-                    'card' => 'summary',
                     'field' => 'seo_twitter_image',
                     'layout' => config('advanced-seo.social_images.presets.twitter.summary.layout', 'social_images/layout'),
                     'template' => config('advanced-seo.social_images.presets.twitter.summary.template', 'social_images/twitter_summary'),
                     'width' => config('advanced-seo.social_images.presets.twitter.summary.width', 240),
                     'height' => config('advanced-seo.social_images.presets.twitter.summary.height', 240),
                 ],
-                [
+                'summary_large_image' => [
                     'type' => 'twitter',
-                    'card' => 'summary_large_image',
                     'field' => 'seo_twitter_image',
                     'layout' => config('advanced-seo.social_images.presets.twitter.summary_large_image.layout', 'social_images/layout'),
                     'template' => config('advanced-seo.social_images.presets.twitter.summary_large_image.template', 'social_images/twitter_summary_large_image'),

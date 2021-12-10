@@ -150,7 +150,7 @@ class Cascade
 
     protected function ogImageSize(): array
     {
-        return collect(SocialImage::types()->get('og'))
+        return collect(SocialImage::specs('og'))
             ->only(['width', 'height'])
             ->all();
     }
@@ -172,7 +172,7 @@ class Cascade
 
     protected function twitterImageSize(): array
     {
-        return collect(SocialImage::types()->get('twitter'))
+        return collect(SocialImage::specs("twitter.{$this->twitterCard()}"))
             ->only(['width', 'height'])
             ->all();
     }
