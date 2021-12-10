@@ -63,6 +63,7 @@ class Cascade
             'og_title' => $this->ogTitle(),
             'og_description' => $this->ogDescription(),
             'og_image_size' => $this->ogImageSize(),
+            'twitter_card' => $this->twitterCard(),
             'twitter_title' => $this->twitterTitle(),
             'twitter_description' => $this->twitterDescription(),
             'twitter_image_size' => $this->twitterImageSize(),
@@ -152,6 +153,11 @@ class Cascade
         return collect(SocialImage::types()->get('og'))
             ->only(['width', 'height'])
             ->all();
+    }
+
+    protected function twitterCard(): Value|string
+    {
+        return $this->data->get('twitter_card') ?? 'summary';
     }
 
     protected function twitterTitle(): Value|string

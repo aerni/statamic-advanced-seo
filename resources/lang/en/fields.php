@@ -60,6 +60,11 @@ return [
         'default_instructions' => 'Configure the default Twitter settings of your :type.',
     ],
 
+    'seo_twitter_card' => [
+        'instructions' => 'Choose the type of card to use when sharing this :type.',
+        'default_instructions' => 'Choose the default type of card to use when sharing your :type.',
+    ],
+
     'seo_twitter_title' => [
         'instructions' => 'Set the Twitter title of this :type. This defaults to the :type\'s meta title.',
         'default_instructions' => 'Set the default Twitter title of your :type.',

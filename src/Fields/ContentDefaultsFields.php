@@ -203,6 +203,22 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_twitter_card',
+                'field' => [
+                    'type' => 'button_group',
+                    'icon' => 'button_group',
+                    'display' => 'Twitter Card',
+                    'instructions' => $this->trans('seo_twitter_card', 'default_instructions'),
+                    'options' => [
+                        'summary' => 'Regular',
+                        'summary_large_image' => 'Large Image',
+                    ],
+                    'default' => 'summary',
+                    'listable' => 'hidden',
+                    'localizable' => true,
+                ],
+            ],
+            [
                 'handle' => 'seo_twitter_title',
                 'field' => [
                     'type' => 'text',
@@ -247,7 +263,7 @@ class ContentDefaultsFields extends BaseFields
         ];
 
         if ($this->displaySocialImagesGenerator()) {
-            $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
+            $fields[4]['field']['if']['seo_generate_social_images'] = 'equals false';
         }
 
         return $fields;
