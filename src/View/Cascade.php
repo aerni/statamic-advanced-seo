@@ -56,9 +56,9 @@ class Cascade
         return $this->ensureOverrides($data);
     }
 
-    protected function computedData(): array
+    protected function computedData(): Collection
     {
-        return [
+        return collect([
             'title' => $this->compiledTitle(),
             'og_title' => $this->ogTitle(),
             'og_description' => $this->ogDescription(),
@@ -72,7 +72,7 @@ class Cascade
             'canonical' => $this->canonical(),
             'schema' => $this->schema(),
             'breadcrumbs' => $this->breadcrumbs(),
-        ];
+        ])->filter();
     }
 
     /**
