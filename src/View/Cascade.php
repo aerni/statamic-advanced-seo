@@ -104,8 +104,8 @@ class Cascade
     protected function ensureOverrides(Collection $data): Collection
     {
         return $data->merge([
-            'noindex' => optional($this->siteDefaults->get('noindex'))->value() ?: optional($data->get('noindex'))->value(),
-            'nofollow' => optional($this->siteDefaults->get('nofollow'))->value() ?: optional($data->get('nofollow'))->value(),
+            'noindex' => $this->siteDefaults->get('noindex')?->value() ?: $data->get('noindex')?->value(),
+            'nofollow' => $this->siteDefaults->get('nofollow')?->value() ?: $data->get('nofollow')?->value(),
         ]);
     }
 
@@ -240,7 +240,7 @@ class Cascade
 
         // We only want to return data for published entries and terms.
         $alternates = $sites->filter(function ($locale) use ($data) {
-            return optional($data->in($locale))->published();
+            return $data->in($locale)?->published();
         })->values();
 
         return $alternates->map(function ($locale) use ($data) {
@@ -253,14 +253,14 @@ class Cascade
 
     protected function canonical(): ?string
     {
-        $type = optional($this->data->get('canonical_type'))->raw();
+        $type = $this->data->get('canonical_type')?->raw();
 
         if ($type === 'other') {
-            return config('app.url') . optional($this->data->get('canonical_entry')->value())->url();
+            return config('app.url') . $this->data->get('canonical_entry')?->value()?->url();
         }
 
         if ($type === 'custom') {
-            return $this->data->get('canonical_custom')->raw();
+            return $this->data->get('canonical_custom')?->raw();
         }
 
         $page = Arr::get($this->context->get('get'), 'page');
@@ -278,14 +278,14 @@ class Cascade
 
     protected function siteSchema(): ?string
     {
-        $type = optional($this->data->get('site_json_ld_type'))->raw();
+        $type = $this->data->get('site_json_ld_type')?->raw();
 
         if (empty($type) || $type === 'none') {
             return null;
         }
 
         if ($type === 'custom') {
-            $data = $this->data->get('site_json_ld')->value()->value();
+            $data = $this->data->get('site_json_ld')?->value()?->value();
 
             return $data
                 ? '<script type="application/ld+json">' . $data . '</script>'
@@ -297,7 +297,7 @@ class Cascade
                 ->name($this->data->get('organization_name')->value())
                 ->url(config('app.url') . $this->context->get('homepage'));
 
-            if ($logo = optional($this->data->get('organization_logo'))->value()) {
+            if ($logo = $this->data->get('organization_logo')?->value()) {
                 $logo = Schema::imageObject()
                     ->url($logo->absoluteUrl())
                     ->width($logo->width())
@@ -318,7 +318,7 @@ class Cascade
 
     protected function entrySchema(): ?string
     {
-        $data = optional($this->data->get('json_ld'))->value()->value();
+        $data = $this->data->get('json_ld')?->value()?->value();
 
         return $data
             ? '<script type="application/ld+json">' . $data . '</script>'
@@ -327,7 +327,7 @@ class Cascade
 
     protected function breadcrumbs(): ?string
     {
-        $enabled = optional($this->data->get('breadcrumbs'))->value();
+        $enabled = $this->data->get('breadcrumbs')?->value();
         $isHome = $this->context->get('url', '') === '/';
 
         if ($enabled && ! $isHome) {
