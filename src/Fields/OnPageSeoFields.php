@@ -117,6 +117,7 @@ class OnPageSeoFields extends BaseFields
                     'image_type' => 'og',
                     'display' => 'Open Graph',
                     'instructions' => $this->trans('seo_og_image_preview', 'instructions'),
+                    'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
@@ -131,6 +132,7 @@ class OnPageSeoFields extends BaseFields
                     'image_type' => 'twitter',
                     'display' => 'Twitter',
                     'instructions' => $this->trans('seo_twitter_image_preview', 'instructions'),
+                    'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
