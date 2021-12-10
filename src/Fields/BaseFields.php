@@ -57,7 +57,8 @@ abstract class BaseFields implements Fields
     }
 
     // TODO: Refactor this to use a new cascade class.
-    protected function getValueFromCascade($handle): ?string
+    // TODO: Probably also a good idea to use Blink for this.
+    protected function getValueFromCascade($handle, $default = null): ?string
     {
         // We can't get any defaults with no data.
         if (! $this->data) {
@@ -74,7 +75,7 @@ abstract class BaseFields implements Fields
 
         $cascade = $siteDefaults->merge($contentDefaults);
 
-        return $cascade->get($handle)?->raw();
+        return $cascade->get($handle)?->raw() ?? $default;
     }
 
     abstract protected function sections(): array;
