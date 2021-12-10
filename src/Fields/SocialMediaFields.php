@@ -113,7 +113,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a global fallback Twitter image. The image will be cropped to 1200 x 628 pixels',
+                    'instructions' => 'Add a global fallback Twitter image. The image will be cropped to 1200 x 628 pixels.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
