@@ -103,10 +103,7 @@ class Cascade
 
     protected function ensureOverrides(Collection $data): Collection
     {
-        return $data->merge([
-            'noindex' => $this->siteDefaults->get('noindex')?->value() ?: $data->get('noindex')?->value(),
-            'nofollow' => $this->siteDefaults->get('nofollow')?->value() ?: $data->get('nofollow')?->value(),
-        ]);
+        return $data->merge($this->siteDefaults->only(['noindex', 'nofollow']));
     }
 
     protected function compiledTitle(): string
