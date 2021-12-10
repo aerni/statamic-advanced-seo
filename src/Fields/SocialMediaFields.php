@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Traits\HasAssetField;
 
 class SocialMediaFields extends BaseFields
@@ -75,7 +76,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add a global fallback Open Graph image. The image will be cropped to 1200 x 628 pixels',
+                    'instructions' => 'Add a global fallback Open Graph image. The image will be cropped to ' . SocialImage::sizeString('og') . '.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -113,7 +114,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'twitter_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Image',
-                    'instructions' => 'Add a global fallback Twitter image. The image will be cropped to 1200 x 628 pixels.',
+                    'instructions' => 'Add a global fallback Twitter image. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',

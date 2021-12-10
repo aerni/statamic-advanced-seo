@@ -43,6 +43,11 @@ class SocialImageRepository
         };
     }
 
+    public function sizeString(string $type): string
+    {
+        return "{$this->specs($type)['width']} x {$this->specs($type)['height']} pixels";
+    }
+
     public function types(): Collection
     {
         return collect([

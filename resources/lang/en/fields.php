@@ -1,5 +1,7 @@
 <?php
 
+use Aerni\AdvancedSeo\Facades\SocialImage;
+
 return [
 
     'seo_section_title_description' => [
@@ -51,8 +53,8 @@ return [
     ],
 
     'seo_og_image' => [
-        'instructions' => 'Add an Open Graph image for this :type. The image will be cropped to 1200 x 628 pixels.',
-        'default_instructions' => 'Add a default Open Graph image for your :type. The image will be cropped to 1200 x 628 pixels.',
+        'instructions' => 'Add an Open Graph image for this :type. The image will be cropped to ' . SocialImage::sizeString('og') . '.',
+        'default_instructions' => 'Add a default Open Graph image for your :type. The image will be cropped to ' . SocialImage::sizeString('og') . '.',
     ],
 
     'seo_section_twitter' => [
@@ -76,8 +78,8 @@ return [
     ],
 
     'seo_twitter_image' => [
-        'instructions' => 'Add a Twitter image for this :type. The image will be cropped to 1200 x 628 pixels.',
-        'default_instructions' => 'Add a default Twitter image for your :type. The image will be cropped to 1200 x 628 pixels.',
+        'instructions' => 'Add a Twitter image for this :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . ' (Regular) or ' . SocialImage::sizeString('twitter.summary_large_image') . ' (Large Image).',
+        'default_instructions' => 'Add a default Twitter image for your :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . ' (Regular) or ' . SocialImage::sizeString('twitter.summary_large_image') . ' (Large Image).',
     ],
 
     'seo_section_canonical_url' => [
