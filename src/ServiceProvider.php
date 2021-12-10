@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Traits\ShouldHandleRoute;
 use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Support\Facades\View;
 use Statamic\Facades\Blink;
@@ -16,6 +17,8 @@ use Statamic\Stache\Stache;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    use ShouldHandleRoute;
+
     protected $actions = [
         Actions\GenerateSocialImages::class,
     ];
@@ -81,11 +84,8 @@ class ServiceProvider extends AddonServiceProvider
         }
 
         View::composer('*', function ($view) {
-            $currentRoute = request()->route()->getName();
-            $allowedRoutes = ['statamic.site', 'advanced-seo.social_images.show'];
-
-            // We only want to add data to the views that need it.
-            if (! in_array($currentRoute, $allowedRoutes)) {
+            // We only want to add data if we're on a Statamic frontend route.
+            if (! $this->isFrontendRoute()) {
                 return;
             }
 

@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
 use Aerni\AdvancedSeo\Traits\GetsEventData;
 use Aerni\AdvancedSeo\Traits\GetsFieldDefaults;
+use Aerni\AdvancedSeo\Traits\ShouldHandleRoute;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -19,6 +20,7 @@ class OnPageSeoBlueprintSubscriber
     use GetsEventData;
     use GetsFieldDefaults;
     use GetsContentDefaults;
+    use ShouldHandleRoute;
 
     protected array $events = [
         Events\EntryBlueprintFound::class => 'handleEntryBlueprintFound',
@@ -94,25 +96,26 @@ class OnPageSeoBlueprintSubscriber
     protected function addEntryDefaultsToCascade(Event $event): void
     {
         // We only want to add data if we're on a Statamic frontend route.
-        if (request()->route()->getName() === 'statamic.site') {
-
-            // Extend the blueprint so that we can add data.
-            $this->extendBlueprint($event);
-
-            // Get the entry's defaults.
-            $defaults = collect($this->getContentDefaults($event->entry))->map->raw();
-
-            // Get the entry's values (entry + origin). Use a fresh copy for each event so that we don't work with previously added data.
-            $data = $event->entry->fresh()->values()->filter(function ($value) {
-                // If a field is desynced and empty, we want to get its defaults value instead of null.
-                return $value !== null;
-            });
-
-            // We only want to set a default value if its key doesn't exist on the entry.
-            $defaultsToSet = $defaults->diffKeys($data);
-
-            $event->entry->merge($defaultsToSet);
+        if (! $this->isFrontendRoute()) {
+            return;
         }
+
+        // Extend the blueprint so that we can add data.
+        $this->extendBlueprint($event);
+
+        // Get the entry's defaults.
+        $defaults = collect($this->getContentDefaults($event->entry))->map->raw();
+
+        // Get the entry's values (entry + origin). Use a fresh copy for each event so that we don't work with previously added data.
+        $data = $event->entry->fresh()->values()->filter(function ($value) {
+            // If a field is desynced and empty, we want to get its defaults value instead of null.
+            return $value !== null;
+        });
+
+        // We only want to set a default value if its key doesn't exist on the entry.
+        $defaultsToSet = $defaults->diffKeys($data);
+
+        $event->entry->merge($defaultsToSet);
     }
 
     protected function saveEntryDefaults(Event $event): void
@@ -172,28 +175,29 @@ class OnPageSeoBlueprintSubscriber
     protected function addTermDefaultsToCascade(Event $event): void
     {
         // We only want to add data if we're on a Statamic frontend route.
-        if (request()->route()->getName() === 'statamic.site') {
-
-            // Extend the blueprint so that we can add data.
-            $this->extendBlueprint($event);
-
-            // Get the term's defaults.
-            $defaults = collect($this->getContentDefaults($event->term))->map->raw();
-
-            // Get the term's locale.
-            $locale = $this->getLocale($event->term);
-
-            // Get the term's values (localization + origin).
-            $data = $event->term->in($locale)->values()->filter(function ($value) {
-                // If a field is desynced and empty, we want to get its defaults value instead of null.
-                return $value !== null;
-            });
-
-            // We only want to set a default value if its key doesn't exist on the term.
-            $defaultsToSet = $defaults->diffKeys($data);
-
-            $event->term->in($locale)->merge($defaultsToSet);
+        if (! $this->isFrontendRoute()) {
+            return;
         }
+
+        // Extend the blueprint so that we can add data.
+        $this->extendBlueprint($event);
+
+        // Get the term's defaults.
+        $defaults = collect($this->getContentDefaults($event->term))->map->raw();
+
+        // Get the term's locale.
+        $locale = $this->getLocale($event->term);
+
+        // Get the term's values (localization + origin).
+        $data = $event->term->in($locale)->values()->filter(function ($value) {
+            // If a field is desynced and empty, we want to get its defaults value instead of null.
+            return $value !== null;
+        });
+
+        // We only want to set a default value if its key doesn't exist on the term.
+        $defaultsToSet = $defaults->diffKeys($data);
+
+        $event->term->in($locale)->merge($defaultsToSet);
     }
 
     /**
