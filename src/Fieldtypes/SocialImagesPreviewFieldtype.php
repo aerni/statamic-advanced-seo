@@ -2,8 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Fields\Fieldtype;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Taxonomies\LocalizedTerm;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 
 class SocialImagesPreviewFieldtype extends Fieldtype
 {
@@ -11,15 +13,15 @@ class SocialImagesPreviewFieldtype extends Fieldtype
 
     public function preload(): array
     {
-        $type = $this->config()['image_type'];
         $entry = $this->field->parent();
+        $type = $this->config()['image_type'];
 
-        $specs = SocialImage::specs($type, $entry);
+        if (! $entry instanceof Entry && ! $entry instanceof LocalizedTerm) {
+            return ['title' => $this->field->display()];
+        }
 
         return [
-            'image' => $entry->augmentedValue($specs['field'])?->value()?->absoluteUrl(),
-            'width' => $specs['width'],
-            'height' => $specs['height'],
+            'image' => $entry->augmentedValue(SocialImage::specs($type, $entry)['field'])?->value()?->absoluteUrl(),
             'title' => $this->field->display(),
         ];
     }
