@@ -66,6 +66,7 @@ class Cascade
             'twitter_card' => $this->twitterCard(),
             'twitter_title' => $this->twitterTitle(),
             'twitter_description' => $this->twitterDescription(),
+            'twitter_image' => $this->twitterImage(),
             'twitter_image_size' => $this->twitterImageSize(),
             'indexing' => $this->indexing(),
             'locale' => $this->locale(),
@@ -168,6 +169,25 @@ class Cascade
     protected function twitterDescription(): ?Value
     {
         return $this->data->get('twitter_description') ?? $this->data->get('description');
+    }
+
+    protected function twitterImage(): ?Value
+    {
+        // Get the image if it exists on the entry or term.
+        if ($image = $this->data->get('twitter_image')) {
+            return $image;
+        }
+
+        // Get the image from the site defaults that matches the content's twitter card setting.
+        $image = $this->data->first(function ($value, $key) {
+            return str_contains($key, $this->twitterCard());
+        });
+
+        // Remove the default images.
+        $this->data->pull('twitter_image_summary');
+        $this->data->pull('twitter_image_summary_large_image');
+
+        return $image;
     }
 
     protected function twitterImageSize(): array

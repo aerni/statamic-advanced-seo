@@ -76,7 +76,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'Add a global fallback Open Graph image. The image will be cropped to ' . SocialImage::sizeString('og') . '.',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('og') . '.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -111,10 +111,21 @@ class SocialMediaFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'twitter_image',
+                'handle' => 'twitter_image_summary',
                 'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Image',
-                    'instructions' => 'Add a global fallback Twitter image. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
+                    'display' => 'Twitter Summary Image',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
+                    'validate' => [
+                        'image',
+                        'mimes:jpg,png',
+                    ],
+                ]),
+            ],
+            [
+                'handle' => 'twitter_image_summary_large_image',
+                'field' => $this->getAssetFieldConfig([
+                    'display' => 'Twitter Summary Large Image',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
