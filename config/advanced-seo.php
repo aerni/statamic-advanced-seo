@@ -19,8 +19,8 @@ return [
         'sizes' => [
             'open_graph' => ['width' => 1200, 'height' => 628],
             'twitter' => [
-                'summary' => ['width' => 1200, 'height' => 628],
-                'summary_large_image' => ['width' => 1200, 'height' => 628],
+                'summary' => ['width' => 240, 'height' => 240],
+                'summary_large_image' => ['width' => 1100, 'height' => 628],
             ],
         ],
 
