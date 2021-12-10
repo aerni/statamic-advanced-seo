@@ -116,7 +116,7 @@ class Cascade
             : "{$this->siteName()} {$this->titleSeparator()} {$this->title()}";
     }
 
-    protected function title(): string
+    protected function title(): Value|string
     {
         if ($this->context->get('response_code') === 404) {
             return '404';
@@ -125,27 +125,27 @@ class Cascade
         return $this->data->get('title') ?? $this->context->get('title');
     }
 
-    protected function titleSeparator(): string
+    protected function titleSeparator(): Value|string
     {
         return $this->data->get('title_separator') ?? '|';
     }
 
-    protected function titlePosition(): string
+    protected function titlePosition(): Value|string
     {
         return $this->data->get('title_position') ?? 'before';
     }
 
-    protected function siteName(): string
+    protected function siteName(): Value|string
     {
         return $this->data->get('site_name') ?? config('app.name');
     }
 
-    protected function ogTitle(): string
+    protected function ogTitle(): Value|string
     {
         return $this->data->get('og_title') ?? $this->title();
     }
 
-    protected function ogDescription(): ?string
+    protected function ogDescription(): ?Value
     {
         return $this->data->get('og_description') ?? $this->data->get('description');
     }
@@ -157,12 +157,12 @@ class Cascade
             ->all();
     }
 
-    protected function twitterTitle(): string
+    protected function twitterTitle(): Value|string
     {
         return $this->data->get('twitter_title') ?? $this->title();
     }
 
-    protected function twitterDescription(): ?string
+    protected function twitterDescription(): ?Value
     {
         return $this->data->get('twitter_description') ?? $this->data->get('description');
     }
