@@ -2,10 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Fields\Fieldtype;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Fields\Fieldtype;
 
 class SocialImagesPreviewFieldtype extends Fieldtype
 {
