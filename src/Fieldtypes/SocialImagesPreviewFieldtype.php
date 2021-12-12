@@ -13,16 +13,28 @@ class SocialImagesPreviewFieldtype extends Fieldtype
 
     public function preload(): array
     {
-        $entry = $this->field->parent();
+        $parent = $this->field->parent();
         $type = $this->config()['image_type'];
 
-        if (! $entry instanceof Entry && ! $entry instanceof LocalizedTerm) {
-            return ['title' => $this->field->display()];
+        $meta = ['title' => $this->field->display()];
+
+        if ($this->shouldDisplayImage($parent)) {
+            $meta['image'] = $parent->augmentedValue(SocialImage::specs($type, $parent)['field'])?->value()?->absoluteUrl();
         }
 
-        return [
-            'image' => $entry->augmentedValue(SocialImage::specs($type, $entry)['field'])?->value()?->absoluteUrl(),
-            'title' => $this->field->display(),
-        ];
+        return $meta;
+    }
+
+    protected function shouldDisplayImage($parent): bool
+    {
+        if (! $parent instanceof Entry) {
+            return false;
+        }
+
+        if (! $parent->value('seo_generate_social_images')) {
+            return false;
+        }
+
+        return true;
     }
 }
