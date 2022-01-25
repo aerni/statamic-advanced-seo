@@ -24,7 +24,7 @@
                             </div>
                         </div>
                         <div class="p-2">
-                            @foreach (Statamic\Facades\Collection::all()->sort() as $collection)
+                            @foreach (Statamic\Facades\Collection::all()->filter(fn ($collection) => ! in_array($collection->handle(), config('advanced-seo.excluded_collections', [])))->sort() as $collection)
                                 <a href="{{ cp_route('advanced-seo.content.collections.edit', $collection) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $collection->title() }}</a>
                             @endforeach
                         </div>
@@ -47,7 +47,7 @@
                             </div>
                         </div>
                         <div class="p-2">
-                            @foreach (Statamic\Facades\Taxonomy::all()->sort() as $taxonomy)
+                            @foreach (Statamic\Facades\Taxonomy::all()->filter(fn ($taxonomy) => ! in_array($taxonomy->handle(), config('advanced-seo.excluded_taxonomies', [])))->sort() as $taxonomy)
                                 <a href="{{ cp_route('advanced-seo.content.taxonomies.edit', $taxonomy) }}" class="block px-1.5 py-1 text-sm rounded-md hover:bg-blue-100">{{ $taxonomy->title() }}</a>
                             @endforeach
                         </div>

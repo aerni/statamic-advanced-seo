@@ -36,8 +36,37 @@ class OnPageSeoBlueprintSubscriber
         }
     }
 
-    protected function shouldHandleBlueprintEvents(): bool
+    protected function shouldHandleEntryBlueprintEvents(Event $event): bool
     {
+        $collection = Str::after($event->blueprint->namespace(), '.');
+
+        // Don't add fields if the collection is excluded in the config.
+        if (in_array($collection, config('advanced-seo.excluded_collections', []))) {
+            return false;
+        }
+
+        // Don't add any fields in the blueprint builder.
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'blueprints']) || app()->runningInConsole()) {
+            return false;
+        }
+
+        // Don't add any fields on custom views.
+        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'advanced-seo']) || app()->runningInConsole()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function shouldHandleTermBlueprintEvents(Event $event): bool
+    {
+        $taxonomy = Str::after($event->blueprint->namespace(), '.');
+
+        // Don't add fields if the taxonomy is excluded in the config.
+        if (in_array($taxonomy, config('advanced-seo.excluded_taxonomies', []))) {
+            return false;
+        }
+
         // Don't add any fields in the blueprint builder.
         if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'blueprints']) || app()->runningInConsole()) {
             return false;
@@ -53,7 +82,7 @@ class OnPageSeoBlueprintSubscriber
 
     public function handleEntryBlueprintFound(Event $event): void
     {
-        if ($this->shouldHandleBlueprintEvents()) {
+        if ($this->shouldHandleEntryBlueprintEvents($event)) {
             $this->addEntryDefaultsInCp($event);
             $this->addEntryDefaultsToCascade($event);
         }
@@ -137,7 +166,7 @@ class OnPageSeoBlueprintSubscriber
 
     public function handleTermBlueprintFound(Event $event): void
     {
-        if ($this->shouldHandleBlueprintEvents()) {
+        if ($this->shouldHandleTermBlueprintEvents($event)) {
             $this->addTermDefaultsInCp($event);
             $this->addTermDefaultsToCascade($event);
         }

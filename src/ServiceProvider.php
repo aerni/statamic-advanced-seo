@@ -91,6 +91,21 @@ class ServiceProvider extends AddonServiceProvider
 
             $viewData = $view->getData();
 
+            // Don't add data for collections that are excluded in the config.
+            if (collect($viewData)->has('is_entry') && in_array(collect($viewData)->get('collection')->handle(), config('advanced-seo.excluded_collections', []))) {
+                return;
+            }
+
+            // Don't add data for taxonomy terms that are excluded in the config.
+            if (collect($viewData)->has('is_term') && in_array(collect($viewData)->get('taxonomy')->handle(), config('advanced-seo.excluded_taxonomies', []))) {
+                return;
+            }
+
+            // Don't add data for taxonomies that are excluded in the config.
+            if (collect($viewData)->has('terms') && in_array(collect($viewData)->get('handle'), config('advanced-seo.excluded_taxonomies', []))) {
+                return;
+            }
+
             /*
             Cache the cascade because we are removing all `seo_` keys at the end of the callback.
             This means that we only have the necesarry data available to construct the cascade in the first loop iteration.
