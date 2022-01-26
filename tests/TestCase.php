@@ -2,14 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Tests;
 
-use Statamic\Statamic;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Statamic\Extend\Manifest;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Extend\Manifest;
-use Statamic\Facades\Blueprint;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Statamic\Stache\Stores\UsersStore;
-use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Statamic\Statamic;
 
 class TestCase extends OrchestraTestCase
 {
