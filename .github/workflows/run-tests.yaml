@@ -4,18 +4,18 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   phpunit:
-    name: PHP ${{ matrix.php }} – Laravel ${{ matrix.laravel }} - ${{ matrix.dependency-version }}
     runs-on: ubuntu-latest
-
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         php: [8.0]
         laravel: [8.*]
-        dependency-version: [prefer-lowest, prefer-stable]
+        stability: [prefer-lowest, prefer-stable]
         include:
           - laravel: 8.*
-            testbench: 6.*
+            testbench: ^6.24
+
+    name: PHP ${{ matrix.php }} – Laravel ${{ matrix.laravel }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Run tests
         run: vendor/bin/phpunit
