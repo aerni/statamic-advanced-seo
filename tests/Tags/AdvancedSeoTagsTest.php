@@ -2,9 +2,8 @@
 
 namespace Tests\Tags;
 
-use Aerni\AdvancedSeo\Tests\TestCase;
 use Aerni\AdvancedSeo\Tags\AdvancedSeoTags;
-use Aerni\AdvancedSeo\Tests\PreventSavingStacheItemsToDisk;
+use Aerni\AdvancedSeo\Tests\TestCase;
 
 class AdvancedSeoTagsTest extends TestCase
 {
