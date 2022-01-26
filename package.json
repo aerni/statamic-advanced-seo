@@ -8,12 +8,12 @@
         "production": "mix --production"
     },
     "dependencies": {
-        "axios": "^0.24.0",
+        "axios": "^0.25.0",
         "tailwindcss": "^2.2.19",
         "vue": "^2.6.14"
     },
     "devDependencies": {
-        "laravel-mix": "^6.0.39",
+        "laravel-mix": "^6.0.41",
         "vue-loader": "^15.9.8",
         "vue-template-compiler": "^2.6.14"
     }
