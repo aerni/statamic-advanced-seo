@@ -1,23 +1,21 @@
-name: Tests
+name: Run Tests
 
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  php_tests:
+  phpunit:
+    name: PHP ${{ matrix.php }} – Laravel ${{ matrix.laravel }} - ${{ matrix.dependency-version }}
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
         php: [8.0]
-        laravel: [8.*, 7.*]
+        laravel: [8.*]
         dependency-version: [prefer-lowest, prefer-stable]
         include:
           - laravel: 8.*
             testbench: 6.*
-          - laravel: 7.*
-            testbench: 5.*
-
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
     steps:
       - name: Checkout code
@@ -35,5 +33,5 @@ jobs:
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
-      - name: Run Tests
+      - name: Run tests
         run: vendor/bin/phpunit
