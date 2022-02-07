@@ -206,15 +206,7 @@ class Cascade
         }
 
         // Get the image from the site defaults that matches the content's twitter card setting.
-        $image = $this->data->first(function ($value, $key) {
-            return str_contains($key, $this->twitterCard());
-        });
-
-        // Remove the default images.
-        $this->data->pull('twitter_image_summary');
-        $this->data->pull('twitter_image_summary_large_image');
-
-        return $image;
+        return $this->data->first(fn ($value, $key) => str_contains($key, $this->twitterCard()));
     }
 
     protected function twitterImageSize(): array
