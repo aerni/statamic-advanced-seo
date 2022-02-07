@@ -146,7 +146,7 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function bootAddonNav()
+    protected function bootAddonNav(): self
     {
         Nav::extend(function ($nav) {
             $nav->tools('SEO')
