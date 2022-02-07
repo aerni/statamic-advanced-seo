@@ -17,7 +17,7 @@ trait GetsContentDefaults
 {
     use GetsLocale;
 
-    public function getContentDefaults($data, string $locale = null): LaravelCollection
+    public function getContentDefaults(Entry|Term|LocalizedTerm|array $data, string $locale = null): LaravelCollection
     {
         $parent = $this->getContentParent($data);
         $locale = $locale ?? $this->getLocale($data);
@@ -34,7 +34,7 @@ trait GetsContentDefaults
         });
     }
 
-    protected function getContentCacheKey($parent, string $locale): string
+    protected function getContentCacheKey(Collection|Taxonomy|array $parent, string $locale): string
     {
         return "advanced-seo::{$this->getContentType($parent)}::{$this->getContentHandle($parent)}::{$locale}";
     }
