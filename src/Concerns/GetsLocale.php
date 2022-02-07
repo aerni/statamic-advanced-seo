@@ -22,7 +22,7 @@ trait GetsLocale
         }
 
         if (is_array($data)) {
-            Arr::get($data, 'locale');
+            return Arr::get($data, 'locale');
         }
 
         return Site::current()->handle();
