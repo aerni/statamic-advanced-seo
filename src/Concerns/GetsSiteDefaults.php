@@ -2,16 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
+use Statamic\Fields\Value;
+use Statamic\Facades\Blink;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
-use Statamic\Facades\Blink;
-use Statamic\Fields\Value;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 
 trait GetsSiteDefaults
 {
     use GetsLocale;
 
-    public function getSiteDefaults($data): Collection
+    public function getSiteDefaults(Entry|Term|array $data): Collection
     {
         return Blink::once($this->getSiteCacheKey($data), function () use ($data) {
             return Seo::allOfType('site')->flatMap(function ($defaults) use ($data) {
@@ -23,7 +25,7 @@ trait GetsSiteDefaults
         });
     }
 
-    protected function getSiteCacheKey($data): string
+    protected function getSiteCacheKey(Entry|Term|array $data): string
     {
         return "advanced-seo::site::all::{$this->getLocale($data)}";
     }
