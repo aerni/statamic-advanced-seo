@@ -22,7 +22,7 @@ trait GetsLocale
         }
 
         if ($data instanceof Collection) {
-            return $data->get('locale');
+            return $data->get('locale', Site::current()->handle());
         }
 
         return Site::current()->handle();
