@@ -67,7 +67,43 @@ class Cascade
         return $this;
     }
 
-    public function withComputedData(): self
+    public function get(): array
+    {
+        return $this->data->all();
+    }
+
+    public function value(string $key): mixed
+    {
+        $value = $this->data->get($key);
+
+        return $value instanceof Value ? $value->raw() : $value;
+    }
+
+    public function processForFrontend(): self
+    {
+        return $this
+            ->ensureOverrides()
+            ->withComputedData()
+            ->sortKeys();
+    }
+
+    protected function removeSeoPrefixFromKeys(Collection $data): Collection
+    {
+        return $data->mapWithKeys(fn ($item, $key) => [Str::remove('seo_', $key) => $item]);
+    }
+
+    protected function ensureOverrides(): self
+    {
+        $overrides = $this->getSiteDefaults($this->context)
+            ->only(['noindex', 'nofollow'])
+            ->filter(fn ($item) => $item->raw());
+
+        $this->data = $this->data->merge($overrides);
+
+        return $this;
+    }
+
+    protected function withComputedData(): self
     {
         $computedData = collect([
             'title' => $this->compiledTitle(),
@@ -88,39 +124,6 @@ class Cascade
         ])->filter();
 
         $this->data = $this->data->merge($computedData);
-
-        return $this;
-    }
-
-    public function get(): array
-    {
-        return $this->data->all();
-    }
-
-    public function value(string $key): mixed
-    {
-        $value = $this->data->get($key);
-
-        return $value instanceof Value ? $value->raw() : $value;
-    }
-
-    public function process(): self
-    {
-        return $this->ensureOverrides()->sortKeys();
-    }
-
-    protected function removeSeoPrefixFromKeys(Collection $data): Collection
-    {
-        return $data->mapWithKeys(fn ($item, $key) => [Str::remove('seo_', $key) => $item]);
-    }
-
-    protected function ensureOverrides(): self
-    {
-        $overrides = $this->getSiteDefaults($this->context)
-            ->only(['noindex', 'nofollow'])
-            ->filter(fn ($item) => $item->raw());
-
-        $this->data = $this->data->merge($overrides);
 
         return $this;
     }

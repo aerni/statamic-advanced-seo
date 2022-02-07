@@ -75,7 +75,6 @@ abstract class BaseFields implements Fields
         $value = Cascade::from($this->data)
             ->withSiteDefaults()
             ->withContentDefaults()
-            ->process()
             ->value(Str::remove('seo_', $handle));
 
         return $value ?? $default;

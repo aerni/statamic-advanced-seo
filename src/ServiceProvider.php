@@ -104,8 +104,7 @@ class ServiceProvider extends AddonServiceProvider
                 return Cascade::from($context)
                     ->withSiteDefaults()
                     ->withPageData()
-                    ->withComputedData()
-                    ->process()
+                    ->processForFrontend()
                     ->get();
             });
 
