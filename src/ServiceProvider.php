@@ -78,8 +78,8 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootCascade(): self
     {
-        // Don't do anything if we're in the CP.
-        if (str_contains(request()->path(), config('cp.route', 'cp'))) {
+        // Don't do anything if we're in the Statamic CP.
+        if (! $this->isCpRoute()) {
             return $this;
         }
 

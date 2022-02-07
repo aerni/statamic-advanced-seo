@@ -66,7 +66,7 @@ abstract class BaseFields implements Fields
         }
 
         // We only need this data for the blueprints in the CP.
-        if (! str_contains(request()->path(), config('cp.route', 'cp'))) {
+        if (! $this->isCpRoute()) {
             return null;
         }
 

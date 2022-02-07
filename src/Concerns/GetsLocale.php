@@ -9,6 +9,8 @@ use Statamic\Facades\Site;
 
 trait GetsLocale
 {
+    use ShouldHandleRoute;
+
     protected function getLocale(Entry|Term|array $data): ?string
     {
         if ($data instanceof Entry) {
@@ -16,9 +18,7 @@ trait GetsLocale
         }
 
         if ($data instanceof Term) {
-            return str_contains(request()->path(), config('cp.route', 'cp'))
-                ? basename(request()->path())
-                : Site::current()->handle();
+            return $this->isCpRoute() ? basename(request()->path()) : Site::current()->handle();
         }
 
         return Arr::get($data, 'locale');
