@@ -11,7 +11,7 @@ trait GetsLocale
 {
     use ShouldHandleRoute;
 
-    protected function getLocale(Entry|Term|array $data): ?string
+    protected function getLocale(mixed $data): string
     {
         if ($data instanceof Entry) {
             return $data->locale();
@@ -21,6 +21,10 @@ trait GetsLocale
             return $this->isCpRoute() ? basename(request()->path()) : Site::current()->handle();
         }
 
-        return Arr::get($data, 'locale');
+        if (is_array($data)) {
+            Arr::get($data, 'locale');
+        }
+
+        return Site::current()->handle();
     }
 }
