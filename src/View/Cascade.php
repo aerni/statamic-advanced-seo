@@ -89,7 +89,7 @@ class Cascade
         return $this->context
             ->intersectByKeys(OnPageSeoBlueprint::make()->items())
             ->filter(function ($item) {
-                return $item instanceof Value && $item->raw();
+                return $item instanceof Value && $item->raw() !== null;
             });
     }
 

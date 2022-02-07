@@ -29,7 +29,7 @@ trait GetsContentDefaults
 
             return collect($defaults)->filter(function ($item) {
                 // Only return values that have a corresponding field in the blueprint.
-                return $item instanceof Value;
+                return $item instanceof Value && $item->raw() !== null;
             });
         });
     }
