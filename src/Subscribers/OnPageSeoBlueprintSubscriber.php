@@ -102,6 +102,11 @@ class OnPageSeoBlueprintSubscriber
 
     protected function addEntryDefaultsInCp(Event $event): void
     {
+        // We only want to add data if we're in the Statamic CP.
+        if (! $this->isCpRoute()) {
+            return;
+        }
+
         $isEditingOrLocalizing = $event->entry?->id();
         $isCreating = Arr::get(Site::all()->map->handle(), basename(request()->path()));
 
@@ -186,6 +191,11 @@ class OnPageSeoBlueprintSubscriber
 
     protected function addTermDefaultsInCp(Event $event): void
     {
+        // We only want to add data if we're in the Statamic CP.
+        if (! $this->isCpRoute()) {
+            return;
+        }
+
         $isEditingOrLocalizing = $event->term?->slug();
         $isCreating = Arr::get(Site::all()->map->handle(), basename(request()->path()));
 
