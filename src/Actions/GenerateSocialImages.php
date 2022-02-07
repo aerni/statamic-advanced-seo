@@ -39,7 +39,7 @@ class GenerateSocialImages extends Action
     {
         GenerateSocialImagesJob::dispatch($items);
 
-        $queue = config('queue.default');
+        $queue = config('advanced-seo.social_images.generator.queue');
         $driver = config("queue.connections.$queue.driver");
 
         return $driver === 'sync'
