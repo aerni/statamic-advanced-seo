@@ -262,7 +262,7 @@ class OnPageSeoBlueprintSubscriber
         })->filter();
 
         // Only save if there are new values.
-        // TODO: This could probably be changed when saveQuietly() is available: https://github.com/statamic/cms/pull/3379
+        // TODO: This should be changed to saveQuietly() as soon as it is available: https://github.com/statamic/cms/pull/3379
         if ($localizations->isNotEmpty()) {
             $event->term->save();
         }
