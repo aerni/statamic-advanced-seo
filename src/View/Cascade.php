@@ -84,6 +84,7 @@ class Cascade
         return $this
             ->ensureOverrides()
             ->withComputedData()
+            ->applyWhitelist()
             ->sortKeys();
     }
 
@@ -124,6 +125,46 @@ class Cascade
         ])->filter();
 
         $this->data = $this->data->merge($computedData);
+
+        return $this;
+    }
+
+    protected function applyWhitelist(): self
+    {
+        // Remove all the keys from the data that won't be used in any view on the frontend.
+        $this->data = $this->data->only([
+            'use_fathom',
+            'fathom_domain',
+            'fathom_id',
+            'fathom_spa',
+            'use_cloudflare_web_analytics',
+            'cloudflare_web_analytics',
+            'use_google_tag_manager',
+            'google_tag_manager',
+            'title',
+            'description',
+            'canonical',
+            'favicon_svg',
+            'hreflang',
+            'indexing',
+            'schema',
+            'breadcrumbs',
+            'site_name',
+            'locale',
+            'og_title',
+            'og_description',
+            'og_image',
+            'generate_social_images',
+            'og_image_size',
+            'google_site_verification_code',
+            'bing_site_verification_code',
+            'twitter_card',
+            'twitter_title',
+            'twitter_description',
+            'twitter_handle',
+            'twitter_image',
+            'twitter_image_size',
+        ]);
 
         return $this;
     }
