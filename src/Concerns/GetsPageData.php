@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Fields\Value;
-use Statamic\Facades\Blink;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
+use Statamic\Fields\Value;
 
 trait GetsPageData
 {

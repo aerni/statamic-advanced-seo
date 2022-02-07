@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 
 class SocialMediaFields extends BaseFields
 {

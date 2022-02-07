@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as LaravelCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;

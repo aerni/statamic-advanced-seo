@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Illuminate\Support\Str;
-use Aerni\AdvancedSeo\View\Cascade;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Contracts\Fields;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Aerni\AdvancedSeo\Contracts\Fields;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
 
 abstract class BaseFields implements Fields
 {
