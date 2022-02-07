@@ -13,7 +13,7 @@ class SocialImagesGeneratorSubscriber
 {
     protected array $events = [
         Events\EntrySaved::class => 'generateSocialImages',
-        // Events\TermSaved::class => 'generateSocialImages', // TODO: This event does not currently exist but will be added with an open PR.
+        // Events\TermSaved::class => 'generateSocialImages', // TODO: This event does not currently exist but might be added with this PR: https://github.com/statamic/cms/pull/3379
     ];
 
     public function subscribe(Dispatcher $events): void
