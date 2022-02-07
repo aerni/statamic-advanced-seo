@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -21,6 +22,8 @@ use Statamic\Taxonomies\Taxonomy;
 
 class Cascade
 {
+    use GetsSiteDefaults;
+
     protected Collection $context;
     protected StatamicSite $site;
     protected Collection $data;
@@ -44,7 +47,7 @@ class Cascade
 
     public function data(): Collection
     {
-        $this->siteDefaults = $this->siteDefaults();
+        $this->siteDefaults = $this->getSiteDefaults();
         $this->onPageSeo = $this->onPageSeo();
 
         $data = $this->siteDefaults
@@ -88,19 +91,6 @@ class Cascade
             ->filter(function ($item) {
                 return $item instanceof Value && $item->raw();
             });
-    }
-
-    /**
-     * Get the augmented site defaults and filter out any values that shouldn't be there
-     * like features that were disabled in the config.
-     */
-    protected function siteDefaults(): Collection
-    {
-        return Seo::allOfType('site')->flatMap(function ($defaults) {
-            return $defaults->in($this->site->handle())->toAugmentedArray();
-        })->filter(function ($item) {
-            return $item instanceof Value && $item->raw();
-        });
     }
 
     protected function ensureOverrides(Collection $data): Collection
