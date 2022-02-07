@@ -285,11 +285,11 @@ class OnPageSeoBlueprintSubscriber
 
         // This data is used on "Create Entry" and "Create Term" views so that we can get the content defaults.
         if (! $data) {
-            $data = [
+            $data = collect([
                 'type' => Str::before($event->blueprint->namespace(), '.'),
                 'handle' => Str::after($event->blueprint->namespace(), '.'),
                 'locale' => basename(request()->path()),
-            ];
+            ]);
         }
 
         $seoBlueprint = OnPageSeoBlueprint::make()->data($data)->items();

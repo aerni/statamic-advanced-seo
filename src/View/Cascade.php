@@ -2,66 +2,74 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Entries\Entry;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Sites\Site as StatamicSite;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
+use Illuminate\Support\Arr;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsPageData;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 class Cascade
 {
+    use GetsContentDefaults;
     use GetsSiteDefaults;
+    use GetsPageData;
 
-    protected Collection $context;
-    protected StatamicSite $site;
     protected Collection $data;
 
-    public function __construct(array $context)
+    public function __construct(protected Entry|Term|Collection $context)
     {
-        $this->context = collect($context);
-        $this->site = Site::current();
-        $this->data = $this->data();
+        $this->data = collect();
     }
 
-    public static function make(array $context): self
+    public static function from(Entry|Term|Collection $context): self
     {
         return new static($context);
     }
 
-    public function get(): array
+    public function withSiteDefaults(): self
     {
-        return $this->data->merge($this->computedData())->sortKeys()->all();
+        $siteDefaults = $this->getSiteDefaults($this->context);
+
+        $this->data = $this->data->merge($siteDefaults);
+
+        return $this;
     }
 
-    public function data(): Collection
+    public function withContentDefaults(): self
     {
-        $this->siteDefaults = $this->getSiteDefaults();
-        $this->onPageSeo = $this->onPageSeo();
+        $contentDefaults = $this->getContentDefaults($this->context);
+        $contentDefaults = $this->removeSeoPrefixFromKeys($contentDefaults);
 
-        $data = $this->siteDefaults
-            ->merge($this->onPageSeo)
-            ->mapWithKeys(function ($item, $key) {
-                return [Str::remove('seo_', $key) => $item];
-            })->sortKeys();
+        $this->data = $this->data->merge($contentDefaults);
 
-        return $this->ensureOverrides($data);
+        return $this;
     }
 
-    protected function computedData(): Collection
+    public function withPageData(): self
     {
-        return collect([
+        $pageData = $this->getPageData($this->context);
+        $pageData = $this->removeSeoPrefixFromKeys($pageData);
+
+        $this->data = $this->data->merge($pageData);
+
+        return $this;
+    }
+
+    public function withComputedData(): self
+    {
+        $computedData = collect([
             'title' => $this->compiledTitle(),
             'og_title' => $this->ogTitle(),
             'og_description' => $this->ogDescription(),
@@ -78,24 +86,50 @@ class Cascade
             'schema' => $this->schema(),
             'breadcrumbs' => $this->breadcrumbs(),
         ])->filter();
+
+        $this->data = $this->data->merge($computedData);
+
+        return $this;
     }
 
-    /**
-     * Only return values that are not empty and whose keys exists in the Blueprint.
-     * This makes sure that we don't return any data of fields that were disabled in the config, e.g. Social Images Generator
-     */
-    protected function onPageSeo(): Collection
+    public function get(): array
     {
-        return $this->context
-            ->intersectByKeys(OnPageSeoBlueprint::make()->items())
-            ->filter(function ($item) {
-                return $item instanceof Value && $item->raw() !== null;
-            });
+        return $this->data->all();
     }
 
-    protected function ensureOverrides(Collection $data): Collection
+    public function value(string $key): mixed
     {
-        return $data->merge($this->siteDefaults->only(['noindex', 'nofollow']));
+        $value = $this->data->get($key);
+
+        return $value instanceof Value ? $value->raw() : $value;
+    }
+
+    public function process(): self
+    {
+        return $this->ensureOverrides()->sortKeys();
+    }
+
+    protected function removeSeoPrefixFromKeys(Collection $data): Collection
+    {
+        return $data->mapWithKeys(fn ($item, $key) => [Str::remove('seo_', $key) => $item]);
+    }
+
+    protected function ensureOverrides(): self
+    {
+        $overrides = $this->getSiteDefaults($this->context)
+            ->only(['noindex', 'nofollow'])
+            ->filter(fn ($item) => $item->raw());
+
+        $this->data = $this->data->merge($overrides);
+
+        return $this;
+    }
+
+    protected function sortKeys(): self
+    {
+        $this->data = $this->data->sortKeys();
+
+        return $this;
     }
 
     protected function compiledTitle(): string
@@ -190,14 +224,14 @@ class Cascade
     protected function indexing(): string
     {
         return collect([
-            'noindex' => $this->data->get('noindex'),
-            'nofollow' => $this->data->get('nofollow'),
+            'noindex' => $this->value('noindex'),
+            'nofollow' => $this->value('nofollow'),
         ])->filter()->keys()->implode(', ');
     }
 
     protected function locale(): string
     {
-        return Helpers::parseLocale($this->site->locale());
+        return Helpers::parseLocale(Site::current()->locale());
     }
 
     // TODO: Support collection taxonomy details page and collection term details page.
@@ -223,6 +257,8 @@ class Cascade
         if ($this->context->has('segment_1') && $this->context->get('terms') instanceof TermQueryBuilder) {
             $taxonomy = $this->context->get('terms')->first()->taxonomy();
 
+            $initialSite = Site::current()->handle();
+
             $data = $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
                 // Set the current site so we can get the localized absolute URLs of the taxonomy.
                 Site::setCurrent($locale);
@@ -235,7 +271,7 @@ class Cascade
 
 
             // Reset the site to the original.
-            Site::setCurrent($this->site->handle());
+            Site::setCurrent($initialSite);
 
             return $data;
         }

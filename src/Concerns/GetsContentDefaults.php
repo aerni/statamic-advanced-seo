@@ -17,7 +17,7 @@ trait GetsContentDefaults
 {
     use GetsLocale;
 
-    public function getContentDefaults(Entry|Term|LocalizedTerm|array $data, string $locale = null): LaravelCollection
+    public function getContentDefaults(Entry|Term|LocalizedTerm|LaravelCollection $data, string $locale = null): LaravelCollection
     {
         $parent = $this->getContentParent($data);
         $locale = $locale ?? $this->getLocale($data);
@@ -34,12 +34,12 @@ trait GetsContentDefaults
         });
     }
 
-    protected function getContentCacheKey(Collection|Taxonomy|array $parent, string $locale): string
+    protected function getContentCacheKey(Collection|Taxonomy|LaravelCollection $parent, string $locale): string
     {
         return "advanced-seo::{$this->getContentType($parent)}::{$this->getContentHandle($parent)}::{$locale}";
     }
 
-    protected function getContentParent(Entry|Term|LocalizedTerm|array $data): Collection|Taxonomy|array
+    protected function getContentParent(Entry|Term|LocalizedTerm|LaravelCollection $data): Collection|Taxonomy|LaravelCollection
     {
         if ($data instanceof Entry) {
             return $data->collection();
@@ -52,7 +52,7 @@ trait GetsContentDefaults
         return $data;
     }
 
-    protected function getContentType(Collection|Taxonomy|array $parent): string
+    protected function getContentType(Collection|Taxonomy|LaravelCollection $parent): string
     {
         if ($parent instanceof Collection) {
             return 'collections';
@@ -62,10 +62,10 @@ trait GetsContentDefaults
             return 'taxonomies';
         }
 
-        return Arr::get($parent, 'type');
+        return $parent->get('type');
     }
 
-    protected function getContentHandle(Collection|Taxonomy|array $parent): string
+    protected function getContentHandle(Collection|Taxonomy|LaravelCollection $parent): string
     {
         if ($parent instanceof Collection) {
             return $parent->handle();
@@ -75,6 +75,6 @@ trait GetsContentDefaults
             return $parent->handle();
         }
 
-        return Arr::get($parent, 'handle');
+        return $parent->get('handle');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Illuminate\Support\Str;
+use Aerni\AdvancedSeo\View\Cascade;
 use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
@@ -58,9 +60,7 @@ abstract class BaseFields implements Fields
         return __("advanced-seo::fields.$parent.$key", ['type' => $this->type()]);
     }
 
-    // TODO: Refactor this to use a new cascade class.
-    // TODO: Probably also a good idea to use Blink for this.
-    protected function getValueFromCascade($handle, $default = null): ?string
+    protected function getValueFromCascade(string $handle, $default = null): ?string
     {
         // We can't get any defaults with no data.
         if (! $this->data) {
@@ -72,12 +72,13 @@ abstract class BaseFields implements Fields
             return null;
         }
 
-        $siteDefaults = $this->getSiteDefaults($this->data);
-        $contentDefaults = $this->getContentDefaults($this->data);
+        $value = Cascade::from($this->data)
+            ->withSiteDefaults()
+            ->withContentDefaults()
+            ->process()
+            ->value(Str::remove('seo_', $handle));
 
-        $cascade = $siteDefaults->merge($contentDefaults);
-
-        return $cascade->get($handle)?->raw() ?? $default;
+        return $value ?? $default;
     }
 
     abstract protected function sections(): array;

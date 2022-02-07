@@ -6,6 +6,8 @@ use Statamic\Fields\Value;
 use Statamic\Facades\Blink;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 
 trait GetsSiteDefaults
 {
@@ -15,7 +17,7 @@ trait GetsSiteDefaults
      * Get the augmented site defaults and filter out any values that shouldn't be there,
      * like features that were disabled in the config.
      */
-    public function getSiteDefaults(mixed $data = null): Collection
+    public function getSiteDefaults(Entry|Term|Collection $data = null): Collection
     {
         $locale = $this->getLocale($data);
 

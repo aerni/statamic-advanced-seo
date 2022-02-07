@@ -2,18 +2,19 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
-use Aerni\AdvancedSeo\View\Cascade;
-use Illuminate\Support\Facades\View;
 use Statamic\Facades\Blink;
+use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Facades\View;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
+use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -89,7 +90,7 @@ class ServiceProvider extends AddonServiceProvider
                 return;
             }
 
-            $context = $view->getData();
+            $context = collect($view->getData());
 
             if (! $this->shouldComposeSeoCascade($context)) {
                 return;
@@ -100,7 +101,12 @@ class ServiceProvider extends AddonServiceProvider
             This means that we only have the necesarry data available to construct the cascade in the first loop iteration.
             */
             $cascade = Blink::once('cascade', function () use ($context) {
-                return Cascade::make($context)->get();
+                return Cascade::from($context)
+                    ->withSiteDefaults()
+                    ->withPageData()
+                    ->withComputedData()
+                    ->process()
+                    ->get();
             });
 
             // Add the seo cascade to the view.
@@ -115,20 +121,20 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function shouldComposeSeoCascade(array $context): bool
+    protected function shouldComposeSeoCascade(Collection $context): bool
     {
         // Don't add data for collections that are excluded in the config.
-        if (collect($context)->has('is_entry') && in_array(collect($context)->get('collection')->handle(), config('advanced-seo.excluded_collections', []))) {
+        if ($context->has('is_entry') && in_array($context->get('collection')->handle(), config('advanced-seo.excluded_collections', []))) {
             return false;
         }
 
         // Don't add data for taxonomy terms that are excluded in the config.
-        if (collect($context)->has('is_term') && in_array(collect($context)->get('taxonomy')->handle(), config('advanced-seo.excluded_taxonomies', []))) {
+        if ($context->has('is_term') && in_array($context->get('taxonomy')->handle(), config('advanced-seo.excluded_taxonomies', []))) {
             return false;
         }
 
         // Don't add data for taxonomies that are excluded in the config.
-        if (collect($context)->has('terms') && in_array(collect($context)->get('handle'), config('advanced-seo.excluded_taxonomies', []))) {
+        if ($context->has('terms') && in_array($context->get('handle'), config('advanced-seo.excluded_taxonomies', []))) {
             return false;
         }
 
