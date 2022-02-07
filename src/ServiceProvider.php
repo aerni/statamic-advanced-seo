@@ -89,20 +89,9 @@ class ServiceProvider extends AddonServiceProvider
                 return;
             }
 
-            $viewData = $view->getData();
+            $context = $view->getData();
 
-            // Don't add data for collections that are excluded in the config.
-            if (collect($viewData)->has('is_entry') && in_array(collect($viewData)->get('collection')->handle(), config('advanced-seo.excluded_collections', []))) {
-                return;
-            }
-
-            // Don't add data for taxonomy terms that are excluded in the config.
-            if (collect($viewData)->has('is_term') && in_array(collect($viewData)->get('taxonomy')->handle(), config('advanced-seo.excluded_taxonomies', []))) {
-                return;
-            }
-
-            // Don't add data for taxonomies that are excluded in the config.
-            if (collect($viewData)->has('terms') && in_array(collect($viewData)->get('handle'), config('advanced-seo.excluded_taxonomies', []))) {
+            if (! $this->shouldComposeSeoCascade($context)) {
                 return;
             }
 
@@ -110,20 +99,40 @@ class ServiceProvider extends AddonServiceProvider
             Cache the cascade because we are removing all `seo_` keys at the end of the callback.
             This means that we only have the necesarry data available to construct the cascade in the first loop iteration.
             */
-            $cascade = Blink::once('cascade', function () use ($viewData) {
-                return Cascade::make($viewData)->get();
+            $cascade = Blink::once('cascade', function () use ($context) {
+                return Cascade::make($context)->get();
             });
 
             // Add the seo cascade to the view.
             $view->with('seo', $cascade);
 
             // Clean up the view data by removing all initial seo keys.
-            foreach ($viewData as $key => $value) {
+            foreach ($context as $key => $value) {
                 $view->offsetUnset(str_start($key, 'seo_'));
             }
         });
 
         return $this;
+    }
+
+    protected function shouldComposeSeoCascade(array $context): bool
+    {
+        // Don't add data for collections that are excluded in the config.
+        if (collect($context)->has('is_entry') && in_array(collect($context)->get('collection')->handle(), config('advanced-seo.excluded_collections', []))) {
+            return false;
+        }
+
+        // Don't add data for taxonomy terms that are excluded in the config.
+        if (collect($context)->has('is_term') && in_array(collect($context)->get('taxonomy')->handle(), config('advanced-seo.excluded_taxonomies', []))) {
+            return false;
+        }
+
+        // Don't add data for taxonomies that are excluded in the config.
+        if (collect($context)->has('terms') && in_array(collect($context)->get('handle'), config('advanced-seo.excluded_taxonomies', []))) {
+            return false;
+        }
+
+        return true;
     }
 
     protected function bootAddonViews(): self
