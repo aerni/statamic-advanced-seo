@@ -114,7 +114,7 @@ class OnPageSeoBlueprintSubscriber
 
         // TODO: BETTER LOCALIZING DEFAULTS: When we're first localizing an entry we are getting its blueprint with $event->entry->blueprint().
         // That method triggers the EntryBlueprintFound event, which in turn triggers this method here.
-        // The event's request is includes the entry's origin, which is why the returned blueprint includes the default data of it.
+        // The event's request includes the entry's origin, which is why the returned blueprint includes the default data of it.
         // We should find a way to get the localizing defaults instead.
 
         if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'collections', 'entries', $status])) {
