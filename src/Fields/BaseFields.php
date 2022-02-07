@@ -2,15 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Contracts\Fields;
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Contracts\Fields;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 abstract class BaseFields implements Fields
 {
     use GetsContentDefaults;
     use GetsSiteDefaults;
+    use ShouldHandleRoute;
 
     protected $data;
 
