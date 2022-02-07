@@ -24,7 +24,7 @@ trait GetsSiteDefaults
                 return $defaults->in($locale)?->toAugmentedArray();
             })->filter(function ($item) {
                 // Only return values that have a corresponding field in the blueprint.
-                return $item instanceof Value && $item->raw();
+                return $item instanceof Value;
             });
         });
     }
