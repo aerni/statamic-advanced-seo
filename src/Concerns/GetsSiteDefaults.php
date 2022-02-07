@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Traits;
+namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;

@@ -3,10 +3,10 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
-use Aerni\AdvancedSeo\Traits\GetsEventData;
-use Aerni\AdvancedSeo\Traits\GetsFieldDefaults;
-use Aerni\AdvancedSeo\Traits\ShouldHandleRoute;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Concerns\GetsFieldDefaults;
+use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;

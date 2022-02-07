@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Traits\HasAssetField;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
 
 class FaviconsFields extends BaseFields
 {

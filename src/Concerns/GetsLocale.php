@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Traits;
+namespace Aerni\AdvancedSeo\Concerns;
 
 use Illuminate\Support\Arr;
 use Statamic\Contracts\Entries\Entry;

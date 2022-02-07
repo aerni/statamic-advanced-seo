@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Contracts\Fields;
-use Aerni\AdvancedSeo\Traits\GetsContentDefaults;
-use Aerni\AdvancedSeo\Traits\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Statamic\Contracts\Entries\Entry;
 
 abstract class BaseFields implements Fields

@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\Traits\ShouldHandleRoute;
+use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
 use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Support\Facades\View;
 use Statamic\Facades\Blink;

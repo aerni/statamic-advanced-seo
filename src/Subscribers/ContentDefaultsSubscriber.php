@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Traits\GetsEventData;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Illuminate\Events\Dispatcher;
 use Statamic\Events;
 use Statamic\Events\Event;
