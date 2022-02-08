@@ -22,9 +22,11 @@ trait GetsLocale
         }
 
         if ($data instanceof Collection) {
-            return $data->get('locale', Site::current()->handle());
+            return $this->isCpRoute()
+                ? $data->get('locale') ?? Site::selected()->handle()
+                : Site::current()->handle();
         }
 
-        return Site::current()->handle();
+        return $this->isCpRoute() ? Site::selected()->handle() : Site::current()->handle();
     }
 }
