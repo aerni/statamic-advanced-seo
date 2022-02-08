@@ -2,19 +2,20 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\View\Cascade;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\View;
+use Statamic\Statamic;
 use Statamic\Facades\Blink;
+use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Facades\View;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
+use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -64,7 +65,8 @@ class ServiceProvider extends AddonServiceProvider
             ->bootCascade()
             ->bootAddonStores()
             ->bootAddonNav()
-            ->bootAddonPermissions();
+            ->bootAddonPermissions()
+            ->autoPublishConfig();
     }
 
     public function register(): void
@@ -213,6 +215,17 @@ class ServiceProvider extends AddonServiceProvider
                             ]),
                     ]);
             });
+        });
+
+        return $this;
+    }
+
+    protected function autoPublishConfig(): self
+    {
+        Statamic::afterInstalled(function ($command) {
+            $command->call('vendor:publish', [
+                '--tag' => 'advanced-seo-config',
+            ]);
         });
 
         return $this;
