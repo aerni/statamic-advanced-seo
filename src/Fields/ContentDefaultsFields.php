@@ -289,7 +289,7 @@ class ContentDefaultsFields extends BaseFields
                     'display' => 'Canonical URL',
                     'instructions' => $this->trans('seo_canonical_type', 'default_instructions'),
                     'options' => [
-                        'current' => 'Current ' . ucfirst(str_singular($this->type())),
+                        'current' => 'Current ' . ucfirst(str_singular($this->typePlaceholder())),
                         'other' => 'Other Entry',
                         'custom' => 'Custom URL',
                     ],
@@ -492,7 +492,7 @@ class ContentDefaultsFields extends BaseFields
         }
 
         // Terms are not yet supported.
-        if (is_array($this->data) && $this->data['type'] === 'taxonomies') {
+        if ($this->data->get('type') === 'taxonomies') {
             return false;
         }
 
@@ -501,7 +501,7 @@ class ContentDefaultsFields extends BaseFields
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the collection is not configured.
-        if (is_array($this->data) && $this->data['type'] === 'collections' && ! in_array($this->data['handle'], $enabledCollections)) {
+        if ($this->data->get('type') === 'collections' && ! in_array($this->data->get('handle'), $enabledCollections)) {
             return false;
         }
 

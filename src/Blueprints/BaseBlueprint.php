@@ -2,21 +2,29 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
-use Statamic\Facades\Blueprint;
-use Statamic\Fields\Blueprint as BlueprintFields;
 use Statamic\Support\Str;
+use Statamic\Facades\Blueprint;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Fields\Blueprint as BlueprintFields;
+use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
 
 abstract class BaseBlueprint implements Contract
 {
-    protected $data;
+    protected Entry|Term|Collection $data;
+
+    public function __construct()
+    {
+        $this->data = collect();
+    }
 
     public static function make(): self
     {
         return new static();
     }
 
-    public function data($data): self
+    public function data(Entry|Term|Collection $data): self
     {
         $this->data = $data;
 
@@ -42,7 +50,7 @@ abstract class BaseBlueprint implements Contract
         return collect($this->sections())->map(function ($section, $handle) {
             return [
                 'display' => Str::slugToTitle($handle),
-                'fields' => $section::make()->data($this->data ?? null)->get(),
+                'fields' => $section::make()->data($this->data)->get(),
             ];
         })->filter(function ($section) {
             return ! empty($section['fields']);

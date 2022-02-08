@@ -334,7 +334,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Canonical URL',
                     'instructions' => $this->trans('seo_canonical_type', 'instructions'),
                     'options' => [
-                        'current' => 'Current ' . ucfirst(str_singular($this->type())),
+                        'current' => 'Current ' . ucfirst(str_singular($this->typePlaceholder())),
                         'other' => 'Other Entry',
                         'custom' => 'Custom URL',
                     ],
@@ -545,8 +545,8 @@ class OnPageSeoFields extends BaseFields
         }
 
         // Terms are not yet supported.
-        // This is the check for the "Create Term" view. Because the data won't yet be an instance a Term.
-        if (is_array($this->data) && $this->data['type'] === 'taxonomies') {
+        // This is the check for the "Create Term" view. Because the data won't yet be an instance of Term.
+        if ($this->data->get('type') === 'taxonomies') {
             return false;
         }
 
@@ -555,13 +555,13 @@ class OnPageSeoFields extends BaseFields
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the entry's collection is not configured.
-        if ($this->data instanceof Entry && ! in_array($this->data->collection()->handle(), $enabledCollections)) {
+        if ($this->data instanceof Entry && ! in_array($this->data->collectionHandle(), $enabledCollections)) {
             return false;
         }
 
-        // This is the check for the "Create Entry" view. Because the data won't yet be an instance of Entry.
         // Don't show the generator section if the collection is not configured.
-        if (is_array($this->data) && $this->data['type'] === 'collections' && ! in_array($this->data['handle'], $enabledCollections)) {
+        // This is the check for the "Create Entry" view. Because the data won't yet be an instance of Entry.
+        if ($this->data->get('type') === 'collections' && ! in_array($this->data->get('handle'), $enabledCollections)) {
             return false;
         }
 
