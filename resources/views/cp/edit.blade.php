@@ -1,7 +1,10 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', $breadcrumbs->title($title))
-@section('wrapper_class', 'max-w-3xl')
+
+@if (count($localizations) > 1)
+    @section('wrapper_class', 'max-w-3xl')
+@endif
 
 @section('content')
 
