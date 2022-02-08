@@ -178,7 +178,9 @@ class Cascade
 
     protected function compiledTitle(): string
     {
-        return $this->titlePosition() === 'before'
+        $titlePosition = $this->data->get('title_position')?->raw() ?? 'before';
+
+        return $titlePosition === 'before'
             ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
             : "{$this->siteName()} {$this->titleSeparator()} {$this->title()}";
     }
@@ -195,11 +197,6 @@ class Cascade
     protected function titleSeparator(): Value|string
     {
         return $this->data->get('title_separator') ?? '|';
-    }
-
-    protected function titlePosition(): Value|string
-    {
-        return $this->data->get('title_position') ?? 'before';
     }
 
     protected function siteName(): Value|string
