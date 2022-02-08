@@ -14,7 +14,7 @@ trait GetsFieldDefaults
      * Use the $localized parameter to automatically get the field defaults by the blueprint parent's locale.
      * Use the $locale parameter to get the defaults of a specific locale.
      */
-    public function getFieldDefaults(Blueprint $blueprint, $localized = false, string $locale = null): Collection
+    public function getFieldDefaults(Blueprint $blueprint, bool $localized = false, string $locale = null): Collection
     {
         // Get the fields that have a default value set.
         $fieldsWithDefaults = $blueprint->fields()->resolveFields()->mapWithKeys(function ($field) {
@@ -27,7 +27,7 @@ trait GetsFieldDefaults
             return $fieldsWithDefaults;
         }
 
-        // Get the content defaults for the entry linked to the blueprint.
+        // Get the content defaults for the entry attached to the blueprint.
         $contentDefaults = collect($this->getContentDefaults($blueprint->parent(), $locale))->map->raw();
 
         // Return the defaults for the current entry.
