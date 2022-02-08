@@ -62,7 +62,6 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this
             ->bootCascade()
-            ->bootAddonViews()
             ->bootAddonStores()
             ->bootAddonNav()
             ->bootAddonPermissions();
@@ -138,17 +137,6 @@ class ServiceProvider extends AddonServiceProvider
         }
 
         return true;
-    }
-
-    protected function bootAddonViews(): self
-    {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'advanced-seo');
-
-        $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/advanced-seo'),
-        ], 'advanced-seo-views');
-
-        return $this;
     }
 
     protected function bootAddonStores(): self
