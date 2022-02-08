@@ -173,7 +173,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootAddonPermissions(): self
     {
-        Permission::group('seo', 'SEO', function () {
+        Permission::group('advanced-seo', 'Advanced SEO', function () {
             Permission::register('view site defaults', function ($permission) {
                 $permission
                     ->label('View Site Defaults')
