@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Blueprint;
+use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blueprint;
 use Statamic\Fields\Blueprint as BlueprintFields;
-use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
+use Statamic\Support\Str;
 
 abstract class BaseBlueprint implements Contract
 {
