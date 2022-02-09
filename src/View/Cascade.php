@@ -15,11 +15,12 @@ use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Fields\FieldDefaults;
+use Aerni\AdvancedSeo\Fields\GeneralFields;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Aerni\AdvancedSeo\Concerns\GetsPageData;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 
 class Cascade
 {
@@ -177,10 +178,9 @@ class Cascade
         return $this;
     }
 
-    // TODO: Can we make sure that the default is already in the data?
     protected function compiledTitle(): string
     {
-        $titlePosition = $this->data->get('title_position')?->raw() ?? FieldDefaults::get('title_position');
+        $titlePosition = $this->data->get('title_position')?->raw() ?? GeneralFields::getDefaultValue('title_position');
 
         return $titlePosition === 'before'
             ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
@@ -198,7 +198,7 @@ class Cascade
 
     protected function titleSeparator(): Value|string
     {
-        return $this->data->get('title_separator') ?? FieldDefaults::get('title_separator');
+        return $this->data->get('title_separator') ?? GeneralFields::getDefaultValue('title_separator');
     }
 
     protected function siteName(): Value|string
@@ -225,7 +225,7 @@ class Cascade
 
     protected function twitterCard(): Value|string
     {
-        return $this->data->get('twitter_card') ?? FieldDefaults::get('seo_twitter_card');
+        return $this->data->get('twitter_card') ?? OnPageSeoFields::getDefaultValue('seo_twitter_card');
     }
 
     protected function twitterTitle(): Value|string
@@ -363,7 +363,7 @@ class Cascade
 
     protected function siteSchema(): ?string
     {
-        $type = $this->data->get('site_json_ld_type')?->raw() ?? FieldDefaults::get('site_json_ld_type');
+        $type = $this->data->get('site_json_ld_type')?->raw() ?? GeneralFields::getDefaultValue('site_json_ld_type');
 
         if ($type === 'none') {
             return null;

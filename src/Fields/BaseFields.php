@@ -2,15 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\View\Cascade;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Contracts\Fields;
+use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
-use Aerni\AdvancedSeo\Contracts\Fields;
-use Aerni\AdvancedSeo\View\Cascade;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 abstract class BaseFields implements Fields
 {
@@ -49,7 +50,19 @@ abstract class BaseFields implements Fields
         })->toArray();
     }
 
-    protected function getValueFromCascade(string $handle, mixed $default = null): mixed
+    public static function getDefaultValue(string $key): mixed
+    {
+        return self::getDefaultValues()->get($key);
+    }
+
+    public static function getDefaultValues(): Collection
+    {
+        return collect((new static)->sections())->flatten(1)->mapWithKeys(function ($item) {
+            return [$item['handle'] => Arr::get($item['field'], 'default')];
+        })->filter(fn ($value) => $value !== null);
+    }
+
+    protected function getValueFromCascade(string $handle): mixed
     {
         // We only need this data for the blueprints in the CP.
         if (! $this->isCpRoute()) {
@@ -61,12 +74,10 @@ abstract class BaseFields implements Fields
             return null;
         }
 
-        $value = Cascade::from($this->data)
+        return Cascade::from($this->data)
             ->withSiteDefaults()
             ->withContentDefaults()
             ->value(Str::remove('seo_', $handle));
-
-        return $value ?? $default;
     }
 
     protected function trans(string $parent, string $key): string

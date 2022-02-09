@@ -7,7 +7,6 @@ use Statamic\Taxonomies\Term;
 use Statamic\Facades\Fieldset;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Fields\FieldDefaults;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 
 class OnPageSeoFields extends BaseFields
@@ -106,7 +105,7 @@ class OnPageSeoFields extends BaseFields
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
                     'instructions' => $this->trans('seo_generate_social_images', 'instructions'),
-                    'default' => (bool) $this->getValueFromCascade('seo_generate_social_images', FieldDefaults::get('seo_generate_social_images')),
+                    'default' => (bool) $this->getValueFromCascade('seo_generate_social_images'),
                     'localizable' => true,
                     'listable' => 'hidden',
                 ],
@@ -256,7 +255,7 @@ class OnPageSeoFields extends BaseFields
                         'summary' => 'Regular',
                         'summary_large_image' => 'Large Image',
                     ],
-                    'default' => $this->getValueFromCascade('seo_twitter_card', FieldDefaults::get('seo_twitter_card')),
+                    'default' => $this->getValueFromCascade('seo_twitter_card') ?? 'summary',
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -339,7 +338,7 @@ class OnPageSeoFields extends BaseFields
                         'other' => 'Other Entry',
                         'custom' => 'Custom URL',
                     ],
-                    'default' => $this->getValueFromCascade('seo_canonical_type', FieldDefaults::get('seo_canonical_type')),
+                    'default' => $this->getValueFromCascade('seo_canonical_type') ?? 'current',
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -403,7 +402,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Noindex',
                     'instructions' => $this->trans('seo_noindex', 'instructions'),
-                    'default' => (bool) $this->getValueFromCascade('seo_noindex', FieldDefaults::get('seo_noindex')),
+                    'default' => (bool) $this->getValueFromCascade('seo_noindex'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -415,7 +414,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Nofollow',
                     'instructions' => $this->trans('seo_nofollow', 'instructions'),
-                    'default' => (bool) $this->getValueFromCascade('seo_nofollow', FieldDefaults::get('seo_nofollow')),
+                    'default' => (bool) $this->getValueFromCascade('seo_nofollow'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -458,7 +457,7 @@ class OnPageSeoFields extends BaseFields
                         '0.9' => '0.9',
                         '1.0' => '1.0',
                     ],
-                    'default' => $this->getValueFromCascade('seo_sitemap_priority', FieldDefaults::get('seo_sitemap_priority')),
+                    'default' => $this->getValueFromCascade('seo_sitemap_priority') ?? '0.5',
                     'clearable' => false,
                     'multiple' => false,
                     'searchable' => false,
@@ -485,7 +484,7 @@ class OnPageSeoFields extends BaseFields
                         'yearly' => 'Yearly',
                         'never' => 'Never',
                     ],
-                    'default' => $this->getValueFromCascade('seo_sitemap_change_frequency', FieldDefaults::get('seo_sitemap_change_frequency')),
+                    'default' => $this->getValueFromCascade('seo_sitemap_change_frequency') ?? 'daily',
                     'clearable' => false,
                     'multiple' => false,
                     'searchable' => false,
