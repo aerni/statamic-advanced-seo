@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
+use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Fields\FieldDefaults;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
 
 class ContentDefaultsFields extends BaseFields
 {
@@ -101,7 +102,7 @@ class ContentDefaultsFields extends BaseFields
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
                     'instructions' => $this->trans('seo_generate_social_images', 'default_instructions'),
-                    'default' => false,
+                    'default' => FieldDefaults::get('seo_generate_social_images'),
                     'localizable' => true,
                     'listable' => 'hidden',
                 ],
@@ -214,7 +215,7 @@ class ContentDefaultsFields extends BaseFields
                         'summary' => 'Regular',
                         'summary_large_image' => 'Large Image',
                     ],
-                    'default' => 'summary',
+                    'default' => FieldDefaults::get('seo_twitter_card'),
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -293,7 +294,7 @@ class ContentDefaultsFields extends BaseFields
                         'other' => 'Other Entry',
                         'custom' => 'Custom URL',
                     ],
-                    'default' => 'current',
+                    'default' => FieldDefaults::get('seo_canonical_type'),
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -355,7 +356,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Noindex',
                     'instructions' => $this->trans('seo_noindex', 'default_instructions'),
-                    'default' => false,
+                    'default' => FieldDefaults::get('seo_noindex'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -367,7 +368,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Nofollow',
                     'instructions' => $this->trans('seo_nofollow', 'default_instructions'),
-                    'default' => false,
+                    'default' => FieldDefaults::get('seo_nofollow'),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -410,7 +411,7 @@ class ContentDefaultsFields extends BaseFields
                         '0.9' => '0.9',
                         '1.0' => '1.0',
                     ],
-                    'default' => '0.5',
+                    'default' => FieldDefaults::get('seo_sitemap_priority'),
                     'clearable' => false,
                     'multiple' => false,
                     'searchable' => false,
@@ -437,7 +438,7 @@ class ContentDefaultsFields extends BaseFields
                         'yearly' => 'Yearly',
                         'never' => 'Never',
                     ],
-                    'default' => 'daily',
+                    'default' => FieldDefaults::get('seo_sitemap_change_frequency'),
                     'clearable' => false,
                     'multiple' => false,
                     'searchable' => false,

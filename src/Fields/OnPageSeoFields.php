@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
 use Statamic\Taxonomies\Term;
+use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Fields\FieldDefaults;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -105,7 +106,7 @@ class OnPageSeoFields extends BaseFields
                     'icon' => 'toggle',
                     'display' => 'Generate Social Images',
                     'instructions' => $this->trans('seo_generate_social_images', 'instructions'),
-                    'default' => (bool) $this->getValueFromCascade('seo_generate_social_images', false),
+                    'default' => (bool) $this->getValueFromCascade('seo_generate_social_images', FieldDefaults::get('seo_generate_social_images')),
                     'localizable' => true,
                     'listable' => 'hidden',
                 ],
@@ -255,7 +256,7 @@ class OnPageSeoFields extends BaseFields
                         'summary' => 'Regular',
                         'summary_large_image' => 'Large Image',
                     ],
-                    'default' => $this->getValueFromCascade('seo_twitter_card', 'summary'),
+                    'default' => $this->getValueFromCascade('seo_twitter_card', FieldDefaults::get('seo_twitter_card')),
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -338,7 +339,7 @@ class OnPageSeoFields extends BaseFields
                         'other' => 'Other Entry',
                         'custom' => 'Custom URL',
                     ],
-                    'default' => $this->getValueFromCascade('seo_canonical_type', 'current'),
+                    'default' => $this->getValueFromCascade('seo_canonical_type', FieldDefaults::get('seo_canonical_type')),
                     'listable' => 'hidden',
                     'localizable' => true,
                 ],
@@ -402,7 +403,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Noindex',
                     'instructions' => $this->trans('seo_noindex', 'instructions'),
-                    'default' => (bool) $this->getValueFromCascade('seo_noindex', false),
+                    'default' => (bool) $this->getValueFromCascade('seo_noindex', FieldDefaults::get('seo_noindex')),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -414,7 +415,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'toggle',
                     'display' => 'Nofollow',
                     'instructions' => $this->trans('seo_nofollow', 'instructions'),
-                    'default' => (bool) $this->getValueFromCascade('seo_nofollow', false),
+                    'default' => (bool) $this->getValueFromCascade('seo_nofollow', FieldDefaults::get('seo_nofollow')),
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -457,7 +458,7 @@ class OnPageSeoFields extends BaseFields
                         '0.9' => '0.9',
                         '1.0' => '1.0',
                     ],
-                    'default' => $this->getValueFromCascade('seo_sitemap_priority', '0.5'),
+                    'default' => $this->getValueFromCascade('seo_sitemap_priority', FieldDefaults::get('seo_sitemap_priority')),
                     'clearable' => false,
                     'multiple' => false,
                     'searchable' => false,
@@ -484,7 +485,7 @@ class OnPageSeoFields extends BaseFields
                         'yearly' => 'Yearly',
                         'never' => 'Never',
                     ],
-                    'default' => $this->getValueFromCascade('seo_sitemap_change_frequency', 'daily'),
+                    'default' => $this->getValueFromCascade('seo_sitemap_change_frequency', FieldDefaults::get('seo_sitemap_change_frequency')),
                     'clearable' => false,
                     'multiple' => false,
                     'searchable' => false,

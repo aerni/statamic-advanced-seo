@@ -2,23 +2,24 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsPageData;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
+use Illuminate\Support\Arr;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Fields\FieldDefaults;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsPageData;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 class Cascade
 {
@@ -176,9 +177,10 @@ class Cascade
         return $this;
     }
 
+    // TODO: Can we make sure that the default is already in the data?
     protected function compiledTitle(): string
     {
-        $titlePosition = $this->data->get('title_position')?->raw() ?? 'before';
+        $titlePosition = $this->data->get('title_position')?->raw() ?? FieldDefaults::get('title_position');
 
         return $titlePosition === 'before'
             ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
@@ -196,7 +198,7 @@ class Cascade
 
     protected function titleSeparator(): Value|string
     {
-        return $this->data->get('title_separator') ?? '|';
+        return $this->data->get('title_separator') ?? FieldDefaults::get('title_separator');
     }
 
     protected function siteName(): Value|string
@@ -223,7 +225,7 @@ class Cascade
 
     protected function twitterCard(): Value|string
     {
-        return $this->data->get('twitter_card') ?? 'summary';
+        return $this->data->get('twitter_card') ?? FieldDefaults::get('seo_twitter_card');
     }
 
     protected function twitterTitle(): Value|string
@@ -345,6 +347,7 @@ class Cascade
             return $this->data->get('canonical_custom')?->raw();
         }
 
+        // Handle canonical type "current".
         $page = Arr::get($this->context->get('get'), 'page');
         $currentUrl = $this->context->get('current_url');
 
@@ -360,9 +363,9 @@ class Cascade
 
     protected function siteSchema(): ?string
     {
-        $type = $this->data->get('site_json_ld_type')?->raw();
+        $type = $this->data->get('site_json_ld_type')?->raw() ?? FieldDefaults::get('site_json_ld_type');
 
-        if (empty($type) || $type === 'none') {
+        if ($type === 'none') {
             return null;
         }
 
