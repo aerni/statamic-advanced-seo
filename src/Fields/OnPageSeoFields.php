@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Statamic\Facades\Site;
-use Statamic\Taxonomies\Term;
-use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\Site;
+use Statamic\Taxonomies\Term;
 
 class OnPageSeoFields extends BaseFields
 {

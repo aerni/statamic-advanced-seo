@@ -2,25 +2,25 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
-use Statamic\Fields\Value;
-use Illuminate\Support\Arr;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Taxonomies\Taxonomy;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Fields\GeneralFields;
-use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsPageData;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Fields\GeneralFields;
 use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Fields\Value;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Support\Str;
+use Statamic\Taxonomies\Taxonomy;
 
 class Cascade
 {
