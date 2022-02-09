@@ -227,7 +227,6 @@ class OnPageSeoFields extends BaseFields
 
         if ($this->displaySocialImagesGenerator()) {
             $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
-            $fields[3]['field']['default'] = null;
         }
 
         return $fields;
@@ -309,7 +308,6 @@ class OnPageSeoFields extends BaseFields
 
         if ($this->displaySocialImagesGenerator()) {
             $fields[4]['field']['if']['seo_generate_social_images'] = 'equals false';
-            $fields[4]['field']['default'] = null;
         }
 
         return $fields;
