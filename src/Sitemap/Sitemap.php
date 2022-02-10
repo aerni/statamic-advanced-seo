@@ -37,6 +37,10 @@ class Sitemap
 
     public function items(): Collection
     {
+        if (! $this->indexable()) {
+            return collect();
+        }
+
         $items = $this->type === 'collections'
             ? $this->entries()
             : $this->terms();
@@ -94,6 +98,15 @@ class Sitemap
             });
 
         return $taxonomy->merge($terms)->merge($collectionTerms);
+    }
+
+    protected function indexable(): bool
+    {
+        $globalNoIndex = Seo::find('site', 'indexing')
+            ?->in($this->site)
+            ?->value('noindex');
+
+        return (bool) ! $globalNoIndex;
     }
 
     protected function noindex(Entry|LocalizedTerm $data): bool

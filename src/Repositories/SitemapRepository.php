@@ -125,11 +125,6 @@ class SitemapRepository
             return false;
         }
 
-        // Remove all entries and tags from the sitemap if the global "noindex" is set to true.
-        if ($config->value('noindex')) {
-            return true;
-        }
-
         $excluded = $data instanceof EntriesCollection
             ? $config->value('excluded_collections') ?? []
             : $config->value('excluded_taxonomies') ?? [];
