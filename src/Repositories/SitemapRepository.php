@@ -2,13 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Sitemap\Sitemap;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as EntriesCollection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Collection as CollectionFacade;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class SitemapRepository
@@ -48,88 +46,64 @@ class SitemapRepository
 
     protected function collectionSitemaps(): Collection
     {
-        return CollectionFacade::all()
-            ->flatMap(function ($collection) {
-                return $collection->sites()->map(function ($site) use ($collection) {
-                    if ($this->hasRoute($collection, $site) && ! $this->excludeFromSitemap($collection, $site)) {
-                        return $this->make('collections', $collection->handle(), $site);
-                    }
-                })->filter();
-            });
+        return CollectionFacade::all()->flatMap(function ($collection) {
+            return $collection->sites()->map(function ($site) use ($collection) {
+                if ($this->collectionHasRoute($collection, $site)) {
+                    return $this->make('collections', $collection->handle(), $site);
+                }
+            })->filter();
+        });
     }
 
     protected function taxonomySitemaps(): Collection
     {
-        return TaxonomyFacade::all()
-            ->flatMap(function ($taxonomy) {
-                return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
-                    if ($this->hasRoute($taxonomy) && ! $this->excludeFromSitemap($taxonomy, $site)) {
-                        return $this->make('taxonomies', $taxonomy->handle(), $site);
-                    }
-                })->filter();
+        return TaxonomyFacade::all()->flatMap(function ($taxonomy) {
+            return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
+                if ($this->taxonomyHasRoute($taxonomy)) {
+                    return $this->make('taxonomies', $taxonomy->handle(), $site);
+                }
             });
+        })->filter();
     }
 
-    protected function hasRoute(EntriesCollection|Taxonomy $data, string $site = null): bool
+    // TODO: Maybe we can remove this and check for the route in the Sitemap class instead.
+    protected function collectionHasRoute(EntriesCollection $collection, string $site): bool
     {
-        return $data instanceof EntriesCollection
-            ? ! is_null($data->route($site))
-            : $this->taxonomyRoutes($data)->isNotEmpty();
+        return ! is_null($collection->route($site));
     }
 
+    // TODO: Maybe we can remove this altogether as we are checking for the views in the Sitemap class already.
+    protected function taxonomyHasRoute(Taxonomy $taxonomy): bool
+    {
+        return $this->taxonomyRoutes($taxonomy)->isNotEmpty();
+    }
+
+    // TODO: Should this return false if not all routes exist? Or should we further distinguish between the type of page in the sitemap?
     // You can't configure routes per site like you can with collections.
     // So we just check the routes for the default site.
     protected function taxonomyRoutes(Taxonomy $taxonomy): Collection
     {
-        $globalTaxonomyTemplates = $taxonomy->template();
-        $globalTermTemplates = $taxonomy->queryTerms()->get()->map->template();
+        $globalTaxonomyTemplate = $taxonomy->template();
+        $globalTermTemplate = $taxonomy->queryTerms()->get()->first()->template();
 
-        $collectionTaxonomies = CollectionFacade::all()
-            ->filter(function ($collection) {
-                return ! $this->excludeFromSitemap($collection);
-            })->flatMap(function ($collection) {
-                return $collection->taxonomies()->map->collection($collection);
-            })->filter(function ($taxonomy) {
-                return ! $this->excludeFromSitemap($taxonomy);
+        $collectionTaxonomies = $taxonomy->collections()->flatMap(function ($collection) use ($taxonomy) {
+            return $collection->taxonomies()->map->collection($collection)->filter(function ($collectionTaxonomy) use ($taxonomy) {
+                return $collectionTaxonomy->handle() === $taxonomy->handle();
             });
+        });
 
         $collectionTaxonomyTemplates = $collectionTaxonomies->map->template();
 
         $collectionTermTemplates = $collectionTaxonomies->flatMap(function ($taxonomy) {
             return $taxonomy->queryTerms()->get()->map->collection($taxonomy->collection());
-        })->map(function ($term) {
-            return $term->template();
-        });
+        })->map(fn ($term) =>  $term->template())->unique();
 
-        $templateViews = collect($globalTaxonomyTemplates)
-            ->merge($globalTermTemplates)
+        $templates = collect($globalTaxonomyTemplate)
+            ->merge($globalTermTemplate)
             ->merge($collectionTaxonomyTemplates)
             ->merge($collectionTermTemplates)
-            ->map(function ($template) {
-                return view()->exists($template);
-            })->filter();
+            ->filter(fn ($template) => view()->exists($template));
 
-        return $templateViews;
-    }
-
-    protected function excludeFromSitemap(EntriesCollection|Taxonomy $data, string $site = null): bool
-    {
-        $site = Site::get($site) ?? Site::current();
-
-        $config = Seo::find('site', 'indexing')
-            ?->createLocalizations(Site::all()->map->handle())
-            ->in($site);
-
-        // Include all entries and tags in the sitemap if there is no config.
-        if (is_null($config)) {
-            return false;
-        }
-
-        $excluded = $data instanceof EntriesCollection
-            ? $config->value('excluded_collections') ?? []
-            : $config->value('excluded_taxonomies') ?? [];
-
-        // Remove any entries and tags that should be excluded based on the config.
-        return in_array($data->handle(), $excluded);
+        return $templates;
     }
 }

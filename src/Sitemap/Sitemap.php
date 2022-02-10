@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Entries\Entry;
-use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
@@ -15,9 +14,11 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class Sitemap
 {
+    protected bool $indexable;
+
     public function __construct(protected string $type, protected string $handle, protected string $site)
     {
-        //
+        $this->indexable = $this->indexable();
     }
 
     public function site(): string
@@ -37,20 +38,20 @@ class Sitemap
 
     public function items(): Collection
     {
-        if (! $this->indexable()) {
+        if (! $this->indexable) {
             return collect();
         }
 
         $items = $this->type === 'collections'
-            ? $this->entries()
-            : $this->terms();
+            ? $this->collectionEntries()
+            : $this->taxonomyAndTerms();
 
         return $items->map(function ($item) {
             return (new Item($item))->toArray();
         });
     }
 
-    protected function entries(): Collection
+    protected function collectionEntries(): Collection
     {
         return EntryFacade::query()
             ->where('collection', $this->handle)
@@ -61,54 +62,92 @@ class Sitemap
             });
     }
 
-    protected function terms(): Collection
+    protected function taxonomyAndTerms(): Collection
     {
-        $taxonomy = collect([Taxonomy::find($this->handle)])->filter(function ($taxonomy) {
-            return $taxonomy->queryTerms()->get()->isNotEmpty() && view()->exists($taxonomy->template());
-        });
+        $taxonomyAndTerms = collect();
 
-        $terms = Term::query()
-            ->where('taxonomy', $this->handle)
+        $taxonomy = Taxonomy::find($this->handle);
+
+        // We only want to add the taxonomy item if the template exists.
+        if (view()->exists($taxonomy->template())) {
+            $taxonomyAndTerms->push($taxonomy);
+        }
+
+        $taxonomyTerms = $taxonomy->queryTerms()
             ->where('site', $this->site)
             ->get()
             ->filter(function ($term) {
-                return $term->published() && view()->exists($term->template()) && ! $this->noindex($term);
+                return $term->published() && ! $this->noindex($term);
             });
 
-        $collectionTaxonomies = CollectionFacade::all()
-            ->flatMap(function ($collection) {
-                return $collection->taxonomies()->map->collection($collection);
-            });
+        // If we don't have any taxonomy terms, we don't need to continue.
+        if ($taxonomyTerms->isEmpty()) {
+            return $taxonomyAndTerms;
+        }
 
-        // TODO: There is currently no way to get the URL of collection taxonomies.
+        // We only want add the terms if the template exists.
+        if (view()->exists($taxonomyTerms->first()->template())) {
+            $taxonomyAndTerms = $taxonomyAndTerms->merge($taxonomyTerms);
+        }
+
+        // Get all the taxonomies that are configured on the collection.
+        $collectionTaxonomies = $taxonomy->collections()->flatMap(function ($collection) {
+            return $collection->taxonomies()->map->collection($collection)->filter(function ($collectionTaxonomy) {
+                return $collectionTaxonomy->handle() === $this->handle;
+            });
+        });
+
+        // TODO: There is currently no way to get the template of collection taxonomies, e.g. /products/tags
         // Statamic first has to provide a way for this.
         // $collectionTaxonomy = $collectionTaxonomies->filter(function ($taxonomy) {
         //     return view()->exists($taxonomy->template());
         // });
 
-        $collectionTerms = $collectionTaxonomies
-            ->flatMap(function ($taxonomy) {
-                return $taxonomy->queryTerms()
-                    ->where('site', $this->site)
-                    ->get()->map->collection($taxonomy->collection());
-            })->filter(function ($term) {
-                $termIsLinkedInAnEntry = $term->queryEntries()->where('site', $this->site)->get()->isNotEmpty();
+        // Get all the terms that are set on a collection entry.
+        $collectionTerms = $collectionTaxonomies->flatMap(function ($taxonomy) {
+            return $taxonomy->queryTerms()
+                ->where('site', $this->site)
+                ->get()->map->collection($taxonomy->collection());
+        })->filter(function ($term) {
+            // TODO: Test with localized entries. Especially `seo_noindex`.
+            $termIsLinkedInAPublishedEntry = $term->queryEntries()
+                ->where('site', $this->site)
+                ->get()
+                ->filter(fn ($entry) => $entry->published() && ! $entry->value('seo_noindex'))
+                ->isNotEmpty();
 
-                return $termIsLinkedInAnEntry && $term->published() && view()->exists($term->template()) && ! $this->noindex($term);
-            });
+            return $termIsLinkedInAPublishedEntry
+                && $term->published()
+                && view()->exists($term->template())
+                && ! $this->noindex($term);
+        });
 
-        return $taxonomy->merge($terms)->merge($collectionTerms);
+        return $taxonomyAndTerms->merge($collectionTerms);
     }
 
     protected function indexable(): bool
     {
-        $globalNoIndex = Seo::find('site', 'indexing')
-            ?->in($this->site)
-            ?->value('noindex');
+        $config = Seo::find('site', 'indexing')?->in($this->site);
 
-        return (bool) ! $globalNoIndex;
+        // If there is no config, the sitemap should be indexable.
+        if (is_null($config)) {
+            return true;
+        }
+
+        // If we have a global noindex, the sitemap shouldn't be indexable.
+        if ($config->value('noindex')) {
+            return false;
+        }
+
+        $excluded = $this->type === 'collections'
+            ? $config->value('excluded_collections') ?? []
+            : $config->value('excluded_taxonomies') ?? [];
+
+        // If the collection/taxonomy is excluded, the sitemap shouldn't be indexable.
+        return ! in_array($this->handle, $excluded);
     }
 
+    // TODO: This should probably be moved to the individual Sitemap Item class.
     protected function noindex(Entry|LocalizedTerm $data): bool
     {
         $handle = $data instanceof Entry
