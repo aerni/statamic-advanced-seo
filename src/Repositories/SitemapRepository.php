@@ -116,8 +116,8 @@ class SitemapRepository
     {
         $site = Site::get($site) ?? Site::current();
 
-        $config = Seo::findOrMake('site', 'indexing')
-            ->createLocalizations(Site::all()->map->handle())
+        $config = Seo::find('site', 'indexing')
+            ?->createLocalizations(Site::all()->map->handle())
             ->in($site);
 
         $excluded = $data instanceof EntriesCollection
