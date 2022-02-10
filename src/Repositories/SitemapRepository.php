@@ -120,10 +120,21 @@ class SitemapRepository
             ?->createLocalizations(Site::all()->map->handle())
             ->in($site);
 
+        // Include all entries and tags in the sitemap if there is no config.
+        if (is_null($config)) {
+            return false;
+        }
+
+        // Remove all entries and tags from the sitemap if the global "noindex" is set to true.
+        if ($config->value('noindex')) {
+            return true;
+        }
+
         $excluded = $data instanceof EntriesCollection
             ? $config->value('excluded_collections') ?? []
             : $config->value('excluded_taxonomies') ?? [];
 
+        // Remove any entries and tags that should be excluded based on the config.
         return in_array($data->handle(), $excluded);
     }
 }
