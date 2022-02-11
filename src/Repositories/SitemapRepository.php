@@ -2,20 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Aerni\AdvancedSeo\Sitemap\Sitemap;
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Collection as EntriesCollection;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Facades\Collection as CollectionFacade;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Aerni\AdvancedSeo\Sitemap\TaxonomySitemap;
+use Aerni\AdvancedSeo\Sitemap\CollectionSitemap;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Statamic\Facades\Collection as CollectionFacade;
 
 class SitemapRepository
 {
-    public function make(string $type, string $handle, string $site): Sitemap
-    {
-        return new Sitemap($type, $handle, $site);
-    }
-
     public function find(string $type, string $handle, string $site): ?Sitemap
     {
         return $this->all()->first(function ($sitemap) use ($type, $handle, $site) {
@@ -32,9 +27,7 @@ class SitemapRepository
 
     public function whereSite(string $site): Collection
     {
-        return $this->all()->filter(function ($sitemap) use ($site) {
-            return $sitemap->site() === $site;
-        });
+        return $this->all()->filter(fn ($sitemap) => $sitemap->site() === $site);
     }
 
     public function clearCache(): bool
@@ -47,63 +40,14 @@ class SitemapRepository
     protected function collectionSitemaps(): Collection
     {
         return CollectionFacade::all()->flatMap(function ($collection) {
-            return $collection->sites()->map(function ($site) use ($collection) {
-                if ($this->collectionHasRoute($collection, $site)) {
-                    return $this->make('collections', $collection->handle(), $site);
-                }
-            })->filter();
-        });
+            return $collection->sites()->map(fn ($site) => CollectionSitemap::make($collection->handle(), $site));
+        })->filter(fn ($sitemap) => $sitemap->indexable());
     }
 
     protected function taxonomySitemaps(): Collection
     {
         return TaxonomyFacade::all()->flatMap(function ($taxonomy) {
-            return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
-                if ($this->taxonomyHasRoute($taxonomy)) {
-                    return $this->make('taxonomies', $taxonomy->handle(), $site);
-                }
-            });
-        })->filter();
-    }
-
-    // TODO: Maybe we can remove this and check for the route in the Sitemap class instead.
-    protected function collectionHasRoute(EntriesCollection $collection, string $site): bool
-    {
-        return ! is_null($collection->route($site));
-    }
-
-    // TODO: Maybe we can remove this altogether as we are checking for the views in the Sitemap class already.
-    protected function taxonomyHasRoute(Taxonomy $taxonomy): bool
-    {
-        return $this->taxonomyRoutes($taxonomy)->isNotEmpty();
-    }
-
-    // TODO: Should this return false if not all routes exist? Or should we further distinguish between the type of page in the sitemap?
-    // You can't configure routes per site like you can with collections.
-    // So we just check the routes for the default site.
-    protected function taxonomyRoutes(Taxonomy $taxonomy): Collection
-    {
-        $globalTaxonomyTemplate = $taxonomy->template();
-        $globalTermTemplate = $taxonomy->queryTerms()->get()->first()->template();
-
-        $collectionTaxonomies = $taxonomy->collections()->flatMap(function ($collection) use ($taxonomy) {
-            return $collection->taxonomies()->map->collection($collection)->filter(function ($collectionTaxonomy) use ($taxonomy) {
-                return $collectionTaxonomy->handle() === $taxonomy->handle();
-            });
-        });
-
-        $collectionTaxonomyTemplates = $collectionTaxonomies->map->template();
-
-        $collectionTermTemplates = $collectionTaxonomies->flatMap(function ($taxonomy) {
-            return $taxonomy->queryTerms()->get()->map->collection($taxonomy->collection());
-        })->map(fn ($term) =>  $term->template())->unique();
-
-        $templates = collect($globalTaxonomyTemplate)
-            ->merge($globalTermTemplate)
-            ->merge($collectionTaxonomyTemplates)
-            ->merge($collectionTermTemplates)
-            ->filter(fn ($template) => view()->exists($template));
-
-        return $templates;
+            return $taxonomy->sites()->map(fn ($site) => TaxonomySitemap::make($taxonomy->handle(), $site));
+        })->filter(fn ($sitemap) => $sitemap->indexable());
     }
 }

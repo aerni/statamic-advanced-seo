@@ -4,22 +4,30 @@ namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Taxonomies\LocalizedTerm;
 
-class Item
+class SitemapItem
 {
-    const DEFAULT_CHANGEFREQ = 'daily';
-    const DEFAULT_PRIORITY = '0.5';
+    // TODO: Should all the `get` methods actually be `value` and fall back to the origin?
 
     protected ?SeoVariables $defaults;
 
-    public function __construct(protected Entry|Taxonomy|LocalizedTerm $content)
+    public function __construct(protected Entry|Taxonomy|LocalizedTerm $content, protected string $site)
     {
-        $this->defaults = Seo::find($this->type(), $this->handle())?->in(Site::current());
+        /**
+         * The `absoluteUrl` method in the Taxonomy class always takes the current site as basis.
+         * In order to get the localized URL, we need to set the correct site for this request.
+         */
+        if ($content instanceof Taxonomy) {
+            Site::setCurrent($site);
+        }
+
+        $this->defaults = Seo::find($this->type(), $this->handle())?->in($site);
     }
 
     public function type(): string
@@ -76,14 +84,14 @@ class Item
     {
         return $this->content->get('seo_sitemap_change_frequency')
             ?? $this->defaults?->get('seo_sitemap_change_frequency')
-            ?? self::DEFAULT_CHANGEFREQ;
+            ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_change_frequency');
     }
 
     public function priority(): string
     {
         return $this->content->get('seo_sitemap_priority')
             ?? $this->defaults?->get('seo_sitemap_priority')
-            ?? self::DEFAULT_PRIORITY;
+            ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_priority');
     }
 
     public function toArray(): array
