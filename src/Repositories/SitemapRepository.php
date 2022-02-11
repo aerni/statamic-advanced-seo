@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
-use Aerni\AdvancedSeo\Sitemap\TaxonomySitemap;
 use Aerni\AdvancedSeo\Sitemap\CollectionSitemap;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Aerni\AdvancedSeo\Sitemap\TaxonomySitemap;
+use Illuminate\Support\Collection;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class SitemapRepository
 {
