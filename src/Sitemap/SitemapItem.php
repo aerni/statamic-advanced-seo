@@ -32,22 +32,20 @@ class SitemapItem
 
     public function type(): string
     {
-        return $this->content instanceof Entry ? 'collections' : 'taxonomies';
+        return match (true) {
+            ($this->content instanceof Entry) => 'collections',
+            ($this->content instanceof Taxonomy) => 'taxonomies',
+            ($this->content instanceof LocalizedTerm) => 'taxonomies',
+        };
     }
 
     public function handle(): string
     {
-        if ($this->content instanceof Entry) {
-            return $this->content->collectionHandle();
-        }
-
-        if ($this->content instanceof Taxonomy) {
-            return $this->content->handle();
-        }
-
-        if ($this->content instanceof LocalizedTerm) {
-            return $this->content->taxonomyHandle();
-        }
+        return match (true) {
+            ($this->content instanceof Entry) => $this->content->collectionHandle(),
+            ($this->content instanceof Taxonomy) => $this->content->handle(),
+            ($this->content instanceof LocalizedTerm) => $this->content->taxonomyHandle(),
+        };
     }
 
     public function path(): string
