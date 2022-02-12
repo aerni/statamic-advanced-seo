@@ -3,8 +3,6 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Sitemap\BaseSitemap;
-use Aerni\AdvancedSeo\Sitemap\SitemapItem;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
 

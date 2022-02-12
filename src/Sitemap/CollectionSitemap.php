@@ -3,10 +3,8 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Sitemap\BaseSitemap;
-use Aerni\AdvancedSeo\Sitemap\SitemapItem;
-use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
+use Statamic\Facades\Collection as CollectionFacade;
 
 class CollectionSitemap extends BaseSitemap
 {
