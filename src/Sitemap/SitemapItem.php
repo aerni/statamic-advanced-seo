@@ -7,14 +7,12 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Facades\Data;
+use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
 use Statamic\Taxonomies\LocalizedTerm;
 
 class SitemapItem
 {
-    // TODO: Should all the `get` methods actually be `value` and fall back to the origin?
-
     protected ?SeoVariables $defaults;
 
     public function __construct(protected Entry|Taxonomy|LocalizedTerm $content, protected string $site)
@@ -55,16 +53,16 @@ class SitemapItem
 
     public function loc(): string
     {
-        $canonicalType = $this->content->get('seo_canonical_type') ?? $this->defaults?->get('seo_canonical_type');
+        $canonicalType = $this->content->value('seo_canonical_type') ?? $this->defaults?->value('seo_canonical_type');
 
         if ($canonicalType === 'other') {
-            $entryId = $this->content->get('seo_canonical_entry') ?? $this->defaults?->get('seo_canonical_entry');
+            $entryId = $this->content->value('seo_canonical_entry') ?? $this->defaults?->value('seo_canonical_entry');
 
-            return Data::find($entryId)->absoluteUrl();
+            return EntryFacade::find($entryId)->absoluteUrl();
         }
 
         if ($canonicalType === 'custom') {
-            return $this->content->get('seo_canonical_custom') ?? $this->defaults?->get('seo_canonical_custom');
+            return $this->content->value('seo_canonical_custom') ?? $this->defaults?->value('seo_canonical_custom');
         }
 
         return $this->content->absoluteUrl();
@@ -72,7 +70,6 @@ class SitemapItem
 
     public function lastmod(): string
     {
-        // TODO: Get the last modified date of the last modified item. Like a taxonomy term.
         return method_exists($this->content, 'lastModified')
             ? $this->content->lastModified()->format('Y-m-d\TH:i:sP')
             : now()->format('Y-m-d\TH:i:sP');
@@ -80,15 +77,15 @@ class SitemapItem
 
     public function changefreq(): string
     {
-        return $this->content->get('seo_sitemap_change_frequency')
-            ?? $this->defaults?->get('seo_sitemap_change_frequency')
+        return $this->content->value('seo_sitemap_change_frequency')
+            ?? $this->defaults?->value('seo_sitemap_change_frequency')
             ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_change_frequency');
     }
 
     public function priority(): string
     {
-        return $this->content->get('seo_sitemap_priority')
-            ?? $this->defaults?->get('seo_sitemap_priority')
+        return $this->content->value('seo_sitemap_priority')
+            ?? $this->defaults?->value('seo_sitemap_priority')
             ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_priority');
     }
 
