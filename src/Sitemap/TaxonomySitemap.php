@@ -64,7 +64,10 @@ class TaxonomySitemap extends BaseSitemap
         // Get all the collections that use this taxonomy.
         $taxonomyCollections = $this->taxonomy->collections();
 
-        // Attach each collection to a new instance of the taxonomy.
+        /**
+         * Attach each collection to a new instance of the taxonomy
+         * so that we can get the correct absolute URL of the collection terms later.
+         */
         return $taxonomyCollections->map(function ($collection) {
             return $collection->taxonomies()
                 ->first(fn ($taxonomy) => $taxonomy->handle() === $this->handle)
@@ -85,7 +88,7 @@ class TaxonomySitemap extends BaseSitemap
                 ->where('site', $this->site)
                 ->where('published', '!=', false) // We only want published entries.
                 ->where('seo_noindex', '!=', true) // We only want indexable entries. This falls back to the origin.
-                ->where('uri', '!=', null) // TODO: Should we really do this? We only want entries that have a route. This works for both single and per-site collection routes.
+                ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
                 ->get()
                 ->isNotEmpty();
         });
