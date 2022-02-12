@@ -53,6 +53,10 @@ class SitemapItem
 
     public function loc(): string
     {
+        if ($this->content instanceof Taxonomy) {
+            return $this->content->absoluteUrl();
+        }
+
         $canonicalType = $this->content->value('seo_canonical_type') ?? $this->defaults?->value('seo_canonical_type');
 
         if ($canonicalType === 'other') {
@@ -70,13 +74,19 @@ class SitemapItem
 
     public function lastmod(): string
     {
-        return method_exists($this->content, 'lastModified')
-            ? $this->content->lastModified()->format('Y-m-d\TH:i:sP')
-            : now()->format('Y-m-d\TH:i:sP');
+        return match (true) {
+            ($this->content instanceof Entry) => $this->content->lastModified()->format('Y-m-d\TH:i:sP'),
+            ($this->content instanceof Taxonomy) => now()->format('Y-m-d\TH:i:sP'), // TODO: Get the last modified date of the last modified taxonomy term.
+            ($this->content instanceof LocalizedTerm) => $this->content->lastModified()->format('Y-m-d\TH:i:sP'),
+        };
     }
 
     public function changefreq(): string
     {
+        if ($this->content instanceof Taxonomy) {
+            return ContentDefaultsFields::getDefaultValue('seo_sitemap_change_frequency');
+        }
+
         return $this->content->value('seo_sitemap_change_frequency')
             ?? $this->defaults?->value('seo_sitemap_change_frequency')
             ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_change_frequency');
@@ -84,6 +94,10 @@ class SitemapItem
 
     public function priority(): string
     {
+        if ($this->content instanceof Taxonomy) {
+            return ContentDefaultsFields::getDefaultValue('seo_sitemap_priority');
+        }
+
         return $this->content->value('seo_sitemap_priority')
             ?? $this->defaults?->value('seo_sitemap_priority')
             ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_priority');
