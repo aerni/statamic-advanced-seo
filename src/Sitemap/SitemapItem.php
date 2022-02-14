@@ -76,9 +76,18 @@ class SitemapItem
     {
         return match (true) {
             ($this->content instanceof Entry) => $this->content->lastModified()->format('Y-m-d\TH:i:sP'),
-            ($this->content instanceof Taxonomy) => now()->format('Y-m-d\TH:i:sP'), // TODO: Get the last modified date of the last modified taxonomy term.
+            ($this->content instanceof Taxonomy) => $this->lastModifiedTaxonomyTerm()->lastModified()->format('Y-m-d\TH:i:sP'),
             ($this->content instanceof LocalizedTerm) => $this->content->lastModified()->format('Y-m-d\TH:i:sP'),
         };
+    }
+
+    protected function lastModifiedTaxonomyTerm(): LocalizedTerm
+    {
+        return $this->content->queryTerms()
+            ->where('site', $this->site)
+            ->get()
+            ->sortByDesc(fn ($term) => $term->lastModified())
+            ->first();
     }
 
     public function changefreq(): string
