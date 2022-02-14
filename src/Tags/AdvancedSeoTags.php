@@ -66,6 +66,9 @@ class AdvancedSeoTags extends Tags
         });
     }
 
+    /**
+     * Check if we should render any meta data.
+     */
     protected function seoIsEnabled(): bool
     {
         // Don't add data for collections that are excluded in the config.
