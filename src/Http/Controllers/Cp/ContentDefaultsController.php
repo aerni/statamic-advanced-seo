@@ -2,18 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Illuminate\Support\Collection;
+use Statamic\Exceptions\NotFoundHttpException;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 
 abstract class ContentDefaultsController extends BaseDefaultsController
 {
     public function edit(Request $request, string $handle): mixed
     {
+        $seoIsEnabled = ! in_array($handle, config("advanced-seo.disabled.{$this->type}", []));
+
+        throw_unless($seoIsEnabled, new NotFoundHttpException);
+
         $this->authorize("view $this->type defaults");
 
         $set = $this->set($handle);
