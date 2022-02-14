@@ -147,7 +147,9 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootGit(): self
     {
-        Git::listen(\Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class);
+        if (config('statamic.git.enabled')) {
+            Git::listen(\Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class);
+        }
 
         return $this;
     }
