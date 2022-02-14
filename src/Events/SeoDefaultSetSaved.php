@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Events;
 
-use Statamic\Events\Event;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
+use Statamic\Events\Event;
 
 class SeoDefaultSetSaved extends Event implements ProvidesCommitMessage
 {

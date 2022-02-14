@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Tags;
 
-use Statamic\Tags\Tags;
-use Illuminate\View\View;
-use Illuminate\Support\Arr;
-use Statamic\Facades\Blink;
 use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Arr;
+use Illuminate\View\View;
+use Statamic\Facades\Blink;
+use Statamic\Tags\Tags;
 
 class AdvancedSeoTags extends Tags
 {
