@@ -69,6 +69,7 @@ class TestCase extends OrchestraTestCase
             'assets',
             'cp',
             'forms',
+            'git',
             'routes',
             'sites',
             'stache',
@@ -104,6 +105,9 @@ class TestCase extends OrchestraTestCase
 
         // Assume the pro edition for our tests
         $app['config']->set('statamic.editions.pro', true);
+
+        // Enable the git integration
+        $app['config']->set('statamic.git.enabled', true);
 
         // Define the addon config for our tests
         $app['config']->set('advanced-seo', require(__DIR__ . '/../config/advanced-seo.php'));
