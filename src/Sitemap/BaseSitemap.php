@@ -52,6 +52,13 @@ abstract class BaseSitemap implements Sitemap
 
     public function indexable(): bool
     {
+        $disabled = config("advanced-seo.disabled.{$this->type()}", []);
+
+        // Check if the collection/taxonomy is set to be disabled globally.
+        if (in_array($this->handle, $disabled)) {
+            return false;
+        }
+
         $config = Seo::find('site', 'indexing')?->in($this->site);
 
         // If there is no config, the sitemap should be indexable.
