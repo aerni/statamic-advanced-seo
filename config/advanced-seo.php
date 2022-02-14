@@ -4,16 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Excluded Collections & Taxonomies
+    | Disabled Collections & Taxonomies
     |--------------------------------------------------------------------------
     |
-    | You may disable the SEO tab and SEO data generation for any collection
-    | and taxonomy by adding its handle to the appropriate array below.
+    | You may disable the SEO tab, the output of SEO meta data,
+    | and the generation of sitemaps for any collection and taxonomy
+    | by adding its handle to the appropriate array below.
     |
     */
 
-    'excluded_collections' => [],
-    'excluded_taxonomies' => [],
+    'disabled' => [
+        'collections' => [],
+        'taxonomies' => [],
+    ],
 
     /*
     |--------------------------------------------------------------------------
