@@ -63,7 +63,6 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
-            ->bootCascade()
             ->bootAddonStores()
             ->bootAddonNav()
             ->bootAddonPermissions()
@@ -78,69 +77,6 @@ class ServiceProvider extends AddonServiceProvider
 
             return new $class($this->app['stache']);
         });
-    }
-
-    protected function bootCascade(): self
-    {
-        // Don't do anything if we're in the Statamic CP.
-        if ($this->isCpRoute()) {
-            return $this;
-        }
-
-        View::composer('*', function ($view) {
-            // We only want to add data if we're on a Statamic frontend route.
-            if (! $this->isFrontendRoute()) {
-                return;
-            }
-
-            $context = collect($view->getData());
-
-            if (! $this->shouldComposeSeoCascade($context)) {
-                return;
-            }
-
-            /*
-            Cache the cascade because we are removing all `seo_` keys at the end of the callback.
-            This means that we only have the necesarry data available to construct the cascade in the first loop iteration.
-            */
-            $cascade = Blink::once('cascade', function () use ($context) {
-                return Cascade::from($context)
-                    ->withSiteDefaults()
-                    ->withPageData()
-                    ->processForFrontend()
-                    ->get();
-            });
-
-            // Add the seo cascade to the view.
-            $view->with('seo', $cascade);
-
-            // Clean up the view data by removing all initial seo keys.
-            foreach ($context as $key => $value) {
-                $view->offsetUnset(str_start($key, 'seo_'));
-            }
-        });
-
-        return $this;
-    }
-
-    protected function shouldComposeSeoCascade(Collection $context): bool
-    {
-        // Don't add data for collections that are excluded in the config.
-        if ($context->has('is_entry') && in_array($context->get('collection')->handle(), config('advanced-seo.excluded_collections', []))) {
-            return false;
-        }
-
-        // Don't add data for taxonomy terms that are excluded in the config.
-        if ($context->has('is_term') && in_array($context->get('taxonomy')->handle(), config('advanced-seo.excluded_taxonomies', []))) {
-            return false;
-        }
-
-        // Don't add data for taxonomies that are excluded in the config.
-        if ($context->has('terms') && in_array($context->get('handle'), config('advanced-seo.excluded_taxonomies', []))) {
-            return false;
-        }
-
-        return true;
     }
 
     protected function bootAddonStores(): self

@@ -1,20 +1,20 @@
 {{# Fathom #}}
-{{ if seo:use_fathom }}
+{{ if use_fathom }}
     <script
-        src="https://{{ seo:fathom_domain ?? 'cdn.usefathom.com' }}/script.js"
-        data-site="{{ seo:fathom_id }}"
+        src="https://{{ fathom_domain ?? 'cdn.usefathom.com' }}/script.js"
+        data-site="{{ fathom_id }}"
         defer
-        {{ if seo:fathom_spa }}data-spa='auto'{{ /if }}
+        {{ if fathom_spa }}data-spa='auto'{{ /if }}
     ></script>
 {{ /if }}
 
 {{# Cloudflare Web Analytics #}}
-{{ if seo:use_cloudflare_web_analytics }}
-    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ seo:cloudflare_web_analytics }}"}'></script>
+{{ if use_cloudflare_web_analytics }}
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ cloudflare_web_analytics }}"}'></script>
 {{ /if }}
 
 {{# Google Tag Manager #}}
-{{ if seo:use_google_tag_manager }}
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ seo:google_tag_manager }}');</script>
+{{ if use_google_tag_manager }}
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ google_tag_manager }}');</script>
     {{# The noscript tag is found in the body view #}}
 {{ /if }}

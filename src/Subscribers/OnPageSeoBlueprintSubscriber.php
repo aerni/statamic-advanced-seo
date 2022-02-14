@@ -41,7 +41,7 @@ class OnPageSeoBlueprintSubscriber
         $collection = Str::after($event->blueprint->namespace(), '.');
 
         // Don't add fields if the collection is excluded in the config.
-        if (in_array($collection, config('advanced-seo.excluded_collections', []))) {
+        if (in_array($collection, config('advanced-seo.disabled.collections', []))) {
             return false;
         }
 
@@ -63,7 +63,7 @@ class OnPageSeoBlueprintSubscriber
         $taxonomy = Str::after($event->blueprint->namespace(), '.');
 
         // Don't add fields if the taxonomy is excluded in the config.
-        if (in_array($taxonomy, config('advanced-seo.excluded_taxonomies', []))) {
+        if (in_array($taxonomy, config('advanced-seo.disabled.taxonomies', []))) {
             return false;
         }
 
