@@ -16,28 +16,4 @@ class AdvancedSeoTagsTest extends TestCase
 
         $this->tag = (new AdvancedSeoTags())->setContext($this->context);
     }
-
-    /** @test */
-    public function it_returns_null_from_the_wildcard(): void
-    {
-        $this->assertNull($this->tag->wildcard());
-    }
-
-    /** @test */
-    public function it_returns_the_head_view_with_context(): void
-    {
-        $view = $this->tag->head();
-
-        $this->assertEquals($view->getName(), 'advanced-seo::head');
-        $this->assertEquals($view->getData(), $this->context);
-    }
-
-    /** @test */
-    public function it_returns_the_body_view_with_context(): void
-    {
-        $view = $this->tag->body();
-
-        $this->assertEquals($view->getName(), 'advanced-seo::body');
-        $this->assertEquals($view->getData(), $this->context);
-    }
 }
