@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Defaults;
@@ -16,8 +15,6 @@ use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    use ShouldHandleRoute;
-
     protected $actions = [
         Actions\GenerateSocialImages::class,
     ];
