@@ -53,7 +53,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     public $singletons = [
-        \Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class => \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class
+        \Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class => \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class,
     ];
 
     public function bootAddon(): void
