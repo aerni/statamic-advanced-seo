@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
@@ -53,6 +52,10 @@ class ServiceProvider extends AddonServiceProvider
         \Aerni\AdvancedSeo\Data\SeoVariables::class => \Aerni\AdvancedSeo\Policies\SeoVariablesPolicy::class,
     ];
 
+    public $singletons = [
+        \Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class => \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class
+    ];
+
     public function bootAddon(): void
     {
         $this
@@ -61,15 +64,6 @@ class ServiceProvider extends AddonServiceProvider
             ->bootAddonPermissions()
             ->bootGit()
             ->autoPublishConfig();
-    }
-
-    public function register(): void
-    {
-        $this->app->singleton(SeoDefaultsRepository::class, function () {
-            $class = \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class;
-
-            return new $class($this->app['stache']);
-        });
     }
 
     protected function bootAddonStores(): self
