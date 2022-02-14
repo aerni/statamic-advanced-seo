@@ -2,25 +2,26 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsPageData;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Fields\GeneralFields;
-use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
+use Illuminate\Support\Arr;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Fields\GeneralFields;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsPageData;
+use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 class Cascade
 {
@@ -122,6 +123,8 @@ class Cascade
             'locale' => $this->locale(),
             'hreflang' => $this->hreflang(),
             'canonical' => $this->canonical(),
+            'prev_url' => $this->prevUrl(),
+            'next_url' => $this->nextUrl(),
             'schema' => $this->schema(),
             'breadcrumbs' => $this->breadcrumbs(),
         ])->filter();
@@ -146,6 +149,8 @@ class Cascade
             'title',
             'description',
             'canonical',
+            'prev_url',
+            'next_url',
             'favicon_svg',
             'hreflang',
             'indexing',
@@ -348,10 +353,54 @@ class Cascade
         }
 
         // Handle canonical type "current".
-        $page = Arr::get($this->context->get('get'), 'page');
         $currentUrl = $this->context->get('current_url');
 
-        return $page ? "{$currentUrl}?page={$page}" : $currentUrl;
+        // Don't add the pagination parameter if it doesn't exists or there's no paginator on the page.
+        if (! app('request')->has('page') || ! Blink::get('tag-paginator')) {
+            return $currentUrl;
+        }
+
+        $page = (int) app('request')->get('page');
+
+        // Don't include the pagination parameter for the first page. We don't want the same site to be indexed with and without parameter.
+        return $page === 1
+            ? $currentUrl
+            : "{$currentUrl}?page={$page}";
+    }
+
+    protected function prevUrl(): ?string
+    {
+        if (! $paginator = Blink::get('tag-paginator')) {
+            return null;
+        }
+
+        $currentUrl = $this->context->get('current_url');
+
+        $page = $paginator->currentPage();
+
+        // Don't include the pagination parameter for the first page. We don't want the same site to be indexed with and without parameter.
+        if ($page === 2) {
+            return $currentUrl;
+        }
+
+        return $page > 1 && $page <= $paginator->lastPage()
+            ? $currentUrl . '?page=' . ($page - 1)
+            : null;
+    }
+
+    protected function nextUrl(): ?string
+    {
+        if (! $paginator = Blink::get('tag-paginator')) {
+            return null;
+        }
+
+        $currentUrl = $this->context->get('current_url');
+
+        $page = $paginator->currentPage();
+
+        return $page < $paginator->lastPage()
+            ? $currentUrl . '?page=' . ($page + 1)
+            : null;
     }
 
     protected function schema(): ?string

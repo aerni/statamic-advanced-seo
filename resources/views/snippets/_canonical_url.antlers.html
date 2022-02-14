@@ -1,1 +1,9 @@
 <link rel="canonical" href="{{ canonical }}">
+
+{{ if prev_url }}
+    <link href="{{ prev_url }}" rel="prev" />
+{{ /if }}
+
+{{ if next_url }}
+    <link href="{{ next_url }}" rel="next" />
+{{ /if }}
