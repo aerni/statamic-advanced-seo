@@ -1,20 +1,8 @@
 <template>
 
-    <div class="flex flex-col">
+    <div class="flex flex-col seo-mt-4">
 
-        <div>
-            <component
-                :is="fieldComponent"
-                :name="name"
-                :config="fieldConfig"
-                :value="fieldValue"
-                :read-only="isReadOnly || fieldSource === 'default'"
-                handle="source_value"
-                @input="updateCustomValue">
-            </component>
-        </div>
-
-        <div class="mt-1 button-group-fieldtype-wrapper">
+        <div class="button-group-fieldtype-wrapper">
             <div class="seo-h-auto btn-group source-btn-group">
                 <button class="btn seo-h-auto seo-text-xs" style="padding: 1px 5px;"
                     v-for="(option, index) in sourceOptions"
@@ -30,6 +18,18 @@
             </div>
         </div>
 
+        <div class="seo-mt-2.5">
+            <component
+                :is="fieldComponent"
+                :name="name"
+                :config="fieldConfig"
+                :value="fieldValue"
+                :read-only="isReadOnly || fieldSource === 'default'"
+                handle="source_value"
+                @input="updateFieldValue">
+            </component>
+        </div>
+
     </div>
 </template>
 
@@ -42,21 +42,34 @@ export default {
         return {
             autoBindChangeWatcher: false,
             changeWatcherWatchDeep: false,
+            tempValue: '',
         }
     },
 
     computed: {
 
         fieldSource() {
-            return this.value.source;
-        },
-
-        fieldValue() {
-            return this.fieldSource === 'default' ? this.fieldDefault : this.value.value;
+            return this.meta.source
         },
 
         fieldDefault() {
-            return this.fieldConfig.default;
+            return this.meta.default
+        },
+
+        fieldValue() {
+            return this.fieldSource === 'default' ? this.fieldDefault : this.value
+        },
+
+        fieldIsSynced() {
+            return this.$parent.$parent.isSynced
+        },
+
+        fieldComponent() {
+            return this.config.field.type.replace('.', '-') + '-fieldtype'
+        },
+
+        fieldConfig() {
+            return this.config.field
         },
 
         sourceOptions() {
@@ -66,34 +79,48 @@ export default {
             ]
         },
 
-        fieldComponent() {
-            return this.config.field.type.replace('.', '-') + '-fieldtype';
+        site() {
+            return this.$store.state.publish.base.site;
+        }
+
+    },
+
+    watch: {
+        fieldIsSynced(value) {
+            if (value === true && this.value === null) {
+                this.meta.source = 'default'
+            } else if (value === true && this.value !== null) {
+                this.meta.source = 'custom'
+            }
         },
 
-        fieldConfig() {
-            return this.config.field;
+        site() {
+            this.tempValue = '';
         },
-
     },
 
     methods: {
 
         sourceChanged(value) {
-            this.value.source = value;
+            if (this.meta.source === value) {
+                return;
+            }
 
-            if (value === 'custom' && ! this.value.value) {
-                this.updateCustomValue(this.fieldDefault)
-            } else {
-                this.updateCustomValue(this.value.value)
+            this.meta.source = value
+
+            if (value === 'default') {
+                this.tempValue = this.value
+                this.updateFieldValue('@default')
+            }
+
+            if (value === 'custom') {
+                let value = this.tempValue || this.fieldDefault
+                this.updateFieldValue(value)
             }
         },
 
-        updateCustomValue(value) {
-            let newValue = this.value;
-
-            newValue.value = value;
-
-            this.update(newValue);
+        updateFieldValue(value) {
+            this.update(value)
         },
 
     },

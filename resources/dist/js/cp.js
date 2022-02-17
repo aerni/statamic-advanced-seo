@@ -392,18 +392,28 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       autoBindChangeWatcher: false,
-      changeWatcherWatchDeep: false
+      changeWatcherWatchDeep: false,
+      tempValue: ''
     };
   },
   computed: {
     fieldSource: function fieldSource() {
-      return this.value.source;
-    },
-    fieldValue: function fieldValue() {
-      return this.fieldSource === 'default' ? this.fieldDefault : this.value.value;
+      return this.meta.source;
     },
     fieldDefault: function fieldDefault() {
-      return this.fieldConfig["default"];
+      return this.meta["default"];
+    },
+    fieldValue: function fieldValue() {
+      return this.fieldSource === 'default' ? this.fieldDefault : this.value;
+    },
+    fieldIsSynced: function fieldIsSynced() {
+      return this.$parent.$parent.isSynced;
+    },
+    fieldComponent: function fieldComponent() {
+      return this.config.field.type.replace('.', '-') + '-fieldtype';
+    },
+    fieldConfig: function fieldConfig() {
+      return this.config.field;
     },
     sourceOptions: function sourceOptions() {
       return [{
@@ -414,27 +424,43 @@ __webpack_require__.r(__webpack_exports__);
         value: 'custom'
       }];
     },
-    fieldComponent: function fieldComponent() {
-      return this.config.field.type.replace('.', '-') + '-fieldtype';
+    site: function site() {
+      return this.$store.state.publish.base.site;
+    }
+  },
+  watch: {
+    fieldIsSynced: function fieldIsSynced(value) {
+      if (value === true && this.value === null) {
+        this.meta.source = 'default';
+      } else if (value === true && this.value !== null) {
+        this.meta.source = 'custom';
+      }
     },
-    fieldConfig: function fieldConfig() {
-      return this.config.field;
+    site: function site() {
+      this.tempValue = '';
     }
   },
   methods: {
     sourceChanged: function sourceChanged(value) {
-      this.value.source = value;
+      if (this.meta.source === value) {
+        return;
+      }
 
-      if (value === 'custom' && !this.value.value) {
-        this.updateCustomValue(this.fieldDefault);
-      } else {
-        this.updateCustomValue(this.value.value);
+      this.meta.source = value;
+
+      if (value === 'default') {
+        this.tempValue = this.value;
+        this.updateFieldValue('@default');
+      }
+
+      if (value === 'custom') {
+        var _value = this.tempValue || this.fieldDefault;
+
+        this.updateFieldValue(_value);
       }
     },
-    updateCustomValue: function updateCustomValue(value) {
-      var newValue = this.value;
-      newValue.value = value;
-      this.update(newValue);
+    updateFieldValue: function updateFieldValue(value) {
+      this.update(value);
     }
   }
 });
@@ -1440,26 +1466,8 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "flex flex-col" }, [
-    _c(
-      "div",
-      [
-        _c(_vm.fieldComponent, {
-          tag: "component",
-          attrs: {
-            name: _vm.name,
-            config: _vm.fieldConfig,
-            value: _vm.fieldValue,
-            "read-only": _vm.isReadOnly || _vm.fieldSource === "default",
-            handle: "source_value",
-          },
-          on: { input: _vm.updateCustomValue },
-        }),
-      ],
-      1
-    ),
-    _vm._v(" "),
-    _c("div", { staticClass: "mt-1 button-group-fieldtype-wrapper" }, [
+  return _c("div", { staticClass: "flex flex-col seo-mt-4" }, [
+    _c("div", { staticClass: "button-group-fieldtype-wrapper" }, [
       _c(
         "div",
         { staticClass: "seo-h-auto btn-group source-btn-group" },
@@ -1487,6 +1495,25 @@ var render = function () {
         0
       ),
     ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "seo-mt-2.5" },
+      [
+        _c(_vm.fieldComponent, {
+          tag: "component",
+          attrs: {
+            name: _vm.name,
+            config: _vm.fieldConfig,
+            value: _vm.fieldValue,
+            "read-only": _vm.isReadOnly || _vm.fieldSource === "default",
+            handle: "source_value",
+          },
+          on: { input: _vm.updateFieldValue },
+        }),
+      ],
+      1
+    ),
   ])
 }
 var staticRenderFns = []

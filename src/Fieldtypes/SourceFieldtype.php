@@ -10,18 +10,22 @@ class SourceFieldtype extends Fieldtype
     protected static $handle = 'seo_source';
     protected $selectable = false;
 
-    public function preProcess(mixed $data): array
+    public function preProcess(mixed $data): mixed
     {
-        return $data === '@default'
-            ? ['source' => 'default', 'value' => null]
-            : ['source' => 'custom', 'value' => $data];
+        return $data === '@default' ? null : $data;
     }
 
     public function process(mixed $data): mixed
     {
-        return $data['source'] === 'default'
-            ? '@default'
-            : $this->sourceFieldtype()->process($data['value']);
+        return is_null($data) ? '@default' : $this->sourceFieldtype()->process($data);
+    }
+
+    public function preload(): array
+    {
+        return [
+            'source' => $this->field->value() ? 'custom' : 'default',
+            'default' => $this->sourceField()->defaultValue(),
+        ];
     }
 
     public function augment(mixed $data): mixed
