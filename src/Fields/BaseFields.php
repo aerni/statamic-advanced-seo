@@ -64,11 +64,6 @@ abstract class BaseFields implements Fields
 
     protected function getValueFromCascade(string $handle): mixed
     {
-        // We only need this data for the blueprints in the CP.
-        if (! $this->isCpRoute()) {
-            return null;
-        }
-
         // We can't get any defaults with no data.
         if ($this->data instanceof Collection && $this->data->isEmpty()) {
             return null;
