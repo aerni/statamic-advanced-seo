@@ -32,4 +32,7 @@ return [
     'social_images' => 'Generated social images|Generated social images for :count items',
     'social_images_queue' => 'Generating social images in the background|Generating social images for :count items in the background',
 
+    'default' => 'Default',
+    'custom' => 'Custom',
+
 ];

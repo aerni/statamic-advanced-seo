@@ -20,6 +20,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $fieldtypes = [
         Fieldtypes\SocialImagesPreviewFieldtype::class,
+        Fieldtypes\SourceFieldtype::class,
     ];
 
     // protected $listen = [
@@ -46,6 +47,10 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $scripts = [
         __DIR__.'/../resources/dist/js/cp.js',
+    ];
+
+    protected $stylesheets = [
+        __DIR__.'/../resources/dist/css/cp.css',
     ];
 
     protected $policies = [
