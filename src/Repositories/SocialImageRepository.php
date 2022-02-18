@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Content\SocialImage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -10,6 +11,8 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class SocialImageRepository
 {
+    use GetsContentDefaults;
+
     public function all(Entry $entry): array
     {
         return $this->types()->flatMap(function ($item, $type) use ($entry) {
@@ -36,11 +39,21 @@ class SocialImageRepository
             return Arr::get($this->types(), $type);
         }
 
-        return match ($type) {
-            'og' => Arr::get($this->types(), $type),
-            'twitter' => Arr::get($this->types(), "twitter.{$data->value('seo_twitter_card', 'summary')}"),
-            default => null,
-        };
+        if ($type === 'og') {
+            return Arr::get($this->types(), $type);
+        }
+
+        if ($type === 'twitter') {
+            $card = $data->value('seo_twitter_card', 'summary');
+
+            if (is_null($card) || $card === '@default') {
+                $card = $this->getContentDefaults($data)->get('seo_twitter_card', 'summary')->raw();
+            }
+
+            return Arr::get($this->types(), "twitter.{$card}");
+        }
+
+        return null;
     }
 
     public function sizeString(string $type): string
