@@ -10,6 +10,16 @@ class SourceFieldtype extends Fieldtype
     protected static $handle = 'seo_source';
     protected $selectable = false;
 
+    public function rules(): array
+    {
+        return $this->sourceFieldtype()->rules();
+    }
+
+    public function fieldRules(): ?array
+    {
+        return $this->sourceFieldtype()->fieldRules();
+    }
+
     public function preProcess(mixed $data): mixed
     {
         if (is_null($data) || $data === '@default') {

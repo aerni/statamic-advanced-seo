@@ -43,14 +43,14 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_title', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'max:60',
-                    ],
                     'field' => [
                         'type' => 'text',
                         'default' => $this->getValueFromCascade('seo_title'),
                         'character_limit' => 60,
                         'antlers' => false,
+                        'validate' => [
+                            'max:60',
+                        ],
                     ],
                 ],
             ],
@@ -61,13 +61,13 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_description', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'max:160',
-                    ],
                     'field' => [
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_description'),
                         'character_limit' => 160,
+                        'validate' => [
+                            'max:160',
+                        ],
                     ],
                 ],
             ],
@@ -189,14 +189,14 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_og_title', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'max:70',
-                    ],
                     'field' => [
                         'type' => 'text',
                         'default' => $this->getValueFromCascade('seo_og_title'),
                         'character_limit' => 70,
                         'antlers' => false,
+                        'validate' => [
+                            'max:70',
+                        ],
                     ],
                 ],
             ],
@@ -207,14 +207,13 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_og_description', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'max:200',
-                    ],
                     'field' => [
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_og_description'),
                         'character_limit' => 200,
-
+                        'validate' => [
+                            'max:200',
+                        ],
                     ],
                 ],
             ],
@@ -225,10 +224,6 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_og_image', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'image',
-                        'mimes:jpg,png',
-                    ],
                     'field' => [
                         'type' => 'assets',
                         'default' => $this->getValueFromCascade('seo_og_image'),
@@ -238,6 +233,10 @@ class OnPageSeoFields extends BaseFields
                         'mode' => 'list',
                         'allow_uploads' => true,
                         'restrict' => false,
+                        'validate' => [
+                            'image',
+                            'mimes:jpg,png',
+                        ],
                     ],
                 ],
             ],
@@ -285,14 +284,14 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_twitter_title', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'max:70',
-                    ],
                     'field' => [
                         'type' => 'text',
                         'default' => $this->getValueFromCascade('seo_twitter_title'),
                         'character_limit' => 70,
                         'antlers' => false,
+                        'validate' => [
+                            'max:70',
+                        ],
                     ],
                 ],
             ],
@@ -303,13 +302,13 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_twitter_description', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'max:200',
-                    ],
                     'field' => [
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_twitter_description'),
                         'character_limit' => 200,
+                        'validate' => [
+                            'max:200',
+                        ],
                     ],
                 ],
             ],
@@ -320,10 +319,6 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_twitter_image', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'image',
-                        'mimes:jpg,png',
-                    ],
                     'field' => [
                         'type' => 'assets',
                         'default' => $this->getValueFromCascade('seo_twitter_image'),
@@ -333,6 +328,10 @@ class OnPageSeoFields extends BaseFields
                         'mode' => 'list',
                         'allow_uploads' => true,
                         'restrict' => false,
+                        'validate' => [
+                            'image',
+                            'mimes:jpg,png',
+                        ],
                     ],
                 ],
             ],
@@ -381,9 +380,6 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_canonical_entry', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'required_if:seo_canonical_type,other',
-                    ],
                     'if' => [
                         'seo_canonical_type' => 'equals other',
                     ],
@@ -393,6 +389,9 @@ class OnPageSeoFields extends BaseFields
                         'component' => 'relationship',
                         'mode' => 'stack',
                         'max_items' => 1,
+                        'validate' => [
+                            'required_if:seo_canonical_type,other',
+                        ],
                     ],
                 ],
             ],
@@ -403,9 +402,6 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_canonical_custom', 'instructions'),
                     'type' => 'seo_source',
                     'localizable' => true,
-                    'validate' => [
-                        'required_if:seo_canonical_type,custom',
-                    ],
                     'if' => [
                         'seo_canonical_type' => 'equals custom',
                     ],
@@ -413,6 +409,9 @@ class OnPageSeoFields extends BaseFields
                         'type' => 'text',
                         'default' => $this->getValueFromCascade('seo_canonical_custom'),
                         'input_type' => 'url',
+                        'validate' => [
+                            'required_if:seo_canonical_type,custom',
+                        ],
                     ],
                 ],
             ],
