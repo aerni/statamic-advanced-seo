@@ -23,6 +23,7 @@
                 :is="fieldComponent"
                 :name="name"
                 :config="fieldConfig"
+                :meta="fieldMeta"
                 :value="fieldValue"
                 :read-only="isReadOnly || fieldSource === 'default'"
                 handle="source_value"
@@ -65,11 +66,19 @@ export default {
         },
 
         fieldComponent() {
-            return this.config.field.type.replace('.', '-') + '-fieldtype'
+            let type = this.config.field.type
+            let component = this.config.field.component
+            let field = component || type // Use the component name if it's an entries fieldtype.
+
+            return field.replace('.', '-') + '-fieldtype'
         },
 
         fieldConfig() {
             return this.config.field
+        },
+
+        fieldMeta() {
+            return this.meta.meta
         },
 
         sourceOptions() {
@@ -87,9 +96,12 @@ export default {
 
     watch: {
         fieldIsSynced(value) {
-            if (value === true && this.value === null) {
+            // Use isEqual because the data can be of different types.
+            // With the code fieldtype for instance the data is an object.
+
+            if (value === true && _.isEqual(this.value, this.fieldDefault)) {
                 this.meta.source = 'default'
-            } else if (value === true && this.value !== null) {
+            } else if (value === true && ! _.isEqual(this.value, this.fieldDefault)) {
                 this.meta.source = 'custom'
             }
         },
@@ -110,11 +122,12 @@ export default {
 
             if (value === 'default') {
                 this.tempValue = this.value
-                this.updateFieldValue('@default')
+                this.updateFieldValue(this.fieldDefault)
             }
 
             if (value === 'custom') {
                 let value = this.tempValue || this.fieldDefault
+                this.meta.meta = this.meta.defaultMeta // TODO: Do I really need this? I just copied it from SEO Pro.
                 this.updateFieldValue(value)
             }
         },

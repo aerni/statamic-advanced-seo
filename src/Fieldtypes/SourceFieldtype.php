@@ -12,26 +12,34 @@ class SourceFieldtype extends Fieldtype
 
     public function preProcess(mixed $data): mixed
     {
-        return $data === '@default' ? null : $data;
+        if (is_null($data) || $data === '@default') {
+            return $this->sourceFieldDefaultValue();
+        }
+
+        return $this->sourceFieldtype()->preProcess($data);
     }
 
     public function process(mixed $data): mixed
     {
-        return is_null($data) ? '@default' : $this->sourceFieldtype()->process($data);
+        return $this->isDefaultValue($data)
+            ? '@default' // TODO: Should we just save null?
+            : $this->sourceFieldtype()->process($data);
     }
 
     public function preload(): array
     {
         return [
-            'source' => $this->field->value() ? 'custom' : 'default',
-            'default' => $this->sourceField()->defaultValue(),
+            'source' => $this->source(),
+            'default' => $this->sourceFieldDefaultValue(),
+            'defaultMeta' => $this->sourceFieldDefaultMeta(),
+            'meta' => $this->sourceFieldMeta(),
         ];
     }
 
     public function augment(mixed $data): mixed
     {
         if ($data === '@default') {
-            $data = $this->sourceField()->defaultValue();
+            $data = $this->sourceFieldDefaultValue();
         }
 
         return $this->sourceFieldtype()->augment($data);
@@ -45,5 +53,35 @@ class SourceFieldtype extends Fieldtype
     protected function sourceFieldtype(): Fieldtype
     {
         return $this->sourceField()->fieldtype();
+    }
+
+    protected function sourceFieldDefaultValue(): mixed
+    {
+        return $this->sourceField()->setValue(null)->preProcess()->value();
+    }
+
+    protected function sourceFieldDefaultMeta(): mixed
+    {
+        return $this->sourceField()->setValue(null)->preProcess()->meta();
+    }
+
+    protected function sourceFieldMeta()
+    {
+        return $this->sourceField()->setValue($this->sourceFieldValue())->preProcess()->meta();
+    }
+
+    protected function isDefaultValue(mixed $value): mixed
+    {
+        return $value === $this->sourceFieldDefaultValue();
+    }
+
+    protected function source(): string
+    {
+        return $this->isDefaultValue($this->sourceFieldValue()) ? 'default' : 'custom';
+    }
+
+    protected function sourceFieldValue(): mixed
+    {
+        return $this->field->value();
     }
 }

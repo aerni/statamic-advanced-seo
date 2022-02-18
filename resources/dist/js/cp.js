@@ -387,6 +387,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mixins: [Fieldtype],
   data: function data() {
@@ -410,10 +411,17 @@ __webpack_require__.r(__webpack_exports__);
       return this.$parent.$parent.isSynced;
     },
     fieldComponent: function fieldComponent() {
-      return this.config.field.type.replace('.', '-') + '-fieldtype';
+      var type = this.config.field.type;
+      var component = this.config.field.component;
+      var field = component || type; // Use the component name if it's an entries fieldtype.
+
+      return field.replace('.', '-') + '-fieldtype';
     },
     fieldConfig: function fieldConfig() {
       return this.config.field;
+    },
+    fieldMeta: function fieldMeta() {
+      return this.meta.meta;
     },
     sourceOptions: function sourceOptions() {
       return [{
@@ -430,9 +438,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   watch: {
     fieldIsSynced: function fieldIsSynced(value) {
-      if (value === true && this.value === null) {
+      // Use isEqual because the data can be of different types.
+      // With the code fieldtype for instance the data is an object.
+      if (value === true && _.isEqual(this.value, this.fieldDefault)) {
         this.meta.source = 'default';
-      } else if (value === true && this.value !== null) {
+      } else if (value === true && !_.isEqual(this.value, this.fieldDefault)) {
         this.meta.source = 'custom';
       }
     },
@@ -450,11 +460,13 @@ __webpack_require__.r(__webpack_exports__);
 
       if (value === 'default') {
         this.tempValue = this.value;
-        this.updateFieldValue('@default');
+        this.updateFieldValue(this.fieldDefault);
       }
 
       if (value === 'custom') {
         var _value = this.tempValue || this.fieldDefault;
+
+        this.meta.meta = this.meta.defaultMeta; // TODO: Do I really need this? I just copied it from SEO Pro.
 
         this.updateFieldValue(_value);
       }
@@ -1505,6 +1517,7 @@ var render = function () {
           attrs: {
             name: _vm.name,
             config: _vm.fieldConfig,
+            meta: _vm.fieldMeta,
             value: _vm.fieldValue,
             "read-only": _vm.isReadOnly || _vm.fieldSource === "default",
             handle: "source_value",

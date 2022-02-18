@@ -42,23 +42,14 @@
     --tw-backdrop-saturate:  ;
     --tw-backdrop-sepia:  
 }
-.seo-mt-1\.5 {
-    margin-top: 0.375rem
-}
-.seo-mt-1 {
-    margin-top: 0.25rem
-}
-.seo-mt-2 {
-    margin-top: 0.5rem
-}
 .seo-mt-4 {
     margin-top: 1rem
 }
-.seo-mt-3 {
-    margin-top: 0.75rem
-}
 .seo-mt-2\.5 {
     margin-top: 0.625rem
+}
+.seo-mt-2 {
+    margin-top: 0.5rem
 }
 .seo-block {
     display: block
@@ -69,9 +60,5 @@
 .seo-text-xs {
     font-size: 0.75rem;
     line-height: 1rem
-}
-.seo-text-sm {
-    font-size: 0.875rem;
-    line-height: 1.25rem
 }
 
