@@ -200,7 +200,7 @@ class Cascade
         return $this->data->get('title') ?? $this->context->get('title');
     }
 
-    protected function titleSeparator(): Value|string
+    protected function titleSeparator(): Value
     {
         return $this->data->get('title_separator') ?? GeneralFields::getDefaultValue('title_separator');
     }
@@ -227,7 +227,7 @@ class Cascade
             ->all();
     }
 
-    protected function twitterCard(): Value|string
+    protected function twitterCard(): Value
     {
         return $this->data->get('twitter_card') ?? OnPageSeoFields::getDefaultValue('seo_twitter_card');
     }
@@ -411,7 +411,7 @@ class Cascade
 
     protected function siteSchema(): ?string
     {
-        $type = $this->data->get('site_json_ld_type')?->raw() ?? GeneralFields::getDefaultValue('site_json_ld_type');
+        $type = $this->data->get('site_json_ld_type')?->raw() ?? GeneralFields::getDefaultValue('site_json_ld_type')?->raw();
 
         if ($type === 'none') {
             return null;
