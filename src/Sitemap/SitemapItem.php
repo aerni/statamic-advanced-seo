@@ -3,14 +3,14 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Actions\DispatchBlueprintFoundEvent;
-use Statamic\Facades\Site;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Facades\Entry as EntryFacade;
-use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Site;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class SitemapItem
 {

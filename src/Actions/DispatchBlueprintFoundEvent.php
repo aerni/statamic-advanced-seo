@@ -3,9 +3,9 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\EntryBlueprintFound;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class DispatchBlueprintFoundEvent
 {
