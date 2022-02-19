@@ -128,7 +128,7 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
-                        'seo_generate_social_images' => 'equals true',
+                        'seo_generate_social_images.value' => 'equals true',
                     ],
                 ],
             ],
@@ -143,7 +143,7 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
-                        'seo_generate_social_images' => 'equals true',
+                        'seo_generate_social_images.value' => 'equals true',
                     ],
                 ],
             ],
@@ -164,7 +164,7 @@ class OnPageSeoFields extends BaseFields
 
             // Hide the fields if the toggle is of.
             $field['field']['if'] = [
-                'seo_generate_social_images' => 'equals true',
+                'seo_generate_social_images.value' => 'equals true',
             ];
 
             // Add the placeholder values from the content defaults.
@@ -249,7 +249,7 @@ class OnPageSeoFields extends BaseFields
         ];
 
         if ($this->displaySocialImagesGenerator()) {
-            $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
+            $fields[3]['field']['if']['seo_generate_social_images.value'] = 'equals false';
         }
 
         return $fields;
@@ -348,7 +348,7 @@ class OnPageSeoFields extends BaseFields
         ];
 
         if ($this->displaySocialImagesGenerator()) {
-            $fields[4]['field']['if']['seo_generate_social_images'] = 'equals false';
+            $fields[4]['field']['if']['seo_generate_social_images.value'] = 'equals false';
         }
 
         return $fields;
@@ -393,7 +393,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'if' => [
-                        'seo_canonical_type' => 'equals other',
+                        'seo_canonical_type.value' => 'equals other',
                     ],
                     'field' => [
                         'type' => 'entries',
@@ -416,7 +416,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'if' => [
-                        'seo_canonical_type' => 'equals custom',
+                        'seo_canonical_type.value' => 'equals custom',
                     ],
                     'field' => [
                         'type' => 'text',

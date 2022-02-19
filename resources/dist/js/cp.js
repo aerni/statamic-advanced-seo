@@ -399,13 +399,13 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     fieldSource: function fieldSource() {
-      return this.meta.source;
+      return this.value.source;
     },
     fieldDefault: function fieldDefault() {
       return this.meta["default"];
     },
     fieldValue: function fieldValue() {
-      return this.fieldSource === 'default' ? this.fieldDefault : this.value;
+      return this.value.value;
     },
     fieldIsSynced: function fieldIsSynced() {
       return this.$parent.$parent.isSynced;
@@ -440,10 +440,10 @@ __webpack_require__.r(__webpack_exports__);
     fieldIsSynced: function fieldIsSynced(value) {
       // Use isEqual because the data can be of different types.
       // With the code fieldtype for instance the data is an object.
-      if (value === true && _.isEqual(this.value, this.fieldDefault)) {
-        this.meta.source = 'default';
-      } else if (value === true && !_.isEqual(this.value, this.fieldDefault)) {
-        this.meta.source = 'custom';
+      if (value === true && _.isEqual(this.value.value, this.fieldDefault)) {
+        this.value.source = 'default';
+      } else if (value === true && !_.isEqual(this.value.value, this.fieldDefault)) {
+        this.value.source = 'custom';
       }
     },
     site: function site() {
@@ -452,27 +452,27 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     sourceChanged: function sourceChanged(value) {
-      if (this.meta.source === value) {
+      if (this.value.source === value) {
         return;
       }
 
-      this.meta.source = value;
+      this.value.source = value;
 
       if (value === 'default') {
-        this.tempValue = this.value;
+        this.tempValue = this.value.value;
         this.updateFieldValue(this.fieldDefault);
       }
 
       if (value === 'custom') {
         var _value = this.tempValue || this.fieldDefault;
 
-        this.meta.meta = this.meta.defaultMeta; // TODO: Do I really need this? I just copied it from SEO Pro.
-
         this.updateFieldValue(_value);
       }
     },
     updateFieldValue: function updateFieldValue(value) {
-      this.update(value);
+      var newValue = this.value;
+      newValue.value = value;
+      this.update(newValue);
     }
   }
 });

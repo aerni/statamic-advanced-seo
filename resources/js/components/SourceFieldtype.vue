@@ -50,7 +50,7 @@ export default {
     computed: {
 
         fieldSource() {
-            return this.meta.source
+            return this.value.source
         },
 
         fieldDefault() {
@@ -58,7 +58,7 @@ export default {
         },
 
         fieldValue() {
-            return this.fieldSource === 'default' ? this.fieldDefault : this.value
+            return this.value.value
         },
 
         fieldIsSynced() {
@@ -99,10 +99,10 @@ export default {
             // Use isEqual because the data can be of different types.
             // With the code fieldtype for instance the data is an object.
 
-            if (value === true && _.isEqual(this.value, this.fieldDefault)) {
-                this.meta.source = 'default'
-            } else if (value === true && ! _.isEqual(this.value, this.fieldDefault)) {
-                this.meta.source = 'custom'
+            if (value === true && _.isEqual(this.value.value, this.fieldDefault)) {
+                this.value.source = 'default'
+            } else if (value === true && ! _.isEqual(this.value.value, this.fieldDefault)) {
+                this.value.source = 'custom'
             }
         },
 
@@ -114,26 +114,29 @@ export default {
     methods: {
 
         sourceChanged(value) {
-            if (this.meta.source === value) {
+            if (this.value.source === value) {
                 return;
             }
 
-            this.meta.source = value
+            this.value.source = value
 
             if (value === 'default') {
-                this.tempValue = this.value
+                this.tempValue = this.value.value
                 this.updateFieldValue(this.fieldDefault)
             }
 
             if (value === 'custom') {
                 let value = this.tempValue || this.fieldDefault
-                this.meta.meta = this.meta.defaultMeta // TODO: Do I really need this? I just copied it from SEO Pro.
                 this.updateFieldValue(value)
             }
         },
 
         updateFieldValue(value) {
-            this.update(value)
+            let newValue = this.value;
+
+            newValue.value = value;
+
+            this.update(newValue);
         },
 
     },

@@ -4,35 +4,55 @@ namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Code;
 
 class SourceFieldtype extends Fieldtype
 {
     protected static $handle = 'seo_source';
     protected $selectable = false;
 
-    public function preProcess(mixed $data): mixed
+    public function preProcess(mixed $data): array
     {
-        return $data === '@default'
-            ? $this->sourceFieldPreProcessedDefaultValue()
-            : $this->sourceFieldtype()->preProcess($data);
+        if ($data === '@default') {
+            return ['source' => 'default', 'value' => $this->sourceFieldDefaultValue()];
+        }
+
+        if ($data === '@null') {
+            return ['source' => 'custom', 'value' => ''];
+        }
+
+        return ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess($data)];
     }
 
     public function process(mixed $data): mixed
     {
-        if (is_null($data) || $this->isDefaultValue($data)) {
+        if ($data['source'] === 'default') {
             return '@default';
         }
 
-        return $this->sourceFieldtype()->process($data);
+        if ($data['value'] === null) {
+            return '@null';
+        }
+
+        // Handle the Assets fieldtype.
+        if ($data['value'] === []) {
+            return '@null';
+        }
+
+        // Handle the Code fieldtype.
+        if ($this->sourceFieldtype() instanceof Code && $data['value']['code'] === '') {
+            return '@null';
+        }
+
+        return $this->sourceFieldtype()->process($data['value']);
     }
 
     public function preload(): array
     {
         return [
-            'source' => $this->source(),
-            'default' => $this->sourceFieldPreProcessedDefaultValue(),
-            'defaultMeta' => $this->sourceFieldPreProcessedDefaultMeta(),
-            'meta' => $this->sourceFieldPreProcessedMeta(),
+            'default' => $this->sourceFieldDefaultValue(),
+            'defaultMeta' => $this->sourceFieldDefaultMeta(),
+            'meta' => $this->sourceFieldMeta(),
         ];
     }
 
@@ -42,13 +62,22 @@ class SourceFieldtype extends Fieldtype
          * TODO: If the value is null it won't correctly get the value from the cascade.
          * How can we fix this?
          */
-        if (is_null($data) || $data === '@default') {
+        if ($data === '@default' || $data === null) {
             $defaultValue = $this->sourceField()->setValue(null)->defaultValue();
 
             return $this->sourceFieldtype()->augment($defaultValue);
         }
 
+        if ($data === '@null') {
+            return $this->sourceFieldtype()->augment(null);
+        }
+
         return $this->sourceFieldtype()->augment($data);
+    }
+
+    public function preProcessValidatable(mixed $value): mixed
+    {
+        return $value['value'];
     }
 
     public function rules(): array
@@ -71,33 +100,23 @@ class SourceFieldtype extends Fieldtype
         return $this->sourceField()->fieldtype();
     }
 
-    protected function sourceFieldPreProcessedDefaultValue(): mixed
+    protected function sourceFieldDefaultValue(): mixed
     {
         return $this->sourceField()->setValue(null)->preProcess()->value();
     }
 
-    protected function sourceFieldPreProcessedDefaultMeta(): mixed
+    protected function sourceFieldDefaultMeta(): mixed
     {
         return $this->sourceField()->setValue(null)->preProcess()->meta();
     }
 
-    protected function sourceFieldPreProcessedMeta(): mixed
+    protected function sourceFieldMeta(): mixed
     {
         return $this->sourceField()->setValue($this->sourceFieldValue())->preProcess()->meta();
     }
 
-    protected function isDefaultValue(mixed $value): mixed
-    {
-        return $value === $this->sourceFieldPreProcessedDefaultValue();
-    }
-
-    protected function source(): string
-    {
-        return $this->isDefaultValue($this->sourceFieldValue()) ? 'default' : 'custom';
-    }
-
     protected function sourceFieldValue(): mixed
     {
-        return $this->field->value();
+        return $this->field->value()['value'];
     }
 }
