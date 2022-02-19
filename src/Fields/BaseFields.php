@@ -7,7 +7,6 @@ use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\View\Cascade;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
