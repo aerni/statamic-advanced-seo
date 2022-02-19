@@ -19,7 +19,6 @@ class SourceFieldtype extends Fieldtype
 
     public function process(mixed $data): mixed
     {
-        // Make sure to always save `@default` so that we don't run into augmentation issues.
         if (is_null($data) || $this->isDefaultValue($data)) {
             return '@default';
         }
@@ -39,9 +38,11 @@ class SourceFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
-        return $data === '@default'
-            ? $this->sourceFieldDefaultValue()
-            : $this->sourceFieldtype()->augment($data);
+        if (is_null($data) || $data === '@default') {
+            return $this->sourceFieldDefaultValue();
+        }
+
+        return $this->sourceFieldtype()->augment($data);
     }
 
     public function rules(): array
