@@ -40,6 +40,8 @@ class SourceFieldtype extends Fieldtype
     {
         if (is_null($data) || $data === '@default') {
             return $this->sourceFieldDefaultValue();
+            // TODO: Shouldn't we augmented this default value as well?
+            // $this->sourceFieldtype()->augment($this->sourceFieldDefaultValue());
         }
 
         return $this->sourceFieldtype()->augment($data);
