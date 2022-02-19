@@ -2,14 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Facades\Entry as EntryFacade;
+use Aerni\AdvancedSeo\Actions\DispatchBlueprintFoundEvent;
 use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
 
 class SitemapItem
 {
@@ -26,6 +27,8 @@ class SitemapItem
         }
 
         $this->defaults = Seo::find($this->type(), $this->handle())?->in($site);
+
+        DispatchBlueprintFoundEvent::handle($this->content);
     }
 
     public function type(): string
@@ -57,16 +60,19 @@ class SitemapItem
             return $this->content->absoluteUrl();
         }
 
-        $canonicalType = $this->content->value('seo_canonical_type') ?? $this->defaults?->value('seo_canonical_type');
+        $canonicalType = $this->content->augmentedValue('seo_canonical_type')?->value()->value()
+             ?? $this->defaults?->augmentedValue('seo_canonical_type')?->value()->value();
 
         if ($canonicalType === 'other') {
-            $entryId = $this->content->value('seo_canonical_entry') ?? $this->defaults?->value('seo_canonical_entry');
+            $entryId = $this->content->augmentedValue('seo_canonical_entry')?->value()->id()
+                ?? $this->defaults?->augmentedValue('seo_canonical_entry')?->value()->id();
 
             return EntryFacade::find($entryId)->absoluteUrl();
         }
 
         if ($canonicalType === 'custom') {
-            return $this->content->value('seo_canonical_custom') ?? $this->defaults?->value('seo_canonical_custom');
+            return $this->content->augmentedValue('seo_canonical_custom')?->value()
+                ?? $this->defaults?->augmentedValue('seo_canonical_custom')?->value();
         }
 
         return $this->content->absoluteUrl();
@@ -96,8 +102,8 @@ class SitemapItem
             return ContentDefaultsFields::getDefaultValue('seo_sitemap_change_frequency');
         }
 
-        return $this->content->value('seo_sitemap_change_frequency')
-            ?? $this->defaults?->value('seo_sitemap_change_frequency')
+        return $this->content->augmentedValue('seo_sitemap_change_frequency')?->value()->value()
+            ?? $this->defaults?->augmentedValue('seo_sitemap_change_frequency')?->value()->value()
             ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_change_frequency');
     }
 
@@ -107,8 +113,8 @@ class SitemapItem
             return ContentDefaultsFields::getDefaultValue('seo_sitemap_priority');
         }
 
-        return $this->content->value('seo_sitemap_priority')
-            ?? $this->defaults?->value('seo_sitemap_priority')
+        return $this->content->augmentedValue('seo_sitemap_priority')?->value()->value()
+            ?? $this->defaults?->augmentedValue('seo_sitemap_priority')?->value()->value()
             ?? ContentDefaultsFields::getDefaultValue('seo_sitemap_priority');
     }
 
