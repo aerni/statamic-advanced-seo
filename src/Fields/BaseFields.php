@@ -69,6 +69,10 @@ abstract class BaseFields implements Fields
 
     protected function getValueFromCascade(string $handle): mixed
     {
+        /**
+         * TODO: We have to remove this to get the fall back default correctly if an entry value is null.
+         * However, this leads to other issues.
+         */
         // We can't get any defaults with no data.
         if ($this->data instanceof Collection && $this->data->isEmpty()) {
             return null;
