@@ -59,12 +59,10 @@ class SocialImagesGeneratorSubscriber
             ?->in($entry->site()->handle())
             ?->value('seo_generate_social_images');
 
-        $enabledOnEntry = $entry->value('seo_generate_social_images');
+        $enabledOnEntry = $entry->augmentedValue('seo_generate_social_images')->value();
 
-        if ($enabledOnEntry === '@default') {
-            return (bool) $enabledByDefault;
-        }
+        $enabled = $enabledOnEntry ?? $enabledByDefault;
 
-        return (bool) $enabledOnEntry;
+        return $enabled ? true : false;
     }
 }
