@@ -276,7 +276,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'button_group',
-                        'default' => $this->getValueFromCascade('seo_twitter_card') ?? 'summary', // TODO: Can we just fall back to the default value set in the ContentDefaultFields?
+                        'default' => $this->getValueFromCascade('seo_twitter_card') ?? 'summary',
                         'options' => [
                             'summary' => 'Regular',
                             'summary_large_image' => 'Large Image',

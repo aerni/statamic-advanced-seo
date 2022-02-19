@@ -12,6 +12,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 
 abstract class BaseFields implements Fields
 {
@@ -50,7 +52,7 @@ abstract class BaseFields implements Fields
         })->toArray();
     }
 
-    public static function getDefaultValue(string $key): mixed
+    public static function getDefaultValue(string $key): Value
     {
         return self::getDefaultValues()->get($key);
     }
@@ -58,8 +60,11 @@ abstract class BaseFields implements Fields
     public static function getDefaultValues(): Collection
     {
         return collect((new static)->sections())->flatten(1)->mapWithKeys(function ($item) {
-            return [$item['handle'] => Arr::get($item['field'], 'default')];
-        })->filter(fn ($value) => $value !== null);
+            $field = new Field($item['handle'], $item['field']);
+            $augmented = $field->setValue($field->defaultValue())->augment()->value();
+
+            return [$item['handle'] => $augmented];
+        });
     }
 
     protected function getValueFromCascade(string $handle): mixed
