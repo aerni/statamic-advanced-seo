@@ -30,7 +30,7 @@ class SocialImagesPreviewFieldtype extends Fieldtype
             return false;
         }
 
-        if (! $parent->value('seo_generate_social_images')) {
+        if (! $parent->augmentedValue('seo_generate_social_images')?->value()) {
             return false;
         }
 
