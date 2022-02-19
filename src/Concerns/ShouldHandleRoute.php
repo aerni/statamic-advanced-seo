@@ -12,7 +12,7 @@ trait ShouldHandleRoute
             'statamic.site',
             'advanced-seo.social_images.show',
             'advanced-seo.sitemap.index',
-            'advanced-seo.sitemap.show'
+            'advanced-seo.sitemap.show',
         ];
 
         if (! in_array($currentRoute, $allowedRoutes)) {
