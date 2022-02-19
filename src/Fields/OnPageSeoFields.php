@@ -42,6 +42,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Meta Title',
                     'instructions' => $this->trans('seo_title', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
@@ -60,6 +61,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Meta Description',
                     'instructions' => $this->trans('seo_description', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'textarea',
@@ -107,6 +109,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Generate Social Images',
                     'instructions' => $this->trans('seo_generate_social_images', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'toggle',
@@ -188,6 +191,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Open Graph Title',
                     'instructions' => $this->trans('seo_og_title', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
@@ -206,6 +210,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Open Graph Description',
                     'instructions' => $this->trans('seo_og_description', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'textarea',
@@ -223,6 +228,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Open Graph Image',
                     'instructions' => $this->trans('seo_og_image', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'assets',
@@ -266,6 +272,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Twitter Card',
                     'instructions' => $this->trans('seo_twitter_card', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'button_group',
@@ -283,6 +290,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Twitter Title',
                     'instructions' => $this->trans('seo_twitter_title', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
@@ -301,6 +309,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Twitter Description',
                     'instructions' => $this->trans('seo_twitter_description', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'textarea',
@@ -318,6 +327,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Twitter Image',
                     'instructions' => $this->trans('seo_twitter_image', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'assets',
@@ -361,6 +371,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Canonical URL',
                     'instructions' => $this->trans('seo_canonical_type', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'button_group',
@@ -379,6 +390,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Entry',
                     'instructions' => $this->trans('seo_canonical_entry', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'if' => [
                         'seo_canonical_type' => 'equals other',
@@ -401,6 +413,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'URL',
                     'instructions' => $this->trans('seo_canonical_custom', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'if' => [
                         'seo_canonical_type' => 'equals custom',
@@ -435,6 +448,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Noindex',
                     'instructions' => $this->trans('seo_noindex', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'width' => 50,
                     'field' => [
@@ -449,6 +463,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Nofollow',
                     'instructions' => $this->trans('seo_nofollow', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'width' => 50,
                     'field' => [
@@ -481,6 +496,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Priority',
                     'instructions' => $this->trans('seo_sitemap_priority', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'width' => 50,
                     'field' => [
@@ -514,6 +530,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Change Frequency',
                     'instructions' => $this->trans('seo_sitemap_change_frequency', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'width' => 50,
                     'field' => [
@@ -557,6 +574,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'JSON-LD Schema',
                     'instructions' => $this->trans('seo_json_ld', 'instructions'),
                     'type' => 'seo_source',
+                    'default' => '@default',
                     'localizable' => true,
                     'field' => [
                         'type' => 'code',

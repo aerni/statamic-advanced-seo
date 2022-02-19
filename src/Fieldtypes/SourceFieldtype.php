@@ -10,29 +10,17 @@ class SourceFieldtype extends Fieldtype
     protected static $handle = 'seo_source';
     protected $selectable = false;
 
-    public function rules(): array
-    {
-        return $this->sourceFieldtype()->rules();
-    }
-
-    public function fieldRules(): ?array
-    {
-        return $this->sourceFieldtype()->fieldRules();
-    }
-
     public function preProcess(mixed $data): mixed
     {
-        if (is_null($data) || $data === '@default') {
-            return $this->sourceFieldDefaultValue();
-        }
-
-        return $this->sourceFieldtype()->preProcess($data);
+        return $data === '@default'
+            ? $this->sourceFieldDefaultValue()
+            : $this->sourceFieldtype()->preProcess($data);
     }
 
     public function process(mixed $data): mixed
     {
         return $this->isDefaultValue($data)
-            ? '@default' // TODO: Should we just save null?
+            ? '@default'
             : $this->sourceFieldtype()->process($data);
     }
 
@@ -48,11 +36,19 @@ class SourceFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
-        if ($data === '@default') {
-            $data = $this->sourceFieldDefaultValue();
-        }
+        return $data === '@default'
+            ? $this->sourceFieldDefaultValue()
+            : $this->sourceFieldtype()->augment($data);
+    }
 
-        return $this->sourceFieldtype()->augment($data);
+    public function rules(): array
+    {
+        return $this->sourceFieldtype()->rules();
+    }
+
+    public function fieldRules(): ?array
+    {
+        return $this->sourceFieldtype()->fieldRules();
     }
 
     protected function sourceField(): Field
@@ -75,7 +71,7 @@ class SourceFieldtype extends Fieldtype
         return $this->sourceField()->setValue(null)->preProcess()->meta();
     }
 
-    protected function sourceFieldMeta()
+    protected function sourceFieldMeta(): mixed
     {
         return $this->sourceField()->setValue($this->sourceFieldValue())->preProcess()->meta();
     }
