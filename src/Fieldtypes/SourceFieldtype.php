@@ -19,9 +19,12 @@ class SourceFieldtype extends Fieldtype
 
     public function process(mixed $data): mixed
     {
-        return $this->isDefaultValue($data)
-            ? '@default'
-            : $this->sourceFieldtype()->process($data);
+        // Make sure to always save `@default` so that we don't run into augmentation issues.
+        if (is_null($data) || $this->isDefaultValue($data)) {
+            return '@default';
+        }
+
+        return $this->sourceFieldtype()->process($data);
     }
 
     public function preload(): array
