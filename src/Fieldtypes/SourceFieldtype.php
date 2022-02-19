@@ -39,9 +39,9 @@ class SourceFieldtype extends Fieldtype
     public function augment(mixed $data): mixed
     {
         if (is_null($data) || $data === '@default') {
-            return $this->sourceFieldDefaultValue();
-            // TODO: Shouldn't we augmented this default value as well?
-            // $this->sourceFieldtype()->augment($this->sourceFieldDefaultValue());
+            $defaultValue = $this->sourceField()->setValue(null)->defaultValue();
+
+            return $this->sourceFieldtype()->augment($defaultValue);
         }
 
         return $this->sourceFieldtype()->augment($data);
