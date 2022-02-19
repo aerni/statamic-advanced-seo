@@ -184,7 +184,7 @@ class Cascade
 
     protected function compiledTitle(): string
     {
-        $titlePosition = $this->data->get('title_position')?->raw() ?? GeneralFields::getDefaultValue('title_position');
+        $titlePosition = $this->data->get('title_position')?->raw() ?? GeneralFields::getDefaultValue('title_position')?->raw();
 
         return $titlePosition === 'before'
             ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
