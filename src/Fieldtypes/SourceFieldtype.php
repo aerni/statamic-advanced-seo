@@ -13,7 +13,7 @@ class SourceFieldtype extends Fieldtype
     public function preProcess(mixed $data): mixed
     {
         return $data === '@default'
-            ? $this->sourceFieldDefaultValue()
+            ? $this->sourceFieldPreProcessedDefaultValue()
             : $this->sourceFieldtype()->preProcess($data);
     }
 
@@ -30,9 +30,9 @@ class SourceFieldtype extends Fieldtype
     {
         return [
             'source' => $this->source(),
-            'default' => $this->sourceFieldDefaultValue(),
-            'defaultMeta' => $this->sourceFieldDefaultMeta(),
-            'meta' => $this->sourceFieldMeta(),
+            'default' => $this->sourceFieldPreProcessedDefaultValue(),
+            'defaultMeta' => $this->sourceFieldPreProcessedDefaultMeta(),
+            'meta' => $this->sourceFieldPreProcessedMeta(),
         ];
     }
 
@@ -67,24 +67,24 @@ class SourceFieldtype extends Fieldtype
         return $this->sourceField()->fieldtype();
     }
 
-    protected function sourceFieldDefaultValue(): mixed
+    protected function sourceFieldPreProcessedDefaultValue(): mixed
     {
         return $this->sourceField()->setValue(null)->preProcess()->value();
     }
 
-    protected function sourceFieldDefaultMeta(): mixed
+    protected function sourceFieldPreProcessedDefaultMeta(): mixed
     {
         return $this->sourceField()->setValue(null)->preProcess()->meta();
     }
 
-    protected function sourceFieldMeta(): mixed
+    protected function sourceFieldPreProcessedMeta(): mixed
     {
         return $this->sourceField()->setValue($this->sourceFieldValue())->preProcess()->meta();
     }
 
     protected function isDefaultValue(mixed $value): mixed
     {
-        return $value === $this->sourceFieldDefaultValue();
+        return $value === $this->sourceFieldPreProcessedDefaultValue();
     }
 
     protected function source(): string
