@@ -1479,7 +1479,7 @@ var render = function () {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "flex flex-col seo-mt-4" }, [
-    _c("div", { staticClass: "button-group-fieldtype-wrapper" }, [
+    _c("div", { staticClass: "self-start button-group-fieldtype-wrapper" }, [
       _c(
         "div",
         { staticClass: "seo-h-auto btn-group source-btn-group" },

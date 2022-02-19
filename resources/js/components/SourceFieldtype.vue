@@ -2,7 +2,7 @@
 
     <div class="flex flex-col seo-mt-4">
 
-        <div class="button-group-fieldtype-wrapper">
+        <div class="self-start button-group-fieldtype-wrapper">
             <div class="seo-h-auto btn-group source-btn-group">
                 <button class="btn seo-h-auto seo-text-xs" style="padding: 1px 5px;"
                     v-for="(option, index) in sourceOptions"
