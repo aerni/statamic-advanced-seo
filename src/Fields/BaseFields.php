@@ -51,7 +51,7 @@ abstract class BaseFields implements Fields
         })->toArray();
     }
 
-    public static function getDefaultValue(string $key): Value
+    public static function getDefaultValue(string $key): ?Value
     {
         return self::getDefaultValues()->get($key);
     }
