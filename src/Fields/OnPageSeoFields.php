@@ -276,7 +276,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'button_group',
-                        'default' => $this->getValueFromCascade('seo_twitter_card') ?? 'summary',
+                        'default' => $this->getValueFromCascade('seo_twitter_card'),
                         'options' => [
                             'summary' => 'Regular',
                             'summary_large_image' => 'Large Image',
@@ -375,7 +375,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'button_group',
-                        'default' => $this->getValueFromCascade('seo_canonical_type') ?? 'current',
+                        'default' => $this->getValueFromCascade('seo_canonical_type'),
                         'options' => [
                             'current' => 'Current ' . ucfirst(str_singular($this->typePlaceholder())),
                             'other' => 'Other Entry',
@@ -501,7 +501,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'field' => [
                         'type' => 'select',
-                        'default' => $this->getValueFromCascade('seo_sitemap_priority') ?? '0.5',
+                        'default' => $this->getValueFromCascade('seo_sitemap_priority'),
                         'options' => [
                             '0.0' => '0.0',
                             '0.1' => '0.1',
@@ -535,7 +535,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'field' => [
                         'type' => 'select',
-                        'default' => $this->getValueFromCascade('seo_sitemap_change_frequency') ?? 'daily',
+                        'default' => $this->getValueFromCascade('seo_sitemap_change_frequency'),
                         'options' => [
                             'always' => 'Always',
                             'hourly' => 'Hourly',
