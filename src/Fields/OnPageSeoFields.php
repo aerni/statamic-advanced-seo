@@ -46,7 +46,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_title'),
+                        'default' => $this->getValueFromCascade('seo_title') ?? $this->data->get('title'),
                         'character_limit' => 60,
                         'antlers' => false,
                         'validate' => [

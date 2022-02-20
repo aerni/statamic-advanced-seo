@@ -60,6 +60,7 @@ class AdvancedSeoTags extends Tags
         return Blink::once('advanced-seo::cascade', function () {
             return Cascade::from($this->context)
                 ->withSiteDefaults()
+                ->withContentDefaults()
                 ->withPageData()
                 ->processForFrontend()
                 ->get();

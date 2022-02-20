@@ -68,14 +68,14 @@ abstract class BaseFields implements Fields
 
     protected function getValueFromCascade(string $handle): mixed
     {
-        /**
-         * TODO: We have to remove this to get the fall back default correctly if an entry value is null.
-         * However, this leads to other issues.
-         */
         // We can't get any defaults with no data.
         if ($this->data instanceof Collection && $this->data->isEmpty()) {
             return null;
         }
+
+        // TODO: Refactor the cascade so that $this->data will be part of the data too.
+        // Then we don't have to do: $this->getValueFromCascade('seo_title') ?? $this->data->get('title')
+        // anymore but can simply do: $this->getValueFromCascade('seo_title')
 
         return Cascade::from($this->data)
             ->withContentDefaults()

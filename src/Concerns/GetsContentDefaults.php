@@ -2,22 +2,30 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection as LaravelCollection;
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Blink;
 use Statamic\Fields\Value;
-use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Tags\Context;
+use Statamic\Facades\Blink;
 use Statamic\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Facades\Entry as EntryFacade;
+use Illuminate\Support\Collection as LaravelCollection;
+use Statamic\Facades\Taxonomy as FacadesTaxonomy;
+use Statamic\Stache\Query\TermQueryBuilder;
 
 trait GetsContentDefaults
 {
     use GetsLocale;
 
-    public function getContentDefaults(Entry|Term|LocalizedTerm|LaravelCollection $data, string $locale = null): LaravelCollection
+    public function getContentDefaults(Entry|Term|LocalizedTerm|LaravelCollection|Context $data, string $locale = null): LaravelCollection
     {
+        if (! $this->canGetContentDefaults($data)) {
+            return collect();
+        }
+
         $parent = $this->getContentParent($data);
         $locale = $locale ?? $this->getLocale($data);
 
@@ -38,7 +46,7 @@ trait GetsContentDefaults
         return "advanced-seo::{$this->getContentType($parent)}::{$this->getContentHandle($parent)}::{$locale}";
     }
 
-    protected function getContentParent(Entry|Term|LocalizedTerm|LaravelCollection $data): Collection|Taxonomy|LaravelCollection
+    protected function getContentParent(Entry|Term|LocalizedTerm|Context|LaravelCollection $data): Collection|Taxonomy|LaravelCollection
     {
         if ($data instanceof Entry) {
             return $data->collection();
@@ -46,6 +54,14 @@ trait GetsContentDefaults
 
         if ($data instanceof Term || $data instanceof LocalizedTerm) {
             return $data->taxonomy();
+        }
+
+        if ($data instanceof Context && $data->get('collection') instanceof Collection) {
+            return $data->get('collection');
+        }
+
+        if ($data instanceof Context && $data->get('taxonomy') instanceof Taxonomy) {
+            return $data->get('taxonomy');
         }
 
         return $data;
@@ -75,5 +91,15 @@ trait GetsContentDefaults
         }
 
         return $parent->get('handle');
+    }
+
+    protected function canGetContentDefaults(mixed $data): bool
+    {
+        // If the context is a taxonomy, we don't have any defaults.
+        if ($data instanceof Context && $data->get('terms') instanceof TermQueryBuilder) {
+            return false;
+        }
+
+        return true;
     }
 }
