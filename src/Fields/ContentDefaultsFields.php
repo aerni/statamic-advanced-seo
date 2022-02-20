@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Fieldset;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\Site;
 
 class ContentDefaultsFields extends BaseFields
 {

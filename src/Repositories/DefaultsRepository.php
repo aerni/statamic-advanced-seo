@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Statamic\Facades\YAML;
-use Statamic\Facades\Blink;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
+use Statamic\Facades\YAML;
 
 class DefaultsRepository
 {

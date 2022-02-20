@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Facades\Defaults;
 
 class GeneralFields extends BaseFields
 {
