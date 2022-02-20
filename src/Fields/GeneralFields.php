@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Facades\Defaults;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 
 class GeneralFields extends BaseFields
@@ -60,7 +61,7 @@ class GeneralFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'display' => 'Title Separator',
-                    'default' => '|',
+                    'default' => Defaults::data('general')->get('title_separator'),
                 ],
             ],
             [
@@ -70,7 +71,7 @@ class GeneralFields extends BaseFields
                         'before' => 'Before',
                         'after' => 'After',
                     ],
-                    'default' => 'before',
+                    'default' => Defaults::data('general')->get('title_position'),
                     'localizable' => true,
                     'type' => 'button_group',
                     'instructions' => 'Diplay the meta title before or after the site name.',
@@ -96,7 +97,7 @@ class GeneralFields extends BaseFields
                         'person' => 'Person',
                         'custom' => 'Custom',
                     ],
-                    'default' => 'none',
+                    'default' => Defaults::data('general')->get('site_json_ld_type'),
                     'localizable' => false,
                     'type' => 'button_group',
                     'instructions' => 'The type of content this site represents.',
@@ -193,7 +194,7 @@ class GeneralFields extends BaseFields
                     'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your pages.',
                     'listable' => false,
                     'display' => 'Breadcrumbs',
-                    'default' => false,
+                    'default' => Defaults::data('general')->get('breadcrumbs'),
                 ],
             ],
         ];

@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Facades\Defaults;
+
 class IndexingFields extends BaseFields
 {
     public function sections(): array
@@ -33,6 +35,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
+                    'default' => Defaults::data('indexing')->get('noindex'),
                 ],
             ],
             [
@@ -44,6 +47,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
+                    'default' => Defaults::data('indexing')->get('nofollow'),
                 ],
             ],
         ];

@@ -1,0 +1,7 @@
+seo_generate_social_images: false
+seo_twitter_card: summary
+seo_canonical_type: current
+seo_noindex: false
+seo_nofollow: false
+seo_sitemap_priority: '0.5'
+seo_sitemap_change_frequency: daily

@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
+use Statamic\Facades\YAML;
+use Statamic\Facades\Blink;
 use Illuminate\Support\Collection;
 
 class DefaultsRepository
@@ -25,6 +27,16 @@ class DefaultsRepository
         return $this->all()->groupBy('group')->keys();
     }
 
+    public function data(string $key): Collection
+    {
+        return Blink::once("advanced-seo::defaults::$key", function () use ($key) {
+            $path = $this->all()->firstWhere('handle', $key)['data'];
+            $data = YAML::file($path)->parse();
+
+            return collect($data);
+        });
+    }
+
     public function all(): Collection
     {
         $defaults = collect([
@@ -33,30 +45,35 @@ class DefaultsRepository
                 'handle' => 'general',
                 'title' => 'General',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::class,
+                'data' => __DIR__.'/../../content/general.yaml',
             ],
             [
                 'group' => 'site',
                 'handle' => 'indexing',
                 'title' => 'Indexing',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::class,
+                'data' => __DIR__.'/../../content/indexing.yaml',
             ],
             [
                 'group' => 'site',
                 'handle' => 'social_media',
                 'title' => 'Social Media',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint::class,
+                'data' => __DIR__.'/../../content/social_media.yaml',
             ],
             [
                 'group' => 'content',
                 'handle' => 'collections',
                 'title' => 'Collections',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
+                'data' => __DIR__.'/../../content/content.yaml',
             ],
             [
                 'group' => 'content',
                 'handle' => 'taxonomies',
                 'title' => 'Taxonomies',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
+                'data' => __DIR__.'/../../content/content.yaml',
             ],
         ]);
 
@@ -66,6 +83,7 @@ class DefaultsRepository
                 'handle' => 'analytics',
                 'title' => 'Analytics',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
+                'data' => __DIR__.'/../../content/analytics.yaml',
             ]);
         }
 
@@ -75,6 +93,7 @@ class DefaultsRepository
                 'handle' => 'favicons',
                 'title' => 'Favicons',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::class,
+                'data' => __DIR__.'/../../content/favicons.yaml',
             ]);
         }
 
