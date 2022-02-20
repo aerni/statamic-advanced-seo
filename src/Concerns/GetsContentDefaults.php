@@ -9,12 +9,11 @@ use Statamic\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
+use Aerni\AdvancedSeo\Facades\Defaults;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Entries\Collection;
-use Statamic\Facades\Entry as EntryFacade;
-use Illuminate\Support\Collection as LaravelCollection;
-use Statamic\Facades\Taxonomy as FacadesTaxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Illuminate\Support\Collection as LaravelCollection;
 
 trait GetsContentDefaults
 {
@@ -30,14 +29,18 @@ trait GetsContentDefaults
         $locale = $locale ?? $this->getLocale($data);
 
         return Blink::once($this->getContentCacheKey($parent, $locale), function () use ($parent, $locale) {
-            $defaults = Seo::find($this->getContentType($parent), $this->getContentHandle($parent))
-                ?->in($locale)
-                ?->toAugmentedArray();
+            $defaultSet = Seo::findOrMake($this->getContentType($parent), $this->getContentHandle($parent));
 
-            return collect($defaults)->filter(function ($item) {
-                // Only return values that have a corresponding field in the blueprint.
-                return $item instanceof Value && $item->raw() !== null;
-            });
+            if (! $defaultSet->existsIn($locale)) {
+                $defaultSet->addLocalization($defaultSet->makeLocalization($locale));
+            }
+
+            $data = Defaults::data('collections')->merge($defaultSet->in($locale)->data())->all();
+
+            return $defaultSet->in($locale)
+                ->data($data)
+                ->toAugmentedCollection()
+                ->filter(fn ($item) => $item instanceof Value && $item->raw() !== null);
         });
     }
 
