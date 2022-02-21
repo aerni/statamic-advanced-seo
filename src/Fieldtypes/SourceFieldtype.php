@@ -58,10 +58,6 @@ class SourceFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
-        /**
-         * TODO: If the value is null it won't correctly get the value from the cascade.
-         * How can we fix this?
-         */
         if ($data === '@default' || $data === null) {
             $defaultValue = $this->sourceField()->setValue(null)->defaultValue();
 
