@@ -162,20 +162,12 @@ class SeoDefaultSet implements Contract
     {
         // Get the blueprint for the site defaults like general, sitemap, favicons, etc.
         if ($this->type() === 'site') {
-            $blueprint = Defaults::site()->first(function ($default) {
-                return $default['handle'] === $this->handle;
-            })['blueprint'];
-
-            return resolve($blueprint)->make()->get();
+            return resolve(Defaults::blueprint($this->handle))->make()->get();
         }
 
         // Get the blueprint for the content defaults like collections and taxonomies.
-        $blueprint = Defaults::content()->first(function ($default) {
-            return $default['handle'] === $this->type;
-        })['blueprint'];
-
         // We are passing some data because we are conditionally showing/hiding fields based on it.
-        return resolve($blueprint)->make()
+        return resolve(Defaults::blueprint($this->type))->make()
             ->data(collect([
                 'type' => $this->type,
                 'handle' => $this->handle,
