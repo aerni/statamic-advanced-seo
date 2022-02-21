@@ -2,20 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Fields\Value;
-use Statamic\Tags\Context;
-use Illuminate\Support\Str;
-use Statamic\Facades\Blink;
-use Statamic\Taxonomies\Taxonomy;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Stache\Query\TermQueryBuilder;
 use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection as LaravelCollection;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Tags\Context;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Taxonomies\Taxonomy;
 
 trait GetsContentDefaults
 {

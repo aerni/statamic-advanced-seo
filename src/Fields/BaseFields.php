@@ -2,18 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Statamic\Fields\Field;
-use Statamic\Fields\Value;
-use Illuminate\Support\Str;
-use Statamic\Facades\Blink;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\View\Cascade;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Contracts\Fields;
-use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Aerni\AdvancedSeo\Contracts\Fields;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
 
 abstract class BaseFields implements Fields
 {

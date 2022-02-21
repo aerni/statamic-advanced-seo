@@ -2,17 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Statamic;
-use Statamic\Events\Event;
-use Statamic\Facades\Site;
-use Illuminate\Support\Str;
-use Statamic\Fields\Blueprint;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\EntryBlueprintFound;
+use Statamic\Events\Event;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Facades\Site;
+use Statamic\Fields\Blueprint;
+use Statamic\Statamic;
+use Statamic\Taxonomies\LocalizedTerm;
 
 trait GetsEventData
 {

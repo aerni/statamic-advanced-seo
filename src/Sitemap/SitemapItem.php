@@ -2,17 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Site;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Statamic\Taxonomies\LocalizedTerm;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Facades\Entry as EntryFacade;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
-use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
 use Aerni\AdvancedSeo\Actions\DispatchBlueprintFoundEvent;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Site;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class SitemapItem
 {

@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Statamic;
-use Statamic\Facades\Site;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
+use Statamic\Statamic;
 
 trait GetsLocale
 {

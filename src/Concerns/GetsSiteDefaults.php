@@ -2,14 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Fields\Value;
-use Statamic\Facades\Blink;
-use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
+use Statamic\Facades\Blink;
 
 trait GetsSiteDefaults
 {
