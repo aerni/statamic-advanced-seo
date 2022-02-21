@@ -103,7 +103,7 @@ class OnPageSeoBlueprintSubscriber
 
     protected function extendBlueprintForFrontend(Event $event): void
     {
-        if (! $this->isFrontendRoute()) {
+        if (Statamic::isCpRoute()) {
             return;
         }
 

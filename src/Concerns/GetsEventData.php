@@ -2,16 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events\EntryBlueprintFound;
+use Statamic\Statamic;
 use Statamic\Events\Event;
-use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades\Site;
+use Illuminate\Support\Str;
 use Statamic\Fields\Blueprint;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Events\EntryBlueprintFound;
 
 trait GetsEventData
 {
@@ -59,7 +60,7 @@ trait GetsEventData
         $data = $this->getProperty($event);
 
         // Make sure to get the data in the correct locale.
-        if ($data && $this->isFrontendRoute()) {
+        if ($data && ! Statamic::isCpRoute()) {
             return $data->in(Site::current()->handle());
         }
 
