@@ -2,13 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
+use Statamic\Fields\Value;
+use Statamic\Facades\Blink;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Blink;
-use Statamic\Fields\Value;
+use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
 
 trait GetsSiteDefaults
 {
@@ -24,11 +25,7 @@ trait GetsSiteDefaults
 
         return Blink::once($this->getSiteCacheKey($locale), function () use ($locale) {
             return Defaults::enabledInGroup('site')->flatMap(function ($model) use ($locale) {
-                return Seo::findOrMake('site', $model['handle'])
-                    ->ensureLocalizations(collect($locale))
-                    ->in($locale)
-                    ->toAugmentedCollection()
-                    ->filter(fn ($item) => $item instanceof Value && $item->raw() !== null);
+                return GetAugmentedDefaults::handle('site', $model['handle'], $locale);
             });
         });
     }

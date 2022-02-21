@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
+use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection as LaravelCollection;
@@ -29,11 +30,10 @@ trait GetsContentDefaults
         $locale = $locale ?? $this->getLocale($data);
 
         return Blink::once($this->getContentCacheKey($parent, $locale), function () use ($parent, $locale) {
-            return Seo::findOrMake($this->getContentType($parent), $this->getContentHandle($parent))
-                ->ensureLocalizations(collect($locale))
-                ->in($locale)
-                ->toAugmentedCollection()
-                ->filter(fn ($item) => $item instanceof Value && $item->raw() !== null);
+            $type = $this->getContentType($parent);
+            $handle = $this->getContentHandle($parent);
+
+            return GetAugmentedDefaults::handle($type, $handle, $locale);
         });
     }
 
