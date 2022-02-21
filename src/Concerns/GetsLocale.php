@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
+use Statamic\Statamic;
+use Statamic\Facades\Site;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Site;
 
 trait GetsLocale
 {
@@ -18,15 +19,15 @@ trait GetsLocale
         }
 
         if ($data instanceof Term) {
-            return $this->isCpRoute() ? basename(request()->path()) : Site::current()->handle();
+            return Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle();
         }
 
         if ($data instanceof Collection) {
-            return $this->isCpRoute()
+            return Statamic::isCpRoute()
                 ? $data->get('locale') ?? Site::selected()->handle()
                 : Site::current()->handle();
         }
 
-        return $this->isCpRoute() ? Site::selected()->handle() : Site::current()->handle();
+        return Statamic::isCpRoute() ? Site::selected()->handle() : Site::current()->handle();
     }
 }

@@ -21,13 +21,4 @@ trait ShouldHandleRoute
 
         return true;
     }
-
-    protected function isCpRoute(): bool
-    {
-        if (! str_contains(request()->path(), config('statamic.cp.route', 'cp'))) {
-            return false;
-        }
-
-        return true;
-    }
 }

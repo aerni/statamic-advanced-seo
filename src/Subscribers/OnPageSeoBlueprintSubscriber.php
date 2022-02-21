@@ -2,17 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Statamic\Events;
+use Statamic\Statamic;
+use Statamic\Events\Event;
+use Statamic\Facades\Site;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Statamic\Fields\Blueprint;
+use Illuminate\Events\Dispatcher;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Concerns\GetsFieldDefaults;
 use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Statamic\Events;
-use Statamic\Events\Event;
-use Statamic\Facades\Site;
-use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -67,7 +68,7 @@ class OnPageSeoBlueprintSubscriber
 
     protected function extendBlueprintForCp(Event $event): void
     {
-        if (! $this->isCpRoute()) {
+        if (! Statamic::isCpRoute()) {
             return;
         }
 
