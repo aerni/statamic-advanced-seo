@@ -166,6 +166,7 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
+    // TODO: We could probably pass in the blueprint from the Defaults Model in the SeoStore
     public function blueprint(): Blueprint
     {
         // Get the blueprint for the site defaults like general, sitemap, favicons, etc.
