@@ -18,6 +18,7 @@ class Defaults extends Model
                 'title' => 'General',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::class,
                 'data' => __DIR__.'/../../content/general.yaml',
+                'enabled' => true,
             ],
             [
                 'group' => 'site',
@@ -26,6 +27,7 @@ class Defaults extends Model
                 'title' => 'Indexing',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::class,
                 'data' => __DIR__.'/../../content/indexing.yaml',
+                'enabled' => true,
             ],
             [
                 'group' => 'site',
@@ -34,6 +36,7 @@ class Defaults extends Model
                 'title' => 'Social Media',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint::class,
                 'data' => __DIR__.'/../../content/social_media.yaml',
+                'enabled' => true,
             ],
             [
                 'group' => 'site',
@@ -42,6 +45,7 @@ class Defaults extends Model
                 'title' => 'Analytics',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
                 'data' => __DIR__.'/../../content/analytics.yaml',
+                'enabled' => ! empty(array_filter(config('advanced-seo.analytics')))
             ],
             [
                 'group' => 'site',
@@ -50,6 +54,7 @@ class Defaults extends Model
                 'title' => 'Favicons',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::class,
                 'data' => __DIR__.'/../../content/favicons.yaml',
+                'enabled' => config('advanced-seo.favicons.enabled', false)
             ],
             [
                 'group' => 'content',
@@ -58,6 +63,7 @@ class Defaults extends Model
                 'title' => 'Collections',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
+                'enabled' => true,
             ],
             [
                 'group' => 'content',
@@ -66,6 +72,7 @@ class Defaults extends Model
                 'title' => 'Taxonomies',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
+                'enabled' => true,
             ],
         ];
     }
@@ -99,16 +106,6 @@ class Defaults extends Model
     // TODO: Apply this to the views and policy. Anywhere else?
     protected static function enabled(): Collection
     {
-        if (empty(array_filter(config('advanced-seo.analytics')))) {
-            $key = static::$rows->where('handle', 'analytics')->keys()->first();
-            static::$rows->forget($key);
-        }
-
-        if (! config('advanced-seo.favicons.enabled', false)) {
-            $key = static::$rows->where('handle', 'favicons')->keys()->first();
-            static::$rows->forget($key);
-        }
-
-        return static::$rows->values();
+        return static::$rows->where('enabled', true);
     }
 }
