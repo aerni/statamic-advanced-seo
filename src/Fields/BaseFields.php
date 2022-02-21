@@ -52,22 +52,7 @@ abstract class BaseFields implements Fields
         })->toArray();
     }
 
-    public static function getDefaultValue(string $key): ?Value
-    {
-        return self::getDefaultValues()->get($key);
-    }
-
-    public static function getDefaultValues(): Collection
-    {
-        return collect((new static)->sections())->flatten(1)->mapWithKeys(function ($item) {
-            $field = new Field($item['handle'], $item['field']);
-            $augmented = $field->setValue($field->defaultValue())->augment()->value();
-
-            return [$item['handle'] => $augmented];
-        });
-    }
-
-    protected function getValueFromCascade(string $handle): mixed
+    public function getValueFromCascade(string $handle): mixed
     {
         // We can't get any defaults with no data.
         if ($this->data instanceof Collection && $this->data->isEmpty()) {
