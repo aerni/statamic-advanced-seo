@@ -22,6 +22,11 @@ class SeoDefaultSet implements Contract
     protected string $type;
     protected array $localizations;
 
+    public function defaultData(): ?Collection
+    {
+        return Defaults::data($this->handle());
+    }
+
     public function id(): string
     {
         return $this->handle();
@@ -74,6 +79,7 @@ class SeoDefaultSet implements Contract
     {
         return (new SeoVariables)
             ->seoSet($this)
+            ->data($this->defaultData())
             ->locale($site);
     }
 

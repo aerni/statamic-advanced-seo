@@ -46,7 +46,7 @@ class SeoDefaultsStore extends ChildStore
 
         $localization = $set->makeLocalization(Site::default()->handle())
             ->initialPath($path)
-            ->data($data['data'] ?? []);
+            ->merge($data['data'] ?? []);
 
         return $set->addLocalization($localization);
     }
@@ -80,7 +80,7 @@ class SeoDefaultsStore extends ChildStore
 
         $variables
             ->initialPath($path)
-            ->data(Arr::except($data, 'origin'))
+            ->merge(Arr::except($data, 'origin'))
             ->origin(Arr::get($data, 'origin'));
 
         return $variables;
