@@ -2,19 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Support\Collection as LaravelCollection;
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Blink;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Tags\Context;
-use Statamic\Taxonomies\LocalizedTerm;
+use Illuminate\Support\Str;
+use Statamic\Facades\Blink;
 use Statamic\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
+use Illuminate\Support\Collection as LaravelCollection;
 
 trait GetsContentDefaults
 {
@@ -93,6 +94,11 @@ trait GetsContentDefaults
     {
         // If the context is a taxonomy, we don't have any defaults.
         if ($data instanceof Context && $data->get('terms') instanceof TermQueryBuilder) {
+            return false;
+        }
+
+        // We can't get any defaults if we're on an error page.
+        if ($data instanceof Context && Str::contains($data->get('current_template'), 'errors')) {
             return false;
         }
 

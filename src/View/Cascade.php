@@ -6,8 +6,6 @@ use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsPageData;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Fields\GeneralFields;
-use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
@@ -29,10 +27,12 @@ class Cascade
     use GetsPageData;
 
     protected Collection $data;
+    protected bool $isErrorPage;
 
     public function __construct(protected Entry|Term|Collection $context)
     {
         $this->data = collect();
+        $this->isErrorPage = Str::contains($context->get('current_template'), 'errors');
     }
 
     public static function from(Entry|Term|Collection $context): self
@@ -110,23 +110,29 @@ class Cascade
     {
         $computedData = collect([
             'title' => $this->compiledTitle(),
-            'og_title' => $this->ogTitle(),
-            'og_description' => $this->ogDescription(),
-            'og_image_size' => $this->ogImageSize(),
-            'twitter_card' => $this->twitterCard(),
-            'twitter_title' => $this->twitterTitle(),
-            'twitter_description' => $this->twitterDescription(),
-            'twitter_image' => $this->twitterImage(),
-            'twitter_image_size' => $this->twitterImageSize(),
-            'indexing' => $this->indexing(),
-            'locale' => $this->locale(),
-            'hreflang' => $this->hreflang(),
-            'canonical' => $this->canonical(),
-            'prev_url' => $this->prevUrl(),
-            'next_url' => $this->nextUrl(),
-            'schema' => $this->schema(),
-            'breadcrumbs' => $this->breadcrumbs(),
-        ])->filter();
+        ]);
+
+        if (! $this->isErrorPage) {
+            $computedData = $computedData->merge([
+                'title' => $this->compiledTitle(),
+                'og_title' => $this->ogTitle(),
+                'og_description' => $this->ogDescription(),
+                'og_image_size' => $this->ogImageSize(),
+                'twitter_card' => $this->twitterCard(),
+                'twitter_title' => $this->twitterTitle(),
+                'twitter_description' => $this->twitterDescription(),
+                'twitter_image' => $this->twitterImage(),
+                'twitter_image_size' => $this->twitterImageSize(),
+                'indexing' => $this->indexing(),
+                'locale' => $this->locale(),
+                'hreflang' => $this->hreflang(),
+                'canonical' => $this->canonical(),
+                'prev_url' => $this->prevUrl(),
+                'next_url' => $this->nextUrl(),
+                'schema' => $this->schema(),
+                'breadcrumbs' => $this->breadcrumbs(),
+            ])->filter();
+        }
 
         $this->data = $this->data->merge($computedData);
 
@@ -191,11 +197,7 @@ class Cascade
 
     protected function title(): Value|string
     {
-        if ($this->context->get('response_code') === 404) {
-            return '404';
-        }
-
-        return $this->data->get('title');
+        return $this->data->get('title') ?? $this->context->get('response_code');
     }
 
     protected function titleSeparator(): Value
