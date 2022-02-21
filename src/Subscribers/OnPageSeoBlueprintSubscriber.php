@@ -48,12 +48,12 @@ class OnPageSeoBlueprintSubscriber
     protected function shouldHandleBlueprintFound(): bool
     {
         // Don't add any fields in the blueprint builder.
-        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'blueprints'])) {
+        if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints'])) {
             return false;
         }
 
         // Don't add any fields on custom views.
-        if (Str::containsAll(request()->path(), [config('cp.route', 'cp'), 'advanced-seo'])) {
+        if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo'])) {
             return false;
         }
 
@@ -85,7 +85,7 @@ class OnPageSeoBlueprintSubscriber
          * Otherwise the default values of the blueprint fields will be set
          * for the localization of the first event calling this method.
          */
-        if (! Str::containsAll(request()->path(), [config('cp.route', 'cp'), $this->model, $id ?? $createLocale])) {
+        if (! Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), $this->model, $id ?? $createLocale])) {
             return;
         }
 
