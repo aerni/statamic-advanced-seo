@@ -188,13 +188,13 @@ class GeneralFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'breadcrumbs',
+                'handle' => 'use_breadcrumbs',
                 'field' => [
                     'type' => 'toggle',
                     'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your pages.',
                     'listable' => false,
                     'display' => 'Breadcrumbs',
-                    'default' => Defaults::data('general')->get('breadcrumbs'),
+                    'default' => Defaults::data('general')->get('use_breadcrumbs'),
                 ],
             ],
         ];

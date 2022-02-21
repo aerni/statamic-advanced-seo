@@ -460,7 +460,7 @@ class Cascade
 
     protected function breadcrumbs(): ?string
     {
-        $enabled = $this->data->get('breadcrumbs')?->value();
+        $enabled = $this->data->get('use_breadcrumbs')->value();
         $isHome = $this->context->get('url', '') === '/';
 
         if ($enabled && ! $isHome) {

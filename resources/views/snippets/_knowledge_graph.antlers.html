@@ -2,4 +2,6 @@
 {{ schema }}
 
 {{# Outputs the breadcrumbs #}}
-{{ breadcrumbs }}
+{{ if use_breadcrumbs }}
+    {{ breadcrumbs }}
+{{ /if }}
