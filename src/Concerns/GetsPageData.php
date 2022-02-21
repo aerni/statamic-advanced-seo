@@ -19,7 +19,7 @@ trait GetsPageData
     {
         return Blink::once($this->getPageDataCacheKey($context), function () use ($context) {
             return $context->intersectByKeys(OnPageSeoBlueprint::make()->items())
-                ->filter(fn ($item) => $item instanceof Value && $item->raw() !== null);
+                ->filter(fn ($item) => $item instanceof Value && $item->value() !== null);
         });
     }
 
