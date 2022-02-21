@@ -21,7 +21,8 @@ class OnPageSeoBlueprintSubscriber
     use GetsFieldDefaults; // TODO: Can we delete this class altogether?
     use ShouldHandleRoute;
 
-    protected static $addingField = false;
+    // This boolean is used to prevent an infinite loop.
+    protected static bool $addingField = false;
 
     protected array $events = [
         Events\EntryBlueprintFound::class => 'handleBlueprintFound',
