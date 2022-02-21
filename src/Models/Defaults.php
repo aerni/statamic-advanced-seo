@@ -57,7 +57,7 @@ class Defaults extends Model
                 'handle' => 'collections',
                 'title' => 'Collections',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
-                'data' => __DIR__.'/../../content/collections.yaml',
+                'data' => __DIR__.'/../../content/content.yaml',
             ],
             [
                 'group' => 'content',
@@ -65,7 +65,7 @@ class Defaults extends Model
                 'handle' => 'taxonomies',
                 'title' => 'Taxonomies',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
-                'data' => __DIR__.'/../../content/taxonomies.yaml',
+                'data' => __DIR__.'/../../content/content.yaml',
             ],
         ];
     }

@@ -9,7 +9,7 @@ use Statamic\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
-use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Stache\Query\TermQueryBuilder;

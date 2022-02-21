@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
-use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\User as UserFacade;
 

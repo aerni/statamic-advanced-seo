@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Statamic\CP\Breadcrumbs;

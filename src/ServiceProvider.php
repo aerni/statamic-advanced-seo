@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Git;

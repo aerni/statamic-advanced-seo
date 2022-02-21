@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Facades\Defaults;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Http\Request;
 use Statamic\CP\Breadcrumbs;
