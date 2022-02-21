@@ -1,5 +1,7 @@
 {{# The main favicon SVG #}}
-<link rel="icon" href="{{ favicon_svg }}" type="image/svg+xml">
+{{ if favicon_svg }}
+    <link rel="icon" href="{{ favicon_svg }}" type="image/svg+xml">
+{{ /if }}
 
 {{# Single color Safari mask-icon #}}
 {{# <link rel="mask-icon" href="{{ favicon_safari_override ?? favicon_svg }}" color="{{ favicon_safari_color }}"> #}}
