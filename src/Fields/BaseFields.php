@@ -2,17 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
-use Aerni\AdvancedSeo\Contracts\Fields;
-use Aerni\AdvancedSeo\View\Cascade;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
+use Illuminate\Support\Str;
+use Statamic\Facades\Blink;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\View\Cascade;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Contracts\Fields;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 abstract class BaseFields implements Fields
 {
@@ -73,13 +74,9 @@ abstract class BaseFields implements Fields
             return null;
         }
 
-        // TODO: Refactor the cascade so that $this->data will be part of the data too.
-        // Then we don't have to do: $this->getValueFromCascade('seo_title') ?? $this->data->get('title')
-        // anymore but can simply do: $this->getValueFromCascade('seo_title')
-
-        return Cascade::from($this->data)
-            ->withContentDefaults()
-            ->value(Str::remove('seo_', $handle));
+        return Blink::once('advanced-seo::cascade::cp', function () {
+            return Cascade::from($this->data)->withContentDefaults();
+        })->value(Str::remove('seo_', $handle));
     }
 
     protected function trans(string $parent, string $key): string

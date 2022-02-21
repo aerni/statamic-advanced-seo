@@ -57,7 +57,7 @@ class AdvancedSeoTags extends Tags
      */
     protected function cascade(): array
     {
-        return Blink::once('advanced-seo::cascade', function () {
+        return Blink::once('advanced-seo::cascade::frontend', function () {
             return Cascade::from($this->context)
                 ->withSiteDefaults()
                 ->withContentDefaults()
