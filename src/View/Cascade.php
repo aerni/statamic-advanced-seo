@@ -184,9 +184,7 @@ class Cascade
 
     protected function compiledTitle(): string
     {
-        $titlePosition = $this->data->get('title_position')?->raw() ?? GeneralFields::getDefaultValue('title_position')?->raw();
-
-        return $titlePosition === 'before'
+        return $this->data->get('title_position')->raw() === 'before'
             ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
             : "{$this->siteName()} {$this->titleSeparator()} {$this->title()}";
     }
@@ -197,12 +195,12 @@ class Cascade
             return '404';
         }
 
-        return $this->data->get('title') ?? $this->context->get('title');
+        return $this->data->get('title');
     }
 
     protected function titleSeparator(): Value
     {
-        return $this->data->get('title_separator') ?? GeneralFields::getDefaultValue('title_separator');
+        return $this->data->get('title_separator');
     }
 
     protected function siteName(): Value|string
@@ -229,7 +227,7 @@ class Cascade
 
     protected function twitterCard(): Value
     {
-        return $this->data->get('twitter_card') ?? OnPageSeoFields::getDefaultValue('seo_twitter_card');
+        return $this->data->get('twitter_card');
     }
 
     protected function twitterTitle(): Value|string
@@ -411,7 +409,7 @@ class Cascade
 
     protected function siteSchema(): ?string
     {
-        $type = $this->data->get('site_json_ld_type')?->raw() ?? GeneralFields::getDefaultValue('site_json_ld_type')?->raw();
+        $type = $this->data->get('site_json_ld_type')->raw();
 
         if ($type === 'none') {
             return null;
