@@ -16,8 +16,6 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 trait GetsEventData
 {
-    use ShouldHandleRoute;
-
     protected function determineRepositoryType(Event $event): string
     {
         return property_exists($event, 'taxonomy')

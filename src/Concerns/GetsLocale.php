@@ -10,8 +10,6 @@ use Statamic\Statamic;
 
 trait GetsLocale
 {
-    use ShouldHandleRoute;
-
     protected function getLocale(Entry|Term|Collection $data = null): string
     {
         if ($data instanceof Entry) {

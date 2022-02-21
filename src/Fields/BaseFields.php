@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Support\Collection;
@@ -17,7 +16,6 @@ abstract class BaseFields implements Fields
 {
     use GetsContentDefaults;
     use GetsSiteDefaults;
-    use ShouldHandleRoute;
 
     protected Entry|Term|Collection $data;
 

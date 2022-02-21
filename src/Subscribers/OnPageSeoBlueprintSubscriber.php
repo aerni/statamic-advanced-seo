@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Subscribers;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Concerns\GetsFieldDefaults;
-use Aerni\AdvancedSeo\Concerns\ShouldHandleRoute;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -19,7 +18,6 @@ class OnPageSeoBlueprintSubscriber
 {
     use GetsEventData;
     use GetsFieldDefaults; // TODO: Can we delete this class altogether?
-    use ShouldHandleRoute;
 
     // This boolean is used to prevent an infinite loop.
     protected static bool $addingField = false;
