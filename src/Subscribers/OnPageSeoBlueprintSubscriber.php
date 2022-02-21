@@ -21,6 +21,8 @@ class OnPageSeoBlueprintSubscriber
     use GetsFieldDefaults; // TODO: Can we delete this class altogether?
     use ShouldHandleRoute;
 
+    protected static $addingField = false;
+
     protected array $events = [
         Events\EntryBlueprintFound::class => 'handleBlueprintFound',
         Events\TermBlueprintFound::class => 'handleBlueprintFound',
@@ -102,13 +104,21 @@ class OnPageSeoBlueprintSubscriber
         $this->extendBlueprint($event);
     }
 
-    protected function extendBlueprint(Event $event): Blueprint
+    protected function extendBlueprint(Event $event): void
     {
+        if (static::$addingField) {
+            return;
+        }
+
+        static::$addingField = true;
+
         $data = $this->getDataFromEvent($event);
         $blueprint = $this->getBlueprintFromEvent($event);
 
         $seoBlueprint = OnPageSeoBlueprint::make()->data($data)->items();
 
-        return $blueprint->ensureFieldsInSection($seoBlueprint, 'SEO');
+        $blueprint->ensureFieldsInSection($seoBlueprint, 'SEO');
+
+        static::$addingField = false;
     }
 }
