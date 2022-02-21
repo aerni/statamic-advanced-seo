@@ -111,7 +111,7 @@ class ServiceProvider extends AddonServiceProvider
                         Permission::make('view {group} defaults')
                             ->label('View :group Defaults')
                             ->replacements('group', function () {
-                                return Defaults::site()->map(function ($item) {
+                                return Defaults::enabledInGroup('site')->map(function ($item) {
                                     return [
                                         'value' => $item['handle'],
                                         'label' => $item['title'],
@@ -132,7 +132,7 @@ class ServiceProvider extends AddonServiceProvider
                         Permission::make('view {group} defaults')
                             ->label('View :group Defaults')
                             ->replacements('group', function () {
-                                return Defaults::content()->map(function ($item) {
+                                return Defaults::enabledInGroup('content')->map(function ($item) {
                                     return [
                                         'value' => $item['handle'],
                                         'label' => $item['title'],

@@ -77,16 +77,9 @@ class Defaults extends Model
         ];
     }
 
-    // TODO: Rename to groupIsSite
-    protected static function site(): Collection
+    protected static function all(): Collection
     {
-        return static::$rows->groupBy('group')->get('site');
-    }
-
-    // TODO: Rename to groupIsContent
-    protected static function content(): Collection
-    {
-        return static::$rows->groupBy('group')->get('content');
+        return static::$rows;
     }
 
     protected static function groups(): Collection
@@ -94,7 +87,6 @@ class Defaults extends Model
         return static::$rows->groupBy('group')->keys();
     }
 
-    // TODO: Rename to dataOf
     protected static function data(string $handle): Collection
     {
         return Blink::once("advanced-seo::defaults::data::$handle", function () use ($handle) {
@@ -103,9 +95,23 @@ class Defaults extends Model
         });
     }
 
-    // TODO: Apply this to the views and policy. Anywhere else?
+    protected static function blueprint(string $handle): string
+    {
+        return static::$rows->firstWhere('handle', $handle)['blueprint'];
+    }
+
     protected static function enabled(): Collection
     {
         return static::$rows->where('enabled', true);
+    }
+
+    protected static function enabledInGroup(string $group): Collection
+    {
+        return static::$rows->where('group', $group)->where('enabled', true);
+    }
+
+    protected static function isEnabled(string $handle): bool
+    {
+        return static::$rows->where('handle', $handle)->where('enabled', true)->isNotEmpty();
     }
 }

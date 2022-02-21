@@ -16,9 +16,7 @@ class SiteDefaultsController extends BaseDefaultsController
 {
     public function edit(Request $request, string $handle): mixed
     {
-        $validDefault = Defaults::site()->map->handle->contains($handle);
-
-        throw_unless($validDefault, new NotFoundHttpException);
+        throw_unless(Defaults::isEnabled($handle), new NotFoundHttpException);
 
         $this->authorize("view $handle defaults");
 

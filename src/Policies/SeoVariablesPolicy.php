@@ -12,7 +12,7 @@ class SeoVariablesPolicy
     {
         $user = UserFacade::fromUser($user);
 
-        $allTypes = Defaults::all()->map->handle;
+        $allTypes = Defaults::enabled()->map->handle;
 
         $permissions = $allTypes->filter(function ($type) use ($user) {
             return $this->view($user, $type);
@@ -25,7 +25,7 @@ class SeoVariablesPolicy
     {
         $user = UserFacade::fromUser($user);
 
-        $permissions = Defaults::site()->map->handle->filter(function ($type) use ($user) {
+        $permissions = Defaults::enabledInGroup('site')->map->handle->filter(function ($type) use ($user) {
             return $this->view($user, $type);
         });
 
@@ -36,7 +36,7 @@ class SeoVariablesPolicy
     {
         $user = UserFacade::fromUser($user);
 
-        $permissions = Defaults::content()->map->handle->filter(function ($type) use ($user) {
+        $permissions = Defaults::enabledInGroup('content')->map->handle->filter(function ($type) use ($user) {
             return $this->view($user, $type);
         });
 
