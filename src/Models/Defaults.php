@@ -87,17 +87,22 @@ class Defaults extends Model
         return static::$rows->groupBy('group')->keys();
     }
 
-    protected static function data(string $handle): Collection
+    protected static function data(string $handle): ?Collection
     {
         return Blink::once("advanced-seo::defaults::data::$handle", function () use ($handle) {
-            $path = static::$rows->firstWhere('handle', $handle)['data'];
+            $path = static::$rows->firstWhere('handle', $handle)['data'] ?? null;
+
+            if (is_null($path)) {
+                return null;
+            }
+
             return collect(YAML::file($path)->parse());
         });
     }
 
-    protected static function blueprint(string $handle): string
+    protected static function blueprint(string $handle): ?string
     {
-        return static::$rows->firstWhere('handle', $handle)['blueprint'];
+        return static::$rows->firstWhere('handle', $handle)['blueprint'] ?? null;
     }
 
     protected static function enabled(): Collection
