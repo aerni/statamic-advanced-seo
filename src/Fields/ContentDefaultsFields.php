@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
 

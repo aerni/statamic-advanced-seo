@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Models;
 
-use Statamic\Facades\YAML;
-use Statamic\Facades\Blink;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
+use Statamic\Facades\YAML;
 
 class Defaults extends Model
 {
@@ -45,7 +45,7 @@ class Defaults extends Model
                 'title' => 'Analytics',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
                 'data' => __DIR__.'/../../content/analytics.yaml',
-                'enabled' => ! empty(array_filter(config('advanced-seo.analytics')))
+                'enabled' => ! empty(array_filter(config('advanced-seo.analytics'))),
             ],
             [
                 'group' => 'site',
@@ -54,7 +54,7 @@ class Defaults extends Model
                 'title' => 'Favicons',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::class,
                 'data' => __DIR__.'/../../content/favicons.yaml',
-                'enabled' => config('advanced-seo.favicons.enabled', false)
+                'enabled' => config('advanced-seo.favicons.enabled', false),
             ],
             [
                 'group' => 'content',
