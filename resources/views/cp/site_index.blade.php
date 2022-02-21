@@ -46,7 +46,7 @@
                             </div>
                         </a>
                     @endcan
-                    @if (! empty(array_filter(config('advanced-seo.analytics'))))
+                    @if (\Aerni\AdvancedSeo\Models\Defaults::isEnabled('analytics'))
                         @can('view analytics defaults')
                             <a href="{{ cp_route('advanced-seo.site.edit', 'analytics') }}" class="flex items-start w-full p-2 rounded-md lg:w-1/2 hover:bg-blue-100 group">
                                 <div class="w-8 h-8 mr-2 text-blue">
@@ -59,7 +59,7 @@
                             </a>
                         @endcan
                     @endif
-                    @if (config('advanced-seo.favicons.enabled', false))
+                    @if (\Aerni\AdvancedSeo\Models\Defaults::isEnabled('favicons'))
                         @can('view favicons defaults')
                             <a href="{{ cp_route('advanced-seo.site.edit', 'favicons') }}" class="flex items-start w-full p-2 rounded-md lg:w-1/2 hover:bg-blue-100 group">
                                 <div class="w-8 h-8 mr-2 text-blue">
