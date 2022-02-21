@@ -24,7 +24,9 @@ class SeoDefaultSet implements Contract
 
     public function defaultData(): ?Collection
     {
-        return Defaults::data($this->handle());
+        return $this->type === 'site'
+            ? Defaults::data($this->handle)
+            : Defaults::data($this->type);
     }
 
     public function id(): string
