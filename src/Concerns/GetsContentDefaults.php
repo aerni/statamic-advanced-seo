@@ -29,16 +29,9 @@ trait GetsContentDefaults
         $locale = $locale ?? $this->getLocale($data);
 
         return Blink::once($this->getContentCacheKey($parent, $locale), function () use ($parent, $locale) {
-            $defaultSet = Seo::findOrMake($this->getContentType($parent), $this->getContentHandle($parent));
-
-            if (! $defaultSet->existsIn($locale)) {
-                $defaultSet->addLocalization($defaultSet->makeLocalization($locale));
-            }
-
-            $data = Defaults::data('collections')->merge($defaultSet->in($locale)->data())->all();
-
-            return $defaultSet->in($locale)
-                ->data($data)
+            return Seo::findOrMake($this->getContentType($parent), $this->getContentHandle($parent))
+                ->ensureLocalizations(collect($locale))
+                ->in($locale)
                 ->toAugmentedCollection()
                 ->filter(fn ($item) => $item instanceof Value && $item->raw() !== null);
         });
