@@ -50,7 +50,7 @@ abstract class BaseFields implements Fields
 
     public function getValueFromCascade(string $handle): mixed
     {
-        // We can't get any defaults with no data.
+        // We can't create a cascade if we don't have any data.
         if ($this->data instanceof Collection && $this->data->isEmpty()) {
             return null;
         }
