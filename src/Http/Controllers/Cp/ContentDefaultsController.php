@@ -2,24 +2,32 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Statamic\CP\Breadcrumbs;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\View\View;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Statamic\Exceptions\NotFoundHttpException;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 
 abstract class ContentDefaultsController extends BaseDefaultsController
 {
+    public function index(): View
+    {
+        throw_unless(Defaults::enabledInType($this->type)->isNotEmpty(), new NotFoundHttpException);
+
+        $this->authorize('index', [SeoVariables::class, $this->type]);
+
+        return view("advanced-seo::cp.{$this->type}");
+    }
+
     public function edit(Request $request, string $handle): mixed
     {
-        $seoIsEnabled = ! in_array($handle, config("advanced-seo.disabled.{$this->type}", []));
+        throw_unless(Defaults::isEnabled("{$this->type}::{$handle}"), new NotFoundHttpException);
 
-        throw_unless($seoIsEnabled, new NotFoundHttpException);
-
-        $this->authorize("view $this->type defaults");
+        $this->authorize("view seo {$handle} defaults");
 
         $set = $this->set($handle);
         $content = $this->content($handle);
@@ -79,7 +87,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
                 ];
             })->sortBy('handle')->values()->all(),
             'breadcrumbs' => $this->breadcrumbs(),
-            'readOnly' => $user->cant("edit $this->type defaults"),
+            'readOnly' => $user->cant("edit seo {$handle} defaults"),
             'contentType' => $this->type,
         ];
 
@@ -95,7 +103,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
     public function update(string $handle, Request $request): void
     {
-        $this->authorize("edit $this->type defaults");
+        $this->authorize("edit seo {$handle} defaults");
 
         $set = $this->set($handle);
         $content = $this->content($handle);
@@ -125,12 +133,8 @@ abstract class ContentDefaultsController extends BaseDefaultsController
     {
         return new Breadcrumbs([
             [
-                'text' => __('advanced-seo::messages.content'),
-                'url' => cp_route('advanced-seo.show', 'content'),
-            ],
-            [
-                'text' => str_plural(Str::title($this->type)),
-                'url' => cp_route('advanced-seo.show', 'content'),
+                'text' => __("advanced-seo::messages.{$this->type}"),
+                'url' => cp_route("advanced-seo.{$this->type}.index"),
             ],
         ]);
     }

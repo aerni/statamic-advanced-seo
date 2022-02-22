@@ -2,23 +2,33 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Http\Request;
-use Statamic\CP\Breadcrumbs;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Contracts\View\View;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Statamic\Exceptions\NotFoundHttpException;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 
 class SiteDefaultsController extends BaseDefaultsController
 {
+    public function index(): View
+    {
+        throw_unless(Defaults::enabledInType('site')->isNotEmpty(), new NotFoundHttpException);
+
+        $this->authorize('index', [SeoVariables::class, 'site']);
+
+        return view('advanced-seo::cp.site');
+    }
+
     public function edit(Request $request, string $handle): mixed
     {
-        throw_unless(Defaults::isEnabled($handle), new NotFoundHttpException);
+        throw_unless(Defaults::isEnabled("site::{$handle}"), new NotFoundHttpException);
 
-        $this->authorize("view $handle defaults");
+        $this->authorize("view seo {$handle} defaults");
 
         $set = $this->set($handle);
 
@@ -74,7 +84,7 @@ class SiteDefaultsController extends BaseDefaultsController
                 ];
             })->sortBy('handle')->values()->all(),
             'breadcrumbs' => $this->breadcrumbs(),
-            'readOnly' => $user->cant("edit $handle defaults"),
+            'readOnly' => $user->cant("edit seo {$handle} defaults"),
             'contentType' => 'site',
         ];
 
@@ -90,7 +100,7 @@ class SiteDefaultsController extends BaseDefaultsController
 
     public function update(string $handle, Request $request): void
     {
-        $this->authorize("edit $handle defaults");
+        $this->authorize("edit seo {$handle} defaults");
 
         $site = $request->site ?? Site::selected()->handle();
 
@@ -121,7 +131,7 @@ class SiteDefaultsController extends BaseDefaultsController
         return new Breadcrumbs([
             [
                 'text' => __('advanced-seo::messages.site'),
-                'url' => cp_route('advanced-seo.show', 'site'),
+                'url' => cp_route('advanced-seo.site.index'),
             ],
         ]);
     }

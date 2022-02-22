@@ -22,11 +22,9 @@ class SeoDefaultSet implements Contract
     protected string $type;
     protected array $localizations;
 
-    public function defaultData(): ?Collection
+    public function defaultData(): Collection
     {
-        return $this->type === 'site'
-            ? Defaults::data($this->handle)
-            : Defaults::data($this->type);
+        return Defaults::data("{$this->type}::{$this->handle}");
     }
 
     public function id(): string
@@ -166,17 +164,9 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
-    // TODO: We could probably pass in the blueprint from the Defaults Model in the SeoStore
     public function blueprint(): Blueprint
     {
-        // Get the blueprint for the site defaults like general, sitemap, favicons, etc.
-        if ($this->type() === 'site') {
-            return resolve(Defaults::blueprint($this->handle))->make()->get();
-        }
-
-        // Get the blueprint for the content defaults like collections and taxonomies.
-        // We are passing some data because we are conditionally showing/hiding fields based on it.
-        return resolve(Defaults::blueprint($this->type))->make()
+        return resolve(Defaults::blueprint("{$this->type}::{$this->handle}"))->make()
             ->data(collect([
                 'type' => $this->type,
                 'handle' => $this->handle,

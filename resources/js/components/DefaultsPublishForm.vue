@@ -170,16 +170,10 @@ export default {
         },
 
         computedBreadcrumbs() {
-            let breadcrumbs = {
+            return {
                 'url': this.breadcrumbs[0].url,
                 'text': this.breadcrumbs[0].text
             }
-
-            if (this.contentType !== 'site') {
-                breadcrumbs.text = `${this.breadcrumbs[0].text} (${this.breadcrumbs[1].text})`
-            }
-
-            return breadcrumbs
         }
 
     },

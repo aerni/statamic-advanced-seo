@@ -98,7 +98,7 @@ class SitemapItem
     public function changefreq(): string
     {
         if ($this->content instanceof Taxonomy) {
-            return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
+            return Defaults::data('taxonomies', true)->get('seo_sitemap_change_frequency');
         }
 
         return $this->content->augmentedValue('seo_sitemap_change_frequency')->value()->value();
@@ -107,7 +107,7 @@ class SitemapItem
     public function priority(): string
     {
         if ($this->content instanceof Taxonomy) {
-            return Defaults::data('taxonomies')->get('seo_sitemap_priority');
+            return Defaults::data('taxonomies', true)->get('seo_sitemap_priority');
         }
 
         return $this->content->augmentedValue('seo_sitemap_priority')->value()->value();

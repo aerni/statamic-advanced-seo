@@ -3,12 +3,15 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 abstract class BaseDefaultsController extends CpController
 {
+    abstract public function index(): View;
+
     abstract public function edit(Request $request, string $handle): mixed;
 
     abstract public function update(string $handle, Request $request): void;

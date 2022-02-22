@@ -83,19 +83,22 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootAddonNav(): self
     {
         Nav::extend(function ($nav) {
-            $nav->tools('SEO')
-                ->can('index', SeoVariables::class)
-                ->route('advanced-seo.index')
-                ->icon('seo-search-graph')
-                ->active('advanced-seo')
-                ->children([
-                    $nav->item('Site Defaults')
-                        ->route('advanced-seo.show', 'site')
-                        ->can('siteDefaultsIndex', SeoVariables::class),
-                    $nav->item('Content Defaults')
-                        ->route('advanced-seo.show', 'content')
-                        ->can('contentDefaultsIndex', SeoVariables::class),
-                ]);
+            Defaults::enabled()->groupBy('type')->each(function ($items, $type) use ($nav) {
+                $nav->create(ucfirst($type))
+                    ->section('SEO')
+                    ->can('index', [SeoVariables::class, $type])
+                    ->route("advanced-seo.{$type}.index")
+                    ->active("advanced-seo/{$type}")
+                    ->icon($items->first()['type_icon'])
+                    ->children(
+                        $items->map(function ($item) use ($nav, $type) {
+                            return $nav->item($item['title'])
+                                ->can('view', [SeoVariables::class, $item['handle']])
+                                ->route("advanced-seo.{$item['type']}.edit", $item['handle'])
+                                ->active("advanced-seo/{$type}/{$item['handle']}");
+                        })->toArray()
+                    );
+            });
         });
 
         return $this;
@@ -104,46 +107,27 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootAddonPermissions(): self
     {
         Permission::group('advanced-seo', 'Advanced SEO', function () {
-            Permission::register('view site defaults', function ($permission) {
-                $permission
-                    ->label('View Site Defaults')
-                    ->children([
-                        Permission::make('view {group} defaults')
-                            ->label('View :group Defaults')
-                            ->replacements('group', function () {
-                                return Defaults::enabledInGroup('site')->map(function ($item) {
-                                    return [
-                                        'value' => $item['handle'],
-                                        'label' => $item['title'],
-                                    ];
-                                });
-                            })
-                            ->children([
-                                Permission::make('edit {group} defaults')
-                                    ->label('Edit :group Defaults'),
-                            ]),
-                    ]);
-            });
-
-            Permission::register('view content defaults', function ($permission) {
-                $permission
-                    ->label('View Content Defaults')
-                    ->children([
-                        Permission::make('view {group} defaults')
-                            ->label('View :group Defaults')
-                            ->replacements('group', function () {
-                                return Defaults::enabledInGroup('content')->map(function ($item) {
-                                    return [
-                                        'value' => $item['handle'],
-                                        'label' => $item['title'],
-                                    ];
-                                });
-                            })
-                            ->children([
-                                Permission::make('edit {group} defaults')
-                                    ->label('Edit :group Defaults'),
-                            ]),
-                    ]);
+            Defaults::enabled()->groupBy('type')->each(function ($items, $group) {
+                Permission::register("view seo {$group} defaults", function ($permission) use ($group, $items) {
+                    $permission
+                        ->label('View ' . ucfirst($group))
+                        ->children([
+                            Permission::make('view seo {group} defaults')
+                                ->label('View :group')
+                                ->replacements('group', function () use ($items) {
+                                    return $items->map(function ($item) {
+                                        return [
+                                            'value' => $item['handle'],
+                                            'label' => $item['title'],
+                                        ];
+                                    });
+                                })
+                                ->children([
+                                    Permission::make('edit seo {group} defaults')
+                                        ->label('Edit :group'),
+                                ]),
+                        ]);
+                });
             });
         });
 

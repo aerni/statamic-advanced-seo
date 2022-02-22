@@ -74,8 +74,8 @@ class SeoVariables implements Localization, Augmentable
     {
         return [
             'site' => $this->cpUrl('advanced-seo.site.edit'),
-            'collections' => $this->cpUrl('advanced-seo.content.collections.edit'),
-            'taxonomies' => $this->cpUrl('advanced-seo.content.taxonomies.edit'),
+            'collections' => $this->cpUrl('advanced-seo.collections.edit'),
+            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.edit'),
         ][$this->type()];
     }
 
@@ -83,8 +83,8 @@ class SeoVariables implements Localization, Augmentable
     {
         return [
             'site' => $this->cpUrl('advanced-seo.site.update'),
-            'collections' => $this->cpUrl('advanced-seo.content.collections.update'),
-            'taxonomies' => $this->cpUrl('advanced-seo.content.taxonomies.update'),
+            'collections' => $this->cpUrl('advanced-seo.collections.update'),
+            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.update'),
         ][$this->type()];
     }
 

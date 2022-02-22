@@ -22,7 +22,7 @@ trait GetsSiteDefaults
         $locale = $this->getLocale($data);
 
         return Blink::once($this->getSiteCacheKey($locale), function () use ($locale) {
-            return Defaults::enabledInGroup('site')->flatMap(function ($model) use ($locale) {
+            return Defaults::enabledInType('site')->flatMap(function ($model) use ($locale) {
                 return GetAugmentedDefaults::handle('site', $model['handle'], $locale);
             });
         });

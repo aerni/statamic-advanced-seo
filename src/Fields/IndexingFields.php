@@ -35,7 +35,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
-                    'default' => Defaults::data('indexing')->get('noindex'),
+                    'default' => Defaults::data('site::indexing')->get('noindex'),
                 ],
             ],
             [
@@ -47,7 +47,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
-                    'default' => Defaults::data('indexing')->get('nofollow'),
+                    'default' => Defaults::data('site::indexing')->get('nofollow'),
                 ],
             ],
         ];

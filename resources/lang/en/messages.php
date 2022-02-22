@@ -4,11 +4,15 @@ return [
 
     'dashboard_title' => 'Advanced SEO',
 
-    'site' => 'Site Defaults',
+    'site' => 'Site',
     'site_description' => 'Site-wide defaults and settings like site name, sitemap, analytics, and more.',
 
     'content' => 'Content Defaults',
     'content_description' => 'On-page defaults for your collection entries and taxonomy terms.',
+
+    'collections' => 'Collections',
+
+    'taxonomies' => 'Taxonomies',
 
     'general' => 'General',
     'general_description' => 'Add general information about your site.',
