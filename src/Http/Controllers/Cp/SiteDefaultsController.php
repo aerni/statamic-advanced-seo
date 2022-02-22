@@ -2,16 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Statamic\CP\Breadcrumbs;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Contracts\View\View;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Statamic\Exceptions\NotFoundHttpException;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
 
 class SiteDefaultsController extends BaseDefaultsController
 {

@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Statamic\CP\Breadcrumbs;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\CP\Breadcrumbs;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\View\View;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Statamic\Exceptions\NotFoundHttpException;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 
 abstract class ContentDefaultsController extends BaseDefaultsController
 {

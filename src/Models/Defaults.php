@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Models;
 
-use Statamic\Facades\YAML;
 use Illuminate\Support\Arr;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Taxonomy;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\YAML;
 
 class Defaults extends Model
 {
