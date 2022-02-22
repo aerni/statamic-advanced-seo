@@ -3,12 +3,13 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Actions\GetFallbackTitle;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
 use Statamic\Taxonomies\Term;
+use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Actions\GetFallbackValue;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -196,7 +197,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_og_title'),
+                        'default' => $this->getValueFromCascade('seo_og_title') ?? GetFallbackTitle::handle($this->data),
                         'character_limit' => 70,
                         'antlers' => false,
                         'validate' => [
@@ -295,7 +296,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_twitter_title'),
+                        'default' => $this->getValueFromCascade('seo_twitter_title') ?? GetFallbackTitle::handle($this->data),
                         'character_limit' => 70,
                         'antlers' => false,
                         'validate' => [
