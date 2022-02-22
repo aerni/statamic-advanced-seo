@@ -119,15 +119,20 @@ class SeoVariables implements Localization, Augmentable
         return $this;
     }
 
+    public function defaultData(): Collection
+    {
+        return $this->seoSet()->defaultData();
+    }
+
     public function fileData(): array
     {
-        $data = $this->data()->all();
-
         if (Site::hasMultiple() && $this->hasOrigin()) {
+            $data = $this->data()->all();
             $data['origin'] = $this->origin()->locale();
         }
 
         if ($this->isRoot()) {
+            $data = $this->defaultData()->merge($this->data())->all();
             $data = Arr::removeNullValues($data);
         }
 

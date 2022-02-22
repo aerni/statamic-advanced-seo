@@ -79,7 +79,6 @@ class SeoDefaultSet implements Contract
     {
         return (new SeoVariables)
             ->seoSet($this)
-            ->data($this->defaultData())
             ->locale($site);
     }
 
