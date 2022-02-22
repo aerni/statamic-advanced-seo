@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Actions\GetFallbackTitle;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
@@ -46,7 +47,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_title') ?? $this->data->get('title'),
+                        'default' => $this->getValueFromCascade('seo_title') ?? GetFallbackTitle::handle($this->data),
                         'character_limit' => 60,
                         'antlers' => false,
                         'validate' => [
