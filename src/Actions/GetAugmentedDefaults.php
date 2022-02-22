@@ -14,6 +14,6 @@ class GetAugmentedDefaults
             ->ensureLocalizations(collect($locale))
             ->in($locale)
             ->toAugmentedCollection()
-            ->filter(fn ($item) => $item instanceof Value && $item->value() !== null);
+            ->filter(fn ($item) => $item instanceof Value);
     }
 }
