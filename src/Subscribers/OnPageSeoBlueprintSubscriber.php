@@ -4,20 +4,17 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Concerns\GetsFieldDefaults;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
 use Statamic\Facades\Site;
-use Statamic\Fields\Blueprint;
 use Statamic\Statamic;
 
 class OnPageSeoBlueprintSubscriber
 {
     use GetsEventData;
-    use GetsFieldDefaults; // TODO: Can we delete this class altogether?
 
     // This boolean is used to prevent an infinite loop.
     protected static bool $addingField = false;
