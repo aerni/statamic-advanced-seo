@@ -31,8 +31,9 @@ trait GetsContentDefaults
         return Blink::once($this->getContentCacheKey($parent, $locale), function () use ($parent, $locale) {
             $type = $this->getContentType($parent);
             $handle = $this->getContentHandle($parent);
+            $sites = $this->getContentSites($parent);
 
-            return GetAugmentedDefaults::handle($type, $handle, $locale);
+            return GetAugmentedDefaults::handle($type, $handle, $locale, $sites);
         });
     }
 
@@ -86,6 +87,19 @@ trait GetsContentDefaults
         }
 
         return $parent->get('handle');
+    }
+
+    protected function getContentSites(Collection|Taxonomy|LaravelCollection $parent): LaravelCollection
+    {
+        if ($parent instanceof Collection) {
+            return $parent->sites();
+        }
+
+        if ($parent instanceof Taxonomy) {
+            return $parent->sites();
+        }
+
+        return $parent->get('sites');
     }
 
     protected function canGetContentDefaults(mixed $data): bool

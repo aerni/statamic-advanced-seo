@@ -9,7 +9,9 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Statamic\Statamic;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -62,13 +64,26 @@ trait GetsEventData
             return $data->in(Site::current()->handle());
         }
 
-        // This data is used on "Create Entry" and "Create Term" views so that we can get the content defaults.
-        $fallbackData = collect([
+        // The fallback data is used on "Create Entry" and "Create Term" views so that we can get the content defaults.
+        return $data ?? $this->getFallbackData($event);
+    }
+
+    protected function getFallbackData(Event $event): Collection
+    {
+        $data = collect([
             'type' => Str::before($event->blueprint->namespace(), '.'),
             'handle' => Str::after($event->blueprint->namespace(), '.'),
             'locale' => basename(request()->path()), // TODO: This won't work with subdomain locales.
         ]);
 
-        return $data ?? $fallbackData;
+        if ($data['type'] === 'collections') {
+            $data->put('sites', CollectionFacade::find($data['handle'])->sites());
+        }
+
+        if ($data['type'] === 'taxonomies') {
+            $data->put('sites', Taxonomy::find($data['handle'])->sites());
+        }
+
+        return $data;
     }
 }

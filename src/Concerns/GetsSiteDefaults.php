@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
 
 trait GetsSiteDefaults
 {
@@ -23,7 +24,7 @@ trait GetsSiteDefaults
 
         return Blink::once($this->getSiteCacheKey($locale), function () use ($locale) {
             return Defaults::enabledInType('site')->flatMap(function ($model) use ($locale) {
-                return GetAugmentedDefaults::handle('site', $model['handle'], $locale);
+                return GetAugmentedDefaults::handle('site', $model['handle'], $locale, Site::all()->map->handle());
             });
         });
     }

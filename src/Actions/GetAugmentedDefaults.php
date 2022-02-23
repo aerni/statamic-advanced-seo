@@ -8,10 +8,10 @@ use Statamic\Fields\Value;
 
 class GetAugmentedDefaults
 {
-    public static function handle(string $type, string $handle, string $locale): Collection
+    public static function handle(string $type, string $handle, string $locale, Collection $sites): Collection
     {
         return Seo::findOrMake($type, $handle)
-            ->ensureLocalizations(collect($locale))
+            ->ensureLocalizations($sites)
             ->in($locale)
             ->toAugmentedCollection()
             ->filter(fn ($item) => $item instanceof Value);

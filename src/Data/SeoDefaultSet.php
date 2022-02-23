@@ -105,8 +105,8 @@ class SeoDefaultSet implements Contract
             $this->in($site) ?? $this->addLocalization($this->makeLocalization($site));
         });
 
-        // Determine the origin for each localization based on the provided sites.
-        $this->localizations()->each->determineOrigin($sites);
+        // Determine the origin and set the default data for each localization based on the provided sites.
+        $this->localizations()->each(fn ($item) => $item->determineOrigin($sites)->withDefaultData()); // Only adds the default data to the root localization.
 
         return $this;
     }
