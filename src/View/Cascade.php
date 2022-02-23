@@ -117,6 +117,7 @@ class Cascade
                 'title' => $this->compiledTitle(),
                 'og_title' => $this->ogTitle(),
                 'og_description' => $this->ogDescription(),
+                'og_image' => $this->ogImage(),
                 'og_image_size' => $this->ogImageSize(),
                 'twitter_card' => $this->twitterCard(),
                 'twitter_title' => $this->twitterTitle(),
@@ -215,6 +216,13 @@ class Cascade
         return $this->data->get('og_title') ?? $this->title();
     }
 
+    protected function ogImage(): ?Value
+    {
+        return $this->data->get('og_image')->value()
+            ? $this->data->get('og_image')
+            : $this->getSiteDefaults($this->context)->get('og_image');
+    }
+
     protected function ogDescription(): ?Value
     {
         return $this->data->get('og_description') ?? $this->data->get('description');
@@ -244,13 +252,9 @@ class Cascade
 
     protected function twitterImage(): ?Value
     {
-        // Get the image if it exists on the entry or term.
-        if ($image = $this->data->get('twitter_image')) {
-            return $image;
-        }
-
-        // Get the image from the site defaults that matches the content's twitter card setting.
-        return $this->data->first(fn ($value, $key) => str_contains($key, $this->twitterCard()));
+        return $this->data->get('twitter_image')->value()
+            ? $this->data->get('twitter_image')
+            : $this->getSiteDefaults($this->context)->get('twitter_image');
     }
 
     protected function twitterImageSize(): array
