@@ -98,6 +98,17 @@ class SocialMediaFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'twitter_image',
+                'field' => $this->getAssetFieldConfig([
+                    'display' => 'Twitter Image',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . ' or ' . SocialImage::sizeString('twitter.summary_large_image') . ' depending on the selected Twitter card.',
+                    'validate' => [
+                        'image',
+                        'mimes:jpg,png',
+                    ],
+                ]),
+            ],
+            [
                 'handle' => 'twitter_handle',
                 'field' => [
                     'listable' => 'hidden',
@@ -109,28 +120,6 @@ class SocialMediaFields extends BaseFields
                     'antlers' => false,
                     'width' => 50,
                 ],
-            ],
-            [
-                'handle' => 'twitter_image_summary',
-                'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Summary Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
-                    'validate' => [
-                        'image',
-                        'mimes:jpg,png',
-                    ],
-                ]),
-            ],
-            [
-                'handle' => 'twitter_image_summary_large_image',
-                'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Summary Large Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
-                    'validate' => [
-                        'image',
-                        'mimes:jpg,png',
-                    ],
-                ]),
             ],
         ];
     }
