@@ -78,7 +78,7 @@ class Cascade
     {
         $value = $this->data->get($key);
 
-        return $value instanceof Value ? $value->raw() : $value;
+        return $value instanceof Value ? $value->value() : $value;
     }
 
     public function processForFrontend(): self
@@ -99,7 +99,7 @@ class Cascade
     {
         $overrides = $this->getSiteDefaults($this->context)
             ->only(['noindex', 'nofollow'])
-            ->filter(fn ($item) => $item->raw());
+            ->filter(fn ($item) => $item->value());
 
         $this->data = $this->data->merge($overrides);
 
