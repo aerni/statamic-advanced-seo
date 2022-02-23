@@ -28,7 +28,6 @@ class CollectionSitemap extends BaseSitemap
 
     protected function entries(): Collection
     {
-        // TODO: Should `noindex` take the content defaults into account?
         return $this->collection->queryEntries()
             ->where('site', $this->site)
             ->where('published', '!=', false) // We only want published entries.
