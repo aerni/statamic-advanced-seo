@@ -19,16 +19,26 @@
         </div>
 
         <div class="seo-mt-2.5">
-            <component
-                :is="fieldComponent"
-                :name="name"
-                :config="fieldConfig"
-                :meta="fieldMeta"
-                :value="fieldValue"
-                :read-only="isReadOnly"
-                handle="source_value"
-                @input="updateFieldValue">
-            </component>
+            <div v-if="fieldSource !== 'auto'">
+                <component
+                    :is="fieldComponent"
+                    :name="name"
+                    :config="fieldConfig"
+                    :meta="fieldMeta"
+                    :value="fieldValue"
+                    :read-only="isReadOnly"
+                    handle="source_value"
+                    @input="updateCustomFieldValue">
+                </component>
+            </div>
+            <div v-else>
+                <component
+                    :is="fieldComponent"
+                    :value="autoFieldValue"
+                    read-only="true">
+                </component>
+                <!-- <div class="mt-1 help-block" v-text="`Source Field: ${autoFieldDisplay} (${autoFieldHandle})`"></div> -->
+            </div>
         </div>
 
     </div>
@@ -81,15 +91,45 @@ export default {
             return this.meta.meta
         },
 
+        autoFieldDisplay() {
+            // TODO: Get the field label from the blueprint vuex store.
+            // let display = this.store.blueprint.sections
+            // console.log(display)
+
+            return 'Title'
+        },
+
+        autoFieldValue() {
+            let value = this.store.values[this.autoFieldHandle]
+
+            return typeof value === 'object'
+                ? value.value
+                : value
+        },
+
+        autoFieldHandle() {
+            return this.config.auto
+        },
+
         sourceOptions() {
-            return [
+            let options = [
                 { label: __('advanced-seo::messages.default'), value: 'default' },
                 { label: __('advanced-seo::messages.custom'), value: 'custom' },
             ]
+
+            if (this.autoFieldHandle) {
+                options.push({ label: this.autoFieldDisplay, value: 'auto' })
+            }
+
+            return options
         },
 
         site() {
-            return this.$store.state.publish.base.site;
+            return this.store.site;
+        },
+
+        store() {
+            return this.$store.state.publish.base;
         }
 
     },
@@ -99,6 +139,7 @@ export default {
             // Use isEqual because the data can be of different types.
             // With the code fieldtype for instance the data is an object.
 
+            // TODO: Handle 'auto' field
             if (value === true && _.isEqual(this.value.value, this.fieldDefault)) {
                 this.value.source = 'default'
             } else if (value === true && ! _.isEqual(this.value.value, this.fieldDefault)) {
@@ -106,9 +147,21 @@ export default {
             }
         },
 
+        autoFieldValue(value) {
+            if (this.fieldSource === 'auto') {
+                this.updateFieldValue(value)
+            }
+        },
+
         site() {
             this.customValue = null;
         },
+    },
+
+    mounted() {
+        if (this.fieldSource === 'auto') {
+            this.updateFieldValue(this.autoFieldValue)
+        }
     },
 
     methods: {
@@ -121,24 +174,33 @@ export default {
             this.value.source = source
 
             if (source === 'default') {
-                // Save the value so that we can restore it if the user switches back to custom.
-                this.customValue = this.value.value
                 this.updateFieldValue(this.fieldDefault)
             }
 
             if (source === 'custom') {
                 this.updateFieldValue(this.customValue || this.fieldDefault)
             }
+
+            if (source === 'auto') {
+                this.updateFieldValue(this.autoFieldValue)
+            }
         },
 
         updateFieldValue(value) {
             this.value.value = value;
 
+            this.update(this.value);
+        },
+
+        updateCustomFieldValue(value) {
+            this.updateFieldValue(value)
+
+            // Save the value so that we can restore it if the user switches back to custom.
+            this.customValue = this.value.value
+
             if (this.fieldValue !== this.fieldDefault) {
                 this.value.source = 'custom'
             }
-
-            this.update(this.value);
         },
 
     },

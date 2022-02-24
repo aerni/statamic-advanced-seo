@@ -44,10 +44,11 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_title', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
+                    'auto' => 'title',
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_title') ?? GetFallbackTitle::handle($this->data),
+                        'default' => $this->getValueFromCascade('seo_title'),
                         'character_limit' => 60,
                         'antlers' => false,
                         'validate' => [
@@ -63,6 +64,7 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_description', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
+                    'auto' => 'seo_description',
                     'localizable' => true,
                     'field' => [
                         'type' => 'textarea',
@@ -193,10 +195,11 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_og_title', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
+                    'auto' => 'seo_title',
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_og_title') ?? GetFallbackTitle::handle($this->data),
+                        'default' => $this->getValueFromCascade('seo_og_title'),
                         'character_limit' => 70,
                         'antlers' => false,
                         'validate' => [
@@ -212,6 +215,7 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_og_description', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
+                    'auto' => 'seo_description',
                     'localizable' => true,
                     'field' => [
                         'type' => 'textarea',
@@ -292,10 +296,11 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_twitter_title', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
+                    'auto' => 'seo_title',
                     'localizable' => true,
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_twitter_title') ?? GetFallbackTitle::handle($this->data),
+                        'default' => $this->getValueFromCascade('seo_twitter_title'),
                         'character_limit' => 70,
                         'antlers' => false,
                         'validate' => [
@@ -311,6 +316,7 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_twitter_description', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
+                    'auto' => 'seo_description',
                     'localizable' => true,
                     'field' => [
                         'type' => 'textarea',

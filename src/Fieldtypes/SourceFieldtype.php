@@ -17,8 +17,12 @@ class SourceFieldtype extends Fieldtype
             return ['source' => 'default', 'value' => $this->sourceFieldDefaultValue()];
         }
 
+        if ($data === '@auto') {
+            return ['source' => 'auto', 'value' => null];
+        }
+
         if ($data === '@null') {
-            return ['source' => 'custom', 'value' => ''];
+            return ['source' => 'custom', 'value' => null];
         }
 
         return ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess($data)];
@@ -26,12 +30,16 @@ class SourceFieldtype extends Fieldtype
 
     public function process(mixed $data): mixed
     {
+        if ($data['value'] === null) {
+            return '@null';
+        }
+
         if ($data['source'] === 'default') {
             return '@default';
         }
 
-        if ($data['value'] === null) {
-            return '@null';
+        if ($data['source'] === 'auto') {
+            return '@auto';
         }
 
         // Handle the Assets fieldtype.
@@ -62,6 +70,15 @@ class SourceFieldtype extends Fieldtype
             $defaultValue = $this->sourceField()->setValue(null)->defaultValue();
 
             return $this->sourceFieldtype()->augment($defaultValue);
+        }
+
+        if ($data === '@auto') {
+            $fieldHandle = $this->field->config()['auto'];
+            $parent = $this->field->parent();
+            $field = $parent->blueprint()->fields()->get($fieldHandle);
+            $value = $parent->get($fieldHandle);
+
+            return $field->setValue($value)->fieldtype()->augment($field->value());
         }
 
         if ($data === '@null') {
