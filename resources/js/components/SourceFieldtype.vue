@@ -9,7 +9,7 @@
                     :key="index"
                     ref="button"
                     :name="name"
-                    @click="sourceChanged($event.target.value)"
+                    @click="updateFieldSource($event.target.value)"
                     :value="option.value"
                     :class="{'active': fieldSource === option.value}"
                     :disabled="isReadOnly"
@@ -25,7 +25,7 @@
                 :config="fieldConfig"
                 :meta="fieldMeta"
                 :value="fieldValue"
-                :read-only="isReadOnly || fieldSource === 'default'"
+                :read-only="isReadOnly"
                 handle="source_value"
                 @input="updateFieldValue">
             </component>
@@ -43,7 +43,7 @@ export default {
         return {
             autoBindChangeWatcher: false,
             changeWatcherWatchDeep: false,
-            tempValue: '',
+            customValue: null,
         }
     },
 
@@ -107,36 +107,38 @@ export default {
         },
 
         site() {
-            this.tempValue = '';
+            this.customValue = null;
         },
     },
 
     methods: {
 
-        sourceChanged(value) {
-            if (this.value.source === value) {
+        updateFieldSource(source) {
+            if (this.value.source === source) {
                 return;
             }
 
-            this.value.source = value
+            this.value.source = source
 
-            if (value === 'default') {
-                this.tempValue = this.value.value
+            if (source === 'default') {
+                // Save the value so that we can restore it if the user switches back to custom.
+                this.customValue = this.value.value
                 this.updateFieldValue(this.fieldDefault)
             }
 
-            if (value === 'custom') {
-                let value = this.tempValue || this.fieldDefault
-                this.updateFieldValue(value)
+            if (source === 'custom') {
+                this.updateFieldValue(this.customValue || this.fieldDefault)
             }
         },
 
         updateFieldValue(value) {
-            let newValue = this.value;
+            this.value.value = value;
 
-            newValue.value = value;
+            if (this.fieldValue !== this.fieldDefault) {
+                this.value.source = 'custom'
+            }
 
-            this.update(newValue);
+            this.update(this.value);
         },
 
     },
