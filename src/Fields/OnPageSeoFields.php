@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\GetFallbackTitle;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
@@ -43,7 +42,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Meta Title',
                     'instructions' => $this->trans('seo_title', 'instructions'),
                     'type' => 'seo_source',
-                    'default' => '@default',
+                    'default' => $this->getValueFromCascade('seo_title') ? '@default' : '@auto',
                     'auto' => 'title',
                     'localizable' => true,
                     'field' => [
@@ -64,7 +63,6 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_description', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
-                    'auto' => 'seo_description',
                     'localizable' => true,
                     'field' => [
                         'type' => 'textarea',
@@ -194,7 +192,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Open Graph Title',
                     'instructions' => $this->trans('seo_og_title', 'instructions'),
                     'type' => 'seo_source',
-                    'default' => '@default',
+                    'default' => $this->getValueFromCascade('seo_og_title') ? '@default' : '@auto',
                     'auto' => 'seo_title',
                     'localizable' => true,
                     'field' => [
@@ -214,7 +212,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Open Graph Description',
                     'instructions' => $this->trans('seo_og_description', 'instructions'),
                     'type' => 'seo_source',
-                    'default' => '@default',
+                    'default' => $this->getValueFromCascade('seo_og_description') ? '@default' : '@auto',
                     'auto' => 'seo_description',
                     'localizable' => true,
                     'field' => [
@@ -295,7 +293,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Twitter Title',
                     'instructions' => $this->trans('seo_twitter_title', 'instructions'),
                     'type' => 'seo_source',
-                    'default' => '@default',
+                    'default' => $this->getValueFromCascade('seo_twitter_title') ? '@default' : '@auto',
                     'auto' => 'seo_title',
                     'localizable' => true,
                     'field' => [
@@ -315,7 +313,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => 'Twitter Description',
                     'instructions' => $this->trans('seo_twitter_description', 'instructions'),
                     'type' => 'seo_source',
-                    'default' => '@default',
+                    'default' => $this->getValueFromCascade('seo_twitter_description') ? '@default' : '@auto',
                     'auto' => 'seo_description',
                     'localizable' => true,
                     'field' => [
