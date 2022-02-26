@@ -37,7 +37,9 @@
                     :value="autoFieldValue"
                     read-only="true">
                 </component>
-                <!-- <div class="mt-1 help-block" v-text="`Source Field: ${autoFieldDisplay} (${autoFieldHandle})`"></div> -->
+                <div class="mt-1 help-block">
+                    The value is inherited from <code>{{ autoFieldDisplay }} ({{ autoFieldHandle }})</code>
+                </div>
             </div>
         </div>
 
