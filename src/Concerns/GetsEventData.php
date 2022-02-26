@@ -68,6 +68,7 @@ trait GetsEventData
         return $data ?? $this->getFallbackData($event);
     }
 
+    // TODO: Make this fallback data its own DTO so that we can typehint it?
     protected function getFallbackData(Event $event): Collection
     {
         $data = collect([
