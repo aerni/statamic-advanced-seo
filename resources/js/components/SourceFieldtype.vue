@@ -116,7 +116,7 @@ export default {
             ]
 
             if (this.autoFieldHandle) {
-                options.push({ label: this.autoFieldDisplay, value: 'auto' })
+                options.unshift({ label: 'Auto', value: 'auto' })
             }
 
             return options
