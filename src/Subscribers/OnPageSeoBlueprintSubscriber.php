@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Illuminate\Events\Dispatcher;

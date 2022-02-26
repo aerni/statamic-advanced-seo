@@ -7,7 +7,6 @@ use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\View\Cascade;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Facades\Blink;
 

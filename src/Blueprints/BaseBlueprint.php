@@ -4,8 +4,6 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Blueprint as BlueprintFields;
 use Statamic\Support\Str;

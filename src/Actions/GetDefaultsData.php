@@ -3,10 +3,6 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Actions\EvaluateModelType;
-use Aerni\AdvancedSeo\Actions\EvaluateModelSites;
-use Aerni\AdvancedSeo\Actions\EvaluateModelHandle;
-use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
 
 class GetDefaultsData
 {
