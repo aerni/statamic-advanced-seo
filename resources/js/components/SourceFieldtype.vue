@@ -147,11 +147,16 @@ export default {
             }
         },
 
-        autoFieldValue(value) {
-            if (this.fieldSource === 'auto') {
-                this.updateFieldValue(value)
-            }
-        },
+        /**
+         * I don't think there is a need to update the field value when it's set to `@auto`
+         * Upon save the field is processed with regard to the source and not the value.
+         * So it shouldn't really make a difference.
+         */
+        // autoFieldValue(value) {
+        //     if (this.fieldSource === 'auto') {
+        //         this.updateFieldValue(value)
+        //     }
+        // },
 
         site() {
             this.customValue = null;
