@@ -63,43 +63,34 @@ trait GetsContentDefaults
         return $data;
     }
 
-    protected function getContentType(Collection|Taxonomy|LaravelCollection $parent): string
+    protected function getContentType(mixed $parent): string
     {
-        if ($parent instanceof Collection) {
-            return 'collections';
-        }
-
-        if ($parent instanceof Taxonomy) {
-            return 'taxonomies';
-        }
-
-        return $parent->get('type');
+        return match ($parent) {
+            ($parent instanceof Collection) => 'collections',
+            ($parent instanceof Taxonomy) => 'taxonomies',
+            ($parent instanceof LaravelCollection) => $parent->get('type'),
+            default => throw new \Exception('No type could be found for the provided parent.')
+        };
     }
 
-    protected function getContentHandle(Collection|Taxonomy|LaravelCollection $parent): string
+    protected function getContentHandle(mixed $parent): string
     {
-        if ($parent instanceof Collection) {
-            return $parent->handle();
-        }
-
-        if ($parent instanceof Taxonomy) {
-            return $parent->handle();
-        }
-
-        return $parent->get('handle');
+        return match ($parent) {
+            ($parent instanceof Collection) => $parent->handle(),
+            ($parent instanceof Taxonomy) => $parent->handle(),
+            ($parent instanceof LaravelCollection) => $parent->get('handle'),
+            default => throw new \Exception('No handle could be found for the provided parent.')
+        };
     }
 
-    protected function getContentSites(Collection|Taxonomy|LaravelCollection $parent): LaravelCollection
+    protected function getContentSites(mixed $parent): LaravelCollection
     {
-        if ($parent instanceof Collection) {
-            return $parent->sites();
-        }
-
-        if ($parent instanceof Taxonomy) {
-            return $parent->sites();
-        }
-
-        return $parent->get('sites');
+        return match ($parent) {
+            ($parent instanceof Collection) => $parent->sites(),
+            ($parent instanceof Taxonomy) => $parent->sites(),
+            ($parent instanceof LaravelCollection) => $parent->get('sites'),
+            default => throw new \Exception('No sites could be found for the provided parent.')
+        };
     }
 
     protected function canGetContentDefaults(mixed $data): bool
