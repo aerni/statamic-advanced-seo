@@ -13,19 +13,12 @@ class SourceFieldtype extends Fieldtype
 
     public function preProcess(mixed $data): array
     {
-        if ($data === '@default') {
-            return ['source' => 'default', 'value' => $this->sourceFieldDefaultValue()];
-        }
-
-        if ($data === '@auto') {
-            return ['source' => 'auto', 'value' => null];
-        }
-
-        if ($data === '@null') {
-            return ['source' => 'custom', 'value' => null];
-        }
-
-        return ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess($data)];
+        return match ($data) {
+            '@default' => ['source' => 'default', 'value' => $this->sourceFieldDefaultValue()],
+            '@auto' => ['source' => 'auto', 'value' => null],
+            '@null' => ['source' => 'custom', 'value' => null],
+            default => ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess($data)],
+        };
     }
 
     public function process(mixed $data): mixed
