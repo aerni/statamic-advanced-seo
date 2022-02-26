@@ -5,11 +5,10 @@ namespace Aerni\AdvancedSeo\Fields;
 use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Contracts\Fields;
+use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blink;
 
 abstract class BaseFields implements Fields
@@ -17,19 +16,14 @@ abstract class BaseFields implements Fields
     use GetsContentDefaults;
     use GetsSiteDefaults;
 
-    protected Entry|Term|Collection $data;
-
-    public function __construct()
-    {
-        $this->data = collect();
-    }
+    protected DefaultsData $data;
 
     public static function make(): self
     {
         return new static();
     }
 
-    public function data(Entry|Term|Collection $data): self
+    public function data(DefaultsData $data): self
     {
         $this->data = $data;
 
@@ -51,7 +45,7 @@ abstract class BaseFields implements Fields
     public function getValueFromCascade(string $handle): mixed
     {
         // We can't create a cascade if we don't have any data.
-        if ($this->data instanceof Collection && $this->data->isEmpty()) {
+        if (! isset($this->data)) {
             return null;
         }
 
@@ -65,25 +59,13 @@ abstract class BaseFields implements Fields
         return __("advanced-seo::fields.$parent.$key", ['type' => $this->typePlaceholder()]);
     }
 
-    protected function typePlaceholder(): string
+    protected function typePlaceholder(): ?string
     {
-        if ($this->data instanceof Entry) {
-            return 'entry';
-        }
-
-        if ($this->data instanceof Term) {
-            return 'term';
-        }
-
-        if ($this->data instanceof Collection && $this->data->get('type') === 'collections') {
-            return 'entries';
-        }
-
-        if ($this->data instanceof Collection && $this->data->get('type') === 'taxonomies') {
-            return 'terms';
-        }
-
-        return '';
+        return match ($this->data->type) {
+            'collections' => 'entry',
+            'taxonomies' => 'term',
+            default => null
+        };
     }
 
     abstract protected function sections(): array;

@@ -2,17 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Fields\Value;
 
 class GetAugmentedDefaults
 {
-    public static function handle(string $type, string $handle, string $locale, Collection $sites): Collection
+    public static function handle(DefaultsData $data): Collection
     {
-        return Seo::findOrMake($type, $handle)
-            ->ensureLocalizations($sites)
-            ->in($locale)
+        return Seo::findOrMake($data->type, $data->handle)
+            ->ensureLocalizations($data->sites)
+            ->in($data->locale)
             ->toAugmentedCollection()
             ->filter(fn ($item) => $item instanceof Value);
     }

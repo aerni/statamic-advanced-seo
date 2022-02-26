@@ -2,23 +2,25 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsPageData;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
+use Statamic\Tags\Context;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsPageData;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 class Cascade
 {
@@ -27,15 +29,13 @@ class Cascade
     use GetsPageData;
 
     protected Collection $data;
-    protected bool $isErrorPage;
 
-    public function __construct(protected Entry|Term|Collection $context)
+    public function __construct(protected Entry|Term|Context|DefaultsData $context)
     {
         $this->data = collect();
-        $this->isErrorPage = Str::contains($context->get('current_template'), 'errors');
     }
 
-    public static function from(Entry|Term|Collection $context): self
+    public static function from(Entry|Term|Context|DefaultsData $context): self
     {
         return new static($context);
     }
@@ -106,13 +106,22 @@ class Cascade
         return $this;
     }
 
+    protected function isErrorPage(): bool
+    {
+        if ($this->context instanceof Context) {
+            return Str::contains($this->context->get('current_template'), 'errors');
+        }
+
+        return false;
+    }
+
     protected function withComputedData(): self
     {
         $computedData = collect([
             'title' => $this->compiledTitle(),
         ]);
 
-        if (! $this->isErrorPage) {
+        if (! $this->isErrorPage()) {
             $computedData = $computedData->merge([
                 'title' => $this->compiledTitle(),
                 'og_title' => $this->ogTitle(),

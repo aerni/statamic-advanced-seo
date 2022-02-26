@@ -2,19 +2,21 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events\EntryBlueprintFound;
+use Statamic\Statamic;
 use Statamic\Events\Event;
-use Statamic\Events\TermBlueprintFound;
-use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
+use Illuminate\Support\Str;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
-use Statamic\Statamic;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Events\EntryBlueprintFound;
+use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Statamic\Facades\Collection as CollectionFacade;
 
 trait GetsEventData
 {
@@ -55,36 +57,14 @@ trait GetsEventData
             : $this->getProperty($event)->blueprint();
     }
 
-    protected function getDataFromEvent(Event $event): Entry|Term|LocalizedTerm|Collection
+    protected function getDataFromEvent(Event $event): DefaultsData
     {
         $data = $this->getProperty($event);
 
-        // Make sure to get the data in the correct locale.
-        if ($data && ! Statamic::isCpRoute()) {
-            return $data->in(Site::current()->handle());
+        if (! Statamic::isCpRoute()) {
+            $data = $data->in(Site::current()->handle());
         }
 
-        // The fallback data is used on "Create Entry" and "Create Term" views so that we can get the content defaults.
-        return $data ?? $this->getFallbackData($event);
-    }
-
-    // TODO: Make this fallback data its own DTO so that we can typehint it?
-    protected function getFallbackData(Event $event): Collection
-    {
-        $data = collect([
-            'type' => Str::before($event->blueprint->namespace(), '.'),
-            'handle' => Str::after($event->blueprint->namespace(), '.'),
-            'locale' => basename(request()->path()), // TODO: This won't work with subdomain locales.
-        ]);
-
-        if ($data['type'] === 'collections') {
-            $data->put('sites', CollectionFacade::find($data['handle'])->sites());
-        }
-
-        if ($data['type'] === 'taxonomies') {
-            $data->put('sites', Taxonomy::find($data['handle'])->sites());
-        }
-
-        return $data;
+        return GetDefaultsData::handle($data ?? $event);
     }
 }

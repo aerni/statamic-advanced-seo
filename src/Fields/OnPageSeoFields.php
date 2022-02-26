@@ -2,12 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Fieldset;
-use Statamic\Facades\Site;
-use Statamic\Taxonomies\Term;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -20,7 +17,7 @@ class OnPageSeoFields extends BaseFields
             $this->socialImages(),
             $this->canonicalUrl(),
             $this->indexing(),
-            $this->sitemap(),
+            // $this->sitemap(),
             $this->jsonLd(),
         ];
     }
@@ -84,7 +81,7 @@ class OnPageSeoFields extends BaseFields
             $this->twitterImage(),
         ]);
 
-        if ($this->displaySocialImagesGenerator()) {
+        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields->prepend($this->socialImagesGeneratorFields());
             $fields->prepend($this->socialImagesGenerator());
         }
@@ -251,7 +248,7 @@ class OnPageSeoFields extends BaseFields
             ],
         ];
 
-        if ($this->displaySocialImagesGenerator()) {
+        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[3]['field']['if']['seo_generate_social_images.value'] = 'equals false';
         }
 
@@ -352,7 +349,7 @@ class OnPageSeoFields extends BaseFields
             ],
         ];
 
-        if ($this->displaySocialImagesGenerator()) {
+        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[4]['field']['if']['seo_generate_social_images.value'] = 'equals false';
         }
 
@@ -595,41 +592,5 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
-    }
-
-    public function displaySocialImagesGenerator(): bool
-    {
-        // Don't show the generator section if the generator is disabled.
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return false;
-        }
-
-        // Terms are not yet supported.
-        if ($this->data instanceof Term) {
-            return false;
-        }
-
-        // Terms are not yet supported.
-        // This is the check for the "Create Term" view. Because the data won't yet be an instance of Term.
-        if ($this->data->get('type') === 'taxonomies') {
-            return false;
-        }
-
-        $enabledCollections = Seo::find('site', 'social_media')
-            ?->in(Site::selected()->handle())
-            ?->value('social_images_generator_collections') ?? [];
-
-        // Don't show the generator section if the entry's collection is not configured.
-        if ($this->data instanceof Entry && ! in_array($this->data->collectionHandle(), $enabledCollections)) {
-            return false;
-        }
-
-        // Don't show the generator section if the collection is not configured.
-        // This is the check for the "Create Entry" view. Because the data won't yet be an instance of Entry.
-        if ($this->data->get('type') === 'collections' && ! in_array($this->data->get('handle'), $enabledCollections)) {
-            return false;
-        }
-
-        return true;
     }
 }

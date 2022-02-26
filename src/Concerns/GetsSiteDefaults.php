@@ -20,6 +20,7 @@ trait GetsSiteDefaults
      */
     public function getSiteDefaults(Entry|Term|Collection $data = null): Collection
     {
+        // TODO: Fix the site defaults.
         $locale = $this->getLocale($data);
 
         return Blink::once($this->getSiteCacheKey($locale), function () use ($locale) {
@@ -28,6 +29,22 @@ trait GetsSiteDefaults
             });
         });
     }
+
+    // public function getSiteDefaults(mixed $data): Collection
+    // {
+    //     $locale = EvaluateModelLocale::handle($data);
+
+    //     return Blink::once("advanced-seo::site::all::$locale", function () use ($locale) {
+    //         return Defaults::enabledInType('site')->flatMap(function ($model) use ($locale) {
+    //             return GetAugmentedDefaults::handle(new DefaultsData(
+    //                 type: 'site',
+    //                 handle: $model['handle'],
+    //                 locale: $locale,
+    //                 sites: Site::all()->map->handle(),
+    //             ));
+    //         });
+    //     });
+    // }
 
     protected function getSiteCacheKey(string $locale): string
     {

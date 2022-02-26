@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
@@ -165,11 +166,12 @@ class SeoDefaultSet implements Contract
 
     public function blueprint(): Blueprint
     {
-        return resolve(Defaults::blueprint("{$this->type}::{$this->handle}"))->make()
-            ->data(collect([
-                'type' => $this->type,
-                'handle' => $this->handle,
-            ]))->get();
+        $blueprint = Defaults::blueprint("{$this->type}::{$this->handle}");
+
+        return resolve($blueprint)
+            ->make()
+            ->data(new DefaultsData(type: $this->type, handle: $this->handle)) // We need to pass data so that we can conditionally hide and show ContentDefaultsFields
+            ->get();
     }
 
     public function save(): self

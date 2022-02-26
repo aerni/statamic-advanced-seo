@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Facades\Fieldset;
-use Statamic\Facades\Site;
 
 class ContentDefaultsFields extends BaseFields
 {
@@ -75,7 +74,7 @@ class ContentDefaultsFields extends BaseFields
             $this->twitterImage(),
         ]);
 
-        if ($this->displaySocialImagesGenerator()) {
+        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields->prepend($this->socialImagesGeneratorFields());
             $fields->prepend($this->socialImagesGenerator());
         }
@@ -186,7 +185,7 @@ class ContentDefaultsFields extends BaseFields
             ],
         ];
 
-        if ($this->displaySocialImagesGenerator()) {
+        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
         }
 
@@ -264,7 +263,7 @@ class ContentDefaultsFields extends BaseFields
             ],
         ];
 
-        if ($this->displaySocialImagesGenerator()) {
+        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[4]['field']['if']['seo_generate_social_images'] = 'equals false';
         }
 
@@ -483,29 +482,5 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
         ];
-    }
-
-    public function displaySocialImagesGenerator(): bool
-    {
-        // Don't show the generator section if the generator is disabled.
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return false;
-        }
-
-        // Terms are not yet supported.
-        if ($this->data->get('type') === 'taxonomies') {
-            return false;
-        }
-
-        $enabledCollections = Seo::find('site', 'social_media')
-            ?->in(Site::selected()->handle())
-            ?->value('social_images_generator_collections') ?? [];
-
-        // Don't show the generator section if the collection is not configured.
-        if ($this->data->get('type') === 'collections' && ! in_array($this->data->get('handle'), $enabledCollections)) {
-            return false;
-        }
-
-        return true;
     }
 }
