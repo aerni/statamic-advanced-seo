@@ -30,16 +30,16 @@ class SourceFieldtype extends Fieldtype
 
     public function process(mixed $data): mixed
     {
-        if ($data['value'] === null) {
-            return '@null';
-        }
-
         if ($data['source'] === 'default') {
             return '@default';
         }
 
         if ($data['source'] === 'auto') {
             return '@auto';
+        }
+
+        if ($data['source'] === 'custom' && empty($data['value'])) {
+            return '@null';
         }
 
         // Handle the Assets fieldtype.
