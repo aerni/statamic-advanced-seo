@@ -92,11 +92,9 @@ export default {
         },
 
         autoFieldDisplay() {
-            // TODO: Get the field label from the blueprint vuex store.
-            // let display = this.store.blueprint.sections
-            // console.log(display)
+            let fields = this.store.blueprint.sections.flatMap(section => section.fields);
 
-            return 'Title'
+            return _.find(fields, {'handle': this.autoFieldHandle}).display;
         },
 
         autoFieldValue() {
