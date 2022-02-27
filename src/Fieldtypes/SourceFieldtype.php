@@ -31,9 +31,8 @@ class SourceFieldtype extends Fieldtype
             return '@auto';
         }
 
-        if ($data['source'] === 'custom' && empty($data['value'])) {
-            return '@null';
-        }
+        // We only want to handle empty values that are not booleans. Booleans should be saved as such.
+        if ($data['source'] === 'custom' && empty($data['value']) && ! is_bool($data['value'])) {
             return '@null';
         }
 
