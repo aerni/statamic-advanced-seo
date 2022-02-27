@@ -2,20 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\View\Cascade;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Facades\Blink;
 
 abstract class BaseFields implements Fields
 {
-    use GetsContentDefaults;
-    use GetsSiteDefaults;
-
     protected DefaultsData $data;
 
     public static function make(): self

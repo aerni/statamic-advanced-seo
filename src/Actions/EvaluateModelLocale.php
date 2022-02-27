@@ -20,11 +20,9 @@ class EvaluateModelLocale
             ($model instanceof Entry)
                 => $model->locale(),
             ($model instanceof Term) // This also handles LocalizedTerm
-                => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(), // TODO: Do we really need this frontend fallback? Isn't this handled by the Context case?
-            ($model instanceof Context && $model->get('collection') instanceof Collection)
-                => $model->get('locale'),
-            ($model instanceof Context && $model->get('taxonomy') instanceof Taxonomy)
-                => Site::current()->handle(),
+                => basename(request()->path()),
+            ($model instanceof Context)
+                => $model->get('site')->handle(),
             ($model instanceof EntryBlueprintFound)
                 => basename(request()->path()),
             ($model instanceof TermBlueprintFound)

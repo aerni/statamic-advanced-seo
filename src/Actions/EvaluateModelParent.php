@@ -13,6 +13,7 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Stache\Query\TermQueryBuilder;
 
 class EvaluateModelParent
 {
@@ -27,6 +28,8 @@ class EvaluateModelParent
                 => $data->get('collection'),
             ($data instanceof Context && $data->get('taxonomy') instanceof Taxonomy)
                 => $data->get('taxonomy'),
+            ($data instanceof Context && $data->get('terms') instanceof TermQueryBuilder)
+                => TaxonomyFacade::find($data->get('handle')),
             ($data instanceof EntryBlueprintFound)
                 => CollectionFacade::find(Str::after($data->blueprint->namespace(), '.')),
             ($data instanceof TermBlueprintFound)
