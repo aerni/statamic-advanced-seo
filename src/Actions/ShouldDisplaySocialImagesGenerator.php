@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Facades\Site;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Facades\Site;
 
 class ShouldDisplaySocialImagesGenerator
 {
