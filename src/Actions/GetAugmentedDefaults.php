@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Actions;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
-use Statamic\Fields\Value;
 
 class GetAugmentedDefaults
 {
@@ -14,7 +13,6 @@ class GetAugmentedDefaults
         return Seo::findOrMake($data->type, $data->handle)
             ->ensureLocalizations($data->sites)
             ->in($data->locale)
-            ->toAugmentedCollection()
-            ->filter(fn ($item) => $item instanceof Value);
+            ->toAugmentedCollection();
     }
 }

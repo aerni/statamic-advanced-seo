@@ -11,6 +11,7 @@ use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Statamic\Fields\Value;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Tags\Context;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -24,12 +25,12 @@ class EvaluateModelParent
                 => $data->collection(),
             ($data instanceof Term) // This also handles LocalizedTerm
                 => $data->taxonomy(),
-            ($data instanceof Context && $data->get('collection') instanceof Collection)
-                => $data->get('collection'),
-            ($data instanceof Context && $data->get('taxonomy') instanceof Taxonomy)
-                => $data->get('taxonomy'),
+            ($data instanceof Context && $data->get('collection') instanceof Value)
+                => $data->get('collection')->value(),
+            ($data instanceof Context && $data->get('taxonomy') instanceof Value)
+                => $data->get('taxonomy')->value(),
             ($data instanceof Context && $data->get('terms') instanceof TermQueryBuilder)
-                => TaxonomyFacade::find($data->get('handle')),
+                => TaxonomyFacade::find($data->get('handle')->value()),
             ($data instanceof EntryBlueprintFound)
                 => CollectionFacade::find(Str::after($data->blueprint->namespace(), '.')),
             ($data instanceof TermBlueprintFound)

@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
-use Statamic\Fields\Value;
 use Statamic\Tags\Context;
 
 trait GetsPageData
@@ -15,9 +14,9 @@ trait GetsPageData
     {
         $data = GetDefaultsData::handle($context);
 
-        return Blink::once("advanced-seo::page::{$data->locale}", function () use ($context, $data) {
-            return $context->intersectByKeys(OnPageSeoBlueprint::make()->data($data)->items())
-                ->filter(fn ($item) => $item instanceof Value);
-        });
+        return Blink::once(
+            "advanced-seo::page::{$data->locale}",
+            fn () => $context->intersectByKeys(OnPageSeoBlueprint::make()->data($data)->items())
+        );
     }
 }
