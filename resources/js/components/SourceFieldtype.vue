@@ -135,30 +135,8 @@ export default {
     },
 
     watch: {
-        fieldIsSynced(value) {
-            // Use isEqual because the data can be of different types.
-            // With the code fieldtype for instance the data is an object.
-
-            // TODO: Handle 'auto' field
-            if (value === true && _.isEqual(this.value.value, this.fieldDefault)) {
-                this.value.source = 'default'
-            } else if (value === true && ! _.isEqual(this.value.value, this.fieldDefault)) {
-                this.value.source = 'custom'
-            }
-        },
-
-        /**
-         * I don't think there is a need to update the field value when it's set to `@auto`
-         * Upon save the field is processed with regard to the source and not the value.
-         * So it shouldn't really make a difference.
-         */
-        // autoFieldValue(value) {
-        //     if (this.fieldSource === 'auto') {
-        //         this.updateFieldValue(value)
-        //     }
-        // },
-
         site() {
+            // Reset the temporary custom value when the user switches the site.
             this.customValue = null;
         },
     },
