@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Models;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Collection as CollectionFacade;
-use Statamic\Facades\Taxonomy;
 use Statamic\Facades\YAML;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Collection as CollectionFacade;
 
 class Defaults extends Model
 {
@@ -107,12 +108,11 @@ class Defaults extends Model
         return static::$rows;
     }
 
-    protected static function data(string $id, bool $getByType = false): Collection
+    protected static function data(string $id): Collection
     {
-        return Blink::once("advanced-seo::defaults::data::$id", function () use ($id, $getByType) {
-            $path = $getByType
-                ? Arr::get(static::$rows->firstWhere('type', $id), 'data')
-                : Arr::get(static::$rows->firstWhere('id', $id), 'data');
+        return Blink::once("advanced-seo::defaults::data::$id", function () use ($id) {
+            $model = static::$rows->filter(fn ($row) => Str::contains($row['id'], $id))->first();
+            $path = Arr::get($model, 'data');
 
             if (is_null($path)) {
                 return collect();
