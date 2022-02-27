@@ -2,18 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Tags\Context;
 use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events\TermBlueprintFound;
-use Statamic\Events\EntryBlueprintFound;
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Events\EntryBlueprintFound;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Tags\Context;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class EvaluateModelParent
 {
