@@ -45,7 +45,7 @@ abstract class BaseFields implements Fields
 
         return Blink::once('advanced-seo::cascade::cp', function () {
             return Cascade::from($this->data)->withContentDefaults();
-        })->value(Str::remove('seo_', $handle));
+        })->raw(Str::remove('seo_', $handle));
     }
 
     protected function trans(string $parent, string $key): string

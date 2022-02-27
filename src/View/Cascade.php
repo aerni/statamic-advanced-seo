@@ -76,9 +76,12 @@ class Cascade
 
     public function value(string $key): mixed
     {
-        $value = $this->data->get($key);
+        return $this->data->get($key)?->value();
+    }
 
-        return $value instanceof Value ? $value->value() : $value;
+    public function raw(string $key): mixed
+    {
+        return $this->data->get($key)?->raw();
     }
 
     public function processForFrontend(): self
