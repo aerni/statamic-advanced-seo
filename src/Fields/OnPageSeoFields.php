@@ -232,7 +232,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'assets',
-                        'default' => $this->getValueFromCascade('seo_og_image')?->path(),
+                        'default' => $this->getValueFromCascade('seo_og_image'),
                         'container' => config('advanced-seo.social_images.container', 'assets'),
                         'folder' => 'social_images',
                         'max_files' => 1,
@@ -333,7 +333,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'field' => [
                         'type' => 'assets',
-                        'default' => $this->getValueFromCascade('seo_twitter_image')?->path(),
+                        'default' => $this->getValueFromCascade('seo_twitter_image'),
                         'container' => config('advanced-seo.social_images.container', 'assets'),
                         'folder' => 'social_images',
                         'max_files' => 1,
