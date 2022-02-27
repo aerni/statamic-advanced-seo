@@ -34,9 +34,6 @@ class SourceFieldtype extends Fieldtype
         if ($data['source'] === 'custom' && empty($data['value'])) {
             return '@null';
         }
-
-        // Handle the Assets fieldtype.
-        if ($data['value'] === []) {
             return '@null';
         }
 
