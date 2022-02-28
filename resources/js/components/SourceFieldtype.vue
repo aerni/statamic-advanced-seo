@@ -181,7 +181,7 @@ export default {
             // Save the value so that we can restore it if the user switches back to custom.
             this.customValue = this.value.value
 
-            if (this.fieldValue !== this.fieldDefault) {
+            if (! _.isEqual(this.fieldValue, this.fieldDefault)) {
                 this.value.source = 'custom'
             }
         },
