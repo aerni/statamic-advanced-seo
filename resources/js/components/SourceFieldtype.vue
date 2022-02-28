@@ -175,6 +175,8 @@ export default {
             this.update(this.value);
         },
 
+        // TODO: This for whatever reason always triggers when changing the source on the code fieldtype.
+        // This is the reason the custom value gets reset again. Why does this happen?!
         updateCustomFieldValue(value) {
             this.updateFieldValue(value)
 
