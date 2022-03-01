@@ -15,14 +15,18 @@ class SourceFieldtype extends Fieldtype
     {
         return match ($data) {
             '@default' => ['source' => 'default', 'value' => $this->sourceFieldDefaultValue()],
-            '@auto' => ['source' => 'auto', 'value' => null],
-            '@null' => ['source' => 'custom', 'value' => null],
+            '@auto' => ['source' => 'auto', 'value' => $this->sourceFieldtype()->preProcess(null)],
+            '@null' => ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess(null)],
             default => ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess($data)],
         };
     }
 
     public function process(mixed $data): mixed
     {
+        if ($data === null) {
+            return $data;
+        }
+
         if ($data['source'] === 'default') {
             return '@default';
         }
@@ -79,6 +83,10 @@ class SourceFieldtype extends Fieldtype
 
     public function preProcessValidatable(mixed $value): mixed
     {
+        if ($value === null) {
+            return $value;
+        }
+
         return $value['value'];
     }
 
