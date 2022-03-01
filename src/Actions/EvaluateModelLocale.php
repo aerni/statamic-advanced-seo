@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Statamic;
-use Statamic\Tags\Context;
+use Aerni\AdvancedSeo\Data\DefaultsData;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events\TermBlueprintFound;
-use Aerni\AdvancedSeo\Data\DefaultsData;
 use Statamic\Events\EntryBlueprintFound;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Statamic;
+use Statamic\Tags\Context;
 
 class EvaluateModelLocale
 {
