@@ -10,9 +10,11 @@ use Statamic\Tags\Context;
 
 trait GetsPageData
 {
-    public function getPageData(Context $context): Collection
+    public function getPageData(Context $context): ?Collection
     {
-        $data = GetDefaultsData::handle($context);
+        if (! $data = GetDefaultsData::handle($context)) {
+            return null;
+        }
 
         return Blink::once(
             "advanced-seo::page::{$data->locale}",

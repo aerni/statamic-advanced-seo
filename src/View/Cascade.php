@@ -2,25 +2,23 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsPageData;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
-use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsPageData;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 class Cascade
 {
@@ -28,14 +26,16 @@ class Cascade
     use GetsSiteDefaults;
     use GetsPageData;
 
+    protected Context|DefaultsData $context;
     protected Collection $data;
 
-    public function __construct(protected Entry|Term|Context|DefaultsData $context)
+    public function __construct(Context|DefaultsData $context)
     {
+        $this->context = $context;
         $this->data = collect();
     }
 
-    public static function from(Entry|Term|Context|DefaultsData $context): self
+    public static function from(Context|DefaultsData $context): self
     {
         return new static($context);
     }
@@ -43,6 +43,7 @@ class Cascade
     public function withSiteDefaults(): self
     {
         $siteDefaults = $this->getSiteDefaults($this->context);
+        $siteDefaults = $this->removeSeoPrefixFromKeys($siteDefaults);
 
         $this->data = $this->data->merge($siteDefaults);
 
@@ -61,6 +62,10 @@ class Cascade
 
     public function withPageData(): self
     {
+        if (! $this->context instanceof Context) {
+            throw new \Exception("The context needs to be an instance of Statamic\Tags\Context in order to get the page data.");
+        }
+
         $pageData = $this->getPageData($this->context);
         $pageData = $this->removeSeoPrefixFromKeys($pageData);
 
@@ -69,72 +74,17 @@ class Cascade
         return $this;
     }
 
-    public function get(): array
+    public function withComputedData(): self
     {
-        return $this->data->all();
-    }
-
-    public function value(string $key): mixed
-    {
-        return $this->data->get($key)?->value();
-    }
-
-    public function raw(string $key): mixed
-    {
-        return $this->data->get($key)?->raw();
-    }
-
-    public function processForFrontend(): self
-    {
-        return $this
-            ->ensureOverrides()
-            ->withComputedData()
-            ->applyWhitelist()
-            ->sortKeys();
-    }
-
-    protected function removeSeoPrefixFromKeys(Collection $data): Collection
-    {
-        return $data->mapWithKeys(fn ($item, $key) => [Str::remove('seo_', $key) => $item]);
-    }
-
-    protected function ensureOverrides(): self
-    {
-        $overrides = $this->getSiteDefaults($this->context)
-            ->only(['noindex', 'nofollow'])
-            ->filter(fn ($item) => $item->value());
-
-        $this->data = $this->data->merge($overrides);
-
-        return $this;
-    }
-
-    protected function isErrorPage(): bool
-    {
-        if ($this->context instanceof Context) {
-            return Str::contains($this->context->get('current_template'), 'errors');
+        if (! $this->context instanceof Context) {
+            throw new \Exception("The context needs to be an instance of Statamic\Tags\Context in order to get the computed data.");
         }
 
-        return false;
-    }
-
-    protected function withComputedData(): self
-    {
-        $computedData = collect([
-            'title' => $this->compiledTitle(),
-        ]);
+        $this->data->put('title', $this->compiledTitle());
 
         if (! $this->isErrorPage()) {
-            $computedData = $computedData->merge([
-                'title' => $this->compiledTitle(),
-                'og_title' => $this->ogTitle(),
-                'og_description' => $this->ogDescription(),
-                'og_image' => $this->ogImage(),
+            $this->data->merge([
                 'og_image_size' => $this->ogImageSize(),
-                'twitter_card' => $this->twitterCard(),
-                'twitter_title' => $this->twitterTitle(),
-                'twitter_description' => $this->twitterDescription(),
-                'twitter_image' => $this->twitterImage(),
                 'twitter_image_size' => $this->twitterImageSize(),
                 'indexing' => $this->indexing(),
                 'locale' => $this->locale(),
@@ -147,9 +97,66 @@ class Cascade
             ])->filter();
         }
 
-        $this->data = $this->data->merge($computedData);
+        return $this;
+    }
+
+    public function all(): array
+    {
+        return $this->data->all();
+    }
+
+    public function get(string $key): mixed
+    {
+        return $this->data->get($key);
+    }
+
+    public function value(string $key): mixed
+    {
+        return $this->data->get($key)?->value();
+    }
+
+    public function raw(string $key): mixed
+    {
+        return $this->data->get($key)?->raw();
+    }
+
+    public function processForFrontend(): array
+    {
+        return $this
+            ->withSiteDefaults()
+            ->withPageData()
+            ->withComputedData()
+            ->applyWhitelist()
+            ->sortKeys()
+            ->all();
+    }
+
+    public function processForBlueprint(): self
+    {
+        return $this
+            ->withSiteDefaults()
+            ->withContentDefaults();
+    }
+
+    protected function removeSeoPrefixFromKeys(Collection $data): Collection
+    {
+        return $data->mapWithKeys(fn ($item, $key) => [Str::remove('seo_', $key) => $item]);
+    }
+
+    protected function sortKeys(): self
+    {
+        $this->data = $this->data->sortKeys();
 
         return $this;
+    }
+
+    protected function isErrorPage(): bool
+    {
+        if ($this->context instanceof Context) {
+            return Str::contains($this->context->get('current_template'), 'errors');
+        }
+
+        return false;
     }
 
     protected function applyWhitelist(): self
@@ -194,50 +201,30 @@ class Cascade
         return $this;
     }
 
-    protected function sortKeys(): self
-    {
-        $this->data = $this->data->sortKeys();
-
-        return $this;
-    }
-
     protected function compiledTitle(): string
     {
-        return $this->data->get('title_position')->raw() === 'before'
+        return $this->value('title_position')->value() === 'before'
             ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
             : "{$this->siteName()} {$this->titleSeparator()} {$this->title()}";
     }
 
-    protected function title(): Value|string
+    protected function title(): string
     {
-        return $this->data->get('title') ?? $this->context->get('response_code');
+        if ($this->isErrorPage()) {
+            return $this->context->get('response_code');
+        }
+
+        return $this->get('title');
     }
 
-    protected function titleSeparator(): Value
+    protected function titleSeparator(): string
     {
-        return $this->data->get('title_separator');
+        return $this->get('title_separator');
     }
 
-    protected function siteName(): Value|string
+    protected function siteName(): string
     {
-        return $this->data->get('site_name') ?? config('app.name');
-    }
-
-    protected function ogTitle(): Value|string
-    {
-        return $this->data->get('og_title') ?? $this->title();
-    }
-
-    protected function ogImage(): ?Value
-    {
-        return $this->data->get('og_image')->value()
-            ? $this->data->get('og_image')
-            : $this->getSiteDefaults($this->context)->get('og_image');
-    }
-
-    protected function ogDescription(): ?Value
-    {
-        return $this->data->get('og_description') ?? $this->data->get('description');
+        return $this->get('site_name') ?? config('app.name');
     }
 
     protected function ogImageSize(): array
@@ -247,40 +234,20 @@ class Cascade
             ->all();
     }
 
-    protected function twitterCard(): Value
-    {
-        return $this->data->get('twitter_card');
-    }
-
-    protected function twitterTitle(): Value|string
-    {
-        return $this->data->get('twitter_title') ?? $this->title();
-    }
-
-    protected function twitterDescription(): ?Value
-    {
-        return $this->data->get('twitter_description') ?? $this->data->get('description');
-    }
-
-    protected function twitterImage(): ?Value
-    {
-        return $this->data->get('twitter_image')->value()
-            ? $this->data->get('twitter_image')
-            : $this->getSiteDefaults($this->context)->get('twitter_image');
-    }
-
     protected function twitterImageSize(): array
     {
-        return collect(SocialImage::specs("twitter.{$this->twitterCard()}"))
+        return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
             ->only(['width', 'height'])
             ->all();
     }
 
     protected function indexing(): string
     {
+        $defaults = $this->getSiteDefaults($this->context)->only(['noindex', 'nofollow']);
+
         return collect([
-            'noindex' => $this->value('noindex'),
-            'nofollow' => $this->value('nofollow'),
+            'noindex' => $this->value('noindex') ?: $defaults->get('noindex')->value(),
+            'nofollow' => $this->value('nofollow') ?: $defaults->get('nofollow')->value(),
         ])->filter()->keys()->implode(', ');
     }
 
@@ -289,10 +256,10 @@ class Cascade
         return Helpers::parseLocale(Site::current()->locale());
     }
 
-    // TODO: Support collection taxonomy details page and collection term details page.
     protected function hreflang(): ?array
     {
         /*
+        TODO: Support collection taxonomy details page.
         Return if we're on a collection taxonomy details page.
         Statamic has yet to provide a way to get the URLs of collection taxonomies.
         */
@@ -301,6 +268,7 @@ class Cascade
         }
 
         /*
+        TODO: Support collection term details page.
         Return if we're on a collection term details page.
         Statamic has yet to provide a way to get the URLs of collection terms.
         */
@@ -357,14 +325,14 @@ class Cascade
 
     protected function canonical(): ?string
     {
-        $type = $this->data->get('canonical_type')?->raw();
+        $type = $this->value('canonical_type')?->value();
 
         if ($type === 'other') {
-            return config('app.url') . $this->data->get('canonical_entry')?->value()?->url();
+            return $this->value('canonical_entry')?->absoluteUrl();
         }
 
         if ($type === 'custom') {
-            return $this->data->get('canonical_custom')?->raw();
+            return $this->value('canonical_custom');
         }
 
         // Handle canonical type "current".
@@ -427,14 +395,14 @@ class Cascade
 
     protected function siteSchema(): ?string
     {
-        $type = $this->data->get('site_json_ld_type')->raw();
+        $type = $this->value('site_json_ld_type')?->value();
 
         if ($type === 'none') {
             return null;
         }
 
         if ($type === 'custom') {
-            $data = $this->data->get('site_json_ld')?->value()?->value();
+            $data = $this->value('site_json_ld')?->value();
 
             return $data
                 ? '<script type="application/ld+json">' . $data . '</script>'
@@ -443,10 +411,10 @@ class Cascade
 
         if ($type === 'organization') {
             $schema = Schema::organization()
-                ->name($this->data->get('organization_name')->value())
-                ->url(config('app.url') . $this->context->get('homepage'));
+                ->name($this->value('organization_name'))
+                ->url($this->context->get('site')->absoluteUrl());
 
-            if ($logo = $this->data->get('organization_logo')?->value()) {
+            if ($logo = $this->value('organization_logo')) {
                 $logo = Schema::imageObject()
                     ->url($logo->absoluteUrl())
                     ->width($logo->width())
@@ -458,8 +426,8 @@ class Cascade
 
         if ($type === 'person') {
             $schema = Schema::person()
-                ->name($this->data->get('person_name')->value())
-                ->url(config('app.url') . $this->context->get('homepage'));
+                ->name($this->value('person_name'))
+                ->url($this->context->get('site')->absoluteUrl());
         }
 
         return $schema->toScript();
@@ -467,7 +435,7 @@ class Cascade
 
     protected function entrySchema(): ?string
     {
-        $data = $this->data->get('json_ld')?->value()?->value();
+        $data = $this->value('json_ld')?->value();
 
         return $data
             ? '<script type="application/ld+json">' . $data . '</script>'
@@ -476,8 +444,8 @@ class Cascade
 
     protected function breadcrumbs(): ?string
     {
-        $enabled = $this->data->get('use_breadcrumbs')->value();
-        $isHome = $this->context->get('url', '') === '/';
+        $enabled = $this->value('use_breadcrumbs');
+        $isHome = $this->context->get('is_homepage');
 
         if ($enabled && ! $isHome) {
             $listItems = $this->breadcrumbsListItems()->map(function ($crumb, $key) {

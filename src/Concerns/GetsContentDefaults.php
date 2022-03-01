@@ -2,19 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
-use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
+use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
+use Illuminate\Support\Collection;
 
 trait GetsContentDefaults
 {
-    // TODO: Add a method to get augmented defaults and another to get unaugmented defaults.
-
-    public function getContentDefaults(mixed $data): Collection
+    public function getContentDefaults(mixed $data): ?Collection
     {
         if (! $data = GetDefaultsData::handle($data)) {
-            return collect();
+            return null;
         }
 
         return Blink::once(
