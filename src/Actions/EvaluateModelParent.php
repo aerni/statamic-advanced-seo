@@ -3,9 +3,7 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\TermBlueprintFound;
@@ -14,7 +12,6 @@ use Statamic\Facades\Taxonomy as TaxonomyFacade;
 use Statamic\Fields\Value;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Tags\Context;
-use Statamic\Taxonomies\LocalizedTerm;
 
 class EvaluateModelParent
 {

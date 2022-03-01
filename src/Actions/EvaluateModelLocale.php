@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Data\DefaultsData;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events\EntryBlueprintFound;
@@ -23,6 +24,8 @@ class EvaluateModelLocale
                 => basename(request()->path()),
             ($model instanceof TermBlueprintFound)
                 => basename(request()->path()),
+            ($model instanceof DefaultsData)
+                => $model->locale,
             default => null
         };
     }
