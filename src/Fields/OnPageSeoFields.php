@@ -166,7 +166,7 @@ class OnPageSeoFields extends BaseFields
             ];
 
             // Add the placeholder values from the content defaults.
-            $field['field']['placeholder'] = $this->getValueFromCascade($field['handle']);
+            $field['field']['default'] = $this->getValueFromCascade($field['handle']);
 
             return $field;
         })->toArray();
