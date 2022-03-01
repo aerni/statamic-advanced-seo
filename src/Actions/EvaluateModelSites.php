@@ -3,9 +3,9 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Illuminate\Support\Collection as LaravelCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Illuminate\Support\Collection as LaravelCollection;
 
 class EvaluateModelSites
 {
