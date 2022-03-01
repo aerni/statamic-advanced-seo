@@ -125,6 +125,7 @@ class Cascade
         return $this
             ->withSiteDefaults()
             ->withPageData()
+            ->ensureOverrides()
             ->withComputedData()
             ->applyWhitelist()
             ->sortKeys()
@@ -135,7 +136,28 @@ class Cascade
     {
         return $this
             ->withSiteDefaults()
-            ->withContentDefaults();
+            ->withContentDefaults()
+            ->ensureOverrides()
+            ->sortKeys();
+    }
+
+    protected function ensureOverrides(): self
+    {
+        // The keys that should be considered for the overrides.
+        $overrides = ['noindex', 'nofollow', 'og_image', 'twitter_image'];
+
+        // The values that should be used as overrides.
+        $defaults = $this->getSiteDefaults($this->context)->only($overrides);
+
+        // The values from the existing data that should be overriden.
+        $data = $this->data->only($overrides)->filter(fn ($item) => $item->value());
+
+        // Only merge the defaults overrides if they don't exist in the data.
+        $merged = $defaults->diffKeys($data)->merge($data);
+
+        $this->data = $this->data->merge($merged);
+
+        return $this;
     }
 
     protected function removeSeoPrefixFromKeys(Collection $data): Collection
@@ -243,11 +265,9 @@ class Cascade
 
     protected function indexing(): string
     {
-        $defaults = $this->getSiteDefaults($this->context)->only(['noindex', 'nofollow']);
-
         return collect([
-            'noindex' => $this->value('noindex') ?: $defaults->get('noindex')->value(),
-            'nofollow' => $this->value('nofollow') ?: $defaults->get('nofollow')->value(),
+            'noindex' => $this->value('noindex'),
+            'nofollow' => $this->value('nofollow'),
         ])->filter()->keys()->implode(', ');
     }
 
