@@ -17,7 +17,7 @@ class OnPageSeoFields extends BaseFields
             $this->socialImages(),
             $this->canonicalUrl(),
             $this->indexing(),
-            // $this->sitemap(),
+            $this->sitemap(),
             $this->jsonLd(),
         ];
     }
