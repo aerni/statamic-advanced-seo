@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Statamic\Statamic;
+use Statamic\Tags\Context;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\TermBlueprintFound;
-use Statamic\Tags\Context;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Statamic\Events\EntryBlueprintFound;
 
 class EvaluateModelLocale
 {
@@ -17,7 +18,7 @@ class EvaluateModelLocale
             ($model instanceof Entry)
                 => $model->locale(),
             ($model instanceof Term) // This also handles LocalizedTerm
-                => basename(request()->path()),
+                => Statamic::isCpRoute() ? basename(request()->path()) : $model->locale(),
             ($model instanceof Context)
                 => $model->get('site')->handle(),
             ($model instanceof EntryBlueprintFound)
