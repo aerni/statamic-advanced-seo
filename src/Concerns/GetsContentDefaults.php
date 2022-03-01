@@ -9,10 +9,10 @@ use Statamic\Facades\Blink;
 
 trait GetsContentDefaults
 {
-    public function getContentDefaults(mixed $data): ?Collection
+    public function getContentDefaults(mixed $data): Collection
     {
         if (! $data = GetDefaultsData::handle($data)) {
-            return null;
+            return collect();
         }
 
         return Blink::once(

@@ -10,10 +10,10 @@ use Statamic\Tags\Context;
 
 trait GetsPageData
 {
-    public function getPageData(Context $context): ?Collection
+    public function getPageData(Context $context): Collection
     {
         if (! $data = GetDefaultsData::handle($context)) {
-            return null;
+            return collect();
         }
 
         return Blink::once(
