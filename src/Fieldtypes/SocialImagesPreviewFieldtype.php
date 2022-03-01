@@ -18,7 +18,8 @@ class SocialImagesPreviewFieldtype extends Fieldtype
         $meta = ['title' => $this->field->display()];
 
         if ($this->shouldDisplayImage($parent)) {
-            $meta['image'] = $parent->augmentedValue(SocialImage::specs($type, $parent)['field'])?->value()?->absoluteUrl();
+            $field = SocialImage::specs($type, $parent)['field'];
+            $meta['image'] = $parent->{$field}?->absoluteUrl();
         }
 
         return $meta;
@@ -30,7 +31,7 @@ class SocialImagesPreviewFieldtype extends Fieldtype
             return false;
         }
 
-        if (! $parent->augmentedValue('seo_generate_social_images')?->value()) {
+        if (! $parent->seo_generate_social_images) {
             return false;
         }
 

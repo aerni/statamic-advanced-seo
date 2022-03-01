@@ -38,7 +38,7 @@ class SocialImageRepository
 
         return match ($type) {
             'og' => Arr::get($this->types(), $type),
-            'twitter' => Arr::get($this->types(), "twitter.{$data->augmentedValue('seo_twitter_card')->value()}"),
+            'twitter' => Arr::get($this->types(), "twitter.{$data->seo_twitter_card}"),
             default => null,
         };
     }
