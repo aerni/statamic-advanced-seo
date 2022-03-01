@@ -86,6 +86,7 @@ return [
     */
 
     'analytics' => [
+        'environments' => ['production'],
         'fathom' => true,
         'cloudflare_analytics' => true,
         'google_tag_manager' => true,

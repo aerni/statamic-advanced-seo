@@ -220,6 +220,20 @@ class Cascade
             'twitter_image_size',
         ]);
 
+        // Remove any analytics data if analytics isn't enabled for the current environment.
+        if (! in_array(app()->environment(), config('advanced-seo.analytics.environments', ['production']))) {
+            $this->data->forget([
+                'use_fathom',
+                'fathom_domain',
+                'fathom_id',
+                'fathom_spa',
+                'use_cloudflare_web_analytics',
+                'cloudflare_web_analytics',
+                'use_google_tag_manager',
+                'google_tag_manager'
+            ]);
+        }
+
         return $this;
     }
 
