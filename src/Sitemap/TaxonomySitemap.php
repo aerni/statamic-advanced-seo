@@ -44,7 +44,7 @@ class TaxonomySitemap extends BaseSitemap
             ->where('site', $this->site)
             ->where('published', '!=', false) // We only want published terms.
             ->get()
-            ->filter(fn ($term) => ! $term->augmentedValue('seo_noindex')?->value()); // We only want indexable terms.;
+            ->filter(fn ($term) => ! $term->seo_noindex); // We only want indexable terms.;
 
         $template = $terms->first()?->template();
 
@@ -87,7 +87,7 @@ class TaxonomySitemap extends BaseSitemap
                 ->where('published', '!=', false) // We only want published entries.
                 ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
                 ->get()
-                ->filter(fn ($term) => ! $term->augmentedValue('seo_noindex')?->value()) // We only want indexable terms.
+                ->filter(fn ($term) => ! $term->seo_noindex) // We only want indexable terms.
                 ->isNotEmpty();
         });
 

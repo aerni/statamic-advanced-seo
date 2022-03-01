@@ -60,10 +60,11 @@ class SitemapItem
             return $this->content->absoluteUrl();
         }
 
-        $canonicalType = $this->content->augmentedValue('seo_canonical_type')->value()->value();
+        $canonicalType = $this->content->seo_canonical_type->value();
+
 
         if ($canonicalType === 'other') {
-            $entryId = $this->content->augmentedValue('seo_canonical_entry')->value()?->id();
+            $entryId = $this->content->seo_canonical_entry?->id();
 
             return $entryId
                 ? EntryFacade::find($entryId)->absoluteUrl()
@@ -71,7 +72,7 @@ class SitemapItem
         }
 
         if ($canonicalType === 'custom') {
-            return $this->content->augmentedValue('seo_canonical_custom')->value() ?? $this->content->absoluteUrl();
+            return $this->content->seo_canonical_custom ?? $this->content->absoluteUrl();
         }
 
         return $this->content->absoluteUrl();
@@ -101,7 +102,7 @@ class SitemapItem
             return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
         }
 
-        return $this->content->augmentedValue('seo_sitemap_change_frequency')->value()->value();
+        return $this->content->seo_sitemap_change_frequency;
     }
 
     public function priority(): string
@@ -110,7 +111,7 @@ class SitemapItem
             return Defaults::data('taxonomies')->get('seo_sitemap_priority');
         }
 
-        return $this->content->augmentedValue('seo_sitemap_priority')->value()->value();
+        return $this->content->seo_sitemap_priority;
     }
 
     public function toArray(): array
