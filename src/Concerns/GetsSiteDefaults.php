@@ -2,14 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Blink;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
 use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
 
 trait GetsSiteDefaults
 {

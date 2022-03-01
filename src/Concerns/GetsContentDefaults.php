@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Facades\Blink;
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
+use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
 
 trait GetsContentDefaults
 {
