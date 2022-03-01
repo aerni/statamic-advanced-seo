@@ -404,7 +404,7 @@ class OnPageSeoFields extends BaseFields
                         'mode' => 'stack',
                         'max_items' => 1,
                         'validate' => [
-                            'required_if:seo_canonical_type.value,other',
+                            'required_if:seo_canonical_type,other',
                         ],
                     ],
                 ],
@@ -425,7 +425,7 @@ class OnPageSeoFields extends BaseFields
                         'default' => $this->getValueFromCascade('seo_canonical_custom'),
                         'input_type' => 'url',
                         'validate' => [
-                            'required_if:seo_canonical_type.value,custom',
+                            'required_if:seo_canonical_type,custom',
                         ],
                     ],
                 ],
