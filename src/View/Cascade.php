@@ -83,7 +83,7 @@ class Cascade
         $this->data->put('title', $this->compiledTitle());
 
         if (! $this->isErrorPage()) {
-            $this->data->merge([
+            $this->data = $this->data->merge([
                 'og_image_size' => $this->ogImageSize(),
                 'twitter_image_size' => $this->twitterImageSize(),
                 'indexing' => $this->indexing(),
