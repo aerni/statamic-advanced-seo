@@ -56,6 +56,7 @@ class IndexingFields extends BaseFields
                     'type' => 'toggle',
                     'instructions' => "Indicate each page's position in the site's hierarchy.",
                     'listable' => false,
+                    'localizable' => true,
                     'display' => 'Breadcrumbs',
                     'width' => 33,
                     'default' => Defaults::data('site::indexing')->get('use_breadcrumbs'),
