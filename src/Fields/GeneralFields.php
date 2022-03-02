@@ -171,6 +171,7 @@ class GeneralFields extends BaseFields
                     'type' => 'code',
                     'icon' => 'code',
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'if' => [
                         'site_json_ld_type' => 'equals custom',
                     ],
