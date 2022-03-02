@@ -230,7 +230,7 @@ class Cascade
                 'use_cloudflare_web_analytics',
                 'cloudflare_web_analytics',
                 'use_google_tag_manager',
-                'google_tag_manager'
+                'google_tag_manager',
             ]);
         }
 
