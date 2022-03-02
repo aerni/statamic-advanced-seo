@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Fields;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Statamic\Facades\Fieldset;
 
 class ContentDefaultsFields extends BaseFields
 {
@@ -75,7 +74,6 @@ class ContentDefaultsFields extends BaseFields
         ]);
 
         if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields->prepend($this->socialImagesGeneratorFields());
             $fields->prepend($this->socialImagesGenerator());
         }
 
@@ -107,27 +105,6 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
         ];
-    }
-
-    public function socialImagesGeneratorFields(): array
-    {
-        $fieldset = Fieldset::setDirectory(resource_path('fieldsets'))->find('social_images_generator');
-
-        if (! $fieldset) {
-            return [];
-        }
-
-        return collect($fieldset->contents()['fields'])->map(function ($field) {
-            // Prefix the field handles to avoid naming conflicts.
-            $field['handle'] = "seo_social_images_{$field['handle']}";
-
-            // Hide the fields if the toggle is of.
-            $field['field']['if'] = [
-                'seo_generate_social_images' => 'equals true',
-            ];
-
-            return $field;
-        })->toArray();
     }
 
     public function openGraphImage(): array
