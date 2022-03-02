@@ -2,11 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Contracts\Fields;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Support\Str;
 use Statamic\Facades\Blink;
+use Aerni\AdvancedSeo\View\Cascade;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Contracts\Fields;
+use Aerni\AdvancedSeo\Data\DefaultsData;
 
 abstract class BaseFields implements Fields
 {
@@ -57,8 +58,8 @@ abstract class BaseFields implements Fields
     protected function typePlaceholder(): ?string
     {
         return match ($this->data->type) {
-            'collections' => 'entry',
-            'taxonomies' => 'term',
+            'collections' => Helpers::isAddonRoute() ? 'entries' : 'entry',
+            'taxonomies' => Helpers::isAddonRoute() ? 'terms' : 'term',
             default => null
         };
     }
