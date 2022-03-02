@@ -102,7 +102,7 @@ export default {
         autoFieldValue() {
             let value = this.store.values[this.autoFieldHandle]
 
-            return typeof value === 'object'
+            return typeof value === 'object' && value !== null
                 ? value.value
                 : value
         },
