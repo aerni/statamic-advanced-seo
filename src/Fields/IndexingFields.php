@@ -34,7 +34,7 @@ class IndexingFields extends BaseFields
                     'instructions' => 'Prevent the site from being indexed by search engines.',
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'width' => 50,
+                    'width' => 33,
                     'default' => Defaults::data('site::indexing')->get('noindex'),
                 ],
             ],
@@ -43,11 +43,22 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Nofollow',
-                    'instructions' => 'Prevent site crawlers from following any links.',
+                    'instructions' => 'Prevent site crawlers from following any links on this site.',
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'width' => 50,
+                    'width' => 33,
                     'default' => Defaults::data('site::indexing')->get('nofollow'),
+                ],
+            ],
+            [
+                'handle' => 'use_breadcrumbs',
+                'field' => [
+                    'type' => 'toggle',
+                    'instructions' => "Indicate each page's position in the site's hierarchy.",
+                    'listable' => false,
+                    'display' => 'Breadcrumbs',
+                    'width' => 33,
+                    'default' => Defaults::data('site::indexing')->get('use_breadcrumbs'),
                 ],
             ],
         ];

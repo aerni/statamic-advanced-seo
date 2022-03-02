@@ -179,24 +179,6 @@ class GeneralFields extends BaseFields
                     ],
                 ],
             ],
-            [
-                'handle' => 'section_breadcrumbs',
-                'field' => [
-                    'type' => 'section',
-                    'instructions' => "Help your users understand your site by indicating each page's position in the hierarchy.",
-                    'display' => 'Breadcrumbs',
-                ],
-            ],
-            [
-                'handle' => 'use_breadcrumbs',
-                'field' => [
-                    'type' => 'toggle',
-                    'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your pages.',
-                    'listable' => false,
-                    'display' => 'Breadcrumbs',
-                    'default' => Defaults::data('site::general')->get('use_breadcrumbs'),
-                ],
-            ],
         ];
     }
 }
