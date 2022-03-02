@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Illuminate\Support\Str;
-use Statamic\Facades\Blink;
-use Aerni\AdvancedSeo\View\Cascade;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Support\Str;
+use Statamic\Facades\Blink;
 
 abstract class BaseFields implements Fields
 {
