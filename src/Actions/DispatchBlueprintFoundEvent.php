@@ -11,9 +11,12 @@ class DispatchBlueprintFoundEvent
 {
     public static function handle(mixed $data): void
     {
-        match (true) {
-            ($data instanceof Entry) => EntryBlueprintFound::dispatch($data->blueprint(), $data),
-            ($data instanceof LocalizedTerm) => TermBlueprintFound::dispatch($data->blueprint(), $data),
-        };
+        if ($data instanceof Entry) {
+            EntryBlueprintFound::dispatch($data->blueprint(), $data);
+        }
+
+        if ($data instanceof LocalizedTerm) {
+            TermBlueprintFound::dispatch($data->blueprint(), $data);
+        }
     }
 }
