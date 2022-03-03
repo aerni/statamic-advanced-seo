@@ -163,10 +163,6 @@ class ContentDefaultsFields extends BaseFields
             ],
         ];
 
-        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
-        }
-
         return $fields;
     }
 
@@ -233,9 +229,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Summary Image',
                     'instructions' => $this->trans('seo_twitter_summary_image', 'default_instructions'),
-                    'if' => [
-                        'seo_twitter_card' => 'equals summary',
-                    ],
+                    'width' => 50,
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -247,9 +241,7 @@ class ContentDefaultsFields extends BaseFields
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Summary Large Image',
                     'instructions' => $this->trans('seo_twitter_summary_large_image', 'default_instructions'),
-                    'if' => [
-                        'seo_twitter_card' => 'equals summary_large_image',
-                    ],
+                    'width' => 50,
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -257,11 +249,6 @@ class ContentDefaultsFields extends BaseFields
                 ]),
             ],
         ];
-
-        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[4]['field']['if']['seo_generate_social_images'] = 'equals false';
-            $fields[5]['field']['if']['seo_generate_social_images'] = 'equals false';
-        }
 
         return $fields;
     }
@@ -305,11 +292,9 @@ class ContentDefaultsFields extends BaseFields
                     'max_items' => 1,
                     'localizable' => true,
                     'listable' => 'hidden',
+                    'width' => 50,
                     'validate' => [
                         'required_if:seo_canonical_type,other',
-                    ],
-                    'if' => [
-                        'seo_canonical_type' => 'equals other',
                     ],
                 ],
             ],
@@ -323,11 +308,9 @@ class ContentDefaultsFields extends BaseFields
                     'icon' => 'text',
                     'listable' => 'hidden',
                     'localizable' => true,
+                    'width' => 50,
                     'validate' => [
                         'required_if:seo_canonical_type,custom',
-                    ],
-                    'if' => [
-                        'seo_canonical_type' => 'equals custom',
                     ],
                 ],
             ],

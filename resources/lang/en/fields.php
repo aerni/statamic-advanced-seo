@@ -103,8 +103,8 @@ return [
     ],
 
     'seo_canonical_custom' => [
-        'instructions' => 'A fully qualified URL starting with `https://`. Use this if the original content is on a different domain.',
-        'default_instructions' => 'A fully qualified URL starting with `https://`. Use this if the original content is on a different domain.',
+        'instructions' => 'A fully qualified URL starting with `https://`.',
+        'default_instructions' => 'A fully qualified URL starting with `https://`.',
     ],
 
     'seo_section_indexing' => [
