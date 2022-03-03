@@ -62,7 +62,7 @@ class SocialImageRepository
             'twitter' => [
                 'summary' => [
                     'type' => 'twitter',
-                    'field' => 'seo_twitter_image',
+                    'field' => 'seo_twitter_summary_image',
                     'layout' => config('advanced-seo.social_images.presets.twitter.summary.layout', 'social_images/layout'),
                     'template' => config('advanced-seo.social_images.presets.twitter.summary.template', 'social_images/twitter_summary'),
                     'width' => config('advanced-seo.social_images.presets.twitter.summary.width', 240),
@@ -70,7 +70,7 @@ class SocialImageRepository
                 ],
                 'summary_large_image' => [
                     'type' => 'twitter',
-                    'field' => 'seo_twitter_image',
+                    'field' => 'seo_twitter_summary_large_image',
                     'layout' => config('advanced-seo.social_images.presets.twitter.summary_large_image.layout', 'social_images/layout'),
                     'template' => config('advanced-seo.social_images.presets.twitter.summary_large_image.template', 'social_images/twitter_summary_large_image'),
                     'width' => config('advanced-seo.social_images.presets.twitter.summary_large_image.width', 1100),
