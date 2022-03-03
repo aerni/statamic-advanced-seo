@@ -50,13 +50,21 @@ abstract class BaseFields implements Fields
         })->raw(Str::remove('seo_', $handle));
     }
 
-    protected function trans(string $parent, string $key): string
+    protected function trans(string $parent, string $key): ?string
     {
+        if (! isset($this->data)) {
+            return null;
+        }
+
         return __("advanced-seo::fields.$parent.$key", ['type' => $this->typePlaceholder()]);
     }
 
-    protected function typePlaceholder(): ?string
+    protected function typePlaceholder(): string
     {
+        if (! isset($this->data)) {
+            return '';
+        }
+
         return match ($this->data->type) {
             'collections' => Helpers::isAddonRoute() ? 'entries' : 'entry',
             'taxonomies' => Helpers::isAddonRoute() ? 'terms' : 'term',

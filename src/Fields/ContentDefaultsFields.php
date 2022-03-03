@@ -73,7 +73,7 @@ class ContentDefaultsFields extends BaseFields
             $this->twitterImage(),
         ]);
 
-        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
+        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields->prepend($this->socialImagesGenerator());
         }
 
@@ -162,7 +162,7 @@ class ContentDefaultsFields extends BaseFields
             ],
         ];
 
-        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
+        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[3]['field']['if']['seo_generate_social_images'] = 'equals false';
         }
 
@@ -240,7 +240,7 @@ class ContentDefaultsFields extends BaseFields
             ],
         ];
 
-        if (ShouldDisplaySocialImagesGenerator::handle($this->data)) {
+        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[4]['field']['if']['seo_generate_social_images'] = 'equals false';
         }
 
