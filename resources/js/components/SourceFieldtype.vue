@@ -135,6 +135,12 @@ export default {
     },
 
     watch: {
+        autoFieldValue() {
+            if (this.fieldSource === 'auto') {
+                this.updateFieldValue(this.autoFieldValue)
+            }
+        },
+
         site() {
             // Reset the temporary custom value when the user switches the site.
             this.customValue = null;
