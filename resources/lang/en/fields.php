@@ -77,9 +77,14 @@ return [
         'default_instructions' => 'Set the default Twitter description of your :type.',
     ],
 
-    'seo_twitter_image' => [
-        'instructions' => 'Add a Twitter image for this :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . ' (Regular) or ' . SocialImage::sizeString('twitter.summary_large_image') . ' (Large Image).',
-        'default_instructions' => 'Add a default Twitter image for your :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . ' (Regular) or ' . SocialImage::sizeString('twitter.summary_large_image') . ' (Large Image).',
+    'seo_twitter_summary_image' => [
+        'instructions' => 'Add a Twitter image for this :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
+        'default_instructions' => 'Add a default Twitter image for your :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
+    ],
+
+    'seo_twitter_summary_large_image' => [
+        'instructions' => 'Add a Twitter image for this :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
+        'default_instructions' => 'Add a default Twitter image for your :type. The image will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
     ],
 
     'seo_section_canonical_url' => [

@@ -324,16 +324,46 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'seo_twitter_image',
+                'handle' => 'seo_twitter_summary_image',
                 'field' => [
-                    'display' => 'Twitter Image',
-                    'instructions' => $this->trans('seo_twitter_image', 'instructions'),
+                    'display' => 'Twitter Summary Image',
+                    'instructions' => $this->trans('seo_twitter_summary_image', 'instructions'),
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'if' => [
+                        'seo_twitter_card.value' => 'equals summary',
+                    ],
                     'field' => [
                         'type' => 'assets',
-                        'default' => $this->getValueFromCascade('seo_twitter_image'),
+                        'default' => $this->getValueFromCascade('seo_twitter_summary_image'),
+                        'container' => config('advanced-seo.social_images.container', 'assets'),
+                        'folder' => 'social_images',
+                        'max_files' => 1,
+                        'mode' => 'list',
+                        'allow_uploads' => true,
+                        'restrict' => false,
+                        'validate' => [
+                            'image',
+                            'mimes:jpg,png',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_twitter_summary_large_image',
+                'field' => [
+                    'display' => 'Twitter Summary Large Image',
+                    'instructions' => $this->trans('seo_twitter_summary_large_image', 'instructions'),
+                    'type' => 'seo_source',
+                    'default' => '@default',
+                    'localizable' => true,
+                    'if' => [
+                        'seo_twitter_card.value' => 'equals summary_large_image',
+                    ],
+                    'field' => [
+                        'type' => 'assets',
+                        'default' => $this->getValueFromCascade('seo_twitter_summary_large_image'),
                         'container' => config('advanced-seo.social_images.container', 'assets'),
                         'folder' => 'social_images',
                         'max_files' => 1,
@@ -351,6 +381,7 @@ class OnPageSeoFields extends BaseFields
 
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[4]['field']['if']['seo_generate_social_images.value'] = 'equals false';
+            $fields[5]['field']['if']['seo_generate_social_images.value'] = 'equals false';
         }
 
         return $fields;

@@ -2,9 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 
 class ContentDefaultsFields extends BaseFields
 {
@@ -228,10 +229,27 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'seo_twitter_image',
+                'handle' => 'seo_twitter_summary_image',
                 'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Image',
-                    'instructions' => $this->trans('seo_twitter_image', 'default_instructions'),
+                    'display' => 'Twitter Summary Image',
+                    'instructions' => $this->trans('seo_twitter_summary_image', 'default_instructions'),
+                    'if' => [
+                        'seo_twitter_card' => 'equals summary',
+                    ],
+                    'validate' => [
+                        'image',
+                        'mimes:jpg,png',
+                    ],
+                ]),
+            ],
+            [
+                'handle' => 'seo_twitter_summary_large_image',
+                'field' => $this->getAssetFieldConfig([
+                    'display' => 'Twitter Summary Large Image',
+                    'instructions' => $this->trans('seo_twitter_summary_large_image', 'default_instructions'),
+                    'if' => [
+                        'seo_twitter_card' => 'equals summary_large_image',
+                    ],
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -242,6 +260,7 @@ class ContentDefaultsFields extends BaseFields
 
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[4]['field']['if']['seo_generate_social_images'] = 'equals false';
+            $fields[5]['field']['if']['seo_generate_social_images'] = 'equals false';
         }
 
         return $fields;

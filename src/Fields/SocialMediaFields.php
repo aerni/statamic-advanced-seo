@@ -98,10 +98,23 @@ class SocialMediaFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'twitter_image',
+                'handle' => 'twitter_summary_image',
                 'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . ' or ' . SocialImage::sizeString('twitter.summary_large_image') . ' depending on the selected Twitter card.',
+                    'display' => 'Twitter Summary Image',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
+                    'width' => 50,
+                    'validate' => [
+                        'image',
+                        'mimes:jpg,png',
+                    ],
+                ]),
+            ],
+            [
+                'handle' => 'twitter_summary_large_image',
+                'field' => $this->getAssetFieldConfig([
+                    'display' => 'Twitter Summary Large Image',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
+                    'width' => 50,
                     'validate' => [
                         'image',
                         'mimes:jpg,png',

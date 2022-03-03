@@ -2,23 +2,25 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsPageData;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsPageData;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Statamic\Fields\Value;
 
 class Cascade
 {
@@ -85,6 +87,7 @@ class Cascade
         if (! $this->isErrorPage()) {
             $this->data = $this->data->merge([
                 'og_image_size' => $this->ogImageSize(),
+                'twitter_image' => $this->twitterImage(),
                 'twitter_image_size' => $this->twitterImageSize(),
                 'indexing' => $this->indexing(),
                 'locale' => $this->locale(),
@@ -141,10 +144,14 @@ class Cascade
             ->sortKeys();
     }
 
+    /**
+     * Make sure to get the site defaults if there is no value
+     * for the overrides keys in the current data.
+     */
     protected function ensureOverrides(): self
     {
         // The keys that should be considered for the overrides.
-        $overrides = ['noindex', 'nofollow', 'og_image', 'twitter_image'];
+        $overrides = ['noindex', 'nofollow', 'og_image', 'twitter_summary_image', 'twitter_summary_large_image'];
 
         // The values that should be used as overrides.
         $defaults = $this->getSiteDefaults($this->context)->only($overrides);
@@ -275,6 +282,13 @@ class Cascade
         return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
             ->only(['width', 'height'])
             ->all();
+    }
+
+    protected function twitterImage(): Value
+    {
+        return $this->value('twitter_card')->value() === 'summary'
+            ? $this->get('twitter_summary_image')
+            : $this->get('twitter_summary_large_image');
     }
 
     protected function indexing(): string
