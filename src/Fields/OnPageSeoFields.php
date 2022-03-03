@@ -184,6 +184,30 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_og_image',
+                'field' => [
+                    'display' => 'Open Graph Image',
+                    'instructions' => $this->trans('seo_og_image', 'instructions'),
+                    'type' => 'seo_source',
+                    'default' => '@default',
+                    'localizable' => true,
+                    'field' => [
+                        'type' => 'assets',
+                        'default' => $this->getValueFromCascade('seo_og_image'),
+                        'container' => config('advanced-seo.social_images.container', 'assets'),
+                        'folder' => 'social_images',
+                        'max_files' => 1,
+                        'mode' => 'list',
+                        'allow_uploads' => true,
+                        'restrict' => false,
+                        'validate' => [
+                            'image',
+                            'mimes:jpg,png',
+                        ],
+                    ],
+                ],
+            ],
+            [
                 'handle' => 'seo_og_title',
                 'field' => [
                     'display' => 'Open Graph Title',
@@ -222,34 +246,10 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
-            [
-                'handle' => 'seo_og_image',
-                'field' => [
-                    'display' => 'Open Graph Image',
-                    'instructions' => $this->trans('seo_og_image', 'instructions'),
-                    'type' => 'seo_source',
-                    'default' => '@default',
-                    'localizable' => true,
-                    'field' => [
-                        'type' => 'assets',
-                        'default' => $this->getValueFromCascade('seo_og_image'),
-                        'container' => config('advanced-seo.social_images.container', 'assets'),
-                        'folder' => 'social_images',
-                        'max_files' => 1,
-                        'mode' => 'list',
-                        'allow_uploads' => true,
-                        'restrict' => false,
-                        'validate' => [
-                            'image',
-                            'mimes:jpg,png',
-                        ],
-                    ],
-                ],
-            ],
         ];
 
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[3]['field']['if']['seo_generate_social_images.value'] = 'equals false';
+            $fields[1]['field']['if']['seo_generate_social_images.value'] = 'equals false';
         }
 
         return $fields;
@@ -280,45 +280,6 @@ class OnPageSeoFields extends BaseFields
                         'options' => [
                             'summary' => 'Regular',
                             'summary_large_image' => 'Large Image',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'handle' => 'seo_twitter_title',
-                'field' => [
-                    'display' => 'Twitter Title',
-                    'instructions' => $this->trans('seo_twitter_title', 'instructions'),
-                    'type' => 'seo_source',
-                    'default' => $this->getValueFromCascade('seo_twitter_title') ? '@default' : '@auto',
-                    'auto' => 'seo_title',
-                    'localizable' => true,
-                    'field' => [
-                        'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_twitter_title'),
-                        'character_limit' => 70,
-                        'antlers' => false,
-                        'validate' => [
-                            'max:70',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'handle' => 'seo_twitter_description',
-                'field' => [
-                    'display' => 'Twitter Description',
-                    'instructions' => $this->trans('seo_twitter_description', 'instructions'),
-                    'type' => 'seo_source',
-                    'default' => $this->getValueFromCascade('seo_twitter_description') ? '@default' : '@auto',
-                    'auto' => 'seo_description',
-                    'localizable' => true,
-                    'field' => [
-                        'type' => 'textarea',
-                        'default' => $this->getValueFromCascade('seo_twitter_description'),
-                        'character_limit' => 200,
-                        'validate' => [
-                            'max:200',
                         ],
                     ],
                 ],
@@ -377,11 +338,50 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
+            [
+                'handle' => 'seo_twitter_title',
+                'field' => [
+                    'display' => 'Twitter Title',
+                    'instructions' => $this->trans('seo_twitter_title', 'instructions'),
+                    'type' => 'seo_source',
+                    'default' => $this->getValueFromCascade('seo_twitter_title') ? '@default' : '@auto',
+                    'auto' => 'seo_title',
+                    'localizable' => true,
+                    'field' => [
+                        'type' => 'text',
+                        'default' => $this->getValueFromCascade('seo_twitter_title'),
+                        'character_limit' => 70,
+                        'antlers' => false,
+                        'validate' => [
+                            'max:70',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_twitter_description',
+                'field' => [
+                    'display' => 'Twitter Description',
+                    'instructions' => $this->trans('seo_twitter_description', 'instructions'),
+                    'type' => 'seo_source',
+                    'default' => $this->getValueFromCascade('seo_twitter_description') ? '@default' : '@auto',
+                    'auto' => 'seo_description',
+                    'localizable' => true,
+                    'field' => [
+                        'type' => 'textarea',
+                        'default' => $this->getValueFromCascade('seo_twitter_description'),
+                        'character_limit' => 200,
+                        'validate' => [
+                            'max:200',
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[4]['field']['if']['seo_generate_social_images.value'] = 'equals false';
-            $fields[5]['field']['if']['seo_generate_social_images.value'] = 'equals false';
+            $fields[2]['field']['if']['seo_generate_social_images.value'] = 'equals false';
+            $fields[3]['field']['if']['seo_generate_social_images.value'] = 'equals false';
         }
 
         return $fields;

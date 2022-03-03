@@ -120,6 +120,17 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_og_image',
+                'field' => $this->getAssetFieldConfig([
+                    'display' => 'Open Graph Image',
+                    'instructions' => $this->trans('seo_og_image', 'default_instructions'),
+                    'validate' => [
+                        'image',
+                        'mimes:jpg,png',
+                    ],
+                ]),
+            ],
+            [
                 'handle' => 'seo_og_title',
                 'field' => [
                     'type' => 'text',
@@ -149,17 +160,6 @@ class ContentDefaultsFields extends BaseFields
                         'max:200',
                     ],
                 ],
-            ],
-            [
-                'handle' => 'seo_og_image',
-                'field' => $this->getAssetFieldConfig([
-                    'display' => 'Open Graph Image',
-                    'instructions' => $this->trans('seo_og_image', 'default_instructions'),
-                    'validate' => [
-                        'image',
-                        'mimes:jpg,png',
-                    ],
-                ]),
             ],
         ];
 
@@ -194,6 +194,30 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_twitter_summary_image',
+                'field' => $this->getAssetFieldConfig([
+                    'display' => 'Twitter Summary Image',
+                    'instructions' => $this->trans('seo_twitter_summary_image', 'default_instructions'),
+                    'width' => 50,
+                    'validate' => [
+                        'image',
+                        'mimes:jpg,png',
+                    ],
+                ]),
+            ],
+            [
+                'handle' => 'seo_twitter_summary_large_image',
+                'field' => $this->getAssetFieldConfig([
+                    'display' => 'Twitter Summary Large Image',
+                    'instructions' => $this->trans('seo_twitter_summary_large_image', 'default_instructions'),
+                    'width' => 50,
+                    'validate' => [
+                        'image',
+                        'mimes:jpg,png',
+                    ],
+                ]),
+            ],
+            [
                 'handle' => 'seo_twitter_title',
                 'field' => [
                     'type' => 'text',
@@ -223,30 +247,6 @@ class ContentDefaultsFields extends BaseFields
                         'max:200',
                     ],
                 ],
-            ],
-            [
-                'handle' => 'seo_twitter_summary_image',
-                'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Summary Image',
-                    'instructions' => $this->trans('seo_twitter_summary_image', 'default_instructions'),
-                    'width' => 50,
-                    'validate' => [
-                        'image',
-                        'mimes:jpg,png',
-                    ],
-                ]),
-            ],
-            [
-                'handle' => 'seo_twitter_summary_large_image',
-                'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Summary Large Image',
-                    'instructions' => $this->trans('seo_twitter_summary_large_image', 'default_instructions'),
-                    'width' => 50,
-                    'validate' => [
-                        'image',
-                        'mimes:jpg,png',
-                    ],
-                ]),
             ],
         ];
 
