@@ -1,7 +1,7 @@
 ![Statamic](https://flat.badgen.net/badge/Statamic/3.0+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
 
 # Advanced SEO
-Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with focus on the user experience and offers top-notch multi-site support. The addon is built with flexibility in mind, letting you tailor its features to your project's needs. You don't use Google Tag Manager? Simply disable the feature in the config.
+Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project's needs. You don't use Google Tag Manager? Simply disable the feature in the config.
 
 ## Features
 - Multi-site support
