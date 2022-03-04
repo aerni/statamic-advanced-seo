@@ -24,7 +24,7 @@ return [
     'social_media_description' => 'Add fallback images and profile information.',
 
     'analytics' => 'Analytics',
-    'analytics_description' => 'Configure trackers like Google Tag Manager.',
+    'analytics_description' => 'Configure trackers like Fathom.',
 
     'favicons' => 'Favicons',
     'favicons_description' => 'Add a favicon for your site.',
