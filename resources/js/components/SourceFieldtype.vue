@@ -28,6 +28,7 @@
                     :value="fieldValue"
                     :read-only="isReadOnly"
                     handle="source_value"
+                    @meta-updated="updateFieldMeta"
                     @input="updateCustomFieldValue">
                 </component>
             </div>
@@ -179,6 +180,10 @@ export default {
             this.value.value = value;
 
             this.update(this.value);
+        },
+
+        updateFieldMeta(meta) {
+            this.meta.meta = meta || this.fieldMeta
         },
 
         // TODO: This for whatever reason always triggers when changing the source on the code and assets fieldtype.
