@@ -42,6 +42,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => $this->getValueFromCascade('seo_title') ? '@default' : '@auto',
                     'auto' => 'title',
                     'localizable' => true,
+                    'classes' => 'text-fieldtype',
                     'field' => [
                         'type' => 'text',
                         'default' => $this->getValueFromCascade('seo_title'),
@@ -61,6 +62,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'textarea-fieldtype',
                     'field' => [
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_description'),
@@ -109,6 +111,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'toggle-fieldtype',
                     'field' => [
                         'type' => 'toggle',
                         'default' => (bool) $this->getValueFromCascade('seo_generate_social_images'),
@@ -191,6 +194,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'assets-fieldtype',
                     'field' => [
                         'type' => 'assets',
                         'default' => $this->getValueFromCascade('seo_og_image'),
@@ -216,6 +220,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => $this->getValueFromCascade('seo_og_title') ? '@default' : '@auto',
                     'auto' => 'seo_title',
                     'localizable' => true,
+                    'classes' => 'text-fieldtype',
                     'field' => [
                         'type' => 'text',
                         'default' => $this->getValueFromCascade('seo_og_title'),
@@ -236,6 +241,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => $this->getValueFromCascade('seo_og_description') ? '@default' : '@auto',
                     'auto' => 'seo_description',
                     'localizable' => true,
+                    'classes' => 'textarea-fieldtype',
                     'field' => [
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_og_description'),
@@ -274,6 +280,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'button_group-fieldtype',
                     'field' => [
                         'type' => 'button_group',
                         'default' => $this->getValueFromCascade('seo_twitter_card'),
@@ -292,6 +299,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'assets-fieldtype',
                     'if' => [
                         'seo_twitter_card.value' => 'equals summary',
                     ],
@@ -319,6 +327,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'assets-fieldtype',
                     'if' => [
                         'seo_twitter_card.value' => 'equals summary_large_image',
                     ],
@@ -347,6 +356,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => $this->getValueFromCascade('seo_twitter_title') ? '@default' : '@auto',
                     'auto' => 'seo_title',
                     'localizable' => true,
+                    'classes' => 'text-fieldtype',
                     'field' => [
                         'type' => 'text',
                         'default' => $this->getValueFromCascade('seo_twitter_title'),
@@ -367,6 +377,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => $this->getValueFromCascade('seo_twitter_description') ? '@default' : '@auto',
                     'auto' => 'seo_description',
                     'localizable' => true,
+                    'classes' => 'textarea-fieldtype',
                     'field' => [
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_twitter_description'),
@@ -406,6 +417,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'button_group-fieldtype',
                     'field' => [
                         'type' => 'button_group',
                         'default' => $this->getValueFromCascade('seo_canonical_type'),
@@ -425,6 +437,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'relationship-fieldtype',
                     'if' => [
                         'seo_canonical_type.value' => 'equals other',
                     ],
@@ -448,6 +461,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'text-fieldtype',
                     'if' => [
                         'seo_canonical_type.value' => 'equals custom',
                     ],
@@ -483,6 +497,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'toggle-fieldtype',
                     'width' => 50,
                     'field' => [
                         'type' => 'toggle',
@@ -498,6 +513,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'toggle-fieldtype',
                     'width' => 50,
                     'field' => [
                         'type' => 'toggle',
@@ -531,6 +547,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'select-fieldtype',
                     'width' => 50,
                     'field' => [
                         'type' => 'select',
@@ -565,6 +582,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'select-fieldtype',
                     'width' => 50,
                     'field' => [
                         'type' => 'select',
@@ -609,6 +627,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'seo_source',
                     'default' => '@default',
                     'localizable' => true,
+                    'classes' => 'code-fieldtype',
                     'field' => [
                         'type' => 'code',
                         'default' => $this->getValueFromCascade('seo_json_ld'),
