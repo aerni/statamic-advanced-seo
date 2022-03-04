@@ -1,3 +1,4 @@
 title_separator: '|'
 title_position: before
 site_json_ld_type: none
+use_breadcrumbs: true
