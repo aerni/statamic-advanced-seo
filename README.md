@@ -57,6 +57,14 @@ The addon will add a new `SEO` tab to the blueprint of your entries and terms, w
 | `Default` | Inherits the value from the defaults        | `@default`        |
 | `Custom`  | Overwrites the default value with your own  | Your custom value |
 
+## Sitemap
+XML Sitemaps will automatically be generated for your entries and terms. The sitemap can be found at `yourwebsite.com/sitemap.xml`. You may exclude certain collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`, or disable the sitemap feature altogether in the config.
+
+The `priority` and `change frequency` of each item can be configured in the SEO settings on the respective entry/term.
+
+## Permissions
+The addon gives you fine-grained control of your user's permissions to view and edit the site, collection, and taxonomy defaults.
+
 ## Tags
 | Tag               | Description                                              |
 | ----------------- | -------------------------------------------------------- |
