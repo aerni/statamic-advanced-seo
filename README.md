@@ -39,19 +39,23 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 SEO settings will cascade down from the site defaults, to the content defaults and finally to the entry/term level.
 
 ## Site Defaults
-The site defaults consist of thoughtfully organized site-wide settings for the likes of site name, noindex, social images, and analytics trackers. If your site is a multi-site, you will be able to localize some of the settings for each of your sites. Head to `SEO -> Site` to configure the settings to your liking. Values configured here will be saved in `content/seo/site/`.
+The site defaults consist of thoughtfully organized site-wide settings for the likes of site name, noindex, social images, and analytics trackers. Head to `SEO -> Site` to configure the settings to your liking. Values configured here will be saved in `content/seo/site/`.
+
+If your site is a multi-site, you will be able to localize some of the settings for each of your sites.
 
 ## Collection & Taxonomy Defaults
 The collection and taxonomy defaults let you define default values for your entries and terms like title, description, social images, sitemap settings, etc. Head to `SEO -> Collections` or `SEO -> Taxonomies` to configure the defaults to your liking. Values configured here will be saved into `content/seo/collections/` or `content/seo/taxonomies/`.
 
-## Entries & Terms
-A new `SEO` tab will be added to the blueprint of your entries and terms. This is where you will manage all the SEO-related data. A custom fieldtype will let you set the source of each field, giving you at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also have the option `Auto`.
+If your site is a multi-site, you will be able to localize each value to the sites configured on the respective collection or taxonomy.
 
-| Source    | Description                                | Value
-| --------- | ------------------------------------------ | ----------------- |
-| `Default` | Inherits the value from the defaults       | `@default`        |
-| `Custom`  | Overwrite the default value with your own  | Your custom value |
-| `Auto`    | Inherits the value from a predefined field | `@auto`           |
+## Entries & Terms
+The addon will add a new `SEO` tab to the blueprint of your entries and terms, where you will be able manage all the SEO-related settings. Each field is wrapped in a custom fieldtype that will let you choose the value's source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the option `Auto`.
+
+| Source    | Description                                 | Value
+| --------- | ------------------------------------------- | ----------------- |
+| `Auto`    | Inherits the value from a predefined field  | `@auto`           |
+| `Default` | Inherits the value from the defaults        | `@default`        |
+| `Custom`  | Overwrites the default value with your own  | Your custom value |
 
 ## Tags
 | Tag               | Description                                              |
