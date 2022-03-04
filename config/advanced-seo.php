@@ -7,7 +7,7 @@ return [
     | Disabled Collections & Taxonomies
     |--------------------------------------------------------------------------
     |
-    | You may disable the SEO tab, the output of SEO meta data,
+    | You may disable the SEO tab, the output of meta data,
     | and the generation of sitemaps for any collection and taxonomy
     | by adding its handle to the appropriate array below.
     |
@@ -23,8 +23,9 @@ return [
     | Social Images
     |--------------------------------------------------------------------------
     |
-    | Configure the Social Images feature to your liking.
-    | The generator requires Puppeteer: https://github.com/spatie/browsershot#requirements
+    | Configure the social images feature to your liking.
+    | If you want to use the generator, you need to install Puppeteer:
+    | https://spatie.be/docs/browsershot/v2/requirements
     |
     */
 
@@ -52,7 +53,7 @@ return [
     | Favicons
     |--------------------------------------------------------------------------
     |
-    | Configure the Favicons feature to your liking.
+    | Configure the favicons feature to your liking.
     |
     */
 
@@ -66,7 +67,7 @@ return [
     | Sitemap
     |--------------------------------------------------------------------------
     |
-    | Configure the Sitemap feature to your liking.
+    | Configure the sitemap feature to your liking.
     | The default cache expiry is 60 minutes.
     |
     */
@@ -81,7 +82,9 @@ return [
     | Analytics Trackers
     |--------------------------------------------------------------------------
     |
-    | Choose to enable/disable specific analytics trackers.
+    | Configure the analytics trackers to your liking.
+    | The trackers will only render in the environments defined below.
+    | You may also disable any trackers you don't need.
     |
     */
 
@@ -97,7 +100,7 @@ return [
     | Site Verification
     |--------------------------------------------------------------------------
     |
-    | Choose to enable/disable the Site Verification feature.
+    | Configure the site verification feature to your liking.
     |
     */
 
