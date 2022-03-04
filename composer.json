@@ -1,6 +1,6 @@
 {
     "name": "aerni/advanced-seo",
-    "description": "An advanced SEO addon for Statamic.",
+    "description": "Comprehensive SEO addon for Statamic with flexibility in mind",
     "keywords": [
         "statamic",
         "seo"
@@ -58,7 +58,7 @@
     "extra": {
         "statamic": {
             "name": "Advanced SEO",
-            "description": "An advanced SEO addon for Statamic."
+            "description": "Comprehensive SEO addon for Statamic with flexibility in mind"
         },
         "laravel": {
             "providers": [
