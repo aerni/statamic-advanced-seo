@@ -129,7 +129,7 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
-                        'seo_generate_social_images.value' => 'equals true',
+                        'seo_generate_social_images.value' => 'true',
                     ],
                 ],
             ],
@@ -144,7 +144,7 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
-                        'seo_generate_social_images.value' => 'equals true',
+                        'seo_generate_social_images.value' => 'true',
                     ],
                 ],
             ],
@@ -165,7 +165,7 @@ class OnPageSeoFields extends BaseFields
 
             // Hide the fields if the toggle is of.
             $field['field']['if'] = [
-                'seo_generate_social_images.value' => 'equals true',
+                'seo_generate_social_images.value' => 'true',
             ];
 
             // Add the placeholder values from the content defaults.
@@ -255,7 +255,7 @@ class OnPageSeoFields extends BaseFields
         ];
 
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[1]['field']['if']['seo_generate_social_images.value'] = 'equals false';
+            $fields[1]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
         }
 
         return $fields;
@@ -391,8 +391,8 @@ class OnPageSeoFields extends BaseFields
         ];
 
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[2]['field']['if']['seo_generate_social_images.value'] = 'equals false';
-            $fields[3]['field']['if']['seo_generate_social_images.value'] = 'equals false';
+            $fields[2]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
+            $fields[3]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
         }
 
         return $fields;
