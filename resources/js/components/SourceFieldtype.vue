@@ -138,7 +138,7 @@ export default {
     watch: {
         autoFieldValue() {
             if (this.fieldSource === 'auto') {
-                this.updateFieldValue(this.autoFieldValue)
+                this.value.value = this.autoFieldValue;
             }
         },
 
@@ -150,7 +150,7 @@ export default {
 
     mounted() {
         if (this.fieldSource === 'auto') {
-            this.updateFieldValue(this.autoFieldValue)
+            this.value.value = this.autoFieldValue
         }
     },
 
