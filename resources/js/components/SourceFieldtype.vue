@@ -154,7 +154,7 @@ export default {
 
     mounted() {
         this.updateAutoFieldValue()
-        this.updateCustomValue(this.fieldValue)
+        if (this.fieldSource === 'custom') this.updateCustomValue(this.fieldValue)
     },
 
     methods: {
