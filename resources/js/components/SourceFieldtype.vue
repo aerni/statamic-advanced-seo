@@ -141,6 +141,7 @@ export default {
         },
 
         fieldSource(source) {
+            // console.log('Update source:', source)
             if (source === 'auto') this.updateFieldValue(this.autoFieldValue)
             if (source === 'default') this.updateFieldValue(this.fieldDefault)
             if (source === 'custom') this.updateFieldValue(this.customValue)
@@ -170,11 +171,13 @@ export default {
                 return
             }
 
+            // console.log('Update value:', value)
             this.value.value = value
             this.update(this.value)
         },
 
         updateCustomValue(value) {
+            // console.log('Update custom:', value)
             this.customValue = value
         },
 
