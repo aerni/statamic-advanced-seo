@@ -143,7 +143,7 @@ export default {
         fieldSource(source) {
             if (source === 'auto') this.updateFieldValue(this.autoFieldValue)
             if (source === 'default') this.updateFieldValue(this.fieldDefault)
-            if (source === 'custom') this.updateFieldValue(this.customValue || this.fieldDefault)
+            if (source === 'custom') this.updateFieldValue(this.customValue)
         },
 
         site() {
