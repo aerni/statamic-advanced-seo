@@ -95,9 +95,9 @@ export default {
         },
 
         autoFieldDisplay() {
-            let fields = this.store.blueprint.sections.flatMap(section => section.fields);
+            let fields = this.store.blueprint.sections.flatMap(section => section.fields)
 
-            return _.find(fields, {'handle': this.autoFieldHandle}).display;
+            return _.find(fields, {'handle': this.autoFieldHandle}).display
         },
 
         autoFieldValue() {
@@ -126,77 +126,70 @@ export default {
         },
 
         site() {
-            return this.store.site;
+            return this.store.site
         },
 
         store() {
-            return this.$store.state.publish.base;
+            return this.$store.state.publish.base
         }
 
     },
 
     watch: {
         autoFieldValue() {
-            if (this.fieldSource === 'auto') {
-                this.value.value = this.autoFieldValue;
-            }
+            this.updateAutoFieldValue()
+        },
+
+        fieldSource(source) {
+            if (source === 'auto') this.updateFieldValue(this.autoFieldValue)
+            if (source === 'default') this.updateFieldValue(this.fieldDefault)
+            if (source === 'custom') this.updateFieldValue(this.customValue || this.fieldDefault)
         },
 
         site() {
-            // Reset the temporary custom value when the user switches the site.
-            this.customValue = null;
+            this.customValue = null
         },
     },
 
     mounted() {
-        if (this.fieldSource === 'auto') {
-            this.value.value = this.autoFieldValue
-        }
+        this.updateAutoFieldValue()
     },
 
     methods: {
 
+        updateAutoFieldValue() {
+            if (this.fieldSource === 'auto') this.value.value = this.autoFieldValue
+        },
+
         updateFieldSource(source) {
-            if (this.value.source === source) {
-                return;
-            }
-
-            this.value.source = source
-
-            if (source === 'default') {
-                this.updateFieldValue(this.fieldDefault)
-            }
-
-            if (source === 'custom') {
-                this.updateFieldValue(this.customValue || this.fieldDefault)
-            }
-
-            if (source === 'auto') {
-                this.updateFieldValue(this.autoFieldValue)
-            }
+            if (this.fieldSource !== source) this.value.source = source
         },
 
         updateFieldValue(value) {
-            this.value.value = value;
+            if (_.isEqual(value, this.fieldValue)) {
+                return
+            }
 
-            this.update(this.value);
+            this.value.value = value
+            this.update(this.value)
+        },
+
+        updateCustomValue(value) {
+            this.customValue = value
         },
 
         updateFieldMeta(meta) {
             this.meta.meta = meta || this.fieldMeta
         },
 
-        // TODO: This for whatever reason always triggers when changing the source on the code and assets fieldtype.
-        // This is the reason the custom value gets reset again. Why does this happen?!
         updateCustomFieldValue(value) {
-            this.updateFieldValue(value)
-
-            // Save the value so that we can restore it if the user switches back to custom.
-            this.customValue = this.value.value
-
-            if (! _.isEqual(this.fieldValue, this.fieldDefault)) {
-                this.value.source = 'custom'
+            if (_.isEqual(value, this.fieldValue)) {
+                return
             }
+
+            this.updateCustomValue(value)
+            this.updateFieldValue(value)
+            this.updateFieldSource('custom')
         },
 
     },
