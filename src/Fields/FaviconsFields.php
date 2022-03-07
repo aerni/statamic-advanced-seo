@@ -29,7 +29,7 @@ class FaviconsFields extends BaseFields
                     'type' => 'section',
                     'listable' => 'hidden',
                     'display' => 'Favicon',
-                    'instructions' => 'The favicon of your site.',
+                    'instructions' => 'Configure the favicon of your site.',
                 ],
             ],
             [

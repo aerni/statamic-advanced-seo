@@ -42,7 +42,7 @@ class AnalyticsFields extends BaseFields
                 'field' => [
                     'width' => 50,
                     'display' => 'Site ID',
-                    'instructions' => 'Add your Site ID.',
+                    'instructions' => 'Add your site ID.',
                     'input_type' => 'text',
                     'type' => 'text',
                     'listable' => 'hidden',
@@ -60,7 +60,7 @@ class AnalyticsFields extends BaseFields
                 'field' => [
                     'width' => 50,
                     'display' => 'Custom Domain',
-                    'instructions' => 'Add an optional Custom Domain.',
+                    'instructions' => 'Add an optional custom domain.',
                     'input_type' => 'text',
                     'type' => 'text',
                     'listable' => 'hidden',
@@ -118,7 +118,7 @@ class AnalyticsFields extends BaseFields
                 'field' => [
                     'width' => 50,
                     'display' => 'Beacon Token',
-                    'instructions' => 'Add your Beacon Token.',
+                    'instructions' => 'Add your beacon token.',
                     'input_type' => 'text',
                     'type' => 'text',
                     'listable' => 'hidden',
@@ -165,7 +165,7 @@ class AnalyticsFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'display' => 'Container ID',
-                    'instructions' => 'Add your Container ID.',
+                    'instructions' => 'Add your container ID.',
                     'validate' => [
                         'required_if:use_google_tag_manager,true',
                     ],

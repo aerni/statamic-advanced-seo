@@ -23,7 +23,7 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Crawling',
-                    'instructions' => 'Configure the crawling settings for your site. Activated toggles override their counterpart on entries and terms.',
+                    'instructions' => 'Configure the crawling settings of your site. These settings will take precedence over their counterparts on entries and terms.',
                 ],
             ],
             [
@@ -31,7 +31,7 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Noindex',
-                    'instructions' => 'Prevent the site from being indexed by search engines.',
+                    'instructions' => 'Prevent your site from being indexed by search engines.',
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -43,7 +43,7 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'toggle',
                     'display' => 'Nofollow',
-                    'instructions' => 'Prevent site crawlers from following any links.',
+                    'instructions' => 'Prevent site crawlers from following any links on your site.',
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
@@ -64,7 +64,7 @@ class IndexingFields extends BaseFields
                 'handle' => 'section_sitemap',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Configure the sitemap settings for your site.',
+                    'instructions' => 'Configure the sitemap settings of your site.',
                     'display' => 'Sitemap',
                 ],
             ],
@@ -118,7 +118,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'display' => 'Google Verification Code',
-                    'instructions' => 'Get your Google verification code in [Google Search Console](https://search.google.com/search-console).',
+                    'instructions' => 'Add your Google verification code. You can get it in [Google Search Console](https://search.google.com/search-console).',
                 ],
             ],
             [
@@ -129,7 +129,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'display' => 'Bing Verification Code',
-                    'instructions' => 'Get your Bing verification code in [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
+                    'instructions' => 'Add your Bing verification code. You can get it in [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
                 ],
             ],
         ];

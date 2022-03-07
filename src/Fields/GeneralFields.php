@@ -74,7 +74,7 @@ class GeneralFields extends BaseFields
                     'default' => Defaults::data('site::general')->get('title_position'),
                     'localizable' => true,
                     'type' => 'button_group',
-                    'instructions' => 'Diplay the meta title before or after the site name.',
+                    'instructions' => 'Display the meta title before or after the site name.',
                     'listable' => false,
                     'display' => 'Title Position',
                     'width' => 50,
@@ -127,7 +127,7 @@ class GeneralFields extends BaseFields
                 'handle' => 'organization_logo',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Organization Logo',
-                    'instructions' => 'Add the logo with a minimum size of `112x112px`.',
+                    'instructions' => 'Add the logo with a minimum size of 112 x 112 pixels.',
                     'width' => 50,
                     'folder' => null,
                     'validate' => [
@@ -184,7 +184,7 @@ class GeneralFields extends BaseFields
                 'handle' => 'section_breadcrumbs',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => "Help your users understand your site by indicating each page's position in the hierarchy.",
+                    'instructions' => "Breadcrumbs help your users understand your site by indicating each page's position in the hierarchy.",
                     'display' => 'Breadcrumbs',
                 ],
             ],

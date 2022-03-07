@@ -30,7 +30,7 @@ class SocialMediaFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => 'Social Images Generator',
-                    'instructions' => 'Automatically generate your social images.',
+                    'instructions' => 'Configurate the settings of the social images generator.',
                     'listable' => 'hidden',
                 ],
             ],
