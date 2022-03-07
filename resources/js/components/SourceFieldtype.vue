@@ -154,6 +154,7 @@ export default {
 
     mounted() {
         this.updateAutoFieldValue()
+        this.updateCustomValue(this.fieldValue)
     },
 
     methods: {
