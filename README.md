@@ -17,6 +17,7 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 - PHP 8.0
 - Statamic 3.3
 - Laravel 8
+- [Puppeteer](https://github.com/spatie/browsershot#requirements) (Social Images Generator)
 
 ## Installation
 Install the addon using Composer:
@@ -55,17 +56,17 @@ Advanced SEO is using its own stache store to save site defaults, as well as con
 
 The data will cascade down from the site defaults, to the content defaults and finally to the entry/term.
 
-## Site Defaults
+### Site Defaults
 The site defaults consist of thoughtfully organized site-wide settings for the likes of site name, noindex, social images, and analytics trackers. Head to `SEO -> Site` to configure the settings to your liking. Values configured here will be saved in `content/seo/site/`.
 
 If your site is a multi-site, you will be able to localize the settings for each of your sites.
 
-## Collection & Taxonomy Defaults
+### Collection & Taxonomy Defaults
 The collection and taxonomy defaults let you define default values for your entries and terms like title, description, social images, sitemap settings, etc. Head to `SEO -> Collections` or `SEO -> Taxonomies` to configure the defaults to your liking. Values configured here will be saved into `content/seo/collections/` or `content/seo/taxonomies/`.
 
 If your site is a multi-site, you will be able to localize the data to the sites that are configured on the respective collection or taxonomy.
 
-## Entries & Terms
+### Entries & Terms
 The addon will add a new `SEO` tab to the blueprint of your entries and terms that bundles all the SEO-related settings. Advanced SEO shipps its own source fieldtype that will let you choose the value’s source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the `Auto` option.
 
 | Source    | Description                                 | Value             |
@@ -73,6 +74,21 @@ The addon will add a new `SEO` tab to the blueprint of your entries and terms th
 | `Auto`    | Inherits the value from a predefined field  | `@auto`           |
 | `Default` | Inherits the value from the defaults        | `@default`        |
 | `Custom`  | Overwrites the default value with your own  | Your custom value |
+
+## Social Images Generator
+The social images generator provides an easy way to add customized images to your entries. To get started, make sure that the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to generate images for. This will add a new `Social Images Generator` section to the selected collections’ defaults blueprint as well as the entry blueprint. It will also add a new action to the contextual menu on the collection listing page.
+
+The generator leverages [Browsershot](https://github.com/spatie/browsershot) to convert your template to an image. This means that you can design your images like you would a regular template, using variables, tags, partials, etc.
+
+To get started, simply run the following command to publish a basic layout and template to `resources/views/social_images/`.
+
+```bash
+php artisan vendor:publish --tag=advanced-seo-views
+```
+
+You might want to add fields to your blueprint that are specifically for your social images. Create a fieldset with the name `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
+
+>**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
 
 ## Sitemap
 XML Sitemaps will automatically be generated for your entries and terms. The sitemap can be found at `yourwebsite.com/sitemap.xml`. You may exclude certain collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`, or disable the sitemap feature altogether in the config.
