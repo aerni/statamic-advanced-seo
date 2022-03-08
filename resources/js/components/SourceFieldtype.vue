@@ -83,10 +83,6 @@ export default {
             return this.value.value
         },
 
-        fieldIsSynced() {
-            return this.$parent.$parent.isSynced
-        },
-
         fieldComponent() {
             let type = this.config.field.type
             let component = this.config.field.component
