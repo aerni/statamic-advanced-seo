@@ -157,7 +157,7 @@ export default {
             // console.log('Update source:', source)
             if (source === 'auto') this.updateFieldValue(this.autoFieldValue)
             if (source === 'default') this.updateFieldValue(this.fieldDefault)
-            if (source === 'custom') this.updateFieldValue(this.customValue)
+            if (source === 'custom') this.updateFieldValue((this.customValue === null) ? this.fieldDefault : this.customValue)
         },
 
         site() {
