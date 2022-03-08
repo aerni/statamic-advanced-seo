@@ -1,7 +1,7 @@
 ![Statamic](https://flat.badgen.net/badge/Statamic/3.0+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
 
 # Advanced SEO
-Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project's needs. You don't use Google Tag Manager? Simply disable the feature in the config.
+Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project’s needs. Want to handle the Sitemap yourself? Simply disable the feature in the config.
 
 ## Features
 - Multi-site support
@@ -10,7 +10,7 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 - Social images generator
 - Fine-grained user permissions
 - Sitemap
-- Support for Statamic's Git integration
+- Support for Statamic’s Git integration
 - Highly flexible by design
 
 ## Installation
@@ -49,7 +49,7 @@ The collection and taxonomy defaults let you define default values for your entr
 If your site is a multi-site, you will be able to localize each value to the sites configured on the respective collection or taxonomy.
 
 ## Entries & Terms
-The addon will add a new `SEO` tab to the blueprint of your entries and terms, where you will be able manage all the SEO-related settings. Each field is wrapped in a custom fieldtype that will let you choose the value's source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the option `Auto`.
+The addon will add a new `SEO` tab to the blueprint of your entries and terms, where you will be able manage all the SEO-related settings. Each field is wrapped in a custom fieldtype that will let you choose the value’s source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the option `Auto`.
 
 | Source    | Description                                 | Value
 | --------- | ------------------------------------------- | ----------------- |
@@ -63,7 +63,7 @@ XML Sitemaps will automatically be generated for your entries and terms. The sit
 The `priority` and `change frequency` of each item can be configured in the SEO settings on the respective entry/term.
 
 ## Permissions
-The addon gives you fine-grained control of your user's permissions to view and edit the site, collection, and taxonomy defaults.
+The addon gives you fine-grained control of your user’s permissions to view and edit the site, collection, and taxonomy defaults.
 
 ## Tags
 | Tag               | Description                                              |
@@ -74,7 +74,7 @@ The addon gives you fine-grained control of your user's permissions to view and 
 | `{{ seo:field }}` | Get the data of a specific field, e.g. `{{ seo:title }}` |
 
 ## License
-Advanced SEO is **commercial software** but has an open-source codebase. If you want to use it in production, you'll need to [buy a license from the Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
+Advanced SEO is **commercial software** but has an open-source codebase. If you want to use it in production, you’ll need to [buy a license from the Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
 >Advanced SEO is **NOT** free software.
 
 ## Credits
