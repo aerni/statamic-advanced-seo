@@ -40,6 +40,14 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 <body>{{ seo:body }}</body>
 ```
 
+### Available Tags
+| Tag               | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| `{{ seo:head }}`  | Render the head view with the meta data                  |
+| `{{ seo:body }}`  | Render the body view with the body data                  |
+| `{{ seo:dump }}`  | Dump all the meta data of the current page               |
+| `{{ seo:field }}` | Get the data of a specific field, e.g. `{{ seo:title }}` |
+
 ## Concept & Usage
 After installing the addon you will find a new `SEO` section in the sidebar navigation in the control panel. You will also find a new `SEO` tab when editing your entries and terms.
 
@@ -73,14 +81,6 @@ The `priority` and `change frequency` of each item can be configured in the SEO 
 
 ## Permissions
 The addon gives you fine-grained control of your user’s permissions to view and edit the site, collection, and taxonomy defaults.
-
-## Tags
-| Tag               | Description                                              |
-| ----------------- | -------------------------------------------------------- |
-| `{{ seo:head }}`  | Render the head view with the meta data                  |
-| `{{ seo:body }}`  | Render the body view with the body data                  |
-| `{{ seo:dump }}`  | Dump all the meta data of the current page               |
-| `{{ seo:field }}` | Get the data of a specific field, e.g. `{{ seo:title }}` |
 
 ## License
 Advanced SEO is **commercial software** but has an open-source codebase. If you want to use it in production, you’ll need to [buy a license from the Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
