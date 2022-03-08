@@ -2,9 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Code;
+use Statamic\Fields\Fieldtype;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
 
 class SourceFieldtype extends Fieldtype
 {
@@ -54,6 +58,7 @@ class SourceFieldtype extends Fieldtype
             'default' => $this->sourceFieldDefaultValue(),
             'defaultMeta' => $this->sourceFieldDefaultMeta(),
             'meta' => $this->sourceFieldMeta(),
+            'title' => $this->parentTitle(),
         ];
     }
 
@@ -128,5 +133,18 @@ class SourceFieldtype extends Fieldtype
     protected function sourceFieldValue(): mixed
     {
         return $this->field->value()['value'];
+    }
+
+    protected function parentTitle(): ?string
+    {
+        $parent = $this->field->parent();
+
+        return match (true) {
+            ($parent instanceof Entry) => $parent->collection()->title(),
+            ($parent instanceof Term) => $parent->taxonomy()->title(),
+            ($parent instanceof Taxonomy) => $parent->title(),
+            ($parent instanceof Collection) => $parent->title(),
+            default => null,
+        };
     }
 }
