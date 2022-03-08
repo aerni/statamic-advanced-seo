@@ -98,7 +98,7 @@ XML Sitemaps will automatically be generated for your entries and terms. The sit
 The `priority` and `change frequency` of each item can be configured in the SEO settings on the respective entry/term.
 
 ## Permissions
-The addon gives you fine-grained control of your user’s permissions to view and edit the site, collection, and taxonomy defaults.
+The addon gives you fine-grained control of your users’ permissions to view and edit the site, collection, and taxonomy defaults.
 
 ## Meta Tags & Scripts
 Advanced SEO supports all of the following meta tags and scripts:
