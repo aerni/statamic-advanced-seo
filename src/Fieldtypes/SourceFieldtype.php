@@ -3,12 +3,12 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Statamic\Contracts\Entries\Collection;
-use Statamic\Fields\Field;
-use Statamic\Fieldtypes\Code;
-use Statamic\Fields\Fieldtype;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Code;
 
 class SourceFieldtype extends Fieldtype
 {
