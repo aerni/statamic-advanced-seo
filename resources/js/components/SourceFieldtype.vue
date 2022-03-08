@@ -19,7 +19,7 @@
         </div>
 
         <div class="seo-mt-2.5">
-            <div v-if="fieldSource !== 'auto'">
+            <div v-if="fieldSource === 'custom'">
                 <component
                     :is="fieldComponent"
                     :name="name"
@@ -35,11 +35,20 @@
             <div v-else>
                 <component
                     :is="fieldComponent"
-                    :value="autoFieldValue"
-                    read-only="true">
+                    :name="name"
+                    :config="fieldConfig"
+                    :meta="fieldMeta"
+                    :value="fieldValue"
+                    read-only="true"
+                    handle="source_value">
                 </component>
                 <div class="mt-1 help-block">
-                    The value is inherited from <code>{{ autoFieldDisplay }} ({{ autoFieldHandle }})</code>
+                    <span v-if="fieldSource === 'auto'">
+                        The value is inherited from the <code>{{ autoFieldDisplay }} ({{ autoFieldHandle }})</code> field.
+                    </span>
+                    <span v-else>
+                        The value is inherited from the <code>{{ this.meta.title }}</code> defaults.
+                    </span>
                 </div>
             </div>
         </div>
