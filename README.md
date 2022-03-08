@@ -43,7 +43,7 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 ## Concept & Usage
 After installing the addon you will find a new `SEO` section in the sidebar navigation in the control panel. You will also find a new `SEO` tab when editing your entries and terms.
 
-Advanced SEO is using its own stache store to save site defaults, as well as content defaults for your collection entries and taxonomy terms. The store is organized in three content types: `site`, `collections` and `taxonomies`. The data for each type is saved in `content/seo/{type}/`.
+Advanced SEO is using its own stache store to save site defaults, as well as content defaults for your collection entries and taxonomy terms. The store is organized in three content types: `site`, `collections` and `taxonomies`.
 
 The data will cascade down from the site defaults, to the content defaults and finally to the entry/term.
 
