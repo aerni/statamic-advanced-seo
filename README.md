@@ -76,7 +76,9 @@ The addon will add a new `SEO` tab to the blueprint of your entries and terms th
 | `Custom`  | Overwrites the default value with your own  | Your custom value |
 
 ## Social Images Generator
-The social images generator provides an easy way to add customized images to your entries. To get started, make sure that the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to generate images for. This will add a new `Social Images Generator` section to the selected collections’ defaults blueprint as well as the entry blueprint. It will also add a new action to the contextual menu on the collection listing page.
+The social images generator provides an easy way to add customized images to your entries. To get started, make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to generate images for. This will add a new `Social Images Generator` section to the selected collections’ defaults blueprint as well as the entry blueprint. It will also add a new action to the contextual menu on the collection listing page.
+
+Activate the newly added toggle to generate the images each time you save the entry. If you don't like this behavior, you can generate the images on demand using the action in the contextual menu instead.
 
 The generator leverages [Browsershot](https://github.com/spatie/browsershot) to convert your template to an image. This means that you can design your images like you would a regular template, using variables, tags, partials, etc.
 
