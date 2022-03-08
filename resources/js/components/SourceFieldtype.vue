@@ -181,13 +181,14 @@ export default {
         },
 
         updateFieldValue(value) {
-            if (_.isEqual(value, this.fieldValue)) {
-                return
-            }
-
             // console.log('Update value:', value)
             this.value.value = value
             this.update(this.value)
+        },
+
+        updateCustomFieldValue(value) {
+            this.updateCustomValue(value)
+            this.updateFieldValue(value)
         },
 
         updateCustomValue(value) {
@@ -197,16 +198,6 @@ export default {
 
         updateFieldMeta(meta) {
             this.meta.meta = meta || this.fieldMeta
-        },
-
-        updateCustomFieldValue(value) {
-            if (_.isEqual(value, this.fieldValue)) {
-                return
-            }
-
-            this.updateCustomValue(value)
-            this.updateFieldValue(value)
-            this.updateFieldSource('custom')
         },
 
     },
