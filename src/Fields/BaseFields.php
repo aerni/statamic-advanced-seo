@@ -10,8 +10,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Statamic\Assets\Asset;
 use Statamic\Facades\Blink;
-use Statamic\Fields\ArrayableString;
-use Statamic\Fields\LabeledValue;
 
 abstract class BaseFields implements Fields
 {
