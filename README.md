@@ -40,23 +40,27 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 <body>{{ seo:body }}</body>
 ```
 
-## Usage
-SEO settings will cascade down from the site defaults, to the content defaults and finally to the entry/term level.
+## Concept & Usage
+After installing the addon you will find a new `SEO` section in the sidebar navigation in the control panel. You will also find a new `SEO` tab when editing your entries and terms.
+
+Advanced SEO is using its own stache store to save site defaults, as well as content defaults for your collection entries and taxonomy terms. The store is organized in three content types: `site`, `collections` and `taxonomies`. The data for each type is saved in `content/seo/{type}/`.
+
+The data will cascade down from the site defaults, to the content defaults and finally to the entry/term.
 
 ## Site Defaults
 The site defaults consist of thoughtfully organized site-wide settings for the likes of site name, noindex, social images, and analytics trackers. Head to `SEO -> Site` to configure the settings to your liking. Values configured here will be saved in `content/seo/site/`.
 
-If your site is a multi-site, you will be able to localize some of the settings for each of your sites.
+If your site is a multi-site, you will be able to localize the settings for each of your sites.
 
 ## Collection & Taxonomy Defaults
 The collection and taxonomy defaults let you define default values for your entries and terms like title, description, social images, sitemap settings, etc. Head to `SEO -> Collections` or `SEO -> Taxonomies` to configure the defaults to your liking. Values configured here will be saved into `content/seo/collections/` or `content/seo/taxonomies/`.
 
-If your site is a multi-site, you will be able to localize each value to the sites configured on the respective collection or taxonomy.
+If your site is a multi-site, you will be able to localize the data to the sites that are configured on the respective collection or taxonomy.
 
 ## Entries & Terms
-The addon will add a new `SEO` tab to the blueprint of your entries and terms, where you will be able manage all the SEO-related settings. Each field is wrapped in a custom fieldtype that will let you choose the value’s source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the option `Auto`.
+The addon will add a new `SEO` tab to the blueprint of your entries and terms that bundles all the SEO-related settings. Advanced SEO shipps its own source fieldtype that will let you choose the value’s source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the `Auto` option.
 
-| Source    | Description                                 | Value
+| Source    | Description                                 | Value             |
 | --------- | ------------------------------------------- | ----------------- |
 | `Auto`    | Inherits the value from a predefined field  | `@auto`           |
 | `Default` | Inherits the value from the defaults        | `@default`        |
