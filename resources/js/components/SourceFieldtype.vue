@@ -117,6 +117,10 @@ export default {
             return this.config.auto
         },
 
+        fieldIsSynced() {
+            return this.$parent.$parent.isSynced
+        },
+
         sourceOptions() {
             let options = [
                 { label: __('advanced-seo::messages.default'), value: 'default' },
@@ -147,6 +151,10 @@ export default {
     watch: {
         autoFieldValue() {
             this.updateAutoFieldValue()
+        },
+
+        fieldIsSynced(value) {
+            if (value === true) this.updateAutoFieldValue()
         },
 
         fieldSource(source) {
