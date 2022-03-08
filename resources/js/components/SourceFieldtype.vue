@@ -122,6 +122,10 @@ export default {
                 options.unshift({ label: 'Auto', value: 'auto' })
             }
 
+            if (this.config.options) {
+                return options.filter(option => this.config.options.includes(option.value))
+            }
+
             return options
         },
 
