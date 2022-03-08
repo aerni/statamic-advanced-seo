@@ -60,18 +60,6 @@ abstract class BaseFields implements Fields
         };
     }
 
-    public function getRawFromCascade(string $handle): mixed
-    {
-        // We can't create a cascade if we don't have any data.
-        if (! isset($this->data)) {
-            return null;
-        }
-
-        return Blink::once('advanced-seo::cascade::cp', function () {
-            return Cascade::from($this->data)->processForBlueprint();
-        })->raw(Str::remove('seo_', $handle));
-    }
-
     protected function trans(string $parent, string $key): ?string
     {
         if (! isset($this->data)) {
