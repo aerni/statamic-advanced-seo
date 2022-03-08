@@ -47,8 +47,8 @@ Advanced SEO supports the following meta tags and scripts:
 - `twitter:image:alt`
 
 ### Site Verification
-google-site-verification (Google)
-msvalidate.01 (Bing)
+- `google-site-verification` (Google)
+- `msvalidate.01` (Bing)
 
 ### Knowledge Graph
 - `JSON-LD Schema`
