@@ -2,13 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\View\Cascade;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 class ContentDefaultsFields extends BaseFields
 {
     use HasAssetField;
+    use GetsContentDefaults;
 
     public function sections(): array
     {
@@ -132,31 +135,41 @@ class ContentDefaultsFields extends BaseFields
             [
                 'handle' => 'seo_og_title',
                 'field' => [
-                    'type' => 'text',
                     'display' => 'Open Graph Title',
                     'instructions' => $this->trans('seo_og_title', 'default_instructions'),
-                    'input_type' => 'text',
+                    'type' => 'seo_source',
+                    'default' => '@auto',
+                    'auto' => 'seo_title',
+                    'options' => ['auto', 'custom'],
                     'localizable' => true,
-                    'listable' => 'hidden',
-                    'character_limit' => 70,
-                    'antlers' => false,
-                    'validate' => [
-                        'max:70',
+                    'classes' => 'text-fieldtype',
+                    'field' => [
+                        'type' => 'text',
+                        'character_limit' => 70,
+                        'antlers' => false,
+                        'validate' => [
+                            'max:70',
+                        ],
                     ],
                 ],
             ],
             [
                 'handle' => 'seo_og_description',
                 'field' => [
-                    'type' => 'textarea',
                     'display' => 'Open Graph Description',
                     'instructions' => $this->trans('seo_og_description', 'default_instructions'),
+                    'type' => 'seo_source',
+                    'default' => '@auto',
+                    'auto' => 'seo_description',
+                    'options' => ['auto', 'custom'],
                     'localizable' => true,
-                    'listable' => 'hidden',
-                    'character_limit' => '200',
-                    'width' => 100,
-                    'validate' => [
-                        'max:200',
+                    'classes' => 'textarea-fieldtype',
+                    'field' => [
+                        'type' => 'textarea',
+                        'character_limit' => 200,
+                        'validate' => [
+                            'max:200',
+                        ],
                     ],
                 ],
             ],
@@ -219,31 +232,41 @@ class ContentDefaultsFields extends BaseFields
             [
                 'handle' => 'seo_twitter_title',
                 'field' => [
-                    'type' => 'text',
                     'display' => 'Twitter Title',
                     'instructions' => $this->trans('seo_twitter_title', 'default_instructions'),
-                    'input_type' => 'text',
+                    'type' => 'seo_source',
+                    'default' => '@auto',
+                    'auto' => 'seo_title',
+                    'options' => ['auto', 'custom'],
                     'localizable' => true,
-                    'listable' => 'hidden',
-                    'character_limit' => 70,
-                    'antlers' => false,
-                    'validate' => [
-                        'max:70',
+                    'classes' => 'text-fieldtype',
+                    'field' => [
+                        'type' => 'text',
+                        'character_limit' => 70,
+                        'antlers' => false,
+                        'validate' => [
+                            'max:70',
+                        ],
                     ],
                 ],
             ],
             [
                 'handle' => 'seo_twitter_description',
                 'field' => [
-                    'type' => 'textarea',
                     'display' => 'Twitter Description',
                     'instructions' => $this->trans('seo_twitter_description', 'default_instructions'),
+                    'type' => 'seo_source',
+                    'default' => '@auto',
+                    'auto' => 'seo_description',
+                    'options' => ['auto', 'custom'],
                     'localizable' => true,
-                    'listable' => 'hidden',
-                    'character_limit' => '200',
-                    'width' => 100,
-                    'validate' => [
-                        'max:200',
+                    'classes' => 'textarea-fieldtype',
+                    'field' => [
+                        'type' => 'textarea',
+                        'character_limit' => 200,
+                        'validate' => [
+                            'max:200',
+                        ],
                     ],
                 ],
             ],

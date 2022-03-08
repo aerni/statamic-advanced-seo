@@ -6,8 +6,12 @@ use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
+use Statamic\Assets\Asset;
 use Statamic\Facades\Blink;
+use Statamic\Fields\ArrayableString;
+use Statamic\Fields\LabeledValue;
 
 abstract class BaseFields implements Fields
 {
@@ -39,6 +43,24 @@ abstract class BaseFields implements Fields
     }
 
     public function getValueFromCascade(string $handle): mixed
+    {
+        // We can't create a cascade if we don't have any data.
+        if (! isset($this->data)) {
+            return null;
+        }
+
+        $value = Blink::once('advanced-seo::cascade::cp', function () {
+            return Cascade::from($this->data)->processForBlueprint();
+        })->value(Str::remove('seo_', $handle));
+
+        return match (true) {
+            ($value instanceof Asset) => $value->path(),
+            ($value instanceof Arrayable) => $value->value(),
+            default => $value,
+        };
+    }
+
+    public function getRawFromCascade(string $handle): mixed
     {
         // We can't create a cascade if we don't have any data.
         if (! isset($this->data)) {
