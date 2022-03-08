@@ -13,6 +13,11 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 - Support for Statamic’s Git integration
 - Highly flexible by design
 
+## Requirements
+- PHP 8.0
+- Statamic 3.3
+- Laravel 8
+
 ## Installation
 Install the addon using Composer:
 
