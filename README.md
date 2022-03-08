@@ -34,7 +34,7 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 <head>{{ seo:head }}</head>
 ```
 
- Add `{{ seo:body }}` after the opening `<body>` tag. This is only needed if you are using Google Tag Manager.
+ Add `{{ seo:body }}` after the opening `<body>` tag. This tag is only needed when using Google Tag Manager.
 
 ```html
 <body>{{ seo:body }}</body>
