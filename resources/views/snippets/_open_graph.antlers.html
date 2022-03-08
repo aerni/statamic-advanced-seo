@@ -4,6 +4,10 @@
 <meta property="og:title" content="{{ og_title }}">
 <meta property="og:url" content="{{ canonical }}">
 
+{{ hreflang }}
+    <meta property='og:locale:alternate' content="{{ locale }}" >
+{{ /hreflang }}
+
 {{ if og_description }}
     <meta property="og:description" content="{{ og_description }}">
 {{ /if }}
