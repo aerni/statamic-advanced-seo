@@ -50,7 +50,7 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 | `{{ seo:dump }}`  | Dump all the meta data of the current page               |
 | `{{ seo:field }}` | Get the data of a specific field, e.g. `{{ seo:title }}` |
 
-## Migratoring from other addons
+## Migration
 If you are migrating from `Aardvark SEO`, you can simply run the following command to update the data on your entries and terms:
 
 ```bash
