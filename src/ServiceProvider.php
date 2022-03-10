@@ -18,6 +18,10 @@ class ServiceProvider extends AddonServiceProvider
         Actions\GenerateSocialImages::class,
     ];
 
+    protected $commands = [
+        Commands\Migrate::class,
+    ];
+
     protected $fieldtypes = [
         Fieldtypes\SocialImagesPreviewFieldtype::class,
         Fieldtypes\SourceFieldtype::class,
