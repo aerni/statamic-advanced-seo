@@ -48,9 +48,6 @@ class OnPageSeoFields extends BaseFields
                         'default' => $this->getValueFromCascade('seo_title'),
                         'character_limit' => 60,
                         'antlers' => false,
-                        'validate' => [
-                            'max:60',
-                        ],
                     ],
                 ],
             ],
@@ -67,9 +64,6 @@ class OnPageSeoFields extends BaseFields
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_description'),
                         'character_limit' => 160,
-                        'validate' => [
-                            'max:160',
-                        ],
                     ],
                 ],
             ],
@@ -226,9 +220,6 @@ class OnPageSeoFields extends BaseFields
                         'default' => $this->getValueFromCascade('seo_og_title'),
                         'character_limit' => 70,
                         'antlers' => false,
-                        'validate' => [
-                            'max:70',
-                        ],
                     ],
                 ],
             ],
@@ -246,9 +237,6 @@ class OnPageSeoFields extends BaseFields
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_og_description'),
                         'character_limit' => 200,
-                        'validate' => [
-                            'max:200',
-                        ],
                     ],
                 ],
             ],
@@ -362,9 +350,6 @@ class OnPageSeoFields extends BaseFields
                         'default' => $this->getValueFromCascade('seo_twitter_title'),
                         'character_limit' => 70,
                         'antlers' => false,
-                        'validate' => [
-                            'max:70',
-                        ],
                     ],
                 ],
             ],
@@ -382,9 +367,6 @@ class OnPageSeoFields extends BaseFields
                         'type' => 'textarea',
                         'default' => $this->getValueFromCascade('seo_twitter_description'),
                         'character_limit' => 200,
-                        'validate' => [
-                            'max:200',
-                        ],
                     ],
                 ],
             ],

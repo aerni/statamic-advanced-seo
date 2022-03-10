@@ -46,9 +46,6 @@ class ContentDefaultsFields extends BaseFields
                     'listable' => 'hidden',
                     'character_limit' => 60,
                     'antlers' => false,
-                    'validate' => [
-                        'max:60',
-                    ],
                 ],
             ],
             [
@@ -60,9 +57,6 @@ class ContentDefaultsFields extends BaseFields
                     'localizable' => true,
                     'listable' => 'hidden',
                     'character_limit' => 160,
-                    'validate' => [
-                        'max:160',
-                    ],
                 ],
             ],
         ];
@@ -146,9 +140,6 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'text',
                         'character_limit' => 70,
                         'antlers' => false,
-                        'validate' => [
-                            'max:70',
-                        ],
                     ],
                 ],
             ],
@@ -166,9 +157,6 @@ class ContentDefaultsFields extends BaseFields
                     'field' => [
                         'type' => 'textarea',
                         'character_limit' => 200,
-                        'validate' => [
-                            'max:200',
-                        ],
                     ],
                 ],
             ],
@@ -243,9 +231,6 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'text',
                         'character_limit' => 70,
                         'antlers' => false,
-                        'validate' => [
-                            'max:70',
-                        ],
                     ],
                 ],
             ],
@@ -263,9 +248,6 @@ class ContentDefaultsFields extends BaseFields
                     'field' => [
                         'type' => 'textarea',
                         'character_limit' => 200,
-                        'validate' => [
-                            'max:200',
-                        ],
                     ],
                 ],
             ],
