@@ -12,6 +12,7 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 - Sitemap
 - Support for Statamic’s Git integration
 - Highly flexible by design
+- Migrator to easily migrate from other popular SEO addons
 
 ## Requirements
 - PHP 8.0
@@ -48,6 +49,17 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 | `{{ seo:body }}`  | Render the body view with the body data                  |
 | `{{ seo:dump }}`  | Dump all the meta data of the current page               |
 | `{{ seo:field }}` | Get the data of a specific field, e.g. `{{ seo:title }}` |
+
+## Migrators
+If you are migrating from `Aardvark SEO`, you can simply run the following command to update the data on your entries and terms:
+
+```bash
+php please seo:migrate
+```
+
+The migrator will update old keys, remove keys that are not needed anymore, and transform a handful of data to its new format.
+
+>**Note:** The migrator doesn't migrate addon settings and default data, as there are too many things that need manual attention. So you will have to migrate those yourself. This should be fairly straight forward and not take too much of your time.
 
 ## Concept & Usage
 After installing the addon you will find a new `SEO` section in the sidebar navigation in the control panel. You will also find a new `SEO` tab when editing your entries and terms.
