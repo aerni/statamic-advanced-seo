@@ -2,9 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
+use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
 
 class Migrate extends Command
 {
@@ -26,6 +27,7 @@ class Migrate extends Command
     {
         return [
             'Aardvark SEO' => AardvarkSeoMigrator::class,
+            'SEO Pro' => SeoProMigrator::class,
         ];
     }
 }
