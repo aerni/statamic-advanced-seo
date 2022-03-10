@@ -5,8 +5,8 @@ namespace Aerni\AdvancedSeo\Migrators;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Term as TermFacade;
 use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Term as TermFacade;
 
 abstract class BaseMigrator
 {

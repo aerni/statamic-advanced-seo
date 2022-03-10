@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Migrators;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class AardvarkSeoMigrator extends BaseMigrator
 {
