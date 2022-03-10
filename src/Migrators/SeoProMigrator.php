@@ -41,7 +41,8 @@ class SeoProMigrator extends BaseMigrator
         return $nonSeoFields
             ->merge($migratedSeoFields)
             ->pipe(fn ($data) => $this->transform($data, $oldData)
-            ->pipe(fn ($data) => $this->parse($data)));
+            ->pipe(fn ($data) => $this->parse($data))
+            ->pipe(fn ($data) => $this->addMissingFields($data)));
     }
 
     protected function transform(Collection $data, ?Collection $oldData = null): Collection
@@ -67,6 +68,6 @@ class SeoProMigrator extends BaseMigrator
             ->filter(fn ($value) => Str::contains($value, '@seo:'))
             ->map(fn ($value) => $data->get(Str::remove('@seo:', $value)));
 
-        return $data->merge($parsed);
+        return $data->merge($parsed)->filter();
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Migrators;
 
+use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
@@ -51,7 +53,8 @@ abstract class BaseMigrator
 
         return $nonSeoFields
             ->merge($migratedSeoFields)
-            ->pipe(fn ($data) => $this->transform($data));
+            ->pipe(fn ($data) => $this->transform($data))
+            ->pipe(fn ($data) => $this->addMissingFields($data));
     }
 
     /**
@@ -61,6 +64,19 @@ abstract class BaseMigrator
     protected function transform(Collection $data, ?Collection $oldData = null): Collection
     {
         return $data;
+    }
+
+    /**
+     * Add the missing fields with their default values.
+     */
+    protected function addMissingFields(Collection $data): Collection
+    {
+        $fields = OnPageSeoFields::make()->items();
+        $fieldDefaults = collect($fields)->map(fn ($field) => Arr::get($field, 'default'))->filter();
+
+        $withoutExistingKeys = $fieldDefaults->diffKeys($data);
+
+        return $data->merge($withoutExistingKeys);
     }
 
     /**
