@@ -5,14 +5,15 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 
 ## Features
 - Multi-site support
-- Site and content defaults
+- Site defaults
+- Content defaults
 - Great user experience leveraging a custom source fieldtype
 - Social images generator
 - Fine-grained user permissions
+- Migration command to easily migrate from other addons
 - Sitemap
 - Support for Statamic’s Git integration
 - Highly flexible by design
-- Migrator to easily migrate from other popular SEO addons
 
 ## Requirements
 - PHP 8.0
