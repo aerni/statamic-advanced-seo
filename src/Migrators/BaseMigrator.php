@@ -27,15 +27,25 @@ abstract class BaseMigrator
     {
         $updated = $this->update($entry->data());
 
+        if ($entry->isRoot()) {
+            $updated = $this->addMissingFields($updated);
+        }
+
         $entry->data($updated)->saveQuietly();
     }
 
     protected function updateTerm(Term $term): void
     {
         $term->taxonomy()->sites()->each(function ($site) use ($term) {
-            $updated = $this->update($term->in($site)->data());
+            $localization = $term->in($site);
 
-            $term->in($site)->data($updated);
+            $updated = $this->update($localization->data());
+
+            if ($localization->isRoot()) {
+                $updated = $this->addMissingFields($updated);
+            }
+
+            $localization->data($updated);
         });
 
         $term->save();
@@ -53,8 +63,7 @@ abstract class BaseMigrator
 
         return $nonSeoFields
             ->merge($migratedSeoFields)
-            ->pipe(fn ($data) => $this->transform($data))
-            ->pipe(fn ($data) => $this->addMissingFields($data));
+            ->pipe(fn ($data) => $this->transform($data));
     }
 
     /**

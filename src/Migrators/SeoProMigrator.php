@@ -40,9 +40,8 @@ class SeoProMigrator extends BaseMigrator
 
         return $nonSeoFields
             ->merge($migratedSeoFields)
-            ->pipe(fn ($data) => $this->transform($data, $oldData)
-            ->pipe(fn ($data) => $this->parse($data))
-            ->pipe(fn ($data) => $this->addMissingFields($data)));
+            ->pipe(fn ($data) => $this->transform($data, $oldData))
+            ->pipe(fn ($data) => $this->parse($data));
     }
 
     protected function transform(Collection $data, ?Collection $oldData = null): Collection
