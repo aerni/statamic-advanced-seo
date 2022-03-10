@@ -38,7 +38,6 @@ class FaviconsFields extends BaseFields
                     'display' => 'Favicon (SVG)',
                     'instructions' => 'Add your favicon as SVG file.',
                     'container' => config('advanced-seo.favicons.container', 'assets'),
-                    'restrict' => true,
                     'folder' => 'favicons',
                     'localizable' => false,
                     'validate' => [
@@ -142,7 +141,6 @@ class FaviconsFields extends BaseFields
                     'instructions' => 'A single color and as flattened as possible SVG. This will use the `Safari` color defined above.',
                     'container' => config('advanced-seo.favicons.container', 'assets'),
                     'width' => 50,
-                    'restrict' => true,
                     'folder' => 'favicons',
                     'localizable' => false,
                     'validate' => [
@@ -158,7 +156,6 @@ class FaviconsFields extends BaseFields
                     'instructions' => 'A `180x180px` PNG for iOS devices.',
                     'container' => config('advanced-seo.favicons.container', 'assets'),
                     'width' => 50,
-                    'restrict' => true,
                     'folder' => 'favicons',
                     'localizable' => false,
                     'validate' => [
@@ -175,7 +172,6 @@ class FaviconsFields extends BaseFields
                     'instructions' => 'A `512x512px` PNG for Android devices.',
                     'container' => config('advanced-seo.favicons.container', 'assets'),
                     'width' => 50,
-                    'restrict' => true,
                     'folder' => 'favicons',
                     'localizable' => false,
                     'validate' => [
