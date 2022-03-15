@@ -1,4 +1,4 @@
-![Statamic](https://flat.badgen.net/badge/Statamic/3.0+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
+![Statamic](https://flat.badgen.net/badge/Statamic/3.3+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
 
 # Advanced SEO
 Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project’s needs. Want to handle the Sitemap yourself? Simply disable the feature in the config.
@@ -7,7 +7,7 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 - Multi-site support
 - Site defaults
 - Content defaults
-- Great user experience leveraging a custom source fieldtype
+- Excellent user experience leveraging a custom source fieldtype
 - Social images generator
 - Fine-grained user permissions
 - Migration command to easily migrate from other addons
@@ -28,7 +28,7 @@ Install the addon using Composer:
 composer require aerni/advanced-seo
 ```
 
-The config will be published to `config/advanced-seo.php` as part of the installation process. Make sure to check it out as there are tons of configuration options to tailor the features to your needs.
+The config will be published to `config/advanced-seo.php` as part of the installation process. Make sure to check it out, as there are tons of configuration options to tailor the features to your needs.
 
 ## Getting started
 Add `{{ seo:head }}` somewhere between your `<head>` tags.
@@ -58,14 +58,14 @@ Advanced SEO provides an easy upgrade path from addons such as `Aardvark SEO` an
 php please seo:migrate
 ```
 
->**Note:** The migrator only migrates data saved on entries and terms. It does not migrate any config files, settings and default data. There are just too many things that could go wrong. So you will have to migrate those yourself. This should be fairly straight forward and not take too much of your time.
+>**Note:** The migrator only migrates data saved on entries and terms. It does not migrate any config files, settings, and default data. There are just too many things that could go wrong. So you will have to migrate those yourself. This should be pretty straightforward and not take too much of your time.
 
 ## Concept & Usage
-After installing the addon you will find a new `SEO` section in the sidebar navigation in the control panel. You will also find a new `SEO` tab when editing your entries and terms.
+After installing the addon, you will find a new `SEO` section in the sidebar navigation in the control panel. You will also find a new `SEO` tab when editing your entries and terms.
 
-Advanced SEO is using its own stache store to save site defaults, as well as content defaults for your collection entries and taxonomy terms. The store is organized in three content types: `site`, `collections` and `taxonomies`.
+Advanced SEO uses its own stache store to save site defaults and content defaults for your collection entries and taxonomy terms. The store is organized into three content types: `site`, `collections` and `taxonomies`.
 
-The data will cascade down from the site defaults, to the content defaults and finally to the entry/term.
+The data will cascade down from the site defaults to the content defaults and finally to the entry/term.
 
 ### Site Defaults
 The site defaults consist of thoughtfully organized site-wide settings for the likes of site name, noindex, social images, and analytics trackers. Head to `SEO -> Site` to configure the settings to your liking. Values configured here will be saved in `content/seo/site/`.
@@ -75,10 +75,10 @@ If your site is a multi-site, you will be able to localize the settings for each
 ### Collection & Taxonomy Defaults
 The collection and taxonomy defaults let you define default values for your entries and terms like title, description, social images, sitemap settings, etc. Head to `SEO -> Collections` or `SEO -> Taxonomies` to configure the defaults to your liking. Values configured here will be saved into `content/seo/collections/` or `content/seo/taxonomies/`.
 
-If your site is a multi-site, you will be able to localize the data to the sites that are configured on the respective collection or taxonomy.
+If your site is a multi-site, you will be able to localize the data to the sites configured on the respective collection or taxonomy.
 
 ### Entries & Terms
-The addon will add a new `SEO` tab to the blueprint of your entries and terms that bundles all the SEO-related settings. Advanced SEO shipps its own source fieldtype that will let you choose the value’s source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the `Auto` option.
+The addon will add a new `SEO` tab to the blueprint of your entries and terms that bundles all the SEO-related settings. Advanced SEO ships with its own source fieldtype that will let you choose the value’s source. It consists of at least two options: `Default` and `Custom`. Some fields, e.g. `Meta Title`, will also give you the `Auto` option.
 
 | Source    | Description                                 | Value             |
 | --------- | ------------------------------------------- | ----------------- |
@@ -87,11 +87,11 @@ The addon will add a new `SEO` tab to the blueprint of your entries and terms th
 | `Custom`  | Overwrites the default value with your own  | Your custom value |
 
 ## Social Images Generator
-The social images generator provides an easy way to add customized images to your entries. To get started, make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to generate images for. This will add a new `Social Images Generator` section to the selected collections’ defaults blueprint as well as the entry blueprint. It will also add a new action to the contextual menu on the collection listing page.
+The social images generator provides an easy way to add customized images to your entries. Make sure the generator is enabled in the addon’s config to get started. Next, head over to `SEO -> Site -> Social Media` and enable the collections for which you want to generate images. This will add a new `Social Images Generator` section to the selected collections’ defaults blueprint and the entry blueprint. It will also add a new action to the contextual menu on the collection listing page.
 
-Activate the newly added toggle to generate the images each time you save the entry. If you don’t like this behavior, you can generate the images on demand using the action in the contextual menu instead.
+Activate the newly added toggle to generate the images each time you save the entry. If you don’t like this behavior, you can use the action in the contextual menu to generate the images on demand.
 
-The generator leverages [Browsershot](https://github.com/spatie/browsershot) to convert your template to an image. This means that you can design your images like you would a regular template, using variables, tags, partials, etc.
+The generator leverages [Browsershot](https://github.com/spatie/browsershot) to convert your template to an image. This means that you can design your images like a regular template, using variables, tags, partials, etc.
 
 To get started, simply run the following command to publish a basic layout and template to `resources/views/social_images/`.
 
@@ -99,12 +99,12 @@ To get started, simply run the following command to publish a basic layout and t
 php artisan vendor:publish --tag=advanced-seo-views
 ```
 
-You might want to add fields to your blueprint that are specifically for your social images. Create a fieldset with the name `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
+You might want to add fields to your blueprint specifically for your social images. Create a fieldset with the name `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
 
 >**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
 
 ## Sitemap
-XML Sitemaps will automatically be generated for your entries and terms. The sitemap can be found at `yourwebsite.com/sitemap.xml`. You may exclude certain collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`, or disable the sitemap feature altogether in the config.
+XML Sitemaps will automatically be generated for your entries and terms. The sitemap can be found at `yourwebsite.com/sitemap.xml`. You may exclude specific collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`, or disable the sitemap feature altogether in the config.
 
 The `priority` and `change frequency` of each item can be configured in the SEO settings on the respective entry/term.
 
