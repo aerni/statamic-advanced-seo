@@ -88,6 +88,7 @@ class Cascade
                 'og_image_size' => $this->ogImageSize(),
                 'twitter_image' => $this->twitterImage(),
                 'twitter_image_size' => $this->twitterImageSize(),
+                'twitter_handle' => $this->twitterHandle(),
                 'indexing' => $this->indexing(),
                 'locale' => $this->locale(),
                 'hreflang' => $this->hreflang(),
@@ -281,6 +282,13 @@ class Cascade
         return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
             ->only(['width', 'height'])
             ->all();
+    }
+
+    protected function twitterHandle(): ?string
+    {
+        $twitterHandle = $this->value('twitter_handle');
+
+        return $twitterHandle ? Str::start($twitterHandle, '@') : null;
     }
 
     protected function twitterImage(): Value
