@@ -27,7 +27,7 @@ class SocialImage
 
     protected function templateUrl(): string
     {
-        return "{$this->entry->site()->absoluteUrl()}/social-images/{$this->specs['type']}/{$this->entry->id()}";
+        return url('/') . "/!/advanced-seo/social-images/{$this->specs['type']}/{$this->entry->id()}/{$this->entry->locale()}";
     }
 
     protected function path(): string
