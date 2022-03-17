@@ -2,15 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Fields\Field;
-use Statamic\Fieldtypes\Code;
-use Statamic\Fields\Fieldtype;
-use Facades\Statamic\CP\LivePreview;
-use Statamic\Contracts\Entries\Entry;
-use Illuminate\Support\Facades\Request;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Code;
 
 class SourceFieldtype extends Fieldtype
 {
