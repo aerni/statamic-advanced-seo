@@ -17,6 +17,10 @@ class AdvancedSeoTags extends Tags
      */
     public function wildcard(): mixed
     {
+        if (! $this->seoIsEnabled()) {
+            return null;
+        }
+
         return Arr::get($this->cascade(), $this->method);
     }
 
@@ -49,7 +53,9 @@ class AdvancedSeoTags extends Tags
      */
     public function dump(): void
     {
-        dd($this->cascade());
+        if ($this->seoIsEnabled()) {
+            dd($this->cascade());
+        }
     }
 
     /**
