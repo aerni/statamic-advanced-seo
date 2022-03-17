@@ -79,4 +79,18 @@ class SocialImageRepository
             ],
         ]);
     }
+
+    public function previewTargets(): array
+    {
+        return [
+            [
+                'label' => 'Open Graph Image',
+                'format' => '/!/advanced-seo/social-images/og/{id}/{locale}'
+            ],
+            [
+                'label' => 'Twitter Image',
+                'format' => '/!/advanced-seo/social-images/twitter/{id}/{locale}'
+            ],
+        ];
+    }
 }
