@@ -4,6 +4,8 @@ namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Facades\Request;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
@@ -54,9 +56,20 @@ trait GetsEventData
     {
         $data = $this->getProperty($event);
 
-        if (! Statamic::isCpRoute()) {
+        // Make sure to get the correct localization of terms on the frontend.
+        if (! Statamic::isCpRoute() && ! Helpers::isActionRoute()) {
             $data = $data->in(Site::current()->handle());
         }
+
+        // Make sure to get the correct localization for social images routes.
+        if (Helpers::isActionRoute()) {
+            $site = collect(Request::segments())->last();
+
+            $locale = Site::get($site)?->handle() ?? Site::current()->handle();
+
+            $data = $data->in($locale);
+        }
+
 
         return GetDefaultsData::handle($data ?? $event);
     }

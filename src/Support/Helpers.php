@@ -17,4 +17,9 @@ class Helpers
     {
         return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
     }
+
+    public static function isActionRoute(): bool
+    {
+        return Str::containsAll(request()->path(), ['!', 'advanced-seo']);
+    }
 }
