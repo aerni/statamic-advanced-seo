@@ -87,18 +87,18 @@ The addon will add a new `SEO` tab to the blueprint of your entries and terms th
 | `Custom`  | Overwrites the default value with your own  | Your custom value |
 
 ## Social Images Generator
-The social images generator provides an easy way to add customized images to your entries. It leverages [Browsershot](https://github.com/spatie/browsershot) to convert your templates to an image. This means that you can design your images like a regular template, using variables, tags, partials, etc.
+The social images generator provides an easy way to add captivating images to your entries. It leverages [Browsershot](https://github.com/spatie/browsershot) to convert your templates to an image. This means that you can design your images like a regular template, using variables, tags, partials, etc.
 
-To get started, simply run the following command to publish a basic layout and template to `resources/views/social_images/`.
+>**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
+
+### Templating
+To get started, simply run the following command to publish a basic layout and templates to `resources/views/social_images/`:
 
 ```bash
 php artisan vendor:publish --tag=advanced-seo-views
 ```
 
->**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
-
-### Templating
-You can access the template views according to the following schema:
+You can access the templates according to the following schema:
 
 ```
 https://site.test/!/advanced-seo/social-images/og/{id}
