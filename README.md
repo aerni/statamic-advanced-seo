@@ -97,6 +97,21 @@ php artisan vendor:publish --tag=advanced-seo-views
 
 >**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
 
+### Templating
+You can access the template views according to the following schema:
+
+```
+https://site.test/!/advanced-seo/social-images/og/{id}
+https://site.test/!/advanced-seo/social-images/twitter/{id}
+```
+
+To access the data of a localized entry, you also need to add the entry’s locale as the last segment of the route:
+
+```
+https://site.test/!/advanced-seo/social-images/og/{id}/german
+https://site.test/!/advanced-seo/social-images/twitter/{id}/german
+```
+
 ### Configuration
 Make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to enable the generator for. This will add a new `Social Images Generator` section to the selected collections’ defaults and entry blueprint. It will also add a new action to the contextual menu on the collections’ listing page.
 
@@ -107,7 +122,7 @@ Activate the `Generate Social Images` toggle to generate the images every time y
 You might want to add fields to your blueprint specifically for your social images. Create a fieldset with the handle `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
 
 ### Live Preview
-You may use Statamic's live preview feature to preview your social images when editing an entry. Simply click the `Live Preview` button and select the `Open Graph Image` or `Twitter Image` from the target dropdown.
+You may use Statamic’s live preview feature to preview your social images when editing an entry. Simply click the `Live Preview` button and select the `Open Graph Image` or `Twitter Image` from the target dropdown.
 
 ## Sitemap
 XML Sitemaps will automatically be generated for your entries and terms. The sitemap can be found at `yourwebsite.com/sitemap.xml`. You may exclude specific collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`, or disable the sitemap feature altogether in the config.
