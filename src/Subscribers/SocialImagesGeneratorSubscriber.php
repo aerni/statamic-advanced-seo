@@ -3,13 +3,13 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
-use Statamic\Events;
-use Statamic\Events\Event;
-use Illuminate\Events\Dispatcher;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
 use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Illuminate\Events\Dispatcher;
+use Statamic\Events;
+use Statamic\Events\Event;
 
 class SocialImagesGeneratorSubscriber
 {
