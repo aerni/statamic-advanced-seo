@@ -17,6 +17,10 @@ class AdvancedSeoTags extends Tags
      */
     public function wildcard(): mixed
     {
+        if (! $this->seoIsEnabled()) {
+            return null;
+        }
+
         return Arr::get($this->cascade(), $this->method);
     }
 
@@ -49,7 +53,9 @@ class AdvancedSeoTags extends Tags
      */
     public function dump(): void
     {
-        dd($this->cascade());
+        if ($this->seoIsEnabled()) {
+            dd($this->cascade());
+        }
     }
 
     /**
@@ -68,17 +74,17 @@ class AdvancedSeoTags extends Tags
     protected function seoIsEnabled(): bool
     {
         // Don't add data for collections that are excluded in the config.
-        if ($this->context->has('is_entry') && in_array($this->context->get('collection')->handle(), config('advanced-seo.disabled.collections', []))) {
+        if ($this->context->has('is_entry') && in_array($this->context->get('collection')->raw()->handle(), config('advanced-seo.disabled.collections', []))) {
             return false;
         }
 
         // Don't add data for taxonomy terms that are excluded in the config.
-        if ($this->context->has('is_term') && in_array($this->context->get('taxonomy')->handle(), config('advanced-seo.disabled.taxonomies', []))) {
+        if ($this->context->has('is_term') && in_array($this->context->get('taxonomy')->raw()->handle(), config('advanced-seo.disabled.taxonomies', []))) {
             return false;
         }
 
         // Don't add data for taxonomies that are excluded in the config.
-        if ($this->context->has('terms') && in_array($this->context->get('handle'), config('advanced-seo.disabled.taxonomies', []))) {
+        if ($this->context->has('terms') && in_array($this->context->get('handle')->raw(), config('advanced-seo.disabled.taxonomies', []))) {
             return false;
         }
 
