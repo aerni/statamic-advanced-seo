@@ -2,13 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Code;
+use Statamic\Fields\Fieldtype;
+use Facades\Statamic\CP\LivePreview;
+use Statamic\Contracts\Entries\Entry;
+use Illuminate\Support\Facades\Request;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class SourceFieldtype extends Fieldtype
 {
@@ -71,12 +73,10 @@ class SourceFieldtype extends Fieldtype
         }
 
         if ($data === '@auto') {
-            $fieldHandle = $this->field->config()['auto'];
+            $field = $this->field->config()['auto'];
             $parent = $this->field->parent();
-            $field = $parent->blueprint()->fields()->get($fieldHandle);
-            $value = $parent->value($fieldHandle);
 
-            return $field->setValue($value)->fieldtype()->augment($field->value());
+            return $parent->$field;
         }
 
         if ($data === '@null') {

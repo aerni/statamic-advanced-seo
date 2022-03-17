@@ -2,23 +2,25 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
-use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\View\View;
+use Statamic\Facades\Data;
+use Illuminate\Http\Request;
+use Facades\Statamic\CP\LivePreview;
 use Illuminate\Routing\Controller;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Data;
 use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\View\View;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Exceptions\NotFoundHttpException;
 
 class SocialImagesController extends Controller
 {
-    public function show(string $type, string $id): View
+    public function show(string $type, string $id, Request $request): View
     {
         // Throw if the social images generator is disabled.
         throw_unless(config('advanced-seo.social_images.generator.enabled', false), new NotFoundHttpException);
 
         // Throw if no data was found.
-        throw_unless($data = Data::find($id), new NotFoundHttpException);
+        throw_unless($data = $this->getData($id, $request), new NotFoundHttpException);
 
         // Throw if the data is not an entry or term.
         throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException());
@@ -30,5 +32,14 @@ class SocialImagesController extends Controller
             ->template($specs['template'])
             ->layout($specs['layout'])
             ->with($data->merge($specs)->toAugmentedArray());
+    }
+
+    protected function getData(string $id, Request $request): ?Entry
+    {
+        if ($request->statamicToken()) {
+            return LivePreview::item($request->statamicToken());
+        }
+
+        return Data::find($id);
     }
 }
