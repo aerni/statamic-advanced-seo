@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Models;
 
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\SocialImageTheme;
 
 class SocialImage extends Model
 {

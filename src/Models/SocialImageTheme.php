@@ -2,10 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Models;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Facades\Folder;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\SocialImage;
 
 class SocialImageTheme extends Model
 {
