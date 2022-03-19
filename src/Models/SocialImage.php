@@ -14,7 +14,7 @@ class SocialImage extends Model
             'og' => [
                 'type' => 'og',
                 'field' => 'seo_og_image',
-                'layout' => config('advanced-seo.social_images.presets.open_graph.layout', 'social_images/layout'),
+                'layout' => 'advanced-seo::social_images/layout',
                 'templates' => SocialImageTheme::templatesOfType('open_graph'),
                 'width' => config('advanced-seo.social_images.presets.open_graph.width', 1200),
                 'height' => config('advanced-seo.social_images.presets.open_graph.height', 628),
@@ -23,7 +23,7 @@ class SocialImage extends Model
                 'summary' => [
                     'type' => 'twitter',
                     'field' => 'seo_twitter_summary_image',
-                    'layout' => config('advanced-seo.social_images.presets.twitter.summary.layout', 'social_images/layout'),
+                    'layout' => 'advanced-seo::social_images/layout',
                     'templates' => SocialImageTheme::templatesOfType('twitter_summary'),
                     'width' => config('advanced-seo.social_images.presets.twitter.summary.width', 240),
                     'height' => config('advanced-seo.social_images.presets.twitter.summary.height', 240),
@@ -31,7 +31,7 @@ class SocialImage extends Model
                 'summary_large_image' => [
                     'type' => 'twitter',
                     'field' => 'seo_twitter_summary_large_image',
-                    'layout' => config('advanced-seo.social_images.presets.twitter.summary_large_image.layout', 'social_images/layout'),
+                    'layout' => 'advanced-seo::social_images/layout',
                     'templates' => SocialImageTheme::templatesOfType('twitter_summary_large'),
                     'width' => config('advanced-seo.social_images.presets.twitter.summary_large_image.width', 1100),
                     'height' => config('advanced-seo.social_images.presets.twitter.summary_large_image.height', 628),
