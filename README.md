@@ -92,13 +92,15 @@ The social images generator provides an easy way to add captivating images to yo
 >**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
 
 ### Templating
-To get started, simply run the following command to publish a basic layout and templates to `resources/views/social_images/`:
+The social images generator is built around the concept of themes. You need at least one theme, but can have as many as you’d like.
+
+Run the following command to publish your first theme to `resources/views/social_images/{theme}`. The theme folder will contain an empty template file for each social image to get you started.
 
 ```bash
-php artisan vendor:publish --tag=advanced-seo-views
+php please seo:theme
 ```
 
-You can access the templates according to the following schema:
+You can view your templates according to the following schema:
 
 ```
 https://site.test/!/advanced-seo/social-images/og/{id}
@@ -110,6 +112,13 @@ To access the data of a localized entry, you also need to add the entry’s loca
 ```
 https://site.test/!/advanced-seo/social-images/og/{id}/german
 https://site.test/!/advanced-seo/social-images/twitter/{id}/german
+```
+
+If you have multiple themes, you should also add the theme’s handle as a parameter:
+
+```
+https://site.test/!/advanced-seo/social-images/og/{id}/german?theme=super_rad
+https://site.test/!/advanced-seo/social-images/twitter/{id}/german?theme=super_rad
 ```
 
 ### Configuration
