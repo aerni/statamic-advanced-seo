@@ -153,7 +153,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function publishSocialImagesViews(): self
     {
         $this->publishes([
-            __DIR__.'/../resources/views/social_images' => resource_path('views/social_images'),
+            __DIR__.'/../resources/views/social_images' => resource_path('views/vendor/advanced-seo/social_images'),
         ], 'advanced-seo-views');
 
         return $this;
