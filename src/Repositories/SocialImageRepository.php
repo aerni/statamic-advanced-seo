@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Repositories;
 
 use Aerni\AdvancedSeo\Content\SocialImage;
+use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -50,34 +51,7 @@ class SocialImageRepository
 
     public function types(): Collection
     {
-        return collect([
-            'og' => [
-                'type' => 'og',
-                'field' => 'seo_og_image',
-                'layout' => config('advanced-seo.social_images.presets.open_graph.layout', 'social_images/layout'),
-                'template' => config('advanced-seo.social_images.presets.open_graph.template', 'social_images/open_graph'),
-                'width' => config('advanced-seo.social_images.presets.open_graph.width', 1200),
-                'height' => config('advanced-seo.social_images.presets.open_graph.height', 628),
-            ],
-            'twitter' => [
-                'summary' => [
-                    'type' => 'twitter',
-                    'field' => 'seo_twitter_summary_image',
-                    'layout' => config('advanced-seo.social_images.presets.twitter.summary.layout', 'social_images/layout'),
-                    'template' => config('advanced-seo.social_images.presets.twitter.summary.template', 'social_images/twitter_summary'),
-                    'width' => config('advanced-seo.social_images.presets.twitter.summary.width', 240),
-                    'height' => config('advanced-seo.social_images.presets.twitter.summary.height', 240),
-                ],
-                'summary_large_image' => [
-                    'type' => 'twitter',
-                    'field' => 'seo_twitter_summary_large_image',
-                    'layout' => config('advanced-seo.social_images.presets.twitter.summary_large_image.layout', 'social_images/layout'),
-                    'template' => config('advanced-seo.social_images.presets.twitter.summary_large_image.template', 'social_images/twitter_summary_large_image'),
-                    'width' => config('advanced-seo.social_images.presets.twitter.summary_large_image.width', 1100),
-                    'height' => config('advanced-seo.social_images.presets.twitter.summary_large_image.height', 628),
-                ],
-            ],
-        ]);
+        return collect(SocialImageModel::all());
     }
 
     public function previewTargets(): array
