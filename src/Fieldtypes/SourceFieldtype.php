@@ -71,12 +71,10 @@ class SourceFieldtype extends Fieldtype
         }
 
         if ($data === '@auto') {
-            $fieldHandle = $this->field->config()['auto'];
+            $field = $this->field->config()['auto'];
             $parent = $this->field->parent();
-            $field = $parent->blueprint()->fields()->get($fieldHandle);
-            $value = $parent->value($fieldHandle);
 
-            return $field->setValue($value)->fieldtype()->augment($field->value());
+            return $parent->$field;
         }
 
         if ($data === '@null') {
