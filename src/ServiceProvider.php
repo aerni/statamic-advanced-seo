@@ -19,6 +19,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $commands = [
+        Commands\MakeTheme::class,
         Commands\Migrate::class,
     ];
 
