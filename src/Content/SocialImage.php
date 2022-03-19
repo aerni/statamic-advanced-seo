@@ -27,12 +27,12 @@ class SocialImage
 
     protected function templateUrl(): string
     {
-        return url('/') . "/!/advanced-seo/social-images/{$this->specs['type']}/{$this->entry->id()}/{$this->entry->locale()}";
+        return url('/') . "/!/advanced-seo/social-images/{$this->specs['type']}/{$this->entry->id}/{$this->entry->locale}";
     }
 
     protected function path(): string
     {
-        return "social_images/{$this->entry->slug()}-{$this->entry->locale()}-{$this->specs['type']}.png";
+        return "social_images/{$this->entry->slug}-{$this->entry->locale}-{$this->specs['type']}.png";
     }
 
     protected function absolutePath($path = null): string
