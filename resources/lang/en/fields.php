@@ -27,6 +27,10 @@ return [
     'seo_generate_social_images' => [
         'instructions' => 'Activate to generate the Open Graph and Twitter images of this :type.',
         'default_instructions' => 'Activate to generate the :type\' Open Graph and Twitter images by default.',
+
+    'seo_social_images_theme' => [
+        'instructions' => 'Choose the social images theme for this :type.',
+        'default_instructions' => 'Choose the :type\'s default social images theme.',
     ],
 
     'seo_og_image_preview' => [

@@ -2,9 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -87,7 +88,7 @@ class OnPageSeoFields extends BaseFields
 
     public function socialImagesGenerator(): array
     {
-        return [
+        $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
@@ -112,6 +113,30 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
+        ]);
+
+        if (SocialImageTheme::all()->count() > 1) {
+            $fields->push([
+                'handle' => 'seo_social_images_theme',
+                'field' => [
+                    'type' => 'select',
+                    'display' => 'Theme',
+                    'instructions' => $this->trans('seo_social_images_theme', 'instructions'),
+                    'options' => SocialImageTheme::fieldtypeOptions(),
+                    'clearable' => false,
+                    'multiple' => false,
+                    'searchable' => false,
+                    'taggable' => false,
+                    'push_tags' => false,
+                    'cast_booleans' => false,
+                    'if' => [
+                        'seo_generate_social_images.value' => 'true',
+                    ],
+                ],
+            ]);
+        }
+
+        $fields->push(
             [
                 'handle' => 'seo_og_image_preview',
                 'field' => [
@@ -142,7 +167,9 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
-        ];
+        );
+
+        return $fields->toArray();
     }
 
     public function socialImagesGeneratorFields(): array
