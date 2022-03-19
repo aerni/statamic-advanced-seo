@@ -5,12 +5,17 @@ namespace Aerni\AdvancedSeo\Models;
 use Illuminate\Support\Str;
 use Statamic\Facades\Folder;
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Models\SocialImage;
 
 class SocialImageTheme extends Model
 {
     protected static function getRows(): array
     {
-        return Folder::disk('resources')
+        if (! Folder::disk('resources')->exists('views/social_images')) {
+            throw new \Exception('You need to create at least one theme for your social images.');
+        }
+
+        $themes = Folder::disk('resources')
             ->getFolders('views/social_images')
             ->map(function ($path) {
                 $handle = Str::of($path)->basename()->snake()->jsonSerialize();
@@ -19,6 +24,10 @@ class SocialImageTheme extends Model
                 $templates = Folder::disk('resources')->getFiles($path)
                     ->mapWithKeys(fn ($template) => [Str::of($template)->basename('.antlers.html')->jsonSerialize() => $template]);
 
+                if ($missingTemplate = collect(SocialImage::$types)->flip()->diffKeys($templates)->flip()->first()) {
+                    throw new \Exception("Please add the \"{$missingTemplate}.antlers.html\" template to your \"{$handle}\" social images theme.");
+                }
+
                 return [
                     'handle' => $handle,
                     'title' => $title,
@@ -26,8 +35,13 @@ class SocialImageTheme extends Model
                 ];
             })
             ->sortBy('title')
-            ->values()
-            ->toArray();
+            ->values();
+
+        if ($themes->isEmpty()) {
+            throw new \Exception('You need to create at least one theme for your social images.');
+        }
+
+        return $themes->toArray();
     }
 
     protected static function all(): Collection
