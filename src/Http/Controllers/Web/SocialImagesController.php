@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Facades\Statamic\CP\LivePreview;
+use Statamic\View\View;
+use Statamic\Facades\Data;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Facades\Statamic\CP\LivePreview;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Data;
 use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\View\View;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Exceptions\NotFoundHttpException;
 
 class SocialImagesController extends Controller
 {
@@ -28,8 +28,12 @@ class SocialImagesController extends Controller
         // Throw if the social image type is not supported.
         throw_unless($specs = SocialImage::specs($type, $data), new NotFoundHttpException);
 
+        $template = $specs['templates']->get($request->get('theme')) // Get the template based on the theme in the request.
+            ?? $specs['templates']->get('default') // If no theme is set, use the default theme.
+            ?? $specs['templates']->first(); // If the default doesn't exist either, fall back to the first theme.
+
         return (new View)
-            ->template($specs['template'])
+            ->template($template)
             ->layout($specs['layout'])
             ->with($data->merge($specs)->toAugmentedArray());
     }
