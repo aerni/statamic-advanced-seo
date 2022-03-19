@@ -22,7 +22,12 @@ class SocialImageTheme extends Model
                 $title = Str::of($handle)->replace('_', ' ')->title()->jsonSerialize();
 
                 $templates = Folder::disk('resources')->getFiles($path)
-                    ->mapWithKeys(fn ($template) => [Str::of($template)->basename('.antlers.html')->jsonSerialize() => $template]);
+                    ->mapWithKeys(function ($template) {
+                        $key = Str::of($template)->basename('.antlers.html')->jsonSerialize();
+                        $view = Str::of($template)->remove('views/')->remove('.antlers.html')->jsonSerialize();
+
+                        return [$key => $view];
+                    });
 
                 if ($missingTemplate = collect(SocialImage::$types)->flip()->diffKeys($templates)->flip()->first()) {
                     throw new \Exception("Please add the \"{$missingTemplate}.antlers.html\" template to your \"{$handle}\" social images theme.");
