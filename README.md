@@ -108,37 +108,41 @@ If you only have one theme, it will be set as default. If you have more than one
 When building your social image templates, you most likely want to see what you’re doing. You can view your templates according to the following schema:
 
 ```
-https://site.test/!/advanced-seo/social-images/{type}/{id}/{locale}?theme={theme}
+https://site.test/!/advanced-seo/social-images/{type}/{id}?site={site}&theme={theme}
 ```
 
-| Variable | Description                                                           | Options                                     |
-| -------- | --------------------------------------------------------------------- | ------------------------------------------- |
-| `type`   | The type of social image                                              | `og`, `twitter`                             |
-| `id`     | The ID of the entry                                                   | e.g. `4358df35-c7fe-4774-97ad-02af0e2dea3b` |
-| `locale` | The locale of the entry. Only required on a multi-site.               | e.g. `german`                               |
-| `theme`  | The theme of the template. Only required if you have multiple themes. | e.g. `special`                              |
+| Variable | Description                                                  | Options                                     |
+| -------- | ------------------------------------------------------------ | ------------------------------------------- |
+| `type`   | The type of social image                                     | `og`, `twitter`                             |
+| `id`     | The ID of the entry                                          | e.g. `4358df35-c7fe-4774-97ad-02af0e2dea3b` |
+| `site` | The locale of the entry. Only required on a multi-site.        | e.g. `german`                               |
+| `theme`  | The theme to use. Only required if you have multiple themes. | e.g. `special`                              |
 
-#### Single-site, single-theme
+**Single-site, single-theme:**
+
 Simply provide the type of social image along with the ID of the entry:
+
 ```
 https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b
 https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b
 ```
 
-#### Multi-site, single-theme
-To access the data of a localized entry, you also need to add the entry’s locale as the last segment of the route:
+**Multi-site, single-theme:**
+
+To access the data of a localized entry, you also need to add the entry’s locale to the `site` parameter:
 
 ```
-https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b/german
-https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b/german
+https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
+https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
 ```
 
-#### Multi-site, multi-theme
-If you have multiple themes, you should also add the theme’s handle as a parameter:
+**Multi-site, multi-theme:**
+
+If you have multiple themes, you should also add the theme’s handle to the `theme` parameter:
 
 ```
-https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b/german?theme=special
-https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b/german?theme=special
+https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german&theme=special
+https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german&theme=special
 ```
 
 ### Configuration
