@@ -63,13 +63,9 @@ trait GetsEventData
 
         // Make sure to get the correct localization for social images routes.
         if (Helpers::isSocialImagesGeneratorActionRoute()) {
-            $site = collect(Request::segments())->last();
-
-            $locale = Site::get($site)?->handle() ?? Site::current()->handle();
-
+            $locale = Site::get(request()->site)?->handle() ?? Site::current()->handle();
             $data = $data->in($locale);
         }
-
 
         return GetDefaultsData::handle($data ?? $event);
     }
