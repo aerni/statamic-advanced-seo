@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Concerns;
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Facades\Request;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
