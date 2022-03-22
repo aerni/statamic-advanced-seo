@@ -18,8 +18,8 @@ class Helpers
         return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
     }
 
-    public static function isActionRoute(): bool
+    public static function isSocialImagesGeneratorActionRoute(): bool
     {
-        return Str::containsAll(request()->path(), ['!', 'advanced-seo']);
+        return Str::containsAll(request()->path(), ['!', 'advanced-seo', 'social-images']);
     }
 }
