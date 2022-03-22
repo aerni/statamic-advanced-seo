@@ -57,14 +57,14 @@ trait GetsEventData
         $data = $this->getProperty($event);
 
         // Make sure to get the correct localization of terms on the frontend.
-        if (! Statamic::isCpRoute() && ! Helpers::isSocialImagesGeneratorActionRoute()) {
+        if (! Statamic::isCpRoute()) {
             $data = $data->in(Site::current()->handle());
         }
 
         // Make sure to get the correct localization for social images routes.
         if (Helpers::isSocialImagesGeneratorActionRoute()) {
-            $locale = Site::get(request()->site)?->handle() ?? Site::current()->handle();
-            $data = $data->in($locale);
+            $site = Site::get(request()->site) ?? Site::current();
+            $data = $data->in($site->handle());
         }
 
         return GetDefaultsData::handle($data ?? $event);
