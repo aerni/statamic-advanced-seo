@@ -118,8 +118,7 @@ https://site.test/!/advanced-seo/social-images/{type}/{id}?site={site}&theme={th
 | `site` | The locale of the entry. Only required on a multi-site.        | e.g. `german`                               |
 | `theme`  | The theme to use. Only required if you have multiple themes. | e.g. `special`                              |
 
-**Single-site, single-theme:**
-
+**Single-site, single-theme:**  
 Simply provide the type of social image along with the ID of the entry:
 
 ```
@@ -127,8 +126,7 @@ https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e
 https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b
 ```
 
-**Multi-site, single-theme:**
-
+**Multi-site, single-theme:**  
 To access the data of a localized entry, you also need to add the entry’s locale to the `site` parameter:
 
 ```
@@ -136,8 +134,7 @@ https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e
 https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
 ```
 
-**Multi-site, multi-theme:**
-
+**Multi-site, multi-theme:**  
 If you have multiple themes, you should also add the theme’s handle to the `theme` parameter:
 
 ```
