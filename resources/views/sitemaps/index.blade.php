@@ -4,7 +4,7 @@
         @if (count($sitemap->items()) >= 1)
             <sitemap>
                 <loc>{{ $sitemap->url() }}</loc>
-                <lastmod>{{ $sitemap->lastmod() }}</lastmod>
+                @if($sitemap->lastmod())<lastmod>{{ $sitemap->lastmod() }}</lastmod>@endif
             </sitemap>
         @endif
     @endforeach

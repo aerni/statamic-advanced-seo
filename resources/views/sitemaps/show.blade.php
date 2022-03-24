@@ -3,9 +3,9 @@
     @foreach ($data as $item)
         <url>
             <loc>{{ $item['loc'] }}</loc>
-            <lastmod>{{ $item['lastmod'] }}</lastmod>
-            <changefreq>{{ $item['changefreq'] }}</changefreq>
-            <priority>{{ $item['priority'] }}</priority>
+            @isset($item['lastmod'])<lastmod>{{ $item['lastmod'] }}</lastmod>@endisset
+            @isset($item['changefreq'])<changefreq>{{ $item['changefreq'] }}</changefreq>@endisset
+            @isset($item['priority'])<priority>{{ $item['priority'] }}</priority>@endisset
         </url>
     @endforeach
 </urlset>
