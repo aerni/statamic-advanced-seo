@@ -55,7 +55,7 @@ class Defaults extends Model
                 'title' => 'Analytics',
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
                 'data' => __DIR__.'/../../content/analytics.yaml',
-                'enabled' => ! empty(array_filter(config('advanced-seo.analytics'))),
+                'enabled' => collect(config('advanced-seo.analytics'))->reject(fn ($value, $key) => $key === 'environments')->filter()->isNotEmpty(),
                 'icon' => 'charts',
                 'type_icon' => 'earth',
             ],
