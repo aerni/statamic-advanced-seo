@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Tags;
 
+use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Support\Arr;
 use Illuminate\View\View;
@@ -73,6 +74,11 @@ class AdvancedSeoTags extends Tags
      */
     protected function seoIsEnabled(): bool
     {
+        // Custom routes don't have the necessary data to compose the SEO cascade.
+        if (Helpers::isCustomRoute()) {
+            return false;
+        }
+
         // Don't add data for collections that are excluded in the config.
         if ($this->context->has('is_entry') && in_array($this->context->get('collection')->raw()->handle(), config('advanced-seo.disabled.collections', []))) {
             return false;

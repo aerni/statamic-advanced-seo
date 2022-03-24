@@ -17,4 +17,13 @@ class Helpers
     {
         return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
     }
+
+    /**
+     * Return false if we're on any Statamic frontend route.
+     * This excludes any Route::get() and even Route::statamic().
+     */
+    public static function isCustomRoute(): bool
+    {
+        return request()->route()->getAction('controller') !== 'Statamic\Http\Controllers\FrontendController@index';
+    }
 }
