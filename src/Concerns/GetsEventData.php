@@ -55,9 +55,11 @@ trait GetsEventData
         $data = $this->getProperty($event);
 
         if (! Statamic::isCpRoute()) {
+            // Make sure to get the correct localization based on the current site.
             $data = $data->in(Site::current()->handle());
         }
 
+        // There is no data if we are creating a new entry/term.
         return GetDefaultsData::handle($data ?? $event);
     }
 }
