@@ -3,10 +3,8 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Sitemap\TaxonomySitemap;
-use Aerni\AdvancedSeo\Sitemap\CollectionSitemap;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class SitemapIndex
 {
