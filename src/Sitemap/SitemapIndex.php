@@ -8,14 +8,11 @@ use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class SitemapIndex
 {
-    protected static $customSitemaps = [];
+    protected static array $customSitemaps = [];
 
     public static function add(CustomSitemap $sitemap): void
     {
-        self::$customSitemaps = collect(self::$customSitemaps)
-            ->push($sitemap)
-            ->unique('handle')
-            ->toArray();
+        self::$customSitemaps = collect(self::$customSitemaps)->push($sitemap)->unique('handle')->toArray();
     }
 
     public function items(): Collection
