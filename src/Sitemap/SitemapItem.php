@@ -2,9 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Actions\DispatchBlueprintFoundEvent;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -25,8 +23,6 @@ class SitemapItem
         if ($content instanceof Taxonomy) {
             Site::setCurrent($site);
         }
-
-        DispatchBlueprintFoundEvent::handle($this->content);
     }
 
     public function type(): string
