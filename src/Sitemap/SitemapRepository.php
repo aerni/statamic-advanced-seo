@@ -3,8 +3,6 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Contracts\Sitemap;
-use Aerni\AdvancedSeo\Sitemap\CustomSitemap;
-use Aerni\AdvancedSeo\Sitemap\SitemapIndex;
 use Illuminate\Support\Collection;
 
 class SitemapRepository

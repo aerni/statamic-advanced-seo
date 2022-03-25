@@ -4,9 +4,7 @@ namespace Aerni\AdvancedSeo\Sitemap;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Aerni\AdvancedSeo\Sitemap\TermSitemapItem;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Aerni\AdvancedSeo\Sitemap\TaxonomySitemapItem;
 
 class TaxonomySitemap extends BaseSitemap
 {

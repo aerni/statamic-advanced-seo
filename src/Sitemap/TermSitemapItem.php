@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Sitemap\BaseSitemapItem;
 
 class TermSitemapItem extends BaseSitemapItem
 {

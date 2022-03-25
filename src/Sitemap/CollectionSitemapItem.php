@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Sitemap\BaseSitemapItem;
 use Statamic\Contracts\Entries\Entry;
 
 class CollectionSitemapItem extends BaseSitemapItem

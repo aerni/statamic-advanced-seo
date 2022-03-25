@@ -3,9 +3,8 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Models\Defaults;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Aerni\AdvancedSeo\Sitemap\BaseSitemapItem;
+use Statamic\Contracts\Taxonomies\Term;
 
 class TaxonomySitemapItem extends BaseSitemapItem
 {
