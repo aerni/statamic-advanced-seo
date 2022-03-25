@@ -2,15 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Statamic\Facades\URL;
+use Statamic\Facades\Site;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Facades\Site;
-use Statamic\Facades\URL;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Sitemap
 {
+    use FluentlyGetsAndSets;
+
     abstract public function items(): Collection|self;
 
     public function id(): string
@@ -67,12 +70,6 @@ abstract class BaseSitemap implements Sitemap
 
     public function __call(string $name, array $arguments): mixed
     {
-        if (empty($arguments)) {
-            return $this->$name;
-        }
-
-        $this->$name = $arguments[0];
-
-        return $this;
+        return $this->fluentlyGetOrSet($name)->args($arguments);
     }
 }
