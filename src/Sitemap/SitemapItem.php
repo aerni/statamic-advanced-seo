@@ -26,8 +26,6 @@ class SitemapItem
             Site::setCurrent($site);
         }
 
-        $this->defaults = Seo::find($this->type(), $this->handle())?->in($site);
-
         DispatchBlueprintFoundEvent::handle($this->content);
     }
 
