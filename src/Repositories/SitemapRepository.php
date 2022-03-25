@@ -19,6 +19,11 @@ class SitemapRepository
         SitemapIndex::add($sitemap);
     }
 
+    public function all(): Collection
+    {
+        return (new SitemapIndex)->items();
+    }
+
     public function find(string $type, string $handle, string $site): ?Sitemap
     {
         return $this->all()->first(function ($sitemap) use ($type, $handle, $site) {
@@ -26,11 +31,6 @@ class SitemapRepository
                 && $sitemap->handle() === $handle
                 && $sitemap->site() === $site;
         });
-    }
-
-    public function all(): Collection
-    {
-        return (new SitemapIndex)->items();
     }
 
     public function whereSite(string $site): Collection
