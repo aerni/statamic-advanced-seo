@@ -6,8 +6,9 @@ use Illuminate\Support\Collection;
 
 class CustomSitemap extends BaseSitemap
 {
+    protected string $type = 'custom';
+
     public function __construct(
-        public string $type,
         public string $handle,
         public string $site,
         public array $items,

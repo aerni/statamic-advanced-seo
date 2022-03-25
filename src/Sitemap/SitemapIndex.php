@@ -16,7 +16,7 @@ class SitemapIndex
     {
         self::$customSitemaps = collect(self::$customSitemaps)
             ->push($sitemap)
-            ->unique(fn ($sitemap) => $sitemap->type.$sitemap->handle)
+            ->unique('handle')
             ->toArray();
     }
 

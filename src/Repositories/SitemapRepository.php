@@ -9,9 +9,9 @@ use Illuminate\Support\Collection;
 
 class SitemapRepository
 {
-    public function make(string $type, string $handle, string $site, array $items): CustomSitemap
+    public function make(string $handle, string $site, array $items): CustomSitemap
     {
-        return new CustomSitemap($type, $handle, $site, $items);
+        return new CustomSitemap($handle, $site, $items);
     }
 
     public function add(CustomSitemap $sitemap): void
