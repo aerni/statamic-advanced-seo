@@ -5,16 +5,13 @@ namespace Aerni\AdvancedSeo\Sitemap;
 use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Sitemap\CollectionSitemapItem;
 use Statamic\Facades\Collection as CollectionFacade;
-use Statamic\Contracts\Entries\Collection as StatamicCollection;
 
 class CollectionSitemap extends BaseSitemap
 {
     protected string $type = 'collections';
-    protected StatamicCollection $collection;
 
     public function __construct(protected string $handle, protected string $site)
     {
-        $this->collection = CollectionFacade::find($handle);
     }
 
     public function items(): Collection
@@ -25,7 +22,8 @@ class CollectionSitemap extends BaseSitemap
 
     protected function entries(): Collection
     {
-        return $this->collection->queryEntries()
+        return CollectionFacade::find($this->handle)
+            ->queryEntries()
             ->where('site', $this->site)
             ->where('published', '!=', false) // We only want published entries.
             ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
