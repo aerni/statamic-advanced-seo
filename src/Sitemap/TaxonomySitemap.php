@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Sitemap;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Sitemap\TermSitemapItem;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
 use Aerni\AdvancedSeo\Sitemap\TaxonomySitemapItem;
 
@@ -19,12 +20,21 @@ class TaxonomySitemap extends BaseSitemap
 
     public function items(): Collection
     {
-        return collect()
-            ->merge($this->taxonomy())
-            ->merge($this->terms($this->taxonomy))
+        return $this->taxonomyItems()->merge($this->termItems());
+    }
+
+    protected function taxonomyItems(): Collection
+    {
+        return $this->taxonomy()
             ->merge($this->collectionTaxonomy())
-            ->merge($this->collectionTerms())
             ->map(fn ($item) => (new TaxonomySitemapItem($item, $this->site))->toArray());
+    }
+
+    protected function termItems(): Collection
+    {
+        return $this->terms($this->taxonomy)
+            ->merge($this->collectionTerms())
+            ->map(fn ($item) => (new TermSitemapItem($item))->toArray());
     }
 
     protected function taxonomy(): Collection

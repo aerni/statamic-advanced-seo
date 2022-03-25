@@ -9,59 +9,36 @@ use Aerni\AdvancedSeo\Sitemap\BaseSitemapItem;
 
 class TaxonomySitemapItem extends BaseSitemapItem
 {
-    public function __construct(protected Taxonomy|Term $model, protected string $site)
+    public function __construct(protected Taxonomy $taxonomy, protected string $site)
     {
     }
 
     public function loc(): string
     {
-        if ($this->model instanceof Taxonomy) {
-            return $this->model->absoluteUrl();
-        }
-
-        $url = match ($this->model->seo_canonical_type->value()) {
-            'current' => $this->model->absoluteUrl(),
-            'other' => $this->model->seo_canonical_entry?->absoluteUrl(),
-            'custom' => $this->model->seo_canonical_custom,
-            default => null,
-        };
-
-        return $url ?? $this->model->absoluteUrl();
+        return $this->taxonomy->absoluteUrl();
     }
 
     public function lastmod(): string
     {
-        if ($this->model instanceof Taxonomy) {
-            return $this->lastModifiedTaxonomyTerm()->lastModified()->format('Y-m-d\TH:i:sP');
-        }
-
-        return $this->model->lastModified()->format('Y-m-d\TH:i:sP');
-    }
-
-    protected function lastModifiedTaxonomyTerm(): Term
-    {
-        return $this->model->queryTerms()
-            ->where('site', $this->site)
-            ->get()
-            ->sortByDesc(fn ($term) => $term->lastModified())
-            ->first();
+        return $this->lastModifiedTaxonomyTerm()->lastModified()->format('Y-m-d\TH:i:sP');
     }
 
     public function changefreq(): string
     {
-        if ($this->model instanceof Taxonomy) {
-            return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
-        }
-
-        return $this->model->seo_sitemap_change_frequency;
+        return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
     }
 
     public function priority(): string
     {
-        if ($this->model instanceof Taxonomy) {
-            return Defaults::data('taxonomies')->get('seo_sitemap_priority');
-        }
+        return Defaults::data('taxonomies')->get('seo_sitemap_priority');
+    }
 
-        return $this->model->seo_sitemap_priority;
+    protected function lastModifiedTaxonomyTerm(): Term
+    {
+        return $this->taxonomy->queryTerms()
+            ->where('site', $this->site)
+            ->get()
+            ->sortByDesc(fn ($term) => $term->lastModified())
+            ->first();
     }
 }
