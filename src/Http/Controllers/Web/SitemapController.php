@@ -46,7 +46,7 @@ class SitemapController extends Controller
             return view('advanced-seo::sitemaps.show', [
                 'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
                 'xslLink' => '<?xml-stylesheet type="text/xsl" href="' . $site->absoluteUrl() . '/sitemap.xsl"?>',
-                'data' => $sitemapItems,
+                'items' => $sitemapItems,
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ])->render();
         });
