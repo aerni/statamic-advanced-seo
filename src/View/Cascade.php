@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View;
 
+use Aerni\AdvancedSeo\Actions\EvaluateContextType;
 use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsPageData;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
@@ -81,26 +82,38 @@ class Cascade
             throw new \Exception("The context needs to be an instance of Statamic\Tags\Context in order to get the computed data.");
         }
 
-        $this->data->put('title', $this->compiledTitle());
+        // Only get the computed data for the keys selected below. Selecting "null" returns all data.
+        $selection = match (true) {
+            $this->isType('taxonomy') => ['title'],
+            $this->isType('error') => ['title'],
+            default => null,
+        };
 
-        if (! $this->isType('error')) {
-            $this->data = $this->data->merge([
-                'og_image_size' => $this->ogImageSize(),
-                'twitter_image' => $this->twitterImage(),
-                'twitter_image_size' => $this->twitterImageSize(),
-                'twitter_handle' => $this->twitterHandle(),
-                'indexing' => $this->indexing(),
-                'locale' => $this->locale(),
-                'hreflang' => $this->hreflang(),
-                'canonical' => $this->canonical(),
-                'prev_url' => $this->prevUrl(),
-                'next_url' => $this->nextUrl(),
-                'schema' => $this->schema(),
-                'breadcrumbs' => $this->breadcrumbs(),
-            ])->filter();
-        }
+        $this->data = $this->data->merge($this->computedData($selection));
 
         return $this;
+    }
+
+    protected function computedData(array $selection = null): Collection
+    {
+        return collect([
+            'title' => 'compiledTitle',
+            'og_image_size' => 'ogImageSize',
+            'twitter_image' => 'twitterImage',
+            'twitter_image_size' => 'twitterImageSize',
+            'twitter_handle' => 'twitterHandle',
+            'indexing' => 'indexing',
+            'locale' => 'locale',
+            'hreflang' => 'hreflang',
+            'canonical' => 'canonical',
+            'prev_url' => 'prevUrl',
+            'next_url' => 'nextUrl',
+            'schema' => 'schema',
+            'breadcrumbs' => 'breadcrumbs',
+        ])
+        ->only($selection)
+        ->map(fn ($item) => call_user_func([$this, $item]))
+        ->filter();
     }
 
     public function all(): array
@@ -249,11 +262,11 @@ class Cascade
 
     protected function title(): string
     {
-        if ($this->isType('error')) {
-            return $this->context->get('response_code');
-        }
-
-        return $this->get('title');
+        return match (true) {
+            $this->isType('taxonomy') => $this->context->get('title'),
+            $this->isType('error') => $this->context->get('response_code'),
+            default => $this->get('title'),
+        };
     }
 
     protected function titleSeparator(): string
