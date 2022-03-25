@@ -83,7 +83,7 @@ class Cascade
 
         $this->data->put('title', $this->compiledTitle());
 
-        if (! $this->isErrorPage()) {
+        if (! $this->isType('error')) {
             $this->data = $this->data->merge([
                 'og_image_size' => $this->ogImageSize(),
                 'twitter_image' => $this->twitterImage(),
@@ -179,13 +179,9 @@ class Cascade
         return $this;
     }
 
-    protected function isErrorPage(): bool
+    protected function isType(string $type): bool
     {
-        if ($this->context instanceof Context) {
-            return Str::contains($this->context->get('current_template'), 'errors');
-        }
-
-        return false;
+        return EvaluateContextType::handle($this->context) === $type;
     }
 
     protected function applyWhitelist(): self
@@ -253,7 +249,7 @@ class Cascade
 
     protected function title(): string
     {
-        if ($this->isErrorPage()) {
+        if ($this->isType('error')) {
             return $this->context->get('response_code');
         }
 
