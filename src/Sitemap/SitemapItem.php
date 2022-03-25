@@ -49,11 +49,6 @@ class SitemapItem
         };
     }
 
-    public function path(): string
-    {
-        return parse_url($this->loc())['path'] ?? '/';
-    }
-
     public function loc(): string
     {
         if ($this->content instanceof Taxonomy) {
@@ -117,7 +112,6 @@ class SitemapItem
     public function toArray(): array
     {
         return [
-            'path' => $this->path(),
             'loc' => $this->loc(),
             'lastmod' => $this->lastmod(),
             'changefreq' => $this->changefreq(),
