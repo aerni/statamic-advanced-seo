@@ -295,6 +295,7 @@ class Cascade
 
     protected function twitterImageSize(): array
     {
+        // TODO: Output the correct size on taxonomy and error pages.
         return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
             ->only(['width', 'height'])
             ->all();
