@@ -307,11 +307,16 @@ class Cascade
         return $twitterHandle ? Str::start($twitterHandle, '@') : null;
     }
 
-    protected function twitterImage(): Value
+    protected function twitterImage(): ?Value
     {
-        return $this->value('twitter_card')->value() === 'summary'
-            ? $this->get('twitter_summary_image')
-            : $this->get('twitter_summary_large_image');
+        $images = array_filter([
+            'summary' => $this->get('twitter_summary_image'),
+            'summary_large_image' => $this->get('twitter_summary_large_image'),
+        ]);
+
+        $card = $this->value('twitter_card')?->value();
+
+        return $card ? $images[$card] : array_first($images);
     }
 
     protected function twitterTitle(): string
