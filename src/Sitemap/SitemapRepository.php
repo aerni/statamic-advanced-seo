@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Repositories;
+namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Sitemap\CustomSitemap;

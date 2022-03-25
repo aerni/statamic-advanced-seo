@@ -8,6 +8,6 @@ class Sitemap extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Aerni\AdvancedSeo\Repositories\SitemapRepository::class;
+        return \Aerni\AdvancedSeo\Sitemap\SitemapRepository::class;
     }
 }
