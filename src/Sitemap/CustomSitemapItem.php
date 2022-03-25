@@ -2,29 +2,37 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-class CustomSitemapItem
+use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+class CustomSitemapItem extends BaseSitemapItem
 {
+    use FluentlyGetsAndSets;
+
     public function __construct(
-        public string $loc,
-        public ?string $lastmod = null,
-        public ?string $changefreq = null,
-        public ?string $priority = null,
+        protected string $loc,
+        protected ?string $lastmod = null,
+        protected ?string $changefreq = null,
+        protected ?string $priority = null,
     ) {
     }
 
-    public function toArray(): array
+    public function loc(string $loc = null): string|self
     {
-        return get_object_vars($this);
+        return $this->fluentlyGetOrSet('loc')->args(func_get_args());
     }
 
-    public function __call(string $name, array $arguments): mixed
+    public function lastmod(string $lastmod = null): string|self|null
     {
-        if (empty($arguments)) {
-            return $this->$name;
-        }
+        return $this->fluentlyGetOrSet('lastmod')->args(func_get_args());
+    }
 
-        $this->$name = $arguments[0];
+    public function changefreq(string $changefreq = null): string|self|null
+    {
+        return $this->fluentlyGetOrSet('changefreq')->args(func_get_args());
+    }
 
-        return $this;
+    public function priority(string $priority = null): string|self|null
+    {
+        return $this->fluentlyGetOrSet('priority')->args(func_get_args());
     }
 }
