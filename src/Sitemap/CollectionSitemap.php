@@ -3,8 +3,9 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Collection as StatamicCollection;
+use Aerni\AdvancedSeo\Sitemap\CollectionSitemapItem;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Contracts\Entries\Collection as StatamicCollection;
 
 class CollectionSitemap extends BaseSitemap
 {
@@ -19,7 +20,7 @@ class CollectionSitemap extends BaseSitemap
     public function items(): Collection
     {
         return $this->entries()
-            ->map(fn ($item) => (new SitemapItem($item, $this->site))->toArray());
+            ->map(fn ($entry) => (new CollectionSitemapItem($entry))->toArray());
     }
 
     protected function entries(): Collection
