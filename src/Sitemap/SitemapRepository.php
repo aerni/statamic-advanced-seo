@@ -14,6 +14,11 @@ class SitemapRepository
         return new CustomSitemap($handle, $site, $items);
     }
 
+    public static function makeItem(string $loc, ?string $lastmod = null, ?string $changefreq = null, ?string $priority = null): CustomSitemapItem
+    {
+        return new CustomSitemapItem($loc, $lastmod, $changefreq, $priority);
+    }
+
     public function add(CustomSitemap $sitemap): void
     {
         SitemapIndex::add($sitemap);
