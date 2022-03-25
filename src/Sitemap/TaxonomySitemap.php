@@ -8,16 +8,12 @@ use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class TaxonomySitemap extends BaseSitemap
 {
+    protected string $type = 'taxonomies';
     protected Taxonomy $taxonomy;
 
     public function __construct(protected string $handle, protected string $site)
     {
         $this->taxonomy = TaxonomyFacade::find($this->handle);
-    }
-
-    public function type(): string
-    {
-        return 'taxonomies';
     }
 
     public function items(): Collection

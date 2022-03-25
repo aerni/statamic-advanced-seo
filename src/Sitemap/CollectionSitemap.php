@@ -8,16 +8,12 @@ use Statamic\Facades\Collection as CollectionFacade;
 
 class CollectionSitemap extends BaseSitemap
 {
+    protected string $type = 'collections';
     protected StatamicCollection $collection;
 
     public function __construct(protected string $handle, protected string $site)
     {
         $this->collection = CollectionFacade::find($handle);
-    }
-
-    public function type(): string
-    {
-        return 'collections';
     }
 
     public function items(): Collection

@@ -19,7 +19,7 @@ class SitemapRepository
         SitemapIndex::add($sitemap);
     }
 
-    public function find(string $type, string $handle, string $site): Sitemap|CustomSitemap|null
+    public function find(string $type, string $handle, string $site): ?Sitemap
     {
         return $this->all()->first(function ($sitemap) use ($type, $handle, $site) {
             return $sitemap->type() === $type

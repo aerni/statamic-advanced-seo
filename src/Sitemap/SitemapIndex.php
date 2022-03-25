@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Sitemap\CollectionSitemap;
-use Aerni\AdvancedSeo\Sitemap\TaxonomySitemap;
 use Illuminate\Support\Collection;
-use Statamic\Facades\Collection as CollectionFacade;
+use Aerni\AdvancedSeo\Sitemap\TaxonomySitemap;
+use Aerni\AdvancedSeo\Sitemap\CollectionSitemap;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Statamic\Facades\Collection as CollectionFacade;
 
 class SitemapIndex
 {
@@ -30,14 +30,14 @@ class SitemapIndex
     public function collectionSitemaps(): Collection
     {
         return CollectionFacade::all()->flatMap(function ($collection) {
-            return $collection->sites()->map(fn ($site) => CollectionSitemap::make($collection->handle(), $site));
+            return $collection->sites()->map(fn ($site) => new CollectionSitemap($collection->handle(), $site));
         })->filter(fn ($sitemap) => $sitemap->indexable());
     }
 
     public function taxonomySitemaps(): Collection
     {
         return TaxonomyFacade::all()->flatMap(function ($taxonomy) {
-            return $taxonomy->sites()->map(fn ($site) => TaxonomySitemap::make($taxonomy->handle(), $site));
+            return $taxonomy->sites()->map(fn ($site) => new TaxonomySitemap($taxonomy->handle(), $site));
         })->filter(fn ($sitemap) => $sitemap->indexable());
     }
 
