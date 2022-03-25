@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 
 abstract class BaseSitemap implements Sitemap
 {
@@ -17,7 +18,7 @@ abstract class BaseSitemap implements Sitemap
         $siteUrl = Site::get($this->site)->absoluteUrl();
         $filename = "sitemap_{$this->type}_{$this->handle}.xml";
 
-        return $siteUrl . '/' . $filename;
+        return URL::tidy("{$siteUrl}/{$filename}");
     }
 
     public function lastmod(): ?string
