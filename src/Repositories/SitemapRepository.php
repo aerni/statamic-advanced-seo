@@ -24,13 +24,9 @@ class SitemapRepository
         return (new SitemapIndex)->items();
     }
 
-    public function find(string $type, string $handle, string $site): ?Sitemap
+    public function find(string $id): ?Sitemap
     {
-        return $this->all()->first(function ($sitemap) use ($type, $handle, $site) {
-            return $sitemap->type() === $type
-                && $sitemap->handle() === $handle
-                && $sitemap->site() === $site;
-        });
+        return $this->all()->first(fn ($sitemap) => $sitemap->id() === $id);
     }
 
     public function whereSite(string $site): Collection

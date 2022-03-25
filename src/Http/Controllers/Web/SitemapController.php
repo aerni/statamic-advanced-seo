@@ -36,7 +36,7 @@ class SitemapController extends Controller
 
         $site = Site::current();
 
-        throw_unless($sitemap = Sitemap::find($type, $handle, $site->handle()), new NotFoundHttpException);
+        throw_unless($sitemap = Sitemap::find("{$type}::{$handle}::{$site->handle()}"), new NotFoundHttpException);
 
         $sitemapItems = $sitemap->items();
 

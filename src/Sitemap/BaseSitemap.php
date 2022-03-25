@@ -13,6 +13,11 @@ abstract class BaseSitemap implements Sitemap
 {
     abstract public function items(): Collection|self;
 
+    public function id(): string
+    {
+        return "{$this->type}::{$this->handle}::{$this->site}";
+    }
+
     public function url(): string
     {
         $siteUrl = Site::get($this->site)->absoluteUrl();
