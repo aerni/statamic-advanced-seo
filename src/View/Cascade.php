@@ -99,9 +99,11 @@ class Cascade
         return collect([
             'title' => 'compiledTitle',
             'og_image_size' => 'ogImageSize',
+            'og_title' => 'ogTitle',
             'twitter_image' => 'twitterImage',
             'twitter_image_size' => 'twitterImageSize',
             'twitter_handle' => 'twitterHandle',
+            'twitter_title' => 'twitterTitle',
             'indexing' => 'indexing',
             'locale' => 'locale',
             'hreflang' => 'hreflang',
@@ -286,6 +288,11 @@ class Cascade
             ->all();
     }
 
+    protected function ogTitle(): string
+    {
+        return $this->get('og_title') ?? $this->title();
+    }
+
     protected function twitterImageSize(): array
     {
         return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
@@ -305,6 +312,11 @@ class Cascade
         return $this->value('twitter_card')->value() === 'summary'
             ? $this->get('twitter_summary_image')
             : $this->get('twitter_summary_large_image');
+    }
+
+    protected function twitterTitle(): string
+    {
+        return $this->get('twitter_title') ?? $this->title();
     }
 
     protected function indexing(): string
