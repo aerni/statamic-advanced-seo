@@ -12,8 +12,6 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class SitemapItem
 {
-    protected ?SeoVariables $defaults;
-
     public function __construct(protected Entry|Taxonomy|LocalizedTerm $content, protected string $site)
     {
         /**
