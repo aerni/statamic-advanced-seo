@@ -114,7 +114,7 @@ You may have custom routes that you want to add to your sitemap. Follow the inst
 ```php
 use Aerni\AdvancedSeo\Facades\Sitemap;
 
-// Create a new item with the URL.
+// Create a new item with the URL as the first argument.
 $signIn = Sitemap::makeItem('https://statamic.com/sign-in');
 
 // You may also add optional attributes.
@@ -132,7 +132,7 @@ $sitemap = Sitemap::make(
     items: [$signIn, $seller],
 );
 
-// Add the sitemap.
+// Add your new custom sitemap to the existing ones.
 Sitemap::add($sitemap);
 ```
 
