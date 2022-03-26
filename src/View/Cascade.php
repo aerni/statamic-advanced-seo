@@ -2,25 +2,27 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Actions\EvaluateContextType;
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsPageData;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Illuminate\Support\Arr;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Concerns\GetsPageData;
+use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Actions\EvaluateContextType;
+use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 
 class Cascade
 {
@@ -100,6 +102,7 @@ class Cascade
             'title' => 'compiledTitle',
             'og_image_size' => 'ogImageSize',
             'og_title' => 'ogTitle',
+            'twitter_card' => 'twitterCard',
             'twitter_image' => 'twitterImage',
             'twitter_image_size' => 'twitterImageSize',
             'twitter_handle' => 'twitterHandle',
@@ -297,14 +300,6 @@ class Cascade
         return $this->get('og_title') ?? $this->title();
     }
 
-    protected function twitterImageSize(): array
-    {
-        // TODO: Output the correct size on taxonomy and error pages.
-        return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
-            ->only(['width', 'height'])
-            ->all();
-    }
-
     protected function twitterHandle(): ?string
     {
         $twitterHandle = $this->value('twitter_handle');
@@ -312,16 +307,47 @@ class Cascade
         return $twitterHandle ? Str::start($twitterHandle, '@') : null;
     }
 
+    protected function twitterImageSize(): ?array
+    {
+        if (! $image = $this->twitterImage()) {
+            return null;
+        }
+
+        // TODO: This can be simplified when the key is `summary_large` instead of `summary_large_image`.
+        $card = str_replace(['seo_', 'twitter_'], '', $image->handle());
+        $card = $card === 'summary_image' ? 'summary' : 'summary_large_image';
+
+        return collect(SocialImage::specs("twitter.{$card}"))
+            ->only(['width', 'height'])
+            ->all();
+    }
+
+    protected function twitterCard(): ?string
+    {
+        if ($this->get('twitter_card')) {
+            return $this->get('twitter_card');
+        }
+
+        if (! $image = $this->twitterImage()) {
+            return null;
+        }
+
+        // TODO: This can be simplified when the key is `summary_large` instead of `summary_large_image`.
+        $card = str_replace(['seo_', 'twitter_'], '', $image->handle());
+
+        return $card === 'summary_image'
+            ? 'summary'
+            : 'summary_large_image';
+    }
+
     protected function twitterImage(): ?Value
     {
-        $images = array_filter([
+        $images = collect([
             'summary' => $this->get('twitter_summary_image'),
             'summary_large_image' => $this->get('twitter_summary_large_image'),
-        ]);
+        ])->filter();
 
-        $card = $this->value('twitter_card')?->value();
-
-        return $card ? $images[$card] : array_first($images);
+        return $images->get($this->value('twitter_card')?->value()) ?? $images->first();
     }
 
     protected function twitterTitle(): string
