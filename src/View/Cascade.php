@@ -84,41 +84,26 @@ class Cascade
             throw new \Exception("The context needs to be an instance of Statamic\Tags\Context in order to get the computed data.");
         }
 
-        // Only get the computed data for the keys selected below. Selecting "null" returns all data.
-        $selection = match (true) {
-            $this->isType('taxonomy') => ['title'],
-            $this->isType('error') => ['title'],
-            default => null,
-        };
-
-        $this->data = $this->data->merge($this->computedData($selection));
+        $this->data = $this->data->merge([
+            'title' => $this->compiledTitle(),
+            'og_image_size' => $this->ogImageSize(),
+            'og_title' => $this->ogTitle(),
+            'twitter_card' => $this->twitterCard(),
+            'twitter_image' => $this->twitterImage(),
+            'twitter_image_size' => $this->twitterImageSize(),
+            'twitter_handle' => $this->twitterHandle(),
+            'twitter_title' => $this->twitterTitle(),
+            'indexing' => $this->indexing(),
+            'locale' => $this->locale(),
+            'hreflang' => $this->hreflang(),
+            'canonical' => $this->canonical(),
+            'prev_url' => $this->prevUrl(),
+            'next_url' => $this->nextUrl(),
+            'schema' => $this->schema(),
+            'breadcrumbs' => $this->breadcrumbs(),
+        ]);
 
         return $this;
-    }
-
-    protected function computedData(array $selection = null): Collection
-    {
-        return collect([
-            'title' => 'compiledTitle',
-            'og_image_size' => 'ogImageSize',
-            'og_title' => 'ogTitle',
-            'twitter_card' => 'twitterCard',
-            'twitter_image' => 'twitterImage',
-            'twitter_image_size' => 'twitterImageSize',
-            'twitter_handle' => 'twitterHandle',
-            'twitter_title' => 'twitterTitle',
-            'indexing' => 'indexing',
-            'locale' => 'locale',
-            'hreflang' => 'hreflang',
-            'canonical' => 'canonical',
-            'prev_url' => 'prevUrl',
-            'next_url' => 'nextUrl',
-            'schema' => 'schema',
-            'breadcrumbs' => 'breadcrumbs',
-        ])
-        ->only($selection)
-        ->map(fn ($item) => call_user_func([$this, $item]))
-        ->filter();
     }
 
     public function all(): array
