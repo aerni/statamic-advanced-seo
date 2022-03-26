@@ -281,8 +281,12 @@ class Cascade
         return $this->get('site_name') ?? config('app.name');
     }
 
-    protected function ogImageSize(): array
+    protected function ogImageSize(): ?array
     {
+        if (is_null($this->get('og_image'))) {
+            return null;
+        }
+
         return collect(SocialImage::specs('og'))
             ->only(['width', 'height'])
             ->all();
