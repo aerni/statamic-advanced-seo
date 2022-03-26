@@ -108,6 +108,34 @@ XML Sitemaps will automatically be generated for your entries and terms. The sit
 
 The `priority` and `change frequency` of each item can be configured in the SEO settings on the respective entry/term.
 
+### Custom Sitemaps
+You may have custom routes that you want to add to your sitemap. Follow the instructions below:
+
+```php
+use Aerni\AdvancedSeo\Facades\Sitemap;
+
+// Create a new item with the URL.
+$signIn = Sitemap::makeItem('https://statamic.com/sign-in');
+
+// You may also add optional attributes.
+$seller = Sitemap::makeItem(
+    loc: 'https://statamic.com/seller',
+    lastmod: '2022-03-25 19:15'
+    changefreq: 'daily',
+    priority: 1.0,
+);
+
+// Create a sitemap and add the items to it.
+$sitemap = Sitemap::make(
+    handle: 'user',
+    site: Site::current()->handle(),
+    items: [$signIn, $seller],
+);
+
+// Add the sitemap.
+Sitemap::add($sitemap);
+```
+
 ## Permissions
 The addon gives you fine-grained control of your users’ permissions to view and edit the site, collection, and taxonomy defaults.
 
