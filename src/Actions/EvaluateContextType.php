@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Tags\Context;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Tags\Context;
 
 class EvaluateContextType
 {
