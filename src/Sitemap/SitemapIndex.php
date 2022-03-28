@@ -15,7 +15,7 @@ class SitemapIndex
         self::$customSitemaps = collect(self::$customSitemaps)->push($sitemap)->unique('handle')->toArray();
     }
 
-    public function items(): Collection
+    public function sitemaps(): Collection
     {
         return $this->collectionSitemaps()
             ->merge($this->taxonomySitemaps())
@@ -24,16 +24,12 @@ class SitemapIndex
 
     public function collectionSitemaps(): Collection
     {
-        return CollectionFacade::all()->flatMap(function ($collection) {
-            return $collection->sites()->map(fn ($site) => new CollectionSitemap($collection->handle(), $site));
-        })->filter(fn ($sitemap) => $sitemap->indexable());
+        return CollectionFacade::all()->map(fn ($collection) => CollectionSitemap::make($collection));
     }
 
     public function taxonomySitemaps(): Collection
     {
-        return TaxonomyFacade::all()->flatMap(function ($taxonomy) {
-            return $taxonomy->sites()->map(fn ($site) => new TaxonomySitemap($taxonomy->handle(), $site));
-        })->filter(fn ($sitemap) => $sitemap->indexable());
+        return TaxonomyFacade::all()->map(fn ($taxonomy) => TaxonomySitemap::make($taxonomy));
     }
 
     public function customSitemaps(): Collection

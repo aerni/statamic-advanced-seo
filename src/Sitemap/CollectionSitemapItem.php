@@ -2,11 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
+use Statamic\Facades\Site;
 use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Sitemap\CollectionSitemap;
+use Illuminate\Support\Collection;
 
 class CollectionSitemapItem extends BaseSitemapItem
 {
-    public function __construct(protected Entry $entry)
+    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap)
     {
     }
 
@@ -22,6 +26,14 @@ class CollectionSitemapItem extends BaseSitemapItem
         return $url ?? $this->entry->absoluteUrl();
     }
 
+    public function alternates(): array
+    {
+        return $this->entries()->map(fn ($entry) => [
+            'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
+            'href' => $entry->absoluteUrl(),
+        ])->toArray();
+    }
+
     public function lastmod(): string
     {
         return $this->entry->lastModified()->format('Y-m-d\TH:i:sP');
@@ -35,5 +47,18 @@ class CollectionSitemapItem extends BaseSitemapItem
     public function priority(): string
     {
         return $this->entry->seo_sitemap_priority;
+    }
+
+    protected function entries(): Collection
+    {
+        $root = $this->entry->root();
+        $descendants = $root->descendants();
+        $allRelatedEntries = collect([$root->locale() => $root])->merge($descendants);
+
+        return $allRelatedEntries
+            ->filter(fn ($entry) => $entry->published != false)
+            ->filter(fn ($entry) => $entry->uri != null)
+            ->filter(fn ($entry) => $entry->seo_noindex != true)
+            ->filter(fn ($entry) => $this->sitemap->indexable($entry));
     }
 }

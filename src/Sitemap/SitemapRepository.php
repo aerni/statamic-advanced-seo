@@ -7,9 +7,9 @@ use Illuminate\Support\Collection;
 
 class SitemapRepository
 {
-    public function make(string $handle, string $site, array $items): CustomSitemap
+    public function make(string $handle, string $site, array $urls): CustomSitemap
     {
-        return new CustomSitemap($handle, $site, $items);
+        return new CustomSitemap($handle, $site, $urls);
     }
 
     public static function makeItem(string $loc, ?string $lastmod = null, ?string $changefreq = null, ?string $priority = null): CustomSitemapItem
@@ -24,17 +24,12 @@ class SitemapRepository
 
     public function all(): Collection
     {
-        return (new SitemapIndex)->items();
+        return (new SitemapIndex)->sitemaps();
     }
 
     public function find(string $id): ?Sitemap
     {
         return $this->all()->first(fn ($sitemap) => $sitemap->id() === $id);
-    }
-
-    public function whereSite(string $site): Collection
-    {
-        return $this->all()->filter(fn ($sitemap) => $sitemap->site() === $site);
     }
 
     public function clearCache(): bool

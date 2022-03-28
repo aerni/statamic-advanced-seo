@@ -6,20 +6,18 @@ use Illuminate\Support\Collection;
 
 class CustomSitemap extends BaseSitemap
 {
-    protected string $type = 'custom';
-
     public function __construct(
         protected string $handle,
         protected string $site,
-        protected array $items,
+        protected array $urls,
     ) {
     }
 
-    public function items(array $items = null): Collection|self
+    public function urls(array $urls = null): Collection|self
     {
-        return $this->fluentlyGetOrSet('items')
-            ->getter(function ($items) {
-                return collect($items)->map(fn ($item) => $item->toArray());
+        return $this->fluentlyGetOrSet('urls')
+            ->getter(function ($urls) {
+                return collect($urls)->map(fn ($url) => $url->toArray());
             })
             ->args(func_get_args());
     }

@@ -16,16 +16,14 @@ class SitemapController extends Controller
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        $site = Site::current();
-
-        $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}", config('advanced-seo.sitemap.expiry', 60), function () use ($site) {
-            return view('advanced-seo::sitemaps.index', [
-                'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
-                'xslLink' => '<?xml-stylesheet type="text/xsl" href="' . $site->absoluteUrl() . '/sitemap.xsl"?>',
-                'sitemaps' => Sitemap::whereSite($site->handle()),
-                'version' => Addon::get('aerni/advanced-seo')->version(),
-            ])->render();
-        });
+        // $view = Cache::remember('advanced-seo::sitemaps::index', config('advanced-seo.sitemap.expiry', 60), function () {
+        $view = view('advanced-seo::sitemaps.index', [
+            'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
+            'xslLink' => '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
+            'sitemaps' => Sitemap::all(),
+            'version' => Addon::get('aerni/advanced-seo')->version(),
+        ])->render();
+        // });
 
         return response($view)->header('Content-Type', 'text/xml');
     }
@@ -34,22 +32,20 @@ class SitemapController extends Controller
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        $site = Site::current();
+        throw_unless($sitemap = Sitemap::find("{$type}::{$handle}"), new NotFoundHttpException);
 
-        throw_unless($sitemap = Sitemap::find("{$type}::{$handle}::{$site->handle()}"), new NotFoundHttpException);
+        $sitemapUrls = $sitemap->urls();
 
-        $sitemapItems = $sitemap->items();
+        throw_unless($sitemapUrls->isNotEmpty(), new NotFoundHttpException);
 
-        throw_unless($sitemapItems->isNotEmpty(), new NotFoundHttpException);
-
-        $view = Cache::remember("advanced-seo::sitemaps::{$site->handle()}::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 60), function () use ($site, $sitemapItems) {
-            return view('advanced-seo::sitemaps.show', [
-                'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
-                'xslLink' => '<?xml-stylesheet type="text/xsl" href="' . $site->absoluteUrl() . '/sitemap.xsl"?>',
-                'items' => $sitemapItems,
-                'version' => Addon::get('aerni/advanced-seo')->version(),
-            ])->render();
-        });
+        // $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 60), function () use ($sitemapUrls) {
+        $view = view('advanced-seo::sitemaps.show', [
+            'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
+            'xslLink' => '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
+            'urls' => $sitemapUrls,
+            'version' => Addon::get('aerni/advanced-seo')->version(),
+        ])->render();
+        // });
 
         return response($view)->header('Content-Type', 'text/xml');
     }

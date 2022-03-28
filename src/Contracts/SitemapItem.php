@@ -6,6 +6,8 @@ interface SitemapItem
 {
     public function loc(): string|self;
 
+    public function alternates(): array|self|null;
+
     public function lastmod(): string|self|null;
 
     public function changefreq(): string|self|null;

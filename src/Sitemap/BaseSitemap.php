@@ -2,54 +2,69 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Statamic\Facades\URL;
+use Statamic\Facades\Site;
+use Illuminate\Support\Str;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Facades\Site;
-use Statamic\Facades\URL;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Sitemap
 {
     use FluentlyGetsAndSets;
 
-    abstract public function items(): Collection|self;
+    abstract public function urls(): Collection|self;
+
+    public static function make($model): static
+    {
+        return new static($model);
+    }
+
+    public function handle(): string
+    {
+        return $this->model->handle();
+    }
+
+    public function type(): string
+    {
+        return Str::of(static::class)->afterLast('\\')->remove('Sitemap')->lower();
+    }
 
     public function id(): string
     {
-        return "{$this->type}::{$this->handle}::{$this->site}";
+        return "{$this->type()}::{$this->handle()}";
     }
 
     public function url(): string
     {
-        $siteUrl = Site::get($this->site)->absoluteUrl();
-        $filename = "sitemap_{$this->type}_{$this->handle}.xml";
+        $siteUrl = Site::default()->absoluteUrl();
+        $filename = "sitemap_{$this->type()}_{$this->handle()}.xml";
 
         return URL::tidy("{$siteUrl}/{$filename}");
     }
 
     public function lastmod(): ?string
     {
-        return $this->items()->sortByDesc('lastmod')->first()['lastmod'];
+        return $this->urls()->sortByDesc('lastmod')->first()['lastmod'];
     }
 
-    public function clearCache(): void
+    public function indexable(Entry|Term|Taxonomy $model, string $locale = null): bool
     {
-        Cache::forget("advanced-seo::sitemaps::{$this->site}");
-        Cache::forget("advanced-seo::sitemaps::{$this->site}::{$this->type}::{$this->handle}");
-    }
+        $type = Str::of($this->type())->plural();
 
-    public function indexable(): bool
-    {
-        $disabled = config("advanced-seo.disabled.{$this->type}", []);
+        $disabled = config("advanced-seo.disabled.{$type}", []);
 
         // Check if the collection/taxonomy is set to be disabled globally.
-        if (in_array($this->handle, $disabled)) {
+        if (in_array($this->handle(), $disabled)) {
             return false;
         }
 
-        $config = Seo::find('site', 'indexing')?->in($this->site);
+        $config = Seo::find('site', 'indexing')?->in($locale ?? $model->locale());
 
         // If there is no config, the sitemap should be indexable.
         if (is_null($config)) {
@@ -62,10 +77,16 @@ abstract class BaseSitemap implements Sitemap
         }
 
         // Check if the collection/taxonomy is set to be excluded from the sitemap
-        $excluded = $config->value("excluded_{$this->type}") ?? [];
+        $excluded = $config->value("excluded_{$type}") ?? [];
 
         // If the collection/taxonomy is excluded, the sitemap shouldn't be indexable.
-        return ! in_array($this->handle, $excluded);
+        return ! in_array($this->handle(), $excluded);
+    }
+
+    public function clearCache(): void
+    {
+        Cache::forget("advanced-seo::sitemaps::index");
+        Cache::forget("advanced-seo::sitemaps::{$this->id()}");
     }
 
     public function __call(string $name, array $arguments): mixed

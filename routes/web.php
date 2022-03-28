@@ -9,7 +9,7 @@ use Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController;
 Route::name('advanced-seo.')->group(function () {
     Route::get(URL::tidy(Site::current()->url() . '/social-images/{type}/{id}'), [SocialImagesController::class, 'show'])->name('social_images.show');
 
-    Route::get(URL::tidy(Site::current()->url() . '/sitemap.xml'), [SitemapController::class, 'index'])->name('sitemap.index');
-    Route::get(URL::tidy(Site::current()->url() . '/sitemap_{type}_{handle}.xml'), [SitemapController::class, 'show'])->name('sitemap.show');
-    Route::get(URL::tidy(Site::current()->url() . '/sitemap.xsl'), [SitemapController::class, 'xsl'])->name('sitemap.xsl');
+    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+    Route::get('/sitemap_{type}_{handle}.xml', [SitemapController::class, 'show'])->name('sitemap.show');
+    Route::get('/sitemap.xsl', [SitemapController::class, 'xsl'])->name('sitemap.xsl');
 });
