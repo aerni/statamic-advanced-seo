@@ -15,12 +15,12 @@ class SitemapController extends Controller
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        // $view = Cache::remember('advanced-seo::sitemaps::index', config('advanced-seo.sitemap.expiry', 60), function () {
-        $view = view('advanced-seo::sitemaps.index', [
-            'sitemaps' => Sitemap::all(),
-            'version' => Addon::get('aerni/advanced-seo')->version(),
-        ])->render();
-        // });
+        $view = Cache::remember('advanced-seo::sitemaps::index', config('advanced-seo.sitemap.expiry', 60), function () {
+            return view('advanced-seo::sitemaps.index', [
+                'sitemaps' => Sitemap::all(),
+                'version' => Addon::get('aerni/advanced-seo')->version(),
+            ])->render();
+        });
 
         return response($view)->header('Content-Type', 'text/xml');
     }
@@ -31,16 +31,16 @@ class SitemapController extends Controller
 
         throw_unless($sitemap = Sitemap::find("{$type}::{$handle}"), new NotFoundHttpException);
 
-        $sitemapUrls = $sitemap->urls();
+        $urls = $sitemap->urls();
 
-        throw_unless($sitemapUrls->isNotEmpty(), new NotFoundHttpException);
+        throw_unless($urls->isNotEmpty(), new NotFoundHttpException);
 
-        // $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 60), function () use ($sitemapUrls) {
-        $view = view('advanced-seo::sitemaps.show', [
-            'urls' => $sitemapUrls,
-            'version' => Addon::get('aerni/advanced-seo')->version(),
-        ])->render();
-        // });
+        $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 60), function () use ($urls) {
+            return view('advanced-seo::sitemaps.show', [
+                'urls' => $urls,
+                'version' => Addon::get('aerni/advanced-seo')->version(),
+            ])->render();
+        });
 
         return response($view)->header('Content-Type', 'text/xml');
     }
