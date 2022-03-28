@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
