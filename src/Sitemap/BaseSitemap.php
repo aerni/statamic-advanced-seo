@@ -2,16 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Site;
-use Illuminate\Support\Str;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Sitemap

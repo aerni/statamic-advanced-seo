@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Site;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Sitemap\TaxonomySitemap;
+use Statamic\Facades\Site;
 
 class TermSitemapItem extends BaseSitemapItem
 {

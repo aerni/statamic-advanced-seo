@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Site;
-use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\Sitemap\CollectionSitemap;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\Site;
 
 class CollectionSitemapItem extends BaseSitemapItem
 {
