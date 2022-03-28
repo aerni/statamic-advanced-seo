@@ -18,8 +18,6 @@ class SitemapController extends Controller
 
         // $view = Cache::remember('advanced-seo::sitemaps::index', config('advanced-seo.sitemap.expiry', 60), function () {
         $view = view('advanced-seo::sitemaps.index', [
-            'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
-            'xslLink' => '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
             'sitemaps' => Sitemap::all(),
             'version' => Addon::get('aerni/advanced-seo')->version(),
         ])->render();
@@ -40,8 +38,6 @@ class SitemapController extends Controller
 
         // $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 60), function () use ($sitemapUrls) {
         $view = view('advanced-seo::sitemaps.show', [
-            'xmlDefinition' => '<?xml version="1.0" encoding="utf-8"?>',
-            'xslLink' => '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
             'urls' => $sitemapUrls,
             'version' => Addon::get('aerni/advanced-seo')->version(),
         ])->render();
