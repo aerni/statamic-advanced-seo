@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySitemapSettings;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Statamic\Facades\Fieldset;
@@ -512,7 +513,7 @@ class OnPageSeoFields extends BaseFields
             return [];
         }
 
-        return [
+        $fields = [
             [
                 'handle' => 'seo_section_sitemap',
                 'field' => [
@@ -597,6 +598,12 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
+
+        if (isset($this->data) && ShouldDisplaySitemapSettings::handle($this->data)) {
+            return $fields;
+        }
+
+        return [];
     }
 
     public function jsonLd(): array
