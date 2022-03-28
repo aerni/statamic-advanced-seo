@@ -8,7 +8,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Addon;
-use Statamic\Facades\Site;
 
 class SitemapController extends Controller
 {
