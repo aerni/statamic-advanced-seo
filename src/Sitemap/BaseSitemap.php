@@ -39,10 +39,10 @@ abstract class BaseSitemap implements Sitemap
 
     public function url(): string
     {
-        $siteUrl = Site::default()->absoluteUrl();
+        $baseUrl = url('/');
         $filename = "sitemap_{$this->type()}_{$this->handle()}.xml";
 
-        return URL::tidy("{$siteUrl}/{$filename}");
+        return URL::tidy("{$baseUrl}/{$filename}");
     }
 
     public function lastmod(): ?string
