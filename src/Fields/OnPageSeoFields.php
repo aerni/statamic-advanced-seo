@@ -519,6 +519,9 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'section',
                     'display' => 'Sitemap',
                     'instructions' => $this->trans('seo_section_sitemap', 'instructions'),
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
                 ],
             ],
             [
@@ -531,6 +534,9 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
                     'width' => 50,
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
                     'field' => [
                         'type' => 'select',
                         'default' => $this->getValueFromCascade('seo_sitemap_priority'),
@@ -566,6 +572,9 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
                     'width' => 50,
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
                     'field' => [
                         'type' => 'select',
                         'default' => $this->getValueFromCascade('seo_sitemap_change_frequency'),
