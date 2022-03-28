@@ -24,12 +24,12 @@ class SitemapIndex
 
     public function collectionSitemaps(): Collection
     {
-        return CollectionFacade::all()->map(fn ($collection) => CollectionSitemap::make($collection));
+        return CollectionFacade::all()->map(fn ($collection) => new CollectionSitemap($collection));
     }
 
     public function taxonomySitemaps(): Collection
     {
-        return TaxonomyFacade::all()->map(fn ($taxonomy) => TaxonomySitemap::make($taxonomy));
+        return TaxonomyFacade::all()->map(fn ($taxonomy) => new TaxonomySitemap($taxonomy));
     }
 
     public function customSitemaps(): Collection

@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-interface SitemapItem
+interface SitemapUrl
 {
     public function loc(): string|self;
 
@@ -13,6 +13,4 @@ interface SitemapItem
     public function changefreq(): string|self|null;
 
     public function priority(): string|self|null;
-
-    public function toArray(): array;
 }

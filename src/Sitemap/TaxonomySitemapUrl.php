@@ -9,7 +9,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 
-class TaxonomySitemapItem extends BaseSitemapItem
+class TaxonomySitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap)
     {

@@ -18,16 +18,13 @@ abstract class BaseSitemap implements Sitemap
 {
     use FluentlyGetsAndSets;
 
-    abstract public function urls(): Collection|self;
-
-    public static function make($model): static
-    {
-        return new static($model);
-    }
+    abstract public function urls(): Collection;
 
     public function handle(): string
     {
-        return $this->model->handle();
+        return $this->type() === 'custom'
+            ? $this->handle
+            : $this->model->handle();
     }
 
     public function type(): string
@@ -50,7 +47,7 @@ abstract class BaseSitemap implements Sitemap
 
     public function lastmod(): ?string
     {
-        return $this->urls()->sortByDesc('lastmod')->first()['lastmod'];
+        return $this->urls()->sortByDesc('lastmod')->first()->lastmod();
     }
 
     public function indexable(Entry|Term|Taxonomy $model, string $locale = null): bool

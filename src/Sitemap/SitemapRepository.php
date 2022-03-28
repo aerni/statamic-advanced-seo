@@ -7,14 +7,14 @@ use Illuminate\Support\Collection;
 
 class SitemapRepository
 {
-    public function make(string $handle, string $site, array $urls): CustomSitemap
+    public function make(string $handle): CustomSitemap
     {
-        return new CustomSitemap($handle, $site, $urls);
+        return new CustomSitemap($handle);
     }
 
-    public static function makeItem(string $loc, ?string $lastmod = null, ?string $changefreq = null, ?string $priority = null): CustomSitemapItem
+    public static function makeUrl(string $loc): CustomSitemapUrl
     {
-        return new CustomSitemapItem($loc, $lastmod, $changefreq, $priority);
+        return new CustomSitemapUrl($loc);
     }
 
     public function add(CustomSitemap $sitemap): void
@@ -32,10 +32,8 @@ class SitemapRepository
         return $this->all()->first(fn ($sitemap) => $sitemap->id() === $id);
     }
 
-    public function clearCache(): bool
+    public function clearCache(): void
     {
         $this->all()->each->clearCache();
-
-        return true;
     }
 }

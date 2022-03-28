@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 
-class TermSitemapItem extends BaseSitemapItem
+class TermSitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Term $term, protected TaxonomySitemap $sitemap)
     {
@@ -27,6 +27,11 @@ class TermSitemapItem extends BaseSitemapItem
 
     public function alternates(): array
     {
+        // If there is only one term, we don't want to render the alternate urls.
+        if ($this->terms()->count() === 1) {
+            return [];
+        }
+
         return $this->terms()->map(fn ($term) => [
             'hreflang' => Helpers::parseLocale(Site::get($term->locale())->locale()),
             'href' => $term->absoluteUrl(),

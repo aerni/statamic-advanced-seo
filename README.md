@@ -114,25 +114,21 @@ You may have custom routes that you want to add to your sitemap. Follow the inst
 ```php
 use Aerni\AdvancedSeo\Facades\Sitemap;
 
-// Create a new item with the URL as the first argument.
-$signIn = Sitemap::makeItem('https://statamic.com/sign-in');
+// Create a new sitemap URL.
+$signIn = Sitemap::makeUrl('https://statamic.com/sign-in');
 
 // You may also add optional attributes.
-$seller = Sitemap::makeItem(
-    loc: 'https://statamic.com/seller',
-    lastmod: '2022-03-25 19:15'
-    changefreq: 'daily',
-    priority: 1.0,
-);
+$seller = Sitemap::makeUrl('https://statamic.com/seller')
+    ->lastmod('2022-03-25 19:15')
+    ->changefreq('daily')
+    ->priority(1.0)
 
 // Create a sitemap and add the items to it.
-$sitemap = Sitemap::make(
-    handle: 'user',
-    site: Site::current()->handle(),
-    items: [$signIn, $seller],
-);
+$sitemap = Sitemap::make('user')
+    ->add($signIn)
+    ->add($seller);
 
-// Add your new custom sitemap to the existing ones.
+// Add your new custom sitemap to the sitemap index.
 Sitemap::add($sitemap);
 ```
 

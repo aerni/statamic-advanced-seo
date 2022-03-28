@@ -9,9 +9,7 @@ use Statamic\Contracts\Taxonomies\Term;
 
 interface Sitemap
 {
-    public function urls(): Collection|self;
-
-    public static function make($model): static;
+    public function urls(): Collection;
 
     public function handle(): string;
 

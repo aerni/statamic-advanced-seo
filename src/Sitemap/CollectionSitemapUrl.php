@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 
-class CollectionSitemapItem extends BaseSitemapItem
+class CollectionSitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap)
     {
@@ -27,6 +27,11 @@ class CollectionSitemapItem extends BaseSitemapItem
 
     public function alternates(): array
     {
+        // If there is only one entry, we don't want to render the alternate urls.
+        if ($this->entries()->count() === 1) {
+            return [];
+        }
+
         return $this->entries()->map(fn ($entry) => [
             'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
             'href' => $entry->absoluteUrl(),
@@ -52,6 +57,7 @@ class CollectionSitemapItem extends BaseSitemapItem
     {
         $root = $this->entry->root();
         $descendants = $root->descendants();
+
         $allRelatedEntries = collect([$root->locale() => $root])->merge($descendants);
 
         return $allRelatedEntries
