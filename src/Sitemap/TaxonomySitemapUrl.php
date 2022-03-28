@@ -30,6 +30,11 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     public function alternates(): array
     {
+        // If there is only one taxonomy, we don't want to render the alternate urls.
+        if ($this->taxonomies()->count() === 1) {
+            return [];
+        }
+
         return $this->taxonomies()->map(function ($taxonomy, $site) {
             // We need to set the site so that we can get to correct URL of the taxonomy.
             Site::setCurrent($site);
