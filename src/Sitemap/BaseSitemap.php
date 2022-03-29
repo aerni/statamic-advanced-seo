@@ -46,7 +46,7 @@ abstract class BaseSitemap implements Sitemap
 
     public function lastmod(): ?string
     {
-        return $this->urls()->sortByDesc('lastmod')->first()->lastmod();
+        return $this->urls()->sortByDesc('lastmod')->first()['lastmod'];
     }
 
     public function indexable(Entry|Term|Taxonomy $model, string $locale = null): bool

@@ -13,4 +13,6 @@ interface SitemapUrl
     public function changefreq(): string|self|null;
 
     public function priority(): string|self|null;
+
+    public function toArray(): array;
 }

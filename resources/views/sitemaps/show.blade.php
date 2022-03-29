@@ -8,25 +8,25 @@
 >
     @foreach ($urls as $url)
         <url>
-            <loc>{{ $url->loc() }}</loc>
+            <loc>{{ $url['loc'] }}</loc>
 
-            @if($url->alternates())
-                @foreach ($url->alternates() as $alternate)
+            @isset($url['alternates'])
+                @foreach ($url['alternates'] as $alternate)
                     <xhtml:link rel="alternate" hreflang="{{ $alternate['hreflang'] }}" href="{{ $alternate['href'] }}"/>
                 @endforeach
-            @endif
+            @endisset
 
-            @if($url->lastmod())
-                <lastmod>{{ $url->lastmod() }}</lastmod>
-            @endif
+            @isset($url['lastmod'])
+                <lastmod>{{ $url['lastmod'] }}</lastmod>
+            @endisset
 
-            @if($url->changefreq())
-                <changefreq>{{ $url->changefreq() }}</changefreq>
-            @endif
+            @isset($url['changefreq'])
+                <changefreq>{{ $url['changefreq'] }}</changefreq>
+            @endisset
 
-            @if($url->priority())
-                <priority>{{ $url->priority() }}</priority>
-            @endif
+            @isset($url['priority'])
+                <priority>{{ $url['priority'] }}</priority>
+            @endisset
         </url>
     @endforeach
 </urlset>
