@@ -16,6 +16,11 @@ abstract class BaseSitemapUrl implements SitemapUrl
 
     abstract public function priority(): string|self|null;
 
+    /**
+     * We need to cast the data to an array so that we can get the correct url of taxonomies in the view.
+     * That's because we are temporarily setting the current site in \Aerni\AdvancedSeo\Sitemap\TaxonomySitemapUrl::class,
+     * which won't have any effect if we are directly accessing the data methods in the view instead.
+     */
     public function toArray(): array
     {
         return [
