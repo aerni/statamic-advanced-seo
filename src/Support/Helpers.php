@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Support;
 
 use Illuminate\Support\Str;
+use Statamic\Facades\Term;
 
 class Helpers
 {
@@ -25,5 +26,10 @@ class Helpers
     public static function isCustomRoute(): bool
     {
         return request()->route()->getAction('controller') !== 'Statamic\Http\Controllers\FrontendController@index';
+    }
+
+    public static function isTaxonomyRoute(): bool
+    {
+        return Term::all()->map->uri()->contains(fn ($uri) => str_contains(request()->getPathInfo(), $uri));
     }
 }

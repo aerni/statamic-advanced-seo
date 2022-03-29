@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
@@ -54,8 +55,9 @@ trait GetsEventData
     {
         $data = $this->getProperty($event);
 
-        if (! Statamic::isCpRoute()) {
-            // Make sure to get the correct localization based on the current site.
+        // TODO: Do we also need this for the term sitemaps?
+        // Make sure to get the correct localization of term defaults on the frontend.
+        if (Helpers::isTaxonomyRoute()) {
             $data = $data->in(Site::current()->handle());
         }
 
