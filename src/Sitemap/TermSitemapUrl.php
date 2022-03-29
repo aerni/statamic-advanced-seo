@@ -56,6 +56,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     protected function terms(): Collection
     {
-        return $this->term->term()->localizations();
+        return $this->term->term()->localizations()
+            ->filter(fn ($term) => $this->sitemap->indexable($term));
     }
 }
