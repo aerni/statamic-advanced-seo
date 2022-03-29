@@ -48,15 +48,16 @@ class TaxonomySitemap extends BaseSitemap
 
     protected function terms(Taxonomy $taxonomy): Collection
     {
-        $terms = $taxonomy->queryTerms()
-            ->get()
-            ->filter(fn ($term) => $term->taxonomy()->sites()->contains($term->locale())) // We only want terms of sites that are configured on the taxonomy.
-            ->filter(fn ($term) => $this->indexable($term)); // We only want indexable terms.
-
-        $template = $terms->first()?->template();
+        $terms = $taxonomy->queryTerms()->get();
 
         // We only want to return the terms if the template exists.
-        return view()->exists($template) ? $terms : collect();
+        if (! view()->exists($terms->first()?->template())) {
+            return collect();
+        }
+
+        return $terms->flatMap(fn ($term) => $term->term()->localizations()->values()) // Get all localizations of the term.
+            ->filter(fn ($term) => $term->taxonomy()->sites()->contains($term->locale())) // We only want terms of sites that are configured on the taxonomy.
+            ->filter(fn ($term) => $this->indexable($term)); // We only want indexable terms.
     }
 
     protected function collectionTaxonomies()
