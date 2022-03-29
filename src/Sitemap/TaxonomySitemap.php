@@ -92,6 +92,7 @@ class TaxonomySitemap extends BaseSitemap
             return $term->queryEntries()
                 ->where('published', '!=', false) // We only want published entries.
                 ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
+                ->where('locale', '=', $term->locale()) // We only want entries with the same locale as the term.
                 ->get()
                 ->filter(fn ($entry) => $this->indexable($entry))
                 ->isNotEmpty();
