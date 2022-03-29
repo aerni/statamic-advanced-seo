@@ -49,7 +49,6 @@ class TaxonomySitemap extends BaseSitemap
     protected function terms(Taxonomy $taxonomy): Collection
     {
         $terms = $taxonomy->queryTerms()
-            ->where('published', '!=', false) // We only want published terms.
             ->get()
             ->filter(fn ($term) => $term->taxonomy()->sites()->contains($term->locale())) // We only want terms of sites that are configured on the taxonomy.
             ->filter(fn ($term) => $this->indexable($term)); // We only want indexable terms.
