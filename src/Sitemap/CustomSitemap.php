@@ -13,7 +13,7 @@ class CustomSitemap extends BaseSitemap
 
     public function add(CustomSitemapUrl $item): self
     {
-        $this->urls = $this->urls->push($item);
+        $this->urls = $this->urls->push($item)->unique();
 
         return $this;
     }
