@@ -50,7 +50,8 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     public function priority(): string
     {
-        return $this->term->seo_sitemap_priority;
+        // Make sure we actually return `0.0` and `1.0`.
+        return number_format($this->term->seo_sitemap_priority->value(), 1);
     }
 
     protected function terms(): Collection
