@@ -10,3 +10,7 @@ Statamic.booting(() => {
     )
     Statamic.component('seo_source-fieldtype', SourceFieldtype)
 })
+
+Statamic.$conditions.add('always', ({ values }) => {
+    return true
+});
