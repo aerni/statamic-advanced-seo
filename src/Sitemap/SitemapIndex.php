@@ -12,7 +12,10 @@ class SitemapIndex
 
     public static function add(CustomSitemap $sitemap): void
     {
-        self::$customSitemaps = collect(self::$customSitemaps)->push($sitemap)->unique('handle')->toArray();
+        self::$customSitemaps = collect(self::$customSitemaps)
+            ->push($sitemap)
+            ->unique(fn ($sitemap) => $sitemap->handle())
+            ->toArray();
     }
 
     public function sitemaps(): Collection
