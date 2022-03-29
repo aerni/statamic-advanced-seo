@@ -64,7 +64,6 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         return $allRelatedEntries
             ->filter(fn ($entry) => $entry->published != false)
             ->filter(fn ($entry) => $entry->uri != null)
-            ->filter(fn ($entry) => $entry->seo_noindex != true)
             ->filter(fn ($entry) => $this->sitemap->indexable($entry));
     }
 }

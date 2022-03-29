@@ -51,6 +51,11 @@ abstract class BaseSitemap implements Sitemap
 
     public function indexable(Entry|Term|Taxonomy $model, string $locale = null): bool
     {
+        // Check if noindex is enabled.
+        if ($model->seo_noindex) {
+            return false;
+        }
+
         $type = Str::of($this->type())->plural();
 
         $disabled = config("advanced-seo.disabled.{$type}", []);

@@ -23,8 +23,7 @@ class CollectionSitemap extends BaseSitemap
             ->queryEntries()
             ->where('published', '!=', false) // We only want published entries.
             ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
-            ->where('seo_noindex', '!=', true) // We only want indexable entries.
             ->get()
-            ->filter(fn ($entry) => $this->indexable($entry)); // Filter out any entries that are not indexable.
+            ->filter(fn ($entry) => $this->indexable($entry)); // // We only want indexable entries.
     }
 }

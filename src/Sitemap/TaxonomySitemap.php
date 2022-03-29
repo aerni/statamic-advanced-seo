@@ -50,10 +50,9 @@ class TaxonomySitemap extends BaseSitemap
     {
         $terms = $taxonomy->queryTerms()
             ->where('published', '!=', false) // We only want published terms.
-            ->where('seo_noindex', '!=', true) // We only want indexable terms.
             ->get()
             ->filter(fn ($term) => $term->taxonomy()->sites()->contains($term->locale())) // We only want terms of sites that are configured on the taxonomy.
-            ->filter(fn ($term) => $this->indexable($term)); // Filter out any terms that are not indexable.
+            ->filter(fn ($term) => $this->indexable($term)); // We only want indexable terms.
 
         $template = $terms->first()?->template();
 
@@ -93,10 +92,8 @@ class TaxonomySitemap extends BaseSitemap
             return $term->queryEntries()
                 ->where('published', '!=', false) // We only want published entries.
                 ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
-                ->where('seo_noindex', '!=', true) // We only want indexable terms.
                 ->get()
-                // TODO: Do we also need to filter by indexable to remove terms if their collection has been deactivated?
-                // ->filter(fn ($entry) => $this->indexable($entry)) // Filter out any entries that are not indexable.
+                ->filter(fn ($entry) => $this->indexable($entry))
                 ->isNotEmpty();
         });
 
