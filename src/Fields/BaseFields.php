@@ -47,7 +47,7 @@ abstract class BaseFields implements Fields
             return null;
         }
 
-        $value = Blink::once('advanced-seo::cascade::cp', function () {
+        $value = Blink::once("advanced-seo::cascade::cp::{$this->data->locale}", function () {
             return Cascade::from($this->data)->processForBlueprint();
         })->value(Str::remove('seo_', $handle));
 
