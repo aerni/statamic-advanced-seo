@@ -7,6 +7,8 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Actions\SupplementDefaultsData;
+use Aerni\AdvancedSeo\Actions\ForgetBlueprintBlink;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
 {
@@ -61,6 +63,8 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         $descendants = $root->descendants();
 
         return collect([$root->locale() => $root])->merge($descendants)
+            // ->each(fn ($entry) => $entry->cacheBlueprint(false)) // TODO: This is dependant on an open PR: https://github.com/statamic/cms/pull/5702
+            // ->map(fn ($entry) => SupplementDefaultsData::handle($entry)) // Make sure to get the correct localization when extending the blueprint
             ->filter(fn ($entry) => Indexable::handle($entry));
     }
 }

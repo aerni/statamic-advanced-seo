@@ -118,6 +118,14 @@ class OnPageSeoBlueprintSubscriber
 
         $seoBlueprint = OnPageSeoBlueprint::make()->data($data)->items();
 
+        /**
+         * TODO: This is dependant on an open PR: https://github.com/statamic/cms/pull/5679
+         * Without this PR we will run into issue with localized blueprint data.
+         */
+        if ($blueprint->hasSection('SEO')) {
+            $blueprint->removeEnsuredFieldsFromSection('SEO');
+        }
+
         $blueprint->ensureFieldsInSection($seoBlueprint, 'SEO');
 
         static::$addingField = false;

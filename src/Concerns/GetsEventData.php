@@ -55,6 +55,10 @@ trait GetsEventData
     {
         $data = $this->getProperty($event);
 
+        if ($data->getSupplement('defaults_data')) {
+            return $data->getSupplement('defaults_data');
+        }
+
         // Make sure to get the correct localization of term defaults on the frontend.
         if (Helpers::isFrontendRoute()) {
             $data = $data->in(Site::current()->handle());
