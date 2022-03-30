@@ -103,6 +103,11 @@ class SourceFieldtype extends Fieldtype
         return $this->sourceFieldtype()->fieldRules();
     }
 
+    public function toQueryableValue(mixed $value): mixed
+    {
+        return $this->augment($value);
+    }
+
     protected function sourceField(): Field
     {
         return new Field(null, $this->config('field'));
