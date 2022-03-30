@@ -56,7 +56,7 @@ trait GetsEventData
         $data = $this->getProperty($event);
 
         // Make sure to get the correct localization of term defaults on the frontend.
-        if (Helpers::isTaxonomyRoute()) {
+        if (Helpers::isFrontendRoute()) {
             $data = $data->in(Site::current()->handle());
         }
 
