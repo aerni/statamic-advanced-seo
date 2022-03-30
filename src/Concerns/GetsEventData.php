@@ -55,7 +55,6 @@ trait GetsEventData
     {
         $data = $this->getProperty($event);
 
-        // TODO: Do we also need this for the term sitemaps?
         // Make sure to get the correct localization of term defaults on the frontend.
         if (Helpers::isTaxonomyRoute()) {
             $data = $data->in(Site::current()->handle());
