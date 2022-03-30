@@ -10,7 +10,6 @@ use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
-use Statamic\Statamic;
 
 trait GetsEventData
 {
