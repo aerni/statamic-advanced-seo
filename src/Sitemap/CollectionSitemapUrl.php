@@ -2,14 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Facades\Site;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Actions\Indexable;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap)
+    public function __construct(protected Entry $entry)
     {
     }
 
@@ -59,11 +60,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         $root = $this->entry->root();
         $descendants = $root->descendants();
 
-        $allRelatedEntries = collect([$root->locale() => $root])->merge($descendants);
-
-        return $allRelatedEntries
-            ->filter(fn ($entry) => $entry->published != false)
-            ->filter(fn ($entry) => $entry->uri != null)
-            ->filter(fn ($entry) => $this->sitemap->indexable($entry));
+        return collect([$root->locale() => $root])->merge($descendants)
+            ->filter(fn ($entry) => Indexable::handle($entry));
     }
 }

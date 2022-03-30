@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Actions\Indexable;
 use Statamic\Contracts\Entries\Collection as EntriesCollection;
 
 class CollectionSitemap extends BaseSitemap
@@ -14,7 +15,7 @@ class CollectionSitemap extends BaseSitemap
     public function urls(): Collection
     {
         return $this->entries()
-            ->map(fn ($entry) => (new CollectionSitemapUrl($entry, $this))->toArray());
+            ->map(fn ($entry) => (new CollectionSitemapUrl($entry))->toArray());
     }
 
     protected function entries(): Collection
@@ -24,6 +25,6 @@ class CollectionSitemap extends BaseSitemap
             ->where('published', '!=', false) // We only want published entries.
             ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
             ->get()
-            ->filter(fn ($entry) => $this->indexable($entry)); // // We only want indexable entries.
+            ->filter(fn ($entry) => Indexable::handle($entry)); // We only want indexable entries.
     }
 }

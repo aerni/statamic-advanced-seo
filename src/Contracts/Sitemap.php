@@ -3,9 +3,6 @@
 namespace Aerni\AdvancedSeo\Contracts;
 
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Taxonomies\Term;
 
 interface Sitemap
 {
@@ -20,8 +17,6 @@ interface Sitemap
     public function url(): string;
 
     public function lastmod(): ?string;
-
-    public function indexable(Entry|Term|Taxonomy $model, string $locale = null): bool;
 
     public function clearCache(): void;
 }

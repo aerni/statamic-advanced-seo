@@ -49,41 +49,6 @@ abstract class BaseSitemap implements Sitemap
         return $this->urls()->sortByDesc('lastmod')->first()['lastmod'];
     }
 
-    public function indexable(Entry|Term|Taxonomy $model, string $locale = null): bool
-    {
-        // Check if noindex is enabled.
-        if ($model->seo_noindex) {
-            return false;
-        }
-
-        $type = Str::of($this->type())->plural();
-
-        $disabled = config("advanced-seo.disabled.{$type}", []);
-
-        // Check if the collection/taxonomy is set to be disabled globally.
-        if (in_array($this->handle(), $disabled)) {
-            return false;
-        }
-
-        $config = Seo::find('site', 'indexing')?->in($locale ?? $model->locale());
-
-        // If there is no config, the sitemap should be indexable.
-        if (is_null($config)) {
-            return true;
-        }
-
-        // If we have a global noindex, the sitemap shouldn't be indexable.
-        if ($config->value('noindex')) {
-            return false;
-        }
-
-        // Check if the collection/taxonomy is set to be excluded from the sitemap
-        $excluded = $config->value("excluded_{$type}") ?? [];
-
-        // If the collection/taxonomy is excluded, the sitemap shouldn't be indexable.
-        return ! in_array($this->handle(), $excluded);
-    }
-
     public function clearCache(): void
     {
         Cache::forget("advanced-seo::sitemaps::index");
