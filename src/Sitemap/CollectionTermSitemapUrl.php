@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 
-class TermSitemapUrl extends BaseSitemapUrl
+class CollectionTermSitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Term $term, protected TaxonomySitemap $sitemap)
     {
@@ -56,6 +56,6 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     protected function terms(): Collection
     {
-        return $this->sitemap->terms($this->term->taxonomy());
+        return $this->sitemap->collectionTerms();
     }
 }

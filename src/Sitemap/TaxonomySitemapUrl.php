@@ -72,8 +72,6 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     protected function taxonomies(): Collection
     {
-        return $this->taxonomy->sites()
-            ->mapWithKeys(fn ($site) => [$site => $this->taxonomy])
-            ->filter(fn ($taxonomy, $site) => $this->sitemap->indexable($taxonomy, $site));
+        return $this->sitemap->taxonomies();
     }
 }
