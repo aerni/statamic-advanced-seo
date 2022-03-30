@@ -2,9 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Support;
 
-use Statamic\Statamic;
-use Statamic\Facades\Term;
 use Illuminate\Support\Str;
+use Statamic\Statamic;
 
 class Helpers
 {

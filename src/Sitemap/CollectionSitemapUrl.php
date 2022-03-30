@@ -2,13 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Site;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\Actions\Indexable;
 use Aerni\AdvancedSeo\Actions\SupplementDefaultsData;
-use Aerni\AdvancedSeo\Actions\ForgetBlueprintBlink;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\Site;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
 {

@@ -2,10 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Actions\Indexable;
 use Aerni\AdvancedSeo\Actions\SupplementDefaultsData;
-use Aerni\AdvancedSeo\Actions\ForgetBlueprintBlink;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as EntriesCollection;
 
 class CollectionSitemap extends BaseSitemap

@@ -4,8 +4,8 @@ namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
 
 class Indexable
 {

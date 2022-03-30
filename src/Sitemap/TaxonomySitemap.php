@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Actions\Indexable;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class TaxonomySitemap extends BaseSitemap
