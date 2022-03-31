@@ -54,6 +54,11 @@ trait GetsEventData
     {
         $data = $this->getProperty($event);
 
+        // There is no data if we are creating a new entry/term.
+        if (! $data) {
+            return GetDefaultsData::handle($event);
+        }
+
         if ($data->getSupplement('defaults_data')) {
             return $data->getSupplement('defaults_data');
         }
@@ -63,7 +68,6 @@ trait GetsEventData
             $data = $data->in(Site::current()->handle());
         }
 
-        // There is no data if we are creating a new entry/term.
-        return GetDefaultsData::handle($data ?? $event);
+        return GetDefaultsData::handle($data);
     }
 }
