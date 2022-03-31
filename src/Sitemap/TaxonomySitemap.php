@@ -49,13 +49,7 @@ class TaxonomySitemap extends BaseSitemap
             return collect();
         }
 
-        /**
-         * Return an item for each site configured on the taxonomy,
-         * so that we can get the correct taxonomy URL in the TaxonomySitemapItem.
-         */
-        return $this->model->sites()
-            ->mapWithKeys(fn ($site) => [$site => $this->model])
-            ->filter(fn ($taxonomy, $site) => Indexable::handle($taxonomy, $site)); // Filter out any taxonomies that are not indexable.
+        return $this->terms($this->model)->mapWithKeys(fn ($term) => [$term->locale() => $term->taxonomy()]);
     }
 
     public function terms(Taxonomy $taxonomy): Collection
