@@ -35,7 +35,7 @@ abstract class BaseSitemap implements Sitemap
     public function url(): string
     {
         $baseUrl = url('/');
-        $filename = "sitemap_{$this->type()}_{$this->handle()}.xml";
+        $filename = "{$this->type()}-{$this->handle()}-sitemap.xml";
 
         return URL::tidy("{$baseUrl}/{$filename}");
     }
