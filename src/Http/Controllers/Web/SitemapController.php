@@ -22,7 +22,10 @@ class SitemapController extends Controller
             ])->render();
         });
 
-        return response($view)->header('Content-Type', 'text/xml');
+        return response($view)->withHeaders([
+            'Content-Type' => 'text/xml',
+            'X-Robots-Tag' => 'noindex, nofollow'
+        ]);
     }
 
     public function show(string $type, string $handle): Response
@@ -42,13 +45,19 @@ class SitemapController extends Controller
             ])->render();
         });
 
-        return response($view)->header('Content-Type', 'text/xml');
+        return response($view)->withHeaders([
+            'Content-Type' => 'text/xml',
+            'X-Robots-Tag' => 'noindex, nofollow'
+        ]);
     }
 
     public function xsl(): Response
     {
         $path = __DIR__ . '/../../../../resources/xsl/sitemap.xsl';
 
-        return response(file_get_contents($path))->header('Content-Type', 'text/xsl');
+        return response(file_get_contents($path))->withHeaders([
+            'Content-Type' => 'text/xsl',
+            'X-Robots-Tag' => 'noindex, nofollow'
+        ]);
     }
 }
