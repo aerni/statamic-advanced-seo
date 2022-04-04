@@ -103,8 +103,8 @@ return [
     ],
 
     'seo_canonical_custom' => [
-        'instructions' => 'A fully qualified URL starting with `https://`.',
-        'default_instructions' => 'A fully qualified URL starting with `https://`.',
+        'instructions' => 'A fully qualified URL starting with https://.',
+        'default_instructions' => 'A fully qualified URL starting with https://.',
     ],
 
     'seo_section_indexing' => [
@@ -128,8 +128,8 @@ return [
     ],
 
     'seo_sitemap_priority' => [
-        'instructions' => 'Choose the sitemap priority of this :type. `1.0` is the most important.',
-        'default_instructions' => 'Choose the default sitemap priority of your :type. `1.0` is the most important.',
+        'instructions' => 'Choose the sitemap priority of this :type. 1.0 is the most important.',
+        'default_instructions' => 'Choose the default sitemap priority of your :type. 1.0 is the most important.',
     ],
 
     'seo_sitemap_change_frequency' => [
