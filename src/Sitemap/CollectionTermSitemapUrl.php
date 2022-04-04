@@ -15,24 +15,19 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        $url = match ($this->term->seo_canonical_type->value()) {
-            'current' => $this->term->absoluteUrl(),
-            'other' => $this->term->seo_canonical_entry?->absoluteUrl(),
-            'custom' => $this->term->seo_canonical_custom,
-            default => null,
-        };
-
-        return $url ?? $this->term->absoluteUrl();
+        return $this->term->absoluteUrl();
     }
 
     public function alternates(): array
     {
-        // If there is only one term, we don't want to render the alternate urls.
-        if ($this->terms()->count() === 1) {
+        $terms = $this->terms();
+
+        // We only want alternate URLs if there are at least two terms.
+        if ($terms->count() <= 1) {
             return [];
         }
 
-        return $this->terms()->map(fn ($term) => [
+        return $terms->map(fn ($term) => [
             'hreflang' => Helpers::parseLocale(Site::get($term->locale())->locale()),
             'href' => $term->absoluteUrl(),
         ])->toArray();
@@ -52,6 +47,14 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
     {
         // Make sure we actually return `0.0` and `1.0`.
         return number_format($this->term->seo_sitemap_priority->value(), 1);
+    }
+
+    public function isCanonicalUrl(): bool
+    {
+        return match ($this->term->seo_canonical_type->value()) {
+            'current' => true,
+            default => false,
+        };
     }
 
     protected function terms(): Collection

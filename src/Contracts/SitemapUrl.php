@@ -14,5 +14,7 @@ interface SitemapUrl
 
     public function priority(): string|self|null;
 
-    public function toArray(): array;
+    public function isCanonicalUrl(): bool;
+
+    public function toArray(): ?array;
 }

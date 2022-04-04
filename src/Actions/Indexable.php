@@ -82,6 +82,11 @@ class Indexable
             return false;
         }
 
+        // If the canonical type isn't current, we shouldn't index the model.
+        if ($model->seo_canonical_type != 'current') {
+            return false;
+        }
+
         return true;
     }
 }

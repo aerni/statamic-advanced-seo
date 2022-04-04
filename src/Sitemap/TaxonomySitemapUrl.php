@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
+use Statamic\Facades\Site;
+use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Site;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class TaxonomySitemapUrl extends BaseSitemapUrl
 {
@@ -30,12 +30,14 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     public function alternates(): array
     {
-        // If there is only one taxonomy, we don't want to render the alternate urls.
-        if ($this->taxonomies()->count() === 1) {
+        $taxonomies = $this->taxonomies();
+
+        // We only want alternate URLs if there are at least two terms.
+        if ($taxonomies->count() <= 1) {
             return [];
         }
 
-        return $this->taxonomies()->map(function ($taxonomy, $site) {
+        return $taxonomies->map(function ($taxonomy, $site) {
             // We need to set the site so that we can get to correct URL of the taxonomy.
             Site::setCurrent($site);
 

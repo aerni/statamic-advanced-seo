@@ -2,9 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Actions\Indexable;
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Actions\Indexable;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Actions\SupplementDefaultsData;
 
 class TaxonomySitemap extends BaseSitemap
 {
@@ -23,7 +24,9 @@ class TaxonomySitemap extends BaseSitemap
 
     protected function taxonomyUrls(): Collection
     {
-        return $this->taxonomies()->map(fn ($taxonomy, $site) => (new TaxonomySitemapUrl($taxonomy, $site, $this))->toArray());
+        return $this->taxonomies()
+            ->map(fn ($taxonomy, $site) => (new TaxonomySitemapUrl($taxonomy, $site, $this))->toArray())
+            ->values();
     }
 
     protected function collectionTaxonomyUrls(): Collection
@@ -34,12 +37,16 @@ class TaxonomySitemap extends BaseSitemap
 
     protected function termUrls(): Collection
     {
-        return $this->terms($this->model)->map(fn ($term) => (new TermSitemapUrl($term, $this))->toArray());
+        return $this->terms($this->model)
+            ->map(fn ($term) => (new TermSitemapUrl($term, $this))->toArray())
+            ->filter();
     }
 
     protected function collectionTermUrls(): Collection
     {
-        return $this->collectionTerms()->map(fn ($term) => (new CollectionTermSitemapUrl($term, $this))->toArray());
+        return $this->collectionTerms()
+            ->map(fn ($term) => (new CollectionTermSitemapUrl($term, $this))->toArray())
+            ->filter();
     }
 
     public function taxonomies(): Collection

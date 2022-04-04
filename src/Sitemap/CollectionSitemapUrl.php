@@ -17,24 +17,19 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        $url = match ($this->entry->seo_canonical_type->value()) {
-            'current' => $this->entry->absoluteUrl(),
-            'other' => $this->entry->seo_canonical_entry?->absoluteUrl(),
-            'custom' => $this->entry->seo_canonical_custom,
-            default => null,
-        };
-
-        return $url ?? $this->entry->absoluteUrl();
+        return $this->entry->absoluteUrl();
     }
 
     public function alternates(): array
     {
-        // If there is only one entry, we don't want to render the alternate urls.
-        if ($this->entries()->count() === 1) {
+        $entries = $this->entries();
+
+        // We only want alternate URLs if there are at least two entries.
+        if ($entries->count() <= 1) {
             return [];
         }
 
-        return $this->entries()->map(fn ($entry) => [
+        return $entries->map(fn ($entry) => [
             'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
             'href' => $entry->absoluteUrl(),
         ])->toArray();
@@ -54,6 +49,14 @@ class CollectionSitemapUrl extends BaseSitemapUrl
     {
         // Make sure we actually return `0.0` and `1.0`.
         return number_format($this->entry->seo_sitemap_priority->value(), 1);
+    }
+
+    public function isCanonicalUrl(): bool
+    {
+        return match ($this->entry->seo_canonical_type->value()) {
+            'current' => true,
+            default => false,
+        };
     }
 
     protected function entries(): Collection
