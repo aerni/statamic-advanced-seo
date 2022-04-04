@@ -79,7 +79,7 @@ class TaxonomySitemap extends BaseSitemap
             ->flatMap(fn ($taxonomy) => $this->terms($taxonomy));
 
         // Filter the terms by the entries they are used on.
-        $filteredTerms = $collectionTerms->filter(function ($term) {
+        return $collectionTerms->filter(function ($term) {
             return $term->queryEntries()
                 ->where('published', '!=', false) // We only want published entries.
                 ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
@@ -88,8 +88,6 @@ class TaxonomySitemap extends BaseSitemap
                 ->filter(fn ($entry) => Indexable::handle($entry))
                 ->isNotEmpty();
         });
-
-        return $filteredTerms;
     }
 
     protected function taxonomyCollections(): Collection
