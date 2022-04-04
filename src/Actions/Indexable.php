@@ -6,17 +6,22 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
 
 class Indexable
 {
     public static function handle(Entry|Term|Taxonomy $model, string $locale = null): bool
     {
-        return match (true) {
-            ($model instanceof Entry) => self::isIndexableEntry($model),
-            ($model instanceof Term) => self::isIndexableTerm($model),
-            ($model instanceof Taxonomy) => self::isIndexableTaxonomy($model, $locale),
-            'default' => true,
-        };
+        $locale = $locale ?? $model->locale();
+
+        return Blink::once("{$model->id()}::{$locale}", function () use ($model, $locale) {
+            return match (true) {
+                ($model instanceof Entry) => self::isIndexableEntry($model),
+                ($model instanceof Term) => self::isIndexableTerm($model),
+                ($model instanceof Taxonomy) => self::isIndexableTaxonomy($model, $locale),
+                'default' => true,
+            };
+        });
     }
 
     protected static function isIndexableEntry(Entry $entry): bool
