@@ -24,7 +24,7 @@ class SitemapController extends Controller
 
         return response($view)->withHeaders([
             'Content-Type' => 'text/xml',
-            'X-Robots-Tag' => 'noindex, nofollow'
+            'X-Robots-Tag' => 'noindex, nofollow',
         ]);
     }
 
@@ -47,7 +47,7 @@ class SitemapController extends Controller
 
         return response($view)->withHeaders([
             'Content-Type' => 'text/xml',
-            'X-Robots-Tag' => 'noindex, nofollow'
+            'X-Robots-Tag' => 'noindex, nofollow',
         ]);
     }
 
@@ -57,7 +57,7 @@ class SitemapController extends Controller
 
         return response(file_get_contents($path))->withHeaders([
             'Content-Type' => 'text/xsl',
-            'X-Robots-Tag' => 'noindex, nofollow'
+            'X-Robots-Tag' => 'noindex, nofollow',
         ]);
     }
 }
