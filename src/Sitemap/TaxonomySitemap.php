@@ -49,7 +49,9 @@ class TaxonomySitemap extends BaseSitemap
             return collect();
         }
 
-        return $this->terms($this->model)->mapWithKeys(fn ($term) => [$term->locale() => $term->taxonomy()]);
+        return $this->model->sites()
+            ->mapWithKeys(fn ($site) => [$site => $this->model])
+            ->filter(fn ($taxonomy, $site) => Indexable::handle($taxonomy, $site));
     }
 
     public function terms(Taxonomy $taxonomy): Collection
