@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
+use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class CustomSitemapUrl extends BaseSitemapUrl
@@ -33,16 +34,28 @@ class CustomSitemapUrl extends BaseSitemapUrl
 
     public function lastmod(string $lastmod = null): string|self|null
     {
-        return $this->fluentlyGetOrSet('lastmod')->args(func_get_args());
+        return $this->fluentlyGetOrSet('lastmod')
+            ->getter(function () {
+                return $this->lastmod ?? now()->format('Y-m-d\TH:i:sP');
+            })
+            ->args(func_get_args());
     }
 
     public function changefreq(string $changefreq = null): string|self|null
     {
-        return $this->fluentlyGetOrSet('changefreq')->args(func_get_args());
+        return $this->fluentlyGetOrSet('changefreq')
+            ->getter(function () {
+                return $this->changefreq ?? Defaults::data('collections')->get('seo_sitemap_change_frequency');
+            })
+            ->args(func_get_args());
     }
 
     public function priority(string $priority = null): string|self|null
     {
-        return $this->fluentlyGetOrSet('priority')->args(func_get_args());
+        return $this->fluentlyGetOrSet('priority')
+            ->getter(function () {
+                return $this->priority ?? Defaults::data('collections')->get('seo_sitemap_priority');
+            })
+            ->args(func_get_args());
     }
 }
