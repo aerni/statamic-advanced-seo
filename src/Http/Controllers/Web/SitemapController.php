@@ -15,7 +15,7 @@ class SitemapController extends Controller
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        $view = Cache::remember('advanced-seo::sitemaps::index', config('advanced-seo.sitemap.expiry', 60), function () {
+        $view = Cache::remember('advanced-seo::sitemaps::index', config('advanced-seo.sitemap.expiry', 3600), function () {
             return view('advanced-seo::sitemaps.index', [
                 'sitemaps' => Sitemap::all(),
                 'version' => Addon::get('aerni/advanced-seo')->version(),
@@ -38,7 +38,7 @@ class SitemapController extends Controller
 
         throw_unless($urls->isNotEmpty(), new NotFoundHttpException);
 
-        $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 60), function () use ($urls) {
+        $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", config('advanced-seo.sitemap.expiry', 3600), function () use ($urls) {
             return view('advanced-seo::sitemaps.show', [
                 'urls' => $urls,
                 'version' => Addon::get('aerni/advanced-seo')->version(),
