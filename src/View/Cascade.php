@@ -2,11 +2,13 @@
 
 namespace Aerni\AdvancedSeo\View;
 
+use Aerni\AdvancedSeo\Actions\EvaluateContextType;
 use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\GetsPageData;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
@@ -81,24 +83,24 @@ class Cascade
             throw new \Exception("The context needs to be an instance of Statamic\Tags\Context in order to get the computed data.");
         }
 
-        $this->data->put('title', $this->compiledTitle());
-
-        if (! $this->isErrorPage()) {
-            $this->data = $this->data->merge([
-                'og_image_size' => $this->ogImageSize(),
-                'twitter_image' => $this->twitterImage(),
-                'twitter_image_size' => $this->twitterImageSize(),
-                'twitter_handle' => $this->twitterHandle(),
-                'indexing' => $this->indexing(),
-                'locale' => $this->locale(),
-                'hreflang' => $this->hreflang(),
-                'canonical' => $this->canonical(),
-                'prev_url' => $this->prevUrl(),
-                'next_url' => $this->nextUrl(),
-                'schema' => $this->schema(),
-                'breadcrumbs' => $this->breadcrumbs(),
-            ])->filter();
-        }
+        $this->data = $this->data->merge([
+            'title' => $this->compiledTitle(),
+            'og_image_size' => $this->ogImageSize(),
+            'og_title' => $this->ogTitle(),
+            'twitter_card' => $this->twitterCard(),
+            'twitter_image' => $this->twitterImage(),
+            'twitter_image_size' => $this->twitterImageSize(),
+            'twitter_handle' => $this->twitterHandle(),
+            'twitter_title' => $this->twitterTitle(),
+            'indexing' => $this->indexing(),
+            'locale' => $this->locale(),
+            'hreflang' => $this->hreflang(),
+            'canonical' => $this->canonical(),
+            'prev_url' => $this->prevUrl(),
+            'next_url' => $this->nextUrl(),
+            'schema' => $this->schema(),
+            'breadcrumbs' => $this->breadcrumbs(),
+        ]);
 
         return $this;
     }
@@ -179,13 +181,9 @@ class Cascade
         return $this;
     }
 
-    protected function isErrorPage(): bool
+    protected function isType(string $type): bool
     {
-        if ($this->context instanceof Context) {
-            return Str::contains($this->context->get('current_template'), 'errors');
-        }
-
-        return false;
+        return EvaluateContextType::handle($this->context) === $type;
     }
 
     protected function applyWhitelist(): self
@@ -253,11 +251,11 @@ class Cascade
 
     protected function title(): string
     {
-        if ($this->isErrorPage()) {
-            return $this->context->get('response_code');
-        }
-
-        return $this->get('title');
+        return match (true) {
+            $this->isType('taxonomy') => $this->context->get('title'),
+            $this->isType('error') => $this->context->get('response_code'),
+            default => $this->get('title'),
+        };
     }
 
     protected function titleSeparator(): string
@@ -270,18 +268,20 @@ class Cascade
         return $this->get('site_name') ?? config('app.name');
     }
 
-    protected function ogImageSize(): array
+    protected function ogImageSize(): ?array
     {
+        if (is_null($this->get('og_image'))) {
+            return null;
+        }
+
         return collect(SocialImage::specs('og'))
             ->only(['width', 'height'])
             ->all();
     }
 
-    protected function twitterImageSize(): array
+    protected function ogTitle(): string
     {
-        return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
-            ->only(['width', 'height'])
-            ->all();
+        return $this->get('og_title') ?? $this->title();
     }
 
     protected function twitterHandle(): ?string
@@ -291,11 +291,52 @@ class Cascade
         return $twitterHandle ? Str::start($twitterHandle, '@') : null;
     }
 
-    protected function twitterImage(): Value
+    protected function twitterImageSize(): ?array
     {
-        return $this->value('twitter_card')->value() === 'summary'
-            ? $this->get('twitter_summary_image')
-            : $this->get('twitter_summary_large_image');
+        if (! $image = $this->twitterImage()) {
+            return null;
+        }
+
+        // TODO: This can be simplified when the key is `summary_large` instead of `summary_large_image`.
+        $card = str_replace(['seo_', 'twitter_'], '', $image->handle());
+        $card = $card === 'summary_image' ? 'summary' : 'summary_large_image';
+
+        return collect(SocialImage::specs("twitter.{$card}"))
+            ->only(['width', 'height'])
+            ->all();
+    }
+
+    protected function twitterCard(): ?string
+    {
+        if ($this->get('twitter_card')) {
+            return $this->get('twitter_card');
+        }
+
+        if (! $image = $this->twitterImage()) {
+            return null;
+        }
+
+        // TODO: This can be simplified when the key is `summary_large` instead of `summary_large_image`.
+        $card = str_replace(['seo_', 'twitter_'], '', $image->handle());
+
+        return $card === 'summary_image'
+            ? 'summary'
+            : 'summary_large_image';
+    }
+
+    protected function twitterImage(): ?Value
+    {
+        $images = collect([
+            'summary' => $this->get('twitter_summary_image'),
+            'summary_large_image' => $this->get('twitter_summary_large_image'),
+        ])->filter();
+
+        return $images->get($this->value('twitter_card')?->value()) ?? $images->first();
+    }
+
+    protected function twitterTitle(): string
+    {
+        return $this->get('twitter_title') ?? $this->title();
     }
 
     protected function indexing(): string

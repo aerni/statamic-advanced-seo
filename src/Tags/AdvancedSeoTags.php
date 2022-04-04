@@ -18,7 +18,7 @@ class AdvancedSeoTags extends Tags
      */
     public function wildcard(): mixed
     {
-        if (! $this->seoIsEnabled()) {
+        if (! $this->canProcessCascade()) {
             return null;
         }
 
@@ -30,7 +30,7 @@ class AdvancedSeoTags extends Tags
      */
     public function head(): ?View
     {
-        if (! $this->seoIsEnabled()) {
+        if (! $this->canProcessCascade()) {
             return null;
         }
 
@@ -42,7 +42,7 @@ class AdvancedSeoTags extends Tags
      */
     public function body(): ?View
     {
-        if (! $this->seoIsEnabled()) {
+        if (! $this->canProcessCascade()) {
             return null;
         }
 
@@ -54,7 +54,7 @@ class AdvancedSeoTags extends Tags
      */
     public function dump(): void
     {
-        if ($this->seoIsEnabled()) {
+        if ($this->canProcessCascade()) {
             dd($this->cascade());
         }
     }
@@ -70,9 +70,9 @@ class AdvancedSeoTags extends Tags
     }
 
     /**
-     * Check if we should render any meta data.
+     * Check if we can process the cascade.
      */
-    protected function seoIsEnabled(): bool
+    protected function canProcessCascade(): bool
     {
         // Custom routes don't have the necessary data to compose the SEO cascade.
         if (Helpers::isCustomRoute()) {
