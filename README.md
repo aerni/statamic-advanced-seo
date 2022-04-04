@@ -119,9 +119,9 @@ $signIn = Sitemap::makeUrl('https://statamic.com/sign-in');
 
 // You may also add optional attributes.
 $seller = Sitemap::makeUrl('https://statamic.com/seller')
-    ->lastmod('2022-03-25 19:15')
+    ->lastmod(now())
     ->changefreq('daily')
-    ->priority(1.0)
+    ->priority('1.0');
 
 // Create a sitemap and add the items to it.
 $sitemap = Sitemap::make('user')
