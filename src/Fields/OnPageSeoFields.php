@@ -526,6 +526,24 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_sitemap_enabled',
+                'field' => [
+                    'display' => 'Enabled',
+                    'instructions' => $this->trans('seo_sitemap_enabled', 'instructions'),
+                    'type' => 'seo_source',
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'toggle-fieldtype',
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
+                    'field' => [
+                        'type' => 'toggle',
+                        'default' => (bool) $this->getValueFromCascade('seo_sitemap_enabled'),
+                    ],
+                ],
+            ],
+            [
                 'handle' => 'seo_sitemap_priority',
                 'field' => [
                     'display' => 'Priority',
@@ -537,6 +555,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'if' => [
                         'seo_noindex.value' => 'false',
+                        'seo_sitemap_enabled.value' => 'true',
                     ],
                     'field' => [
                         'type' => 'select',
@@ -575,6 +594,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'if' => [
                         'seo_noindex.value' => 'false',
+                        'seo_sitemap_enabled.value' => 'true',
                     ],
                     'field' => [
                         'type' => 'select',
@@ -603,6 +623,7 @@ class OnPageSeoFields extends BaseFields
             $fields[0]['field']['if'] = 'always';
             $fields[1]['field']['if'] = 'always';
             $fields[2]['field']['if'] = 'always';
+            $fields[3]['field']['if'] = 'always';
         }
 
         return $fields;

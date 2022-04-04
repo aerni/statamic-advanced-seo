@@ -82,6 +82,11 @@ class Indexable
             return false;
         }
 
+        // If the sitemap is disabled, we shouldn't index the model.
+        if (! $model->seo_sitemap_enabled) {
+            return false;
+        }
+
         // Check if noindex is enabled.
         if ($model->seo_noindex) {
             return false;

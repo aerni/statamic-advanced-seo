@@ -374,6 +374,17 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_sitemap_enabled',
+                'field' => [
+                    'type' => 'toggle',
+                    'display' => 'Enabled',
+                    'instructions' => $this->trans('seo_sitemap_enabled', 'default_instructions'),
+                    'default' => Defaults::data('collections')->get('seo_sitemap_enabled'),
+                    'listable' => 'hidden',
+                    'localizable' => true,
+                ],
+            ],
+            [
                 'handle' => 'seo_sitemap_priority',
                 'field' => [
                     'type' => 'select',

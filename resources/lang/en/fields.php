@@ -127,6 +127,11 @@ return [
         'default_instructions' => 'Configure the default sitemap settings of your :type.',
     ],
 
+    'seo_sitemap_enabled' => [
+        'instructions' => 'Choose to add or remove this :type from the sitemap.',
+        'default_instructions' => 'Choose to add or remove your :type from the sitemap.',
+    ],
+
     'seo_sitemap_priority' => [
         'instructions' => 'Choose the sitemap priority of this :type. 1.0 is the most important.',
         'default_instructions' => 'Choose the default sitemap priority of your :type. 1.0 is the most important.',
