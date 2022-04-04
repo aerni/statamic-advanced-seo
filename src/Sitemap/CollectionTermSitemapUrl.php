@@ -56,6 +56,7 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
     protected function terms(): Collection
     {
-        return $this->sitemap->collectionTerms();
+        return $this->sitemap->collectionTerms()
+            ->filter(fn ($term) => $term->id() === $this->term->id());
     }
 }
