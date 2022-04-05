@@ -63,8 +63,10 @@ class SocialImage
         $filePath = collect(Folder::getFilesRecursively($cachePath))
             ->firstWhere(fn ($path) => str_contains($path, $this->path()));
 
-        // Delete the cached image.
-        StatamicFile::delete($filePath);
+        if ($filePath) {
+            // Delete the cached image.
+            StatamicFile::delete($filePath);
+        }
 
         // Clean up subfolders.
         Folder::deleteEmptySubfolders($cachePath);
