@@ -2,10 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Content;
 
-use Illuminate\Support\Facades\File;
+use Statamic\Facades\Folder;
 use Spatie\Browsershot\Browsershot;
-use Statamic\Contracts\Entries\Entry;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\AssetContainer;
+use Statamic\Contracts\Entries\Entry;
+use Facades\Statamic\Imaging\GlideServer;
+use Statamic\Facades\File as StatamicFile;
 
 class SocialImage
 {
@@ -21,6 +24,8 @@ class SocialImage
         Browsershot::url($this->templateUrl())
             ->windowSize($this->specs['width'], $this->specs['height'])
             ->save($this->absolutePath());
+
+        $this->clearGlideCache();
 
         return [$this->specs['field'] => $this->path()];
     }
@@ -47,5 +52,21 @@ class SocialImage
         $directory = $this->absolutePath(pathinfo($this->path(), PATHINFO_DIRNAME));
 
         File::ensureDirectoryExists($directory);
+    }
+
+    protected function clearGlideCache(): void
+    {
+        // Get the glide server cache path.
+        $cachePath = GlideServer::cachePath();
+
+        // Get the cached image path
+        $filePath = collect(Folder::getFilesRecursively($cachePath))
+            ->firstWhere(fn ($path) => str_contains($path, $this->path()));
+
+        // Delete the cached image.
+        StatamicFile::delete($filePath);
+
+        // Clean up subfolders.
+        Folder::deleteEmptySubfolders($cachePath);
     }
 }
