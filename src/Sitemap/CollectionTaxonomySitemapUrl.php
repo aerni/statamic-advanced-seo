@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Site;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Taxonomies\Term;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 
 class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 {
@@ -33,7 +33,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         return $taxonomies->map(function ($taxonomy, $site) {
             return [
                 'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
-                'href' => $this->getUrl($taxonomy, $site)
+                'href' => $this->getUrl($taxonomy, $site),
             ];
         })->toArray();
     }
