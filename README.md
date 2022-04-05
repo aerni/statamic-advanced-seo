@@ -104,12 +104,15 @@ You might want to add fields to your blueprint specifically for your social imag
 >**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
 
 ## Sitemap
-XML Sitemaps will automatically be generated for your entries and terms. The sitemap can be found at `yourwebsite.com/sitemap.xml`. You may exclude specific collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`, or disable the sitemap feature altogether in the config.
+This addon automatically generates sitemaps for your collections and taxonomies. The sitemaps are organized in a sitemap index so you only have to submit one URL to Google Search Console. The sitemap index can be found at `yourwebsite.com/sitemap.xml`.
 
-The `priority` and `change frequency` of each item can be configured in the SEO settings on the respective entry/term.
+### Exclude From Sitemap
+You may exclude specific collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`. You can also remove a specific entry or term from the sitemap by disabling the toggle in the SEO tab. If you don’t want to use the sitemap feature at all, simply disable it in the config file.
 
 ### Custom Sitemaps
-You may have custom routes that you want to add to your sitemap. Follow the instructions below:
+This addon allows you to easily generate your own sitemaps and add it to the existing ones. This comes in handy if you have custom routes outside of Statamic.
+
+See the example below for instructions on how to create your custom sitemap. This code has to go within a service provider.
 
 ```php
 use Aerni\AdvancedSeo\Facades\Sitemap;
