@@ -421,6 +421,11 @@ class Cascade
 
     protected function canonical(): ?string
     {
+        // We don't want to output a canonical tag if noindex is true.
+        if ($this->value('noindex')) {
+            return null;
+        }
+
         $type = $this->value('canonical_type')?->value();
 
         if ($type === 'other') {
