@@ -108,7 +108,7 @@ class TaxonomySitemap extends BaseSitemap
                 ->get()
                 ->filter(fn ($entry) => Indexable::handle($entry))
                 ->isNotEmpty();
-        });
+        })->values();
     }
 
     protected function taxonomyCollections(): Collection
