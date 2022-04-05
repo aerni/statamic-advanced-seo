@@ -30,8 +30,9 @@ class TaxonomySitemap extends BaseSitemap
 
     protected function collectionTaxonomyUrls(): Collection
     {
-        // TODO: There is currently no way to get the items for collection taxonomies, e.g. /products/tags
-        return $this->collectionTaxonomies();
+        return $this->collectionTaxonomies()
+            ->map(fn ($item) => (new CollectionTaxonomySitemapUrl($item['taxonomy'], $item['site'], $this))->toArray())
+            ->filter();
     }
 
     protected function termUrls(): Collection
@@ -60,6 +61,24 @@ class TaxonomySitemap extends BaseSitemap
             ->filter(fn ($taxonomy, $site) => Indexable::handle($taxonomy, $site));
     }
 
+    public function collectionTaxonomies(): Collection
+    {
+        $taxonomies = $this->taxonomyCollections();
+
+        // We only want to return the terms if the template exists.
+        if (! view()->exists($taxonomies->first()?->template())) {
+            return collect();
+        }
+
+        return $taxonomies->flatMap(function ($taxonomy) {
+            return $taxonomy->collection()->sites()
+                ->map(fn ($site) => [
+                    'taxonomy' => $taxonomy,
+                    'site' => $site,
+                ]);
+        })->filter(fn ($item) => Indexable::handle($item['taxonomy'], $item['site']));
+    }
+
     public function terms(Taxonomy $taxonomy): Collection
     {
         $terms = $taxonomy->queryTerms()->get();
@@ -72,12 +91,6 @@ class TaxonomySitemap extends BaseSitemap
         return $terms->flatMap(fn ($term) => $term->term()->localizations()->values()) // Get all localizations of the term.
             ->filter(fn ($term) => $term->taxonomy()->sites()->contains($term->locale())) // We only want terms of sites that are configured on the taxonomy.
             ->filter(fn ($term) => Indexable::handle($term)); // We only want indexable terms.
-    }
-
-    public function collectionTaxonomies(): Collection
-    {
-        // TODO: There is currently no way to get the items for collection taxonomies, e.g. /products/tags
-        return collect();
     }
 
     public function collectionTerms(): Collection
