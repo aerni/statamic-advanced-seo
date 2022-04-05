@@ -107,12 +107,10 @@ You might want to add fields to your blueprint specifically for your social imag
 This addon automatically generates sitemaps for your collections and taxonomies. The sitemaps are organized in a sitemap index so you only have to submit one URL to Google Search Console. The sitemap index can be found at `yourwebsite.com/sitemap.xml`.
 
 ### Exclude From Sitemap
-You may exclude specific collections and taxonomies from the sitemap in `SEO -> Site -> Indexing`. You can also remove a specific entry or term from the sitemap by disabling the toggle in the SEO tab. If you don’t want to use the sitemap feature at all, simply disable it in the config file.
+You may want to exclude specific collections and taxonomies from the sitemap. Simply navigate to `SEO -> Site -> Indexing` and change the settings to your liking. You can also remove a specific entry or term from the sitemap by disabling the toggle in the SEO tab. If you don’t want to use the sitemap feature at all, simply disable it in the config file.
 
 ### Custom Sitemaps
-This addon allows you to easily generate your own sitemaps and add it to the existing ones. This comes in handy if you have custom routes outside of Statamic.
-
-See the example below for instructions on how to create your custom sitemap. This code has to go within a service provider.
+You can also generate your own custom sitemaps. This comes in handy if you have custom routes outside of Statamic. See the example below for instructions on how to create your sitemap. This code has to go within a Service Provider to make sure it gets executed on every request.
 
 ```php
 use Aerni\AdvancedSeo\Facades\Sitemap;
