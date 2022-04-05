@@ -68,6 +68,7 @@ trait GetsEventData
             $data = $data->in(Site::current()->handle());
         }
 
-        return GetDefaultsData::handle($data);
+        // Fall back to event if no data exists, e.g. non-existent entry localization.
+        return GetDefaultsData::handle($data ?? $event);
     }
 }
