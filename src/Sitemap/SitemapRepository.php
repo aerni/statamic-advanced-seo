@@ -36,4 +36,9 @@ class SitemapRepository
     {
         $this->all()->each->clearCache();
     }
+
+    public function cacheExpiry(): int
+    {
+        return config('advanced-seo.sitemap.expiry', 60) * 60;
+    }
 }

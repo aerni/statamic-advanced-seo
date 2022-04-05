@@ -68,13 +68,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the sitemap feature to your liking.
-    | The default cache expiry is one hour.
+    | The cache expiry is set in minutes and defaults to 60.
     |
     */
 
     'sitemap' => [
         'enabled' => true,
-        'expiry' => 3600,
+        'expiry' => 60,
     ],
 
     /*
