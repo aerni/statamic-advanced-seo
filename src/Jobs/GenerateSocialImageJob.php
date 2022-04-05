@@ -18,7 +18,7 @@ class GenerateSocialImageJob implements ShouldQueue
     // TODO: Have to make this work with Taxonomies as well.
     public function __construct(protected Entry $entry)
     {
-        $this->queue = config('advanced-seo.social_images.generator.queue', config('queue.default'));
+        $this->queue = config('advanced-seo.social_images.generator.queue', 'default');
     }
 
     public function handle(): void
