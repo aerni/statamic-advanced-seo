@@ -522,6 +522,7 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_section_sitemap', 'instructions'),
                     'if' => [
                         'seo_noindex.value' => 'false',
+                        'seo_canonical_type.value' => 'equals current',
                     ],
                 ],
             ],
@@ -536,6 +537,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'toggle-fieldtype',
                     'if' => [
                         'seo_noindex.value' => 'false',
+                        'seo_canonical_type.value' => 'equals current',
                     ],
                     'field' => [
                         'type' => 'toggle',
@@ -555,6 +557,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'if' => [
                         'seo_noindex.value' => 'false',
+                        'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
                     ],
                     'field' => [
@@ -594,6 +597,7 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'if' => [
                         'seo_noindex.value' => 'false',
+                        'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
                     ],
                     'field' => [
