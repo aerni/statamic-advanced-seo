@@ -18,7 +18,7 @@ class SocialImagesGeneratorSubscriber
     protected array $events = [
         Events\EntrySaved::class => 'generateSocialImages',
         // Events\TermSaved::class => 'generateSocialImages', // TODO: This event does not currently exist but might be added with this PR: https://github.com/statamic/cms/pull/3379
-        Events\EntryBlueprintFound::class => 'addPreviewTargets',
+        // Events\EntryBlueprintFound::class => 'addPreviewTargets',
         // Events\TermBlueprintFound::class => 'addPreviewTargets',
     ];
 
