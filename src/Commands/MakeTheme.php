@@ -15,9 +15,28 @@ class MakeTheme extends Command
 
     public function handle(): void
     {
+        $this->publishTheme();
+        $this->publishLayout();
+    }
+
+    protected function publishLayout(): void
+    {
+        $source = __DIR__ . '/../../resources/stubs/social_images/';
+        $target = resource_path('views/social_images/');
+        $layout = 'layout.antlers.html';
+
+        if (! File::exists($target.$layout)) {
+            File::ensureDirectoryExists($target);
+            File::copy($source.$layout, $target.$layout);
+            $this->line("<info>[✓]</info> The layout was successfully created: <comment>{$this->getRelativePath($target.$layout)}</comment>");
+        }
+    }
+
+    protected function publishTheme(): void
+    {
         $theme = $this->argument('name') ?? $this->ask('What do you want to call the theme?', 'default');
 
-        $source = __DIR__ . '/../../resources/stubs/social_images';
+        $source = __DIR__ . '/../../resources/stubs/social_images/templates';
         $target = resource_path('views/social_images/' . $theme);
 
         if (! File::exists($target) || $this->confirm("A theme with the name <comment>$theme</comment> already exists. Do you want to overwrite it?")) {
