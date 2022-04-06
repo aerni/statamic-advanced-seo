@@ -15,18 +15,14 @@ class SocialImagesGeneratorSubscriber
 {
     use GetsEventData;
 
-    protected array $events = [
-        Events\EntrySaved::class => 'generateSocialImages',
-        // Events\TermSaved::class => 'generateSocialImages', // TODO: This event does not currently exist but might be added with this PR: https://github.com/statamic/cms/pull/3379
-        // Events\EntryBlueprintFound::class => 'addPreviewTargets',
-        // Events\TermBlueprintFound::class => 'addPreviewTargets',
-    ];
-
-    public function subscribe(Dispatcher $events): void
+    public function subscribe(Dispatcher $events): array
     {
-        foreach ($this->events as $event => $method) {
-            $events->listen($event, [self::class, $method]);
-        }
+        return [
+            Events\EntrySaved::class => 'generateSocialImages',
+            // Events\TermSaved::class => 'generateSocialImages', // TODO: This event does not currently exist but might be added with this PR: https://github.com/statamic/cms/pull/3379
+            // Events\EntryBlueprintFound::class => 'addPreviewTargets',
+            // Events\TermBlueprintFound::class => 'addPreviewTargets',
+        ];
     }
 
     public function generateSocialImages(Event $event): void

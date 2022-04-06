@@ -12,18 +12,14 @@ class ContentDefaultsSubscriber
 {
     use GetsEventData;
 
-    protected array $events = [
-        Events\CollectionSaved::class => 'createOrDeleteLocalizations',
-        Events\TaxonomySaved::class => 'createOrDeleteLocalizations',
-        Events\CollectionDeleted::class => 'deleteDefaults',
-        Events\TaxonomyDeleted::class => 'deleteDefaults',
-    ];
-
-    public function subscribe(Dispatcher $events): void
+    public function subscribe(Dispatcher $events): array
     {
-        foreach ($this->events as $event => $method) {
-            $events->listen($event, [self::class, $method]);
-        }
+        return [
+            Events\CollectionSaved::class => 'createOrDeleteLocalizations',
+            Events\TaxonomySaved::class => 'createOrDeleteLocalizations',
+            Events\CollectionDeleted::class => 'deleteDefaults',
+            Events\TaxonomyDeleted::class => 'deleteDefaults',
+        ];
     }
 
     /**

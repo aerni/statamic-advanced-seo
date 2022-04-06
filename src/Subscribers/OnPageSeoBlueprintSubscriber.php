@@ -19,16 +19,12 @@ class OnPageSeoBlueprintSubscriber
     // This boolean is used to prevent an infinite loop.
     protected static bool $addingField = false;
 
-    protected array $events = [
-        Events\EntryBlueprintFound::class => 'handleBlueprintFound',
-        Events\TermBlueprintFound::class => 'handleBlueprintFound',
-    ];
-
-    public function subscribe(Dispatcher $events): void
+    public function subscribe(Dispatcher $events): array
     {
-        foreach ($this->events as $event => $method) {
-            $events->listen($event, [self::class, $method]);
-        }
+        return [
+            Events\EntryBlueprintFound::class => 'handleBlueprintFound',
+            Events\TermBlueprintFound::class => 'handleBlueprintFound',
+        ];
     }
 
     public function handleBlueprintFound(Event $event): void
