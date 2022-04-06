@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Fields\Fieldtype;
 
 class SocialImageFieldtype extends Fieldtype
