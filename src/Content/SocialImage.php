@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Content;
 
-use Statamic\Facades\URL;
-use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\File;
-use Statamic\Facades\AssetContainer;
+use Spatie\Browsershot\Browsershot;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\URL;
 
 class SocialImage
 {
