@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Facades\Statamic\CP\LivePreview;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -14,7 +15,7 @@ use Statamic\View\View;
 
 class SocialImagesController extends Controller
 {
-    public function show(string $type, string $id, Request $request): View
+    public function show(string $type, string $id, Request $request): Response
     {
         // Throw if the social images generator is disabled.
         throw_unless(config('advanced-seo.social_images.generator.enabled', false), new NotFoundHttpException);
@@ -32,10 +33,12 @@ class SocialImagesController extends Controller
             ?? $specs['templates']->get('default') // If no theme is set, use the default theme.
             ?? $specs['templates']->first(); // If the default doesn't exist either, fall back to the first theme.
 
-        return (new View)
+        $view = (new View)
             ->template($template)
             ->layout($specs['layout'])
             ->with($data->merge($specs)->toAugmentedArray());
+
+        return response($view)->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
     protected function getData(string $id, Request $request): ?Entry
