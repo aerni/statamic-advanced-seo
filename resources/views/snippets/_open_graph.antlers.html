@@ -14,7 +14,7 @@
 
 {{ if og_image }}
     {{ if generate_social_images }}
-        <meta property="og:image" content="{{ og_image:permalink }}">
+        <meta property="og:image" content="{{ og_image }}">
     {{ else }}
         <meta property="og:image" content="{{ glide :src="og_image" :width="og_image_size:width" :height="og_image_size:height" fit="crop_focal" absolute="true" }}">
     {{ /if }}

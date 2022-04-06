@@ -85,6 +85,7 @@ class Cascade
 
         if (! $this->isErrorPage()) {
             $this->data = $this->data->merge([
+                'og_image' => $this->ogImage(),
                 'og_image_size' => $this->ogImageSize(),
                 'twitter_image' => $this->twitterImage(),
                 'twitter_image_size' => $this->twitterImageSize(),
@@ -270,11 +271,29 @@ class Cascade
         return $this->get('site_name') ?? config('app.name');
     }
 
+    protected function ogImage(): Value
+    {
+        return $this->value('generate_social_images')
+            ? $this->get('generated_og_image')
+            : $this->get('og_image');
+    }
+
     protected function ogImageSize(): array
     {
         return collect(SocialImage::specs('og'))
             ->only(['width', 'height'])
             ->all();
+    }
+
+    protected function twitterImage(): Value
+    {
+        if ($this->value('generate_social_images')) {
+            return $this->get('generated_twitter_image');
+        }
+
+        return $this->value('twitter_card')->value() === 'summary'
+            ? $this->get('twitter_summary_image')
+            : $this->get('twitter_summary_large_image');
     }
 
     protected function twitterImageSize(): array
@@ -289,13 +308,6 @@ class Cascade
         $twitterHandle = $this->value('twitter_handle');
 
         return $twitterHandle ? Str::start($twitterHandle, '@') : null;
-    }
-
-    protected function twitterImage(): Value
-    {
-        return $this->value('twitter_card')->value() === 'summary'
-            ? $this->get('twitter_summary_image')
-            : $this->get('twitter_summary_large_image');
     }
 
     protected function indexing(): string

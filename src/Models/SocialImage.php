@@ -13,7 +13,6 @@ class SocialImage extends Model
         return [
             'og' => [
                 'type' => 'og',
-                'field' => 'seo_og_image',
                 'layout' => 'social_images/layout',
                 'templates' => SocialImageTheme::templatesOfType('open_graph'),
                 'width' => config('advanced-seo.social_images.presets.open_graph.width', 1200),
@@ -22,7 +21,6 @@ class SocialImage extends Model
             'twitter' => [
                 'summary' => [
                     'type' => 'twitter',
-                    'field' => 'seo_twitter_summary_image',
                     'layout' => 'social_images/layout',
                     'templates' => SocialImageTheme::templatesOfType('twitter_summary'),
                     'width' => config('advanced-seo.social_images.presets.twitter.summary.width', 240),
@@ -30,7 +28,6 @@ class SocialImage extends Model
                 ],
                 'summary_large_image' => [
                     'type' => 'twitter',
-                    'field' => 'seo_twitter_summary_large_image',
                     'layout' => 'social_images/layout',
                     'templates' => SocialImageTheme::templatesOfType('twitter_summary_large'),
                     'width' => config('advanced-seo.social_images.presets.twitter.summary_large_image.width', 1100),

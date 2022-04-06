@@ -11,7 +11,7 @@
 
 {{ if twitter_image }}
     {{ if generate_social_images }}
-        <meta name="twitter:image" content="{{ twitter_image:permalink }}">
+        <meta name="twitter:image" content="{{ twitter_image }}">
     {{ else }}
         <meta name="twitter:image" content="{{ glide :src="twitter_image" :width="twitter_image_size:width" :height="twitter_image_size:height" fit="crop_focal" absolute="true" }}">
     {{ /if }}

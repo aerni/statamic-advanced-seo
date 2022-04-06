@@ -23,8 +23,6 @@ class GenerateSocialImageJob implements ShouldQueue
 
     public function handle(): void
     {
-        $this->entry
-            ->merge(SocialImage::all($this->entry))
-            ->saveQuietly();
+        SocialImage::all($this->entry)->each(fn ($image) => $image->generate());
     }
 }

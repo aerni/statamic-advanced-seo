@@ -11,24 +11,24 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class SocialImageRepository
 {
-    public function all(Entry $entry): array
+    public function all(Entry $entry): Collection
     {
-        return $this->types()->flatMap(function ($item, $type) use ($entry) {
+        return $this->types()->map(function ($item, $type) use ($entry) {
             return match ($type) {
                 'twitter' => $this->twitter($entry),
                 'og' => $this->openGraph($entry),
             };
-        })->toArray();
+        });
     }
 
-    public function openGraph(Entry $entry): array
+    public function openGraph(Entry $entry): SocialImage
     {
-        return (new SocialImage($entry, $this->specs('og')))->generate();
+        return (new SocialImage($entry, $this->specs('og')));
     }
 
-    public function twitter(Entry $entry): array
+    public function twitter(Entry $entry): SocialImage
     {
-        return (new SocialImage($entry, $this->specs('twitter', $entry)))->generate();
+        return (new SocialImage($entry, $this->specs('twitter', $entry)));
     }
 
     public function specs(string $type, Entry|LocalizedTerm $data = null): ?array

@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Content;
 
-use Illuminate\Support\Facades\File;
+use Statamic\Facades\URL;
 use Spatie\Browsershot\Browsershot;
-use Statamic\Contracts\Entries\Entry;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\AssetContainer;
+use Statamic\Contracts\Entries\Entry;
 
 class SocialImage
 {
@@ -14,15 +15,25 @@ class SocialImage
         //
     }
 
-    public function generate(): array
+    public function generate(): void
     {
         $this->ensureDirectoryExists();
 
         Browsershot::url($this->templateUrl())
             ->windowSize($this->specs['width'], $this->specs['height'])
             ->save($this->absolutePath());
+    }
 
-        return [$this->specs['field'] => $this->path()];
+    public function exists(): bool
+    {
+        return File::exists($this->absolutePath());
+    }
+
+    public function absoluteUrl(): string
+    {
+        $container = config('advanced-seo.social_images.container', 'assets');
+
+        return URL::assemble(AssetContainer::find($container)->absoluteUrl(), $this->path());
     }
 
     protected function templateUrl(): string

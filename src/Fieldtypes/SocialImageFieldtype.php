@@ -12,29 +12,29 @@ class SocialImageFieldtype extends Fieldtype
 
     public function preload(): array
     {
+        $meta = ['title' => $this->field->display()];
+
         $parent = $this->field->parent();
         $type = $this->config()['image_type'];
 
-        $meta = ['title' => $this->field->display()];
+        $image = SocialImage::all($parent)->get($type);
 
-        if ($this->shouldDisplayImage($parent)) {
-            $field = SocialImage::specs($type, $parent)['field'];
-            $meta['image'] = $parent->{$field}?->absoluteUrl();
+        if ($image->exists()) {
+            $meta['image'] = $image->absoluteUrl();
         }
 
         return $meta;
     }
 
-    protected function shouldDisplayImage($parent): bool
+    public function augment($value): ?string
     {
-        if (! $parent instanceof Entry) {
-            return false;
-        }
+        $parent = $this->field->parent();
+        $type = $this->config()['image_type'];
 
-        if (! $parent->seo_generate_social_images) {
-            return false;
-        }
+        $image = SocialImage::all($parent)->get($type);
 
-        return true;
+        return $image->exists()
+            ? $image->absoluteUrl()
+            : null;
     }
 }
