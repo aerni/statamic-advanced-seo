@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Fields\Fieldtype;
 
-class SocialImagesPreviewFieldtype extends Fieldtype
+class SocialImageFieldtype extends Fieldtype
 {
     protected $selectable = false;
 

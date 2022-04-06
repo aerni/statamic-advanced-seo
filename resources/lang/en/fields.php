@@ -34,11 +34,11 @@ return [
         'default_instructions' => 'Choose the default social images theme for your :type.',
     ],
 
-    'seo_og_image_preview' => [
+    'seo_generated_og_image' => [
         'instructions' => 'Reload the page after save to update the preview.',
     ],
 
-    'seo_twitter_image_preview' => [
+    'seo_generated_twitter_image' => [
         'instructions' => 'Reload the page after save to update the preview.',
     ],
 

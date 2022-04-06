@@ -24,7 +24,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $fieldtypes = [
-        Fieldtypes\SocialImagesPreviewFieldtype::class,
+        Fieldtypes\SocialImageFieldtype::class,
         Fieldtypes\SourceFieldtype::class,
     ];
 
