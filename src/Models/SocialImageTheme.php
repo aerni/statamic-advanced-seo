@@ -64,4 +64,11 @@ class SocialImageTheme extends Model
     {
         return static::$rows->flatMap(fn ($theme) => [$theme['handle'] => $theme['title']])->toArray();
     }
+
+    protected static function fieldtypeDefault(): string
+    {
+        $theme = static::$rows->firstWhere('handle', 'default') ?? static::$rows->first();
+
+        return $theme['handle'];
+    }
 }

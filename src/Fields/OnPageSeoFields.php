@@ -119,18 +119,25 @@ class OnPageSeoFields extends BaseFields
             $fields->push([
                 'handle' => 'seo_social_images_theme',
                 'field' => [
-                    'type' => 'select',
                     'display' => 'Theme',
                     'instructions' => $this->trans('seo_social_images_theme', 'instructions'),
-                    'options' => SocialImageTheme::fieldtypeOptions(),
-                    'clearable' => false,
-                    'multiple' => false,
-                    'searchable' => false,
-                    'taggable' => false,
-                    'push_tags' => false,
-                    'cast_booleans' => false,
+                    'type' => 'seo_source',
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'select-fieldtype',
                     'if' => [
                         'seo_generate_social_images.value' => 'true',
+                    ],
+                    'field' => [
+                        'type' => 'select',
+                        'options' => SocialImageTheme::fieldtypeOptions(),
+                        'default' => $this->getValueFromCascade('seo_social_images_theme') ?? SocialImageTheme::fieldtypeDefault(),
+                        'clearable' => false,
+                        'multiple' => false,
+                        'searchable' => false,
+                        'taggable' => false,
+                        'push_tags' => false,
+                        'cast_booleans' => false,
                     ],
                 ],
             ]);

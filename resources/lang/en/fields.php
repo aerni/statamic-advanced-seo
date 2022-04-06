@@ -31,7 +31,7 @@ return [
 
     'seo_social_images_theme' => [
         'instructions' => 'Choose the social images theme for this :type.',
-        'default_instructions' => 'Choose the :type\'s default social images theme.',
+        'default_instructions' => 'Choose the default social images theme for your :type.',
     ],
 
     'seo_og_image_preview' => [
