@@ -34,14 +34,6 @@ return [
         'default_instructions' => 'Choose the default social images theme for your :type.',
     ],
 
-    'seo_generated_og_image' => [
-        'instructions' => 'Reload the page after save to update the preview.',
-    ],
-
-    'seo_generated_twitter_image' => [
-        'instructions' => 'Reload the page after save to update the preview.',
-    ],
-
     'seo_section_og' => [
         'instructions' => 'Configure the Open Graph settings of this :type.',
         'default_instructions' => 'Configure the default Open Graph settings of your :type.',
