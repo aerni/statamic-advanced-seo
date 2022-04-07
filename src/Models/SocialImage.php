@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 class SocialImage extends Model
 {
-    public static $types = ['open_graph', 'twitter_summary', 'twitter_summary_large'];
+    public static $types = ['open_graph', 'twitter_summary', 'twitter_summary_large_image'];
 
     protected static function getRows(): array
     {
@@ -29,7 +29,7 @@ class SocialImage extends Model
                 'summary_large_image' => [
                     'type' => 'twitter',
                     'layout' => 'social_images/layout',
-                    'templates' => SocialImageTheme::templatesOfType('twitter_summary_large'),
+                    'templates' => SocialImageTheme::templatesOfType('twitter_summary_large_image'),
                     'width' => config('advanced-seo.social_images.presets.twitter_summary_large_image.width', 1100),
                     'height' => config('advanced-seo.social_images.presets.twitter_summary_large_image.height', 628),
                 ],
