@@ -118,6 +118,8 @@ class ContentDefaultsFields extends BaseFields
                     'taggable' => false,
                     'push_tags' => false,
                     'cast_booleans' => false,
+                    'localizable' => true,
+                    'listable' => 'hidden',
                 ],
             ]);
         }
