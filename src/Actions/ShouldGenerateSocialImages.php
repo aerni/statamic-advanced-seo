@@ -9,14 +9,13 @@ class ShouldGenerateSocialImages
 {
     public static function handle(Entry $entry): bool
     {
-        // Don't generate if we're first localiting an entry.
-        // TODO: If we support taxonomies add this check as well: str_contains(url()->previous(), 'create')
-        if (str_contains(request()->path(), 'localize')) {
-            return false;
-        };
-
         // Shouldn't generate if the generator was disabled in the config.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
+        // Shouldn't generate if it was configured to generate on demand.
+        if (! config('advanced-seo.social_images.generator.generate_on_save', true)) {
             return false;
         }
 

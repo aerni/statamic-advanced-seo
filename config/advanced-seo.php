@@ -43,6 +43,7 @@ return [
 
         'generator' => [
             'enabled' => true,
+            'generate_on_save' => true,
             'queue' => 'default',
         ],
 

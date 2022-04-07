@@ -2,14 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
-use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
-use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
-use Illuminate\Events\Dispatcher;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Actions\DeleteSocialImages;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
+use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 
 class SocialImagesGeneratorSubscriber
 {
@@ -27,11 +28,9 @@ class SocialImagesGeneratorSubscriber
 
     public function generateSocialImages(Event $event): void
     {
-        if (! ShouldGenerateSocialImages::handle($event->entry)) {
-            return;
-        }
-
-        GenerateSocialImageJob::dispatch($event->entry);
+        ShouldGenerateSocialImages::handle($event->entry)
+            ? GenerateSocialImagesJob::dispatch($event->entry)
+            : DeleteSocialImages::handle($event->entry);
     }
 
     public function addPreviewTargets(Event $event): void

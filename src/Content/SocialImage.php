@@ -15,18 +15,25 @@ class SocialImage
         //
     }
 
-    public function generate(): void
+    public function generate(): self
     {
         $this->ensureDirectoryExists();
 
         Browsershot::url($this->templateUrl())
             ->windowSize($this->specs['width'], $this->specs['height'])
             ->save($this->absolutePath());
+
+        return $this;
     }
 
     public function exists(): bool
     {
         return File::exists($this->absolutePath());
+    }
+
+    public function delete(): bool
+    {
+        return File::delete($this->absolutePath());
     }
 
     public function absoluteUrl(): string
