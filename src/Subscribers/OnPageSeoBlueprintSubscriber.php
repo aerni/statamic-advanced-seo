@@ -42,11 +42,6 @@ class OnPageSeoBlueprintSubscriber
 
     protected function shouldHandleBlueprintFound(): bool
     {
-        // Abort if we're running in console.
-        if (app()->runningInConsole()) {
-            return false;
-        }
-
         // Don't add any fields in the blueprint builder.
         if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints'])) {
             return false;
