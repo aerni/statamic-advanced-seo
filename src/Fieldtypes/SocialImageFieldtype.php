@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Fields\Fieldtype;
 
 class SocialImageFieldtype extends Fieldtype
@@ -11,10 +12,14 @@ class SocialImageFieldtype extends Fieldtype
 
     public function preload(): array
     {
-        $meta = ['title' => $this->field->display()];
-
         $parent = $this->field->parent();
         $type = $this->config()['image_type'];
+
+        $meta = ['title' => $this->field->display()];
+
+        if (! $parent instanceof Entry) {
+            return $meta;
+        }
 
         $image = SocialImage::all($parent)->get($type);
 
