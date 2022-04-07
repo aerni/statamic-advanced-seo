@@ -15,7 +15,11 @@ class SocialImageFieldtype extends Fieldtype
         $parent = $this->field->parent();
         $type = $this->config()['image_type'];
 
-        $meta = ['title' => $this->field->display()];
+        $meta = [
+            'message' => config('advanced-seo.social_images.generator.generate_on_save', true)
+                ? trans('advanced-seo::messages.social_images_generator_on_save')
+                : trans('advanced-seo::messages.social_images_generator_on_demand'),
+        ];
 
         if (! $parent instanceof Entry) {
             return $meta;
