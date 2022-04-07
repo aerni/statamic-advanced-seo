@@ -25,8 +25,8 @@ return [
     ],
 
     'seo_generate_social_images' => [
-        'instructions' => 'Activate to generate the social images when saving this :type.',
-        'default_instructions' => 'Activate to generate the social images of your :type by default.',
+        'instructions' => 'Activate to use the social images generator for this :type.',
+        'default_instructions' => 'Activate to use the social images generator for your :type by default.',
     ],
 
     'seo_social_images_theme' => [
