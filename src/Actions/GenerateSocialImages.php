@@ -26,8 +26,11 @@ class GenerateSocialImages extends Action
             ?->in($item->site()->handle())
             ?->value('social_images_generator_collections') ?? [];
 
+        if (! in_array($item->collectionHandle(), $enabledCollections)) {
+            return false;
+        }
 
-        return in_array($item->collectionHandle(), $enabledCollections);
+        return $item->seo_generate_social_images;
     }
 
     public function authorize($user, $item): bool
@@ -37,9 +40,7 @@ class GenerateSocialImages extends Action
 
     public function run($items, $values): string
     {
-        $items->each(function ($item) {
-            GenerateSocialImageJob::dispatch($item);
-        });
+        $items->each(fn ($item) => GenerateSocialImageJob::dispatch($item));
 
         $queue = config('advanced-seo.social_images.generator.queue', config('queue.default'));
         $driver = config("queue.connections.$queue.driver");
