@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Contracts\Entries\Entry;
 
 class DeleteSocialImages
 {
