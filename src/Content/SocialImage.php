@@ -48,7 +48,7 @@ class SocialImage
         return url('/') . "/!/advanced-seo/social-images/{$this->specs['type']}/{$this->entry->id}?site={$this->entry->locale}&theme={$this->entry->seo_social_images_theme}";
     }
 
-    protected function path(): string
+    public function path(): string
     {
         return "social_images/{$this->entry->slug}-{$this->entry->locale}-{$this->specs['type']}.png";
     }

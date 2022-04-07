@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Jobs;
 
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Illuminate\Bus\Queueable;
+use Statamic\Contracts\Entries\Entry;
+use Illuminate\Queue\InteractsWithQueue;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Actions\ClearImageGlideCache;
 
 class GenerateSocialImagesJob implements ShouldQueue
 {
@@ -22,6 +23,8 @@ class GenerateSocialImagesJob implements ShouldQueue
 
     public function handle(): void
     {
-        SocialImage::all($this->entry)->each(fn ($image) => $image->generate());
+        SocialImage::all($this->entry)
+            ->each(fn ($image) => $image->generate())
+            ->each(fn ($image) => ClearImageGlideCache::handle($image->path()));
     }
 }
