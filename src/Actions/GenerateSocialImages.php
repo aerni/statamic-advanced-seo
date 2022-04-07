@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Statamic\Actions\Action;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImageJob;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 
 class GenerateSocialImages extends Action
 {
@@ -37,7 +38,9 @@ class GenerateSocialImages extends Action
 
     public function run($items, $values): string
     {
-        GenerateSocialImagesJob::dispatch($items);
+        $items->each(function ($item) {
+            GenerateSocialImageJob::dispatch($item);
+        });
 
         $queue = config('advanced-seo.social_images.generator.queue', config('queue.default'));
         $driver = config("queue.connections.$queue.driver");
