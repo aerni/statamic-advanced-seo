@@ -30,7 +30,7 @@ class SocialImageFieldtype extends Fieldtype
         return $meta;
     }
 
-    public function augment($value): ?string
+    public function augment($value): string
     {
         $parent = $this->field->parent();
         $type = $this->config()['image_type'];
@@ -39,6 +39,6 @@ class SocialImageFieldtype extends Fieldtype
 
         return $image->exists()
             ? $image->absoluteUrl()
-            : null;
+            : $image->generate()->absoluteUrl();
     }
 }
