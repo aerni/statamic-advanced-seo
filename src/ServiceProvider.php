@@ -35,10 +35,10 @@ class ServiceProvider extends AddonServiceProvider
     // ];
 
     protected $subscribe = [
-        'Aerni\AdvancedSeo\Subscribers\ContentDefaultsSubscriber',
-        'Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber',
-        'Aerni\AdvancedSeo\Subscribers\SitemapCacheSubscriber',
-        'Aerni\AdvancedSeo\Subscribers\SocialImagesGeneratorSubscriber',
+        \Aerni\AdvancedSeo\Subscribers\ContentDefaultsSubscriber::class,
+        \Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber::class,
+        \Aerni\AdvancedSeo\Subscribers\SitemapCacheSubscriber::class,
+        \Aerni\AdvancedSeo\Subscribers\SocialImagesGeneratorSubscriber::class,
     ];
 
     protected $tags = [
