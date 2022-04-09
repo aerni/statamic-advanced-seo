@@ -2,9 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Actions\ClearImageGlideCache;
+use Statamic\Contracts\Entries\Entry;
 
 class DeleteSocialImages
 {

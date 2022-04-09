@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Facades\Statamic\Imaging\GlideServer;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
-use Facades\Statamic\Imaging\GlideServer;
 
 class ClearImageGlideCache
 {
