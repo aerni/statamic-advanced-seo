@@ -24,14 +24,30 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the social images feature to your liking.
-    | If you want to use the generator, you need to install Puppeteer:
-    | https://spatie.be/docs/browsershot/v2/requirements
     |
     */
 
     'social_images' => [
 
+        /*
+        |--------------------------------------------------------------------------
+        | Asset Container
+        |--------------------------------------------------------------------------
+        |
+        | The asset container that will be used for your social images.
+        |
+        */
+
         'container' => 'assets',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Presets
+        |--------------------------------------------------------------------------
+        |
+        | The presets defining the width and height of your social images.
+        |
+        */
 
         'presets' => [
             'open_graph' => ['width' => 1200, 'height' => 628],
@@ -39,9 +55,51 @@ return [
             'twitter_summary_large_image' => ['width' => 1100, 'height' => 628],
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Social Images Generator
+        |--------------------------------------------------------------------------
+        |
+        | To use the social images generator, you need to install Puppeteer:
+        | https://spatie.be/docs/browsershot/v2/requirements
+        |
+        */
+
         'generator' => [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | You may enable or disable the generator for you whole project.
+            |
+            */
+
             'enabled' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Generate on Save
+            |--------------------------------------------------------------------------
+            |
+            | Generate the social images every time an entry is saved.
+            | Disable this to generate the image the first time an entry is
+            | viewed on the frontend instead.
+            |
+            */
+
             'generate_on_save' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Queue
+            |--------------------------------------------------------------------------
+            |
+            | The queue that is used when generating the social images.
+            |
+            */
+
             'queue' => 'default',
         ],
 
@@ -57,8 +115,29 @@ return [
     */
 
     'favicons' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Disable the feature if you want to manually add the favicons yourself.
+        |
+        */
+
         'enabled' => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Asset Container
+        |--------------------------------------------------------------------------
+        |
+        | The asset container that will be used for your favicons.
+        |
+        */
+
         'container' => 'assets',
+
     ],
 
     /*
@@ -67,13 +146,33 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the sitemap feature to your liking.
-    | The default cache expiry is 60 minutes.
     |
     */
 
     'sitemap' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Disable the feature if you want to implement your own sitemaps.
+        |
+        */
+
         'enabled' => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cache Expiry
+        |--------------------------------------------------------------------------
+        |
+        | The time in minutes the sitemap will be cached for.
+        |
+        */
+
         'expiry' => 60,
+
     ],
 
     /*
@@ -82,16 +181,35 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the analytics trackers to your liking.
-    | The trackers will only render in the environments defined below.
-    | You may also disable any trackers you don't need.
     |
     */
 
     'analytics' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Environments
+        |--------------------------------------------------------------------------
+        |
+        | The tracker scripts will only render in the defined environments.
+        |
+        */
+
         'environments' => ['production'],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled Trackers
+        |--------------------------------------------------------------------------
+        |
+        | Disable the trackers you don't need for the project.
+        |
+        */
+
         'fathom' => true,
         'cloudflare_analytics' => true,
         'google_tag_manager' => true,
+
     ],
 
     /*
