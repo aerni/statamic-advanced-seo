@@ -7,9 +7,9 @@ return [
     | Disabled Collections & Taxonomies
     |--------------------------------------------------------------------------
     |
-    | You may disable the SEO tab, the output of meta data,
-    | and the generation of sitemaps for any collection and taxonomy
-    | by adding its handle to the appropriate array below.
+    | Disable Advanced SEO for any collection and taxonomy by adding
+    | its handle to the appropriate array below. This will remove the SEO tab,
+    | stop the output of meta data on the frontend, and remove the sitemap.
     |
     */
 
@@ -72,7 +72,7 @@ return [
             | Enabled
             |--------------------------------------------------------------------------
             |
-            | You may enable or disable the generator for you whole project.
+            | Enable or disable the generator for all collections.
             |
             */
 
@@ -101,6 +101,7 @@ return [
             */
 
             'queue' => 'default',
+
         ],
 
     ],
@@ -167,7 +168,7 @@ return [
         | Cache Expiry
         |--------------------------------------------------------------------------
         |
-        | The time in minutes the sitemap will be cached for.
+        | The sitemap cache expiry in minutes.
         |
         */
 
@@ -191,7 +192,7 @@ return [
         | Environments
         |--------------------------------------------------------------------------
         |
-        | The tracker scripts will only render in the defined environments.
+        | The tracker scripts will only render in the configured environments.
         |
         */
 
@@ -202,7 +203,8 @@ return [
         | Enabled Trackers
         |--------------------------------------------------------------------------
         |
-        | Disable the trackers you don't need for the project.
+        | Disable the trackers you don't need. This will remove the tracker's
+        | section from the analytics settings in the control panel.
         |
         */
 
@@ -218,6 +220,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the site verification feature to your liking.
+    | Disabling this feature will remove the site verification section
+    | from the settings in the control panel.
     |
     */
 
