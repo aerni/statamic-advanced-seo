@@ -11,5 +11,15 @@
 <script>
     export default {
         mixins: [Fieldtype],
+
+        mounted() {
+            Statamic.$hooks.on('entry.saved', (resolve, reject) => {
+                const url = new URL(this.meta.image)
+                url.searchParams.delete('timestamp')
+                url.searchParams.append('timestamp', Date.now())
+                this.meta.image = url.href
+                resolve();
+            });
+        },
     }
 </script>
