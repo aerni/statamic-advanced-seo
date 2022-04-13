@@ -100,9 +100,7 @@ Run the following command to create your first theme:
 php please seo:theme
 ```
 
- This will publish an empty template file for each social image type to `resources/views/social_images/{theme}` to get you started.
-
-If you only have one theme, it will be set as default. If you have more than one theme, the social images generator in the SEO tab will show a `Themes` dropdown that let’s you select the theme of your choice for the current entry.
+This will publish an empty template file for each social image type to `resources/views/social_images/{theme}` to get you started.
 
 ### Templating
 When building your social image templates, you most likely want to see what you’re doing. You can view your templates according to the following schema:
@@ -115,10 +113,10 @@ https://site.test/!/advanced-seo/social-images/{type}/{id}?site={site}&theme={th
 | -------- | ------------------------------------------------------------ | ------------------------------------------- |
 | `type`   | The type of social image                                     | `og`, `twitter`                             |
 | `id`     | The ID of the entry                                          | e.g. `4358df35-c7fe-4774-97ad-02af0e2dea3b` |
-| `site` | The locale of the entry. Only required on a multi-site.        | e.g. `german`                               |
+| `site`   | The locale of the entry. Only required on a multi-site.      | e.g. `german`                               |
 | `theme`  | The theme to use. Only required if you have multiple themes. | e.g. `special`                              |
 
-**Single-site, single-theme:**  
+**Single-site, single-theme:**
 Simply provide the type of social image along with the ID of the entry:
 
 ```
@@ -126,7 +124,7 @@ https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e
 https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b
 ```
 
-**Multi-site, single-theme:**  
+**Multi-site, single-theme:**
 To access the data of a localized entry, you also need to add the entry’s locale to the `site` parameter:
 
 ```
@@ -134,7 +132,7 @@ https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e
 https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
 ```
 
-**Multi-site, multi-theme:**  
+**Multi-site, multi-theme:**
 If you have multiple themes, you should also add the theme’s handle to the `theme` parameter:
 
 ```
@@ -143,10 +141,10 @@ https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-0
 ```
 
 ### Configuration
-Make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to enable the generator for. This will add a new `Social Images Generator` section to the selected collections’ defaults and entry blueprint. It will also add a new action to the contextual menu on the collections’ listing page.
+Make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to enable the generator for. This will add a new `Social Images Generator` section to the selected collections’ defaults and entry blueprint.
 
 ### Usage
-Activate the `Generate Social Images` toggle to generate the images every time you save the entry. If you don’t like this behavior, you can instead use the action in the contextual menu to generate the images on demand.
+Activate the `Generate Social Images` toggle on the entry to generate the social images. If you have multiple themes, you may select the theme of your choice in the `Themes` dropdown. The images are generated every time you save the entry. You may also disable this behavior in the config, to generate the images the first time the entry is viewed on the frontend instead.
 
 ### Additional Fields
 You might want to add fields to your blueprint specifically for your social images. Create a fieldset with the handle `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
