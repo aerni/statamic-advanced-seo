@@ -36,6 +36,7 @@ class SocialImagesGeneratorSubscriber
         // Delete the images so we can create a new one on the next request.
         if (! config('advanced-seo.social_images.generator.generate_on_save', true)) {
             DeleteSocialImages::handle($event->entry);
+
             return;
         }
 
