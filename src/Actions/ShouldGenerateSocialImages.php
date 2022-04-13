@@ -14,11 +14,6 @@ class ShouldGenerateSocialImages
             return false;
         }
 
-        // Shouldn't generate if it was configured to generate on demand.
-        if (! config('advanced-seo.social_images.generator.generate_on_save', true)) {
-            return false;
-        }
-
         // Get the collections that are allowed to generate social images.
         $enabledCollections = Seo::find('site', 'social_media')
             ?->in($entry->site()->handle())
