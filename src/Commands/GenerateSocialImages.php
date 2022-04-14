@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Statamic\Facades\Entry;
+use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
-use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
-use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
+use Statamic\Facades\Entry;
 
 class GenerateSocialImages extends Command
 {
@@ -21,6 +21,7 @@ class GenerateSocialImages extends Command
 
         if ($entries->isEmpty()) {
             $this->info("There are no images to generate");
+
             return;
         }
 
@@ -29,6 +30,7 @@ class GenerateSocialImages extends Command
             $this->withProgressBar($entries, fn ($entry) => GenerateSocialImagesJob::dispatch($entry));
             $this->newLine();
             $this->info("<info>[✓]</info> The social images have been succesfully generated");
+
             return;
         }
 
