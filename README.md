@@ -146,6 +146,12 @@ Make sure the generator is enabled in the addon’s config. Next, head over to `
 ### Usage
 Activate the `Generate Social Images` toggle on the entry to generate the social images. If you have multiple themes, you may select the theme of your choice in the `Themes` dropdown. The images are generated every time you save the entry. You may also disable this behavior in the config, to generate the images the first time the entry is viewed on the frontend instead.
 
+You can also run the following command to generate all images at once:
+
+```bash
+php please seo:generate-images
+```
+
 ### Additional Fields
 You might want to add fields to your blueprint specifically for your social images. Create a fieldset with the handle `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
 

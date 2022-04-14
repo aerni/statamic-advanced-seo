@@ -15,6 +15,7 @@ use Statamic\Statamic;
 class ServiceProvider extends AddonServiceProvider
 {
     protected $commands = [
+        Commands\GenerateSocialImages::class,
         Commands\MakeTheme::class,
         Commands\Migrate::class,
     ];
