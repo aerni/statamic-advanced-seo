@@ -59,11 +59,11 @@ class SocialImageRepository
         return [
             [
                 'label' => 'Open Graph Image',
-                'format' => '/!/advanced-seo/social-images/og/{id}/{locale}?theme={seo_social_images_theme}',
+                'format' => '/!/advanced-seo/social-images/og/{id}?site={locale}&theme={seo_social_images_theme}',
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => '/!/advanced-seo/social-images/twitter/{id}/{locale}?theme={seo_social_images_theme}',
+                'format' => '/!/advanced-seo/social-images/twitter/{id}?site={locale}&theme={seo_social_images_theme}',
             ],
         ];
     }
