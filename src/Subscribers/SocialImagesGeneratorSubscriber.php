@@ -22,7 +22,7 @@ class SocialImagesGeneratorSubscriber
         return [
             Events\EntrySaved::class => 'generateSocialImages',
             // Events\TermSaved::class => 'generateSocialImages', // TODO: This event does not currently exist but might be added with this PR: https://github.com/statamic/cms/pull/3379
-            // Events\EntryBlueprintFound::class => 'addPreviewTargets',
+            Events\EntryBlueprintFound::class => 'addPreviewTargets',
             // Events\TermBlueprintFound::class => 'addPreviewTargets',
         ];
     }
@@ -57,6 +57,6 @@ class SocialImagesGeneratorSubscriber
         }
 
         // TODO: This has to change when implementing for taxonomies.
-        $this->getProperty($event)?->collection()->extraPreviewTargets(SocialImage::previewTargets());
+        $this->getProperty($event)?->collection()->addPreviewTargets(SocialImage::previewTargets());
     }
 }
