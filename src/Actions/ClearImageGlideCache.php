@@ -2,24 +2,26 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Facades\Statamic\Imaging\GlideServer;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
+use Statamic\Facades\Glide;
 
 class ClearImageGlideCache
 {
     public static function handle(string $path): void
     {
-        // Get the glide server cache path.
-        $cachePath = GlideServer::cachePath();
+        // Clear the glide path cache.
+        Glide::cacheStore()->flush();
 
-        // Get the cached image path
-        $filePath = collect(Folder::getFilesRecursively($cachePath))
-            ->firstWhere(fn ($filePath) => str_contains($filePath, $path));
+        // Get the glide cache disk.
+        $disk = File::disk(Glide::cacheDisk());
+
+        // Get the path of the cached image.
+        $cachePath = $disk->getFilesRecursively('/')
+            ->firstWhere(fn ($cachePath) => str_contains($cachePath, $path));
 
         // Delete the cached image.
-        if ($filePath) {
-            File::delete($filePath);
+        if ($cachePath) {
+            $disk->delete($cachePath);
         }
     }
 }
