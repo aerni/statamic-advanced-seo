@@ -2,11 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Content;
 
-use Illuminate\Support\Facades\File;
-use Spatie\Browsershot\Browsershot;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\AssetContainer;
 use Statamic\Facades\URL;
+use Spatie\Browsershot\Browsershot;
+use Illuminate\Support\Facades\File;
+use Statamic\Facades\AssetContainer;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Facades\SocialImage as SocialImageApi;
 
 class SocialImage
 {
@@ -50,7 +51,12 @@ class SocialImage
 
     protected function templateUrl(): string
     {
-        return url('/') . "/!/advanced-seo/social-images/{$this->specs['type']}/{$this->entry->id}?site={$this->entry->locale}&theme={$this->entry->seo_social_images_theme}";
+        return url('/') . SocialImageApi::route(
+            type: $this->specs['type'],
+            id: $this->entry->id,
+            locale: $this->entry->locale,
+            theme: $this->entry->seo_social_images_theme
+        );
     }
 
     protected function absolutePath($path = null): string

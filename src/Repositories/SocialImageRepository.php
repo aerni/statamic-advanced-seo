@@ -59,12 +59,17 @@ class SocialImageRepository
         return [
             [
                 'label' => 'Open Graph Image',
-                'format' => '/!/advanced-seo/social-images/og/{id}?site={locale}&theme={seo_social_images_theme}',
+                'format' => $this->route(type: 'og', id: '{id}', locale: '{locale}', theme: '{seo_social_images_theme}'),
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => '/!/advanced-seo/social-images/twitter/{id}?site={locale}&theme={seo_social_images_theme}',
+                'format' => $this->route(type: 'twitter', id: '{id}', locale: '{locale}', theme: '{seo_social_images_theme}'),
             ],
         ];
+    }
+
+    public function route(string $type, string $id, string $locale, string $theme): string
+    {
+        return "/!/advanced-seo/social-images/{$type}/{$id}?site={$locale}&theme={$theme}";
     }
 }
