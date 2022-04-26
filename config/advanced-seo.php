@@ -7,9 +7,9 @@ return [
     | Disabled Collections & Taxonomies
     |--------------------------------------------------------------------------
     |
-    | You may disable the SEO tab, the output of meta data,
-    | and the generation of sitemaps for any collection and taxonomy
-    | by adding its handle to the appropriate array below.
+    | Disable Advanced SEO for any collection and taxonomy by adding
+    | its handle to the appropriate array below. This will remove the SEO tab,
+    | stop the output of meta data on the frontend, and remove the sitemap.
     |
     */
 
@@ -24,26 +24,84 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the social images feature to your liking.
-    | If you want to use the generator, you need to install Puppeteer:
-    | https://spatie.be/docs/browsershot/v2/requirements
     |
     */
 
     'social_images' => [
 
+        /*
+        |--------------------------------------------------------------------------
+        | Asset Container
+        |--------------------------------------------------------------------------
+        |
+        | The asset container that will be used for your social images.
+        |
+        */
+
         'container' => 'assets',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Presets
+        |--------------------------------------------------------------------------
+        |
+        | The presets defining the width and height of your social images.
+        |
+        */
 
         'presets' => [
             'open_graph' => ['width' => 1200, 'height' => 628],
-            'twitter' => [
-                'summary' => ['width' => 240, 'height' => 240],
-                'summary_large_image' => ['width' => 1100, 'height' => 628],
-            ],
+            'twitter_summary' => ['width' => 240, 'height' => 240],
+            'twitter_summary_large_image' => ['width' => 1100, 'height' => 628],
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Social Images Generator
+        |--------------------------------------------------------------------------
+        |
+        | To use the social images generator, you need to install Puppeteer:
+        | https://spatie.be/docs/browsershot/v2/requirements
+        |
+        */
+
         'generator' => [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | Enable or disable the generator for all collections.
+            |
+            */
+
             'enabled' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Generate on Save
+            |--------------------------------------------------------------------------
+            |
+            | Generate the social images every time an entry is saved.
+            | Disable this to generate the image the first time an entry is
+            | viewed on the frontend instead.
+            |
+            */
+
+            'generate_on_save' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Queue
+            |--------------------------------------------------------------------------
+            |
+            | The queue that is used when generating the social images.
+            |
+            */
+
             'queue' => 'default',
+
         ],
 
     ],
@@ -58,8 +116,29 @@ return [
     */
 
     'favicons' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Disable the feature if you want to manually add the favicons yourself.
+        |
+        */
+
         'enabled' => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Asset Container
+        |--------------------------------------------------------------------------
+        |
+        | The asset container that will be used for your favicons.
+        |
+        */
+
         'container' => 'assets',
+
     ],
 
     /*
@@ -68,13 +147,33 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the sitemap feature to your liking.
-    | The cache expiry is set in minutes and defaults to 60.
     |
     */
 
     'sitemap' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Disable the feature if you want to implement your own sitemaps.
+        |
+        */
+
         'enabled' => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cache Expiry
+        |--------------------------------------------------------------------------
+        |
+        | The sitemap cache expiry in minutes.
+        |
+        */
+
         'expiry' => 60,
+
     ],
 
     /*
@@ -83,16 +182,36 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the analytics trackers to your liking.
-    | The trackers will only render in the environments defined below.
-    | You may also disable any trackers you don't need.
     |
     */
 
     'analytics' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Environments
+        |--------------------------------------------------------------------------
+        |
+        | The tracker scripts will only render in the configured environments.
+        |
+        */
+
         'environments' => ['production'],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled Trackers
+        |--------------------------------------------------------------------------
+        |
+        | Disable the trackers you don't need. This will remove the tracker's
+        | section from the analytics settings in the control panel.
+        |
+        */
+
         'fathom' => true,
         'cloudflare_analytics' => true,
         'google_tag_manager' => true,
+
     ],
 
     /*
@@ -101,6 +220,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure the site verification feature to your liking.
+    | Disabling this feature will remove the site verification section
+    | from the settings in the control panel.
     |
     */
 

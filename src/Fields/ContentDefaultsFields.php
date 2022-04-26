@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
 
 class ContentDefaultsFields extends BaseFields
 {
@@ -78,7 +79,7 @@ class ContentDefaultsFields extends BaseFields
 
     public function socialImagesGenerator(): array
     {
-        return [
+        $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
@@ -100,7 +101,30 @@ class ContentDefaultsFields extends BaseFields
                     'listable' => 'hidden',
                 ],
             ],
-        ];
+        ]);
+
+        if (SocialImageTheme::all()->count() > 1) {
+            $fields->push([
+                'handle' => 'seo_social_images_theme',
+                'field' => [
+                    'type' => 'select',
+                    'display' => 'Theme',
+                    'instructions' => $this->trans('seo_social_images_theme', 'default_instructions'),
+                    'default' => SocialImageTheme::fieldtypeDefault(),
+                    'options' => SocialImageTheme::fieldtypeOptions(),
+                    'clearable' => false,
+                    'multiple' => false,
+                    'searchable' => false,
+                    'taggable' => false,
+                    'push_tags' => false,
+                    'cast_booleans' => false,
+                    'localizable' => true,
+                    'listable' => 'hidden',
+                ],
+            ]);
+        }
+
+        return $fields->toArray();
     }
 
     public function openGraphImage(): array

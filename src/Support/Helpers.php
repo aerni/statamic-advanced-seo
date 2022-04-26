@@ -32,4 +32,9 @@ class Helpers
     {
         return ! Statamic::isCpRoute();
     }
+
+    public static function isSocialImagesGeneratorActionRoute(): bool
+    {
+        return Str::containsAll(request()->path(), ['!', 'advanced-seo', 'social-images']);
+    }
 }

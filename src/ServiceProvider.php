@@ -14,16 +14,14 @@ use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    protected $actions = [
-        Actions\GenerateSocialImages::class,
-    ];
-
     protected $commands = [
+        Commands\GenerateSocialImages::class,
+        Commands\MakeTheme::class,
         Commands\Migrate::class,
     ];
 
     protected $fieldtypes = [
-        Fieldtypes\SocialImagesPreviewFieldtype::class,
+        Fieldtypes\SocialImageFieldtype::class,
         Fieldtypes\SourceFieldtype::class,
     ];
 
@@ -34,10 +32,10 @@ class ServiceProvider extends AddonServiceProvider
     // ];
 
     protected $subscribe = [
-        'Aerni\AdvancedSeo\Subscribers\ContentDefaultsSubscriber',
-        'Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber',
-        'Aerni\AdvancedSeo\Subscribers\SitemapCacheSubscriber',
-        'Aerni\AdvancedSeo\Subscribers\SocialImagesGeneratorSubscriber',
+        \Aerni\AdvancedSeo\Subscribers\ContentDefaultsSubscriber::class,
+        \Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber::class,
+        \Aerni\AdvancedSeo\Subscribers\SitemapCacheSubscriber::class,
+        \Aerni\AdvancedSeo\Subscribers\SocialImagesGeneratorSubscriber::class,
     ];
 
     protected $tags = [
@@ -45,6 +43,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $routes = [
+        'actions' => __DIR__.'/../routes/actions.php',
         'cp' => __DIR__.'/../routes/cp.php',
         'web' => __DIR__.'/../routes/web.php',
     ];
@@ -151,7 +150,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function publishSocialImagesViews(): self
     {
         $this->publishes([
-            __DIR__.'/../resources/views/social_images' => resource_path('views/social_images'),
+            __DIR__.'/../resources/views/social_images' => resource_path('views/vendor/advanced-seo/social_images'),
         ], 'advanced-seo-views');
 
         return $this;

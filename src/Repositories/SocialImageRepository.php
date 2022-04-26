@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Repositories;
 
 use Aerni\AdvancedSeo\Content\SocialImage;
+use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -10,24 +11,24 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class SocialImageRepository
 {
-    public function all(Entry $entry): array
+    public function all(Entry $entry): Collection
     {
-        return $this->types()->flatMap(function ($item, $type) use ($entry) {
+        return $this->types()->map(function ($item, $type) use ($entry) {
             return match ($type) {
                 'twitter' => $this->twitter($entry),
                 'og' => $this->openGraph($entry),
             };
-        })->toArray();
+        });
     }
 
-    public function openGraph(Entry $entry): array
+    public function openGraph(Entry $entry): SocialImage
     {
-        return (new SocialImage($entry, $this->specs('og')))->generate();
+        return (new SocialImage($entry, $this->specs('og')));
     }
 
-    public function twitter(Entry $entry): array
+    public function twitter(Entry $entry): SocialImage
     {
-        return (new SocialImage($entry, $this->specs('twitter', $entry)))->generate();
+        return (new SocialImage($entry, $this->specs('twitter', $entry)));
     }
 
     public function specs(string $type, Entry|LocalizedTerm $data = null): ?array
@@ -50,33 +51,25 @@ class SocialImageRepository
 
     public function types(): Collection
     {
-        return collect([
-            'og' => [
-                'type' => 'og',
-                'field' => 'seo_og_image',
-                'layout' => config('advanced-seo.social_images.presets.open_graph.layout', 'social_images/layout'),
-                'template' => config('advanced-seo.social_images.presets.open_graph.template', 'social_images/open_graph'),
-                'width' => config('advanced-seo.social_images.presets.open_graph.width', 1200),
-                'height' => config('advanced-seo.social_images.presets.open_graph.height', 628),
+        return collect(SocialImageModel::all());
+    }
+
+    public function previewTargets(): array
+    {
+        return [
+            [
+                'label' => 'Open Graph Image',
+                'format' => $this->route(type: 'og', id: '{id}', locale: '{locale}', theme: '{seo_social_images_theme}'),
             ],
-            'twitter' => [
-                'summary' => [
-                    'type' => 'twitter',
-                    'field' => 'seo_twitter_summary_image',
-                    'layout' => config('advanced-seo.social_images.presets.twitter.summary.layout', 'social_images/layout'),
-                    'template' => config('advanced-seo.social_images.presets.twitter.summary.template', 'social_images/twitter_summary'),
-                    'width' => config('advanced-seo.social_images.presets.twitter.summary.width', 240),
-                    'height' => config('advanced-seo.social_images.presets.twitter.summary.height', 240),
-                ],
-                'summary_large_image' => [
-                    'type' => 'twitter',
-                    'field' => 'seo_twitter_summary_large_image',
-                    'layout' => config('advanced-seo.social_images.presets.twitter.summary_large_image.layout', 'social_images/layout'),
-                    'template' => config('advanced-seo.social_images.presets.twitter.summary_large_image.template', 'social_images/twitter_summary_large_image'),
-                    'width' => config('advanced-seo.social_images.presets.twitter.summary_large_image.width', 1100),
-                    'height' => config('advanced-seo.social_images.presets.twitter.summary_large_image.height', 628),
-                ],
+            [
+                'label' => 'Twitter Image',
+                'format' => $this->route(type: 'twitter', id: '{id}', locale: '{locale}', theme: '{seo_social_images_theme}'),
             ],
-        ]);
+        ];
+    }
+
+    public function route(string $type, string $id, string $locale, string $theme): string
+    {
+        return "/!/advanced-seo/social-images/{$type}/{$id}?site={$locale}&theme={$theme}";
     }
 }

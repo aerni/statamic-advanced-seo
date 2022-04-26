@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Fields;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySitemapSettings;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Statamic\Facades\Fieldset;
 
 class OnPageSeoFields extends BaseFields
@@ -88,7 +89,7 @@ class OnPageSeoFields extends BaseFields
 
     public function socialImagesGenerator(): array
     {
-        return [
+        $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
@@ -113,13 +114,43 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
-            [
-                'handle' => 'seo_og_image_preview',
+        ]);
+
+        if (SocialImageTheme::all()->count() > 1) {
+            $fields->push([
+                'handle' => 'seo_social_images_theme',
                 'field' => [
-                    'type' => 'social_images_preview',
+                    'display' => 'Theme',
+                    'instructions' => $this->trans('seo_social_images_theme', 'instructions'),
+                    'type' => 'seo_source',
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'select-fieldtype',
+                    'if' => [
+                        'seo_generate_social_images.value' => 'true',
+                    ],
+                    'field' => [
+                        'type' => 'select',
+                        'options' => SocialImageTheme::fieldtypeOptions(),
+                        'default' => $this->getValueFromCascade('seo_social_images_theme') ?? SocialImageTheme::fieldtypeDefault(),
+                        'clearable' => false,
+                        'multiple' => false,
+                        'searchable' => false,
+                        'taggable' => false,
+                        'push_tags' => false,
+                        'cast_booleans' => false,
+                    ],
+                ],
+            ]);
+        }
+
+        $fields->push(
+            [
+                'handle' => 'seo_generated_og_image',
+                'field' => [
+                    'type' => 'social_image',
                     'image_type' => 'og',
                     'display' => 'Open Graph',
-                    'instructions' => $this->trans('seo_og_image_preview', 'instructions'),
                     'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
@@ -129,12 +160,11 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'seo_twitter_image_preview',
+                'handle' => 'seo_generated_twitter_image',
                 'field' => [
-                    'type' => 'social_images_preview',
+                    'type' => 'social_image',
                     'image_type' => 'twitter',
                     'display' => 'Twitter',
-                    'instructions' => $this->trans('seo_twitter_image_preview', 'instructions'),
                     'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
@@ -143,7 +173,9 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
-        ];
+        );
+
+        return $fields->toArray();
     }
 
     public function socialImagesGeneratorFields(): array

@@ -10,7 +10,6 @@ class ShouldGenerateSocialImages
     public static function handle(Entry $entry): bool
     {
         // Don't generate if we're first localiting an entry.
-        // TODO: If we support taxonomies add this check as well: str_contains(url()->previous(), 'create')
         if (str_contains(request()->path(), 'localize')) {
             return false;
         };

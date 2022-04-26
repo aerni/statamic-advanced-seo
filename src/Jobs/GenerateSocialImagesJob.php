@@ -2,29 +2,29 @@
 
 namespace Aerni\AdvancedSeo\Jobs;
 
+use Aerni\AdvancedSeo\Actions\ClearImageGlideCache;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
 
 class GenerateSocialImagesJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
 
-    public function __construct(protected Collection $items)
+    public function __construct(protected Entry $entry)
     {
         $this->queue = config('advanced-seo.social_images.generator.queue', 'default');
     }
 
-    public function handle()
+    public function handle(): void
     {
-        $this->items->each(function ($item) {
-            GenerateSocialImageJob::dispatch($item);
-        });
+        SocialImage::all($this->entry)
+            ->each(fn ($image) => $image->generate())
+            ->each(fn ($image) => ClearImageGlideCache::handle($image->path()));
     }
 }

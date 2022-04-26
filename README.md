@@ -87,21 +87,76 @@ The addon will add a new `SEO` tab to the blueprint of your entries and terms th
 | `Custom`  | Overwrites the default value with your own  | Your custom value |
 
 ## Social Images Generator
-The social images generator provides an easy way to add customized images to your entries. Make sure the generator is enabled in the addon’s config to get started. Next, head over to `SEO -> Site -> Social Media` and enable the collections for which you want to generate images. This will add a new `Social Images Generator` section to the selected collections’ defaults blueprint and the entry blueprint. It will also add a new action to the contextual menu on the collection listing page.
-
-Activate the newly added toggle to generate the images each time you save the entry. If you don’t like this behavior, you can use the action in the contextual menu to generate the images on demand.
-
-The generator leverages [Browsershot](https://github.com/spatie/browsershot) to convert your template to an image. This means that you can design your images like a regular template, using variables, tags, partials, etc.
-
-To get started, simply run the following command to publish a basic layout and template to `resources/views/social_images/`.
-
-```bash
-php artisan vendor:publish --tag=advanced-seo-views
-```
-
-You might want to add fields to your blueprint specifically for your social images. Create a fieldset with the name `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
+The social images generator provides an easy way to add captivating images to your entries. It leverages [Browsershot](https://github.com/spatie/browsershot) to convert your templates to an image. This means that you can design your images like a regular template, using variables, tags, partials, etc.
 
 >**Note:** The generator requires a working installation of [Puppeteer](https://github.com/spatie/browsershot#requirements).
+
+### Themes
+The social images generator is built around the concept of themes. You need at least one theme, but can have as many as you’d like.
+
+Run the following command to create your first theme:
+
+```bash
+php please seo:theme
+```
+
+This will publish an empty template file for each social image type to `resources/views/social_images/{theme}` to get you started.
+
+### Templating
+When building your social image templates, you most likely want to see what you’re doing. You can view your templates according to the following schema:
+
+```
+https://site.test/!/advanced-seo/social-images/{type}/{id}?site={site}&theme={theme}
+```
+
+| Variable | Description                                                  | Options                                     |
+| -------- | ------------------------------------------------------------ | ------------------------------------------- |
+| `type`   | The type of social image                                     | `og`, `twitter`                             |
+| `id`     | The ID of the entry                                          | e.g. `4358df35-c7fe-4774-97ad-02af0e2dea3b` |
+| `site`   | The locale of the entry. Only required on a multi-site.      | e.g. `german`                               |
+| `theme`  | The theme to use. Only required if you have multiple themes. | e.g. `special`                              |
+
+**Single-site, single-theme:**
+Simply provide the type of social image along with the ID of the entry:
+
+```
+https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b
+https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b
+```
+
+**Multi-site, single-theme:**
+To access the data of a localized entry, you also need to add the entry’s locale to the `site` parameter:
+
+```
+https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
+https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
+```
+
+**Multi-site, multi-theme:**
+If you have multiple themes, you should also add the theme’s handle to the `theme` parameter:
+
+```
+https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german&theme=special
+https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german&theme=special
+```
+
+### Configuration
+Make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to enable the generator for. This will add a new `Social Images Generator` section to the selected collections’ defaults and entry blueprint.
+
+### Usage
+Activate the `Generate Social Images` toggle on the entry to generate the social images. If you have multiple themes, you may select the theme of your choice in the `Themes` dropdown. The images are generated every time you save the entry. You may also disable this behavior in the config, to generate the images the first time the entry is viewed on the frontend instead.
+
+You can also run the following command to generate all images at once:
+
+```bash
+php please seo:generate-images
+```
+
+### Additional Fields
+You might want to add fields to your blueprint specifically for your social images. Create a fieldset with the handle `social_images_generator` and it will add the fields directly below the social images generator. How sweet is that!
+
+### Live Preview
+You may use Statamic’s live preview feature to preview your social images when editing an entry. Simply click the `Live Preview` button and select the `Open Graph Image` or `Twitter Image` from the target dropdown.
 
 ## Sitemap
 This addon automatically generates sitemaps for your collections and taxonomies. The sitemaps are organized in a sitemap index so you only have to submit one URL to Google Search Console. The sitemap index can be found at `yourwebsite.com/sitemap.xml`.

@@ -25,16 +25,13 @@ return [
     ],
 
     'seo_generate_social_images' => [
-        'instructions' => 'Activate to generate the Open Graph and Twitter images of this :type.',
-        'default_instructions' => 'Activate to generate the :type\' Open Graph and Twitter images by default.',
+        'instructions' => 'Activate to use the social images generator for this :type.',
+        'default_instructions' => 'Activate to use the social images generator for your :type by default.',
     ],
 
-    'seo_og_image_preview' => [
-        'instructions' => 'Reload the page after save to update the preview.',
-    ],
-
-    'seo_twitter_image_preview' => [
-        'instructions' => 'Reload the page after save to update the preview.',
+    'seo_social_images_theme' => [
+        'instructions' => 'Choose the social images theme for this :type.',
+        'default_instructions' => 'Choose the default social images theme for your :type.',
     ],
 
     'seo_section_og' => [

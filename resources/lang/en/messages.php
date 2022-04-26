@@ -33,8 +33,8 @@ return [
 
     'taxonomies_description' => 'Customize the default data of your taxonomy terms. Choose a taxonomy below.',
 
-    'social_images' => 'Generated social images|Generated social images for :count items',
-    'social_images_queue' => 'Generating social images in the background|Generating social images for :count items in the background',
+    'social_images_generator_on_save' => 'Save the entry to generate the image.',
+    'social_images_generator_on_demand' => 'The image will be generated the first time you visit the URL of this entry.',
 
     'default' => 'Default',
     'custom' => 'Custom',

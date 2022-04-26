@@ -19,16 +19,12 @@ class OnPageSeoBlueprintSubscriber
     // This boolean is used to prevent an infinite loop.
     protected static bool $addingField = false;
 
-    protected array $events = [
-        Events\EntryBlueprintFound::class => 'handleBlueprintFound',
-        Events\TermBlueprintFound::class => 'handleBlueprintFound',
-    ];
-
-    public function subscribe(Dispatcher $events): void
+    public function subscribe(Dispatcher $events): array
     {
-        foreach ($this->events as $event => $method) {
-            $events->listen($event, [self::class, $method]);
-        }
+        return [
+            Events\EntryBlueprintFound::class => 'handleBlueprintFound',
+            Events\TermBlueprintFound::class => 'handleBlueprintFound',
+        ];
     }
 
     public function handleBlueprintFound(Event $event): void
@@ -46,11 +42,6 @@ class OnPageSeoBlueprintSubscriber
 
     protected function shouldHandleBlueprintFound(): bool
     {
-        // Abort if we're running in console.
-        if (app()->runningInConsole()) {
-            return false;
-        }
-
         // Don't add any fields in the blueprint builder.
         if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints'])) {
             return false;
@@ -89,11 +80,14 @@ class OnPageSeoBlueprintSubscriber
          * Otherwise the default values of the blueprint fields will be set
          * for the localization of the first event calling this method.
          */
-        if (! Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), $this->model, $id ?? $createLocale])) {
-            return;
+        if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), $this->model, $id ?? $createLocale])) {
+            $this->extendBlueprint($event);
         }
 
-        $this->extendBlueprint($event);
+        // Make sure to extend the blueprint for actions.
+        if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), $this->model, 'actions'])) {
+            $this->extendBlueprint($event);
+        }
     }
 
     protected function extendBlueprintForFrontend(Event $event): void

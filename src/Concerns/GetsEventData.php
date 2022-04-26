@@ -68,6 +68,12 @@ trait GetsEventData
             $data = $data->in(Site::current()->handle());
         }
 
+        // Make sure to get the correct localization for social images routes.
+        if (Helpers::isSocialImagesGeneratorActionRoute()) {
+            $site = Site::get(request()->site) ?? Site::current();
+            $data = $data->in($site->handle());
+        }
+
         // Fall back to event if no data exists, e.g. non-existent entry localization.
         return GetDefaultsData::handle($data ?? $event);
     }

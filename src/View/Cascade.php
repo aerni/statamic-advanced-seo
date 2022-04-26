@@ -85,13 +85,14 @@ class Cascade
 
         $this->data = $this->data->merge([
             'title' => $this->compiledTitle(),
+            'og_image' => $this->ogImage(),
             'og_image_size' => $this->ogImageSize(),
             'og_title' => $this->ogTitle(),
             'twitter_card' => $this->twitterCard(),
             'twitter_image' => $this->twitterImage(),
             'twitter_image_size' => $this->twitterImageSize(),
-            'twitter_handle' => $this->twitterHandle(),
             'twitter_title' => $this->twitterTitle(),
+            'twitter_handle' => $this->twitterHandle(),
             'indexing' => $this->indexing(),
             'locale' => $this->locale(),
             'hreflang' => $this->hreflang(),
@@ -100,7 +101,7 @@ class Cascade
             'next_url' => $this->nextUrl(),
             'schema' => $this->schema(),
             'breadcrumbs' => $this->breadcrumbs(),
-        ]);
+        ])->filter();
 
         return $this;
     }
@@ -268,20 +269,46 @@ class Cascade
         return $this->get('site_name') ?? config('app.name');
     }
 
-    protected function ogImageSize(): ?array
+    protected function ogTitle(): string
     {
-        if (is_null($this->get('og_image'))) {
-            return null;
-        }
+        return $this->get('og_title') ?? $this->title();
+    }
 
+    protected function ogImage(): Value
+    {
+        return $this->value('generate_social_images')
+            ? $this->get('generated_og_image')
+            : $this->get('og_image');
+    }
+
+    protected function ogImageSize(): array
+    {
         return collect(SocialImage::specs('og'))
             ->only(['width', 'height'])
             ->all();
     }
 
-    protected function ogTitle(): string
+    protected function twitterTitle(): string
     {
-        return $this->get('og_title') ?? $this->title();
+        return $this->get('twitter_title') ?? $this->title();
+    }
+
+    protected function twitterImage(): Value
+    {
+        if ($this->value('generate_social_images')) {
+            return $this->get('generated_twitter_image');
+        }
+
+        return $this->value('twitter_card')->value() === 'summary'
+            ? $this->get('twitter_summary_image')
+            : $this->get('twitter_summary_large_image');
+    }
+
+    protected function twitterImageSize(): array
+    {
+        return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
+            ->only(['width', 'height'])
+            ->all();
     }
 
     protected function twitterHandle(): ?string
@@ -289,54 +316,6 @@ class Cascade
         $twitterHandle = $this->value('twitter_handle');
 
         return $twitterHandle ? Str::start($twitterHandle, '@') : null;
-    }
-
-    protected function twitterImageSize(): ?array
-    {
-        if (! $image = $this->twitterImage()) {
-            return null;
-        }
-
-        // TODO: This can be simplified when the key is `summary_large` instead of `summary_large_image`.
-        $card = str_replace(['seo_', 'twitter_'], '', $image->handle());
-        $card = $card === 'summary_image' ? 'summary' : 'summary_large_image';
-
-        return collect(SocialImage::specs("twitter.{$card}"))
-            ->only(['width', 'height'])
-            ->all();
-    }
-
-    protected function twitterCard(): ?string
-    {
-        if ($this->get('twitter_card')) {
-            return $this->get('twitter_card');
-        }
-
-        if (! $image = $this->twitterImage()) {
-            return null;
-        }
-
-        // TODO: This can be simplified when the key is `summary_large` instead of `summary_large_image`.
-        $card = str_replace(['seo_', 'twitter_'], '', $image->handle());
-
-        return $card === 'summary_image'
-            ? 'summary'
-            : 'summary_large_image';
-    }
-
-    protected function twitterImage(): ?Value
-    {
-        $images = collect([
-            'summary' => $this->get('twitter_summary_image'),
-            'summary_large_image' => $this->get('twitter_summary_large_image'),
-        ])->filter();
-
-        return $images->get($this->value('twitter_card')?->value()) ?? $images->first();
-    }
-
-    protected function twitterTitle(): string
-    {
-        return $this->get('twitter_title') ?? $this->title();
     }
 
     protected function indexing(): string
