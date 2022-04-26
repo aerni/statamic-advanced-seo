@@ -8,7 +8,6 @@ use Statamic\Facades\Site;
 
 class ShouldDisplaySocialImagesGenerator
 {
-    // TODO: Use Blink.
     public static function handle(DefaultsData $data): bool
     {
         // Don't show the generator section if the generator is disabled.
