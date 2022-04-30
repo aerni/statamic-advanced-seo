@@ -47,7 +47,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'text-fieldtype',
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_title'),
                         'character_limit' => 60,
                         'antlers' => false,
                     ],
@@ -64,7 +63,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'textarea-fieldtype',
                     'field' => [
                         'type' => 'textarea',
-                        'default' => $this->getValueFromCascade('seo_description'),
                         'character_limit' => 160,
                     ],
                 ],
@@ -110,7 +108,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'toggle-fieldtype',
                     'field' => [
                         'type' => 'toggle',
-                        'default' => (bool) $this->getValueFromCascade('seo_generate_social_images'),
                     ],
                 ],
             ],
@@ -132,7 +129,7 @@ class OnPageSeoFields extends BaseFields
                     'field' => [
                         'type' => 'select',
                         'options' => SocialImageTheme::fieldtypeOptions(),
-                        'default' => $this->getValueFromCascade('seo_social_images_theme') ?? SocialImageTheme::fieldtypeDefault(),
+                        'default' => SocialImageTheme::fieldtypeDefault(),
                         'clearable' => false,
                         'multiple' => false,
                         'searchable' => false,
@@ -221,7 +218,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'assets-fieldtype',
                     'field' => [
                         'type' => 'assets',
-                        'default' => $this->getValueFromCascade('seo_og_image'),
                         'container' => config('advanced-seo.social_images.container', 'assets'),
                         'folder' => 'social_images',
                         'max_files' => 1,
@@ -247,7 +243,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'text-fieldtype',
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_og_title'),
                         'character_limit' => 70,
                         'antlers' => false,
                     ],
@@ -265,7 +260,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'textarea-fieldtype',
                     'field' => [
                         'type' => 'textarea',
-                        'default' => $this->getValueFromCascade('seo_og_description'),
                         'character_limit' => 200,
                     ],
                 ],
@@ -301,7 +295,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'button_group-fieldtype',
                     'field' => [
                         'type' => 'button_group',
-                        'default' => $this->getValueFromCascade('seo_twitter_card'),
                         'options' => [
                             'summary' => 'Regular',
                             'summary_large_image' => 'Large Image',
@@ -323,7 +316,6 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'field' => [
                         'type' => 'assets',
-                        'default' => $this->getValueFromCascade('seo_twitter_summary_image'),
                         'container' => config('advanced-seo.social_images.container', 'assets'),
                         'folder' => 'social_images',
                         'max_files' => 1,
@@ -351,7 +343,6 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'field' => [
                         'type' => 'assets',
-                        'default' => $this->getValueFromCascade('seo_twitter_summary_large_image'),
                         'container' => config('advanced-seo.social_images.container', 'assets'),
                         'folder' => 'social_images',
                         'max_files' => 1,
@@ -377,7 +368,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'text-fieldtype',
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_twitter_title'),
                         'character_limit' => 70,
                         'antlers' => false,
                     ],
@@ -395,7 +385,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'textarea-fieldtype',
                     'field' => [
                         'type' => 'textarea',
-                        'default' => $this->getValueFromCascade('seo_twitter_description'),
                         'character_limit' => 200,
                     ],
                 ],
@@ -432,7 +421,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'button_group-fieldtype',
                     'field' => [
                         'type' => 'button_group',
-                        'default' => $this->getValueFromCascade('seo_canonical_type'),
                         'options' => [
                             'current' => 'Current ' . ucfirst(str_singular($this->typePlaceholder())),
                             'other' => 'Other Entry',
@@ -455,7 +443,6 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'field' => [
                         'type' => 'entries',
-                        'default' => $this->getValueFromCascade('seo_canonical_entry'),
                         'component' => 'relationship',
                         'mode' => 'stack',
                         'max_items' => 1,
@@ -479,7 +466,6 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'field' => [
                         'type' => 'text',
-                        'default' => $this->getValueFromCascade('seo_canonical_custom'),
                         'input_type' => 'url',
                         'validate' => [
                             'required_if:seo_canonical_type,custom',
@@ -513,7 +499,6 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'field' => [
                         'type' => 'toggle',
-                        'default' => (bool) $this->getValueFromCascade('seo_noindex'),
                     ],
                 ],
             ],
@@ -529,7 +514,6 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'field' => [
                         'type' => 'toggle',
-                        'default' => (bool) $this->getValueFromCascade('seo_nofollow'),
                     ],
                 ],
             ],
@@ -570,7 +554,6 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'field' => [
                         'type' => 'toggle',
-                        'default' => (bool) $this->getValueFromCascade('seo_sitemap_enabled'),
                     ],
                 ],
             ],
@@ -591,7 +574,6 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'field' => [
                         'type' => 'select',
-                        'default' => $this->getValueFromCascade('seo_sitemap_priority'),
                         'options' => [
                             '0.0' => '0.0',
                             '0.1' => '0.1',
@@ -631,7 +613,6 @@ class OnPageSeoFields extends BaseFields
                     ],
                     'field' => [
                         'type' => 'select',
-                        'default' => $this->getValueFromCascade('seo_sitemap_change_frequency'),
                         'options' => [
                             'always' => 'Always',
                             'hourly' => 'Hourly',
@@ -684,7 +665,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'code-fieldtype',
                     'field' => [
                         'type' => 'code',
-                        'default' => $this->getValueFromCascade('seo_json_ld'),
                         'theme' => 'material',
                         'mode' => 'javascript',
                         'indent_type' => 'tabs',

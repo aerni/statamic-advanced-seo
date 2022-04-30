@@ -2,13 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fieldtype;
+use Illuminate\Support\Str;
+use Statamic\Facades\Blink;
 use Statamic\Fieldtypes\Code;
+use Statamic\Fields\Fieldtype;
+use Aerni\AdvancedSeo\View\Cascade;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Entries\Collection;
+use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 
 class SourceFieldtype extends Fieldtype
 {
@@ -65,9 +71,7 @@ class SourceFieldtype extends Fieldtype
     public function augment(mixed $data): mixed
     {
         if ($data === '@default' || $data === null) {
-            $defaultValue = $this->sourceField()->setValue(null)->defaultValue();
-
-            return $this->sourceFieldtype()->augment($defaultValue);
+            return $this->sourceFieldtype()->augment($this->defaultValueFromCascade());
         }
 
         if ($data === '@auto') {
@@ -120,12 +124,12 @@ class SourceFieldtype extends Fieldtype
 
     protected function sourceFieldDefaultValue(): mixed
     {
-        return $this->sourceField()->setValue(null)->preProcess()->value();
+        return $this->sourceField()->setValue($this->defaultValueFromCascade())->preProcess()->value();
     }
 
     protected function sourceFieldDefaultMeta(): mixed
     {
-        return $this->sourceField()->setValue(null)->preProcess()->meta();
+        return $this->sourceField()->setValue($this->defaultValueFromCascade())->preProcess()->meta();
     }
 
     protected function sourceFieldMeta(): mixed
@@ -136,6 +140,31 @@ class SourceFieldtype extends Fieldtype
     protected function sourceFieldValue(): mixed
     {
         return $this->field->value()['value'];
+    }
+
+    protected function defaultValueFromCascade(): mixed
+    {
+        $data = GetDefaultsData::handle($this->field->parent());
+
+        if (! $data) {
+            return null;
+        }
+
+        $value = Blink::once(
+            "advanced-seo::cascade::cp::{$data->locale}",
+            fn () => Cascade::from($data)->processForBlueprint()
+        )->value(Str::remove('seo_', $this->field->handle()));
+
+        $value = match (true) {
+            ($value instanceof Entry) => $value->id(),
+            ($value instanceof Asset) => $value->path(),
+            ($value instanceof Arrayable) => $value->value(),
+            default => $value,
+        };
+
+        $fallbackValue = $this->sourceField()->setValue(null)->defaultValue();
+
+        return $value ?? $fallbackValue;
     }
 
     protected function parentTitle(): ?string
