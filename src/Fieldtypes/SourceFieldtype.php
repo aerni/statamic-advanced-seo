@@ -2,19 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Fields\Field;
-use Illuminate\Support\Str;
-use Statamic\Facades\Blink;
-use Statamic\Fieldtypes\Code;
-use Statamic\Fields\Fieldtype;
-use Aerni\AdvancedSeo\View\Cascade;
-use Statamic\Contracts\Assets\Asset;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Contracts\Entries\Collection;
-use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\View\Cascade;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Code;
 
 class SourceFieldtype extends Fieldtype
 {
