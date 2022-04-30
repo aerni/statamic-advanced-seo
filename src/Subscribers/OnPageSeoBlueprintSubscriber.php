@@ -83,11 +83,6 @@ class OnPageSeoBlueprintSubscriber
         if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), $this->model, $id ?? $createLocale])) {
             $this->extendBlueprint($event);
         }
-
-        // Make sure to extend the blueprint for actions.
-        if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), $this->model, 'actions'])) {
-            $this->extendBlueprint($event);
-        }
     }
 
     protected function extendBlueprintForFrontend(Event $event): void
