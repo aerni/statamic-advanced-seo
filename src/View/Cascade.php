@@ -88,7 +88,6 @@ class Cascade
             'og_image' => $this->ogImage(),
             'og_image_size' => $this->ogImageSize(),
             'og_title' => $this->ogTitle(),
-            'twitter_card' => $this->twitterCard(),
             'twitter_image' => $this->twitterImage(),
             'twitter_image_size' => $this->twitterImageSize(),
             'twitter_title' => $this->twitterTitle(),
