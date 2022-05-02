@@ -4,9 +4,7 @@ namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\Event;
-use Statamic\Events\TermBlueprintFound;
 use Statamic\Fields\Blueprint;
 
 trait GetsEventData

@@ -2,17 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
-use Statamic\View\View;
-use Statamic\Facades\Data;
-use Illuminate\Support\Str;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Facades\Statamic\CP\LivePreview;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Facades\Statamic\CP\LivePreview;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Data;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\View\View;
 
 class SocialImagesController extends Controller
 {

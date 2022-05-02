@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Content\SocialImage;
 use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
 
 class SocialImageRepository
 {
