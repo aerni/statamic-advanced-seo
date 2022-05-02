@@ -3,7 +3,9 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\TermBlueprintFound;
@@ -22,6 +24,10 @@ class EvaluateModelParent
                 => $data->collection(),
             ($data instanceof Term) // This also handles LocalizedTerm
                 => $data->taxonomy(),
+            ($data instanceof Collection)
+                => $data,
+            ($data instanceof Taxonomy)
+                => $data,
             ($data instanceof Context && $data->get('collection') instanceof Value)
                 => $data->get('collection')->value(),
             ($data instanceof Context && $data->get('taxonomy') instanceof Value)
