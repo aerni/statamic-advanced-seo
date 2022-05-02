@@ -30,6 +30,7 @@ class SocialImagesController extends Controller
         throw_unless($specs = SocialImage::specs($type, $data), new NotFoundHttpException);
 
         $template = $specs['templates']->get($request->get('theme')) // Get the template based on the theme in the request.
+            ?? $specs['templates']->get($data->seo_social_images_theme->value()) // If theme paremeter doesn't exist, use the theme set on the entry.
             ?? $specs['templates']->get('default') // If no theme is set, use the default theme.
             ?? $specs['templates']->first(); // If the default doesn't exist either, fall back to the first theme.
 
