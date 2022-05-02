@@ -18,22 +18,17 @@ class OnPageSeoBlueprintSubscriber
     public function subscribe(Dispatcher $events): array
     {
         return [
-            Events\EntryBlueprintFound::class => 'handleBlueprintFound',
-            Events\TermBlueprintFound::class => 'handleBlueprintFound',
+            Events\EntryBlueprintFound::class => 'extendBlueprint',
+            Events\TermBlueprintFound::class => 'extendBlueprint',
         ];
     }
 
-    public function handleBlueprintFound(Event $event): void
+    public function extendBlueprint(Event $event): void
     {
-        if (! $this->shouldHandleBlueprintFound($event)) {
+        if (! $this->shouldExtendBlueprint($event)) {
             return;
         }
 
-        $this->extendBlueprint($event);
-    }
-
-    protected function extendBlueprint(Event $event): void
-    {
         // The data is used to show/hide fields under certain conditions.
         $seoBlueprint = OnPageSeoBlueprint::make()
             ->data($this->getDataFromEvent($event))
@@ -42,7 +37,7 @@ class OnPageSeoBlueprintSubscriber
         $this->getBlueprintFromEvent($event)->ensureFieldsInSection($seoBlueprint, 'SEO');
     }
 
-    protected function shouldHandleBlueprintFound(Event $event): bool
+    protected function shouldExtendBlueprint(Event $event): bool
     {
         // Don't add any fields in the blueprint builder.
         if (Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints'])) {
