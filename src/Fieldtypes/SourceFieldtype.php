@@ -144,16 +144,15 @@ class SourceFieldtype extends Fieldtype
 
     protected function defaultValueFromCascade(): mixed
     {
-        $data = GetDefaultsData::handle($this->field->parent());
+        $data = Blink::once('advanced-seo::source-fieldtype::parent', fn () => GetDefaultsData::handle($this->field->parent()));
 
         if (! $data) {
             return null;
         }
 
-        $value = Blink::once(
-            "advanced-seo::cascade::cp::{$data->locale}",
-            fn () => Cascade::from($data)->processForBlueprint()
-        )->value(Str::remove('seo_', $this->field->handle()));
+        $cascade = Blink::once("advanced-seo::cascade::cp", fn () => Cascade::from($data)->processForBlueprint());
+
+        $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 
         $value = match (true) {
             ($value instanceof Entry) => $value->id(),
