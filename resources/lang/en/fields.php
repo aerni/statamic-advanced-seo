@@ -50,8 +50,8 @@ return [
     ],
 
     'seo_og_image' => [
-        'instructions' => 'Add an Open Graph image for this :type. It will be cropped to ' . SocialImage::sizeString('og') . '.',
-        'default_instructions' => 'Add a default Open Graph image for your :type. It will be cropped to ' . SocialImage::sizeString('og') . '.',
+        'instructions' => 'Add an Open Graph image for this :type. It will be cropped to ' . SocialImage::sizeString('open_graph') . '.',
+        'default_instructions' => 'Add a default Open Graph image for your :type. It will be cropped to ' . SocialImage::sizeString('open_graph') . '.',
     ],
 
     'seo_section_twitter' => [
@@ -75,13 +75,13 @@ return [
     ],
 
     'seo_twitter_summary_image' => [
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
+        'instructions' => 'Add a Twitter image for this :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary') . '.',
+        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary') . '.',
     ],
 
     'seo_twitter_summary_large_image' => [
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
+        'instructions' => 'Add a Twitter image for this :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary_large_image') . '.',
+        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary_large_image') . '.',
     ],
 
     'seo_section_canonical_url' => [

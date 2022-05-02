@@ -146,7 +146,7 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_generated_og_image',
                 'field' => [
                     'type' => 'social_image',
-                    'image_type' => 'og',
+                    'image_type' => 'open_graph',
                     'display' => 'Open Graph',
                     'read_only' => true,
                     'listable' => 'hidden',

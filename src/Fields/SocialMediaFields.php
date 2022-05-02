@@ -76,7 +76,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'og_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Open Graph Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('og') . '.',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('open_graph') . '.',
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -101,7 +101,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'twitter_summary_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Summary Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary') . '.',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter_summary') . '.',
                     'width' => 50,
                     'validate' => [
                         'image',
@@ -113,7 +113,7 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'twitter_summary_large_image',
                 'field' => $this->getAssetFieldConfig([
                     'display' => 'Twitter Summary Large Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter.summary_large_image') . '.',
+                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter_summary_large_image') . '.',
                     'width' => 50,
                     'validate' => [
                         'image',

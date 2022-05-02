@@ -2,56 +2,35 @@
 
 namespace Aerni\AdvancedSeo\Repositories;
 
-use Aerni\AdvancedSeo\Content\SocialImage;
-use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
+use Aerni\AdvancedSeo\Content\SocialImage;
+use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
 
 class SocialImageRepository
 {
     public function all(Entry $entry): Collection
     {
-        return $this->types()->map(function ($item, $type) use ($entry) {
-            return match ($type) {
-                'twitter' => $this->twitter($entry),
-                'og' => $this->openGraph($entry),
-            };
-        });
+        return SocialImageModel::groups()
+            ->map(fn ($group, $type) => $this->{Str::camel($type)}($entry));
+    }
+
+    public function findModel(string $type): ?array
+    {
+        return SocialImageModel::firstWhere('type', $type);
     }
 
     public function openGraph(Entry $entry): SocialImage
     {
-        return (new SocialImage($entry, $this->specs('og')));
+        return new SocialImage($entry, $this->findModel('open_graph'));
     }
 
     public function twitter(Entry $entry): SocialImage
     {
-        return (new SocialImage($entry, $this->specs('twitter', $entry)));
-    }
+        $card = $entry->seo_twitter_card ?? 'summary';
 
-    public function specs(string $type, Entry|LocalizedTerm $data = null): ?array
-    {
-        if (! $data) {
-            return Arr::get($this->types(), $type);
-        }
-
-        return match ($type) {
-            'og' => Arr::get($this->types(), $type),
-            'twitter' => Arr::get($this->types(), "twitter.{$data->seo_twitter_card}"),
-            default => null,
-        };
-    }
-
-    public function sizeString(string $type): string
-    {
-        return "{$this->specs($type)['width']} x {$this->specs($type)['height']} pixels";
-    }
-
-    public function types(): Collection
-    {
-        return collect(SocialImageModel::all());
+        return new SocialImage($entry, $this->findModel("twitter_{$card}"));
     }
 
     public function previewTargets(): array
@@ -59,17 +38,24 @@ class SocialImageRepository
         return [
             [
                 'label' => 'Open Graph Image',
-                'format' => $this->route(type: 'og', id: '{id}', theme: '{seo_social_images_theme}'),
+                'format' => $this->route(type: 'open_graph', theme: '{seo_social_images_theme}', id: '{id}'),
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => $this->route(type: 'twitter', id: '{id}', theme: '{seo_social_images_theme}'),
+                'format' => $this->route(type: "twitter_{seo_twitter_card}", theme: '{seo_social_images_theme}', id: '{id}'),
             ],
         ];
     }
 
-    public function route(string $type, string $id, string $theme): string
+    public function route(string $type, string $theme, string $id): string
     {
-        return "/!/advanced-seo/social-images/{$type}/{$id}?theme={$theme}";
+        return "/!/advanced-seo/social-images/{$type}/{$theme}/{$id}";
+    }
+
+    public function sizeString(string $type): string
+    {
+        $type = $this->findModel($type);
+
+        return "{$type['width']} x {$type['height']} pixels";
     }
 }

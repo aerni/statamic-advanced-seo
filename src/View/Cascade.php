@@ -282,7 +282,7 @@ class Cascade
 
     protected function ogImageSize(): array
     {
-        return collect(SocialImage::specs('og'))
+        return collect(SocialImage::findModel('open_graph'))
             ->only(['width', 'height'])
             ->all();
     }
@@ -298,14 +298,14 @@ class Cascade
             return $this->get('generated_twitter_image');
         }
 
-        return $this->value('twitter_card')->value() === 'summary'
-            ? $this->get('twitter_summary_image')
-            : $this->get('twitter_summary_large_image');
+        $card = $this->value('twitter_card')?->value() ?? 'summary';
+
+        return $this->get("twitter_{$card}");
     }
 
     protected function twitterImageSize(): array
     {
-        return collect(SocialImage::specs("twitter.{$this->get('twitter_card')}"))
+        return collect(SocialImage::findModel("twitter_{$this->get('twitter_card')}"))
             ->only(['width', 'height'])
             ->all();
     }

@@ -11,7 +11,7 @@ use Statamic\Facades\URL;
 
 class SocialImage
 {
-    public function __construct(protected Entry $entry, protected array $specs)
+    public function __construct(protected Entry $entry, protected array $model)
     {
         //
     }
@@ -21,7 +21,7 @@ class SocialImage
         $this->ensureDirectoryExists();
 
         Browsershot::url($this->templateUrl())
-            ->windowSize($this->specs['width'], $this->specs['height'])
+            ->windowSize($this->model['width'], $this->model['height'])
             ->save($this->absolutePath());
 
         return $this;
@@ -46,15 +46,15 @@ class SocialImage
 
     public function path(): string
     {
-        return "social_images/{$this->entry->slug}-{$this->entry->locale}-{$this->specs['type']}.png";
+        return "social_images/{$this->entry->slug}-{$this->entry->locale}-{$this->model['type']}.png";
     }
 
     protected function templateUrl(): string
     {
         return url('/') . SocialImageApi::route(
-            type: $this->specs['type'],
+            type: $this->model['type'],
+            theme: $this->entry->seo_social_images_theme,
             id: $this->entry->id,
-            theme: $this->entry->seo_social_images_theme
         );
     }
 
