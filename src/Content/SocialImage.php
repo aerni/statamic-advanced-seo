@@ -54,7 +54,6 @@ class SocialImage
         return url('/') . SocialImageApi::route(
             type: $this->specs['type'],
             id: $this->entry->id,
-            locale: $this->entry->locale,
             theme: $this->entry->seo_social_images_theme
         );
     }

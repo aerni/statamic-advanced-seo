@@ -103,42 +103,25 @@ php please seo:theme
 This will publish an empty template file for each social image type to `resources/views/social_images/{theme}` to get you started.
 
 ### Templating
-When building your social image templates, you most likely want to see what you’re doing. You can view your templates according to the following schema:
-
-```
-https://site.test/!/advanced-seo/social-images/{type}/{id}?site={site}&theme={theme}
-```
-
-| Variable | Description                                                  | Options                                     |
-| -------- | ------------------------------------------------------------ | ------------------------------------------- |
-| `type`   | The type of social image                                     | `og`, `twitter`                             |
-| `id`     | The ID of the entry                                          | e.g. `4358df35-c7fe-4774-97ad-02af0e2dea3b` |
-| `site`   | The locale of the entry. Only required on a multi-site.      | e.g. `german`                               |
-| `theme`  | The theme to use. Only required if you have multiple themes. | e.g. `special`                              |
-
-**Single-site, single-theme:**
-Simply provide the type of social image along with the ID of the entry:
+When building your social image templates, you most likely want to see what you’re doing. To view your templates, simply provide the type of social image along with the ID of the entry:
 
 ```
 https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b
 https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b
 ```
 
-**Multi-site, single-theme:**
-To access the data of a localized entry, you also need to add the entry’s locale to the `site` parameter:
+If you have multiple themes, you can preview a specific theme by adding the theme’s handle to the `theme` parameter:
 
 ```
-https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
-https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german
+https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b?theme=special
+https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?theme=special
 ```
 
-**Multi-site, multi-theme:**
-If you have multiple themes, you should also add the theme’s handle to the `theme` parameter:
-
-```
-https://site.test/!/advanced-seo/social-images/og/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german&theme=special
-https://site.test/!/advanced-seo/social-images/twitter/4358df35-c7fe-4774-97ad-02af0e2dea3b?site=german&theme=special
-```
+| Variable | Description                                                  | Options                                     |
+| -------- | ------------------------------------------------------------ | ------------------------------------------- |
+| `type`   | The type of social image                                     | `og`, `twitter`                             |
+| `id`     | The ID of the entry                                          | e.g. `4358df35-c7fe-4774-97ad-02af0e2dea3b` |
+| `theme`  | The theme to use. Only required if you have multiple themes. | e.g. `special`                              |
 
 ### Configuration
 Make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to enable the generator for. This will add a new `Social Images Generator` section to the selected collections’ defaults and entry blueprint.
