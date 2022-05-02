@@ -273,7 +273,7 @@ class Cascade
         return $this->get('og_title') ?? $this->title();
     }
 
-    protected function ogImage(): Value
+    protected function ogImage(): ?Value
     {
         return $this->value('generate_social_images')
             ? $this->get('generated_og_image')
@@ -292,7 +292,7 @@ class Cascade
         return $this->get('twitter_title') ?? $this->title();
     }
 
-    protected function twitterImage(): Value
+    protected function twitterImage(): ?Value
     {
         if ($this->value('generate_social_images')) {
             return $this->get('generated_twitter_image');
