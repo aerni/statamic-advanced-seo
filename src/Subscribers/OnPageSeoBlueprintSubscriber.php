@@ -2,12 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Str;
+use Aerni\AdvancedSeo\Actions\EvaluateModelHandle;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Actions\EvaluateModelType;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -52,8 +54,8 @@ class OnPageSeoBlueprintSubscriber
             return false;
         }
 
-        $model = $this->determineModel($event);
-        $handle = Str::after($event->blueprint->namespace(), '.');
+        $model = EvaluateModelType::handle($event);
+        $handle = EvaluateModelHandle::handle($event);
 
         // Don't add fields if the collection/taxonomy is excluded in the config.
         if (in_array($handle, config("advanced-seo.disabled.{$model}", []))) {

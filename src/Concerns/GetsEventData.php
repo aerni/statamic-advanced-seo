@@ -18,14 +18,6 @@ trait GetsEventData
             : 'collections';
     }
 
-    protected function determineModel(Event $event): string
-    {
-        return match ($event::class) {
-            EntryBlueprintFound::class => 'collections',
-            TermBlueprintFound::class => 'taxonomies'
-        };
-    }
-
     protected function determineProperty(Event $event): string
     {
         return collect(['collection', 'entry', 'taxonomy', 'term', 'defaults'])
