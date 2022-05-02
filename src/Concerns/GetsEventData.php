@@ -4,11 +4,9 @@ namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
-use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 
 trait GetsEventData
@@ -52,19 +50,7 @@ trait GetsEventData
 
     protected function getDataFromEvent(Event $event): DefaultsData
     {
-        $data = $this->getProperty($event);
-
-        // There is no data if we are creating a new entry/term.
-        if (! $data) {
-            return GetDefaultsData::handle($event);
-        }
-
-        // Make sure to get the correct localization of term defaults on the frontend.
-        if (Helpers::isFrontendRoute()) {
-            $data = $data->in(Site::current()->handle());
-        }
-
-        // Fall back to event if no data exists, e.g. non-existent entry localization.
-        return GetDefaultsData::handle($data ?? $event);
+        // Fall back to event if no data exists, e.g. when creating an entry/term.
+        return GetDefaultsData::handle($this->getProperty($event) ?? $event);
     }
 }
