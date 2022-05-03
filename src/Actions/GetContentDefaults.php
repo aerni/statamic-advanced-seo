@@ -1,15 +1,15 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Concerns;
+namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
 
-trait GetsContentDefaults
+class GetContentDefaults
 {
-    public function getContentDefaults(mixed $data): Collection
+    public static function handle(mixed $data): Collection
     {
         if (! $data = GetDefaultsData::handle($data)) {
             return collect();

@@ -3,9 +3,9 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Actions\EvaluateContextType;
-use Aerni\AdvancedSeo\Concerns\GetsContentDefaults;
-use Aerni\AdvancedSeo\Concerns\GetsPageData;
-use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
+use Aerni\AdvancedSeo\Actions\GetContentDefaults;
+use Aerni\AdvancedSeo\Actions\GetPageData;
+use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -24,10 +24,6 @@ use Statamic\Taxonomies\Taxonomy;
 
 class Cascade
 {
-    use GetsContentDefaults;
-    use GetsSiteDefaults;
-    use GetsPageData;
-
     protected Context|DefaultsData $context;
     protected Collection $data;
 
@@ -44,7 +40,7 @@ class Cascade
 
     public function withSiteDefaults(): self
     {
-        $siteDefaults = $this->getSiteDefaults($this->context);
+        $siteDefaults = GetSiteDefaults::handle($this->context);
         $siteDefaults = $this->removeSeoPrefixFromKeys($siteDefaults);
 
         $this->data = $this->data->merge($siteDefaults);
@@ -54,7 +50,7 @@ class Cascade
 
     public function withContentDefaults(): self
     {
-        $contentDefaults = $this->getContentDefaults($this->context);
+        $contentDefaults = GetContentDefaults::handle($this->context);
         $contentDefaults = $this->removeSeoPrefixFromKeys($contentDefaults);
 
         $this->data = $this->data->merge($contentDefaults);
@@ -68,7 +64,7 @@ class Cascade
             throw new \Exception("The context needs to be an instance of Statamic\Tags\Context in order to get the page data.");
         }
 
-        $pageData = $this->getPageData($this->context);
+        $pageData = GetPageData::handle($this->context);
         $pageData = $this->removeSeoPrefixFromKeys($pageData);
 
         $this->data = $this->data->merge($pageData);
@@ -155,7 +151,7 @@ class Cascade
         $overrides = ['noindex', 'nofollow', 'og_image', 'twitter_summary_image', 'twitter_summary_large_image'];
 
         // The values that should be used as overrides.
-        $defaults = $this->getSiteDefaults($this->context)->only($overrides);
+        $defaults = GetSiteDefaults::handle($this->context)->only($overrides);
 
         // The values from the existing data that should be overriden.
         $data = $this->data->only($overrides)->filter(fn ($item) => $item->value());

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Concerns;
+namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
 use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
@@ -10,9 +10,9 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 
-trait GetsSiteDefaults
+class GetSiteDefaults
 {
-    public function getSiteDefaults(mixed $data): Collection
+    public static function handle(mixed $data): Collection
     {
         $locale = EvaluateModelLocale::handle($data);
 

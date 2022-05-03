@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Concerns;
+namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
@@ -8,9 +8,9 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
 use Statamic\Tags\Context;
 
-trait GetsPageData
+class GetPageData
 {
-    public function getPageData(Context $context): Collection
+    public static function handle(Context $context): Collection
     {
         if (! $data = GetDefaultsData::handle($context)) {
             return collect();
