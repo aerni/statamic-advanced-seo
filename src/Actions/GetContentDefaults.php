@@ -2,8 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
 

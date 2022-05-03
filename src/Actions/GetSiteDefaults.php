@@ -2,8 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
-use Aerni\AdvancedSeo\Actions\GetAugmentedDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
