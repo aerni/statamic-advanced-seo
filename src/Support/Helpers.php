@@ -14,7 +14,7 @@ class Helpers
         return \WhiteCube\Lingua\Service::create($parsed)->toW3C();
     }
 
-    public static function isAddonRoute(): bool
+    public static function isAddonCpRoute(): bool
     {
         return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
     }

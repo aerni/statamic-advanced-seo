@@ -51,8 +51,8 @@ abstract class BaseFields implements Fields
         }
 
         return match ($this->data->type) {
-            'collections' => Helpers::isAddonRoute() ? 'entries' : 'entry',
-            'taxonomies' => Helpers::isAddonRoute() ? 'terms' : 'term',
+            'collections' => Helpers::isAddonCpRoute() ? 'entries' : 'entry',
+            'taxonomies' => Helpers::isAddonCpRoute() ? 'terms' : 'term',
             default => null
         };
     }
