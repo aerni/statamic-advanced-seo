@@ -52,10 +52,10 @@ class SocialImage
 
     protected function filename(): string
     {
-        $type = Str::replace('_', '-', $this->model['group']);
         $id = $this->entry->id;
+        $type = Str::replace('_', '-', $this->model['group']);
 
-        return "{$type}_{$id}.png";
+        return "{$id}_{$type}.png";
     }
 
     protected function templateUrl(): string
