@@ -14,6 +14,7 @@ class SocialImage extends Model
             'open_graph' => [
                 'group' => 'open_graph',
                 'type' => 'open_graph',
+                'handle' => 'og_image',
                 'layout' => 'social_images/layout',
                 'templates' => SocialImageTheme::templatesOfType('open_graph'),
                 'width' => config('advanced-seo.social_images.presets.open_graph.width', 1200),
@@ -22,6 +23,7 @@ class SocialImage extends Model
             'twitter_summary' => [
                 'group' => 'twitter',
                 'type' => 'twitter_summary',
+                'handle' => 'twitter_summary_image',
                 'layout' => 'social_images/layout',
                 'templates' => SocialImageTheme::templatesOfType('twitter_summary'),
                 'width' => config('advanced-seo.social_images.presets.twitter_summary.width', 240),
@@ -30,6 +32,7 @@ class SocialImage extends Model
             'twitter_summary_large_image' => [
                 'group' => 'twitter',
                 'type' => 'twitter_summary_large_image',
+                'handle' => 'twitter_summary_large_image',
                 'layout' => 'social_images/layout',
                 'templates' => SocialImageTheme::templatesOfType('twitter_summary_large_image'),
                 'width' => config('advanced-seo.social_images.presets.twitter_summary_large_image.width', 1100),
