@@ -171,10 +171,10 @@ class SourceFieldtype extends Fieldtype
         $parent = $this->field->parent();
 
         return match (true) {
-            ($parent instanceof Entry) => $parent->collection()->title(),
-            ($parent instanceof Term) => $parent->taxonomy()->title(),
-            ($parent instanceof Taxonomy) => $parent->title(),
             ($parent instanceof Collection) => $parent->title(),
+            ($parent instanceof Entry) => $parent->collection()->title(),
+            ($parent instanceof Taxonomy) => $parent->title(),
+            ($parent instanceof Term) => $parent->taxonomy()->title(),
             default => null,
         };
     }
