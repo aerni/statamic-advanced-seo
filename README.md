@@ -109,7 +109,7 @@ When building your social image templates, you most likely want to see what youâ
 https://site.test/!/advanced-seo/social-images/{theme}/{type}/{id}
 ```
 
-| Variable | Description              | Options                                                        |
+| Variable | Description              | Values                                                         |
 | -------- | ------------------------ | -------------------------------------------------------------- |
 | `theme`  | The theme to use         | e.g. `default` or `very-special`                               |
 | `type`   | The type of social image | `open-graph`, `twitter-summary`, `twitter-summary-large-image` |
