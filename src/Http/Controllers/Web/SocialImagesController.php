@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Facades\Statamic\CP\LivePreview;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
