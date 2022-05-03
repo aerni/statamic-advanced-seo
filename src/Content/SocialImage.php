@@ -47,9 +47,15 @@ class SocialImage
 
     public function path(): string
     {
-        $id = Str::replace('_', '-', $this->model['group']);
+        return "social_images/{$this->entry->collection}/{$this->filename()}";
+    }
 
-        return "social_images/{$this->entry->collection}/{$this->entry->slug}-{$this->entry->locale}-{$id}.png";
+    protected function filename(): string
+    {
+        $type = Str::replace('_', '-', $this->model['group']);
+        $id = $this->entry->id;
+
+        return "{$type}_{$id}.png";
     }
 
     protected function templateUrl(): string
