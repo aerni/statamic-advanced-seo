@@ -8,7 +8,6 @@ use Aerni\AdvancedSeo\Concerns\GetsPageData;
 use Aerni\AdvancedSeo\Concerns\GetsSiteDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
@@ -137,7 +136,7 @@ class Cascade
             ->all();
     }
 
-    public function processForBlueprint(): self
+    public function processForFieldtype(): self
     {
         return $this
             ->withSiteDefaults()

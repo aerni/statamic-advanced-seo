@@ -150,7 +150,7 @@ class SourceFieldtype extends Fieldtype
             return null;
         }
 
-        $cascade = Blink::once("advanced-seo::cascade::cp", fn () => Cascade::from($data)->processForBlueprint());
+        $cascade = Blink::once("advanced-seo::cascade::cp", fn () => Cascade::from($data)->processForFieldtype());
 
         $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 
