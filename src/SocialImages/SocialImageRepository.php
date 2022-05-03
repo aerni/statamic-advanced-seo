@@ -27,9 +27,7 @@ class SocialImageRepository
 
     public function twitter(Entry $entry): SocialImage
     {
-        $card = $entry->seo_twitter_card ?? 'summary';
-
-        return new SocialImage($entry, $this->findModel("twitter_{$card}"));
+        return new SocialImage($entry, $this->findModel("twitter_{$entry->seo_twitter_card}"));
     }
 
     public function previewTargets(): array
