@@ -14,23 +14,25 @@ class CreateSocialImagesTheme extends UpdateScript
 
     public function update()
     {
-        $filesToMove = [
+        $filesToMove = collect([
             'open_graph.antlers.html',
             'twitter_summary.antlers.html',
             'twitter_summary_large_image.antlers.html',
-        ];
+        ])->filter(fn ($file) => File::exists(resource_path("views/social_images/{$file}")));
 
-        collect($filesToMove)->each(function ($filename) {
-            $filePath = resource_path("views/social_images/{$filename}");
-            $directoryPath = resource_path("views/social_images/default");
-            $fileTarget = resource_path("views/social_images/default/{$filename}");
+        if ($filesToMove->isEmpty()) {
+            return;
+        }
 
-            if (File::exists($filePath)) {
-                File::makeDirectory($directoryPath);
-                File::move($filePath, $fileTarget);
-            }
+        File::ensureDirectoryExists(resource_path("views/social_images/default"));
+
+        $filesToMove->each(function ($file) {
+            $path = resource_path("views/social_images/{$file}");
+            $target = resource_path("views/social_images/default/{$file}");
+
+            File::move($path, $target);
         });
 
-        $this->console()->info('Successfully created social images theme!');
+        $this->console()->info('Successfully migrated social images theme.');
     }
 }
