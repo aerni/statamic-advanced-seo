@@ -18,22 +18,14 @@ class EvaluateModelLocale
     public static function handle(mixed $model): ?string
     {
         return match (true) {
-            ($model instanceof Entry)
-                => $model->locale(),
-            ($model instanceof Term) // This also handles LocalizedTerm
-                => Statamic::isCpRoute() ? basename(request()->path()) : $model->locale(),
-            ($model instanceof Collection)
-                => basename(request()->path()),
-            ($model instanceof Taxonomy)
-                => basename(request()->path()),
-            ($model instanceof Context)
-                => $model->get('site')->handle(),
-            ($model instanceof EntryBlueprintFound)
-                => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
-            ($model instanceof TermBlueprintFound)
-                => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
-            ($model instanceof DefaultsData)
-                => $model->locale,
+            ($model instanceof Collection) => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
+            ($model instanceof Entry) => $model->locale(),
+            ($model instanceof EntryBlueprintFound) => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
+            ($model instanceof Taxonomy) => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
+            ($model instanceof Term) => Statamic::isCpRoute() ? basename(request()->path()) : $model->locale(),
+            ($model instanceof TermBlueprintFound) => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
+            ($model instanceof Context) => $model->get('site')->handle(),
+            ($model instanceof DefaultsData) => $model->locale,
             default => null
         };
     }

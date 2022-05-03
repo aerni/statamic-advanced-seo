@@ -34,7 +34,7 @@ class OnPageSeoBlueprintSubscriber
             ->data($this->getDataFromEvent($event))
             ->items();
 
-        $this->getBlueprintFromEvent($event)->ensureFieldsInSection($seoBlueprint, 'SEO');
+        $event->blueprint->ensureFieldsInSection($seoBlueprint, 'SEO');
     }
 
     protected function shouldExtendBlueprint(Event $event): bool
