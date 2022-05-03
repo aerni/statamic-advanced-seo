@@ -42,6 +42,10 @@ class ServiceProvider extends AddonServiceProvider
         Tags\AdvancedSeoTags::class,
     ];
 
+    protected $updateScripts = [
+        Updates\CreateSocialImagesTheme::class,
+    ];
+
     protected $routes = [
         'actions' => __DIR__.'/../routes/actions.php',
         'cp' => __DIR__.'/../routes/cp.php',
