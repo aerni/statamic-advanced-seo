@@ -49,7 +49,7 @@ class SocialImage
     {
         $id = Str::replace('_', '-', $this->model['group']);
 
-        return "social_images/{$this->entry->slug}-{$this->entry->locale}-{$id}.png";
+        return "social_images/{$this->entry->collection}/{$this->entry->slug}-{$this->entry->locale}-{$id}.png";
     }
 
     protected function templateUrl(): string
