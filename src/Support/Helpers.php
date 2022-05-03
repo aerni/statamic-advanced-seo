@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Support;
 
 use Illuminate\Support\Str;
-use Statamic\Statamic;
 
 class Helpers
 {
@@ -26,15 +25,5 @@ class Helpers
     public static function isCustomRoute(): bool
     {
         return request()->route()->getAction('controller') !== 'Statamic\Http\Controllers\FrontendController@index';
-    }
-
-    public static function isFrontendRoute(): bool
-    {
-        return ! Statamic::isCpRoute();
-    }
-
-    public static function isSocialImagesGeneratorActionRoute(): bool
-    {
-        return Str::containsAll(request()->path(), ['!', 'advanced-seo', 'social-images']);
     }
 }
