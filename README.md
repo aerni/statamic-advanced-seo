@@ -106,21 +106,21 @@ This will publish an empty template file for each social image type to `resource
 When building your social image templates, you most likely want to see what you’re doing. You can view your templates according this schema:
 
 ```
-https://site.test/!/advanced-seo/social-images/{type}/{theme}/{id}
+https://site.test/!/advanced-seo/social-images/{theme}/{type}/{id}
 ```
 
 | Variable | Description              | Options                                                        |
 | -------- | ------------------------ | -------------------------------------------------------------- |
+| `theme`  | The theme to use         | e.g. `default` or `very-special`                               |
 | `type`   | The type of social image | `open-graph`, `twitter-summary`, `twitter-summary-large-image` |
-| `theme`  | The theme to use         | e.g. `special` or `very-special`                               |
 | `id`     | The ID of the entry      | e.g. `4358df35-c7fe-4774-97ad-02af0e2dea3b`                    |
 
 **Example:**
 
 ```
-https://site.test/!/advanced-seo/social-images/open-graph/default/4358df35-c7fe-4774-97ad-02af0e2dea3b
-https://site.test/!/advanced-seo/social-images/twitter-summary/default/4358df35-c7fe-4774-97ad-02af0e2dea3b
-https://site.test/!/advanced-seo/social-images/twitter-summary-large-image/default/4358df35-c7fe-4774-97ad-02af0e2dea3b
+https://site.test/!/advanced-seo/social-images/default/open-graph/4358df35-c7fe-4774-97ad-02af0e2dea3b
+https://site.test/!/advanced-seo/social-images/default/twitter-summary/4358df35-c7fe-4774-97ad-02af0e2dea3b
+https://site.test/!/advanced-seo/social-images/default/twitter-summary-large-image/4358df35-c7fe-4774-97ad-02af0e2dea3b
 ```
 
 ### Configuration

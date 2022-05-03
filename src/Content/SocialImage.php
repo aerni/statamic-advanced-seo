@@ -52,8 +52,8 @@ class SocialImage
     protected function templateUrl(): string
     {
         return url('/') . SocialImageApi::route(
-            type: $this->model['type'],
             theme: $this->entry->seo_social_images_theme,
+            type: $this->model['type'],
             id: $this->entry->id,
         );
     }

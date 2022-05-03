@@ -16,13 +16,13 @@ use Statamic\View\View;
 
 class SocialImagesController extends Controller
 {
-    public function show(string $type, string $theme, string $id, Request $request): Response
+    public function show(string $theme, string $type, string $id): Response
     {
         // Throw if the social images generator is disabled.
         throw_unless(config('advanced-seo.social_images.generator.enabled', false), new NotFoundHttpException);
 
         // Throw if no data was found.
-        throw_unless($data = $this->getData($id, $request), new NotFoundHttpException);
+        throw_unless($data = $this->getData($id), new NotFoundHttpException);
 
         // Throw if the data is not an entry or term.
         throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException());
@@ -38,10 +38,10 @@ class SocialImagesController extends Controller
         return response($view)->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
-    protected function getData(string $id, Request $request): ?Entry
+    protected function getData(string $id): ?Entry
     {
-        if ($request->statamicToken()) {
-            return LivePreview::item($request->statamicToken());
+        if (request()->statamicToken()) {
+            return LivePreview::item(request()->statamicToken());
         }
 
         return Data::find($id);
