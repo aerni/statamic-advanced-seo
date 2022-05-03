@@ -29,7 +29,7 @@ class ContentDefaultsSubscriber
     public function createOrDeleteLocalizations(Event $event): void
     {
         $property = $this->getProperty($event);
-        $type = $this->determineRepositoryType($event);
+        $type = $this->getRepositoryType($event);
 
         $handle = $property->handle();
         $sites = $property->sites();
@@ -43,8 +43,16 @@ class ContentDefaultsSubscriber
     public function deleteDefaults(Event $event): void
     {
         $property = $this->getProperty($event);
-        $type = $this->determineRepositoryType($event);
+        $type = $this->getRepositoryType($event);
 
         Seo::find($type, $property->handle())?->delete();
+    }
+
+    protected function getRepositoryType(Event $event): string
+    {
+        return match (true) {
+            (property_exists($event, 'collection')) => 'collections',
+            (property_exists($event, 'taxonomy')) => 'taxonomies',
+        };
     }
 }

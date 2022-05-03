@@ -8,14 +8,6 @@ use Statamic\Events\Event;
 
 trait GetsEventData
 {
-    protected function determineRepositoryType(Event $event): string
-    {
-        return match (true) {
-            (property_exists($event, 'collection')) => 'collections',
-            (property_exists($event, 'taxonomy')) => 'taxonomies',
-        };
-    }
-
     protected function getProperty(Event $event): mixed
     {
         $property = collect(['collection', 'entry', 'taxonomy', 'term', 'defaults'])
