@@ -8,6 +8,6 @@ class SocialImage extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Aerni\AdvancedSeo\Repositories\SocialImageRepository::class;
+        return \Aerni\AdvancedSeo\SocialImages\SocialImageRepository::class;
     }
 }

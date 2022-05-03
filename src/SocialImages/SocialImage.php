@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Content;
+namespace Aerni\AdvancedSeo\SocialImages;
 
 use Aerni\AdvancedSeo\Facades\SocialImage as SocialImageApi;
 use Illuminate\Support\Facades\File;

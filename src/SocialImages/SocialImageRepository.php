@@ -1,8 +1,8 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Repositories;
+namespace Aerni\AdvancedSeo\SocialImages;
 
-use Aerni\AdvancedSeo\Content\SocialImage;
+use Aerni\AdvancedSeo\SocialImages\SocialImage;
 use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
