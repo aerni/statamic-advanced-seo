@@ -526,7 +526,11 @@ class OnPageSeoFields extends BaseFields
             return [];
         }
 
-        $fields = [
+        if (isset($this->data) && ! ShouldDisplaySitemapSettings::handle($this->data)) {
+            return [];
+        }
+
+        return [
             [
                 'handle' => 'seo_section_sitemap',
                 'field' => [
@@ -632,15 +636,6 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
-
-        if (isset($this->data) && ! ShouldDisplaySitemapSettings::handle($this->data)) {
-            $fields[0]['field']['if'] = 'always';
-            $fields[1]['field']['if'] = 'always';
-            $fields[2]['field']['if'] = 'always';
-            $fields[3]['field']['if'] = 'always';
-        }
-
-        return $fields;
     }
 
     public function jsonLd(): array

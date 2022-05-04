@@ -18,6 +18,11 @@ class Helpers
         return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
     }
 
+    public static function isBlueprintCpRoute(): bool
+    {
+        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints']);
+    }
+
     /**
      * Return false if we're on any Statamic frontend route.
      * This excludes any Route::get() and even Route::statamic().

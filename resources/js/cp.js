@@ -7,7 +7,3 @@ Statamic.booting(() => {
     Statamic.component('social_image-fieldtype', SocialImageFieldtype)
     Statamic.component('seo_source-fieldtype', SourceFieldtype)
 })
-
-Statamic.$conditions.add('always', ({ values }) => {
-    return true
-});
