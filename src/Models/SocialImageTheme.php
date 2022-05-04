@@ -10,8 +10,12 @@ class SocialImageTheme extends Model
 {
     protected static function getRows(): array
     {
-        if (! Folder::disk('resources')->exists('views/social_images')) {
+        if (config('advanced-seo.social_images.generator.enabled', false) && ! Folder::disk('resources')->exists('views/social_images')) {
             throw new \Exception('You need to create at least one theme for your social images.');
+        }
+
+        if (! Folder::disk('resources')->exists('views/social_images')) {
+            return [];
         }
 
         $themes = Folder::disk('resources')
