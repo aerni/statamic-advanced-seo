@@ -23,7 +23,7 @@
         mounted() {
             Statamic.$hooks.on('entry.saved', (resolve) => {
                 if (this.image) this.image = `${this.image}?reload`
-                resolve();
+                resolve()
             })
         },
 
