@@ -75,8 +75,7 @@ class ServiceProvider extends AddonServiceProvider
             ->bootAddonNav()
             ->bootAddonPermissions()
             ->bootGit()
-            ->autoPublishConfig()
-            ->publishSocialImagesViews();
+            ->autoPublishConfig();
     }
 
     protected function bootAddonStores(): self
@@ -147,15 +146,6 @@ class ServiceProvider extends AddonServiceProvider
         if (config('statamic.git.enabled')) {
             Git::listen(\Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class);
         }
-
-        return $this;
-    }
-
-    protected function publishSocialImagesViews(): self
-    {
-        $this->publishes([
-            __DIR__.'/../resources/views/social_images' => resource_path('views/vendor/advanced-seo/social_images'),
-        ], 'advanced-seo-views');
 
         return $this;
     }
