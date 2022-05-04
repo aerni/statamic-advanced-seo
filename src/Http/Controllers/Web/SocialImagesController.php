@@ -29,11 +29,12 @@ class SocialImagesController extends Controller
         // Throw if the social image type is not supported.
         throw_unless($model = SocialImage::findModel(Str::replace('-', '_', $type)), new NotFoundHttpException);
 
-        // Throw if the requested social image theme does not exist.
-        throw_unless($theme = $model['templates']->get(Str::replace('-', '_', $theme)), new NotFoundHttpException);
+        $template = $model['templates']->get(Str::replace('-', '_', $theme)) // Get the template based on the theme in the request.
+            ?? $model['templates']->get('default') // If no theme is set, use the default theme.
+            ?? $model['templates']->first(); // If the default doesn't exist either, fall back to the first theme.
 
         $view = (new View)
-            ->template($theme)
+            ->template($template)
             ->layout($model['layout'])
             ->with($data->merge($model)->toAugmentedArray());
 
