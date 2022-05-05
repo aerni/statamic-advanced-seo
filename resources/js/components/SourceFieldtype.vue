@@ -166,6 +166,7 @@ export default {
 
         site() {
             this.customValue = null
+            this.updateAutoFieldValue()
         },
     },
 
