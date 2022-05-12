@@ -10,7 +10,7 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 - Excellent user experience leveraging a custom source fieldtype
 - Social images generator
 - Fine-grained user permissions
-- Migration command to easily migrate from other addons
+- Simple migration from Aardvark SEO and SEO Pro
 - Sitemap
 - Support for Statamic’s Git integration
 - Highly flexible by design
@@ -30,14 +30,14 @@ composer require aerni/advanced-seo
 
 The config will be published to `config/advanced-seo.php` as part of the installation process. Make sure to check it out, as there are tons of configuration options to tailor the features to your needs.
 
-## Getting started
+## Getting Started
 Add `{{ seo:head }}` somewhere between your `<head>` tags.
 
 ```html
 <head>{{ seo:head }}</head>
 ```
 
- Add `{{ seo:body }}` after the opening `<body>` tag. This tag is only needed when using Google Tag Manager.
+ Add `{{ seo:body }}` after the opening `<body>` tag. Note that this tag is only needed when using Google Tag Manager.
 
 ```html
 <body>{{ seo:body }}</body>
@@ -100,10 +100,10 @@ Run the following command to create your first theme:
 php please seo:theme
 ```
 
-This will publish an empty template file for each social image type to `resources/views/social_images/{theme}` to get you started.
+This will publish an empty template file for each social image type to `resources/views/social_images/{theme}`.
 
 ### Templating
-When building your social image templates, you most likely want to see what you’re doing. You can view your templates according this schema:
+When building your social image templates, you most likely want to see what you’re doing. You can view your templates according to this schema:
 
 ```
 https://site.test/!/advanced-seo/social-images/{theme}/{type}/{id}
@@ -127,7 +127,7 @@ https://site.test/!/advanced-seo/social-images/default/twitter-summary-large-ima
 Make sure the generator is enabled in the addon’s config. Next, head over to `SEO -> Site -> Social Media` and enable the collections you want to enable the generator for. This will add a new `Social Images Generator` section to the selected collections’ defaults and entry blueprint.
 
 ### Usage
-Activate the `Generate Social Images` toggle on the entry to generate the social images. If you have multiple themes, you may select the theme of your choice in the `Themes` dropdown. The images are generated every time you save the entry. You may also disable this behavior in the config, to generate the images the first time the entry is viewed on the frontend instead.
+Activate the `Generate Social Images` toggle on the entry to generate the social images. If you have multiple themes, you may select the theme of your choice in the `Themes` dropdown. The images are generated every time you save the entry. You may also disable this behavior in the config and instead generate the images the first time the entry is viewed on the frontend.
 
 You can also run the following command to generate all images at once:
 
@@ -145,10 +145,10 @@ You may use Statamic’s live preview feature to preview your social images when
 This addon automatically generates sitemaps for your collections and taxonomies. The sitemaps are organized in a sitemap index so you only have to submit one URL to Google Search Console. The sitemap index can be found at `yourwebsite.com/sitemap.xml`.
 
 ### Exclude From Sitemap
-You may want to exclude specific collections and taxonomies from the sitemap. Simply navigate to `SEO -> Site -> Indexing` and change the settings to your liking. You can also remove a specific entry or term from the sitemap by disabling the toggle in the SEO tab. If you don’t want to use the sitemap feature at all, simply disable it in the config file.
+You may want to exclude specific collections and taxonomies from the sitemap. Simply navigate to `SEO -> Site -> Indexing` and change the settings to your liking. You can also remove a specific entry or term from the sitemap by disabling the toggle in the SEO tab. If an entry or term has noindex enabled, it will be removed from the sitemap as well. Lastly, if you don’t want to use the sitemap feature at all, simply disable it in the config file.
 
 ### Custom Sitemaps
-You can also generate your own custom sitemaps. This comes in handy if you have custom routes outside of Statamic. See the example below for instructions on how to create your sitemap. This code has to go within a Service Provider to make sure it gets executed on every request.
+You can generate your own custom sitemaps, which comes in handy if you have custom routes outside of Statamic. See the example below for instructions on how to create a sitemap. This code has to go within a Service Provider to make sure the sitemap is loaded with each request.
 
 ```php
 use Aerni\AdvancedSeo\Facades\Sitemap;
