@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Statamic\Facades\Fieldset;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySitemapSettings;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Statamic\Facades\Fieldset;
 
 class OnPageSeoFields extends BaseFields
 {

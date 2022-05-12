@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
 
 class ContentDefaultsFields extends BaseFields
 {
