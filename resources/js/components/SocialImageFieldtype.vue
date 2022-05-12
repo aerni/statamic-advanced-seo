@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="this.image">
+        <div v-if="this.exists">
             <img class="rounded-md" :src="this.image">
         </div>
 
@@ -31,6 +31,17 @@
             '$store.state.publish.base.site': function () {
                 this.image = this.meta.image
             },
+        },
+
+        computed: {
+            exists() {
+                const http = new XMLHttpRequest();
+
+                http.open('HEAD', this.image, false);
+                http.send();
+
+                return http.status != 404;
+            }
         },
     }
 </script>
