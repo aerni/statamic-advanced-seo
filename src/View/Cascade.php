@@ -2,27 +2,26 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
-use Statamic\Fields\Value;
-use Statamic\Tags\Context;
-use Statamic\Facades\Blink;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Taxonomies\Taxonomy;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Actions\EvaluateContextType;
+use Aerni\AdvancedSeo\Actions\GetContentDefaults;
+use Aerni\AdvancedSeo\Actions\GetPageData;
+use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Actions\GetPageData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
+use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Fields\Value;
 use Statamic\Stache\Query\TermQueryBuilder;
-use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
-use Aerni\AdvancedSeo\Actions\GetContentDefaults;
-use Aerni\AdvancedSeo\Actions\EvaluateContextType;
-use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
+use Statamic\Support\Str;
+use Statamic\Tags\Context;
+use Statamic\Taxonomies\Taxonomy;
 
 class Cascade
 {
