@@ -15,7 +15,7 @@ abstract class BaseFields implements Fields
         return new static();
     }
 
-    // TODO: Probably a good idea to make the data required in the constructor? We always need the data anyways.
+    // TODO: Might be a good idea to make the data required in the constructor? We always need the data anyways.
     public function data(DefaultsData $data): self
     {
         $this->data = $data;
