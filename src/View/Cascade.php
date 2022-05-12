@@ -276,8 +276,12 @@ class Cascade
             : $this->get('og_image');
     }
 
-    protected function ogImageSize(): array
+    protected function ogImageSize(): ?array
     {
+        if (! $this->ogImage()) {
+            return null;
+        }
+
         return collect(SocialImage::findModel('open_graph'))
             ->only(['width', 'height'])
             ->all();
