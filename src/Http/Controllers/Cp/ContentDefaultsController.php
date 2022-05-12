@@ -85,7 +85,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
                     'origin' => $exists ? $localization->locale() === optional($requestLocalization->origin())->locale() : null,
                     'url' => $exists ? $localization->editUrl() : null,
                 ];
-            })->sortBy('handle')->values()->all(),
+            })->values()->all(),
             'breadcrumbs' => $this->breadcrumbs(),
             'readOnly' => $user->cant("edit seo {$handle} defaults"),
             'contentType' => $this->type,
