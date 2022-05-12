@@ -2,26 +2,27 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Actions\EvaluateContextType;
-use Aerni\AdvancedSeo\Actions\GetContentDefaults;
-use Aerni\AdvancedSeo\Actions\GetPageData;
-use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Taxonomies\Taxonomy;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Actions\GetPageData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
+use Aerni\AdvancedSeo\Actions\GetContentDefaults;
+use Aerni\AdvancedSeo\Actions\EvaluateContextType;
+use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
 
 class Cascade
 {
@@ -84,6 +85,7 @@ class Cascade
             'og_image' => $this->ogImage(),
             'og_image_size' => $this->ogImageSize(),
             'og_title' => $this->ogTitle(),
+            'twitter_card' => $this->twitterCard(),
             'twitter_image' => $this->twitterImage(),
             'twitter_image_size' => $this->twitterImageSize(),
             'twitter_title' => $this->twitterTitle(),
@@ -292,18 +294,40 @@ class Cascade
         return $this->get('twitter_title') ?? $this->title();
     }
 
+    protected function twitterCard(): string
+    {
+        if ($card = $this->get('twitter_card')) {
+            return $card;
+        }
+
+        /**
+         * Determine the twitter card based on the images set in the social media defaults.
+         * This is used on taxonomy and error pages.
+         */
+
+        $image = $this->get('twitter_summary_large_image') ?? $this->get('twitter_summary_image');
+
+        return $image?->field()?->config()['twitter_card'] ?? Defaults::data('collections')->get('seo_twitter_card');
+    }
+
     protected function twitterImage(): ?Value
     {
-        $handle = SocialImageModel::firstWhere('type', "twitter_{$this->get('twitter_card')}")['handle'];
+        if (! $model = SocialImage::findModel("twitter_{$this->twitterCard()}")) {
+            return null;
+        }
 
         return $this->value('generate_social_images')
             ? $this->get('generated_twitter_image')
-            : $this->get($handle);
+            : $this->get($model['handle']);
     }
 
-    protected function twitterImageSize(): array
+    protected function twitterImageSize(): ?array
     {
-        return collect(SocialImage::findModel("twitter_{$this->get('twitter_card')}"))
+        if (! $this->twitterImage()) {
+            return null;
+        }
+
+        return collect(SocialImage::findModel("twitter_{$this->twitterCard()}"))
             ->only(['width', 'height'])
             ->all();
     }

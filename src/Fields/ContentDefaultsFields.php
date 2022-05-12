@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 
 class ContentDefaultsFields extends BaseFields
 {
@@ -220,6 +221,7 @@ class ContentDefaultsFields extends BaseFields
                     'display' => 'Twitter Summary Image',
                     'instructions' => $this->trans('seo_twitter_summary_image', 'default_instructions'),
                     'width' => 50,
+                    'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -232,6 +234,7 @@ class ContentDefaultsFields extends BaseFields
                     'display' => 'Twitter Summary Large Image',
                     'instructions' => $this->trans('seo_twitter_summary_large_image', 'default_instructions'),
                     'width' => 50,
+                    'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
                     'validate' => [
                         'image',
                         'mimes:jpg,png',

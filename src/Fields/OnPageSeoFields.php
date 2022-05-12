@@ -2,11 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySitemapSettings;
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
+use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
-use Statamic\Facades\Fieldset;
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySitemapSettings;
+use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -311,6 +312,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'assets-fieldtype',
+                    'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
                     'if' => [
                         'seo_twitter_card.value' => 'equals summary',
                     ],
@@ -338,6 +340,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'assets-fieldtype',
+                    'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
                     'if' => [
                         'seo_twitter_card.value' => 'equals summary_large_image',
                     ],

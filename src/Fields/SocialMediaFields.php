@@ -103,6 +103,7 @@ class SocialMediaFields extends BaseFields
                     'display' => 'Twitter Summary Image',
                     'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter_summary') . '.',
                     'width' => 50,
+                    'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -119,6 +120,7 @@ class SocialMediaFields extends BaseFields
                         'image',
                         'mimes:jpg,png',
                     ],
+                    'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
                 ]),
             ],
             [
