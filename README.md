@@ -1,4 +1,4 @@
-![Statamic](https://flat.badgen.net/badge/Statamic/3.3+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
+![Statamic](https://flat.badgen.net/badge/Statamic/3.3.8+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
 
 # Advanced SEO
 Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project’s needs. Want to handle the Sitemap yourself? Simply disable the feature in the config.
@@ -15,9 +15,9 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 - Support for Statamic’s Git integration
 - Highly flexible by design
 
-## Requirements
+## Minimum Requirements
 - PHP 8.0
-- Statamic 3.3
+- Statamic 3.3.8
 - Laravel 8
 - [Puppeteer](https://github.com/spatie/browsershot#requirements) (Social Images Generator)
 
