@@ -3,11 +3,16 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\GraphQL\AdvancedSeoField;
+use Aerni\AdvancedSeo\GraphQL\AdvancedSeoType;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Git;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Stache\Stache;
 use Statamic\Statamic;
@@ -75,6 +80,7 @@ class ServiceProvider extends AddonServiceProvider
             ->bootAddonNav()
             ->bootAddonPermissions()
             ->bootGit()
+            ->bootGraphQL()
             ->autoPublishConfig();
     }
 
@@ -117,7 +123,7 @@ class ServiceProvider extends AddonServiceProvider
             Defaults::enabled()->groupBy('type')->each(function ($items, $group) {
                 Permission::register("view seo {$group} defaults", function ($permission) use ($group, $items) {
                     $permission
-                        ->label('View ' . ucfirst($group))
+                        ->label('View '.ucfirst($group))
                         ->children([
                             Permission::make('view seo {group} defaults')
                                 ->label('View :group')
@@ -146,6 +152,16 @@ class ServiceProvider extends AddonServiceProvider
         if (config('statamic.git.enabled')) {
             Git::listen(\Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class);
         }
+
+        return $this;
+    }
+
+    protected function bootGraphQL(): self
+    {
+        GraphQL::addType(AdvancedSeoType::class);
+
+        GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new AdvancedSeoField())->toArray());
+        GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new AdvancedSeoField())->toArray());
 
         return $this;
     }
