@@ -34,6 +34,11 @@ class ContentDefaultsSubscriber
         $handle = $property->handle();
         $sites = $property->sites();
 
+        // Abort if Collection or Taxnomy was disabled in the config.
+        if (in_array($handle, config("advanced-seo.disabled.{$type}", []))) {
+            return;
+        }
+
         Seo::findOrMake($type, $handle)->createOrDeleteLocalizations($sites);
     }
 
