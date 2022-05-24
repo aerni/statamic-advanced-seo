@@ -112,10 +112,17 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
+            [
+                'handle' => 'seo_social_images_theme',
+                'field' => [
+                    'type' => 'hidden',
+                    'default' => SocialImageTheme::fieldtypeDefault(),
+                ],
+            ],
         ]);
 
         if (SocialImageTheme::all()->count() > 1) {
-            $fields->push([
+            $fields->put(2, [
                 'handle' => 'seo_social_images_theme',
                 'field' => [
                     'display' => 'Theme',
@@ -425,7 +432,7 @@ class OnPageSeoFields extends BaseFields
                     'field' => [
                         'type' => 'button_group',
                         'options' => [
-                            'current' => 'Current ' . ucfirst(str_singular($this->typePlaceholder())),
+                            'current' => 'Current '.ucfirst(str_singular($this->typePlaceholder())),
                             'other' => 'Other Entry',
                             'custom' => 'Custom URL',
                         ],

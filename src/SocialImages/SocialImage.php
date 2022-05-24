@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\SocialImages;
 
 use Aerni\AdvancedSeo\Facades\SocialImage as SocialImageApi;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
@@ -60,8 +61,8 @@ class SocialImage
 
     protected function templateUrl(): string
     {
-        return url('/') . SocialImageApi::route(
-            theme: $this->entry->seo_social_images_theme,
+        return url('/').SocialImageApi::route(
+            theme: $this->entry->seo_social_images_theme ?? SocialImageTheme::fieldtypeDefault(),
             type: $this->model['type'],
             id: $this->entry->id,
         );
