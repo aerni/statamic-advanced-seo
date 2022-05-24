@@ -17,7 +17,8 @@ class ClearImageGlideCache
 
         // Get the path of the cached image.
         $cachePath = $disk->getFilesRecursively('/')
-            ->firstWhere(fn ($cachePath) => str_contains($cachePath, $path));
+            ->filter(fn ($cachePath) => str_contains($cachePath, $path))
+            ->first();
 
         // Delete the cached image.
         if ($cachePath) {
