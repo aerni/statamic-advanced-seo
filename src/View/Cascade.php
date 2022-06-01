@@ -303,7 +303,6 @@ class Cascade
          * Determine the twitter card based on the images set in the social media defaults.
          * This is used on taxonomy and error pages.
          */
-
         $image = $this->get('twitter_summary_large_image') ?? $this->get('twitter_summary_image');
 
         return $image?->field()?->config()['twitter_card'] ?? Defaults::data('collections')->get('seo_twitter_card');
@@ -354,8 +353,8 @@ class Cascade
     protected function hreflang(): ?array
     {
         /*
-        TODO: Support collection taxonomy details page.
-        Return if we're on a collection taxonomy details page.
+        TODO: Support collection taxonomy index page.
+        Return if we're on a collection taxonomy index page.
         Statamic has yet to provide a way to get the URLs of collection taxonomies.
         */
         if ($this->context->has('segment_2') && $this->context->get('terms') instanceof TermQueryBuilder) {
@@ -363,15 +362,15 @@ class Cascade
         }
 
         /*
-        TODO: Support collection term details page.
-        Return if we're on a collection term details page.
+        TODO: Support collection term show page.
+        Return if we're on a collection term show page.
         Statamic has yet to provide a way to get the URLs of collection terms.
         */
-        if ($this->context->has('segment_3') && $this->context->get('is_term') === true) {
+        if ($this->context->has('segment_3') && $this->context->value('is_term') === true) {
             return null;
         }
 
-        // Handles global taxonomy details page.
+        // Handles taxonomy index page.
         if ($this->context->has('segment_1') && $this->context->get('terms') instanceof TermQueryBuilder) {
             $taxonomy = $this->context->get('terms')->first()->taxonomy();
 
@@ -387,14 +386,13 @@ class Cascade
                 ];
             })->toArray();
 
-
             // Reset the site to the original.
             Site::setCurrent($initialSite);
 
             return $data;
         }
 
-        // Handle entries and global term details page.
+        // Handle entries and term show page.
         $data = Data::find($this->context->get('id'));
 
         if (! $data) {
@@ -406,16 +404,12 @@ class Cascade
             : $data->taxonomy()->sites();
 
         // We only want to return data for published entries and terms.
-        $alternates = $sites->filter(function ($locale) use ($data) {
-            return $data->in($locale)?->published();
-        })->values();
+        $alternates = $sites->filter(fn ($locale) => $data->in($locale)?->published())->values();
 
-        return $alternates->map(function ($locale) use ($data) {
-            return [
-                'url' => $data->in($locale)->absoluteUrl(),
-                'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
-            ];
-        })->toArray();
+        return $alternates->map(fn ($locale) => [
+            'url' => $data->in($locale)->absoluteUrl(),
+            'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+        ])->toArray();
     }
 
     protected function canonical(): ?string
@@ -467,7 +461,7 @@ class Cascade
         }
 
         return $page > 1 && $page <= $paginator->lastPage()
-            ? $currentUrl . '?page=' . ($page - 1)
+            ? $currentUrl.'?page='.($page - 1)
             : null;
     }
 
@@ -482,13 +476,13 @@ class Cascade
         $page = $paginator->currentPage();
 
         return $page < $paginator->lastPage()
-            ? $currentUrl . '?page=' . ($page + 1)
+            ? $currentUrl.'?page='.($page + 1)
             : null;
     }
 
     protected function schema(): ?string
     {
-        $schema = $this->siteSchema() . $this->entrySchema();
+        $schema = $this->siteSchema().$this->entrySchema();
 
         return ! empty($schema) ? $schema : null;
     }
@@ -505,7 +499,7 @@ class Cascade
             $data = $this->value('site_json_ld')?->value();
 
             return $data
-                ? '<script type="application/ld+json">' . $data . '</script>'
+                ? '<script type="application/ld+json">'.$data.'</script>'
                 : null;
         }
 
@@ -538,7 +532,7 @@ class Cascade
         $data = $this->value('json_ld')?->value();
 
         return $data
-            ? '<script type="application/ld+json">' . $data . '</script>'
+            ? '<script type="application/ld+json">'.$data.'</script>'
             : null;
     }
 
@@ -576,7 +570,7 @@ class Cascade
         $segments[0] = '/';
 
         $crumbs = collect($segments)->map(function () use (&$segments) {
-            $uri = URL::tidy(join('/', $segments));
+            $uri = URL::tidy(implode('/', $segments));
             array_pop($segments);
 
             return $uri;
