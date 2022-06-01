@@ -34,11 +34,11 @@ class SitemapController extends Controller
 
         throw_unless($sitemap = Sitemap::find("{$type}::{$handle}"), new NotFoundHttpException);
 
-        $urls = $sitemap->urls();
+        $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", Sitemap::cacheExpiry(), function () use ($sitemap) {
+            $urls = $sitemap->urls();
 
-        throw_unless($urls->isNotEmpty(), new NotFoundHttpException);
+            throw_unless($urls->isNotEmpty(), new NotFoundHttpException);
 
-        $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", Sitemap::cacheExpiry(), function () use ($urls) {
             return view('advanced-seo::sitemaps.show', [
                 'urls' => $urls,
                 'version' => Addon::get('aerni/advanced-seo')->version(),
@@ -53,7 +53,7 @@ class SitemapController extends Controller
 
     public function xsl(): Response
     {
-        $path = __DIR__ . '/../../../../resources/xsl/sitemap.xsl';
+        $path = __DIR__.'/../../../../resources/xsl/sitemap.xsl';
 
         return response(file_get_contents($path))->withHeaders([
             'Content-Type' => 'text/xsl',
