@@ -367,7 +367,7 @@ class Cascade
         Return if we're on a collection term details page.
         Statamic has yet to provide a way to get the URLs of collection terms.
         */
-        if ($this->context->has('segment_3') && $this->context->get('is_term') === true) {
+        if ($this->context->has('segment_3') && $this->context->value('is_term') === true) {
             return null;
         }
 
