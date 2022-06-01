@@ -406,16 +406,12 @@ class Cascade
             : $data->taxonomy()->sites();
 
         // We only want to return data for published entries and terms.
-        $alternates = $sites->filter(function ($locale) use ($data) {
-            return $data->in($locale)?->published();
-        })->values();
+        $alternates = $sites->filter(fn ($locale) => $data->in($locale)?->published())->values();
 
-        return $alternates->map(function ($locale) use ($data) {
-            return [
-                'url' => $data->in($locale)->absoluteUrl(),
-                'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
-            ];
-        })->toArray();
+        return $alternates->map(fn ($locale) => [
+            'url' => $data->in($locale)->absoluteUrl(),
+            'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+        ])->toArray();
     }
 
     protected function canonical(): ?string
