@@ -538,26 +538,24 @@ class Cascade
 
     protected function breadcrumbs(): ?string
     {
-        $enabled = $this->value('use_breadcrumbs');
-        $isHome = $this->context->get('is_homepage');
-
-        if ($enabled && ! $isHome) {
-            $listItems = $this->breadcrumbsListItems()->map(function ($crumb, $key) {
-                $item = Schema::thing()->setProperty('id', $crumb->absoluteUrl());
-
-                if ($crumb instanceof Taxonomy) {
-                    $item->name($crumb->title());
-                } elseif ($title = $crumb->get('title') ?? $crumb->origin()?->get('title')) {
-                    $item->name($title);
-                }
-
-                return Schema::listItem()->position($key + 1)->item($item);
-            });
-
-            return Schema::breadcrumbList()->itemListElement($listItems);
+        // Don't render breadcrumbs if deactivated in the site defaults.
+        if (! $this->value('use_breadcrumbs')) {
+            return null;
         }
 
-        return null;
+        // Don't render breadcrumbs on the homepage.
+        if ($this->context->get('is_homepage')) {
+            return null;
+        }
+
+        $listItems = $this->breadcrumbsListItems()->map(function ($crumb, $key) {
+            return Schema::listItem()
+                ->position($key + 1)
+                ->name($crumb->title())
+                ->item($crumb->absoluteUrl());
+        })->all();
+
+        return Schema::breadcrumbList()->itemListElement($listItems);
     }
 
     protected function breadcrumbsListItems(): Collection
