@@ -548,11 +548,11 @@ class Cascade
             return null;
         }
 
-        $listItems = $this->breadcrumbsListItems()->map(function ($crumb, $key) {
+        $listItems = $this->breadcrumbsListItems()->map(function ($crumb) {
             return Schema::listItem()
-                ->position($key + 1)
-                ->name($crumb->title())
-                ->item($crumb->absoluteUrl());
+                ->position($crumb['position'])
+                ->name($crumb['title'])
+                ->item($crumb['url']);
         })->all();
 
         return Schema::breadcrumbList()->itemListElement($listItems);
@@ -571,13 +571,19 @@ class Cascade
             $uri = URL::tidy(implode('/', $segments));
             array_pop($segments);
 
-            return $uri;
-        })->mapWithKeys(function ($uri) {
-            $uri = Str::ensureLeft($uri, '/');
+            return Data::findByUri(Str::ensureLeft($uri, '/'), Site::current()->handle());
+        })
+        ->filter()
+        ->reverse()
+        ->values()
+        ->map(function ($item, $key) {
+            return [
+                'position' => $key + 1,
+                'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
+                'url' => $item->absoluteUrl(),
+            ];
+        });
 
-            return [$uri => Data::findByUri($uri, Site::current()->handle())];
-        })->filter();
-
-        return $crumbs->reverse()->values();
+        return $crumbs;
     }
 }
