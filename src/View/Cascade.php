@@ -560,16 +560,11 @@ class Cascade
 
     protected function breadcrumbsListItems(): Collection
     {
-        $url = URL::makeAbsolute(URL::getCurrent());
-        $url = Str::removeLeft($url, Site::current()->absoluteUrl());
-        $url = Str::ensureLeft($url, '/');
+        $segments = collect(request()->segments())->prepend('/');
 
-        $segments = explode('/', $url);
-        $segments[0] = '/';
-
-        $crumbs = collect($segments)->map(function () use (&$segments) {
-            $uri = URL::tidy(implode('/', $segments));
-            array_pop($segments);
+        $crumbs = $segments->map(function () use (&$segments) {
+            $uri = URL::tidy($segments->join('/'));
+            $segments->pop();
 
             return Data::findByUri(Str::ensureLeft($uri, '/'), Site::current()->handle());
         })
