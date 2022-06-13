@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^8.0",
-        "laravel/framework": "^8.0 || ^9.0",
+        "laravel/framework": "^8.77 || ^9.0",
         "spatie/browsershot": "^3.52",
         "spatie/laravel-ray": "^1.26",
         "spatie/schema-org": "^3.8",
