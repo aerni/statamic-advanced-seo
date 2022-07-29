@@ -52,7 +52,7 @@ Add `{{ seo:head }}` somewhere between your `<head>` tags.
 | `{{ seo:field }}` | Get the data of a specific field, e.g. `{{ seo:title }}` |
 
 ## Migration
-Advanced SEO provides an easy upgrade path from addons such as `Aardvark SEO` and `SEO Pro`. Simply run the following command to migrate your entries and terms to the new data format:
+Advanced SEO provides multiple migration scripts to get your content into shape. This is super handy when installing the addon into an existing site with lots of entries and terms. There are even migration scripts for popular addons such as `Aardvark SEO` and `SEO Pro`. Simply run the following command to migrate your entries and terms to the new data format:
 
 ```bash
 php please seo:migrate
