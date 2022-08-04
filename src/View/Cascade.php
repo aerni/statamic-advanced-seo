@@ -241,9 +241,14 @@ class Cascade
 
     protected function compiledTitle(): string
     {
-        return $this->value('title_position')->value() === 'before'
-            ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
-            : "{$this->siteName()} {$this->titleSeparator()} {$this->title()}";
+        $position = $this->value('site_name_position')->value();
+
+        return match (true) {
+            ($position === 'end') => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
+            ($position === 'start') => "{$this->siteName()} {$this->titleSeparator()} {$this->title()}",
+            ($position === 'disabled') => $this->title(),
+            default => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
+        };
     }
 
     protected function title(): string
