@@ -352,13 +352,21 @@ class Cascade
 
     protected function hreflang(): ?array
     {
-        /*
-        TODO: Support collection taxonomy index page.
-        Return if we're on a collection taxonomy index page.
-        Statamic has yet to provide a way to get the URLs of collection taxonomies.
-        */
+        // Handles collection taxonomy index page.
         if ($this->context->has('segment_2') && $this->context->get('terms') instanceof TermQueryBuilder) {
-            return null;
+            $taxonomy = $this->context->get('title')->augmentable();
+
+            return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
+                $site = Site::get($site);
+                $siteUrl = $site->absoluteUrl();
+                $taxonomyHandle = $taxonomy->handle();
+                $collectionHandle = $taxonomy->collection()->handle();
+
+                return [
+                    'url' => URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}"),
+                    'locale' => Helpers::parseLocale($site->locale()),
+                ];
+            })->all();
         }
 
         // Handles collection taxonomy show page.
@@ -369,6 +377,7 @@ class Cascade
                 ->map(fn ($locale) => [
                     'url' => $localizedTerm->in($locale)->absoluteUrl(),
                     'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+                ])->all();
         }
 
         // Handles taxonomy index page.
