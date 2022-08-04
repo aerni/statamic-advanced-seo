@@ -37,6 +37,25 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_site_name_position',
+                'field' => [
+                    'display' => 'Site Name Position',
+                    'instructions' => $this->trans('seo_site_name_position', 'instructions'),
+                    'type' => 'seo_source',
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'button_group-fieldtype',
+                    'field' => [
+                        'type' => 'button_group',
+                        'options' => [
+                            'end' => 'End',
+                            'start' => 'Start',
+                            'disabled' => 'Disabled',
+                        ],
+                    ],
+                ],
+            ],
+            [
                 'handle' => 'seo_title',
                 'field' => [
                     'display' => 'Meta Title',

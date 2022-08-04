@@ -36,6 +36,22 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
             [
+                'handle' => 'seo_site_name_position',
+                'field' => [
+                    'type' => 'button_group',
+                    'display' => 'Site Name Position',
+                    'instructions' => $this->trans('seo_site_name_position', 'default_instructions'),
+                    'options' => [
+                        'end' => 'End',
+                        'start' => 'Start',
+                        'disabled' => 'Disabled',
+                    ],
+                    'default' => Defaults::data('collections')->get('seo_site_name_position'),
+                    'localizable' => true,
+                    'listable' => false,
+                ],
+            ],
+            [
                 'handle' => 'seo_title',
                 'field' => [
                     'type' => 'text',

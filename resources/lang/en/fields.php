@@ -9,6 +9,11 @@ return [
         'default_instructions' => 'Configure the default title and description of your :type.',
     ],
 
+    'seo_site_name_position' => [
+        'instructions' => 'Set the site name position for the meta title of this :type.',
+        'default_instructions' => 'Set the default site name position for the meta title of your :type.',
+    ],
+
     'seo_title' => [
         'instructions' => 'Set the meta title of this :type.',
         'default_instructions' => 'Set the default meta title of your :type.',

@@ -66,22 +66,6 @@ class GeneralFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'title_position',
-                'field' => [
-                    'options' => [
-                        'before' => 'Before',
-                        'after' => 'After',
-                    ],
-                    'default' => Defaults::data('site::general')->get('title_position'),
-                    'localizable' => true,
-                    'type' => 'button_group',
-                    'instructions' => 'Display the meta title before or after the site name.',
-                    'listable' => false,
-                    'display' => 'Title Position',
-                    'width' => 50,
-                ],
-            ],
-            [
                 'handle' => 'section_knowledge_graph',
                 'field' => [
                     'type' => 'section',
