@@ -361,13 +361,14 @@ class Cascade
             return null;
         }
 
-        /*
-        TODO: Support collection term show page.
-        Return if we're on a collection term show page.
-        Statamic has yet to provide a way to get the URLs of collection terms.
-        */
+        // Handles collection taxonomy show page.
         if ($this->context->has('segment_3') && $this->context->value('is_term') === true) {
-            return null;
+            $localizedTerm = $this->context->get('title')->augmentable();
+
+            return $localizedTerm->taxonomy()->sites()
+                ->map(fn ($locale) => [
+                    'url' => $localizedTerm->in($locale)->absoluteUrl(),
+                    'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
         }
 
         // Handles taxonomy index page.
