@@ -36,6 +36,7 @@ class GeneralFields extends BaseFields
                     'listable' => 'hidden',
                     'display' => 'Site Name',
                     'instructions' => 'The site name is added to your meta titles.',
+                    'width' => 50,
                 ],
             ],
             [
@@ -57,7 +58,7 @@ class GeneralFields extends BaseFields
                     'push_tags' => false,
                     'cast_booleans' => false,
                     'type' => 'select',
-                    'instructions' => 'The separator between the site name and meta title.',
+                    'instructions' => 'This separates the site name and page title.',
                     'width' => 50,
                     'listable' => 'hidden',
                     'display' => 'Title Separator',
