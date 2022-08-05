@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Updates;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Illuminate\Support\Arr;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Collection;
-use Statamic\Facades\Taxonomy;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Support\Arr;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\UpdateScripts\UpdateScript;
 
 class MigrateSiteNamePosition extends UpdateScript
@@ -43,6 +43,7 @@ class MigrateSiteNamePosition extends UpdateScript
             ->map(fn ($default) => Seo::findOrMake($default['type'], $default['handle']))
             ->map(function ($default) {
                 $sites = Collection::find($default->handle())->sites();
+
                 return $default->ensureLocalizations($sites);
             })
             ->each(function ($default) use ($titlePositions) {
@@ -56,6 +57,7 @@ class MigrateSiteNamePosition extends UpdateScript
             ->map(fn ($default) => Seo::findOrMake($default['type'], $default['handle']))
             ->map(function ($default) {
                 $sites = Taxonomy::find($default->handle())->sites();
+
                 return $default->ensureLocalizations($sites);
             })
             ->each(function ($default) use ($titlePositions) {
