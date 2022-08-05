@@ -3,11 +3,11 @@
 namespace Aerni\AdvancedSeo\Updates;
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\UpdateScripts\UpdateScript;
-use Statamic\Facades\Site;
 use Illuminate\Support\Arr;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\Term;
+use Statamic\UpdateScripts\UpdateScript;
 
 class MigrateSiteNamePosition extends UpdateScript
 {
