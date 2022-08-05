@@ -241,7 +241,7 @@ class Cascade
 
     protected function compiledTitle(): string
     {
-        $position = $this->value('site_name_position')->value();
+        $position = $this->value('site_name_position')?->value();
 
         return match (true) {
             ($position === 'end') => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
