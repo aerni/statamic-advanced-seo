@@ -44,6 +44,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $updateScripts = [
         Updates\CreateSocialImagesTheme::class,
+        Updates\MigrateSiteNamePosition::class,
     ];
 
     protected $routes = [

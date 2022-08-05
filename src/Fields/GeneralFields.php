@@ -36,6 +36,7 @@ class GeneralFields extends BaseFields
                     'listable' => 'hidden',
                     'display' => 'Site Name',
                     'instructions' => 'The site name is added to your meta titles.',
+                    'width' => 50,
                 ],
             ],
             [
@@ -57,27 +58,11 @@ class GeneralFields extends BaseFields
                     'push_tags' => false,
                     'cast_booleans' => false,
                     'type' => 'select',
-                    'instructions' => 'The separator between the site name and meta title.',
+                    'instructions' => 'This separates the site name and page title.',
                     'width' => 50,
                     'listable' => 'hidden',
                     'display' => 'Title Separator',
                     'default' => Defaults::data('site::general')->get('title_separator'),
-                ],
-            ],
-            [
-                'handle' => 'title_position',
-                'field' => [
-                    'options' => [
-                        'before' => 'Before',
-                        'after' => 'After',
-                    ],
-                    'default' => Defaults::data('site::general')->get('title_position'),
-                    'localizable' => true,
-                    'type' => 'button_group',
-                    'instructions' => 'Display the meta title before or after the site name.',
-                    'listable' => false,
-                    'display' => 'Title Position',
-                    'width' => 50,
                 ],
             ],
             [
