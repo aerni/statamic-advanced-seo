@@ -32,16 +32,16 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_title_description',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Title & Description',
-                    'instructions' => $this->trans('seo_section_title_description', 'instructions'),
+                    'display' => $this->trans('seo_section_title_description.display'),
+                    'instructions' => $this->trans('seo_section_title_description.instructions'),
                 ],
             ],
             [
                 'handle' => 'seo_title',
                 'field' => [
-                    'display' => 'Meta Title',
-                    'instructions' => $this->trans('seo_title', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_title.display'),
+                    'instructions' => $this->trans('seo_title.instructions'),
                     'default' => '@auto',
                     'auto' => 'title',
                     'localizable' => true,
@@ -56,9 +56,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_description',
                 'field' => [
-                    'display' => 'Meta Description',
-                    'instructions' => $this->trans('seo_description', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_description.display'),
+                    'instructions' => $this->trans('seo_description.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'textarea-fieldtype',
@@ -71,18 +71,18 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_site_name_position',
                 'field' => [
-                    'display' => 'Site Name Position',
-                    'instructions' => $this->trans('seo_site_name_position', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_site_name_position.display'),
+                    'instructions' => $this->trans('seo_site_name_position.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'button_group-fieldtype',
                     'field' => [
                         'type' => 'button_group',
                         'options' => [
-                            'end' => 'End',
-                            'start' => 'Start',
-                            'disabled' => 'Disabled',
+                            'end' => $this->trans('seo_site_name_position.end'),
+                            'start' => $this->trans('seo_site_name_position.start'),
+                            'disabled' => $this->trans('seo_site_name_position.disabled'),
                         ],
                     ],
                 ],
@@ -112,17 +112,17 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Social Images Generator',
-                    'instructions' => $this->trans('seo_section_social_images_generator', 'instructions'),
+                    'display' => $this->trans('seo_section_social_images_generator.display'),
+                    'instructions' => $this->trans('seo_section_social_images_generator.instructions'),
                     'listable' => 'hidden',
                 ],
             ],
             [
                 'handle' => 'seo_generate_social_images',
                 'field' => [
-                    'display' => 'Generate Social Images',
-                    'instructions' => $this->trans('seo_generate_social_images', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_generate_social_images.display'),
+                    'instructions' => $this->trans('seo_generate_social_images.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
@@ -144,9 +144,9 @@ class OnPageSeoFields extends BaseFields
             $fields->put(2, [
                 'handle' => 'seo_social_images_theme',
                 'field' => [
-                    'display' => 'Theme',
-                    'instructions' => $this->trans('seo_social_images_theme', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_social_images_theme.display'),
+                    'instructions' => $this->trans('seo_social_images_theme.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
@@ -173,8 +173,8 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_generated_og_image',
                 'field' => [
                     'type' => 'social_image',
+                    'display' => $this->trans('seo_generated_og_image.display'),
                     'image_type' => 'open_graph',
-                    'display' => 'Open Graph',
                     'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
@@ -187,8 +187,8 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_generated_twitter_image',
                 'field' => [
                     'type' => 'social_image',
+                    'display' => $this->trans('seo_generated_twitter_image.display'),
                     'image_type' => 'twitter',
-                    'display' => 'Twitter',
                     'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
@@ -230,16 +230,16 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_og',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Open Graph',
-                    'instructions' => $this->trans('seo_section_og', 'instructions'),
+                    'display' => $this->trans('seo_section_og.display'),
+                    'instructions' => $this->trans('seo_section_og.instructions'),
                 ],
             ],
             [
                 'handle' => 'seo_og_image',
                 'field' => [
-                    'display' => 'Open Graph Image',
-                    'instructions' => $this->trans('seo_og_image', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_og_image.display'),
+                    'instructions' => $this->trans('seo_og_image.instructions', ['size' => SocialImage::sizeString('open_graph')]),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'assets-fieldtype',
@@ -261,9 +261,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_og_title',
                 'field' => [
-                    'display' => 'Open Graph Title',
-                    'instructions' => $this->trans('seo_og_title', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_og_title.display'),
+                    'instructions' => $this->trans('seo_og_title.instructions'),
                     'default' => '@auto',
                     'auto' => 'seo_title',
                     'localizable' => true,
@@ -278,9 +278,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_og_description',
                 'field' => [
-                    'display' => 'Open Graph Description',
-                    'instructions' => $this->trans('seo_og_description', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_og_description.display'),
+                    'instructions' => $this->trans('seo_og_description.instructions'),
                     'default' => '@auto',
                     'auto' => 'seo_description',
                     'localizable' => true,
@@ -307,24 +307,24 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_twitter',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Twitter',
-                    'instructions' => $this->trans('seo_section_twitter', 'instructions'),
+                    'display' => $this->trans('seo_section_twitter.display'),
+                    'instructions' => $this->trans('seo_section_twitter.instructions'),
                 ],
             ],
             [
                 'handle' => 'seo_twitter_card',
                 'field' => [
-                    'display' => 'Twitter Card',
-                    'instructions' => $this->trans('seo_twitter_card', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_twitter_card.display'),
+                    'instructions' => $this->trans('seo_twitter_card.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'button_group-fieldtype',
                     'field' => [
                         'type' => 'button_group',
                         'options' => [
-                            'summary' => 'Regular',
-                            'summary_large_image' => 'Large Image',
+                            'summary' => $this->trans('seo_twitter_card.summary'),
+                            'summary_large_image' => $this->trans('seo_twitter_card.summary_large_image'),
                         ],
                     ],
                 ],
@@ -332,9 +332,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_twitter_summary_image',
                 'field' => [
-                    'display' => 'Twitter Summary Image',
-                    'instructions' => $this->trans('seo_twitter_summary_image', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_twitter_summary_image.display'),
+                    'instructions' => $this->trans('seo_twitter_summary_image.instructions', ['size' => SocialImage::sizeString('twitter_summary')]),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'assets-fieldtype',
@@ -360,9 +360,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_twitter_summary_large_image',
                 'field' => [
-                    'display' => 'Twitter Summary Large Image',
-                    'instructions' => $this->trans('seo_twitter_summary_large_image', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_twitter_summary_large_image.display'),
+                    'instructions' => $this->trans('seo_twitter_summary_large_image.instructions', ['size' => SocialImage::sizeString('twitter_summary_large_image')]),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'assets-fieldtype',
@@ -388,9 +388,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_twitter_title',
                 'field' => [
-                    'display' => 'Twitter Title',
-                    'instructions' => $this->trans('seo_twitter_title', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_twitter_title.display'),
+                    'instructions' => $this->trans('seo_twitter_title.instructions'),
                     'default' => '@auto',
                     'auto' => 'seo_title',
                     'localizable' => true,
@@ -405,9 +405,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_twitter_description',
                 'field' => [
-                    'display' => 'Twitter Description',
-                    'instructions' => $this->trans('seo_twitter_description', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_twitter_description.display'),
+                    'instructions' => $this->trans('seo_twitter_description.instructions'),
                     'default' => '@auto',
                     'auto' => 'seo_description',
                     'localizable' => true,
@@ -435,25 +435,25 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_canonical_url',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Canonical URL',
-                    'instructions' => $this->trans('seo_section_canonical_url', 'instructions'),
+                    'display' => $this->trans('seo_section_canonical_url.display'),
+                    'instructions' => $this->trans('seo_section_canonical_url.instructions'),
                 ],
             ],
             [
                 'handle' => 'seo_canonical_type',
                 'field' => [
-                    'display' => 'Canonical URL',
-                    'instructions' => $this->trans('seo_canonical_type', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_canonical_type.display'),
+                    'instructions' => $this->trans('seo_canonical_type.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'button_group-fieldtype',
                     'field' => [
                         'type' => 'button_group',
                         'options' => [
-                            'current' => 'Current '.ucfirst(str_singular($this->typePlaceholder())),
-                            'other' => 'Other Entry',
-                            'custom' => 'Custom URL',
+                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(str_singular($this->typePlaceholder()))]),
+                            'other' => $this->trans('seo_canonical_type.other'),
+                            'custom' => $this->trans('seo_canonical_type.custom'),
                         ],
                     ],
                 ],
@@ -461,9 +461,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_canonical_entry',
                 'field' => [
-                    'display' => 'Entry',
-                    'instructions' => $this->trans('seo_canonical_entry', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_canonical_entry.display'),
+                    'instructions' => $this->trans('seo_canonical_entry.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'relationship-fieldtype',
@@ -484,9 +484,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_canonical_custom',
                 'field' => [
-                    'display' => 'URL',
-                    'instructions' => $this->trans('seo_canonical_custom', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_canonical_custom.display'),
+                    'instructions' => $this->trans('seo_canonical_custom.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'text-fieldtype',
@@ -512,16 +512,16 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_indexing',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Indexing',
-                    'instructions' => $this->trans('seo_section_indexing', 'instructions'),
+                    'display' => $this->trans('seo_section_indexing.display'),
+                    'instructions' => $this->trans('seo_section_indexing.instructions'),
                 ],
             ],
             [
                 'handle' => 'seo_noindex',
                 'field' => [
-                    'display' => 'Noindex',
-                    'instructions' => $this->trans('seo_noindex', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_noindex.display'),
+                    'instructions' => $this->trans('seo_noindex.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
@@ -534,9 +534,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_nofollow',
                 'field' => [
-                    'display' => 'Nofollow',
-                    'instructions' => $this->trans('seo_nofollow', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_nofollow.display'),
+                    'instructions' => $this->trans('seo_nofollow.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
@@ -564,8 +564,8 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_sitemap',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Sitemap',
-                    'instructions' => $this->trans('seo_section_sitemap', 'instructions'),
+                    'display' => $this->trans('seo_section_sitemap.display'),
+                    'instructions' => $this->trans('seo_section_sitemap.instructions'),
                     'if' => [
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
@@ -575,9 +575,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_sitemap_enabled',
                 'field' => [
-                    'display' => 'Enabled',
-                    'instructions' => $this->trans('seo_sitemap_enabled', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_sitemap_enabled.display'),
+                    'instructions' => $this->trans('seo_sitemap_enabled.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
@@ -593,9 +593,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_sitemap_priority',
                 'field' => [
-                    'display' => 'Priority',
-                    'instructions' => $this->trans('seo_sitemap_priority', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_sitemap_priority.display'),
+                    'instructions' => $this->trans('seo_sitemap_priority.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
@@ -632,9 +632,9 @@ class OnPageSeoFields extends BaseFields
             [
                 'handle' => 'seo_sitemap_change_frequency',
                 'field' => [
-                    'display' => 'Change Frequency',
-                    'instructions' => $this->trans('seo_sitemap_change_frequency', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_sitemap_change_frequency.display'),
+                    'instructions' => $this->trans('seo_sitemap_change_frequency.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
@@ -647,13 +647,13 @@ class OnPageSeoFields extends BaseFields
                     'field' => [
                         'type' => 'select',
                         'options' => [
-                            'always' => 'Always',
-                            'hourly' => 'Hourly',
-                            'daily' => 'Daily',
-                            'weekly' => 'Weekly',
-                            'monthly' => 'Monthly',
-                            'yearly' => 'Yearly',
-                            'never' => 'Never',
+                            'always' => $this->trans('seo_sitemap_change_frequency.always'),
+                            'hourly' => $this->trans('seo_sitemap_change_frequency.hourly'),
+                            'daily' => $this->trans('seo_sitemap_change_frequency.daily'),
+                            'weekly' => $this->trans('seo_sitemap_change_frequency.weekly'),
+                            'monthly' => $this->trans('seo_sitemap_change_frequency.monthly'),
+                            'yearly' => $this->trans('seo_sitemap_change_frequency.yearly'),
+                            'never' => $this->trans('seo_sitemap_change_frequency.never'),
                         ],
                         'clearable' => false,
                         'multiple' => false,
@@ -674,16 +674,16 @@ class OnPageSeoFields extends BaseFields
                 'handle' => 'seo_section_json_ld',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'JSON-ld Schema',
-                    'instructions' => $this->trans('seo_section_json_ld', 'instructions'),
+                    'display' => $this->trans('seo_section_json_ld.display'),
+                    'instructions' => $this->trans('seo_section_json_ld.instructions'),
                 ],
             ],
             [
                 'handle' => 'seo_json_ld',
                 'field' => [
-                    'display' => 'JSON-LD Schema',
-                    'instructions' => $this->trans('seo_json_ld', 'instructions'),
                     'type' => 'seo_source',
+                    'display' => $this->trans('seo_json_ld.display'),
+                    'instructions' => $this->trans('seo_json_ld.instructions'),
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'code-fieldtype',

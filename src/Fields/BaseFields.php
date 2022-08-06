@@ -35,13 +35,15 @@ abstract class BaseFields implements Fields
         })->toArray();
     }
 
-    protected function trans(string $parent, string $key): ?string
+    protected function trans(string $key, array $placeholders = []): ?string
     {
         if (! isset($this->data)) {
             return null;
         }
 
-        return __("advanced-seo::fields.$parent.$key", ['type' => $this->typePlaceholder()]);
+        $placeholders = array_merge(['type' => $this->typePlaceholder()], $placeholders);
+
+        return __("advanced-seo::fields.$key", $placeholders);
     }
 
     protected function typePlaceholder(): string

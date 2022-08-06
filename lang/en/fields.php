@@ -1,155 +1,206 @@
 <?php
 
-use Aerni\AdvancedSeo\Facades\SocialImage;
-
 return [
 
     'seo_section_title_description' => [
+        'display' => 'Title & Description',
         'instructions' => 'Configure the title and description of this :type.',
         'default_instructions' => 'Configure the default title and description of your :type.',
     ],
 
-    'seo_site_name_position' => [
-        'instructions' => 'Set the site name position for the meta title of this :type.',
-        'default_instructions' => 'Set the default site name position for the meta title of your :type.',
-    ],
-
     'seo_title' => [
+        'display' => 'Meta Title',
         'instructions' => 'Set the meta title of this :type.',
         'default_instructions' => 'Set the default meta title of your :type.',
     ],
 
     'seo_description' => [
+        'display' => 'Meta Description',
         'instructions' => 'Set the meta description of this :type.',
         'default_instructions' => 'Set the default meta description of your :type.',
     ],
 
+    'seo_site_name_position' => [
+        'display' => 'Site Name Position',
+        'instructions' => 'Set the site name position for the meta title of this :type.',
+        'default_instructions' => 'Set the default site name position for the meta title of your :type.',
+        'end' => 'End',
+        'start' => 'Start',
+        'disabled' => 'Disabled',
+    ],
+
     'seo_section_social_images_generator' => [
+        'display' => 'Social Images Generator',
         'instructions' => 'Configure the generator settings of this :type.',
         'default_instructions' => 'Configure the default generator settings of your :type.',
     ],
 
     'seo_generate_social_images' => [
+        'display' => 'Generate Social Images',
         'instructions' => 'Activate to use the social images generator for this :type.',
         'default_instructions' => 'Activate to use the social images generator for your :type by default.',
     ],
 
     'seo_social_images_theme' => [
+        'display' => 'Theme',
         'instructions' => 'Choose the social images theme for this :type.',
         'default_instructions' => 'Choose the default social images theme for your :type.',
     ],
 
+    'seo_generated_og_image' => [
+        'display' => 'Open Graph',
+    ],
+
+    'seo_generated_twitter_image' => [
+        'display' => 'Twitter',
+    ],
+
     'seo_section_og' => [
+        'display' => 'Open Graph',
         'instructions' => 'Configure the Open Graph settings of this :type.',
         'default_instructions' => 'Configure the default Open Graph settings of your :type.',
     ],
 
+    'seo_og_image' => [
+        'display' => 'Open Graph Image',
+        'instructions' => 'Add an Open Graph image for this :type. It will be cropped to :size.',
+        'default_instructions' => 'Add a default Open Graph image for your :type. It will be cropped to :size.',
+    ],
+
     'seo_og_title' => [
+        'display' => 'Open Graph Title',
         'instructions' => 'Set the Open Graph title of this :type.',
         'default_instructions' => 'Set the default Open Graph title of your :type.',
     ],
 
     'seo_og_description' => [
+        'display' => 'Open Graph Description',
         'instructions' => 'Set the Open Graph description of this :type.',
         'default_instructions' => 'Set the default Open Graph description of your :type.',
     ],
 
-    'seo_og_image' => [
-        'instructions' => 'Add an Open Graph image for this :type. It will be cropped to ' . SocialImage::sizeString('open_graph') . '.',
-        'default_instructions' => 'Add a default Open Graph image for your :type. It will be cropped to ' . SocialImage::sizeString('open_graph') . '.',
-    ],
-
     'seo_section_twitter' => [
+        'display' => 'Twitter',
         'instructions' => 'Configure the Twitter settings of this :type.',
         'default_instructions' => 'Configure the default Twitter settings of your :type.',
     ],
 
     'seo_twitter_card' => [
+        'display' => 'Twitter Card',
         'instructions' => 'Choose the type of card to use when sharing this :type.',
         'default_instructions' => 'Choose the default type of card to use when sharing your :type.',
+        'summary' => 'Regular',
+        'summary_large_image' => 'Large Image',
+    ],
+
+    'seo_twitter_summary_image' => [
+        'display' => 'Twitter Summary Image',
+        'instructions' => 'Add a Twitter image for this :type. It will be cropped to :size.',
+        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to :size.',
+    ],
+
+    'seo_twitter_summary_large_image' => [
+        'display' => 'Twitter Summary Large Image',
+        'instructions' => 'Add a Twitter image for this :type. It will be cropped to :size.',
+        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to :size.',
     ],
 
     'seo_twitter_title' => [
+        'display' => 'Twitter Title',
         'instructions' => 'Set the Twitter title of this :type.',
         'default_instructions' => 'Set the default Twitter title of your :type.',
     ],
 
     'seo_twitter_description' => [
+        'display' => 'Twitter Description',
         'instructions' => 'Set the Twitter description of this :type.',
         'default_instructions' => 'Set the default Twitter description of your :type.',
     ],
 
-    'seo_twitter_summary_image' => [
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary') . '.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary') . '.',
-    ],
-
-    'seo_twitter_summary_large_image' => [
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary_large_image') . '.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to ' . SocialImage::sizeString('twitter_summary_large_image') . '.',
-    ],
-
     'seo_section_canonical_url' => [
+        'display' => 'Canonical URL',
         'instructions' => 'Configure the canonical URL settings of this :type.',
         'default_instructions' => 'Configure the default canonical URL settings of your :type.',
     ],
 
     'seo_canonical_type' => [
+        'display' => 'Canonical URL',
         'instructions' => 'Where should the canonical URL of this :type point to.',
         'default_instructions' => 'Where should the default canonical URL of your :type point to.',
+        'current' => 'Current :type',
+        'other' => 'Other Entry',
+        'custom' => 'Custom URL',
     ],
 
     'seo_canonical_entry' => [
+        'display' => 'Entry',
         'instructions' => 'Choose the entry with the original content.',
         'default_instructions' => 'Choose the entry with the original content.',
     ],
 
     'seo_canonical_custom' => [
+        'display' => 'URL',
         'instructions' => 'A fully qualified URL starting with https://.',
         'default_instructions' => 'A fully qualified URL starting with https://.',
     ],
 
     'seo_section_indexing' => [
+        'display' => 'Indexing',
         'instructions' => 'Configure the indexing settings of this :type.',
         'default_instructions' => 'Configure the default indexing settings of your :type.',
     ],
 
     'seo_noindex' => [
+        'display' => 'Noindex',
         'instructions' => 'Prevent this :type from being indexed by search engines.',
         'default_instructions' => 'Prevent your :type from being indexed by search engines.',
     ],
 
     'seo_nofollow' => [
+        'display' => 'Nofollow',
         'instructions' => 'Prevent site crawlers from following links on this :type\'s page.',
         'default_instructions' => 'Prevent site crawlers from following links on your :type\' pages.',
     ],
 
     'seo_section_sitemap' => [
+        'display' => 'Sitemap',
         'instructions' => 'Configure the sitemap settings of this :type.',
         'default_instructions' => 'Configure the default sitemap settings of your :type.',
     ],
 
     'seo_sitemap_enabled' => [
+        'display' => 'Enabled',
         'instructions' => 'Choose to add or remove this :type from the sitemap.',
         'default_instructions' => 'Choose to add or remove your :type from the sitemap.',
     ],
 
     'seo_sitemap_priority' => [
+        'display' => 'Priority',
         'instructions' => 'Choose the sitemap priority of this :type. 1.0 is the most important.',
         'default_instructions' => 'Choose the default sitemap priority of your :type. 1.0 is the most important.',
     ],
 
     'seo_sitemap_change_frequency' => [
+        'display' => 'Change Frequency',
         'instructions' => 'Choose the frequency in which search engines should crawl this :type.',
         'default_instructions' => 'Choose the default frequency in which search engines should crawl your :type.',
+        'always' => 'Always',
+        'hourly' => 'Hourly',
+        'daily' => 'Daily',
+        'weekly' => 'Weekly',
+        'monthly' => 'Monthly',
+        'yearly' => 'Yearly',
+        'never' => 'Never',
     ],
 
     'seo_section_json_ld' => [
+        'display' => 'JSON-ld Schema',
         'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this :type.',
         'default_instructions' => 'Add default custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for your :type.',
     ],
 
     'seo_json_ld' => [
+        'display' => 'JSON-LD Schema',
         'instructions' => 'The structured data of this :type. This will be wrapped in the appropriate script tag.',
         'default_instructions' => 'The default structured data of your :type. This will be wrapped in the appropriate script tag.',
     ],
