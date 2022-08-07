@@ -53,8 +53,12 @@ abstract class BaseFields implements Fields
         }
 
         return match ($this->data->type) {
-            'collections' => Helpers::isAddonCpRoute() ? 'entries' : 'entry',
-            'taxonomies' => Helpers::isAddonCpRoute() ? 'terms' : 'term',
+            'collections' => Helpers::isAddonCpRoute()
+                ? lcfirst(__('advanced-seo::messages.entries'))
+                : lcfirst(__('advanced-seo::messages.entry')),
+            'taxonomies' => Helpers::isAddonCpRoute()
+                ? lcfirst(__('advanced-seo::messages.terms'))
+                : lcfirst(__('advanced-seo::messages.term')),
             default => null
         };
     }

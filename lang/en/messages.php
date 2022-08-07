@@ -38,6 +38,11 @@ return [
         'defaults' => 'The value is inherited from the <code>:title</code> defaults.',
     ],
 
+    'entry' => 'Entry',
+    'entries' => 'Entries',
+    'term' => 'Term',
+    'terms' => 'Terms',
+
     'commit_message' => 'SEO defaults saved',
 
 ];
