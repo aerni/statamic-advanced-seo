@@ -15,7 +15,7 @@
                         @cp_svg('tags')
                     </div>
                     <div class="flex-1 mt-sm">
-                        <h2>{{ __('Taxonomies') }}</h2>
+                        <h2>{{ __('advanced-seo::messages.taxonomies') }}</h2>
                         <p>{{ __('advanced-seo::messages.taxonomies_description') }}</p>
                     </div>
                 </div>

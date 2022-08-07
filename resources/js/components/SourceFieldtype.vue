@@ -43,12 +43,14 @@
                     handle="source_value">
                 </component>
                 <div class="mt-1 help-block">
-                    <span v-if="fieldSource === 'auto'">
-                        The value is inherited from the <code>{{ autoFieldDisplay }} ({{ autoFieldHandle }})</code> field.
-                    </span>
-                    <span v-else>
-                        The value is inherited from the <code>{{ this.meta.title }}</code> defaults.
-                    </span>
+                    <span
+                        v-if="fieldSource === 'auto'"
+                        v-html="__('advanced-seo::messages.field_source_description.auto', {title: this.autoFieldDisplay, handle: this.autoFieldHandle})"
+                    ></span>
+                    <span
+                        v-else
+                        v-html="__('advanced-seo::messages.field_source_description.defaults', {title: this.meta.title})"
+                    ></span>
                 </div>
             </div>
         </div>
@@ -123,12 +125,12 @@ export default {
 
         sourceOptions() {
             let options = [
-                { label: __('advanced-seo::messages.default'), value: 'default' },
-                { label: __('advanced-seo::messages.custom'), value: 'custom' },
+                { label: __('advanced-seo::messages.field_sources.default'), value: 'default' },
+                { label: __('advanced-seo::messages.field_sources.custom'), value: 'custom' },
             ]
 
             if (this.autoFieldHandle) {
-                options.unshift({ label: 'Auto', value: 'auto' })
+                options.unshift({ label: __('advanced-seo::messages.field_sources.auto'), value: 'auto' })
             }
 
             if (this.config.options) {
