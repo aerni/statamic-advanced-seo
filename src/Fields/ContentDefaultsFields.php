@@ -22,8 +22,6 @@ class ContentDefaultsFields extends BaseFields
             $this->sitemap(),
             $this->jsonLd(),
         ];
-
-
     }
 
     public function titleAndDescription(): array
@@ -413,7 +411,7 @@ class ContentDefaultsFields extends BaseFields
                 'handle' => 'seo_section_sitemap',
                 'field' => [
                     'type' => 'section',
-                    'display' =>$this->trans('seo_section_sitemap.display'),
+                    'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.default_instructions'),
                 ],
             ],
