@@ -205,4 +205,213 @@ return [
         'default_instructions' => 'The default structured data of your :type. This will be wrapped in the appropriate script tag.',
     ],
 
+    'section_fathom' => [
+        'display' => 'Fathom',
+        'instructions' => 'Use [Fathom](https://usefathom.com) as a privacy-friendly alternative to Google Analytics.',
+    ],
+
+    'use_fathom' => [
+        'display' => 'Fathom',
+        'instructions' => 'Add the Fathom tracking script to your head.',
+    ],
+
+    'fathom_id' => [
+        'display' => 'Site ID',
+        'instructions' => 'Add your site ID.',
+    ],
+
+    'fathom_domain' => [
+        'display' => 'Custom Domain',
+        'instructions' => 'Add an optional custom domain.',
+    ],
+
+    'fathom_spa' => [
+        'display' => 'SPA Mode',
+        'instructions' => 'Activate if your site is a single page application.',
+    ],
+
+    'section_cloudflare_web_analytics' => [
+        'display' => 'Cloudflare Web Analytics',
+        'instructions' => 'Use [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics) as a privacy-friendly alternative to Google Analytics.',
+    ],
+
+    'use_cloudflare_web_analytics' => [
+        'display' => 'Cloudflare Web Analytics',
+        'instructions' => 'Add the Cloudflare tracking script to your head.',
+    ],
+
+    'cloudflare_web_analytics' => [
+        'display' => 'Beacon Token',
+        'instructions' => 'Add your beacon token.',
+    ],
+
+    'section_google_tag_manager' => [
+        'display' => 'Google Tag Manager',
+        'instructions' => 'Use [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager) to track your users. You are `required by privacy law` to get your user\'s consent before loading any tracking scripts. You also need to inform them about what data you collect and what you intent to do with it.',
+    ],
+
+    'use_google_tag_manager' => [
+        'display' => 'Google Tag Manager',
+        'instructions' => 'Add the Google Tag Manager tracking scripts.',
+    ],
+
+    'google_tag_manager' => [
+        'display' => 'Container ID',
+        'instructions' => 'Add your container ID.',
+    ],
+
+    'section_favicon' => [
+        'display' => 'Favicon',
+        'instructions' => 'Configure the favicon of your site.',
+    ],
+
+    'favicon_svg' => [
+        'display' => 'Favicon (SVG)',
+        'instructions' => 'Add your favicon as SVG file.',
+    ],
+
+    'section_titles' => [
+        'display' => 'Titles',
+        'instructions' => 'Configure the appearance of your page titles.',
+    ],
+
+    'site_name' => [
+        'display' => 'Site Name',
+        'instructions' => 'The site name is added to your meta titles.',
+    ],
+
+    'title_separator' => [
+        'display' => 'Title Separator',
+        'instructions' => 'This separates the site name and page title.',
+    ],
+
+    'section_knowledge_graph' => [
+        'display' => 'Basic Information',
+        'instructions' => 'Add basic [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) information about this site.',
+    ],
+
+    'site_json_ld_type' => [
+        'display' => 'Content Type',
+        'instructions' => 'The type of content this site represents.',
+        'none' => 'None',
+        'organization' => 'Organization',
+        'person' => 'Person',
+        'custom' => 'Custom',
+    ],
+
+    'organization_name' => [
+        'display' => 'Organization Name',
+        'instructions' => "The name of this site's organization.",
+    ],
+
+    'organization_logo' => [
+        'display' => 'Organization Logo',
+        'instructions' => 'Add the logo with a minimum size of 112 x 112 pixels.',
+    ],
+
+    'person_name' => [
+        'display' => 'Person Name',
+        'instructions' => "The name of this site's person.",
+    ],
+
+    'site_json_ld' => [
+        'display' => 'JSON-LD Schema',
+        'instructions' => 'Structured data that will be added to every page. This will be wrapped in the appropriate script tag.',
+    ],
+
+    'section_breadcrumbs' => [
+        'display' => 'Breadcrumbs',
+        'instructions' => "Breadcrumbs help your users understand your site by indicating each page's position in the hierarchy.",
+    ],
+
+    'use_breadcrumbs' => [
+        'display' => 'Breadcrumbs',
+        'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your pages.',
+    ],
+
+    'section_crawling' => [
+        'display' => 'Crawling',
+        'instructions' => 'Configure the crawling settings of your site. These settings will take precedence over their counterparts on entries and terms.',
+    ],
+
+    'noindex' => [
+        'display' => 'Noindex',
+        'instructions' => 'Prevent your site from being indexed by search engines.',
+    ],
+
+    'nofollow' => [
+        'display' => 'Nofollow',
+        'instructions' => 'Prevent site crawlers from following any links on your site.',
+    ],
+
+    'section_sitemap' => [
+        'display' => 'Sitemap',
+        'instructions' => 'Configure the sitemap settings of your site.',
+    ],
+
+    'excluded_collections' => [
+        'display' => 'Collections',
+        'instructions' => 'Collections you want to exclude from the sitemap.',
+    ],
+
+    'excluded_taxonomies' => [
+        'display' => 'Taxonomies',
+        'instructions' => 'Taxonomies you want to exclude from the sitemap.',
+    ],
+
+    'section_verification' => [
+        'display' => 'Site verification',
+        'instructions' => 'Verify your ownership of this site.',
+    ],
+
+    'google_site_verification_code' => [
+        'display' => 'Google Verification Code',
+        'instructions' => 'Add your Google verification code. You can get it in [Google Search Console](https://search.google.com/search-console).',
+    ],
+
+    'bing_site_verification_code' => [
+        'display' => 'Bing Verification Code',
+        'instructions' => 'Add your Bing verification code. You can get it in [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
+    ],
+
+    'section_social_images_generator' => [
+        'display' => 'Social Images Generator',
+        'instructions' => 'Configurate the settings of the social images generator.',
+    ],
+
+    'social_images_generator_collections' => [
+        'display' => 'Collections',
+        'instructions' => 'Enable the generator for the selected collections.',
+    ],
+
+    'section_og' => [
+        'display' => 'Open Graph',
+        'instructions' => 'Configure the site-wide Open Graph settings.',
+    ],
+
+    'og_image' => [
+        'display' => 'Open Graph Image',
+        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+    ],
+
+    'section_twitter' => [
+        'display' => 'Twitter',
+        'instructions' => 'Configure the site-wide Twitter settings.',
+    ],
+
+    'twitter_summary_image' => [
+        'display' => 'Twitter Summary Image',
+        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+    ],
+
+    'twitter_summary_large_image' => [
+        'display' => 'Twitter Summary Large Image',
+        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+    ],
+
+    'twitter_handle' => [
+        'display' => 'Twitter Username',
+        'instructions' => 'Add your Twitter username.',
+    ],
+
 ];

@@ -46,7 +46,7 @@ abstract class BaseFields implements Fields
         return __("advanced-seo::fields.$key", $placeholders);
     }
 
-    protected function typePlaceholder(): string
+    protected function typePlaceholder(): ?string
     {
         if (! isset($this->data)) {
             return '';
