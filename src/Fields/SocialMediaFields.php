@@ -29,8 +29,8 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'section_social_images_generator',
                 'field' => [
                     'type' => 'section',
-                    'display' => 'Social Images Generator',
-                    'instructions' => 'Configurate the settings of the social images generator.',
+                    'display' => $this->trans('section_social_images_generator.display'),
+                    'instructions' => $this->trans('section_social_images_generator.instructions'),
                     'listable' => 'hidden',
                 ],
             ],
@@ -38,10 +38,10 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'social_images_generator_collections',
                 'field' => [
                     'type' => 'collections',
+                    'display' => $this->trans('social_images_generator_collections.display'),
+                    'instructions' => $this->trans('social_images_generator_collections.instructions'),
                     'icon' => 'collections',
                     'mode' => 'select',
-                    'display' => 'Collections',
-                    'instructions' => 'Enable the generator for the selected collections.',
                     'listable' => 'hidden',
                     // 'width' => 50,
                 ],
@@ -68,15 +68,15 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'section_og',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Configure the site-wide Open Graph settings.',
-                    'display' => 'Open Graph',
+                    'display' => $this->trans('section_og.display'),
+                    'instructions' => $this->trans('section_og.instructions'),
                 ],
             ],
             [
                 'handle' => 'og_image',
                 'field' => $this->getAssetFieldConfig([
-                    'display' => 'Open Graph Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('open_graph') . '.',
+                    'display' => $this->trans('og_image.display'),
+                    'instructions' => $this->trans('og_image.instructions', ['size' => SocialImage::sizeString('open_graph')]),
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -93,17 +93,17 @@ class SocialMediaFields extends BaseFields
                 'handle' => 'section_twitter',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Configure the site-wide Twitter settings.',
-                    'display' => 'Twitter',
+                    'display' => $this->trans('section_twitter.display'),
+                    'instructions' => $this->trans('section_twitter.instructions'),
                 ],
             ],
             [
                 'handle' => 'twitter_summary_image',
                 'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Summary Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter_summary') . '.',
-                    'width' => 50,
+                    'display' => $this->trans('twitter_summary_image.display'),
+                    'instructions' => $this->trans('twitter_summary_image.instructions', ['size' => SocialImage::sizeString('twitter_summary')]),
                     'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
+                    'width' => 50,
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
@@ -113,24 +113,24 @@ class SocialMediaFields extends BaseFields
             [
                 'handle' => 'twitter_summary_large_image',
                 'field' => $this->getAssetFieldConfig([
-                    'display' => 'Twitter Summary Large Image',
-                    'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to ' . SocialImage::sizeString('twitter_summary_large_image') . '.',
+                    'display' => $this->trans('twitter_summary_large_image.display'),
+                    'instructions' => $this->trans('twitter_summary_large_image.instructions', ['size' => SocialImage::sizeString('twitter_summary_large_image')]),
+                    'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
                     'width' => 50,
                     'validate' => [
                         'image',
                         'mimes:jpg,png',
                     ],
-                    'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
                 ]),
             ],
             [
                 'handle' => 'twitter_handle',
                 'field' => [
-                    'listable' => 'hidden',
-                    'display' => 'Twitter Username',
-                    'input_type' => 'text',
                     'type' => 'text',
-                    'instructions' => 'Add your Twitter username.',
+                    'display' => $this->trans('twitter_handle.display'),
+                    'instructions' => $this->trans('twitter_handle.instructions'),
+                    'input_type' => 'text',
+                    'listable' => 'hidden',
                     'prepend' => '@',
                     'antlers' => false,
                     'width' => 50,

@@ -27,16 +27,16 @@ class FaviconsFields extends BaseFields
                 'handle' => 'section_favicon',
                 'field' => [
                     'type' => 'section',
+                    'display' => $this->trans('section_favicon.display'),
+                    'instructions' => $this->trans('section_favicon.instructions'),
                     'listable' => 'hidden',
-                    'display' => 'Favicon',
-                    'instructions' => 'Configure the favicon of your site.',
                 ],
             ],
             [
                 'handle' => 'favicon_svg',
                 'field' => $this->getAssetFieldConfig([
-                    'display' => 'Favicon (SVG)',
-                    'instructions' => 'Add your favicon as SVG file.',
+                    'display' => $this->trans('favicon_svg.display'),
+                    'instructions' => $this->trans('favicon_svg.instructions'),
                     'container' => config('advanced-seo.favicons.container', 'assets'),
                     'folder' => 'favicons',
                     'localizable' => false,
@@ -60,9 +60,9 @@ class FaviconsFields extends BaseFields
                 'handle' => 'section_favicon_colors',
                 'field' => [
                     'type' => 'section',
-                    'listable' => 'hidden',
                     'display' => 'Favicon Colors',
                     'instructions' => 'Configure your favicon colors.',
+                    'listable' => 'hidden',
                 ],
             ],
             [

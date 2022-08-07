@@ -15,7 +15,7 @@
                         @cp_svg('content-writing')
                     </div>
                     <div class="flex-1 mt-sm">
-                        <h2>{{ __('Collections') }}</h2>
+                        <h2>{{ __('advanced-seo::messages.collections') }}</h2>
                         <p>{{ __('advanced-seo::messages.collections_description') }}</p>
                     </div>
                 </div>

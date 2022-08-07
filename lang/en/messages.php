@@ -1,18 +1,7 @@
 <?php
 
 return [
-
-    'dashboard_title' => 'Advanced SEO',
-
     'site' => 'Site',
-    'site_description' => 'Site-wide defaults and settings like site name, sitemap, analytics, and more.',
-
-    'content' => 'Content Defaults',
-    'content_description' => 'On-page defaults of your collection entries and taxonomy terms.',
-
-    'collections' => 'Collections',
-
-    'taxonomies' => 'Taxonomies',
 
     'general' => 'General',
     'general_description' => 'Configure general information about your site.',
@@ -29,14 +18,31 @@ return [
     'favicons' => 'Favicons',
     'favicons_description' => 'Configure the favicon of your site.',
 
+    'collections' => 'Collections',
     'collections_description' => 'Customize the default data of your collection entries. Choose a collection below.',
 
+    'taxonomies' => 'Taxonomies',
     'taxonomies_description' => 'Customize the default data of your taxonomy terms. Choose a taxonomy below.',
 
-    'social_images_generator_on_save' => 'Save the entry to generate the image. Then reload to see the changes.',
+    'social_images_generator_on_save' => 'Save the entry to generate the image. Then reload the page to see the changes.',
     'social_images_generator_on_demand' => 'The image will be generated the first time you visit the URL of this entry.',
 
-    'default' => 'Default',
-    'custom' => 'Custom',
+    'field_sources' => [
+        'auto' => 'Auto',
+        'default' => 'Default',
+        'custom' => 'Custom',
+    ],
+
+    'field_source_description' => [
+        'auto' => 'The value is inherited from the <code>:title (:handle)</code> field.',
+        'defaults' => 'The value is inherited from the <code>:title</code> defaults.',
+    ],
+
+    'entry' => 'Entry',
+    'entries' => 'Entries',
+    'term' => 'Term',
+    'terms' => 'Terms',
+
+    'commit_message' => 'SEO defaults saved',
 
 ];

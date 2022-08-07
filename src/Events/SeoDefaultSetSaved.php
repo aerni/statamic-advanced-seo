@@ -15,6 +15,6 @@ class SeoDefaultSetSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('SEO defaults saved', [], config('statamic.git.locale'));
+        return __('advanced-seo::messages.commit_message', [], config('statamic.git.locale'));
     }
 }
