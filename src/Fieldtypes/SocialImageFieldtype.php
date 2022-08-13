@@ -34,15 +34,21 @@ class SocialImageFieldtype extends Fieldtype
         return $meta;
     }
 
-    public function augment($value): string
+    public function augment($value): ?string
     {
         $parent = $this->field->parent();
         $type = $this->config()['image_type'];
 
         $image = SocialImage::all($parent)->get($type);
 
-        return $image->exists()
-            ? $image->absoluteUrl()
-            : $image->generate()->absoluteUrl();
+        if ($image->exists()) {
+            return $image->absoluteUrl();
+        }
+
+        if ($parent->generate_social_images) {
+            return $image->generate()->absoluteUrl();
+        }
+
+        return null;
     }
 }

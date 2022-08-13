@@ -29,6 +29,13 @@ class Helpers
      */
     public static function isCustomRoute(): bool
     {
-        return request()->route()->getAction('controller') !== 'Statamic\Http\Controllers\FrontendController@index';
+        $allowedControllerActions = collect([
+            'Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController@show',
+            'Statamic\Http\Controllers\FrontendController@index',
+        ]);
+
+        $controllerAction = request()->route()->getAction('controller');
+
+        return $allowedControllerActions->doesntContain($controllerAction);
     }
 }

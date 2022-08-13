@@ -24,27 +24,27 @@ class AnalyticsFields extends BaseFields
                 'handle' => 'section_fathom',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Use [Fathom](https://usefathom.com) as a privacy-friendly alternative to Google Analytics.',
-                    'display' => 'Fathom',
+                    'display' => $this->trans('section_fathom.display'),
+                    'instructions' => $this->trans('section_fathom.instructions'),
                 ],
             ],
             [
                 'handle' => 'use_fathom',
                 'field' => [
                     'type' => 'toggle',
-                    'instructions' => 'Add the Fathom tracking script to your head.',
+                    'display' => $this->trans('use_fathom.display'),
+                    'instructions' => $this->trans('use_fathom.instructions'),
                     'listable' => false,
-                    'display' => 'Fathom',
                 ],
             ],
             [
                 'handle' => 'fathom_id',
                 'field' => [
-                    'width' => 50,
-                    'display' => 'Site ID',
-                    'instructions' => 'Add your site ID.',
-                    'input_type' => 'text',
                     'type' => 'text',
+                    'display' => $this->trans('fathom_id.display'),
+                    'instructions' => $this->trans('fathom_id.instructions'),
+                    'input_type' => 'text',
+                    'width' => 50,
                     'listable' => 'hidden',
                     'antlers' => true,
                     'validate' => [
@@ -58,11 +58,11 @@ class AnalyticsFields extends BaseFields
             [
                 'handle' => 'fathom_domain',
                 'field' => [
-                    'width' => 50,
-                    'display' => 'Custom Domain',
-                    'instructions' => 'Add an optional custom domain.',
-                    'input_type' => 'text',
                     'type' => 'text',
+                    'display' => $this->trans('fathom_domain.display'),
+                    'instructions' => $this->trans('fathom_domain.instructions'),
+                    'input_type' => 'text',
+                    'width' => 50,
                     'listable' => 'hidden',
                     'antlers' => true,
                     'if' => [
@@ -73,10 +73,10 @@ class AnalyticsFields extends BaseFields
             [
                 'handle' => 'fathom_spa',
                 'field' => [
-                    'display' => 'SPA Mode',
                     'type' => 'toggle',
+                    'display' => $this->trans('fathom_spa.display'),
+                    'instructions' => $this->trans('fathom_spa.instructions'),
                     'icon' => 'toggle',
-                    'instructions' => 'Activate if your site is a single page application.',
                     'listable' => 'hidden',
                     'validate' => [
                         'required_if:use_fathom,true',
@@ -100,27 +100,27 @@ class AnalyticsFields extends BaseFields
                 'handle' => 'section_cloudflare_web_analytics',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Use [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics) as a privacy-friendly alternative to Google Analytics.',
-                    'display' => 'Cloudflare Web Analytics',
+                    'display' => $this->trans('section_cloudflare_web_analytics.display'),
+                    'instructions' => $this->trans('section_cloudflare_web_analytics.instructions'),
                 ],
             ],
             [
                 'handle' => 'use_cloudflare_web_analytics',
                 'field' => [
                     'type' => 'toggle',
-                    'instructions' => 'Add the Cloudflare tracking script to your head.',
+                    'display' => $this->trans('use_cloudflare_web_analytics.display'),
+                    'instructions' => $this->trans('use_cloudflare_web_analytics.instructions'),
                     'listable' => false,
-                    'display' => 'Cloudflare Web Analytics',
                 ],
             ],
             [
                 'handle' => 'cloudflare_web_analytics',
                 'field' => [
-                    'width' => 50,
-                    'display' => 'Beacon Token',
-                    'instructions' => 'Add your beacon token.',
-                    'input_type' => 'text',
                     'type' => 'text',
+                    'display' => $this->trans('cloudflare_web_analytics.display'),
+                    'instructions' => $this->trans('cloudflare_web_analytics.instructions'),
+                    'input_type' => 'text',
+                    'width' => 50,
                     'listable' => 'hidden',
                     'validate' => [
                         'required_if:use_cloudflare_web_analytics,true',
@@ -144,28 +144,28 @@ class AnalyticsFields extends BaseFields
                 'handle' => 'section_google_tag_manager',
                 'field' => [
                     'type' => 'section',
-                    'instructions' => 'Use [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager) to track your users. You are `required by privacy law` to get your user\'s consent before loading any tracking scripts. You also need to inform them about what data you collect and what you intent to do with it.',
-                    'display' => 'Google Tag Manager',
+                    'display' => $this->trans('section_google_tag_manager.display'),
+                    'instructions' => $this->trans('section_google_tag_manager.instructions'),
                 ],
             ],
             [
                 'handle' => 'use_google_tag_manager',
                 'field' => [
                     'type' => 'toggle',
-                    'instructions' => 'Add the Google Tag Manager tracking scripts.',
+                    'display' => $this->trans('use_google_tag_manager.display'),
+                    'instructions' => $this->trans('use_google_tag_manager.instructions'),
                     'listable' => false,
-                    'display' => 'Google Tag Manager',
                 ],
             ],
             [
                 'handle' => 'google_tag_manager',
                 'field' => [
-                    'input_type' => 'text',
                     'type' => 'text',
-                    'listable' => 'hidden',
+                    'display' => $this->trans('google_tag_manager.display'),
+                    'instructions' => $this->trans('google_tag_manager.instructions'),
+                    'input_type' => 'text',
                     'width' => 50,
-                    'display' => 'Container ID',
-                    'instructions' => 'Add your container ID.',
+                    'listable' => 'hidden',
                     'validate' => [
                         'required_if:use_google_tag_manager,true',
                     ],

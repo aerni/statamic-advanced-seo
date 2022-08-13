@@ -241,9 +241,14 @@ class Cascade
 
     protected function compiledTitle(): string
     {
-        return $this->value('title_position')->value() === 'before'
-            ? "{$this->title()} {$this->titleSeparator()} {$this->siteName()}"
-            : "{$this->siteName()} {$this->titleSeparator()} {$this->title()}";
+        $position = $this->value('site_name_position')?->value();
+
+        return match (true) {
+            ($position === 'end') => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
+            ($position === 'start') => "{$this->siteName()} {$this->titleSeparator()} {$this->title()}",
+            ($position === 'disabled') => $this->title(),
+            default => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
+        };
     }
 
     protected function title(): string
@@ -303,7 +308,6 @@ class Cascade
          * Determine the twitter card based on the images set in the social media defaults.
          * This is used on taxonomy and error pages.
          */
-
         $image = $this->get('twitter_summary_large_image') ?? $this->get('twitter_summary_image');
 
         return $image?->field()?->config()['twitter_card'] ?? Defaults::data('collections')->get('seo_twitter_card');
@@ -353,25 +357,35 @@ class Cascade
 
     protected function hreflang(): ?array
     {
-        /*
-        TODO: Support collection taxonomy details page.
-        Return if we're on a collection taxonomy details page.
-        Statamic has yet to provide a way to get the URLs of collection taxonomies.
-        */
+        // Handles collection taxonomy index page.
         if ($this->context->has('segment_2') && $this->context->get('terms') instanceof TermQueryBuilder) {
-            return null;
+            $taxonomy = $this->context->get('title')->augmentable();
+
+            return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
+                $site = Site::get($site);
+                $siteUrl = $site->absoluteUrl();
+                $taxonomyHandle = $taxonomy->handle();
+                $collectionHandle = $taxonomy->collection()->handle();
+
+                return [
+                    'url' => URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}"),
+                    'locale' => Helpers::parseLocale($site->locale()),
+                ];
+            })->all();
         }
 
-        /*
-        TODO: Support collection term details page.
-        Return if we're on a collection term details page.
-        Statamic has yet to provide a way to get the URLs of collection terms.
-        */
-        if ($this->context->has('segment_3') && $this->context->get('is_term') === true) {
-            return null;
+        // Handles collection taxonomy show page.
+        if ($this->context->has('segment_3') && $this->context->value('is_term') === true) {
+            $localizedTerm = $this->context->get('title')->augmentable();
+
+            return $localizedTerm->taxonomy()->sites()
+                ->map(fn ($locale) => [
+                    'url' => $localizedTerm->in($locale)->absoluteUrl(),
+                    'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+                ])->all();
         }
 
-        // Handles global taxonomy details page.
+        // Handles taxonomy index page.
         if ($this->context->has('segment_1') && $this->context->get('terms') instanceof TermQueryBuilder) {
             $taxonomy = $this->context->get('terms')->first()->taxonomy();
 
@@ -387,14 +401,13 @@ class Cascade
                 ];
             })->toArray();
 
-
             // Reset the site to the original.
             Site::setCurrent($initialSite);
 
             return $data;
         }
 
-        // Handle entries and global term details page.
+        // Handle entries and term show page.
         $data = Data::find($this->context->get('id'));
 
         if (! $data) {
@@ -406,16 +419,12 @@ class Cascade
             : $data->taxonomy()->sites();
 
         // We only want to return data for published entries and terms.
-        $alternates = $sites->filter(function ($locale) use ($data) {
-            return $data->in($locale)?->published();
-        })->values();
+        $alternates = $sites->filter(fn ($locale) => $data->in($locale)?->published())->values();
 
-        return $alternates->map(function ($locale) use ($data) {
-            return [
-                'url' => $data->in($locale)->absoluteUrl(),
-                'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
-            ];
-        })->toArray();
+        return $alternates->map(fn ($locale) => [
+            'url' => $data->in($locale)->absoluteUrl(),
+            'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+        ])->toArray();
     }
 
     protected function canonical(): ?string
@@ -467,7 +476,7 @@ class Cascade
         }
 
         return $page > 1 && $page <= $paginator->lastPage()
-            ? $currentUrl . '?page=' . ($page - 1)
+            ? $currentUrl.'?page='.($page - 1)
             : null;
     }
 
@@ -482,13 +491,13 @@ class Cascade
         $page = $paginator->currentPage();
 
         return $page < $paginator->lastPage()
-            ? $currentUrl . '?page=' . ($page + 1)
+            ? $currentUrl.'?page='.($page + 1)
             : null;
     }
 
     protected function schema(): ?string
     {
-        $schema = $this->siteSchema() . $this->entrySchema();
+        $schema = $this->siteSchema().$this->entrySchema();
 
         return ! empty($schema) ? $schema : null;
     }
@@ -505,7 +514,7 @@ class Cascade
             $data = $this->value('site_json_ld')?->value();
 
             return $data
-                ? '<script type="application/ld+json">' . $data . '</script>'
+                ? '<script type="application/ld+json">'.$data.'</script>'
                 : null;
         }
 
@@ -538,54 +547,53 @@ class Cascade
         $data = $this->value('json_ld')?->value();
 
         return $data
-            ? '<script type="application/ld+json">' . $data . '</script>'
+            ? '<script type="application/ld+json">'.$data.'</script>'
             : null;
     }
 
     protected function breadcrumbs(): ?string
     {
-        $enabled = $this->value('use_breadcrumbs');
-        $isHome = $this->context->get('is_homepage');
-
-        if ($enabled && ! $isHome) {
-            $listItems = $this->breadcrumbsListItems()->map(function ($crumb, $key) {
-                $item = Schema::thing()->setProperty('id', $crumb->absoluteUrl());
-
-                if ($crumb instanceof Taxonomy) {
-                    $item->name($crumb->title());
-                } elseif ($title = $crumb->get('title') ?? $crumb->origin()?->get('title')) {
-                    $item->name($title);
-                }
-
-                return Schema::listItem()->position($key + 1)->item($item);
-            });
-
-            return Schema::breadcrumbList()->itemListElement($listItems);
+        // Don't render breadcrumbs if deactivated in the site defaults.
+        if (! $this->value('use_breadcrumbs')) {
+            return null;
         }
 
-        return null;
+        // Don't render breadcrumbs on the homepage.
+        if ($this->context->get('is_homepage')) {
+            return null;
+        }
+
+        $listItems = $this->breadcrumbsListItems()->map(function ($crumb) {
+            return Schema::listItem()
+                ->position($crumb['position'])
+                ->name($crumb['title'])
+                ->item($crumb['url']);
+        })->all();
+
+        return Schema::breadcrumbList()->itemListElement($listItems);
     }
 
     protected function breadcrumbsListItems(): Collection
     {
-        $url = URL::makeAbsolute(URL::getCurrent());
-        $url = Str::removeLeft($url, Site::current()->absoluteUrl());
-        $url = Str::ensureLeft($url, '/');
+        $segments = collect(request()->segments())->prepend('/');
 
-        $segments = explode('/', $url);
-        $segments[0] = '/';
+        $crumbs = $segments->map(function () use (&$segments) {
+            $uri = URL::tidy($segments->join('/'));
+            $segments->pop();
 
-        $crumbs = collect($segments)->map(function () use (&$segments) {
-            $uri = URL::tidy(join('/', $segments));
-            array_pop($segments);
+            return Data::findByUri(Str::ensureLeft($uri, '/'), Site::current()->handle());
+        })
+        ->filter()
+        ->reverse()
+        ->values()
+        ->map(function ($item, $key) {
+            return [
+                'position' => $key + 1,
+                'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
+                'url' => $item->absoluteUrl(),
+            ];
+        });
 
-            return $uri;
-        })->mapWithKeys(function ($uri) {
-            $uri = Str::ensureLeft($uri, '/');
-
-            return [$uri => Data::findByUri($uri, Site::current()->handle())];
-        })->filter();
-
-        return $crumbs->reverse()->values();
+        return $crumbs;
     }
 }

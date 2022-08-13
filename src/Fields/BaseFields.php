@@ -35,24 +35,30 @@ abstract class BaseFields implements Fields
         })->toArray();
     }
 
-    protected function trans(string $parent, string $key): ?string
+    protected function trans(string $key, array $placeholders = []): ?string
     {
         if (! isset($this->data)) {
             return null;
         }
 
-        return __("advanced-seo::fields.$parent.$key", ['type' => $this->typePlaceholder()]);
+        $placeholders = array_merge(['type' => $this->typePlaceholder()], $placeholders);
+
+        return __("advanced-seo::fields.$key", $placeholders);
     }
 
-    protected function typePlaceholder(): string
+    protected function typePlaceholder(): ?string
     {
         if (! isset($this->data)) {
             return '';
         }
 
         return match ($this->data->type) {
-            'collections' => Helpers::isAddonCpRoute() ? 'entries' : 'entry',
-            'taxonomies' => Helpers::isAddonCpRoute() ? 'terms' : 'term',
+            'collections' => Helpers::isAddonCpRoute()
+                ? lcfirst(__('advanced-seo::messages.entries'))
+                : lcfirst(__('advanced-seo::messages.entry')),
+            'taxonomies' => Helpers::isAddonCpRoute()
+                ? lcfirst(__('advanced-seo::messages.terms'))
+                : lcfirst(__('advanced-seo::messages.term')),
             default => null
         };
     }
