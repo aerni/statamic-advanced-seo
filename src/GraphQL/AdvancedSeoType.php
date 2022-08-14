@@ -2,16 +2,15 @@
 
 namespace Aerni\AdvancedSeo\GraphQL;
 
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Statamic\Contracts\GraphQL\ResolvesValues;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Types\ArrayType;
-use GraphQL\Type\Definition\ResolveInfo;
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\GraphQL\Types\AssetInterface;
-use Statamic\Contracts\GraphQL\ResolvesValues;
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use ReflectionMethod;
 
 class AdvancedSeoType extends \Rebing\GraphQL\Support\Type
 {

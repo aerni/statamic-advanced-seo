@@ -2,8 +2,6 @@
 
 namespace Aerni\AdvancedSeo\GraphQL;
 
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
-use Aerni\AdvancedSeo\View\Cascade;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Field;
 use Statamic\Contracts\Entries\Entry;
