@@ -12,6 +12,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blink;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Code;
@@ -112,6 +113,11 @@ class SourceFieldtype extends Fieldtype
         return $this->augment($value);
     }
 
+    public function toGqlType(): mixed
+    {
+        return $this->sourceFieldtype()->toGqlType();
+    }
+
     protected function sourceField(): Field
     {
         return new Field(null, $this->config('field'));
@@ -150,7 +156,7 @@ class SourceFieldtype extends Fieldtype
             return null;
         }
 
-        $cascade = Blink::once("advanced-seo::cascade::fieldtype", fn () => Cascade::from($data)->processForFieldtype());
+        $cascade = Blink::once('advanced-seo::cascade::fieldtype', fn () => Cascade::from($data)->processForFieldtype());
 
         $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 

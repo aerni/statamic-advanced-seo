@@ -3,9 +3,15 @@
 namespace Aerni\AdvancedSeo\GraphQL;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Types\ArrayType;
+use GraphQL\Type\Definition\ResolveInfo;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\GraphQL\Types\AssetInterface;
+use Statamic\Contracts\GraphQL\ResolvesValues;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use ReflectionMethod;
 
 class AdvancedSeoType extends \Rebing\GraphQL\Support\Type
 {
@@ -17,6 +23,39 @@ class AdvancedSeoType extends \Rebing\GraphQL\Support\Type
 
     public function fields(): array
     {
+        $fields = OnPageSeoBlueprint::make()->get()->fields()->toGql()
+            // ->merge([
+            //     // TODO: Should we even do this or is the width and height that the AssetInterface provides enough?
+            //     'og_image_size' => [
+            //         'type' => GraphQL::type(ArrayType::NAME),
+            //         'description' => 'The Open Graph image size of this entry.',
+            //         'resolve' => function () {
+            //             $model = SocialImage::findModel('open_graph');
+
+            //             return [
+            //                 'width' => $model['width'],
+            //                 'height' => $model['height'],
+            //             ];
+            //         },
+            //     ],
+            // ])
+            ->filter(fn ($field, $handle) => ! Str::startsWith($handle, 'seo_section')) // We don't want to expose the content of section fields
+            ->mapWithKeys(function ($field, $handle) {
+                $field['resolve'] = $this->resolver();
+
+                /**
+                 * There are some fields that have existing resolvers. Like defined in HasSelectOptions for instance.
+                 * We want to be able to remove `seo_` from the field names, but then those existing resolvers won't work
+                 * because they use `$info->fieldName` without adding `seo_` in front of it to make it work like in `$this->resolver`.
+                 */
+                // $field['resolve'] = $field['resolve'] ?? $this->resolver();
+
+                return [Str::remove('seo_', $handle) => $field];
+            })
+            ->all();
+
+        return $fields;
+
         return [
             'title' => [
                 'type' => GraphQL::string(),
@@ -87,5 +126,12 @@ class AdvancedSeoType extends \Rebing\GraphQL\Support\Type
             //     'description' => 'The name of this site.',
             // ],
         ];
+    }
+
+    protected function resolver()
+    {
+        return function (ResolvesValues $entry, $args, $context, ResolveInfo $info) {
+            return $entry->resolveGqlValue("seo_{$info->fieldName}");
+        };
     }
 }

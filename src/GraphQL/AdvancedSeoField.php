@@ -20,10 +20,8 @@ class AdvancedSeoField extends Field
         return GraphQL::type(AdvancedSeoType::NAME);
     }
 
-    protected function resolve(Entry $entry): array
+    protected function resolve(Entry $entry)
     {
-        rd(GetDefaultsData::handle($entry), $entry);
-
-        // return Cascade::from(GetDefaultsData::handle($entry))->processForFrontend();
+        return $entry;
     }
 }
