@@ -15,7 +15,7 @@ class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
         $this->attributes['name'] = static::buildName($set);
     }
 
-    public static function buildName($set): string
+    public static function buildName(SeoDefaultSet|SeoVariables $set): string
     {
         $type = Str::studly($set->type());
         $handle = Str::studly($set->handle());
