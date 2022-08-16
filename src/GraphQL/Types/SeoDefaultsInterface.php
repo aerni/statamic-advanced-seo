@@ -2,12 +2,11 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\GraphQL\Types\SiteType;
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Rebing\GraphQL\Support\InterfaceType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Types\SiteType;
 
 class SeoDefaultsInterface extends InterfaceType
 {

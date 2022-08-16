@@ -2,22 +2,22 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Statamic;
-use Statamic\Facades\Git;
-use Statamic\Stache\Stache;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\GraphQL\Types\EntryInterface;
-use Statamic\Providers\AddonServiceProvider;
-use Aerni\AdvancedSeo\GraphQL\AdvancedSeoType;
 use Aerni\AdvancedSeo\GraphQL\AdvancedSeoField;
+use Aerni\AdvancedSeo\GraphQL\AdvancedSeoType;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Git;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\Providers\AddonServiceProvider;
+use Statamic\Stache\Stache;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
