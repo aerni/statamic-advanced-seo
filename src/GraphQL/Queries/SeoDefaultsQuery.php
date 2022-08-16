@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
-use Illuminate\Support\Arr;
-use Statamic\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\GraphQL\Queries\Query;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Queries\Query;
 
 class SeoDefaultsQuery extends Query
 {
