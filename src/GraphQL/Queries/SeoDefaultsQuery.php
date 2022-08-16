@@ -7,17 +7,18 @@ use Statamic\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\GraphQL\Queries\Query;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultSetInterface;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Illuminate\Support\Collection;
 
-class SeoDefaultSetQuery extends Query
+class SeoDefaultsQuery extends Query
 {
     protected $attributes = [
-        'name' => 'seoDefaultSet',
+        'name' => 'seoDefaults',
     ];
 
     public function type(): Type
     {
-        return GraphQL::listOf(GraphQL::type(SeoDefaultSetInterface::NAME));
+        return GraphQL::listOf(GraphQL::type(SeoDefaultsInterface::NAME));
     }
 
     public function args(): array
@@ -29,7 +30,7 @@ class SeoDefaultSetQuery extends Query
         ];
     }
 
-    public function resolve($root, $args)
+    public function resolve($root, $args): Collection
     {
         $variables = Seo::all()
             ->flatten()

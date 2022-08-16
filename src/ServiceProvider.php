@@ -2,23 +2,22 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\AdvancedSeoField;
-use Aerni\AdvancedSeo\GraphQL\AdvancedSeoType;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultSetQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultSetsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultSetInterface;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Statamic\Facades\CP\Nav;
+use Statamic\Statamic;
 use Statamic\Facades\Git;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
-use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
+use Aerni\AdvancedSeo\GraphQL\AdvancedSeoType;
+use Aerni\AdvancedSeo\GraphQL\AdvancedSeoField;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -163,11 +162,10 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGraphQL(): self
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
-            GraphQL::addQuery(SeoDefaultSetsQuery::class);
-            GraphQL::addQuery(SeoDefaultSetQuery::class);
-            GraphQL::addType(SeoDefaultSetInterface::class);
+            GraphQL::addQuery(SeoDefaultsQuery::class);
+            GraphQL::addType(SeoDefaultsInterface::class);
 
-            SeoDefaultSetInterface::addTypes();
+            SeoDefaultsInterface::addTypes();
 
             GraphQL::addType(AdvancedSeoType::class);
 

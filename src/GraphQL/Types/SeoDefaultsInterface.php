@@ -2,15 +2,16 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\GraphQL\Types\SiteType;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Rebing\GraphQL\Support\InterfaceType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 
-class SeoDefaultSetInterface extends InterfaceType
+class SeoDefaultsInterface extends InterfaceType
 {
-    const NAME = 'SeoDefaultSetInterface';
+    const NAME = 'SeoDefaultsInterface';
 
     protected $attributes = [
         'name' => self::NAME,
@@ -46,7 +47,7 @@ class SeoDefaultSetInterface extends InterfaceType
 
     public function resolveType(SeoVariables $variables): string
     {
-        return GraphQL::type(SeoDefaultSetType::buildName($variables));
+        return GraphQL::type(SeoDefaultsType::buildName($variables));
     }
 
     public static function addTypes(): void
@@ -54,7 +55,7 @@ class SeoDefaultSetInterface extends InterfaceType
         $seoDefaultSets = Seo::all()
             ->flatten()
             ->each(fn ($seoDefaultSet) => $seoDefaultSet->blueprint()->addGqlTypes())
-            ->mapInto(SeoDefaultSetType::class)
+            ->mapInto(SeoDefaultsType::class)
             ->all();
 
         GraphQL::addTypes($seoDefaultSets);

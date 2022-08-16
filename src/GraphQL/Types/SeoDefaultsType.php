@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
+use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
 
-class SeoDefaultSetType extends \Rebing\GraphQL\Support\Type
+class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
 {
     public function __construct(private SeoDefaultSet $set)
     {
@@ -25,7 +26,7 @@ class SeoDefaultSetType extends \Rebing\GraphQL\Support\Type
     public function interfaces(): array
     {
         return [
-            GraphQL::type(SeoDefaultSetInterface::NAME),
+            GraphQL::type(SeoDefaultsInterface::NAME),
         ];
     }
 
@@ -33,7 +34,7 @@ class SeoDefaultSetType extends \Rebing\GraphQL\Support\Type
     {
         return $this->set->blueprint()->fields()->toGql()
             ->filter(fn ($field, $handle) => ! Str::startsWith($handle, 'section'))
-            ->merge((new SeoDefaultSetInterface)->fields())
+            ->merge((new SeoDefaultsInterface)->fields())
             ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(fn ($closure) => $closure()))
             ->map(function (array $field) {
                 $field['resolve'] = $field['resolve'] ?? $this->resolver();
