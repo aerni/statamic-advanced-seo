@@ -12,6 +12,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -22,6 +23,7 @@ class SeoVariables implements Localization, Augmentable
     use FluentlyGetsAndSets;
     use HasAugmentedInstance;
     use HasOrigin;
+    use ResolvesValues;
 
     protected SeoDefaultSet $set;
     protected string $locale;
