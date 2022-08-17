@@ -33,12 +33,12 @@ class SeoDefaultsQuery extends Query
 
     public function resolve($root, $args): Collection
     {
-        // Remove any disabled defaults. Like collections and taxonomies that were disabled in the config.
+        // Get all enabled defaults. Like collections and taxonomies that were disabled in the config.
         $enabled = collect(Defaults::enabled()->map(fn ($default) => $default['id']))->flip();
 
         $variables = Seo::all()
             ->flatten()
-            ->filter(fn ($set) => $enabled->has("{$set->type()}::{$set->handle()}"))
+            ->filter(fn ($set) => $enabled->has("{$set->type()}::{$set->handle()}")) // Remove any disabled defaults.
             ->flatMap(fn ($set) => $set->localizations()->values());
 
         if ($type = Arr::get($args, 'type')) {

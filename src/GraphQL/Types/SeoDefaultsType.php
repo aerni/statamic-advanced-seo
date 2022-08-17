@@ -19,7 +19,7 @@ class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
         $type = Str::studly($set->type());
         $handle = Str::studly($set->handle());
 
-        return "SeoDefaultSet_{$type}_{$handle}";
+        return "SeoDefaults_{$type}_{$handle}";
     }
 
     public function interfaces(): array
@@ -32,7 +32,7 @@ class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
     public function fields(): array
     {
         return $this->set->blueprint()->fields()->toGql()
-            ->filter(fn ($field, $handle) => ! Str::startsWith($handle, 'section'))
+            ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_'))
             ->merge((new SeoDefaultsInterface)->fields())
             ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(fn ($closure) => $closure()))
             ->map(function (array $field) {

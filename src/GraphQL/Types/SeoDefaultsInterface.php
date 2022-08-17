@@ -52,12 +52,12 @@ class SeoDefaultsInterface extends InterfaceType
 
     public static function addTypes(): void
     {
-        // Remove any disabled defaults. Like collections and taxonomies that were disabled in the config.
+        // Get all enabled defaults. Like collections and taxonomies that were disabled in the config.
         $enabled = collect(Defaults::enabled()->map(fn ($default) => $default['id']))->flip();
 
         $seoDefaultSets = Seo::all()
             ->flatten()
-            ->filter(fn ($set) => $enabled->has("{$set->type()}::{$set->handle()}"))
+            ->filter(fn ($set) => $enabled->has("{$set->type()}::{$set->handle()}")) // Remove any disabled defaults.
             ->each(fn ($seoDefaultSet) => $seoDefaultSet->blueprint()->addGqlTypes())
             ->mapInto(SeoDefaultsType::class)
             ->all();
