@@ -47,7 +47,7 @@ class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
 
     private function resolver()
     {
-        return function (ResolvesValues $variables, $args, $context, ResolveInfo $info) {
+        return function (SeoVariables $variables, $args, $context, ResolveInfo $info) {
             return $variables->resolveGqlValue($info->fieldName);
         };
     }
