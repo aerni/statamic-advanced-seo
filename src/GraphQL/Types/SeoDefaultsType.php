@@ -2,10 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
+use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use GraphQL\Type\Definition\ResolveInfo;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Statamic\Contracts\GraphQL\ResolvesValues;
 
 class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
 {
@@ -32,7 +34,7 @@ class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
     public function fields(): array
     {
         return $this->set->blueprint()->fields()->toGql()
-            ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_'))
+            ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_'))  // We don't want to expose the content of section fields
             ->merge((new SeoDefaultsInterface)->fields())
             ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(fn ($closure) => $closure()))
             ->map(function (array $field) {
@@ -45,7 +47,7 @@ class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
 
     private function resolver()
     {
-        return function (SeoVariables $variables, $args, $context, $info) {
+        return function (ResolvesValues $variables, $args, $context, ResolveInfo $info) {
             return $variables->resolveGqlValue($info->fieldName);
         };
     }

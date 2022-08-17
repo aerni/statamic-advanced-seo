@@ -5,7 +5,9 @@ namespace Aerni\AdvancedSeo;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\GraphQL\AdvancedSeoField;
 use Aerni\AdvancedSeo\GraphQL\AdvancedSeoType;
+use Aerni\AdvancedSeo\GraphQL\Fields\OnPageSeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
@@ -164,13 +166,12 @@ class ServiceProvider extends AddonServiceProvider
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
             GraphQL::addQuery(SeoDefaultsQuery::class);
             GraphQL::addType(SeoDefaultsInterface::class);
+            GraphQL::addType(OnPageSeoType::class);
+
+            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
+            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
 
             SeoDefaultsInterface::addTypes();
-
-            GraphQL::addType(AdvancedSeoType::class);
-
-            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new AdvancedSeoField())->toArray());
-            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new AdvancedSeoField())->toArray());
         }
 
         return $this;
