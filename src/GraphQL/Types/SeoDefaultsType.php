@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\GraphQL\Types;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use GraphQL\Type\Definition\ResolveInfo;
-use Statamic\Contracts\GraphQL\ResolvesValues;
 use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
