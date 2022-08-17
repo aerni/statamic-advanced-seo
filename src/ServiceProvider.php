@@ -3,8 +3,6 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\AdvancedSeoField;
-use Aerni\AdvancedSeo\GraphQL\AdvancedSeoType;
 use Aerni\AdvancedSeo\GraphQL\Fields\OnPageSeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;

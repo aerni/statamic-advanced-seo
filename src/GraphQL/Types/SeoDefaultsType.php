@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Support\Str;
-use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use GraphQL\Type\Definition\ResolveInfo;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Statamic\Contracts\GraphQL\ResolvesValues;
+use Statamic\Facades\GraphQL;
+use Statamic\Support\Str;
 
 class SeoDefaultsType extends \Rebing\GraphQL\Support\Type
 {
