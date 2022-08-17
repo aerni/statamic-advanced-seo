@@ -149,13 +149,14 @@ class SourceFieldtype extends Fieldtype
 
     protected function defaultValueFromCascade(): mixed
     {
-        $data = Blink::once('advanced-seo::source-fieldtype::parent', fn () => GetDefaultsData::handle($this->field->parent()));
+        $data = GetDefaultsData::handle($this->field->parent());
 
+        // We can't get any data on default views like '/cp/advanced-seo/collections/pages'.
         if (! $data) {
             return null;
         }
 
-        $cascade = Blink::once('advanced-seo::cascade::fieldtype', fn () => Cascade::from($data)->processForFieldtype());
+        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$data->id()}", fn () => Cascade::from($data)->processForFieldtype());
 
         $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 
