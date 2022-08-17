@@ -2,11 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\GraphQL\Types\SiteType;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Rebing\GraphQL\Support\InterfaceType;
 
 class SeoDefaultsInterface extends InterfaceType
 {
@@ -51,8 +52,12 @@ class SeoDefaultsInterface extends InterfaceType
 
     public static function addTypes(): void
     {
+        // Remove any disabled defaults. Like collections and taxonomies that were disabled in the config.
+        $enabled = collect(Defaults::enabled()->map(fn ($default) => $default['id']))->flip();
+
         $seoDefaultSets = Seo::all()
             ->flatten()
+            ->filter(fn ($set) => $enabled->has("{$set->type()}::{$set->handle()}"))
             ->each(fn ($seoDefaultSet) => $seoDefaultSet->blueprint()->addGqlTypes())
             ->mapInto(SeoDefaultsType::class)
             ->all();

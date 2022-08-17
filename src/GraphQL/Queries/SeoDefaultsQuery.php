@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Aerni\AdvancedSeo\Models\Defaults;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -32,8 +33,12 @@ class SeoDefaultsQuery extends Query
 
     public function resolve($root, $args): Collection
     {
+        // Remove any disabled defaults. Like collections and taxonomies that were disabled in the config.
+        $enabled = collect(Defaults::enabled()->map(fn ($default) => $default['id']))->flip();
+
         $variables = Seo::all()
             ->flatten()
+            ->filter(fn ($set) => $enabled->has("{$set->type()}::{$set->handle()}"))
             ->flatMap(fn ($set) => $set->localizations()->values());
 
         if ($type = Arr::get($args, 'type')) {
