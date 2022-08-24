@@ -92,17 +92,12 @@ class OnPageSeoFields extends BaseFields
 
     public function socialImages(): array
     {
-        $fields = collect([
+        return collect([
+            $this->socialImagesGenerator(),
+            $this->socialImagesGeneratorFields(),
             $this->openGraphImage(),
             $this->twitterImage(),
-        ]);
-
-        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields->prepend($this->socialImagesGeneratorFields());
-            $fields->prepend($this->socialImagesGenerator());
-        }
-
-        return $fields->flatten(1)->toArray();
+        ])->flatten(1)->toArray();
     }
 
     public function socialImagesGenerator(): array
@@ -115,6 +110,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.instructions'),
                     'listable' => 'hidden',
+                    'if' => 'showSocialImagesGenerator',
                 ],
             ],
             [
@@ -126,22 +122,17 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
+                    'if' => 'showSocialImagesGenerator',
                     'field' => [
                         'type' => 'toggle',
                     ],
                 ],
             ],
-            [
-                'handle' => 'seo_social_images_theme',
-                'field' => [
-                    'type' => 'hidden',
-                    'default' => SocialImageTheme::fieldtypeDefault(),
-                ],
-            ],
         ]);
 
+        // Make themes selectable if we've got more than one. If not, use a hidden field with the default theme instead.
         if (SocialImageTheme::all()->count() > 1) {
-            $fields->put(2, [
+            $fields->push([
                 'handle' => 'seo_social_images_theme',
                 'field' => [
                     'type' => 'seo_source',
@@ -163,6 +154,17 @@ class OnPageSeoFields extends BaseFields
                         'taggable' => false,
                         'push_tags' => false,
                         'cast_booleans' => false,
+                    ],
+                ],
+            ]);
+        } else {
+            $fields->push([
+                'handle' => 'seo_social_images_theme',
+                'field' => [
+                    'type' => 'hidden',
+                    'default' => SocialImageTheme::fieldtypeDefault(),
+                    'if' => [
+                        'seo_generate_social_images.value' => 'true',
                     ],
                 ],
             ]);
