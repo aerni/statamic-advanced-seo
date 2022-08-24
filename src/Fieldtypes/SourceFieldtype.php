@@ -70,7 +70,9 @@ class SourceFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
-        if ($data === '@default' || $data === null) {
+        $data = $data ?? $this->field->defaultValue();
+
+        if ($data === '@default') {
             return $this->sourceFieldtype()->augment($this->defaultValueFromCascade());
         }
 
