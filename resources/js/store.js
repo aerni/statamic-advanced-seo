@@ -11,14 +11,15 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
     },
 
     actions: {
-        async getConditions({commit}, payload) {
-            const conditions = await fetch(`https://statamic-advanced-seo.test/!/advanced-seo/conditions/${payload.id}`);
-            commit('SET_CONDITIONS', await conditions.json());
+        fetchConditions({ commit }, payload) {
+            return fetch(`https://statamic-advanced-seo.test/!/advanced-seo/conditions/${payload.id}`)
+                .then(response => response.json())
+                .then(conditions => commit('setConditions', conditions))
         },
     },
 
     mutations: {
-        SET_CONDITIONS(state, conditions) {
+        setConditions(state, conditions) {
             state.conditions = conditions;
         },
     }

@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySitemapSettings;
 use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
@@ -553,13 +552,7 @@ class OnPageSeoFields extends BaseFields
 
     public function sitemap(): array
     {
-        if (! config('advanced-seo.sitemap.enabled', true)) {
-            return [];
-        }
-
-        if (isset($this->data) && ! ShouldDisplaySitemapSettings::handle($this->data)) {
-            return [];
-        }
+        // TODO: Apply showSitemapSettings conditions
 
         return [
             [
