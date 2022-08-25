@@ -11,10 +11,12 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
     },
 
     actions: {
-        fetchConditions({ commit }, payload) {
-            return fetch(`https://statamic-advanced-seo.test/!/advanced-seo/conditions/${payload.id}`)
-                .then(response => response.json())
-                .then(conditions => commit('setConditions', conditions))
+        fetchConditions({ commit }) {
+            return Statamic.$request.post(`/!/advanced-seo/conditions`, window.location)
+                .then(response => commit('setConditions', response.data))
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
     },
 

@@ -109,7 +109,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.instructions'),
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGenerator',
+                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ],
             [
@@ -121,7 +121,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
-                    'if' => 'showSocialImagesGenerator',
+                    'if' => 'showSocialImagesGeneratorFields',
                     'field' => [
                         'type' => 'toggle',
                     ],
@@ -294,6 +294,7 @@ class OnPageSeoFields extends BaseFields
             ],
         ];
 
+        // TODO: Handle this.
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[1]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
         }
@@ -421,6 +422,7 @@ class OnPageSeoFields extends BaseFields
             ],
         ];
 
+        // TODO: Handle this.
         if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
             $fields[2]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
             $fields[3]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
@@ -552,9 +554,16 @@ class OnPageSeoFields extends BaseFields
 
     public function sitemap(): array
     {
-        // TODO: Apply showSitemapSettings conditions
-
         return [
+            [
+                'handle' => 'seo_test',
+                'field' => [
+                    'type' => 'section',
+                    'display' => $this->trans('seo_section_sitemap.display'),
+                    'instructions' => $this->trans('seo_section_sitemap.instructions'),
+                    'if' => 'showSitemapFields',
+                ],
+            ],
             [
                 'handle' => 'seo_section_sitemap',
                 'field' => [
@@ -562,6 +571,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.instructions'),
                     'if' => [
+                        'showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
@@ -577,6 +587,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
                     'if' => [
+                        'showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
@@ -596,6 +607,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'select-fieldtype',
                     'width' => 50,
                     'if' => [
+                        'showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
@@ -635,6 +647,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'select-fieldtype',
                     'width' => 50,
                     'if' => [
+                        'showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',

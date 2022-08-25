@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Conditions;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 
-class ShowSitemapSettings
+class ShowSitemapFields
 {
     public static function handle(DefaultsData $data): bool
     {

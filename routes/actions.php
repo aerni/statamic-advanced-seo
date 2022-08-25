@@ -6,5 +6,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('advanced-seo.')->group(function () {
     Route::get('/social-images/{theme}/{type}/{id}', [SocialImagesController::class, 'show'])->name('social_images.show');
-    Route::get('/conditions/{id}', ConditionsController::class)->name('conditions');
+    Route::post('/conditions', ConditionsController::class);
 });

@@ -1,13 +1,11 @@
 Statamic.booted(() => {
-    if (id = Statamic.$store.state.publish?.base?.values?.id) {
-        Statamic.$store.dispatch("publish/advancedSeo/fetchConditions", { id: id })
-    }
+    Statamic.$store.dispatch("publish/advancedSeo/fetchConditions")
 })
 
-Statamic.$conditions.add('showSitemapSettings', ({ store }) => {
-    return store.state.publish.advancedSeo.conditions.showSitemapSettings
+Statamic.$conditions.add('showSitemapFields', ({ store }) => {
+    return store.state.publish.advancedSeo.conditions.showSitemapFields
 });
 
-Statamic.$conditions.add('showSocialImagesGenerator', ({ store }) => {
-    return store.state.publish.advancedSeo.conditions.showSocialImagesGenerator
+Statamic.$conditions.add('showSocialImagesGeneratorFields', ({ store }) => {
+    return store.state.publish.advancedSeo.conditions.showSocialImagesGeneratorFields
 });

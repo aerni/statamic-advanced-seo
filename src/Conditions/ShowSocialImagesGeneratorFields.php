@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\Site;
 
-class ShowSocialImagesGenerator
+class ShowSocialImagesGeneratorFields
 {
     public static function handle(DefaultsData $data): bool
     {

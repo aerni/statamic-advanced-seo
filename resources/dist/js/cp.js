@@ -599,21 +599,15 @@ Statamic.booting(function () {
 /***/ (() => {
 
 Statamic.booted(function () {
-  var _Statamic$$store$stat, _Statamic$$store$stat2, _Statamic$$store$stat3;
-
-  if (id = (_Statamic$$store$stat = Statamic.$store.state.publish) === null || _Statamic$$store$stat === void 0 ? void 0 : (_Statamic$$store$stat2 = _Statamic$$store$stat.base) === null || _Statamic$$store$stat2 === void 0 ? void 0 : (_Statamic$$store$stat3 = _Statamic$$store$stat2.values) === null || _Statamic$$store$stat3 === void 0 ? void 0 : _Statamic$$store$stat3.id) {
-    Statamic.$store.dispatch("publish/advancedSeo/fetchConditions", {
-      id: id
-    });
-  }
+  Statamic.$store.dispatch("publish/advancedSeo/fetchConditions");
 });
-Statamic.$conditions.add('showSitemapSettings', function (_ref) {
+Statamic.$conditions.add('showSitemapFields', function (_ref) {
   var store = _ref.store;
-  return store.state.publish.advancedSeo.conditions.showSitemapSettings;
+  return store.state.publish.advancedSeo.conditions.showSitemapFields;
 });
-Statamic.$conditions.add('showSocialImagesGenerator', function (_ref2) {
+Statamic.$conditions.add('showSocialImagesGeneratorFields', function (_ref2) {
   var store = _ref2.store;
-  return store.state.publish.advancedSeo.conditions.showSocialImagesGenerator;
+  return store.state.publish.advancedSeo.conditions.showSocialImagesGeneratorFields;
 });
 
 /***/ }),
@@ -654,12 +648,12 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
     }
   },
   actions: {
-    fetchConditions: function fetchConditions(_ref, payload) {
+    fetchConditions: function fetchConditions(_ref) {
       var commit = _ref.commit;
-      return fetch("https://statamic-advanced-seo.test/!/advanced-seo/conditions/".concat(payload.id)).then(function (response) {
-        return response.json();
-      }).then(function (conditions) {
-        return commit('setConditions', conditions);
+      return Statamic.$request.post("/!/advanced-seo/conditions", window.location).then(function (response) {
+        return commit('setConditions', response.data);
+      })["catch"](function (error) {
+        console.log(error);
       });
     }
   },
