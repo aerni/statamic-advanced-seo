@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
@@ -239,7 +238,7 @@ class OnPageSeoFields extends BaseFields
 
     public function openGraphImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_og',
                 'field' => [
@@ -257,6 +256,9 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'assets-fieldtype',
+                    'if' => [
+                        'seo_generate_social_images.value' => 'isnt true',
+                    ],
                     'field' => [
                         'type' => 'assets',
                         'container' => config('advanced-seo.social_images.container', 'assets'),
@@ -306,18 +308,11 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
-
-        // TODO: Handle this.
-        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[1]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
-        }
-
-        return $fields;
     }
 
     public function twitterImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_twitter',
                 'field' => [
@@ -355,6 +350,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'assets-fieldtype',
                     'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
                     'if' => [
+                        'seo_generate_social_images.value' => 'isnt true',
                         'seo_twitter_card.value' => 'equals summary',
                     ],
                     'field' => [
@@ -383,6 +379,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'assets-fieldtype',
                     'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
                     'if' => [
+                        'seo_generate_social_images.value' => 'isnt true',
                         'seo_twitter_card.value' => 'equals summary_large_image',
                     ],
                     'field' => [
@@ -434,14 +431,6 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
-
-        // TODO: Handle this.
-        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields[2]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
-            $fields[3]['field']['if']['seo_generate_social_images.value'] = 'isnt true';
-        }
-
-        return $fields;
     }
 
     public function canonicalUrl(): array

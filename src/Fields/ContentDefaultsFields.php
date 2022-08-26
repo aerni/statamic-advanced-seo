@@ -146,7 +146,7 @@ class ContentDefaultsFields extends BaseFields
 
     public function openGraphImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_og',
                 'field' => [
@@ -202,13 +202,11 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
         ];
-
-        return $fields;
     }
 
     public function twitterImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_twitter',
                 'field' => [
@@ -295,8 +293,6 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
         ];
-
-        return $fields;
     }
 
     public function canonicalUrl(): array

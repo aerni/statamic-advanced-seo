@@ -15,7 +15,7 @@ abstract class BaseFields implements Fields
         return new static();
     }
 
-    // TODO: Might be a good idea to make the data required in the constructor? We always need the data anyways.
+    // TODO: We can probaly safely remove this, now that we are using JS conditions?
     public function data(DefaultsData $data): self
     {
         $this->data = $data;
