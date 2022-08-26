@@ -556,22 +556,13 @@ class OnPageSeoFields extends BaseFields
     {
         return [
             [
-                'handle' => 'seo_test',
-                'field' => [
-                    'type' => 'section',
-                    'display' => $this->trans('seo_section_sitemap.display'),
-                    'instructions' => $this->trans('seo_section_sitemap.instructions'),
-                    'if' => 'showSitemapFields',
-                ],
-            ],
-            [
                 'handle' => 'seo_section_sitemap',
                 'field' => [
                     'type' => 'section',
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.instructions'),
                     'if' => [
-                        'showSitemapFields',
+                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
@@ -587,7 +578,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
                     'if' => [
-                        'showSitemapFields',
+                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
@@ -607,7 +598,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'select-fieldtype',
                     'width' => 50,
                     'if' => [
-                        'showSitemapFields',
+                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
@@ -647,7 +638,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'select-fieldtype',
                     'width' => 50,
                     'if' => [
-                        'showSitemapFields',
+                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
