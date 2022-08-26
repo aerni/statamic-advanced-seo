@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Stache;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Statamic\Data\DataCollection;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
@@ -25,14 +26,22 @@ class SeoDefaultsRepository implements Contract
         return app(SeoDefaultSet::class);
     }
 
-    public function find(string $type, string $id): ?SeoDefaultSet
+    public function find(string $type, string $handle): ?SeoDefaultSet
     {
-        return $this->store->store($type)->getItem($id);
+        return $this->store->store($type)->getItem($handle);
     }
 
-    public function findOrMake(string $type, string $id): SeoDefaultSet
+    public function findById(string $id): ?SeoDefaultSet
     {
-        return $this->find($type, $id) ?? $this->make()->type($type)->handle($id);
+        $type = Str::before($id, '::');
+        $handle = Str::after($id, '::');
+
+        return $this->find($type, $handle);
+    }
+
+    public function findOrMake(string $type, string $handle): SeoDefaultSet
+    {
+        return $this->find($type, $handle) ?? $this->make()->type($type)->handle($handle);
     }
 
     public function all(): Collection

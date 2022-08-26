@@ -3,7 +3,7 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
     namespaced: true,
 
     state: {
-        conditions: {},
+        conditions: null,
     },
 
     getters: {
@@ -12,7 +12,13 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
 
     actions: {
         fetchConditions({ commit }) {
-            return Statamic.$request.post(`/!/advanced-seo/conditions`, window.location)
+            const id = Statamic.$store.state.publish?.base?.values?.id;
+
+            if (! id) {
+                return
+            }
+
+            return Statamic.$request.get(`/!/advanced-seo/conditions/${id}`)
                 .then(response => commit('setConditions', response.data))
                 .catch(function (error) {
                     console.log(error);

@@ -60,7 +60,7 @@ class SiteDefaultsController extends BaseDefaultsController
             'actions' => [
                 'save' => $localization->updateUrl(),
             ],
-            'values' => $values,
+            'values' => array_merge($values, ['id' => $set->id()]),
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'locale' => $localization->locale(),

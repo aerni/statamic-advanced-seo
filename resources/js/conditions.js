@@ -3,9 +3,9 @@ Statamic.booted(() => {
 })
 
 Statamic.$conditions.add('showSitemapFields', ({ store }) => {
-    return store.state.publish.advancedSeo.conditions.showSitemapFields
+    return store.state.publish.advancedSeo.conditions?.showSitemapFields
 });
 
 Statamic.$conditions.add('showSocialImagesGeneratorFields', ({ store }) => {
-    return store.state.publish.advancedSeo.conditions.showSocialImagesGeneratorFields
+    return store.state.publish.advancedSeo.conditions?.showSocialImagesGeneratorFields
 });

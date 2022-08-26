@@ -29,7 +29,7 @@ class SeoDefaultSet implements Contract
 
     public function id(): string
     {
-        return $this->handle();
+        return "{$this->type()}::{$this->handle()}";
     }
 
     public function handle($handle = null)

@@ -10,9 +10,11 @@ interface SeoDefaultsRepository
 {
     public function make(): SeoDefaultSet;
 
-    public function find(string $type, string $id): ?SeoDefaultSet;
+    public function find(string $type, string $handle): ?SeoDefaultSet;
 
-    public function findOrMake(string $type, string $id): SeoDefaultSet;
+    public function findById(string $id): ?SeoDefaultSet;
+
+    public function findOrMake(string $type, string $handle): SeoDefaultSet;
 
     public function all(): Collection;
 

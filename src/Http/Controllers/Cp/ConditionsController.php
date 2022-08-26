@@ -2,17 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Actions\GetDefaultsDataFromUrl;
+use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Conditions\ShowSitemapFields;
 use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
-use Illuminate\Http\Request;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Routing\Controller;
+use Statamic\Facades\Data;
 
 class ConditionsController extends Controller
 {
-    public function __invoke(Request $request): array
+    public function __invoke(string $id): array
     {
-        $data = GetDefaultsDataFromUrl::handle($request->get('href'));
+        $model = Data::find($id) ?? Seo::findById($id);
+
+        $data = GetDefaultsData::handle($model);
 
         if (! $data) {
             return [];

@@ -602,12 +602,16 @@ Statamic.booted(function () {
   Statamic.$store.dispatch("publish/advancedSeo/fetchConditions");
 });
 Statamic.$conditions.add('showSitemapFields', function (_ref) {
+  var _store$state$publish$;
+
   var store = _ref.store;
-  return store.state.publish.advancedSeo.conditions.showSitemapFields;
+  return (_store$state$publish$ = store.state.publish.advancedSeo.conditions) === null || _store$state$publish$ === void 0 ? void 0 : _store$state$publish$.showSitemapFields;
 });
 Statamic.$conditions.add('showSocialImagesGeneratorFields', function (_ref2) {
+  var _store$state$publish$2;
+
   var store = _ref2.store;
-  return store.state.publish.advancedSeo.conditions.showSocialImagesGeneratorFields;
+  return (_store$state$publish$2 = store.state.publish.advancedSeo.conditions) === null || _store$state$publish$2 === void 0 ? void 0 : _store$state$publish$2.showSocialImagesGeneratorFields;
 });
 
 /***/ }),
@@ -640,7 +644,7 @@ __webpack_require__.r(__webpack_exports__);
 Statamic.$store.registerModule(['publish', 'advancedSeo'], {
   namespaced: true,
   state: {
-    conditions: {}
+    conditions: null
   },
   getters: {
     conditions: function conditions(state) {
@@ -649,8 +653,16 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
   },
   actions: {
     fetchConditions: function fetchConditions(_ref) {
+      var _Statamic$$store$stat, _Statamic$$store$stat2, _Statamic$$store$stat3;
+
       var commit = _ref.commit;
-      return Statamic.$request.post("/!/advanced-seo/conditions", window.location).then(function (response) {
+      var id = (_Statamic$$store$stat = Statamic.$store.state.publish) === null || _Statamic$$store$stat === void 0 ? void 0 : (_Statamic$$store$stat2 = _Statamic$$store$stat.base) === null || _Statamic$$store$stat2 === void 0 ? void 0 : (_Statamic$$store$stat3 = _Statamic$$store$stat2.values) === null || _Statamic$$store$stat3 === void 0 ? void 0 : _Statamic$$store$stat3.id;
+
+      if (!id) {
+        return;
+      }
+
+      return Statamic.$request.get("/!/advanced-seo/conditions/".concat(id)).then(function (response) {
         return commit('setConditions', response.data);
       })["catch"](function (error) {
         console.log(error);
