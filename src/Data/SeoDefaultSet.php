@@ -29,7 +29,13 @@ class SeoDefaultSet implements Contract
 
     public function id(): string
     {
-        return "{$this->type()}::{$this->handle()}";
+        return $this->handle();
+
+        /**
+         * TODO: This breaks everything. It looks like it can't create/get from the Stache anymore.
+         * Have to figure this out as we need this ID in the SiteDefaultsController.
+         */
+        // return "{$this->type()}::{$this->handle()}";
     }
 
     public function handle($handle = null)

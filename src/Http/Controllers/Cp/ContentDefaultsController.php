@@ -63,8 +63,9 @@ abstract class ContentDefaultsController extends BaseDefaultsController
             'actions' => [
                 'save' => $localization->updateUrl(),
             ],
-            'values' => $values,
-            'values' => array_merge($values, ['id' => $set->id()]),
+            // TODO: Make this work with $set->id()
+            // 'values' => array_merge($values, ['id' => $set->id()]),
+            'values' => array_merge($values, ['id' => "{$set->type()}::{$set->handle()}"]),
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'locale' => $localization->locale(),
