@@ -145,6 +145,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
                     'if' => [
+                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                     'field' => [
@@ -167,6 +168,7 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'hidden',
                     'default' => SocialImageTheme::fieldtypeDefault(),
                     'if' => [
+                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                 ],
@@ -184,6 +186,7 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
+                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                 ],
@@ -198,6 +201,7 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
+                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                 ],
@@ -225,6 +229,7 @@ class OnPageSeoFields extends BaseFields
 
             // Hide the fields if the toggle is of.
             $field['field']['if'] = [
+                'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                 'seo_generate_social_images.value' => 'true',
             ];
 
