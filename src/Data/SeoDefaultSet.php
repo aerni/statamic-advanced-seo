@@ -54,6 +54,11 @@ class SeoDefaultSet implements Contract
         return collect($this->localizations);
     }
 
+    public function sites(): Collection
+    {
+        return $this->localizations()->map->locale()->values();
+    }
+
     public function title(): string
     {
         return Str::slugToTitle($this->handle());
