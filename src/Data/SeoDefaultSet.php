@@ -190,7 +190,7 @@ class SeoDefaultSet implements Contract
 
         return resolve($blueprint)
             ->make()
-            ->data(new DefaultsData(type: $this->type, handle: $this->handle)) // We need to pass data so that we can conditionally hide and show ContentDefaultsFields
+            ->data(new DefaultsData(type: $this->type, handle: $this->handle))
             ->get();
     }
 

@@ -15,7 +15,6 @@ abstract class BaseFields implements Fields
         return new static();
     }
 
-    // TODO: We can probaly safely remove this, now that we are using JS conditions?
     public function data(DefaultsData $data): self
     {
         $this->data = $data;
