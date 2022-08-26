@@ -18,11 +18,14 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
                 return
             }
 
-            return Statamic.$request.get(`/!/advanced-seo/conditions/${id}`)
-                .then(response => commit('setConditions', response.data))
-                .catch(function (error) {
-                    console.log(error);
-                });
+            return Statamic.$request.post(`/!/advanced-seo/conditions`, {
+                id: id,
+                site: Statamic.$store.state.publish.base.site,
+            })
+            .then(response => commit('setConditions', response.data))
+            .catch(function (error) {
+                console.log(error);
+            });
         },
     },
 
