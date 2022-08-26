@@ -59,6 +59,15 @@ class SeoDefaultSet implements Contract
         return $this->localizations()->map->locale()->values();
     }
 
+    public function selectedSite(): string
+    {
+        $selectedSite = Site::selected()->handle();
+
+        return $this->sites()->contains($selectedSite)
+            ? $selectedSite
+            : $this->sites()->first();
+    }
+
     public function title(): string
     {
         return Str::slugToTitle($this->handle());

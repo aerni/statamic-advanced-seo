@@ -19,7 +19,7 @@ class EvaluateModelLocale
     public static function handle(mixed $model): ?string
     {
         return match (true) {
-            ($model instanceof SeoDefaultSet) => request()->get('site') ?? Site::selected()->handle(),
+            ($model instanceof SeoDefaultSet) => request()->get('site') ?? $model->selectedSite(),
             ($model instanceof Collection) => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
             ($model instanceof Entry) => $model->locale(),
             ($model instanceof EntryBlueprintFound) => Statamic::isCpRoute() ? basename(request()->path()) : Site::current()->handle(),
