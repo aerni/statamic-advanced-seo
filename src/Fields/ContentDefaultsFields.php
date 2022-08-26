@@ -89,6 +89,10 @@ class ContentDefaultsFields extends BaseFields
 
     public function socialImagesGenerator(): array
     {
+        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
         $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',

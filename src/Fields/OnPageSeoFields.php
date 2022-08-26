@@ -101,6 +101,10 @@ class OnPageSeoFields extends BaseFields
 
     public function socialImagesGenerator(): array
     {
+        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
         $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',
@@ -205,6 +209,10 @@ class OnPageSeoFields extends BaseFields
 
     public function socialImagesGeneratorFields(): array
     {
+        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
         $fieldset = Fieldset::setDirectory(resource_path('fieldsets'))->find('social_images_generator');
 
         if (! $fieldset) {
@@ -554,6 +562,10 @@ class OnPageSeoFields extends BaseFields
 
     public function sitemap(): array
     {
+        if (! config('advanced-seo.sitemap.enabled', true)) {
+            return [];
+        }
+
         return [
             [
                 'handle' => 'seo_section_sitemap',
