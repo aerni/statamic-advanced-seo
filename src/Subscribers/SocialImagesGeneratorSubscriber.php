@@ -52,6 +52,7 @@ class SocialImagesGeneratorSubscriber
     {
         $data = $this->getDataFromEvent($event);
 
+        // TODO: Handle this.
         if (! ShouldDisplaySocialImagesGenerator::handle($data)) {
             return;
         }
