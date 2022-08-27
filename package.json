@@ -8,7 +8,8 @@
         "production": "mix --production"
     },
     "dependencies": {
-        "vue": "^2.6.14"
+        "vue": "^2.6.14",
+        "marked": "^4.0.10"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.5",
