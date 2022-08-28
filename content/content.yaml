@@ -1,6 +1,10 @@
 seo_site_name_position: end
 seo_generate_social_images: false
+seo_og_title: '@auto'
+seo_og_description: '@auto'
 seo_twitter_card: summary
+seo_twitter_title: '@auto'
+seo_twitter_description: '@auto'
 seo_canonical_type: current
 seo_noindex: false
 seo_nofollow: false
