@@ -22,11 +22,6 @@ class SeoDefaultSet implements Contract
     protected string $type;
     protected array $localizations;
 
-    public function defaultData(): Collection
-    {
-        return Defaults::data("{$this->type}::{$this->handle}");
-    }
-
     public function id(): string
     {
         return $this->handle();
@@ -127,7 +122,7 @@ class SeoDefaultSet implements Contract
         });
 
         // Determine the origin and set the default data for each localization based on the provided sites.
-        $this->localizations()->each(fn ($item) => $item->determineOrigin($sites)->withDefaultData()); // Only adds the default data to the root localization.
+        $this->localizations()->each(fn ($item) => $item->determineOrigin($sites)->withDefaultData());
 
         return $this;
     }
