@@ -12,14 +12,9 @@ Statamic.$store.registerModule(['publish', 'advancedSeo'], {
 
     actions: {
         fetchConditions({ commit }) {
-            const id = Statamic.$store.state.publish?.base?.values?.id;
-
-            if (! id) {
-                return
-            }
-
             return Statamic.$request.post(`/!/advanced-seo/conditions`, {
-                id: id,
+                url: window.location,
+                id: Statamic.$store.state.publish?.base?.values?.id,
                 site: Statamic.$store.state.publish.base.site,
             })
             .then(response => commit('setConditions', response.data))
