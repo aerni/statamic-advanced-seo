@@ -154,7 +154,7 @@ class SeoDefaultSet implements Contract
         return $this;
     }
 
-    public function in(string $locale): ?SeoVariables
+    public function in($locale): ?SeoVariables
     {
         return $this->localizations[$locale] ?? null;
     }
