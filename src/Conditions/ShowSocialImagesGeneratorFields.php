@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Conditions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Facades\Site;
 
 class ShowSocialImagesGeneratorFields
 {
@@ -15,13 +14,20 @@ class ShowSocialImagesGeneratorFields
             return false;
         }
 
+        $disabled = config("advanced-seo.disabled.{$data->type}", []);
+
+        // Check if the collection/taxonomy is set to be disabled globally.
+        if (in_array($data->handle, $disabled)) {
+            return false;
+        }
+
         // Terms are not yet supported.
         if ($data->type === 'taxonomies') {
             return false;
         }
 
         $enabledCollections = Seo::find('site', 'social_media')
-            ?->in(Site::selected()->handle())
+            ?->in($data->locale)
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the collection is not configured.
