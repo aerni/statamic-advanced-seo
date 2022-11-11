@@ -101,7 +101,7 @@ class OnPageSeoFields extends BaseFields
     public function socialImagesGenerator(): array
     {
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return false;
+            return [];
         }
 
         $fields = collect([
@@ -213,7 +213,7 @@ class OnPageSeoFields extends BaseFields
     public function socialImagesGeneratorFields(): array
     {
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return false;
+            return [];
         }
 
         $fieldset = Fieldset::setDirectory(resource_path('fieldsets'))->find('social_images_generator');
