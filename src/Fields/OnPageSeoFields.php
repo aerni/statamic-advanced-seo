@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Statamic\Facades\Fieldset;
@@ -226,7 +227,7 @@ class OnPageSeoFields extends BaseFields
             // Prefix the field handles to avoid naming conflicts.
             $field['handle'] = "seo_social_images_{$field['handle']}";
 
-            // Hide the fields if the toggle is of.
+            // Hide the fields if the toggle is off.
             $field['field']['if'] = [
                 'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                 'seo_generate_social_images.value' => 'true',
@@ -238,7 +239,7 @@ class OnPageSeoFields extends BaseFields
 
     public function openGraphImage(): array
     {
-        return [
+        $fields = [
             [
                 'handle' => 'seo_section_og',
                 'field' => [
@@ -308,11 +309,19 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
+
+        // Make sure the `seo_og_image` field isn't hidden if the entry's collection
+        // has been removed from the social images generator config in the site defaults.
+        if (! ShowSocialImagesGeneratorFields::handle($this->data)) {
+            unset($fields[1]['field']['if']);
+        }
+
+        return $fields;
     }
 
     public function twitterImage(): array
     {
-        return [
+        $fields = [
             [
                 'handle' => 'seo_section_twitter',
                 'field' => [
@@ -431,6 +440,15 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
+
+        // Make sure the `seo_twitter_summary_image` and `seo_twitter_summary_large_image` field isn't hidden if the entry's collection
+        // has been removed from the social images generator config in the site defaults.
+        if (! ShowSocialImagesGeneratorFields::handle($this->data)) {
+            unset($fields[2]['field']['if']['seo_generate_social_images.value']);
+            unset($fields[3]['field']['if']['seo_generate_social_images.value']);
+        }
+
+        return $fields;
     }
 
     public function canonicalUrl(): array
