@@ -1,14 +1,18 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Actions;
+namespace Aerni\AdvancedSeo\Conditions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 
-class ShouldDisplaySitemapSettings
+class ShowSitemapFields
 {
     public static function handle(DefaultsData $data): bool
     {
+        if (! config('advanced-seo.sitemap.enabled', true)) {
+            return false;
+        }
+
         $disabled = config("advanced-seo.disabled.{$data->type}", []);
 
         // Check if the collection/taxonomy is set to be disabled globally.

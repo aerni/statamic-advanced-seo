@@ -39,6 +39,8 @@ abstract class ContentDefaultsController extends BaseDefaultsController
         $site = $this->evaluateSite($content->sites(), $requestedSite);
 
         // Create a localization for each of the provided sites. This triggers a save on the set.
+        // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
+        // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
         $set = $set->createLocalizations($content->sites());
 
         $localization = $set->in($site);
@@ -63,7 +65,9 @@ abstract class ContentDefaultsController extends BaseDefaultsController
             'actions' => [
                 'save' => $localization->updateUrl(),
             ],
-            'values' => $values,
+            // TODO: Make this work with $set->id()
+            // 'values' => array_merge($values, ['id' => $set->id()]),
+            'values' => array_merge($values, ['id' => "{$set->type()}::{$set->handle()}"]),
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'locale' => $localization->locale(),

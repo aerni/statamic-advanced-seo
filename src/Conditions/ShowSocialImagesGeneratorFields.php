@@ -1,17 +1,23 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Actions;
+namespace Aerni\AdvancedSeo\Conditions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Facades\Site;
 
-class ShouldDisplaySocialImagesGenerator
+class ShowSocialImagesGeneratorFields
 {
     public static function handle(DefaultsData $data): bool
     {
         // Don't show the generator section if the generator is disabled.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
+        $disabled = config("advanced-seo.disabled.{$data->type}", []);
+
+        // Check if the collection/taxonomy is set to be disabled globally.
+        if (in_array($data->handle, $disabled)) {
             return false;
         }
 
@@ -21,7 +27,7 @@ class ShouldDisplaySocialImagesGenerator
         }
 
         $enabledCollections = Seo::find('site', 'social_media')
-            ?->in(Site::selected()->handle())
+            ?->in($data->locale)
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the collection is not configured.

@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
@@ -81,20 +80,19 @@ class ContentDefaultsFields extends BaseFields
 
     public function socialImages(): array
     {
-        $fields = collect([
+        return collect([
+            $this->socialImagesGenerator(),
             $this->openGraphImage(),
             $this->twitterImage(),
-        ]);
-
-        if (isset($this->data) && ShouldDisplaySocialImagesGenerator::handle($this->data)) {
-            $fields->prepend($this->socialImagesGenerator());
-        }
-
-        return $fields->flatten(1)->toArray();
+        ])->flatten(1)->toArray();
     }
 
     public function socialImagesGenerator(): array
     {
+        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return [];
+        }
+
         $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',
@@ -103,6 +101,7 @@ class ContentDefaultsFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.default_instructions'),
                     'listable' => 'hidden',
+                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ],
             [
@@ -115,6 +114,7 @@ class ContentDefaultsFields extends BaseFields
                     'icon' => 'toggle',
                     'localizable' => true,
                     'listable' => 'hidden',
+                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ],
         ]);
@@ -136,6 +136,7 @@ class ContentDefaultsFields extends BaseFields
                     'cast_booleans' => false,
                     'localizable' => true,
                     'listable' => 'hidden',
+                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ]);
         }
@@ -145,7 +146,7 @@ class ContentDefaultsFields extends BaseFields
 
     public function openGraphImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_og',
                 'field' => [
@@ -171,7 +172,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'seo_source',
                     'display' => $this->trans('seo_og_title.display'),
                     'instructions' => $this->trans('seo_og_title.default_instructions'),
-                    'default' => '@auto',
+                    'default' => Defaults::data('collections')->get('seo_og_title'),
                     'auto' => 'seo_title',
                     'options' => ['auto', 'custom'],
                     'localizable' => true,
@@ -189,7 +190,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'seo_source',
                     'display' => $this->trans('seo_og_description.display'),
                     'instructions' => $this->trans('seo_og_description.default_instructions'),
-                    'default' => '@auto',
+                    'default' => Defaults::data('collections')->get('seo_og_description'),
                     'auto' => 'seo_description',
                     'options' => ['auto', 'custom'],
                     'localizable' => true,
@@ -201,13 +202,11 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
         ];
-
-        return $fields;
     }
 
     public function twitterImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_twitter',
                 'field' => [
@@ -264,7 +263,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'seo_source',
                     'display' => $this->trans('seo_twitter_title.display'),
                     'instructions' => $this->trans('seo_twitter_title.default_instructions'),
-                    'default' => '@auto',
+                    'default' => Defaults::data('collections')->get('seo_twitter_title'),
                     'auto' => 'seo_title',
                     'options' => ['auto', 'custom'],
                     'localizable' => true,
@@ -282,7 +281,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'seo_source',
                     'display' => $this->trans('seo_twitter_description.display'),
                     'instructions' => $this->trans('seo_twitter_description.default_instructions'),
-                    'default' => '@auto',
+                    'default' => Defaults::data('collections')->get('seo_twitter_description'),
                     'auto' => 'seo_description',
                     'options' => ['auto', 'custom'],
                     'localizable' => true,
@@ -294,8 +293,6 @@ class ContentDefaultsFields extends BaseFields
                 ],
             ],
         ];
-
-        return $fields;
     }
 
     public function canonicalUrl(): array
@@ -413,6 +410,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.default_instructions'),
+                    'if' => 'showSitemapFields',
                 ],
             ],
             [
@@ -424,6 +422,7 @@ class ContentDefaultsFields extends BaseFields
                     'default' => Defaults::data('collections')->get('seo_sitemap_enabled'),
                     'listable' => 'hidden',
                     'localizable' => true,
+                    'if' => 'showSitemapFields',
                 ],
             ],
             [
@@ -455,6 +454,7 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
+                    'if' => 'showSitemapFields',
                 ],
             ],
             [
@@ -482,6 +482,7 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
+                    'if' => 'showSitemapFields',
                 ],
             ],
         ];

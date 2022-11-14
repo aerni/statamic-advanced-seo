@@ -22,14 +22,16 @@ class SeoDefaultSet implements Contract
     protected string $type;
     protected array $localizations;
 
-    public function defaultData(): Collection
-    {
-        return Defaults::data("{$this->type}::{$this->handle}");
-    }
-
     public function id(): string
     {
         return $this->handle();
+
+        /**
+         * TODO: It would be nice to simply call $set->id in the ContentDefaultsController and SiteDefaultsController.
+         * But if we change the ID to consist of the type and handle, everything breaks.
+         * It looks like an issue with the Stache. Have to investigate this come more.
+         */
+        // return "{$this->type()}::{$this->handle()}";
     }
 
     public function handle($handle = null)
@@ -45,6 +47,20 @@ class SeoDefaultSet implements Contract
     public function localizations(): Collection
     {
         return collect($this->localizations);
+    }
+
+    public function sites(): Collection
+    {
+        return $this->localizations()->map->locale()->values();
+    }
+
+    public function selectedSite(): string
+    {
+        $selectedSite = Site::selected()->handle();
+
+        return $this->sites()->contains($selectedSite)
+            ? $selectedSite
+            : $this->sites()->first();
     }
 
     public function title(): string
@@ -106,7 +122,7 @@ class SeoDefaultSet implements Contract
         });
 
         // Determine the origin and set the default data for each localization based on the provided sites.
-        $this->localizations()->each(fn ($item) => $item->determineOrigin($sites)->withDefaultData()); // Only adds the default data to the root localization.
+        $this->localizations()->each(fn ($item) => $item->determineOrigin($sites)->withDefaultData());
 
         return $this;
     }
@@ -169,7 +185,7 @@ class SeoDefaultSet implements Contract
 
         return resolve($blueprint)
             ->make()
-            ->data(new DefaultsData(type: $this->type, handle: $this->handle)) // We need to pass data so that we can conditionally hide and show ContentDefaultsFields
+            ->data(new DefaultsData(type: $this->type, handle: $this->handle))
             ->get();
     }
 
