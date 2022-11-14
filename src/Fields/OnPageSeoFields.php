@@ -312,7 +312,7 @@ class OnPageSeoFields extends BaseFields
 
         // Make sure the `seo_og_image` field isn't hidden if the entry's collection
         // has been removed from the social images generator config in the site defaults.
-        if (! ShowSocialImagesGeneratorFields::handle($this->data)) {
+        if (isset($this->data) && ! ShowSocialImagesGeneratorFields::handle($this->data)) {
             unset($fields[1]['field']['if']);
         }
 
@@ -443,7 +443,7 @@ class OnPageSeoFields extends BaseFields
 
         // Make sure the `seo_twitter_summary_image` and `seo_twitter_summary_large_image` field isn't hidden if the entry's collection
         // has been removed from the social images generator config in the site defaults.
-        if (! ShowSocialImagesGeneratorFields::handle($this->data)) {
+        if (isset($this->data) && ! ShowSocialImagesGeneratorFields::handle($this->data)) {
             unset($fields[2]['field']['if']['seo_generate_social_images.value']);
             unset($fields[3]['field']['if']['seo_generate_social_images.value']);
         }
