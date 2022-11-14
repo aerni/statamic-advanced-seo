@@ -60,7 +60,9 @@ class SiteDefaultsController extends BaseDefaultsController
             'actions' => [
                 'save' => $localization->updateUrl(),
             ],
-            'values' => $values,
+            // TODO: Make this work with $set->id()
+            // 'values' => array_merge($values, ['id' => $set->id()]),
+            'values' => array_merge($values, ['id' => "{$set->type()}::{$set->handle()}"]),
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'locale' => $localization->locale(),

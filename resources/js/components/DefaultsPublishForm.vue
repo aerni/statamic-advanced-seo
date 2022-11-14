@@ -89,7 +89,13 @@
 </style>
 
 <script>
+import HasHiddenFields from '../../../vendor/statamic/cms/resources/js/components/data-list/HasHiddenFields';
+
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     props: {
         publishContainer: String,
@@ -199,7 +205,7 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            const payload = { ...this.values, ...{
+            const payload = { ...this.visibleValues, ...{
                 blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
             }};

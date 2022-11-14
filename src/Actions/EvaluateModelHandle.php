@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -16,6 +17,7 @@ class EvaluateModelHandle
     public static function handle(mixed $model): ?string
     {
         return match (true) {
+            ($model instanceof SeoDefaultSet) => $model->handle(),
             ($model instanceof Collection) => $model->handle(),
             ($model instanceof Entry) => $model->collection()->handle(),
             ($model instanceof EntryBlueprintFound) => Str::after($model->blueprint->namespace(), '.'),

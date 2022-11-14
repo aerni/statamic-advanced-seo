@@ -3,9 +3,9 @@
 namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Actions\DeleteSocialImages;
-use Aerni\AdvancedSeo\Actions\ShouldDisplaySocialImagesGenerator;
 use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Events\Dispatcher;
@@ -52,7 +52,7 @@ class SocialImagesGeneratorSubscriber
     {
         $data = $this->getDataFromEvent($event);
 
-        if (! ShouldDisplaySocialImagesGenerator::handle($data)) {
+        if (! ShowSocialImagesGeneratorFields::handle($data)) {
             return;
         }
 

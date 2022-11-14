@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Conditions\ShowSitemapFields;
+use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -65,7 +67,7 @@ class SeoVariables implements Localization, Augmentable
     {
         return vsprintf('%s/%s%s.yaml', [
             Stache::store('seo')->store($this->type())->directory(),
-            Site::hasMultiple() ? $this->locale(). '/' : '',
+            Site::hasMultiple() ? $this->locale().'/' : '',
             $this->handle(),
         ]);
     }
@@ -119,10 +121,54 @@ class SeoVariables implements Localization, Augmentable
         return $this;
     }
 
+    public function defaultData(): Collection
+    {
+        // Get the default value of each field from the blueprint.
+        $defaultData = $this->blueprint()->fields()->all()->map->defaultValue();
+
+        // Remove any field whose custom condition evaluates to false.
+        $defaultData = $this->evaluateFieldConditions($defaultData);
+
+        // Only keep default fields with values that should be saved to file.
+        $defaultData = $defaultData->filter(fn ($value) => $value !== null && $value !== []);
+
+        return $defaultData;
+    }
+
+    // TODO: Probably makes sense to extract this into its own Conditions class.
+    protected function evaluateFieldConditions(Collection $values): Collection
+    {
+        $defaultsData = new DefaultsData(type: $this->type(), handle: $this->handle(), locale: $this->locale());
+
+        $evaluatedConditions = collect([
+            'showSocialImagesGeneratorFields' => ShowSocialImagesGeneratorFields::handle($defaultsData),
+            'showSitemapFields' => ShowSitemapFields::handle($defaultsData),
+        ]);
+
+        $fieldsToRemove = $this->blueprint()->fields()->all()
+            ->map(fn ($field) => array_flatten($field->conditions()))
+            ->filter()
+            ->filter(function ($conditions) use ($evaluatedConditions) {
+                // Only keep fields whose conditions evaluate to false.
+                return collect($conditions)
+                    ->map(fn ($condition) => $evaluatedConditions->get($condition))
+                    ->filter()
+                    ->isEmpty();
+            });
+
+        return $values->diffKeys($fieldsToRemove);
+    }
+
     public function withDefaultData(): self
     {
         if ($this->isRoot()) {
-            $this->data = $this->seoSet()->defaultData()->merge($this->data());
+            $this->data = $this->defaultData()->merge($this->data());
+        }
+
+        if ($this->hasOrigin()) {
+            $this->data = $this->defaultData()
+                ->diffAssoc($this->origin()->defaultData())
+                ->merge($this->data());
         }
 
         return $this;
@@ -139,6 +185,11 @@ class SeoVariables implements Localization, Augmentable
         if ($this->isRoot()) {
             $data = Arr::removeNullValues($data);
         }
+
+        /**
+         * TODO: Should we remove any values that don't have a field on the blueprint?
+         * This should also take the conditions into consideration. This ensures that fields of deactivated features will be removed.
+         */
 
         return $data;
     }

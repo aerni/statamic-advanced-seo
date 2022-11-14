@@ -12,10 +12,17 @@ class ShouldGenerateSocialImages
         // Don't generate if we're first localiting an entry.
         if (str_contains(request()->path(), 'localize')) {
             return false;
-        };
+        }
 
         // Shouldn't generate if the generator was disabled in the config.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
+        $disabled = config('advanced-seo.disabled.collections', []);
+
+        // Check if the collection is set to be disabled globally.
+        if (in_array($entry->collectionHandle(), $disabled)) {
             return false;
         }
 

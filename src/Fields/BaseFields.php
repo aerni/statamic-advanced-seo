@@ -15,7 +15,6 @@ abstract class BaseFields implements Fields
         return new static();
     }
 
-    // TODO: Might be a good idea to make the data required in the constructor? We always need the data anyways.
     public function data(DefaultsData $data): self
     {
         $this->data = $data;
@@ -46,7 +45,7 @@ abstract class BaseFields implements Fields
         return __("advanced-seo::fields.$key", $placeholders);
     }
 
-    protected function typePlaceholder(): ?string
+    protected function typePlaceholder(): string
     {
         if (! isset($this->data)) {
             return '';
@@ -59,7 +58,7 @@ abstract class BaseFields implements Fields
             'taxonomies' => Helpers::isAddonCpRoute()
                 ? lcfirst(__('advanced-seo::messages.terms'))
                 : lcfirst(__('advanced-seo::messages.term')),
-            default => null
+            default => ''
         };
     }
 
