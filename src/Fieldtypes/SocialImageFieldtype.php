@@ -45,7 +45,7 @@ class SocialImageFieldtype extends Fieldtype
             return $image->absoluteUrl();
         }
 
-        if ($parent->generate_social_images) {
+        if ($parent->seo_generate_social_images) {
             return $image->generate()->absoluteUrl();
         }
 
