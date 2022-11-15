@@ -71,8 +71,13 @@ class SourceFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
+        /**
+         * Augment null when encountering a field of a disabled feature.
+         * This is necessary for fields like `seo_generate_social_images` that can be hidden (disabled)
+         * on a collection and site level. This ensures empty data on the frontend and when using GraphQL.
+         */
         if ($this->isDisabledFeature()) {
-            return null;
+            return $this->sourceFieldtype()->augment(null);
         }
 
         $data = $data ?? $this->field->defaultValue();
