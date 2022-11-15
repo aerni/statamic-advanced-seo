@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Models\Conditions;
 use Aerni\AdvancedSeo\View\Cascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
@@ -70,6 +71,10 @@ class SourceFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
+        if ($this->isDisabledFeature()) {
+            return null;
+        }
+
         $data = $data ?? $this->field->defaultValue();
 
         if ($data === '@default') {
@@ -185,5 +190,27 @@ class SourceFieldtype extends Fieldtype
             ($parent instanceof Term) => $parent->taxonomy()->title(),
             default => null,
         };
+    }
+
+    protected function isDisabledFeature(): bool
+    {
+        $fieldConditions = collect($this->field->conditions())
+            ->flatten()
+            ->map(fn ($condition) => Str::remove('custom ', $condition))
+            ->flip();
+
+        $conditions = Conditions::all()->intersectByKeys($fieldConditions);
+
+        // The feature is enabled if there are no conditions.
+        if ($conditions->isEmpty()) {
+            return false;
+        }
+
+        $data = GetDefaultsData::handle($this->field->parent());
+
+        $evaluatedConditions = $conditions->map(fn ($condition) => app($condition)::handle($data));
+
+        // The feature is disabled if the conditions evaluate to false.
+        return $evaluatedConditions->filter()->isEmpty();
     }
 }
