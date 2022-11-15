@@ -3,10 +3,9 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
-use Aerni\AdvancedSeo\Conditions\ShowSitemapFields;
-use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Models\Conditions;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Statamic\Facades\Data;
@@ -34,10 +33,7 @@ class ConditionsController extends Controller
             $data->locale = $site;
         }
 
-        return [
-            'showSitemapFields' => ShowSitemapFields::handle($data),
-            'showSocialImagesGeneratorFields' => ShowSocialImagesGeneratorFields::handle($data),
-        ];
+        return Conditions::evaluate($data)->toArray();
     }
 
     protected function getDataById(Request $request): DefaultsData
