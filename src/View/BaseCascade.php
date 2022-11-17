@@ -9,17 +9,17 @@ use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 use Statamic\Tags\Context;
 
 abstract class BaseCascade
 {
-    protected Context|DefaultsData|Entry $model;
+    protected Context|DefaultsData|Entry|Term $model;
     protected Collection $data;
 
-    // TODO: This also has to work with Taxonomy/Term. Not sure which class it is at this point. Have to test in GraphQl.
-    public function __construct(Context|DefaultsData|Entry $model)
+    public function __construct(Context|DefaultsData|Entry|Term $model)
     {
         $this->model = $model;
         $this->data = collect();

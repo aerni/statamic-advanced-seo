@@ -9,6 +9,7 @@ use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
@@ -19,7 +20,7 @@ use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
-    public function __construct(Entry $model)
+    public function __construct(Entry|Term $model)
     {
         parent::__construct($model);
     }
