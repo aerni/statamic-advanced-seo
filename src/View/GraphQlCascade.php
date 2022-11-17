@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Actions\EvaluateContextType;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -40,67 +39,39 @@ class GraphQlCascade extends BaseCascade
     public function processComputedData(): self
     {
         $this->data = $this->data->merge([
-            'title' => $this->compiledTitle(),
-            'og_image' => $this->ogImage(),
-            'og_image_size' => $this->ogImageSize(),
-            'og_title' => $this->ogTitle(),
-            'twitter_card' => $this->twitterCard(),
-            'twitter_image' => $this->twitterImage(),
-            'twitter_image_size' => $this->twitterImageSize(),
-            'twitter_title' => $this->twitterTitle(),
-            'twitter_handle' => $this->twitterHandle(),
-            'indexing' => $this->indexing(),
-            'locale' => $this->locale(),
-            'hreflang' => $this->hreflang(),
-            'canonical' => $this->canonical(),
-            'prev_url' => $this->prevUrl(),
-            'next_url' => $this->nextUrl(),
-            'schema' => $this->schema(),
-            'breadcrumbs' => $this->breadcrumbs(),
+            'title' => $this->title(),
+            // 'og_image' => $this->ogImage(),
+            // 'og_image_size' => $this->ogImageSize(),
+            // 'twitter_card' => $this->twitterCard(),
+            // 'twitter_image' => $this->twitterImage(),
+            // 'twitter_image_size' => $this->twitterImageSize(),
+            // 'twitter_handle' => $this->twitterHandle(),
+            // 'indexing' => $this->indexing(),
+            // 'locale' => $this->locale(),
+            // 'hreflang' => $this->hreflang(),
+            // 'canonical' => $this->canonical(),
+            // 'prev_url' => $this->prevUrl(),
+            // 'next_url' => $this->nextUrl(),
+            // 'schema' => $this->schema(),
+            // 'breadcrumbs' => $this->breadcrumbs(),
         ])->filter();
 
         return $this;
     }
 
-    protected function isType(string $type): bool
-    {
-        return EvaluateContextType::handle($this->model) === $type;
-    }
-
-    protected function compiledTitle(): string
-    {
-        $position = $this->value('site_name_position')?->value();
-
-        return match (true) {
-            ($position === 'end') => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
-            ($position === 'start') => "{$this->siteName()} {$this->titleSeparator()} {$this->title()}",
-            ($position === 'disabled') => $this->title(),
-            default => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
-        };
-    }
-
     protected function title(): string
     {
+        $siteNamePosition = $this->value('site_name_position');
+        $title = $this->get('title');
+        $titleSeparator = $this->get('title_separator');
+        $siteName = $this->get('site_name') ?? config('app.name');
+
         return match (true) {
-            $this->isType('taxonomy') => $this->model->get('title'),
-            $this->isType('error') => $this->model->get('response_code'),
-            default => $this->get('title'),
+            ($siteNamePosition == 'end') => "{$title} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$title}",
+            ($siteNamePosition == 'disabled') => $title,
+            default => "{$title} {$titleSeparator} {$siteName}",
         };
-    }
-
-    protected function titleSeparator(): string
-    {
-        return $this->get('title_separator');
-    }
-
-    protected function siteName(): string
-    {
-        return $this->get('site_name') ?? config('app.name');
-    }
-
-    protected function ogTitle(): string
-    {
-        return $this->get('og_title') ?? $this->title();
     }
 
     protected function ogImage(): ?Value
@@ -119,11 +90,6 @@ class GraphQlCascade extends BaseCascade
         return collect(SocialImage::findModel('open_graph'))
             ->only(['width', 'height'])
             ->all();
-    }
-
-    protected function twitterTitle(): string
-    {
-        return $this->get('twitter_title') ?? $this->title();
     }
 
     protected function twitterCard(): string
