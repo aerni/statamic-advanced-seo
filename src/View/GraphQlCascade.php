@@ -37,20 +37,6 @@ class GraphQlCascade extends BaseCascade
             ->sortKeys();
     }
 
-    public static function fields(): Collection
-    {
-        // Get all the blueprints
-        $blueprints = Defaults::all()
-            ->map(fn ($default) => $default['blueprint'])
-            ->push(OnPageSeoBlueprint::class)
-            ->unique();
-
-        // Prepare the fields that should be available to the user
-        return $blueprints->flatMap(fn ($blueprint) => app($blueprint)::make()->get()->fields()->all()) // Get all the fields
-            ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_')) // We don't want to expose any section fields
-            ->mapWithKeys(fn ($field, $handle) => [Str::remove('seo_', $handle) => $field]); // We want to remove `seo_` from all the field keys
-    }
-
     public function processComputedData(): self
     {
         $this->data = $this->data->merge([
