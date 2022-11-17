@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\Models\Conditions;
-use Aerni\AdvancedSeo\View\Cascade;
+use Aerni\AdvancedSeo\View\SourceFieldtypeCascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Assets\Asset;
@@ -168,7 +168,7 @@ class SourceFieldtype extends Fieldtype
             return null;
         }
 
-        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$data->id()}", fn () => Cascade::from($data)->processForFieldtype());
+        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$data->id()}", fn () => SourceFieldtypeCascade::from($data)->process());
 
         $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 

@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Tags;
 
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\View\Cascade;
+use Aerni\AdvancedSeo\View\AntlersCascade;
 use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Statamic\Facades\Blink;
@@ -64,8 +64,8 @@ class AdvancedSeoTags extends Tags
      */
     protected function cascade(): array
     {
-        return Blink::once('advanced-seo::cascade::frontend', function () {
-            return Cascade::from($this->context)->processForFrontend();
+        return Blink::once('advanced-seo::cascade::antlers', function () {
+            return AntlersCascade::from($this->context)->process()->all();
         });
     }
 
