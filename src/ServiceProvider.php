@@ -3,8 +3,10 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\GraphQL\Fields\CascadeField;
 use Aerni\AdvancedSeo\GraphQL\Fields\OnPageSeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\CascadeType;
 use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
 use Aerni\AdvancedSeo\Models\Defaults;
@@ -165,9 +167,13 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addQuery(SeoDefaultsQuery::class);
             GraphQL::addType(SeoDefaultsInterface::class);
             GraphQL::addType(OnPageSeoType::class);
+            GraphQL::addType(CascadeType::class);
 
             GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
+            GraphQL::addField(EntryInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
             GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
+            // TODO: The terms might need different fields. E.g. the social images generator is not available on taxonomies.
+            GraphQL::addField(TermInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
 
             SeoDefaultsInterface::addTypes();
         }
