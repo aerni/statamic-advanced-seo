@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Statamic\Tags\Context;
 
 class GetPageData
