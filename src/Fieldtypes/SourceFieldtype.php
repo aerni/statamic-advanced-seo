@@ -74,7 +74,9 @@ class SourceFieldtype extends Fieldtype
         /**
          * Augment null when encountering a field of a disabled feature.
          * This is necessary for fields like `seo_generate_social_images` that can be hidden (disabled)
-         * on a collection and site level. This ensures empty data on the frontend and when using GraphQL.
+         * on a collection and site level. This ensures that no data is returned when this field is augmented
+         * on the frontend and when using GraphQL. It's like "soft" removing the field from the blueprint.
+         * We can't actually remove the field from the blueprint because that wouldn't work with GraphQL.
          */
         if ($this->isDisabledFeature()) {
             return $this->sourceFieldtype()->augment(null);
