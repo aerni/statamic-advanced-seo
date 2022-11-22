@@ -2,22 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Illuminate\Support\Collection;
-use Statamic\Facades\Blink;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Statamic\Tags\Context;
 
 class GetPageData
 {
-    public static function handle(Context $context): Collection
+    public static function handle(mixed $model): ?Collection
     {
-        if (! $data = GetDefaultsData::handle($context)) {
-            return collect();
-        }
+        $fields = OnPageSeoBlueprint::make()->items();
 
-        return Blink::once(
-            "advanced-seo::page::{$data->locale}",
-            fn () => $context->intersectByKeys(OnPageSeoBlueprint::make()->data($data)->items())
-        );
+        return match (true) {
+            ($model instanceof Context) => $model->intersectByKeys($fields),
+            ($model instanceof Entry) => $model->toAugmentedCollection(array_keys($fields)),
+            ($model instanceof Term) => $model->toAugmentedCollection(array_keys($fields)),
+            default => null,
+        };
     }
 }

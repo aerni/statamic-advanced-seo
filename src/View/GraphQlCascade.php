@@ -28,7 +28,7 @@ class GraphQlCascade extends BaseCascade
     {
         return $this
             ->withSiteDefaults()
-            ->withOnPageSeoData()
+            ->withPageData()
             ->removeSeoPrefix()
             ->removeSectionFields()
             ->ensureOverrides()

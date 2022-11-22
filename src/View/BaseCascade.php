@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Actions\GetContentDefaults;
-use Aerni\AdvancedSeo\Actions\GetOnPageSeoData;
 use Aerni\AdvancedSeo\Actions\GetPageData;
 use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
@@ -70,24 +69,8 @@ abstract class BaseCascade
         return $this;
     }
 
-    // TODO: Can we merge this with `withPageData` method?
-    // This is used for GraphQL computed data.
-    public function withOnPageSeoData(): self
-    {
-        $this->data = $this->data->merge(GetOnPageSeoData::handle($this->model));
-
-        return $this;
-    }
-
-    // TODO: Can we merge this with `withOnPageSeoData` method?
-    // This is used for Antlers computed data.
     public function withPageData(): self
     {
-        // TODO: Can we move this to the constructor of the AntlersCascade?
-        if (! $this->model instanceof Context) {
-            throw new \Exception("The context needs to be an instance of Statamic\Tags\Context in order to get the page data.");
-        }
-
         $this->data = $this->data->merge(GetPageData::handle($this->model));
 
         return $this;
