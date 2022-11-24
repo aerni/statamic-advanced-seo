@@ -25,6 +25,7 @@ class GenerateSocialImagesJob implements ShouldQueue
     {
         SocialImage::all($this->entry)
             ->each(fn ($image) => $image->generate())
+            // TODO: Do we still need this, as we are now generating an actual asset?
             ->each(fn ($image) => ClearImageGlideCache::handle($image->path()));
     }
 }

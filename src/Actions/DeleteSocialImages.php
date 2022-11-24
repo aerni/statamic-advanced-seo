@@ -11,6 +11,7 @@ class DeleteSocialImages
     {
         SocialImage::all($entry)
             ->each(fn ($image) => $image->delete())
+            // TODO: Do we still need this, as we are now deleting an actual asset, that clears cache in its delete method.
             ->each(fn ($image) => ClearImageGlideCache::handle($image->path()));
     }
 }

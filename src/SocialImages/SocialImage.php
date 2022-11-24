@@ -7,9 +7,10 @@ use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\AssetContainer as Container;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\URL;
 
 class SocialImage
 {
@@ -26,29 +27,36 @@ class SocialImage
             ->windowSize($this->model['width'], $this->model['height'])
             ->save($this->absolutePath());
 
+        $this->container()->makeAsset($this->path())->save();
+
         return $this;
     }
 
-    public function exists(): bool
+    public function asset(): ?Asset
     {
-        return File::exists($this->absolutePath());
+        return $this->container()->asset($this->path());
     }
 
-    public function delete(): bool
+    public function delete(): void
     {
-        return File::delete($this->absolutePath());
-    }
-
-    public function absoluteUrl(): string
-    {
-        $container = config('advanced-seo.social_images.container', 'assets');
-
-        return URL::assemble(AssetContainer::find($container)->absoluteUrl(), $this->path());
+        $this->asset()?->delete();
     }
 
     public function path(): string
     {
         return "social_images/{$this->entry->collection}/{$this->filename()}";
+    }
+
+    protected function absolutePath($path = null): string
+    {
+        return $this->container()->disk()->path($path ?? $this->path());
+    }
+
+    protected function container(): Container
+    {
+        $container = config('advanced-seo.social_images.container', 'assets');
+
+        return AssetContainer::find($container);
     }
 
     protected function filename(): string
@@ -66,13 +74,6 @@ class SocialImage
             type: $this->model['type'],
             id: $this->entry->id,
         );
-    }
-
-    protected function absolutePath($path = null): string
-    {
-        $container = config('advanced-seo.social_images.container', 'assets');
-
-        return AssetContainer::find($container)->disk()->path($path ?? $this->path());
     }
 
     protected function ensureDirectoryExists(): void
