@@ -3,13 +3,18 @@
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\GraphQL\ResolvesValues;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
+use Statamic\Facades\GraphQL;
 
 class OnPageSeoType extends \Rebing\GraphQL\Support\Type
 {
-    const NAME = 'AdvancedSeo';
+    const NAME = 'OnPageSeo';
 
     protected $attributes = [
         'name' => self::NAME,
@@ -17,6 +22,17 @@ class OnPageSeoType extends \Rebing\GraphQL\Support\Type
 
     public function fields(): array
     {
+        return [
+            'head' => [
+                'type' => GraphQL::string(),
+                'resolve' => fn ($model) => view('advanced-seo::head', $this->cascade($model)),
+            ],
+            'body' => [
+                'type' => GraphQL::string(),
+                'resolve' => fn ($model) => view('advanced-seo::body', $this->cascade($model)),
+            ],
+        ];
+
         $fields = OnPageSeoBlueprint::make()->get()->fields()->toGql()
             ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_')) // We don't want to expose the content of section fields
             // ->merge([
@@ -44,7 +60,14 @@ class OnPageSeoType extends \Rebing\GraphQL\Support\Type
         return $fields;
     }
 
-    private function resolver()
+    protected function cascade(Entry|Term $model)
+    {
+        return Blink::once(
+            "advanced-seo::cascade::graphql::{$model->id()}",
+            fn () => GraphQlCascade::from($model)->process()->all());
+    }
+
+    protected function resolver()
     {
         return function (ResolvesValues $entry, $args, $context, ResolveInfo $info) {
             return $entry->resolveGqlValue($info->fieldName);

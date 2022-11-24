@@ -2,24 +2,27 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\Fields\CascadeField;
-use Aerni\AdvancedSeo\GraphQL\Fields\OnPageSeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\CascadeType;
-use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Statamic\Facades\CP\Nav;
+use Statamic\Statamic;
 use Statamic\Facades\Git;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
-use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
+use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\CascadeType;
+use Aerni\AdvancedSeo\GraphQL\Fields\CascadeField;
+use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
+use Aerni\AdvancedSeo\GraphQL\Fields\OnPageSeoField;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -165,15 +168,17 @@ class ServiceProvider extends AddonServiceProvider
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
             GraphQL::addQuery(SeoDefaultsQuery::class);
+            GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addType(SeoDefaultsInterface::class);
             GraphQL::addType(OnPageSeoType::class);
-            GraphQL::addType(CascadeType::class);
+            GraphQL::addType(MetaType::class);
+            GraphQL::addType(HreflangType::class);
 
             GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
-            GraphQL::addField(EntryInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
+            // GraphQL::addField(EntryInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
             GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
             // TODO: The terms might need different fields. E.g. the social images generator is not available on taxonomies.
-            GraphQL::addField(TermInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
+            // GraphQL::addField(TermInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
 
             SeoDefaultsInterface::addTypes();
         }
