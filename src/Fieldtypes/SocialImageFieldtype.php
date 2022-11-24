@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Facades\GraphQL;
-use Statamic\Fields\Fieldtype;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Facades\GraphQL;
+use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 
 class SocialImageFieldtype extends Fieldtype
@@ -44,7 +44,7 @@ class SocialImageFieldtype extends Fieldtype
         }
 
         $type = $this->config()['image_type'];
-        $image =  SocialImage::all($parent)->get($type);
+        $image = SocialImage::all($parent)->get($type);
 
         return $image->asset() ?? $image->generate()->asset();
     }

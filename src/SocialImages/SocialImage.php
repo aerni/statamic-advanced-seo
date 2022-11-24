@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\SocialImages;
 
+use Aerni\AdvancedSeo\Facades\SocialImage as SocialImageApi;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
-use Illuminate\Support\Facades\File;
-use Statamic\Facades\AssetContainer;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Models\SocialImageTheme;
-use Aerni\AdvancedSeo\Facades\SocialImage as SocialImageApi;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as Container;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\AssetContainer;
 
 class SocialImage
 {
