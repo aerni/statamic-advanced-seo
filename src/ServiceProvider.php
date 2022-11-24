@@ -2,27 +2,26 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Statamic;
-use Statamic\Facades\Git;
-use Statamic\Stache\Stache;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\GraphQL\Types\EntryInterface;
-use Statamic\Providers\AddonServiceProvider;
-use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\CascadeType;
 use Aerni\AdvancedSeo\GraphQL\Fields\CascadeField;
-use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
 use Aerni\AdvancedSeo\GraphQL\Fields\OnPageSeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Git;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\Providers\AddonServiceProvider;
+use Statamic\Stache\Stache;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {

@@ -64,7 +64,8 @@ class OnPageSeoType extends \Rebing\GraphQL\Support\Type
     {
         return Blink::once(
             "advanced-seo::cascade::graphql::{$model->id()}",
-            fn () => GraphQlCascade::from($model)->process()->all());
+            fn () => GraphQlCascade::from($model)->process()->all()
+        );
     }
 
     protected function resolver()

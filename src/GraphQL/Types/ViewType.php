@@ -2,13 +2,10 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\View\GraphQlCascade;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
-use Statamic\Support\Str;
 
 class MetaType extends Type
 {

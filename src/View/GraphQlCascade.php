@@ -9,12 +9,10 @@ use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
