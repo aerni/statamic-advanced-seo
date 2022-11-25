@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
@@ -17,6 +16,8 @@ use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
+    protected Collection $computedData;
+
     public function __construct(Entry|Term $model)
     {
         parent::__construct($model);
@@ -30,47 +31,13 @@ class GraphQlCascade extends BaseCascade
             ->removeSeoPrefix()
             ->removeSectionFields()
             ->ensureOverrides()
-            ->withComputedFields()
+            ->withComputedData()
             ->sortKeys();
     }
 
-    // TODO: Add sitemap fields?
-    public static function whitelist(): array
+    public function withComputedData(): self
     {
-        return [
-            'fathom_domain',
-            'fathom_id',
-            'fathom_spa',
-            'cloudflare_web_analytics',
-            'google_tag_manager',
-            'title',
-            'description',
-            'canonical',
-            'favicon_svg',
-            'hreflang',
-            'indexing',
-            'schema',
-            'breadcrumbs',
-            'site_name',
-            'locale',
-            'og_title',
-            'og_description',
-            'og_image',
-            'og_image_preset',
-            'google_site_verification_code',
-            'bing_site_verification_code',
-            'twitter_card',
-            'twitter_title',
-            'twitter_description',
-            'twitter_handle',
-            'twitter_image',
-            'twitter_image_preset',
-        ];
-    }
-
-    public function withComputedFields(): self
-    {
-        $this->data = $this->data->merge([
+        $this->computedData = collect([
             'title' => $this->title(),
             'og_image' => $this->ogImage(),
             'og_image_preset' => $this->ogImagePreset(),
@@ -85,7 +52,14 @@ class GraphQlCascade extends BaseCascade
             'breadcrumbs' => $this->breadcrumbs(),
         ])->filter();
 
+        $this->data = $this->data->merge($this->computedData);
+
         return $this;
+    }
+
+    public function getComputedData(): Collection
+    {
+        return $this->computedData;
     }
 
     protected function title(): string

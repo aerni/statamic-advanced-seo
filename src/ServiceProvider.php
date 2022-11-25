@@ -2,27 +2,34 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\Fields\CascadeField;
-use Aerni\AdvancedSeo\GraphQL\Fields\OnPageSeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Statamic\Facades\CP\Nav;
+use Statamic\Statamic;
 use Statamic\Facades\Git;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
-use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
+use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewType;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -168,18 +175,24 @@ class ServiceProvider extends AddonServiceProvider
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
             GraphQL::addQuery(SeoDefaultsQuery::class);
-            GraphQL::addQuery(SeoMetaQuery::class);
-            GraphQL::addType(SeoDefaultsInterface::class);
-            GraphQL::addType(OnPageSeoType::class);
-            GraphQL::addType(MetaType::class);
-            GraphQL::addType(HreflangType::class);
-            GraphQL::addType(SocialImagePresetType::class);
+            GraphQL::addQuery(SeoQuery::class);
 
-            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
-            // GraphQL::addField(EntryInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
-            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
-            // TODO: The terms might need different fields. E.g. the social images generator is not available on taxonomies.
-            // GraphQL::addField(TermInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
+            GraphQL::addType(AnalyticsDefaultsType::class);
+            GraphQL::addType(ComputedDataType::class);
+            GraphQL::addType(FaviconsDefaultsType::class);
+            GraphQL::addType(GeneralDefaultsType::class);
+            GraphQL::addType(HreflangType::class);
+            GraphQL::addType(IndexingDefaultsType::class);
+            GraphQL::addType(PageDataType::class);
+            GraphQL::addType(RenderedViewType::class);
+            GraphQL::addType(SeoDefaultsInterface::class);
+            GraphQL::addType(SeoType::class);
+            GraphQL::addType(SiteDefaultsType::class);
+            GraphQL::addType(SocialImagePresetType::class);
+            GraphQL::addType(SocialMediaDefaultsType::class);
+
+            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField())->toArray());
+            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new SeoField())->toArray());
 
             SeoDefaultsInterface::addTypes();
         }

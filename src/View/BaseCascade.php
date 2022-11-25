@@ -17,6 +17,9 @@ abstract class BaseCascade
 {
     protected Context|DefaultsData|Entry|Term $model;
     protected Collection $data;
+    protected Collection $siteDefaults;
+    protected Collection $contentDefaults;
+    protected Collection $pageData;
 
     public function __construct(Context|DefaultsData|Entry|Term $model)
     {
@@ -57,23 +60,41 @@ abstract class BaseCascade
 
     public function withSiteDefaults(): self
     {
-        $this->data = $this->data->merge(GetSiteDefaults::handle($this->model));
+        $this->siteDefaults = GetSiteDefaults::handle($this->model);
+        $this->data = $this->data->merge($this->siteDefaults);
 
         return $this;
+    }
+
+    public function getSiteDefaults(): Collection
+    {
+        return $this->siteDefaults;
     }
 
     public function withContentDefaults(): self
     {
-        $this->data = $this->data->merge(GetContentDefaults::handle($this->model));
+        $this->contentDefaults = GetContentDefaults::handle($this->model);
+        $this->data = $this->data->merge($this->contentDefaults);
 
         return $this;
     }
 
+    public function getContentDefaults(): Collection
+    {
+        return $this->contentDefaults;
+    }
+
     public function withPageData(): self
     {
-        $this->data = $this->data->merge(GetPageData::handle($this->model));
+        $this->pageData = GetPageData::handle($this->model);
+        $this->data = $this->data->merge($this->pageData);
 
         return $this;
+    }
+
+    public function getPageData(): Collection
+    {
+        return $this->pageData;
     }
 
     /**

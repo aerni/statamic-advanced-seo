@@ -2,27 +2,28 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
-use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
-use GraphQL\Type\Definition\Type;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Data;
 use Statamic\Facades\GraphQL;
-use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
+use GraphQL\Type\Definition\Type;
 use Statamic\GraphQL\Queries\Query;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
+use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
+use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 
-class SeoMetaQuery extends Query
+class SeoQuery extends Query
 {
     use FiltersQuery;
 
     protected $attributes = [
-        'name' => 'seoMeta',
+        'name' => 'seo',
     ];
 
     public function type(): Type
     {
-        return GraphQL::type(MetaType::NAME);
+        return GraphQL::type(SeoType::NAME);
     }
 
     public function args(): array
@@ -48,8 +49,8 @@ class SeoMetaQuery extends Query
             $termExistsInLocale = $locales->contains($site);
 
             /**
-             * Have to explicitly return 'null' because the 'in' method returns
-             * a new LocalizedTerm, even if none exists for the requested locale.
+             * We have to explicitly return 'null' because the 'in' method returns
+             * a new LocalizedTerm, even if this term doesn't exists in the requested locale.
              * This is different to how the 'in' method works on an Entry.
              */
             $model = $termExistsInLocale ? $model->in($site) : null;
