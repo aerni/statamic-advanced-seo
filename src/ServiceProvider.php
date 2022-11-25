@@ -2,34 +2,34 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Statamic;
-use Statamic\Facades\Git;
-use Statamic\Stache\Stache;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\GraphQL\Types\EntryInterface;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
-use Statamic\Providers\AddonServiceProvider;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
+use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Git;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\Providers\AddonServiceProvider;
+use Statamic\Stache\Stache;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {

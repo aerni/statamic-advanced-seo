@@ -2,13 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Fields\Value;
-use Statamic\Facades\GraphQL;
-use Rebing\GraphQL\Support\Type;
-use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Collection;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Facades\GraphQL;
+use Statamic\Fields\Value;
 use Statamic\GraphQL\Types\AssetInterface;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 
 class ComputedDataType extends Type
 {

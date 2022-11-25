@@ -2,16 +2,15 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
-use Statamic\Facades\Data;
-use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
 use GraphQL\Type\Definition\Type;
-use Statamic\GraphQL\Queries\Query;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
-use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
+use Statamic\Facades\Data;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
+use Statamic\GraphQL\Queries\Query;
 
 class SeoQuery extends Query
 {

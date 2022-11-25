@@ -2,11 +2,8 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
 use Rebing\GraphQL\Support\Type;
-use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Statamic\Facades\GraphQL;
 
 class SeoType extends Type
 {

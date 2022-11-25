@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Support\Str;
-use Rebing\GraphQL\Support\Type;
-use GraphQL\Type\Definition\ResolveInfo;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use GraphQL\Type\Definition\ResolveInfo;
+use Rebing\GraphQL\Support\Type;
 use Statamic\Data\AugmentedCollection;
+use Statamic\Support\Str;
 
 class PageDataType extends Type
 {

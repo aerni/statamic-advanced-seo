@@ -2,14 +2,10 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
-use Rebing\GraphQL\Support\Type;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Facades\GraphQL;
+
 
 class SiteDefaultsType extends Type
 {
