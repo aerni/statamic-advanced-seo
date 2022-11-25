@@ -30,26 +30,22 @@ class GraphQlCascade extends BaseCascade
             ->removeSeoPrefix()
             ->removeSectionFields()
             ->ensureOverrides()
-            ->processComputedData()
+            ->withComputedFields()
             ->sortKeys();
     }
 
+    // TODO: Add sitemap fields?
     public static function whitelist(): array
     {
         return [
-            'use_fathom',
             'fathom_domain',
             'fathom_id',
             'fathom_spa',
-            'use_cloudflare_web_analytics',
             'cloudflare_web_analytics',
-            'use_google_tag_manager',
             'google_tag_manager',
             'title',
             'description',
             'canonical',
-            'prev_url',
-            'next_url',
             'favicon_svg',
             'hreflang',
             'indexing',
@@ -60,8 +56,7 @@ class GraphQlCascade extends BaseCascade
             'og_title',
             'og_description',
             'og_image',
-            'generate_social_images',
-            'og_image_size',
+            'og_image_preset',
             'google_site_verification_code',
             'bing_site_verification_code',
             'twitter_card',
@@ -69,19 +64,18 @@ class GraphQlCascade extends BaseCascade
             'twitter_description',
             'twitter_handle',
             'twitter_image',
-            'twitter_image_size',
+            'twitter_image_preset',
         ];
     }
 
-    public function processComputedData(): self
+    public function withComputedFields(): self
     {
         $this->data = $this->data->merge([
             'title' => $this->title(),
-            // 'og_image' => $this->ogImage(),
-            // 'og_image_size' => $this->ogImageSize(),
-            // 'twitter_card' => $this->twitterCard(), // TODO: Delete
-            // 'twitter_image' => $this->twitterImage(),
-            // 'twitter_image_size' => $this->twitterImageSize(),
+            'og_image' => $this->ogImage(),
+            'og_image_preset' => $this->ogImagePreset(),
+            'twitter_image' => $this->twitterImage(),
+            'twitter_image_preset' => $this->twitterImagePreset(),
             'twitter_handle' => $this->twitterHandle(),
             'indexing' => $this->indexing(),
             'locale' => $this->locale(),
@@ -90,8 +84,6 @@ class GraphQlCascade extends BaseCascade
             'schema' => $this->schema(),
             'breadcrumbs' => $this->breadcrumbs(),
         ])->filter();
-
-        // dd($this->data);
 
         return $this;
     }
@@ -118,36 +110,16 @@ class GraphQlCascade extends BaseCascade
             : $this->get('og_image');
     }
 
-    protected function ogImageSize(): ?array
+    protected function ogImagePreset(): array
     {
-        if (! $this->ogImage()) {
-            return null;
-        }
-
         return collect(SocialImage::findModel('open_graph'))
             ->only(['width', 'height'])
             ->all();
     }
 
-    // TODO: Delete
-    // protected function twitterCard(): string
-    // {
-    //     if ($card = $this->get('twitter_card')) {
-    //         return $card;
-    //     }
-
-    //     /**
-    //      * Determine the twitter card based on the images set in the social media defaults.
-    //      * This is used on taxonomy and error pages.
-    //      */
-    //     $image = $this->get('twitter_summary_large_image') ?? $this->get('twitter_summary_image');
-
-    //     return $image?->field()?->config()['twitter_card'] ?? Defaults::data('collections')->get('seo_twitter_card');
-    // }
-
     protected function twitterImage(): ?Value
     {
-        if (! $model = SocialImage::findModel("twitter_{$this->twitterCard()}")) {
+        if (! $model = SocialImage::findModel("twitter_{$this->get('twitter_card')}")) {
             return null;
         }
 
@@ -156,13 +128,9 @@ class GraphQlCascade extends BaseCascade
             : $this->get($model['handle']);
     }
 
-    protected function twitterImageSize(): ?array
+    protected function twitterImagePreset(): array
     {
-        if (! $this->twitterImage()) {
-            return null;
-        }
-
-        return collect(SocialImage::findModel("twitter_{$this->twitterCard()}"))
+        return collect(SocialImage::findModel("twitter_{$this->get('twitter_card')}"))
             ->only(['width', 'height'])
             ->all();
     }

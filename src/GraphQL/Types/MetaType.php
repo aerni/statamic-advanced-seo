@@ -2,13 +2,15 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\Type;
-use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
+use Statamic\Facades\GraphQL;
+use Rebing\GraphQL\Support\Type;
+use Aerni\AdvancedSeo\Models\Defaults;
+use GraphQL\Type\Definition\ResolveInfo;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Statamic\GraphQL\Types\AssetInterface;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 
 class MetaType extends Type
 {
@@ -31,6 +33,7 @@ class MetaType extends Type
             ->mapWithKeys(fn ($field, $handle) => [Str::remove('seo_', $handle) => $field]) // We want to remove `seo_` from all the field keys
             ->only(GraphQlCascade::whitelist()); // Only keep necessary fields.
 
+        // Define all the additional fields that are not part of the blueprint
         $computedFields = [
             'locale' => [
                 'type' => GraphQl::string(),
@@ -50,26 +53,22 @@ class MetaType extends Type
             'schema' => [
                 'type' => GraphQl::string(),
             ],
+            'twitter_image' => [
+                'type' => GraphQl::type(AssetInterface::NAME),
+            ],
+            'og_image_preset' => [
+                'type' => GraphQl::type(SocialImagePresetType::NAME),
+            ],
+            'twitter_image_preset' => [
+                'type' => GraphQl::type(SocialImagePresetType::NAME),
+            ],
         ];
 
-        return $fields->merge($computedFields)
-            ->map(function ($field, $handle) {
-                $field['resolve'] = $this->resolver(); // Tell each field how to get its value
+        return $fields->merge($computedFields)->map(function ($field, $handle) {
+            $field['resolve'] = $this->resolver(); // Tell each field how to get its value
 
-                return $field;
-            })->all();
-
-        /**
-         * TODO: Have to set the type as well. The `og_image` is sometimes an asset, sometimes a social image.
-         * And the social image just augments to a string and not an asset.
-         * We shouldn't merge different fields into the same key. Each field has to stay the way it was.
-         */
-
-        /**
-         * TODO: There are a bunch of computed fields like hreflang or breadcrumbs.
-         * These have to be included too.
-         * Because they don't have a blueprint field, I have to manually add them with type etc.
-         */
+            return $field;
+        })->all();
     }
 
     private function resolver(): callable

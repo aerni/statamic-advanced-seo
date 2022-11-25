@@ -11,6 +11,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
 use Aerni\AdvancedSeo\GraphQL\Types\MetaType;
 use Aerni\AdvancedSeo\GraphQL\Types\OnPageSeoType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsInterface;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Statamic\Facades\CP\Nav;
@@ -172,6 +173,7 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(OnPageSeoType::class);
             GraphQL::addType(MetaType::class);
             GraphQL::addType(HreflangType::class);
+            GraphQL::addType(SocialImagePresetType::class);
 
             GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new OnPageSeoField())->toArray());
             // GraphQL::addField(EntryInterface::NAME, 'seo_cascade', fn () => (new CascadeField())->toArray());
