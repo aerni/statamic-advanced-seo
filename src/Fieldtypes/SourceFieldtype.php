@@ -202,7 +202,8 @@ class SourceFieldtype extends Fieldtype
     protected function isDisabledFeature(): bool
     {
         $fieldConditions = collect($this->field->conditions())
-            ->flatMap(fn ($condition) => Str::remove('custom ', $condition))
+            ->flatten()
+            ->map(fn ($condition) => Str::remove('custom ', $condition))
             ->flip();
 
         $conditions = Conditions::all()->intersectByKeys($fieldConditions);
