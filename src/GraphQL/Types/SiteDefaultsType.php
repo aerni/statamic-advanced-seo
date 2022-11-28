@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Models\Defaults;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 
-
 class SiteDefaultsType extends Type
 {
     const NAME = 'SiteDefaults';
