@@ -31,7 +31,7 @@ class PageDataType extends Type
     private function resolver(): callable
     {
         return function (AugmentedCollection $pageData, $args, $context, ResolveInfo $info) {
-            return $pageData->value('seo_'.$info->fieldName);
+            return $pageData->get('seo_'.$info->fieldName)->value();
         };
     }
 }
