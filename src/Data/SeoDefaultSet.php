@@ -2,18 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Globals\GlobalSet as Contract;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Fields\Blueprint;
-use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Facades\Collection as CollectionFacade;
-use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Facades\Taxonomy;
+use Statamic\Fields\Blueprint;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoDefaultSet implements Contract
 {

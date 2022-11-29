@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Illuminate\Support\Str;
-use Rebing\GraphQL\Support\Type;
+use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use GraphQL\Type\Definition\ResolveInfo;
-use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
+use Illuminate\Support\Str;
+use Rebing\GraphQL\Support\Type;
 
 class FaviconsDefaultsType extends Type
 {

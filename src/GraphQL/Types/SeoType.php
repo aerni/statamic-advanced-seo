@@ -2,13 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\Blink;
-use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Statamic\Facades\Blink;
+use Statamic\Facades\GraphQL;
 
 class SeoType extends Type
 {
@@ -31,7 +30,7 @@ class SeoType extends Type
             ],
             'siteDefaults' => [
                 'type' => GraphQL::type(SiteDefaultsType::NAME),
-                'resolve' => fn ($model) => ['site' => $model->locale()]
+                'resolve' => fn ($model) => ['site' => $model->locale()],
             ],
             'renderedViews' => [
                 'type' => GraphQL::type(RenderedViewsType::NAME),

@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Illuminate\Support\Str;
-use Rebing\GraphQL\Support\Type;
+use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use GraphQL\Type\Definition\ResolveInfo;
-use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
+use Illuminate\Support\Str;
+use Rebing\GraphQL\Support\Type;
 
 class AnalyticsDefaultsType extends Type
 {

@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Support\Str;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use GraphQL\Type\Definition\ResolveInfo;
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Statamic\Support\Str;
 
 class PageDataType extends Type
 {

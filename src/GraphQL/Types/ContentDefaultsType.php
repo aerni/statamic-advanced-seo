@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Support\Str;
-use Rebing\GraphQL\Support\Type;
+use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use GraphQL\Type\Definition\ResolveInfo;
-use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Support\Str;
 
 class ContentDefaultsType extends Type
 {
