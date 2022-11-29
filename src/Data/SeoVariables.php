@@ -221,6 +221,7 @@ class SeoVariables implements Localization, Augmentable
         return $this->seoSet()->in($origin);
     }
 
+    // TODO: Might be able to not accept $sites but use $this->seoSet->sites() instead.
     public function determineOrigin(Collection $sites): self
     {
         $defaultSite = Site::default()->handle();

@@ -7,7 +7,7 @@ use Statamic\Facades\GraphQL;
 
 class HreflangType extends Type
 {
-    const NAME = 'Hreflang';
+    const NAME = 'hreflang';
 
     protected $attributes = [
         'name' => self::NAME,

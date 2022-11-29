@@ -2,16 +2,15 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Rebing\GraphQL\Support\Type;
-use Statamic\Fields\Value;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use GraphQL\Type\Definition\ResolveInfo;
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
 
 class GeneralDefaultsType extends Type
 {
-    const NAME = 'GeneralDefaults';
+    const NAME = 'generalDefaults';
 
     protected $attributes = [
         'name' => self::NAME,
@@ -30,10 +29,8 @@ class GeneralDefaultsType extends Type
 
     private function resolver(): callable
     {
-        return function (Collection $siteDefaults, $args, $context, ResolveInfo $info) {
-            $value = $siteDefaults->get($info->fieldName);
-
-            return $value instanceof Value ? $value->value() : $value;
+        return function (SeoVariables $variables, $args, $context, ResolveInfo $info) {
+            return $variables->resolveGqlValue($info->fieldName);
         };
     }
 }

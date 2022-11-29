@@ -3,19 +3,15 @@
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
 use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
 use GraphQL\Type\Definition\Type;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Data;
 use Statamic\Facades\GraphQL;
-use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Queries\Query;
 
 class SeoQuery extends Query
 {
-    use FiltersQuery;
-
     protected $attributes = [
         'name' => 'seo',
     ];
@@ -28,12 +24,16 @@ class SeoQuery extends Query
     public function args(): array
     {
         return [
-            'id' => GraphQL::string(),
+            'id' => [
+                'name' => 'id',
+                'type' => GraphQL::string(),
+                'rules' => ['required'],
+            ],
             'site' => GraphQL::string(),
         ];
     }
 
-    public function resolve($root, $args)
+    public function resolve($root, $args): Entry|Term|Null
     {
         $model = Data::find($args['id']);
 
@@ -55,10 +55,6 @@ class SeoQuery extends Query
             $model = $termExistsInLocale ? $model->in($site) : null;
         }
 
-        if (! $model) {
-            return null;
-        }
-
-        return GraphQlCascade::from($model)->process();
+        return $model;
     }
 }

@@ -7,7 +7,7 @@ use Statamic\Facades\GraphQL;
 
 class SocialImagePresetType extends Type
 {
-    const NAME = 'SocialImagePreset';
+    const NAME = 'socialImagePreset';
 
     protected $attributes = [
         'name' => self::NAME,

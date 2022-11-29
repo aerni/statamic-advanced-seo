@@ -5,9 +5,9 @@ namespace Aerni\AdvancedSeo\GraphQL\Types;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 
-class RenderedViewType extends Type
+class RenderedViewsType extends Type
 {
-    const NAME = 'RenderedView';
+    const NAME = 'renderedViews';
 
     protected $attributes = [
         'name' => self::NAME,
@@ -18,11 +18,11 @@ class RenderedViewType extends Type
         return [
             'head' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn ($cascade) => view("advanced-seo::head", $cascade),
+                'resolve' => fn ($cascade) => view("advanced-seo::head", $cascade->all()),
             ],
             'body' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn ($cascade) => view("advanced-seo::body", $cascade),
+                'resolve' => fn ($cascade) => view("advanced-seo::body", $cascade->all()),
             ],
         ];
     }

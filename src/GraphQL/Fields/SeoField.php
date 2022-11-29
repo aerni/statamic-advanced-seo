@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\GraphQL\Fields;
 use Aerni\AdvancedSeo\Actions\EvaluateModelParent;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Field;
 use Statamic\Contracts\Entries\Collection;
@@ -25,7 +24,7 @@ class SeoField extends Field
         return GraphQL::type(SeoType::NAME);
     }
 
-    protected function resolve(Entry|Term $model): ?GraphQlCascade
+    protected function resolve(Entry|Term $model): Entry|Term|Null
     {
         $parent = EvaluateModelParent::handle($model);
 
@@ -38,8 +37,6 @@ class SeoField extends Field
         }
 
         // Only return seo data if the collection or taxonomy wasn't disabled in the config
-        return Defaults::isEnabled($id)
-            ? GraphQlCascade::from($model)->process()
-            : null;
+        return Defaults::isEnabled($id) ? $model : null;
     }
 }

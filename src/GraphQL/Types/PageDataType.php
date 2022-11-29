@@ -2,15 +2,16 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\Type;
-use Statamic\Data\AugmentedCollection;
 use Statamic\Support\Str;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use GraphQL\Type\Definition\ResolveInfo;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class PageDataType extends Type
 {
-    const NAME = 'PageData';
+    const NAME = 'pageData';
 
     protected $attributes = [
         'name' => self::NAME,
@@ -30,8 +31,8 @@ class PageDataType extends Type
 
     private function resolver(): callable
     {
-        return function (AugmentedCollection $pageData, $args, $context, ResolveInfo $info) {
-            return $pageData->get('seo_'.$info->fieldName)->value();
+        return function (Entry|Term $model, $args, $context, ResolveInfo $info) {
+            return $model->resolveGqlValue("seo_{$info->fieldName}");
         };
     }
 }

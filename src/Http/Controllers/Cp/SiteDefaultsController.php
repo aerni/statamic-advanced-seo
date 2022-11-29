@@ -36,6 +36,7 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $sites = Site::all()->map->handle();
 
+        // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
         $set = $set->createLocalizations($sites);
 
         $localization = $set->in($site);

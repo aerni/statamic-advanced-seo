@@ -2,12 +2,17 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Rebing\GraphQL\Support\Type;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
 
 class SeoType extends Type
 {
-    const NAME = 'Seo';
+    const NAME = 'seo';
 
     protected $attributes = [
         'name' => self::NAME,
@@ -18,20 +23,28 @@ class SeoType extends Type
         return [
             'computedData' => [
                 'type' => GraphQL::type(ComputedDataType::NAME),
-                'resolve' => fn ($cascade) => $cascade->getComputedData(),
+                'resolve' => fn ($model) => $this->cascade($model),
             ],
             'pageData' => [
                 'type' => GraphQL::type(PageDataType::NAME),
-                'resolve' => fn ($cascade) => $cascade->getPageData(),
+                'resolve' => fn ($model) => $model,
             ],
             'siteDefaults' => [
                 'type' => GraphQL::type(SiteDefaultsType::NAME),
-                'resolve' => fn ($cascade) => $cascade->getSiteDefaults(),
+                'resolve' => fn ($model) => ['site' => $model->locale()]
             ],
-            'renderedView' => [
-                'type' => GraphQL::type(RenderedViewType::NAME),
-                'resolve' => fn ($cascade) => $cascade->all(),
+            'renderedViews' => [
+                'type' => GraphQL::type(RenderedViewsType::NAME),
+                'resolve' => fn ($model) => $this->cascade($model),
             ],
         ];
+    }
+
+    private function cascade(Entry|Term $model): GraphQlCascade
+    {
+        return Blink::once(
+            "advanced-seo::cascade::graphql",
+            fn () => GraphQlCascade::from($model)->process()
+        );
     }
 }
