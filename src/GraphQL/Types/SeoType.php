@@ -24,22 +24,22 @@ class SeoType extends Type
             'computedData' => [
                 'type' => GraphQL::type(ComputedDataType::NAME),
                 'description' => 'The computed Advanced SEO fields like the `title`, `hreflang`, or `indexing`',
-                'resolve' => fn ($model) => $this->cascade($model),
+                'resolve' => fn (Entry|Term $model) => $this->cascade($model),
             ],
             'pageData' => [
                 'type' => GraphQL::type(PageDataType::NAME),
                 'description' => 'The unprocessed Advanced SEO fields of the entry/term',
-                'resolve' => fn ($model) => $model,
+                'resolve' => fn (Entry|Term $model) => $model,
             ],
             'siteDefaults' => [
                 'type' => GraphQL::type(SiteDefaultsType::NAME),
                 'description' => 'The Advanced SEO site defaults like `site_name` in the locale of the entry/term',
-                'resolve' => fn ($model) => ['site' => $model->locale()],
+                'resolve' => fn (Entry|Term $model) => ['site' => $model->locale()],
             ],
             'renderedViews' => [
                 'type' => GraphQL::type(RenderedViewsType::NAME),
                 'description' => 'The rendered Advanced SEO `head` and `body` views',
-                'resolve' => fn ($model) => $this->cascade($model),
+                'resolve' => fn (Entry|Term $model) => $this->cascade($model),
             ],
         ];
     }

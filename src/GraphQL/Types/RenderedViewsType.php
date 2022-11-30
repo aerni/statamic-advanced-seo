@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
+use Aerni\AdvancedSeo\View\GraphQlCascade;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 
@@ -19,11 +20,11 @@ class RenderedViewsType extends Type
         return [
             'head' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn ($cascade) => view('advanced-seo::head', $cascade->all()),
+                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::head', $cascade->all()),
             ],
             'body' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn ($cascade) => view('advanced-seo::body', $cascade->all()),
+                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::body', $cascade->all()),
             ],
         ];
     }
