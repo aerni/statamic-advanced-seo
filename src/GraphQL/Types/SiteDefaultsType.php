@@ -14,6 +14,7 @@ class SiteDefaultsType extends Type
 
     protected $attributes = [
         'name' => self::NAME,
+        'description' => 'The Advanced SEO site defaults',
     ];
 
     public function fields(): array

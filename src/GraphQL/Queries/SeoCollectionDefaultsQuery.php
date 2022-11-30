@@ -13,6 +13,7 @@ class SeoCollectionDefaultsQuery extends Query
 {
     protected $attributes = [
         'name' => 'seoCollectionDefaults',
+        'description' => 'Use this query to get the Advanced SEO collection defaults',
     ];
 
     public function type(): Type

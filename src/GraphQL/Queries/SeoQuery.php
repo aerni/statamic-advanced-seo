@@ -14,6 +14,7 @@ class SeoQuery extends Query
 {
     protected $attributes = [
         'name' => 'seo',
+        'description' => 'Use this query to get the Advanced SEO data of an entry or term by its id',
     ];
 
     public function type(): Type

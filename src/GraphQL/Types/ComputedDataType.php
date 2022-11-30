@@ -14,6 +14,7 @@ class ComputedDataType extends Type
 
     protected $attributes = [
         'name' => self::NAME,
+        'description' => 'The computed Advanced SEO fields like the `title`, `hreflang`, or `indexing`',
     ];
 
     public function fields(): array

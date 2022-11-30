@@ -15,6 +15,7 @@ class SeoType extends Type
 
     protected $attributes = [
         'name' => self::NAME,
+        'description' => 'All the Advanced SEO data of an entry/term',
     ];
 
     public function fields(): array
@@ -22,18 +23,22 @@ class SeoType extends Type
         return [
             'computedData' => [
                 'type' => GraphQL::type(ComputedDataType::NAME),
+                'description' => 'The computed Advanced SEO fields like the `title`, `hreflang`, or `indexing`',
                 'resolve' => fn ($model) => $this->cascade($model),
             ],
             'pageData' => [
                 'type' => GraphQL::type(PageDataType::NAME),
+                'description' => 'The unprocessed Advanced SEO fields of the entry/term',
                 'resolve' => fn ($model) => $model,
             ],
             'siteDefaults' => [
                 'type' => GraphQL::type(SiteDefaultsType::NAME),
+                'description' => 'The Advanced SEO site defaults like `site_name` in the locale of the entry/term',
                 'resolve' => fn ($model) => ['site' => $model->locale()],
             ],
             'renderedViews' => [
                 'type' => GraphQL::type(RenderedViewsType::NAME),
+                'description' => 'The rendered Advanced SEO `head` and `body` views',
                 'resolve' => fn ($model) => $this->cascade($model),
             ],
         ];
@@ -42,7 +47,7 @@ class SeoType extends Type
     private function cascade(Entry|Term $model): GraphQlCascade
     {
         return Blink::once(
-            "advanced-seo::cascade::graphql",
+            'advanced-seo::cascade::graphql',
             fn () => GraphQlCascade::from($model)->process()
         );
     }

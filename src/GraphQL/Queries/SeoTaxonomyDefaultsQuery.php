@@ -13,6 +13,7 @@ class SeoTaxonomyDefaultsQuery extends Query
 {
     protected $attributes = [
         'name' => 'seoTaxonomyDefaults',
+        'description' => 'Use this query to get the Advanced SEO taxonomy defaults',
     ];
 
     public function type(): Type

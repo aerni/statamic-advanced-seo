@@ -15,6 +15,7 @@ class PageDataType extends Type
 
     protected $attributes = [
         'name' => self::NAME,
+        'description' => 'The unprocessed Advanced SEO fields of the entry/term',
     ];
 
     public function fields(): array

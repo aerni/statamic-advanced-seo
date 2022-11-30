@@ -14,6 +14,7 @@ class ContentDefaultsType extends Type
 
     protected $attributes = [
         'name' => self::NAME,
+        'description' => 'The Advanced SEO collection/taxonomy defaults',
     ];
 
     public function fields(): array

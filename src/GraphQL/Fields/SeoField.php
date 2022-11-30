@@ -16,7 +16,7 @@ use Statamic\Facades\GraphQL;
 class SeoField extends Field
 {
     protected $attributes = [
-        'description' => 'Get the seo meta data',
+        'description' => 'All the Advanced SEO data of an entry/term',
     ];
 
     public function type(): Type

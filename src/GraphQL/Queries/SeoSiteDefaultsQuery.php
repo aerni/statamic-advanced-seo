@@ -11,6 +11,7 @@ class SeoSiteDefaultsQuery extends Query
 {
     protected $attributes = [
         'name' => 'seoSiteDefaults',
+        'description' => 'Use this query to get the Advanced SEO site defaults',
     ];
 
     public function type(): Type
