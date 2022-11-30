@@ -199,6 +199,10 @@ class SourceFieldtype extends Fieldtype
         };
     }
 
+    /**
+     * TODO: Extract this to a Conditions class or action.
+     * Along with the evaluateFieldConditions method in the SeoVariables class.
+     */
     protected function isDisabledFeature(): bool
     {
         $fieldConditions = collect($this->field->conditions())

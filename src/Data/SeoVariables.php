@@ -137,7 +137,10 @@ class SeoVariables implements Localization, Augmentable
         return $defaultData;
     }
 
-    // TODO: Probably makes sense to extract this into its own Conditions class.
+    /**
+     * TODO: Extract this to a Conditions class or action.
+     * Along with the isDisabledFeature method in the SourceFieldtype class.
+     */
     protected function evaluateFieldConditions(Collection $values): Collection
     {
         $defaultsData = new DefaultsData(type: $this->type(), handle: $this->handle(), locale: $this->locale());
