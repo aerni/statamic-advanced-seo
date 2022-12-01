@@ -135,13 +135,14 @@ class GraphQlCascade extends BaseCascade
             ? $this->model->sites()
             : $this->model->taxonomy()->sites();
 
-        // We only want to return data for published entries and terms.
-        $alternates = $sites->filter(fn ($locale) => $this->model->in($locale)?->published())->values();
-
-        $hreflang = $alternates->map(fn ($locale) => [
-            'url' => $this->model->in($locale)->absoluteUrl(),
-            'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
-        ])->toArray();
+        $hreflang = $sites->map(fn ($locale) => $this->model->in($locale))
+            ->filter() // A model might no exist in a site. So we need to remove it to prevent further issues.
+            ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
+            ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
+            ->map(fn ($model) => [
+                'url' => $model->absoluteUrl(),
+                'locale' => Helpers::parseLocale($model->site()->locale()),
+            ])->all();
 
         return $hreflang;
     }
