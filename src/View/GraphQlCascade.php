@@ -135,6 +135,10 @@ class GraphQlCascade extends BaseCascade
             ? $this->model->sites()
             : $this->model->taxonomy()->sites();
 
+        $root = $this->model instanceof Entry
+            ? $this->model->root()
+            : $this->model->inDefaultLocale();
+
         $hreflang = $sites->map(fn ($locale) => $this->model->in($locale))
             ->filter() // A model might no exist in a site. So we need to remove it to prevent further issues.
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
@@ -142,6 +146,9 @@ class GraphQlCascade extends BaseCascade
             ->map(fn ($model) => [
                 'url' => $model->absoluteUrl(),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
+            ])->push([
+                'url' => $root->absoluteUrl(),
+                'locale' => 'x-default',
             ])->all();
 
         return $hreflang;
