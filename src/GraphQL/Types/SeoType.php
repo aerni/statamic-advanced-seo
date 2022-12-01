@@ -24,7 +24,7 @@ class SeoType extends Type
             'computedData' => [
                 'type' => GraphQL::type(ComputedDataType::NAME),
                 'description' => 'The computed Advanced SEO fields like the `title`, `hreflang`, or `indexing`',
-                'resolve' => fn (Entry|Term $model) => $this->cascade($model),
+                'resolve' => fn (Entry|Term $model) => GraphQlCascade::from($model)->process(),
             ],
             'pageData' => [
                 'type' => GraphQL::type(PageDataType::NAME),
@@ -39,16 +39,8 @@ class SeoType extends Type
             'renderedViews' => [
                 'type' => GraphQL::type(RenderedViewsType::NAME),
                 'description' => 'The rendered Advanced SEO `head` and `body` views',
-                'resolve' => fn (Entry|Term $model) => $this->cascade($model),
+                'resolve' => fn (Entry|Term $model) => GraphQlCascade::from($model)->process(),
             ],
         ];
-    }
-
-    private function cascade(Entry|Term $model): GraphQlCascade
-    {
-        return Blink::once(
-            'advanced-seo::cascade::graphql',
-            fn () => GraphQlCascade::from($model)->process()
-        );
     }
 }
