@@ -243,7 +243,6 @@ class GraphQlCascade extends BaseCascade
         $breadcrumbs = Schema::breadcrumbList()->itemListElement($listItems);
 
         return json_encode($breadcrumbs->toArray(), JSON_UNESCAPED_UNICODE);
-
     }
 
     protected function breadcrumbsListItems(): Collection

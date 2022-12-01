@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\View\GraphQlCascade;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 
 class SeoType extends Type
