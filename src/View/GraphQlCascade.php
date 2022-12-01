@@ -201,11 +201,7 @@ class GraphQlCascade extends BaseCascade
         }
 
         if ($type == 'custom') {
-            $data = $this->value('site_json_ld')?->value();
-
-            return $data
-                ? '<script type="application/ld+json">'.$data.'</script>'
-                : null;
+            return $this->value('site_json_ld')?->value();
         }
 
         if ($type == 'organization') {
@@ -229,16 +225,12 @@ class GraphQlCascade extends BaseCascade
                 ->url($this->model->site()->absoluteUrl());
         }
 
-        return $schema->toScript();
+        return json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE);
     }
 
     protected function entrySchema(): ?string
     {
-        $data = $this->value('json_ld')?->value();
-
-        return $data
-            ? '<script type="application/ld+json">'.$data.'</script>'
-            : null;
+        return $this->value('json_ld')?->value();
     }
 
     protected function breadcrumbs(): ?string
@@ -260,7 +252,10 @@ class GraphQlCascade extends BaseCascade
                 ->item($crumb['url']);
         })->all();
 
-        return Schema::breadcrumbList()->itemListElement($listItems);
+        $breadcrumbs = Schema::breadcrumbList()->itemListElement($listItems);
+
+        return json_encode($breadcrumbs->toArray(), JSON_UNESCAPED_UNICODE);
+
     }
 
     protected function breadcrumbsListItems(): Collection
