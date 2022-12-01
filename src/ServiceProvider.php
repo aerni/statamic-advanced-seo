@@ -9,6 +9,7 @@ use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSiteDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoTaxonomyDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\CanonicalType;
 use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
 use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
@@ -182,6 +183,7 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addQuery(SeoQuery::class);
 
             GraphQL::addType(AnalyticsDefaultsType::class);
+            GraphQL::addType(CanonicalType::class);
             GraphQL::addType(ComputedDataType::class);
             GraphQL::addType(ContentDefaultsType::class);
             GraphQL::addType(FaviconsDefaultsType::class);

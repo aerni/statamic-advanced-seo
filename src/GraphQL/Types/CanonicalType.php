@@ -5,9 +5,9 @@ namespace Aerni\AdvancedSeo\GraphQL\Types;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 
-class HreflangType extends Type
+class CanonicalType extends Type
 {
-    const NAME = 'hreflang';
+    const NAME = 'canonical';
 
     protected $attributes = [
         'name' => self::NAME,
@@ -18,15 +18,11 @@ class HreflangType extends Type
         return [
             'permalink' => [
                 'type' => GraphQl::string(),
-                'resolve' => fn (array $hreflang) => $hreflang['permalink'],
+                'resolve' => fn (array $canonical) => $canonical['permalink'],
             ],
             'url' => [
                 'type' => GraphQl::string(),
-                'resolve' => fn (array $hreflang) => $hreflang['url'],
-            ],
-            'locale' => [
-                'type' => GraphQl::string(),
-                'resolve' => fn (array $hreflang) => $hreflang['locale'],
+                'resolve' => fn (array $canonical) => $canonical['url'],
             ],
         ];
     }

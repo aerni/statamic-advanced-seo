@@ -144,17 +144,19 @@ class GraphQlCascade extends BaseCascade
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
             ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
             ->map(fn ($model) => [
-                'url' => $model->absoluteUrl(),
+                'permalink' => $model->absoluteUrl(),
+                'url' => $model->url(),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
             ])->push([
-                'url' => $root->absoluteUrl(),
+                'permalink' => $root->absoluteUrl(),
+                'url' => $root->url(),
                 'locale' => 'x-default',
             ])->all();
 
         return $hreflang;
     }
 
-    protected function canonical(): ?string
+    protected function canonical(): ?array
     {
         // We don't want to output a canonical tag if noindex is true.
         if ($this->value('noindex')) {
@@ -163,11 +165,24 @@ class GraphQlCascade extends BaseCascade
 
         $type = $this->value('canonical_type');
 
-        return match (true) {
-            ($type == 'other') => $this->value('canonical_entry')?->absoluteUrl(),
-            ($type == 'custom') => $this->value('canonical_custom'),
-            default => $this->model->absoluteUrl(),
-        };
+        if ($type == 'other') {
+            return [
+                'permalink' => $this->value('canonical_entry')?->absoluteUrl(),
+                'url' => $this->value('canonical_entry')?->url(),
+            ];
+        }
+
+        if ($type == 'custom') {
+            return [
+                'permalink' => $this->value('canonical_custom'),
+                'url' => $this->value('canonical_custom'),
+            ];
+        }
+
+        return [
+            'permalink' => $this->model->absoluteUrl(),
+            'url' => $this->model->url(),
+        ];
     }
 
     protected function schema(): ?string
