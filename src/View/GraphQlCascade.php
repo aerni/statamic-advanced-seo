@@ -48,7 +48,7 @@ class GraphQlCascade extends BaseCascade
             'locale' => $this->locale(),
             'hreflang' => $this->hreflang(),
             'canonical' => $this->canonical(),
-            'schema' => $this->schema(),
+            'site_schema' => $this->siteSchema(),
             'breadcrumbs' => $this->breadcrumbs(),
         ])->filter();
 
@@ -185,13 +185,6 @@ class GraphQlCascade extends BaseCascade
         ];
     }
 
-    protected function schema(): ?string
-    {
-        $schema = $this->siteSchema().$this->entrySchema();
-
-        return ! empty($schema) ? $schema : null;
-    }
-
     protected function siteSchema(): ?string
     {
         $type = $this->value('site_json_ld_type');
@@ -226,11 +219,6 @@ class GraphQlCascade extends BaseCascade
         }
 
         return json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE);
-    }
-
-    protected function entrySchema(): ?string
-    {
-        return $this->value('json_ld')?->value();
     }
 
     protected function breadcrumbs(): ?string

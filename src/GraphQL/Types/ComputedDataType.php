@@ -60,7 +60,7 @@ class ComputedDataType extends Type
                 'type' => GraphQl::type(CanonicalType::NAME),
                 'resolve' => $this->resolver(),
             ],
-            'schema' => [
+            'site_schema' => [
                 'type' => GraphQl::string(),
                 'resolve' => $this->resolver(),
             ],
