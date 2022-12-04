@@ -80,4 +80,12 @@ class AdvancedSeoTags extends Tags
 
         return true;
     }
+
+    /**
+     * Only render the analytics tags in the environments defined in the config.
+     */
+    public function shouldRenderAnalyticsTags(): bool
+    {
+        return in_array(app()->environment(), config('advanced-seo.analytics.environments', ['production']));
+    }
 }

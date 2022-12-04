@@ -35,7 +35,6 @@ class ViewCascade extends BaseCascade
             ->removeSectionFields()
             ->ensureOverrides()
             ->processComputedData()
-            ->applyWhitelist()
             ->sortKeys();
     }
 
@@ -67,65 +66,6 @@ class ViewCascade extends BaseCascade
     protected function isType(string $type): bool
     {
         return EvaluateContextType::handle(new Context($this->model)) === $type;
-    }
-
-    // TODO: Remove whitelist to make all fields available to the {{ seo }} tag.
-    // This was requested here https://github.com/aerni/statamic-advanced-seo/issues/21
-    protected function applyWhitelist(): self
-    {
-        // Remove all the keys from the data that won't be used in any view on the frontend.
-        $this->data = $this->data->only([
-            'use_fathom',
-            'fathom_domain',
-            'fathom_id',
-            'fathom_spa',
-            'use_cloudflare_web_analytics',
-            'cloudflare_web_analytics',
-            'use_google_tag_manager',
-            'google_tag_manager',
-            'title',
-            'description',
-            'canonical',
-            'prev_url',
-            'next_url',
-            'favicon_svg',
-            'hreflang',
-            'indexing',
-            'schema',
-            'breadcrumbs',
-            'site_name',
-            'locale',
-            'og_title',
-            'og_description',
-            'og_image',
-            'generate_social_images',
-            'og_image_size',
-            'google_site_verification_code',
-            'bing_site_verification_code',
-            'twitter_card',
-            'twitter_title',
-            'twitter_description',
-            'twitter_handle',
-            'twitter_image',
-            'twitter_image_size',
-        ]);
-
-        // Remove any analytics data if analytics isn't enabled for the current environment.
-        // TODO: Shouldn't the data of those keys be null anyways? The source fieldtype should return null for disabled features.
-        if (! in_array(app()->environment(), config('advanced-seo.analytics.environments', ['production']))) {
-            $this->data->forget([
-                'use_fathom',
-                'fathom_domain',
-                'fathom_id',
-                'fathom_spa',
-                'use_cloudflare_web_analytics',
-                'cloudflare_web_analytics',
-                'use_google_tag_manager',
-                'google_tag_manager',
-            ]);
-        }
-
-        return $this;
     }
 
     protected function compiledTitle(): string
