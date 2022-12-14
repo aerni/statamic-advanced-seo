@@ -89,7 +89,6 @@ abstract class BaseCascade
         $overrides = ['noindex', 'nofollow', 'og_image', 'twitter_summary_image', 'twitter_summary_large_image'];
 
         // The values that should be used as overrides.
-        // TODO: Could pass down the overrides keys so to only augment those keys to prevent overload.
         $defaults = GetSiteDefaults::handle($this->model)->only($overrides);
 
         // The values from the existing data that should be overriden.
