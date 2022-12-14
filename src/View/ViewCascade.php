@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Actions\EvaluateContextType;
 use Aerni\AdvancedSeo\Concerns\WithComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
@@ -65,45 +64,39 @@ class ViewCascade extends BaseCascade
         return $this;
     }
 
-    protected function isType(string $type): bool
-    {
-        return EvaluateContextType::handle($this->model) === $type;
-    }
-
     protected function compiledTitle(): string
     {
-        $position = $this->value('site_name_position')?->value();
+        $siteNamePosition = $this->value('site_name_position');
+        $titleSeparator = $this->get('title_separator');
+        $siteName = $this->get('site_name') ?? config('app.name');
 
         return match (true) {
-            ($position === 'end') => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
-            ($position === 'start') => "{$this->siteName()} {$this->titleSeparator()} {$this->title()}",
-            ($position === 'disabled') => $this->title(),
-            default => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
+            ($siteNamePosition == 'end') => "{$this->title()} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->title()}",
+            ($siteNamePosition == 'disabled') => $this->title(),
+            default => "{$this->title()} {$titleSeparator} {$siteName}",
         };
     }
 
     protected function title(): string
     {
-        return match (true) {
-            $this->isType('taxonomy') => $this->model->get('title'),
-            $this->isType('error') => $this->model->get('response_code'),
-            default => $this->get('title'),
-        };
-    }
+        // Handle taxonomy page.
+        if ($this->model->get('terms') instanceof TermQueryBuilder) {
+            return $this->model->get('title');
+        }
 
-    protected function titleSeparator(): string
-    {
-        return $this->get('title_separator');
-    }
+        // Handle error page.
+        if ($this->model->get('response_code') === 404) {
+            return '404';
+        }
 
-    protected function siteName(): string
-    {
-        return $this->get('site_name') ?? config('app.name');
+        // Handle all other pages. Fall back to the model title if the SEO title is null.
+        return $this->value('title') ? $this->get('title') : $this->model->get('title');
     }
 
     protected function ogTitle(): string
     {
-        return $this->get('og_title') ?? $this->title();
+        return $this->value('og_title') ? $this->get('og_title') : $this->title();
     }
 
     protected function ogImage(): ?Value
@@ -126,7 +119,7 @@ class ViewCascade extends BaseCascade
 
     protected function twitterTitle(): string
     {
-        return $this->get('twitter_title') ?? $this->title();
+        return $this->value('twitter_title') ? $this->get('twitter_title') : $this->title();
     }
 
     protected function twitterCard(): string

@@ -39,11 +39,13 @@ class GraphQlCascade extends BaseCascade
     public function processComputedData(): self
     {
         $this->data = $this->data->merge([
-            'title' => $this->title(),
+            'title' => $this->compiledTitle(),
             'og_image' => $this->ogImage(),
             'og_image_preset' => $this->ogImagePreset(),
+            'og_title' => $this->ogTitle(),
             'twitter_image' => $this->twitterImage(),
             'twitter_image_preset' => $this->twitterImagePreset(),
+            'twitter_title' => $this->twitterTitle(),
             'twitter_handle' => $this->twitterHandle(),
             'indexing' => $this->indexing(),
             'locale' => $this->locale(),
@@ -56,19 +58,28 @@ class GraphQlCascade extends BaseCascade
         return $this;
     }
 
-    protected function title(): string
+    protected function compiledTitle(): string
     {
         $siteNamePosition = $this->value('site_name_position');
-        $title = $this->get('title');
         $titleSeparator = $this->get('title_separator');
         $siteName = $this->get('site_name') ?? config('app.name');
 
         return match (true) {
-            ($siteNamePosition == 'end') => "{$title} {$titleSeparator} {$siteName}",
-            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$title}",
-            ($siteNamePosition == 'disabled') => $title,
-            default => "{$title} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'end') => "{$this->title()} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->title()}",
+            ($siteNamePosition == 'disabled') => $this->title(),
+            default => "{$this->title()} {$titleSeparator} {$siteName}",
         };
+    }
+
+    protected function title(): string
+    {
+        return $this->value('title') ? $this->get('title') : $this->model->get('title');
+    }
+
+    protected function ogTitle(): string
+    {
+        return $this->value('og_title') ? $this->get('og_title') : $this->title();
     }
 
     protected function ogImage(): ?Value
@@ -83,6 +94,11 @@ class GraphQlCascade extends BaseCascade
         return collect(SocialImage::findModel('open_graph'))
             ->only(['width', 'height'])
             ->all();
+    }
+
+    protected function twitterTitle(): string
+    {
+        return $this->value('twitter_title') ? $this->get('twitter_title') : $this->title();
     }
 
     protected function twitterImage(): ?Value
