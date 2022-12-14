@@ -184,7 +184,13 @@ class ServiceProvider extends AddonServiceProvider
         View::composer('*', function ($view) {
             $data = new Context($view->getData());
 
-            if (! $this->shouldProcessCascade($data)) {
+            // Don't process the cascade if it has been added before.
+            if ($data->has('seo')) {
+                return;
+            }
+
+            // Check if we should process the cascade.
+            if (! ShouldProcessViewCascade::handle($data)) {
                 return;
             }
 
@@ -192,16 +198,6 @@ class ServiceProvider extends AddonServiceProvider
         });
 
         return $this;
-    }
-
-    protected function shouldProcessCascade(Context $data): bool
-    {
-        // Don't process the cascade if it has been added before.
-        if ($data->has('seo')) {
-            return false;
-        }
-
-        return ShouldProcessViewCascade::handle($data);
     }
 
     protected function bootGraphQL(): self
