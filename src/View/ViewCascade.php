@@ -42,11 +42,11 @@ class ViewCascade extends BaseCascade
         $this->data = $this->data->merge([
             'title' => $this->compiledTitle(),
             'og_image' => $this->ogImage(),
-            'og_image_size' => $this->ogImageSize(),
+            'og_image_preset' => $this->ogImagePreset(),
             'og_title' => $this->ogTitle(),
             'twitter_card' => $this->twitterCard(),
             'twitter_image' => $this->twitterImage(),
-            'twitter_image_size' => $this->twitterImageSize(),
+            'twitter_image_preset' => $this->twitterImagePreset(),
             'twitter_title' => $this->twitterTitle(),
             'twitter_handle' => $this->twitterHandle(),
             'indexing' => $this->indexing(),
@@ -110,7 +110,7 @@ class ViewCascade extends BaseCascade
             : $this->get('og_image');
     }
 
-    protected function ogImageSize(): ?array
+    protected function ogImagePreset(): ?array
     {
         if (! $this->ogImage()) {
             return null;
@@ -152,7 +152,7 @@ class ViewCascade extends BaseCascade
             : $this->get($model['handle']);
     }
 
-    protected function twitterImageSize(): ?array
+    protected function twitterImagePreset(): ?array
     {
         if (! $this->twitterImage()) {
             return null;
