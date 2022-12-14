@@ -31,13 +31,13 @@ class GraphQlCascade extends BaseCascade
             ->removeSeoPrefix()
             ->removeSectionFields()
             ->ensureOverrides()
-            ->withComputedData()
+            ->processComputedData()
             ->sortKeys();
     }
 
-    public function withComputedData(): self
+    public function processComputedData(): self
     {
-        $this->computedData = collect([
+        $this->data = $this->data->merge([
             'title' => $this->title(),
             'og_image' => $this->ogImage(),
             'og_image_preset' => $this->ogImagePreset(),
@@ -50,16 +50,9 @@ class GraphQlCascade extends BaseCascade
             'canonical' => $this->canonical(),
             'site_schema' => $this->siteSchema(),
             'breadcrumbs' => $this->breadcrumbs(),
-        ])->filter();
-
-        $this->data = $this->data->merge($this->computedData);
+        ]);
 
         return $this;
-    }
-
-    public function getComputedData(): Collection
-    {
-        return $this->computedData;
     }
 
     protected function title(): string
@@ -129,7 +122,7 @@ class GraphQlCascade extends BaseCascade
         return Helpers::parseLocale($this->model->site()->locale());
     }
 
-    protected function hreflang(): ?array
+    protected function hreflang(): array
     {
         $sites = $this->model instanceof Entry
             ? $this->model->sites()

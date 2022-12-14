@@ -57,7 +57,7 @@ class ViewCascade extends BaseCascade
             'next_url' => $this->nextUrl(),
             'schema' => $this->schema(),
             'breadcrumbs' => $this->breadcrumbs(),
-        ])->filter();
+        ]);
 
         return $this;
     }

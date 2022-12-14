@@ -60,41 +60,23 @@ abstract class BaseCascade
 
     public function withSiteDefaults(): self
     {
-        $this->siteDefaults = GetSiteDefaults::handle($this->model);
-        $this->data = $this->data->merge($this->siteDefaults);
+        $this->data = $this->data->merge(GetSiteDefaults::handle($this->model));
 
         return $this;
-    }
-
-    public function getSiteDefaults(): Collection
-    {
-        return $this->siteDefaults;
     }
 
     public function withContentDefaults(): self
     {
-        $this->contentDefaults = GetContentDefaults::handle($this->model);
-        $this->data = $this->data->merge($this->contentDefaults);
+        $this->data = $this->data->merge(GetContentDefaults::handle($this->model));
 
         return $this;
-    }
-
-    public function getContentDefaults(): Collection
-    {
-        return $this->contentDefaults;
     }
 
     public function withPageData(): self
     {
-        $this->pageData = GetPageData::handle($this->model);
-        $this->data = $this->data->merge($this->pageData);
+        $this->data = $this->data->merge(GetPageData::handle($this->model));
 
         return $this;
-    }
-
-    public function getPageData(): Collection
-    {
-        return $this->pageData;
     }
 
     /**
