@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Tags;
 
-use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
 use Illuminate\View\View;
 use Statamic\Tags\Tags;
 
@@ -58,27 +58,7 @@ class AdvancedSeoTags extends Tags
      */
     protected function shouldRenderView(): bool
     {
-        // Don't add data for collections that are excluded in the config.
-        if ($this->context->has('is_entry') && in_array($this->context->get('collection')->raw()->handle(), config('advanced-seo.disabled.collections', []))) {
-            return false;
-        }
-
-        // Don't add data for taxonomy terms that are excluded in the config.
-        if ($this->context->has('is_term') && in_array($this->context->get('taxonomy')->raw()->handle(), config('advanced-seo.disabled.taxonomies', []))) {
-            return false;
-        }
-
-        // Don't add data for taxonomies that are excluded in the config.
-        if ($this->context->has('terms') && in_array($this->context->get('handle')->raw(), config('advanced-seo.disabled.taxonomies', []))) {
-            return false;
-        }
-
-        // Custom routes don't have the necessary data to compose the SEO cascade.
-        if (Helpers::isCustomRoute()) {
-            return false;
-        }
-
-        return true;
+        return ShouldProcessViewCascade::handle($this->context);
     }
 
     /**

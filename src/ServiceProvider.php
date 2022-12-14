@@ -2,42 +2,41 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Statamic;
-use Statamic\Facades\Git;
-use Statamic\Tags\Context;
-use Illuminate\Support\Str;
-use Statamic\Stache\Stache;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Illuminate\Support\Facades\View;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\View\ViewCascade;
+use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\GraphQL\Types\EntryInterface;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
-use Statamic\Providers\AddonServiceProvider;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoCollectionDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSiteDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoTaxonomyDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\CanonicalType;
 use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
 use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
 use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
+use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSiteDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoTaxonomyDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoCollectionDefaultsQuery;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\View\ViewCascade;
+use Illuminate\Support\Facades\View;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Git;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\Providers\AddonServiceProvider;
+use Statamic\Stache\Stache;
+use Statamic\Statamic;
+use Statamic\Tags\Context;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -183,49 +182,26 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootCascade(): self
     {
         View::composer('*', function ($view) {
-            if (! $this->shouldProcessCascade($view->getData())) {
+            $data = new Context($view->getData());
+
+            if (! $this->shouldProcessCascade($data)) {
                 return;
             }
 
-            $data = new Context($view->getData());
-            $cascade = ViewCascade::from($data)->process()->all();
-
-            $view->with('seo', $cascade);
+            $view->with('seo', ViewCascade::from($data)->process()->all());
         });
 
         return $this;
     }
 
-    protected function shouldProcessCascade(array $data): bool
+    protected function shouldProcessCascade(Context $data): bool
     {
-        $data = collect($data);
-
         // Don't process the cascade if it has been added before.
         if ($data->has('seo')) {
             return false;
         }
 
-        // Don't add data for collections that are excluded in the config.
-        if ($data->has('is_entry') && in_array($data->get('collection')->raw()->handle(), config('advanced-seo.disabled.collections', []))) {
-            return false;
-        }
-
-        // Don't add data for taxonomy terms that are excluded in the config.
-        if ($data->has('is_term') && in_array($data->get('taxonomy')->raw()->handle(), config('advanced-seo.disabled.taxonomies', []))) {
-            return false;
-        }
-
-        // Don't add data for taxonomies that are excluded in the config.
-        if ($data->has('terms') && in_array($data->get('handle')->raw(), config('advanced-seo.disabled.taxonomies', []))) {
-            return false;
-        }
-
-        // Custom routes don't have the necessary data to compose the SEO cascade.
-        if (Helpers::isCustomRoute()) {
-            return false;
-        }
-
-        return true;
+        return ShouldProcessViewCascade::handle($data);
     }
 
     protected function bootGraphQL(): self
