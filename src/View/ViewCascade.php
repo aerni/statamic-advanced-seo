@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Actions\EvaluateContextType;
+use Aerni\AdvancedSeo\Concerns\WithComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -20,6 +21,8 @@ use Statamic\Tags\Context;
 
 class ViewCascade extends BaseCascade
 {
+    use WithComputedData;
+
     public function __construct(Context $model)
     {
         parent::__construct($model);
