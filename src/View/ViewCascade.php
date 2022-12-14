@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Actions\EvaluateContextType;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Entries\Entry;
@@ -65,7 +64,7 @@ class ViewCascade extends BaseCascade
 
     protected function isType(string $type): bool
     {
-        return EvaluateContextType::handle(new Context($this->model)) === $type;
+        return EvaluateContextType::handle($this->model) === $type;
     }
 
     protected function compiledTitle(): string
