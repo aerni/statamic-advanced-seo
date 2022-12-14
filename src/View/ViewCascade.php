@@ -258,24 +258,18 @@ class ViewCascade extends BaseCascade
         return $hreflang;
     }
 
-    protected function canonical(): ?string
+    protected function canonical(): string
     {
-        // We don't want to output a canonical tag if noindex is true.
-        if ($this->value('noindex')) {
-            return null;
+        $type = $this->value('canonical_type');
+
+        if ($type == 'other' && $this->value('canonical_entry')) {
+            return $this->value('canonical_entry')->absoluteUrl();
         }
 
-        $type = $this->value('canonical_type')?->value();
-
-        if ($type === 'other') {
-            return $this->value('canonical_entry')?->absoluteUrl();
-        }
-
-        if ($type === 'custom') {
+        if ($type == 'custom' && $this->value('canonical_custom')) {
             return $this->value('canonical_custom');
         }
 
-        // Handle canonical type "current".
         $currentUrl = $this->model->get('current_url');
 
         // Don't add the pagination parameter if it doesn't exists or there's no paginator on the page.

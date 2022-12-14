@@ -156,23 +156,18 @@ class GraphQlCascade extends BaseCascade
         return $hreflang;
     }
 
-    protected function canonical(): ?array
+    protected function canonical(): array
     {
-        // We don't want to output a canonical tag if noindex is true.
-        if ($this->value('noindex')) {
-            return null;
-        }
-
         $type = $this->value('canonical_type');
 
-        if ($type == 'other') {
+        if ($type == 'other' && $this->value('canonical_entry')) {
             return [
-                'permalink' => $this->value('canonical_entry')?->absoluteUrl(),
-                'url' => $this->value('canonical_entry')?->url(),
+                'permalink' => $this->value('canonical_entry')->absoluteUrl(),
+                'url' => $this->value('canonical_entry')->url(),
             ];
         }
 
-        if ($type == 'custom') {
+        if ($type == 'custom' && $this->value('canonical_custom')) {
             return [
                 'permalink' => $this->value('canonical_custom'),
                 'url' => $this->value('canonical_custom'),
