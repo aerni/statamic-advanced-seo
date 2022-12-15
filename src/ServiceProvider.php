@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo;
 
+use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoCollectionDefaultsQuery;
@@ -24,6 +25,8 @@ use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
+use Aerni\AdvancedSeo\View\ViewCascade;
+use Illuminate\Support\Facades\View;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Git;
 use Statamic\Facades\GraphQL;
@@ -33,6 +36,7 @@ use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Stache\Stache;
 use Statamic\Statamic;
+use Statamic\Tags\Context;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -98,6 +102,7 @@ class ServiceProvider extends AddonServiceProvider
             ->bootAddonNav()
             ->bootAddonPermissions()
             ->bootGit()
+            ->bootCascade()
             ->bootGraphQL()
             ->autoPublishConfig();
     }
@@ -170,6 +175,27 @@ class ServiceProvider extends AddonServiceProvider
         if (config('statamic.git.enabled')) {
             Git::listen(\Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class);
         }
+
+        return $this;
+    }
+
+    protected function bootCascade(): self
+    {
+        View::composer('*', function ($view) {
+            $data = new Context($view->getData());
+
+            // Don't process the cascade if it has been added before.
+            if ($data->has('seo')) {
+                return;
+            }
+
+            // Check if we should process the cascade.
+            if (! ShouldProcessViewCascade::handle($data)) {
+                return;
+            }
+
+            $view->with('seo', ViewCascade::from($data)->process()->all());
+        });
 
         return $this;
     }

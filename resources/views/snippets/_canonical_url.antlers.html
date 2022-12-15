@@ -1,11 +1,9 @@
-{{ if canonical }}
-    <link rel="canonical" href="{{ canonical }}">
+<link rel="canonical" href="{{ seo:canonical }}">
+
+{{ if seo:prev_url }}
+    <link href="{{ seo:prev_url }}" rel="prev" />
 {{ /if }}
 
-{{ if prev_url }}
-    <link href="{{ prev_url }}" rel="prev" />
-{{ /if }}
-
-{{ if next_url }}
-    <link href="{{ next_url }}" rel="next" />
+{{ if seo:next_url }}
+    <link href="{{ seo:next_url }}" rel="next" />
 {{ /if }}

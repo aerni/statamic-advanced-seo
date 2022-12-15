@@ -24,8 +24,8 @@ class Helpers
     }
 
     /**
-     * Return false if we're on any Statamic frontend route.
-     * This excludes any Route::get() and even Route::statamic().
+     * Return true if we're on any custom route other than the defined exceptions below.
+     * This includes any routes defined with `Route::get()` and `Route::statamic()`.
      */
     public static function isCustomRoute(): bool
     {

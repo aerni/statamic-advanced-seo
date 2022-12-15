@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Actions\EvaluateContextType;
+use Aerni\AdvancedSeo\Concerns\WithComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -18,8 +18,10 @@ use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Support\Str;
 use Statamic\Tags\Context;
 
-class AntlersCascade extends BaseCascade
+class ViewCascade extends BaseCascade
 {
+    use WithComputedData;
+
     public function __construct(Context $model)
     {
         parent::__construct($model);
@@ -34,7 +36,6 @@ class AntlersCascade extends BaseCascade
             ->removeSectionFields()
             ->ensureOverrides()
             ->processComputedData()
-            ->applyWhitelist()
             ->sortKeys();
     }
 
@@ -43,11 +44,11 @@ class AntlersCascade extends BaseCascade
         $this->data = $this->data->merge([
             'title' => $this->compiledTitle(),
             'og_image' => $this->ogImage(),
-            'og_image_size' => $this->ogImageSize(),
+            'og_image_preset' => $this->ogImagePreset(),
             'og_title' => $this->ogTitle(),
             'twitter_card' => $this->twitterCard(),
             'twitter_image' => $this->twitterImage(),
-            'twitter_image_size' => $this->twitterImageSize(),
+            'twitter_image_preset' => $this->twitterImagePreset(),
             'twitter_title' => $this->twitterTitle(),
             'twitter_handle' => $this->twitterHandle(),
             'indexing' => $this->indexing(),
@@ -58,109 +59,44 @@ class AntlersCascade extends BaseCascade
             'next_url' => $this->nextUrl(),
             'schema' => $this->schema(),
             'breadcrumbs' => $this->breadcrumbs(),
-        ])->filter();
-
-        return $this;
-    }
-
-    protected function isType(string $type): bool
-    {
-        return EvaluateContextType::handle($this->model) === $type;
-    }
-
-    // TODO: Remove whitelist to make all fields available to the {{ seo }} tag.
-    // This was requested here https://github.com/aerni/statamic-advanced-seo/issues/21
-    protected function applyWhitelist(): self
-    {
-        // Remove all the keys from the data that won't be used in any view on the frontend.
-        $this->data = $this->data->only([
-            'use_fathom',
-            'fathom_domain',
-            'fathom_id',
-            'fathom_spa',
-            'use_cloudflare_web_analytics',
-            'cloudflare_web_analytics',
-            'use_google_tag_manager',
-            'google_tag_manager',
-            'title',
-            'description',
-            'canonical',
-            'prev_url',
-            'next_url',
-            'favicon_svg',
-            'hreflang',
-            'indexing',
-            'schema',
-            'breadcrumbs',
-            'site_name',
-            'locale',
-            'og_title',
-            'og_description',
-            'og_image',
-            'generate_social_images',
-            'og_image_size',
-            'google_site_verification_code',
-            'bing_site_verification_code',
-            'twitter_card',
-            'twitter_title',
-            'twitter_description',
-            'twitter_handle',
-            'twitter_image',
-            'twitter_image_size',
         ]);
-
-        // Remove any analytics data if analytics isn't enabled for the current environment.
-        // TODO: Shouldn't the data of those keys be null anyways? The source fieldtype should return null for disabled features.
-        if (! in_array(app()->environment(), config('advanced-seo.analytics.environments', ['production']))) {
-            $this->data->forget([
-                'use_fathom',
-                'fathom_domain',
-                'fathom_id',
-                'fathom_spa',
-                'use_cloudflare_web_analytics',
-                'cloudflare_web_analytics',
-                'use_google_tag_manager',
-                'google_tag_manager',
-            ]);
-        }
 
         return $this;
     }
 
     protected function compiledTitle(): string
     {
-        $position = $this->value('site_name_position')?->value();
+        $siteNamePosition = $this->value('site_name_position');
+        $titleSeparator = $this->get('title_separator');
+        $siteName = $this->get('site_name') ?? config('app.name');
 
         return match (true) {
-            ($position === 'end') => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
-            ($position === 'start') => "{$this->siteName()} {$this->titleSeparator()} {$this->title()}",
-            ($position === 'disabled') => $this->title(),
-            default => "{$this->title()} {$this->titleSeparator()} {$this->siteName()}",
+            ($siteNamePosition == 'end') => "{$this->title()} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->title()}",
+            ($siteNamePosition == 'disabled') => $this->title(),
+            default => "{$this->title()} {$titleSeparator} {$siteName}",
         };
     }
 
     protected function title(): string
     {
-        return match (true) {
-            $this->isType('taxonomy') => $this->model->get('title'),
-            $this->isType('error') => $this->model->get('response_code'),
-            default => $this->get('title'),
-        };
-    }
+        // Handle taxonomy page.
+        if ($this->model->get('terms') instanceof TermQueryBuilder) {
+            return $this->model->get('title');
+        }
 
-    protected function titleSeparator(): string
-    {
-        return $this->get('title_separator');
-    }
+        // Handle error page.
+        if ($this->model->get('response_code') === 404) {
+            return '404';
+        }
 
-    protected function siteName(): string
-    {
-        return $this->get('site_name') ?? config('app.name');
+        // Handle all other pages. Fall back to the model title if the SEO title is null.
+        return $this->value('title') ? $this->get('title') : $this->model->get('title');
     }
 
     protected function ogTitle(): string
     {
-        return $this->get('og_title') ?? $this->title();
+        return $this->value('og_title') ? $this->get('og_title') : $this->title();
     }
 
     protected function ogImage(): ?Value
@@ -170,7 +106,7 @@ class AntlersCascade extends BaseCascade
             : $this->get('og_image');
     }
 
-    protected function ogImageSize(): ?array
+    protected function ogImagePreset(): ?array
     {
         if (! $this->ogImage()) {
             return null;
@@ -183,7 +119,7 @@ class AntlersCascade extends BaseCascade
 
     protected function twitterTitle(): string
     {
-        return $this->get('twitter_title') ?? $this->title();
+        return $this->value('twitter_title') ? $this->get('twitter_title') : $this->title();
     }
 
     protected function twitterCard(): string
@@ -212,7 +148,7 @@ class AntlersCascade extends BaseCascade
             : $this->get($model['handle']);
     }
 
-    protected function twitterImageSize(): ?array
+    protected function twitterImagePreset(): ?array
     {
         if (! $this->twitterImage()) {
             return null;
@@ -318,24 +254,18 @@ class AntlersCascade extends BaseCascade
         return $hreflang;
     }
 
-    protected function canonical(): ?string
+    protected function canonical(): string
     {
-        // We don't want to output a canonical tag if noindex is true.
-        if ($this->value('noindex')) {
-            return null;
+        $type = $this->value('canonical_type');
+
+        if ($type == 'other' && $this->value('canonical_entry')) {
+            return $this->value('canonical_entry')->absoluteUrl();
         }
 
-        $type = $this->value('canonical_type')?->value();
-
-        if ($type === 'other') {
-            return $this->value('canonical_entry')?->absoluteUrl();
-        }
-
-        if ($type === 'custom') {
+        if ($type == 'custom' && $this->value('canonical_custom')) {
             return $this->value('canonical_custom');
         }
 
-        // Handle canonical type "current".
         $currentUrl = $this->model->get('current_url');
 
         // Don't add the pagination parameter if it doesn't exists or there's no paginator on the page.
