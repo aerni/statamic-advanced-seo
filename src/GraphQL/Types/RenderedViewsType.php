@@ -20,11 +20,11 @@ class RenderedViewsType extends Type
         return [
             'head' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::head', $cascade->all()),
+                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::head', $cascade->toAugmentedArray()),
             ],
             'body' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::body', $cascade->all()),
+                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::body', $cascade->toAugmentedArray()),
             ],
         ];
     }

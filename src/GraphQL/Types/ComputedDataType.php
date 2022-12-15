@@ -82,7 +82,7 @@ class ComputedDataType extends Type
     private function resolver(): callable
     {
         return function (GraphQlCascade $cascade, $args, $context, ResolveInfo $info) {
-            return $cascade->value($info->fieldName);
+            return $cascade->{$info->fieldName};
         };
     }
 }
