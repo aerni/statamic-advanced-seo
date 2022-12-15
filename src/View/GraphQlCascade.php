@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Actions\GetPageData;
 use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
+use Aerni\AdvancedSeo\Data\WithComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
@@ -23,6 +24,7 @@ class GraphQlCascade implements Augmentable
 {
     use HasAugmentedInstance;
     use ContainsData;
+    use WithComputedData;
 
     protected Entry|Term $model;
 
@@ -121,25 +123,6 @@ class GraphQlCascade implements Augmentable
     public function value(string $key): mixed
     {
         return $this->computedValue($key) ?? $this->get($key);
-    }
-
-    public function computedValues(): Collection
-    {
-        return $this->computedValueKeys()
-            ->mapWithKeys(fn ($key) => [$key => $this->computedValue($key)]);
-    }
-
-    public function computedValue(string $key): mixed
-    {
-        return $this->hasComputedValue($key)
-            ? $this->{Str::camel($key)}()
-            : null;
-    }
-
-    public function hasComputedValue(string $key): bool
-    {
-        return $this->computedValueKeys()->flip()->has($key)
-            && method_exists($this, Str::camel($key));
     }
 
     public function computedValueKeys(): Collection
