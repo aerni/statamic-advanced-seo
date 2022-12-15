@@ -32,12 +32,20 @@ class ComputedDataType extends Type
                 'type' => GraphQl::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
+            'og_title' => [
+                'type' => GraphQl::string(),
+                'resolve' => $this->resolver(),
+            ],
             'twitter_image' => [
                 'type' => GraphQl::type(AssetInterface::NAME),
                 'resolve' => $this->resolver(),
             ],
             'twitter_image_preset' => [
                 'type' => GraphQl::type(SocialImagePresetType::NAME),
+                'resolve' => $this->resolver(),
+            ],
+            'twitter_title' => [
+                'type' => GraphQl::string(),
                 'resolve' => $this->resolver(),
             ],
             'twitter_handle' => [

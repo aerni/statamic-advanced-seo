@@ -9,15 +9,12 @@ use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Data;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
-    protected Collection $computedData;
-
     public function __construct(Entry|Term $model)
     {
         parent::__construct($model);
@@ -31,18 +28,20 @@ class GraphQlCascade extends BaseCascade
             ->removeSeoPrefix()
             ->removeSectionFields()
             ->ensureOverrides()
-            ->withComputedData()
+            ->processComputedData()
             ->sortKeys();
     }
 
-    public function withComputedData(): self
+    public function processComputedData(): self
     {
-        $this->computedData = collect([
-            'title' => $this->title(),
+        $this->data = $this->data->merge([
+            'title' => $this->compiledTitle(),
             'og_image' => $this->ogImage(),
             'og_image_preset' => $this->ogImagePreset(),
+            'og_title' => $this->ogTitle(),
             'twitter_image' => $this->twitterImage(),
             'twitter_image_preset' => $this->twitterImagePreset(),
+            'twitter_title' => $this->twitterTitle(),
             'twitter_handle' => $this->twitterHandle(),
             'indexing' => $this->indexing(),
             'locale' => $this->locale(),
@@ -50,31 +49,33 @@ class GraphQlCascade extends BaseCascade
             'canonical' => $this->canonical(),
             'site_schema' => $this->siteSchema(),
             'breadcrumbs' => $this->breadcrumbs(),
-        ])->filter();
-
-        $this->data = $this->data->merge($this->computedData);
+        ]);
 
         return $this;
     }
 
-    public function getComputedData(): Collection
-    {
-        return $this->computedData;
-    }
-
-    protected function title(): string
+    protected function compiledTitle(): string
     {
         $siteNamePosition = $this->value('site_name_position');
-        $title = $this->get('title');
         $titleSeparator = $this->get('title_separator');
         $siteName = $this->get('site_name') ?? config('app.name');
 
         return match (true) {
-            ($siteNamePosition == 'end') => "{$title} {$titleSeparator} {$siteName}",
-            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$title}",
-            ($siteNamePosition == 'disabled') => $title,
-            default => "{$title} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'end') => "{$this->title()} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->title()}",
+            ($siteNamePosition == 'disabled') => $this->title(),
+            default => "{$this->title()} {$titleSeparator} {$siteName}",
         };
+    }
+
+    protected function title(): string
+    {
+        return $this->value('title') ? $this->get('title') : $this->model->get('title');
+    }
+
+    protected function ogTitle(): string
+    {
+        return $this->value('og_title') ? $this->get('og_title') : $this->title();
     }
 
     protected function ogImage(): ?Value
@@ -89,6 +90,11 @@ class GraphQlCascade extends BaseCascade
         return collect(SocialImage::findModel('open_graph'))
             ->only(['width', 'height'])
             ->all();
+    }
+
+    protected function twitterTitle(): string
+    {
+        return $this->value('twitter_title') ? $this->get('twitter_title') : $this->title();
     }
 
     protected function twitterImage(): ?Value
@@ -129,7 +135,7 @@ class GraphQlCascade extends BaseCascade
         return Helpers::parseLocale($this->model->site()->locale());
     }
 
-    protected function hreflang(): ?array
+    protected function hreflang(): array
     {
         $sites = $this->model instanceof Entry
             ? $this->model->sites()
@@ -156,23 +162,18 @@ class GraphQlCascade extends BaseCascade
         return $hreflang;
     }
 
-    protected function canonical(): ?array
+    protected function canonical(): array
     {
-        // We don't want to output a canonical tag if noindex is true.
-        if ($this->value('noindex')) {
-            return null;
-        }
-
         $type = $this->value('canonical_type');
 
-        if ($type == 'other') {
+        if ($type == 'other' && $this->value('canonical_entry')) {
             return [
-                'permalink' => $this->value('canonical_entry')?->absoluteUrl(),
-                'url' => $this->value('canonical_entry')?->url(),
+                'permalink' => $this->value('canonical_entry')->absoluteUrl(),
+                'url' => $this->value('canonical_entry')->url(),
             ];
         }
 
-        if ($type == 'custom') {
+        if ($type == 'custom' && $this->value('canonical_custom')) {
             return [
                 'permalink' => $this->value('canonical_custom'),
                 'url' => $this->value('canonical_custom'),
