@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Data;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-trait WithComputedData
+trait HasComputedData
 {
     abstract public function computedKeys(): Collection;
 

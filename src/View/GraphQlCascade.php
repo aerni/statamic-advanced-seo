@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Data\WithComputedData;
+use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
@@ -16,7 +16,7 @@ use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
-    use WithComputedData;
+    use HasComputedData;
 
     public function __construct(Entry|Term $model)
     {

@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Data\WithComputedData;
+use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -20,7 +20,7 @@ use Statamic\Tags\Context;
 
 class ViewCascade extends BaseCascade
 {
-    use WithComputedData;
+    use HasComputedData;
 
     public function __construct(Context $model)
     {
