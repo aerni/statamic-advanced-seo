@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Actions\GetContentDefaults;
 use Aerni\AdvancedSeo\Actions\GetPageData;
 use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Data\WithComputedData;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;

@@ -2,17 +2,17 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Spatie\SchemaOrg\Schema;
+use Aerni\AdvancedSeo\Data\WithComputedData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Data\WithComputedData;
+use Statamic\Facades\Data;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
