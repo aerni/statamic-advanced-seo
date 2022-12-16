@@ -16,10 +16,6 @@ class HreflangType extends Type
     public function fields(): array
     {
         return [
-            'permalink' => [
-                'type' => GraphQl::string(),
-                'resolve' => fn (array $hreflang) => $hreflang['permalink'],
-            ],
             'url' => [
                 'type' => GraphQl::string(),
                 'resolve' => fn (array $hreflang) => $hreflang['url'],

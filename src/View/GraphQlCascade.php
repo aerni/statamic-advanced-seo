@@ -18,6 +18,8 @@ class GraphQlCascade extends BaseCascade
 {
     use HasComputedData;
 
+    protected ?string $baseUrl = null;
+
     public function __construct(Entry|Term $model)
     {
         parent::__construct($model);
@@ -152,40 +154,29 @@ class GraphQlCascade extends BaseCascade
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
             ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
             ->map(fn ($model) => [
-                'permalink' => $model->absoluteUrl(),
-                'url' => $model->url(),
+                'url' => $this->buildUrl($model),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
             ])->push([
-                'permalink' => $root->absoluteUrl(),
-                'url' => $root->url(),
+                'url' => $this->buildUrl($root),
                 'locale' => 'x-default',
             ])->all();
 
         return $hreflang;
     }
 
-    public function canonical(): array
+    public function canonical(): string
     {
         $type = $this->get('canonical_type');
 
-        if ($type == 'other' && $entry = $this->get('canonical_entry')) {
-            return [
-                'permalink' => $entry->absoluteUrl(),
-                'url' => $entry->url(),
-            ];
+        if ($type == 'other' && $this->has('canonical_entry')) {
+            return $this->buildUrl($this->get('canonical_entry'));
         }
 
-        if ($type == 'custom' && $custom = $this->get('canonical_custom')) {
-            return [
-                'permalink' => $custom,
-                'url' => $custom,
-            ];
+        if ($type == 'custom' && $this->has('canonical_custom')) {
+            return $this->get('canonical_custom');
         }
 
-        return [
-            'permalink' => $this->model->absoluteUrl(),
-            'url' => $this->model->url(),
-        ];
+        return $this->buildUrl($this->model);
     }
 
     public function siteSchema(): ?string
@@ -203,11 +194,11 @@ class GraphQlCascade extends BaseCascade
         if ($type == 'organization') {
             $schema = Schema::organization()
                 ->name($this->get('organization_name'))
-                ->url($this->model->site()->absoluteUrl());
+                ->url($this->buildUrl($this->model->site()));
 
             if ($logo = $this->get('organization_logo')) {
                 $logo = Schema::imageObject()
-                    ->url($logo->absoluteUrl())
+                    ->url($this->buildUrl($logo))
                     ->width($logo->width())
                     ->height($logo->height());
 
@@ -218,7 +209,7 @@ class GraphQlCascade extends BaseCascade
         if ($type == 'person') {
             $schema = Schema::person()
                 ->name($this->get('person_name'))
-                ->url($this->model->site()->absoluteUrl());
+                ->url($this->buildUrl($this->model->site()));
         }
 
         return json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE);
@@ -250,8 +241,7 @@ class GraphQlCascade extends BaseCascade
 
     protected function breadcrumbsListItems(): Collection
     {
-        $url = parse_url($this->model->absoluteUrl(), PHP_URL_PATH);
-        $segments = collect(explode('/', $url))->filter()->prepend('/');
+        $segments = collect(explode('/', $this->model->url()))->filter()->prepend('/');
 
         $crumbs = $segments->map(function () use (&$segments) {
             $uri = URL::tidy($segments->join('/'));
@@ -265,9 +255,23 @@ class GraphQlCascade extends BaseCascade
         ->map(fn ($model, $key) => [
             'position' => $key + 1,
             'title' => method_exists($model, 'title') ? $model->title() : $model->value('title'),
-            'url' => $model->absoluteUrl(),
+            'url' => $this->buildUrl($model),
         ]);
 
         return $crumbs;
+    }
+
+    public function baseUrl(?string $baseUrl): self
+    {
+        $this->baseUrl = $baseUrl;
+
+        return $this;
+    }
+
+    protected function buildUrl(mixed $model): string
+    {
+        return $this->baseUrl
+            ? URL::assemble($this->baseUrl, $model->url())
+            : $model->absoluteUrl();
     }
 }
