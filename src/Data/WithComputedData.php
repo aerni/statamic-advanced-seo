@@ -7,11 +7,11 @@ use Illuminate\Support\Str;
 
 trait WithComputedData
 {
-    abstract public function computedValueKeys(): Collection;
+    abstract public function computedKeys(): Collection;
 
     public function computedValues(): Collection
     {
-        return $this->computedValueKeys()
+        return $this->computedKeys()
             ->mapWithKeys(fn ($key) => [$key => $this->computedValue($key)]);
     }
 
@@ -24,7 +24,7 @@ trait WithComputedData
 
     public function hasComputedValue(string $key): bool
     {
-        return $this->computedValueKeys()->flip()->has($key)
+        return $this->computedKeys()->flip()->has($key)
             && method_exists($this, Str::camel($key));
     }
 }

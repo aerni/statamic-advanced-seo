@@ -38,7 +38,7 @@ class ViewCascade extends BaseCascade
             ->sortKeys();
     }
 
-    public function computedValueKeys(): Collection
+    public function computedKeys(): Collection
     {
         return collect([
             'title',

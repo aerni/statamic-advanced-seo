@@ -10,11 +10,11 @@ class AugmentedCascade extends AbstractAugmented
     {
         $dataKeys = $this->data->data()->keys();
 
-        $computedValueKeys = method_exists($this->data, 'computedValueKeys') ? $this->data->computedValueKeys() : null;
+        $computedKeys = method_exists($this->data, 'computedKeys') ? $this->data->computedKeys() : null;
 
         return collect()
             ->merge($dataKeys)
-            ->merge($computedValueKeys)
+            ->merge($computedKeys)
             ->unique()->sort()->values()->all();
     }
 }

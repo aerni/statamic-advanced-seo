@@ -103,7 +103,7 @@ abstract class BaseCascade implements Augmentable
 
     public function values(): Collection
     {
-        if (method_exists($this, 'computedValueKeys')) {
+        if (method_exists($this, 'computedKeys')) {
             return $this->data->merge($this->computedValues());
         }
 
@@ -112,7 +112,7 @@ abstract class BaseCascade implements Augmentable
 
     public function value(string $key): mixed
     {
-        if (method_exists($this, 'computedValueKeys')) {
+        if (method_exists($this, 'computedKeys')) {
             return $this->computedValue($key) ?? $this->get($key);
         }
 
