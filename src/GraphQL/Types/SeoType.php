@@ -37,7 +37,7 @@ class SeoType extends Type
             ],
             'renderedViews' => [
                 'type' => GraphQL::type(RenderedViewsType::NAME),
-                'description' => 'The rendered Advanced SEO `head` and `body` views',
+                'description' => 'The rendered Advanced SEO `head` and `body` views. Only use this when your frontend is hosted on the same domain as Statamic, as the views contain a whole bunch of absolute URLs that won\'t make sense otherwise.',
                 'resolve' => fn (Entry|Term $model) => GraphQlCascade::from($model),
             ],
         ];
