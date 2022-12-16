@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoCollectionDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSiteDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoTaxonomyDefaultsQuery;
@@ -18,6 +19,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
 use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
@@ -202,9 +204,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGraphQL(): self
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
-            GraphQL::addQuery(SeoCollectionDefaultsQuery::class);
-            GraphQL::addQuery(SeoSiteDefaultsQuery::class);
-            GraphQL::addQuery(SeoTaxonomyDefaultsQuery::class);
+            GraphQL::addQuery(SeoDefaultsQuery::class);
             GraphQL::addQuery(SeoQuery::class);
 
             GraphQL::addType(AnalyticsDefaultsType::class);
@@ -218,6 +218,7 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(RenderedViewsType::class);
             GraphQL::addType(ContentDefaultsType::class);
             GraphQL::addType(SeoType::class);
+            GraphQL::addType(SeoDefaultsType::class);
             GraphQL::addType(SiteDefaultsType::class);
             GraphQL::addType(SocialImagePresetType::class);
             GraphQL::addType(SocialMediaDefaultsType::class);
