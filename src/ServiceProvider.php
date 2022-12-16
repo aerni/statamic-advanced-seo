@@ -194,7 +194,7 @@ class ServiceProvider extends AddonServiceProvider
                 return;
             }
 
-            $view->with('seo', ViewCascade::from($data)->process()->all());
+            $view->with('seo', ViewCascade::from($data)->toAugmentedArray());
         });
 
         return $this;

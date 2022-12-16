@@ -2,21 +2,21 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Concerns\WithComputedData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
-use Statamic\Fields\Value;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Aerni\AdvancedSeo\Data\WithComputedData;
 
 class ViewCascade extends BaseCascade
 {
@@ -27,7 +27,7 @@ class ViewCascade extends BaseCascade
         parent::__construct($model);
     }
 
-    public function process(): self
+    protected function process(): self
     {
         return $this
             ->withSiteDefaults()
@@ -35,50 +35,33 @@ class ViewCascade extends BaseCascade
             ->removeSeoPrefix()
             ->removeSectionFields()
             ->ensureOverrides()
-            ->processComputedData()
             ->sortKeys();
     }
 
-    public function processComputedData(): self
+    public function computedValueKeys(): Collection
     {
-        $this->data = $this->data->merge([
-            'title' => $this->compiledTitle(),
-            'og_image' => $this->ogImage(),
-            'og_image_preset' => $this->ogImagePreset(),
-            'og_title' => $this->ogTitle(),
-            'twitter_card' => $this->twitterCard(),
-            'twitter_image' => $this->twitterImage(),
-            'twitter_image_preset' => $this->twitterImagePreset(),
-            'twitter_title' => $this->twitterTitle(),
-            'twitter_handle' => $this->twitterHandle(),
-            'indexing' => $this->indexing(),
-            'locale' => $this->locale(),
-            'hreflang' => $this->hreflang(),
-            'canonical' => $this->canonical(),
-            'prev_url' => $this->prevUrl(),
-            'next_url' => $this->nextUrl(),
-            'schema' => $this->schema(),
-            'breadcrumbs' => $this->breadcrumbs(),
+        return collect([
+            'title',
+            'og_image',
+            'og_image_preset',
+            'og_title',
+            'twitter_card',
+            'twitter_image',
+            'twitter_image_preset',
+            'twitter_title',
+            'twitter_handle',
+            'indexing',
+            'locale',
+            'hreflang',
+            'canonical',
+            'prev_url',
+            'next_url',
+            'schema',
+            'breadcrumbs',
         ]);
-
-        return $this;
     }
 
-    protected function compiledTitle(): string
-    {
-        $siteNamePosition = $this->value('site_name_position');
-        $titleSeparator = $this->get('title_separator');
-        $siteName = $this->get('site_name') ?? config('app.name');
-
-        return match (true) {
-            ($siteNamePosition == 'end') => "{$this->title()} {$titleSeparator} {$siteName}",
-            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->title()}",
-            ($siteNamePosition == 'disabled') => $this->title(),
-            default => "{$this->title()} {$titleSeparator} {$siteName}",
-        };
-    }
-
-    protected function title(): string
+    protected function pageTitle(): string
     {
         // Handle taxonomy page.
         if ($this->model->get('terms') instanceof TermQueryBuilder) {
@@ -91,95 +74,99 @@ class ViewCascade extends BaseCascade
         }
 
         // Handle all other pages. Fall back to the model title if the SEO title is null.
-        return $this->value('title') ? $this->get('title') : $this->model->get('title');
+        return $this->get('title') ?? $this->model->get('title');
     }
 
-    protected function ogTitle(): string
+    public function title(): string
     {
-        return $this->value('og_title') ? $this->get('og_title') : $this->title();
+        $siteNamePosition = $this->get('site_name_position');
+        $titleSeparator = $this->get('title_separator');
+        $siteName = $this->get('site_name') ?? config('app.name');
+
+        return match (true) {
+            ($siteNamePosition == 'end') => "{$this->pageTitle()} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->pageTitle()}",
+            ($siteNamePosition == 'disabled') => $this->pageTitle(),
+            default => "{$this->pageTitle()} {$titleSeparator} {$siteName}",
+        };
     }
 
-    protected function ogImage(): ?Value
+    public function ogTitle(): string
     {
-        return $this->value('generate_social_images')
+        return $this->get('og_title') ?? $this->pageTitle();
+    }
+
+    public function ogImage(): ?Asset
+    {
+        return $this->get('generate_social_images')
             ? $this->get('generated_og_image')
             : $this->get('og_image');
     }
 
-    protected function ogImagePreset(): ?array
+    public function ogImagePreset(): array
     {
-        if (! $this->ogImage()) {
-            return null;
-        }
-
         return collect(SocialImage::findModel('open_graph'))
             ->only(['width', 'height'])
             ->all();
     }
 
-    protected function twitterTitle(): string
+    public function twitterTitle(): string
     {
-        return $this->value('twitter_title') ? $this->get('twitter_title') : $this->title();
+        return $this->get('twitter_title') ?? $this->pageTitle();
     }
 
-    protected function twitterCard(): string
+    public function twitterCard(): string
     {
-        if ($card = $this->get('twitter_card')) {
-            return $card;
-        }
-
-        /**
-         * Determine the twitter card based on the images set in the social media defaults.
-         * This is used on taxonomy and error pages.
-         */
-        $image = $this->get('twitter_summary_large_image') ?? $this->get('twitter_summary_image');
-
-        return $image?->field()?->config()['twitter_card'] ?? Defaults::data('collections')->get('seo_twitter_card');
+        return match (true) {
+            ($this->has('twitter_card')) => $this->get('twitter_card'),
+            // The following three cases handle pages like taxonomy and 404.
+            ($this->has('twitter_summary_large_image')) => SocialImage::findModel('twitter_summary_large_image')['card'],
+            ($this->has('twitter_summary_image')) => SocialImage::findModel('twitter_summary')['card'],
+            default => Defaults::data('collections')->get('seo_twitter_card'),
+        };
     }
 
-    protected function twitterImage(): ?Value
+    public function twitterImage(): ?Asset
     {
         if (! $model = SocialImage::findModel("twitter_{$this->twitterCard()}")) {
             return null;
         }
 
-        return $this->value('generate_social_images')
+        return $this->get('generate_social_images')
             ? $this->get('generated_twitter_image')
             : $this->get($model['handle']);
     }
 
-    protected function twitterImagePreset(): ?array
+    public function twitterImagePreset(): array
     {
-        if (! $this->twitterImage()) {
-            return null;
-        }
-
         return collect(SocialImage::findModel("twitter_{$this->twitterCard()}"))
             ->only(['width', 'height'])
             ->all();
     }
 
-    protected function twitterHandle(): ?string
+    public function twitterHandle(): ?string
     {
-        $twitterHandle = $this->value('twitter_handle');
+        $twitterHandle = $this->get('twitter_handle');
 
         return $twitterHandle ? Str::start($twitterHandle, '@') : null;
     }
 
-    protected function indexing(): string
+    public function indexing(): ?string
     {
-        return collect([
-            'noindex' => $this->value('noindex'),
-            'nofollow' => $this->value('nofollow'),
+        $indexing = collect([
+            'noindex' => $this->get('noindex'),
+            'nofollow' => $this->get('nofollow'),
         ])->filter()->keys()->implode(', ');
+
+        return ! empty($indexing) ? $indexing : null;
     }
 
-    protected function locale(): string
+    public function locale(): string
     {
         return Helpers::parseLocale(Site::current()->locale());
     }
 
-    protected function hreflang(): ?array
+    public function hreflang(): ?array
     {
         // Handles collection taxonomy index page.
         if ($this->model->has('segment_2') && $this->model->get('terms') instanceof TermQueryBuilder) {
@@ -243,7 +230,7 @@ class ViewCascade extends BaseCascade
             : $data->taxonomy()->sites();
 
         $hreflang = $sites->map(fn ($locale) => $data->in($locale))
-            ->filter() // A model might no exist in a site. So we need to remove it to prevent further issues.
+            ->filter() // A model might no exist in a site. So we need to remove it to prevent calling methods on null
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
             ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
             ->map(fn ($model) => [
@@ -254,16 +241,16 @@ class ViewCascade extends BaseCascade
         return $hreflang;
     }
 
-    protected function canonical(): string
+    public function canonical(): string
     {
-        $type = $this->value('canonical_type');
+        $type = $this->get('canonical_type');
 
-        if ($type == 'other' && $this->value('canonical_entry')) {
-            return $this->value('canonical_entry')->absoluteUrl();
+        if ($type == 'other' && $this->has('canonical_entry')) {
+            return $this->get('canonical_entry')->absoluteUrl();
         }
 
-        if ($type == 'custom' && $this->value('canonical_custom')) {
-            return $this->value('canonical_custom');
+        if ($type == 'custom' && $this->has('canonical_custom')) {
+            return $this->get('canonical_custom');
         }
 
         $currentUrl = $this->model->get('current_url');
@@ -281,7 +268,7 @@ class ViewCascade extends BaseCascade
             : "{$currentUrl}?page={$page}";
     }
 
-    protected function prevUrl(): ?string
+    public function prevUrl(): ?string
     {
         if (! $paginator = Blink::get('tag-paginator')) {
             return null;
@@ -301,7 +288,7 @@ class ViewCascade extends BaseCascade
             : null;
     }
 
-    protected function nextUrl(): ?string
+    public function nextUrl(): ?string
     {
         if (! $paginator = Blink::get('tag-paginator')) {
             return null;
@@ -316,7 +303,7 @@ class ViewCascade extends BaseCascade
             : null;
     }
 
-    protected function schema(): ?string
+    public function schema(): ?string
     {
         $schema = $this->siteSchema().$this->entrySchema();
 
@@ -325,26 +312,26 @@ class ViewCascade extends BaseCascade
 
     protected function siteSchema(): ?string
     {
-        $type = $this->value('site_json_ld_type')?->value();
+        $type = $this->get('site_json_ld_type');
 
-        if ($type === 'none') {
+        if ($type == 'none') {
             return null;
         }
 
-        if ($type === 'custom') {
-            $data = $this->value('site_json_ld')?->value();
+        if ($type == 'custom') {
+            $data = $this->get('site_json_ld');
 
             return $data
                 ? '<script type="application/ld+json">'.$data.'</script>'
                 : null;
         }
 
-        if ($type === 'organization') {
+        if ($type == 'organization') {
             $schema = Schema::organization()
-                ->name($this->value('organization_name'))
+                ->name($this->get('organization_name'))
                 ->url($this->model->get('site')->absoluteUrl());
 
-            if ($logo = $this->value('organization_logo')) {
+            if ($logo = $this->get('organization_logo')) {
                 $logo = Schema::imageObject()
                     ->url($logo->absoluteUrl())
                     ->width($logo->width())
@@ -354,9 +341,9 @@ class ViewCascade extends BaseCascade
             }
         }
 
-        if ($type === 'person') {
+        if ($type == 'person') {
             $schema = Schema::person()
-                ->name($this->value('person_name'))
+                ->name($this->get('person_name'))
                 ->url($this->model->get('site')->absoluteUrl());
         }
 
@@ -365,17 +352,17 @@ class ViewCascade extends BaseCascade
 
     protected function entrySchema(): ?string
     {
-        $data = $this->value('json_ld')?->value();
+        $data = $this->get('json_ld');
 
         return $data
             ? '<script type="application/ld+json">'.$data.'</script>'
             : null;
     }
 
-    protected function breadcrumbs(): ?string
+    public function breadcrumbs(): ?string
     {
         // Don't render breadcrumbs if deactivated in the site defaults.
-        if (! $this->value('use_breadcrumbs')) {
+        if (! $this->get('use_breadcrumbs')) {
             return null;
         }
 

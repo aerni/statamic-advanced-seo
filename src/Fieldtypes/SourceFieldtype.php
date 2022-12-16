@@ -170,7 +170,7 @@ class SourceFieldtype extends Fieldtype
             return null;
         }
 
-        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$data->id()}", fn () => SourceFieldtypeCascade::from($data)->process());
+        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$data->id()}", fn () => SourceFieldtypeCascade::from($data));
 
         $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 

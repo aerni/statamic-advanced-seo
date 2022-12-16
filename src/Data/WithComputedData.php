@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 
 trait WithComputedData
 {
+    abstract public function computedValueKeys(): Collection;
+
     public function computedValues(): Collection
     {
         return $this->computedValueKeys()
@@ -25,6 +27,4 @@ trait WithComputedData
         return $this->computedValueKeys()->flip()->has($key)
             && method_exists($this, Str::camel($key));
     }
-
-    abstract public function computedValueKeys(): Collection;
 }

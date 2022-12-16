@@ -11,7 +11,7 @@ class SourceFieldtypeCascade extends BaseCascade
         parent::__construct($model);
     }
 
-    public function process(): self
+    protected function process(): self
     {
         return $this
             ->withSiteDefaults()
