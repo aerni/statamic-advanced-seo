@@ -2,12 +2,11 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Statamic\Facades\GraphQL;
 
 class SeoMetaType extends Type
 {

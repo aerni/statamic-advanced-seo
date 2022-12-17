@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
-use Statamic\Facades\Data;
-use Statamic\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
-use Statamic\GraphQL\Queries\Query;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Actions\IsEnabledModel;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
+use GraphQL\Type\Definition\Type;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Data;
+use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Queries\Query;
 
 class SeoMetaQuery extends Query
 {

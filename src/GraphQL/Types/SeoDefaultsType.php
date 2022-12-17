@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
-use Rebing\GraphQL\Support\Type;
 use Aerni\AdvancedSeo\GraphQL\Fields\ContentDefaultsField;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Facades\GraphQL;
 
 class SeoDefaultsType extends Type
 {

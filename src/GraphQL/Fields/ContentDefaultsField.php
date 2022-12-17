@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
-use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Field;
-use Aerni\AdvancedSeo\Facades\Seo;
-use GraphQL\Type\Definition\ResolveInfo;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Statamic\Facades\GraphQL;
 
 class ContentDefaultsField extends Field
 {

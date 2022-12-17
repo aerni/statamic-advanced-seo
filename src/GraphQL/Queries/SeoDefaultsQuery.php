@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
-use Statamic\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
-use Statamic\GraphQL\Queries\Query;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use GraphQL\Type\Definition\Type;
+use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Queries\Query;
 
 class SeoDefaultsQuery extends Query
 {

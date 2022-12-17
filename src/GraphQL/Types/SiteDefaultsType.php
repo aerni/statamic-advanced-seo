@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
-use Rebing\GraphQL\Support\Type;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\SeoVariables;
 use GraphQL\Type\Definition\ResolveInfo;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Facades\GraphQL;
 
 class SiteDefaultsType extends Type
 {
