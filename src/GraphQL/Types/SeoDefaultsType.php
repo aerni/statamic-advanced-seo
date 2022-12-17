@@ -2,11 +2,9 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
+use Rebing\GraphQL\Support\Type;
+use Aerni\AdvancedSeo\GraphQL\Fields\ContentDefaultsField;
 
 class SeoDefaultsType extends Type
 {
@@ -28,64 +26,10 @@ class SeoDefaultsType extends Type
                         'type' => GraphQL::string(),
                     ],
                 ],
-                'resolve' => $this->siteDefaultsResolver(),
+                'resolve' => fn ($root, $args) => $args,
             ],
-            'collections' => [
-                'type' => GraphQL::type(ContentDefaultsType::NAME),
-                'description' => 'The Advanced SEO collection defaults',
-                'args' => [
-                    'handle' => [
-                        'name' => 'handle',
-                        'type' => GraphQL::string(),
-                        'rules' => ['required'],
-                    ],
-                    'site' => [
-                        'type' => GraphQL::string(),
-                    ],
-                ],
-                'resolve' => $this->contentDefaultsResolver(),
-            ],
-            'taxonomies' => [
-                'type' => GraphQL::type(ContentDefaultsType::NAME),
-                'description' => 'The Advanced SEO taxonomy defaults',
-                'args' => [
-                    'handle' => [
-                        'name' => 'handle',
-                        'type' => GraphQL::string(),
-                        'rules' => ['required'],
-                    ],
-                    'site' => [
-                        'type' => GraphQL::string(),
-                    ],
-                ],
-                'resolve' => $this->contentDefaultsResolver(),
-            ],
+            'collections' => new ContentDefaultsField,
+            'taxonomies' => new ContentDefaultsField,
         ];
-    }
-
-    private function siteDefaultsResolver(): callable
-    {
-        return function ($queryArgs, $args, $context, ResolveInfo $info) {
-            return $args;
-        };
-    }
-
-    private function contentDefaultsResolver(): callable
-    {
-        return function ($queryArgs, $args, $context, ResolveInfo $info) {
-            $set = Seo::find($info->fieldName, $args['handle']);
-
-            if (! $set) {
-                return null;
-            }
-
-            if (! $set->isEnabled()) {
-                return null;
-            }
-
-            return array_has($args, 'site')
-                ? $set->in($args['site'])
-                : $set->inDefaultSite();
-        };
     }
 }

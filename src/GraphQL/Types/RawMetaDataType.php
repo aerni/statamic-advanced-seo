@@ -9,13 +9,13 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Str;
 
-class PageDataType extends Type
+class RawMetaDataType extends Type
 {
-    const NAME = 'pageData';
+    const NAME = 'rawMetaData';
 
     protected $attributes = [
         'name' => self::NAME,
-        'description' => 'The unprocessed Advanced SEO fields of the entry/term',
+        'description' => 'The Advanced SEO raw meta data',
     ];
 
     public function fields(): array

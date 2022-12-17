@@ -2,25 +2,21 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
-use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
-use GraphQL\Type\Definition\Type;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Data;
 use Statamic\Facades\GraphQL;
+use GraphQL\Type\Definition\Type;
 use Statamic\GraphQL\Queries\Query;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Actions\IsEnabledModel;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
 
-class SeoQuery extends Query
+class SeoMetaQuery extends Query
 {
     protected $attributes = [
-        'name' => 'seo',
-        'description' => 'Query the Advanced SEO data of an entry or term',
+        'name' => 'seoMeta',
+        'description' => 'The Advanced SEO meta data',
     ];
-
-    public function type(): Type
-    {
-        return GraphQL::type(SeoType::NAME);
-    }
 
     public function args(): array
     {
@@ -30,8 +26,15 @@ class SeoQuery extends Query
                 'type' => GraphQL::string(),
                 'rules' => ['required'],
             ],
-            'site' => GraphQL::string(),
+            'site' => [
+                'type' => GraphQL::string(),
+            ],
         ];
+    }
+
+    public function type(): Type
+    {
+        return GraphQL::type(SeoMetaType::NAME);
     }
 
     public function resolve($root, $args): Entry|Term|Null
@@ -56,6 +59,7 @@ class SeoQuery extends Query
             $model = $termExistsInLocale ? $model->in($site) : null;
         }
 
-        return $model;
+        // Only resolve the meta data if the collection or taxonomy wasn't disabled in the config
+        return IsEnabledModel::handle($model) ? $model : null;
     }
 }

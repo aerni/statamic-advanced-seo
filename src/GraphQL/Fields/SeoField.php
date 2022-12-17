@@ -2,41 +2,29 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
-use Aerni\AdvancedSeo\Actions\EvaluateModelParent;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Actions\IsEnabledModel;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Field;
-use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\GraphQL;
 
 class SeoField extends Field
 {
     protected $attributes = [
-        'description' => 'All the Advanced SEO data of an entry/term',
+        'name' => 'seo',
+        'description' => 'The Advanced SEO meta data',
     ];
 
     public function type(): Type
     {
-        return GraphQL::type(SeoType::NAME);
+        return GraphQL::type(SeoMetaType::NAME);
     }
 
     protected function resolve(Entry|Term $model): Entry|Term|Null
     {
-        $parent = EvaluateModelParent::handle($model);
-
-        if ($parent instanceof Collection) {
-            $id = "collections::{$parent->handle()}";
-        }
-
-        if ($parent instanceof Taxonomy) {
-            $id = "taxonomies::{$parent->handle()}";
-        }
-
-        // Only return seo data if the collection or taxonomy wasn't disabled in the config
-        return Defaults::isEnabled($id) ? $model : null;
+        // Only resolve the data if the collection or taxonomy wasn't disabled in the config
+        return IsEnabledModel::handle($model) ? $model : null;
     }
 }

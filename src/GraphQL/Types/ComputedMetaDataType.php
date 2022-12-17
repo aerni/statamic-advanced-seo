@@ -8,13 +8,13 @@ use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Types\AssetInterface;
 
-class ComputedDataType extends Type
+class ComputedMetaDataType extends Type
 {
-    const NAME = 'computedData';
+    const NAME = 'computedMetaData';
 
     protected $attributes = [
         'name' => self::NAME,
-        'description' => 'The computed Advanced SEO fields like the `title`, `hreflang`, or `indexing`',
+        'description' => 'The Advanced SEO computed meta data',
     ];
 
     public function fields(): array

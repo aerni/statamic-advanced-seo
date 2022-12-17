@@ -2,38 +2,34 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Statamic\Facades\GraphQL;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
 
-class SeoType extends Type
+class SeoMetaType extends Type
 {
-    const NAME = 'seo';
+    const NAME = 'seoMeta';
 
     protected $attributes = [
         'name' => self::NAME,
-        'description' => 'All the Advanced SEO data of an entry/term',
+        'description' => 'The Advanced SEO meta data of an entry or term',
     ];
 
     public function fields(): array
     {
         return [
             'computed' => [
-                'type' => GraphQL::type(ComputedDataType::NAME),
-                'description' => 'The computed Advanced SEO fields like the `title`, `hreflang`, or `indexing`',
+                'type' => GraphQL::type(ComputedMetaDataType::NAME),
+                'description' => 'The Advanced SEO computed meta data',
                 'resolve' => fn (Entry|Term $model) => GraphQlCascade::from($model),
             ],
-            'data' => [
-                'type' => GraphQL::type(PageDataType::NAME),
-                'description' => 'The unprocessed Advanced SEO fields of the entry/term',
+            'raw' => [
+                'type' => GraphQL::type(RawMetaDataType::NAME),
+                'description' => 'The Advanced SEO raw meta data',
                 'resolve' => fn (Entry|Term $model) => $model,
-            ],
-            'defaults' => [
-                'type' => GraphQL::type(SiteDefaultsType::NAME),
-                'description' => 'The Advanced SEO site defaults like `site_name` in the locale of the entry/term',
-                'resolve' => fn (Entry|Term $model) => ['site' => $model->locale()],
             ],
             'view' => [
                 'type' => GraphQL::type(RenderedViewsType::NAME),

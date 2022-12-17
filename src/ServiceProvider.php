@@ -2,42 +2,46 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoCollectionDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSiteDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoTaxonomyDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
-use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Statamic\Statamic;
+use Statamic\Facades\Git;
+use Statamic\Tags\Context;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Illuminate\Support\Facades\View;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\View\ViewCascade;
-use Illuminate\Support\Facades\View;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Git;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoType;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
-use Statamic\Tags\Context;
+use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Types\PageDataType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSiteDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoTaxonomyDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoCollectionDefaultsQuery;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -204,20 +208,20 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGraphQL(): self
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
+            GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoDefaultsQuery::class);
-            GraphQL::addQuery(SeoQuery::class);
 
             GraphQL::addType(AnalyticsDefaultsType::class);
-            GraphQL::addType(ComputedDataType::class);
+            GraphQL::addType(ComputedMetaDataType::class);
             GraphQL::addType(ContentDefaultsType::class);
             GraphQL::addType(FaviconsDefaultsType::class);
             GraphQL::addType(GeneralDefaultsType::class);
             GraphQL::addType(HreflangType::class);
             GraphQL::addType(IndexingDefaultsType::class);
-            GraphQL::addType(PageDataType::class);
+            GraphQL::addType(RawMetaDataType::class);
             GraphQL::addType(RenderedViewsType::class);
             GraphQL::addType(ContentDefaultsType::class);
-            GraphQL::addType(SeoType::class);
+            GraphQL::addType(SeoMetaType::class);
             GraphQL::addType(SeoDefaultsType::class);
             GraphQL::addType(SiteDefaultsType::class);
             GraphQL::addType(SocialImagePresetType::class);
