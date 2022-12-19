@@ -1,0 +1,38 @@
+title: 'Twitter'
+fields:
+  -
+    handle: seo_section_twitter
+    field:
+      type: advanced_seo
+      display: 'Twitter'
+      field: seo_section_twitter
+  -
+    handle: seo_twitter_card
+    field:
+      type: advanced_seo
+      display: 'Twitter Card'
+      field: seo_twitter_card
+  -
+    handle: seo_twitter_summary_image
+    field:
+      type: advanced_seo
+      display: 'Twitter Summary Image'
+      field: seo_twitter_summary_image
+  -
+    handle: seo_twitter_summary_large_image
+    field:
+      type: advanced_seo
+      display: 'Twitter Summary Large Image'
+      field: seo_twitter_summary_large_image
+  -
+    handle: seo_twitter_title
+    field:
+      type: advanced_seo
+      display: 'Twitter Title'
+      field: seo_twitter_title
+  -
+    handle: seo_twitter_description
+    field:
+      type: advanced_seo
+      display: 'Twitter Description'
+      field: seo_twitter_description

@@ -1,0 +1,26 @@
+title: 'Sitemap'
+fields:
+  -
+    handle: seo_section_sitemap
+    field:
+      type: advanced_seo
+      display: 'Sitemap'
+      field: seo_section_sitemap
+  -
+    handle: seo_sitemap_enabled
+    field:
+      type: advanced_seo
+      display: 'Enabled'
+      field: seo_sitemap_enabled
+  -
+    handle: seo_sitemap_priority
+    field:
+      type: advanced_seo
+      display: 'Priority'
+      field: seo_sitemap_priority
+  -
+    handle: seo_sitemap_change_frequency
+    field:
+      type: advanced_seo
+      display: 'Change Frequency'
+      field: seo_sitemap_change_frequency

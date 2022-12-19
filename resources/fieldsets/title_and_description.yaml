@@ -1,0 +1,26 @@
+title: 'Title & Description'
+fields:
+  -
+    handle: seo_section_title_description
+    field:
+      type: advanced_seo
+      display: 'Title & Description'
+      field: seo_section_title_description
+  -
+    handle: seo_title
+    field:
+      type: advanced_seo
+      display: 'Meta Title'
+      field: seo_title
+  -
+    handle: seo_description
+    field:
+      type: advanced_seo
+      display: 'Meta Description'
+      field: seo_description
+  -
+    handle: seo_site_name_position
+    field:
+      type: advanced_seo
+      display: 'Site Name Position'
+      field: seo_site_name_position

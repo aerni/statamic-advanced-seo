@@ -1,0 +1,26 @@
+title: 'Canonical URL'
+fields:
+  -
+    handle: seo_section_canonical_url
+    field:
+      type: advanced_seo
+      display: 'Canonical URL'
+      field: seo_section_canonical_url
+  -
+    handle: seo_canonical_type
+    field:
+      type: advanced_seo
+      display: 'Canonical URL'
+      field: seo_canonical_type
+  -
+    handle: seo_canonical_entry
+    field:
+      type: advanced_seo
+      display: 'Entry'
+      field: seo_canonical_entry
+  -
+    handle: seo_canonical_custom
+    field:
+      type: advanced_seo
+      display: 'URL'
+      field: seo_canonical_custom

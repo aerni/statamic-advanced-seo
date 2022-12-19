@@ -1,0 +1,14 @@
+title: 'JSON-LD Schema'
+fields:
+  -
+    handle: seo_section_json_ld
+    field:
+      type: advanced_seo
+      display: 'JSON-LD Schema'
+      field: seo_section_json_ld
+  -
+    handle: seo_json_ld
+    field:
+      type: advanced_seo
+      display: 'JSON-LD Schema'
+      field: seo_json_ld
