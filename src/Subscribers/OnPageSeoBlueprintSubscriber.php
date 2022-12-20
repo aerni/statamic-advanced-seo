@@ -33,23 +33,32 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
-        // The data is used to show/hide fields under certain conditions.
+        // $this->data is used to show/hide fields under certain conditions.
         $seoFields = OnPageSeoBlueprint::make()->data($this->data)->items();
 
-        // This only works with linked fieldsets. It doesn't work with single imported fieldset fields or single advanced_seo fields.
-        $existingSeoFields = $event->blueprint->fields()->all()
-            ->filter(fn ($field) => $field->type() === 'advanced_seo') // Remove any fields other than of type `advanced_seo`
-            ->filter(fn ($field) => array_key_exists($field->config()['field'], $seoFields)) // Remove any fields that are not part of the SEO fields
-            ->each(function ($field) use ($seoFields) { // Override each field with the config from the SEO fields.
-                $handle = $field->config()['field'];
-                $config = $seoFields[$handle];
-                $field->setHandle($handle)->setConfig($config);
-            });
+        // Get all the linked SEO fieldset fields that are part of the blueprint.
+        $linkedSeoFieldsetFields = $event->blueprint->fields()->all()
+            ->filter(fn ($field) => $field->type() === 'advanced_seo') // Remove any field that isn't of type `advanced_seo`
+            ->filter(fn ($field) => array_key_exists($field->config()['field'], $seoFields)); // Remove any field that isn't an SEO field
 
-        // Add all SEO fields if the user didn't specify which fields he wants.
-        if ($existingSeoFields->isEmpty()) {
-            $event->blueprint->ensureFieldsInSection($seoFields, 'SEO');
-        }
+        /**
+         * Override each linked 'advanced_seo' field with the corresponding field from the OnPageSeoBlueprint.
+         * Note, that this only works with linked fieldsets. It doesn't work with single linked fields.
+         */
+        $linkedSeoFieldsetFields->each(function ($field) use ($seoFields) {
+            $handle = $field->config()['field'];
+            $config = $seoFields[$handle];
+
+            return $field->setHandle($handle)->setConfig($config);
+        });
+
+        /**
+         * To ensure the addon's functionality, we need to add all the remaining SEO fields that were not added through a linked fieldset.
+         * But we'll hide those fields so the admin can decide which fields should be editable by the user.
+         */
+        collect($seoFields)->diffKeys($linkedSeoFieldsetFields)
+            ->map(fn ($config) => array_merge($config, ['visibility' => 'hidden']))
+            ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
 
         /**
          * This only works with single linked fields and advanced_seo fields.
