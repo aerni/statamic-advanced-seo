@@ -27,6 +27,7 @@ class AdvancedSeoFieldtype extends Fieldtype
                 'type' => 'select',
                 'width' => 50,
                 'options' => $this->options(),
+                'validate' => 'required',
             ],
         ];
     }
