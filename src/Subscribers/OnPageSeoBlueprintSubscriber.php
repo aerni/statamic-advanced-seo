@@ -30,11 +30,6 @@ class OnPageSeoBlueprintSubscriber
         $this->data = $this->getDataFromEvent($event);
 
         if (! $this->shouldExtendBlueprint($event)) {
-            // Remove all linked SEO fieldset fields.
-            $event->blueprint->fields()->all()
-                ->filter(fn ($field) => $field->type() === 'advanced_seo')
-                ->each(fn ($field) => $event->blueprint->ensureField($field->handle(), ['visibility' => 'hidden']));
-
             return;
         }
 

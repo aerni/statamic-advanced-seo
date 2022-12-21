@@ -6,21 +6,25 @@ fields:
       type: advanced_seo
       display: 'Title & Description'
       field: seo_section_title_description
+      visibility: hidden
   -
     handle: seo_title
     field:
       type: advanced_seo
       display: 'Meta Title'
       field: seo_title
+      visibility: hidden
   -
     handle: seo_description
     field:
       type: advanced_seo
       display: 'Meta Description'
       field: seo_description
+      visibility: hidden
   -
     handle: seo_site_name_position
     field:
       type: advanced_seo
       display: 'Site Name Position'
       field: seo_site_name_position
+      visibility: hidden

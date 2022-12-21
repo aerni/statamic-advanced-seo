@@ -6,27 +6,32 @@ fields:
       type: advanced_seo
       display: 'Social Images Generator'
       field: seo_section_social_images_generator
+      visibility: hidden
   -
     handle: seo_generate_social_images
     field:
       type: advanced_seo
       display: 'Generate Social Images'
       field: seo_generate_social_images
+      visibility: hidden
   -
     handle: seo_social_images_theme
     field:
       type: advanced_seo
       display: 'Theme'
       field: seo_social_images_theme
+      visibility: hidden
   -
     handle: seo_generated_og_image
     field:
       type: advanced_seo
       display: 'Open Graph'
       field: seo_generated_og_image
+      visibility: hidden
   -
     handle: seo_generated_twitter_image
     field:
       type: advanced_seo
       display: 'Twitter'
       field: seo_generated_twitter_image
+      visibility: hidden

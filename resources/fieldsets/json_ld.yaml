@@ -6,9 +6,11 @@ fields:
       type: advanced_seo
       display: 'JSON-LD Schema'
       field: seo_section_json_ld
+      visibility: hidden
   -
     handle: seo_json_ld
     field:
       type: advanced_seo
       display: 'JSON-LD Schema'
       field: seo_json_ld
+      visibility: hidden

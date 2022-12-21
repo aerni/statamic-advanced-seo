@@ -6,33 +6,39 @@ fields:
       type: advanced_seo
       display: 'Twitter'
       field: seo_section_twitter
+      visibility: hidden
   -
     handle: seo_twitter_card
     field:
       type: advanced_seo
       display: 'Twitter Card'
       field: seo_twitter_card
+      visibility: hidden
   -
     handle: seo_twitter_summary_image
     field:
       type: advanced_seo
       display: 'Twitter Summary Image'
       field: seo_twitter_summary_image
+      visibility: hidden
   -
     handle: seo_twitter_summary_large_image
     field:
       type: advanced_seo
       display: 'Twitter Summary Large Image'
       field: seo_twitter_summary_large_image
+      visibility: hidden
   -
     handle: seo_twitter_title
     field:
       type: advanced_seo
       display: 'Twitter Title'
       field: seo_twitter_title
+      visibility: hidden
   -
     handle: seo_twitter_description
     field:
       type: advanced_seo
       display: 'Twitter Description'
       field: seo_twitter_description
+      visibility: hidden

@@ -6,21 +6,25 @@ fields:
       type: advanced_seo
       display: 'Open Graph'
       field: seo_section_og
+      visibility: hidden
   -
     handle: seo_og_image
     field:
       type: advanced_seo
       display: 'Open Graph Image'
       field: seo_og_image
+      visibility: hidden
   -
     handle: seo_og_title
     field:
       type: advanced_seo
       display: 'Open Graph Title'
       field: seo_og_title
+      visibility: hidden
   -
     handle: seo_og_description
     field:
       type: advanced_seo
       display: 'Open Graph Description'
       field: seo_og_description
+      visibility: hidden
