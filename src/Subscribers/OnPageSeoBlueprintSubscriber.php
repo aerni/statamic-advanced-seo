@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
 
@@ -36,16 +37,41 @@ class OnPageSeoBlueprintSubscriber
         // $this->data is used to show/hide fields under certain conditions.
         $seoFields = OnPageSeoBlueprint::make()->data($this->data)->items();
 
-        // Get all the linked SEO fieldset fields that are part of the blueprint.
+        // Get all the linked SEO fieldset fields that the user explicitly added to the blueprint.
         $linkedSeoFieldsetFields = $event->blueprint->fields()->all()
             ->filter(fn ($field) => $field->type() === 'advanced_seo') // Remove any field that isn't of type `advanced_seo`
-            ->filter(fn ($field) => array_key_exists($field->config()['field'], $seoFields)); // Remove any field that isn't an SEO field
+            ->filter(fn ($field) => array_key_exists($field->config()['field'], $seoFields)); // Remove any field that isn't an actual SEO field
 
-        // If the user didn't explicitly add any Advanced SEO fieldsets to the blueprint, we want to add all fields in the SEO section.
+        /**
+         * If the user didn't explicitly add any Advanced SEO fieldsets to the blueprint,
+         * we want to add all fields that are part of the 'advanced-seo::main' fieldset to the SEO section.
+         * This allows the user to configure the SEO fields that should be shown by default.
+         * All SEO fields, that are not part of the fieldset will still be added but as hidden field.
+         */
         if ($linkedSeoFieldsetFields->isEmpty()) {
-            $event->blueprint->ensureFieldsInSection($seoFields, 'SEO');
+
+            // The fields I want to show by default.
+            $fieldset = Fieldset::find('advanced-seo::main')->fields()->all();
+
+            // The SEO fields that should be visible.
+            $visibleFields = collect($seoFields)->intersectByKeys($fieldset);
+
+            // If the user added other non-SEO fields to the fieldset, we still want to add those too.
+            $otherFields = $fieldset->diffKeys($visibleFields)->map(fn ($field) => $field->config());
+
+            // Add all visible fields to the blueprint.
+            $event->blueprint->ensureFieldsInSection($visibleFields->merge($otherFields), 'SEO');
+
+            // All other SEO fields that are not part of the fieldset and should not be visible.
+            $hiddenFields = collect($seoFields)->diffKeys($fieldset);
+
+            // Add all hidden fields to the blueprint.
+            $hiddenFields
+                ->map(fn ($config) => array_merge($config, ['visibility' => 'hidden']))
+                ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
 
             return;
+
         }
 
         /**
