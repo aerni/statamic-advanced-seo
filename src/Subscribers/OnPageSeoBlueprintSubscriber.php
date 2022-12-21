@@ -73,11 +73,11 @@ class OnPageSeoBlueprintSubscriber
          * Override each linked 'advanced_seo' field with the corresponding field from the OnPageSeoBlueprint.
          * Note, that this only works with linked fieldsets. It doesn't work with single linked fields.
          */
-        $linkedSeoFieldsetFields->each(function ($field) use ($seoFields) {
+        $linkedSeoFieldsetFields = $linkedSeoFieldsetFields->mapWithKeys(function ($field) use ($seoFields) {
             $handle = $field->config()['field'];
             $config = $seoFields[$handle];
 
-            return $field->setHandle($handle)->setConfig($config);
+            return [$handle => $field->setHandle($handle)->setConfig($config)];
         });
 
         /**
@@ -87,22 +87,6 @@ class OnPageSeoBlueprintSubscriber
         collect($seoFields)->diffKeys($linkedSeoFieldsetFields)
             ->map(fn ($config) => array_merge($config, ['visibility' => 'hidden']))
             ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
-
-        /**
-         * This only works with single linked fields and advanced_seo fields.
-         * It doesn't work with linked fieldsets because of how imported fieldset configs are merged.
-         */
-        // $existingSeoFields->each(function ($field) use ($event) {
-        //     $event->blueprint
-        //         ->removeField($field->handle())
-        //         ->ensureField($field->handle(), $field->config());
-        // });
-
-        // This doesn't have any effect. Would be nice if it did so we don't have to use ensureField().
-        // $event->blueprint->field('seo_section_title_description')->setConfig(['type' => 'text']);
-
-        // This doesn't work with linked fieldsets or single linked fieldset fields.
-        // $event->blueprint->ensureFieldHasConfig('seo_section_title_description', ['display' => 'hi', 'type' => 'text']);
     }
 
     protected function shouldExtendBlueprint(Event $event): bool
