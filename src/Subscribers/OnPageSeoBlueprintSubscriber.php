@@ -49,7 +49,6 @@ class OnPageSeoBlueprintSubscriber
          * All SEO fields, that are not part of the fieldset will still be added but as hidden field.
          */
         if ($linkedSeoFieldsetFields->isEmpty()) {
-
             // The fields I want to show by default.
             $fieldset = Fieldset::find('advanced-seo::main')->fields()->all();
 
@@ -71,7 +70,6 @@ class OnPageSeoBlueprintSubscriber
                 ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
 
             return;
-
         }
 
         /**
