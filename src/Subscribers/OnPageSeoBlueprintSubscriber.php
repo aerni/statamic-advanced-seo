@@ -46,6 +46,13 @@ class OnPageSeoBlueprintSubscriber
             ->filter(fn ($field) => $field->type() === 'advanced_seo') // Remove any field that isn't of type `advanced_seo`
             ->filter(fn ($field) => array_key_exists($field->config()['field'], $seoFields)); // Remove any field that isn't an SEO field
 
+        // If the user didn't explicitly add any Advanced SEO fieldsets to the blueprint, we want to add all fields in the SEO section.
+        if ($linkedSeoFieldsetFields->isEmpty()) {
+            $event->blueprint->ensureFieldsInSection($seoFields, 'SEO');
+
+            return;
+        }
+
         /**
          * Override each linked 'advanced_seo' field with the corresponding field from the OnPageSeoBlueprint.
          * Note, that this only works with linked fieldsets. It doesn't work with single linked fields.
@@ -59,7 +66,7 @@ class OnPageSeoBlueprintSubscriber
 
         /**
          * To ensure the addon's functionality, we need to add all the remaining SEO fields that were not added through a linked fieldset.
-         * But we'll hide those fields so the admin can decide which fields should be editable by the user.
+         * But we'll hide those fields so that it's up to the admin to explicitly add fields that should be editable.
          */
         collect($seoFields)->diffKeys($linkedSeoFieldsetFields)
             ->map(fn ($config) => array_merge($config, ['visibility' => 'hidden']))
