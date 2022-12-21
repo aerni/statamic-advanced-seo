@@ -50,16 +50,13 @@ class OnPageSeoBlueprintSubscriber
          */
         if ($linkedSeoFieldsetFields->isEmpty()) {
             // The fields I want to show by default.
-            $fieldset = Fieldset::find('advanced-seo::main')->fields()->all();
+            $fieldset = Fieldset::find('advanced-seo::main')->fields()->all()->map(fn ($field) => $field->config());
 
-            // The SEO fields that should be visible.
-            $visibleFields = collect($seoFields)->intersectByKeys($fieldset);
-
-            // If the user added other non-SEO fields to the fieldset, we still want to add those too.
-            $otherFields = $fieldset->diffKeys($visibleFields)->map(fn ($field) => $field->config());
+            // The SEO fields that should be visible. This also includes any other fields the user might have added to the fieldset.
+            $visibleFields = $fieldset->map(fn ($field, $handle) => collect($seoFields)->get($handle) ?? $field);
 
             // Add all visible fields to the blueprint.
-            $event->blueprint->ensureFieldsInSection($visibleFields->merge($otherFields), 'SEO');
+            $event->blueprint->ensureFieldsInSection($visibleFields, 'SEO');
 
             // All other SEO fields that are not part of the fieldset and should not be visible.
             $hiddenFields = collect($seoFields)->diffKeys($fieldset);
