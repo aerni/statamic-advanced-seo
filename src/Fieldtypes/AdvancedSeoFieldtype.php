@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Fields\Fieldtype;
 use Aerni\AdvancedSeo\Fields\OnPageSeoFields;
 use Illuminate\Support\Collection;
+use Statamic\Fields\Fieldtype;
 
 class AdvancedSeoFieldtype extends Fieldtype
 {
@@ -30,5 +30,4 @@ class AdvancedSeoFieldtype extends Fieldtype
             ],
         ];
     }
-
 }
