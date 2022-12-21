@@ -102,19 +102,6 @@ return [
 
             /*
             |--------------------------------------------------------------------------
-            | Generate on Save
-            |--------------------------------------------------------------------------
-            |
-            | Generate the social images every time an entry is saved.
-            | Disable this to generate the image the first time an entry is
-            | viewed on the frontend instead.
-            |
-            */
-
-            'generate_on_save' => true,
-
-            /*
-            |--------------------------------------------------------------------------
             | Queue
             |--------------------------------------------------------------------------
             |

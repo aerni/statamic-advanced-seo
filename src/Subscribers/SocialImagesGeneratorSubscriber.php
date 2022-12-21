@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Actions\DeleteSocialImages;
 use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
@@ -33,16 +32,9 @@ class SocialImagesGeneratorSubscriber
             return;
         }
 
-        // Delete the images so we can create a new one on the next request.
-        if (! config('advanced-seo.social_images.generator.generate_on_save', true)) {
-            DeleteSocialImages::handle($event->entry);
-
-            return;
-        }
-
         // Show a toast message if we are using the queue.
         if (config('queue.default') !== 'sync') {
-            Toast::info('Generating the social images in the background');
+            Toast::info(__('advanced-seo::messages.social_images_generator_generating_queue'));
         }
 
         GenerateSocialImagesJob::dispatch($event->entry);
