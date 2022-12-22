@@ -352,7 +352,7 @@ class ViewCascade extends BaseCascade
 
     protected function entrySchema(): ?string
     {
-        $data = $this->get('json_ld')->value();
+        $data = $this->get('json_ld')?->value();
 
         return $data
             ? '<script type="application/ld+json">'.$data.'</script>'
