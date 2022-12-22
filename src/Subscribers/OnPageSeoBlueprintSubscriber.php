@@ -121,8 +121,11 @@ class OnPageSeoBlueprintSubscriber
     /**
      * Evaluate if a field belongs to a disabled feature. If it does, we won't add it to the blueprint.
      * This ensures that we can remove any disabled feature field when augmenting the page data in GetPageData.
+     * This is only necessary for GraphQL, as we can't remove e.g. social image generator fields on a per blueprint basis.
+     *
      * TODO: Extract this to a Conditions class or action.
      * Along with the evaluateFieldConditions method in the SeoVariables class.
+     * Or should we move this into the Blueprint class?
      */
     protected function isDisabledFeature(Field $field): bool
     {

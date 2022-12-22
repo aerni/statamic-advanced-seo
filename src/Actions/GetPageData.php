@@ -14,7 +14,7 @@ class GetPageData
     {
         $fields = OnPageSeoBlueprint::make()->items();
 
-        $fields = match (true) {
+        $values = match (true) {
             ($model instanceof Context) => $model->intersectByKeys($fields),
             ($model instanceof Entry) => $model->toAugmentedCollection(array_keys($fields)),
             ($model instanceof Term) => $model->toAugmentedCollection(array_keys($fields)),
@@ -28,6 +28,6 @@ class GetPageData
          * This ensures that we don't return any values of fields that are not part of the blueprint.
          * This would typically happen when a feature like the social images generator has been disabled.
          */
-        return $fields?->filter(fn ($field) => $field->fieldtype());
+        return $values?->filter(fn ($value) => $value->fieldtype());
     }
 }

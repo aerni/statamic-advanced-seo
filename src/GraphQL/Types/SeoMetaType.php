@@ -29,6 +29,9 @@ class SeoMetaType extends Type
             'raw' => [
                 'type' => GraphQL::type(RawMetaDataType::NAME),
                 'description' => 'The Advanced SEO raw meta data',
+                // TODO: This eats performance as we are augmenting all the data before it's needed.
+                // Before, we simply augmented single fields from the entry when needed.
+                // Can we also get single augmented fields. Maybe a new action that only handles one field?
                 'resolve' => fn (Entry|Term $model) => GetPageData::handle($model),
             ],
             'view' => [
