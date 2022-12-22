@@ -63,7 +63,7 @@ class OnPageSeoBlueprintSubscriber
 
             // Add all hidden fields to the blueprint.
             $hiddenFields
-                ->map(fn ($config) => array_merge($config, ['visibility' => 'hidden']))
+                ->map(fn ($config) => array_merge($config, ['if' => 'hideMeAndDoNotSaveData']))
                 ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
 
             return;
@@ -84,8 +84,13 @@ class OnPageSeoBlueprintSubscriber
          * To ensure the addon's functionality, we need to add all the remaining SEO fields that were not added through a linked fieldset.
          * But we'll hide those fields so that it's up to the admin to explicitly add fields that should be editable.
          */
-        collect($seoFields)->diffKeys($linkedSeoFieldsetFields)
-            ->map(fn ($config) => array_merge($config, ['visibility' => 'hidden']))
+
+        // All other SEO fields that are not part of the fieldset and should not be visible.
+        $hiddenFields = collect($seoFields)->diffKeys($linkedSeoFieldsetFields);
+
+        // Add all hidden fields to the blueprint.
+        $hiddenFields
+            ->map(fn ($config) => array_merge($config, ['if' => 'hideMeAndDoNotSaveData']))
             ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
     }
 
