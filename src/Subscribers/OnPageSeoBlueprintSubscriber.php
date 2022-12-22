@@ -45,8 +45,8 @@ class OnPageSeoBlueprintSubscriber
         /**
          * If the user didn't explicitly add any Advanced SEO fieldsets to the blueprint,
          * we want to add all fields that are part of the 'advanced-seo::main' fieldset to the SEO section.
-         * This allows the user to configure the SEO fields that should be shown by default.
-         * All SEO fields, that are not part of the fieldset will still be added but as hidden field.
+         * This allows the user to configure the SEO fields that should be shown by default by editing the main fieldset.
+         * Any SEO field, that doesn't exist in the fieldset will be added as a hidden field to ensure the addon's functionality.
          */
         if ($linkedSeoFieldsetFields->isEmpty()) {
             // The fields I want to show by default.
