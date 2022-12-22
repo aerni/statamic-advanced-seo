@@ -2,11 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Statamic\Facades\GraphQL;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\GraphQL;
+use Aerni\AdvancedSeo\Actions\GetPageData;
+use Aerni\AdvancedSeo\View\GraphQlCascade;
 
 class SeoMetaType extends Type
 {
@@ -28,7 +29,7 @@ class SeoMetaType extends Type
             'raw' => [
                 'type' => GraphQL::type(RawMetaDataType::NAME),
                 'description' => 'The Advanced SEO raw meta data',
-                'resolve' => fn (Entry|Term $model) => $model,
+                'resolve' => fn (Entry|Term $model) => GetPageData::handle($model),
             ],
             'view' => [
                 'type' => GraphQL::type(RenderedViewsType::NAME),

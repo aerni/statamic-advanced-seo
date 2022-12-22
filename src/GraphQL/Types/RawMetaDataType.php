@@ -4,9 +4,8 @@ namespace Aerni\AdvancedSeo\GraphQL\Types;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Collection;
 use Rebing\GraphQL\Support\Type;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Str;
 
 class RawMetaDataType extends Type
@@ -32,8 +31,8 @@ class RawMetaDataType extends Type
 
     private function resolver(): callable
     {
-        return function (Entry|Term $model, $args, $context, ResolveInfo $info) {
-            return $model->resolveGqlValue("seo_{$info->fieldName}");
+        return function (Collection $values, $args, $context, ResolveInfo $info) {
+            return $values->get("seo_{$info->fieldName}");
         };
     }
 }
