@@ -99,7 +99,7 @@ class ViewCascade extends BaseCascade
     public function ogImage(): ?Asset
     {
         return $this->get('generate_social_images')
-            ? $this->get('generated_og_image')
+            ? $this->get('generated_og_image') ?? $this->get('og_image')
             : $this->get('og_image');
     }
 
@@ -133,7 +133,7 @@ class ViewCascade extends BaseCascade
         }
 
         return $this->get('generate_social_images')
-            ? $this->get('generated_twitter_image')
+            ? $this->get('generated_twitter_image') ?? $this->get($model['handle'])
             : $this->get($model['handle']);
     }
 
