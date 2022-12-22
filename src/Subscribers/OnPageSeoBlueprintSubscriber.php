@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Models\Conditions;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -12,6 +13,7 @@ use Statamic\Events;
 use Statamic\Events\Event;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
+use Statamic\Fields\Field;
 use Statamic\Statamic;
 
 class OnPageSeoBlueprintSubscriber
@@ -34,13 +36,24 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
-        // $this->data is used to show/hide fields under certain conditions.
-        $seoFields = OnPageSeoBlueprint::make()->data($this->data)->items();
+        /**
+         * The following code determines which seo fields should be added to the blueprint.
+         * This is an important concept, as we will only return data of ensured blueprint fields
+         * in the ViewCascade and GraphQlCascade. Data of fields with no blueprint field won't be augmented.
+         */
+
+        /**
+         * These are the fields that we will end up adding to the blueprint.
+         * '$this->data' is used to remove fields under certain conditions. (STILL TRUE?)
+         */
+        $seoFields = OnPageSeoBlueprint::make()->data($this->data)
+            ->get()->fields()->all()
+            ->filter(fn ($field) => ! $this->isDisabledFeature($field)); // We don't want to add any fields of disabled features
 
         // Get all the linked SEO fieldset fields that the user explicitly added to the blueprint.
         $linkedSeoFieldsetFields = $event->blueprint->fields()->all()
             ->filter(fn ($field) => $field->type() === 'advanced_seo') // Remove any field that isn't of type `advanced_seo`
-            ->filter(fn ($field) => array_key_exists($field->config()['field'], $seoFields)); // Remove any field that isn't an actual SEO field
+            ->filter(fn ($field) => $seoFields->has($field->config()['field'])); // Remove any field that isn't an actual SEO field
 
         /**
          * If the user didn't explicitly add any Advanced SEO fieldsets to the blueprint,
@@ -50,20 +63,29 @@ class OnPageSeoBlueprintSubscriber
          */
         if ($linkedSeoFieldsetFields->isEmpty()) {
             // The fields I want to show by default.
-            $fieldset = Fieldset::find('advanced-seo::main')->fields()->all()->map(fn ($field) => $field->config());
+            $seoFieldsetFields = Fieldset::find('advanced-seo::main')->fields()->all();
 
-            // The SEO fields that should be visible. This also includes any other fields the user might have added to the fieldset.
-            $visibleFields = $fieldset->map(fn ($field, $handle) => collect($seoFields)->get($handle) ?? $field);
+            // All non-SEO fields the user might have added to the fieldset.
+            $customUserFields = $seoFieldsetFields->filter(fn ($field) => $field->type() !== 'advanced_seo');
+
+            $visibleFields = $seoFieldsetFields
+                ->filter(fn ($field) => $field->type() === 'advanced_seo') // Remove any field that isn't of type `advanced_seo`
+                ->filter(fn ($field) => $seoFields->has($field->config()['field'])) // Remove any field that isn't an actual SEO field
+                ->map(fn ($field) => $seoFields->get($field->config()['field'])) // Get the field from the OnPageSeoBlueprint fields
+                ->mapWithKeys(fn ($field) => [$field->handle() => $field]) // Make sure to set the correct handle
+                ->merge($customUserFields) // Include custom user fields
+                ->map(fn ($field) => $field->config()); // We need the config to ensure the field below
 
             // Add all visible fields to the blueprint.
             $event->blueprint->ensureFieldsInSection($visibleFields, 'SEO');
 
             // All other SEO fields that are not part of the fieldset and should not be visible.
-            $hiddenFields = collect($seoFields)->diffKeys($fieldset);
+            $hiddenFields = collect($seoFields)->diffKeys($visibleFields);
 
             // Add all hidden fields to the blueprint.
             $hiddenFields
-                ->map(fn ($config) => array_merge($config, ['if' => 'hideMeAndDoNotSaveData']))
+                ->map(fn ($field) => $field->config()) // We need the config to ensure the field below.
+                ->map(fn ($config) => array_merge($config, ['if' => 'hideMeAndDoNotSaveData'])) // Add condition to hide the field and save no data.
                 ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
 
             return;
@@ -73,9 +95,10 @@ class OnPageSeoBlueprintSubscriber
          * Override each linked 'advanced_seo' field with the corresponding field from the OnPageSeoBlueprint.
          * Note, that this only works with linked fieldsets. It doesn't work with single linked fields.
          */
-        $linkedSeoFieldsetFields = $linkedSeoFieldsetFields->mapWithKeys(function ($field) use ($seoFields) {
-            $handle = $field->config()['field'];
-            $config = $seoFields[$handle];
+        $visibleFields = $linkedSeoFieldsetFields->mapWithKeys(function ($field) use ($seoFields) {
+            $seoField = $seoFields[$field->config()['field']];
+            $handle = $seoField->handle();
+            $config = $seoField->config();
 
             return [$handle => $field->setHandle($handle)->setConfig($config)];
         });
@@ -86,12 +109,39 @@ class OnPageSeoBlueprintSubscriber
          */
 
         // All other SEO fields that are not part of the fieldset and should not be visible.
-        $hiddenFields = collect($seoFields)->diffKeys($linkedSeoFieldsetFields);
+        $hiddenFields = collect($seoFields)->diffKeys($visibleFields);
 
         // Add all hidden fields to the blueprint.
         $hiddenFields
-            ->map(fn ($config) => array_merge($config, ['if' => 'hideMeAndDoNotSaveData']))
+            ->map(fn ($field) => $field->config()) // We need the config to ensure the field below.
+            ->map(fn ($config) => array_merge($config, ['if' => 'hideMeAndDoNotSaveData'])) // Add condition to hide the field and save no data.
             ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
+    }
+
+    /**
+     * Evaluate if a field belongs to a disabled feature. If it does, we won't add it to the blueprint.
+     * This ensures that we can remove any disabled feature field when augmenting the page data in GetPageData.
+     * TODO: Extract this to a Conditions class or action.
+     * Along with the evaluateFieldConditions method in the SeoVariables class.
+     */
+    protected function isDisabledFeature(Field $field): bool
+    {
+        $fieldConditions = collect($field->conditions())
+            ->flatten()
+            ->map(fn ($condition) => Str::remove('custom ', $condition))
+            ->flip();
+
+        $conditions = Conditions::all()->intersectByKeys($fieldConditions);
+
+        // The feature is enabled if there are no conditions.
+        if ($conditions->isEmpty()) {
+            return false;
+        }
+
+        $evaluatedConditions = $conditions->map(fn ($condition) => app($condition)::handle($this->data));
+
+        // The feature is disabled if the conditions evaluate to false.
+        return $evaluatedConditions->filter()->isEmpty();
     }
 
     protected function shouldExtendBlueprint(Event $event): bool

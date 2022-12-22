@@ -14,11 +14,20 @@ class GetPageData
     {
         $fields = OnPageSeoBlueprint::make()->items();
 
-        return match (true) {
+        $fields = match (true) {
             ($model instanceof Context) => $model->intersectByKeys($fields),
             ($model instanceof Entry) => $model->toAugmentedCollection(array_keys($fields)),
             ($model instanceof Term) => $model->toAugmentedCollection(array_keys($fields)),
             default => null,
         };
+
+        // TODO: Can we cast booleans so we always have values for `seo_generate_social_image`, `sitemap_enabled`, and such?
+
+        /**
+         * Remove any field that doesn't know how to be augmented.
+         * This ensures that we don't return any values of fields that are not part of the blueprint.
+         * This would typically happen when a feature like the social images generator has been disabled.
+         */
+        return $fields?->filter(fn ($field) => $field->fieldtype());
     }
 }
