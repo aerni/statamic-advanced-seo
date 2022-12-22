@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
-use Aerni\AdvancedSeo\Models\Conditions;
 use Aerni\AdvancedSeo\View\SourceFieldtypeCascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
@@ -71,17 +70,6 @@ class SourceFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
-        /**
-         * Augment null when encountering a field of a disabled feature.
-         * This is necessary for fields like `seo_generate_social_images` that can be hidden (disabled)
-         * on a collection and site level. This ensures that no data is returned when this field is augmented
-         * on the frontend and when using GraphQL. It's like "soft" removing the field from the blueprint.
-         * We can't actually remove the field from the blueprint because that wouldn't work with GraphQL.
-         */
-        if ($this->isDisabledFeature()) {
-            return $this->sourceFieldtype()->augment(null);
-        }
-
         $data = $data ?? $this->field->defaultValue();
 
         if ($data === '@default') {
@@ -197,31 +185,5 @@ class SourceFieldtype extends Fieldtype
             ($parent instanceof Term) => $parent->taxonomy()->title(),
             default => null,
         };
-    }
-
-    /**
-     * TODO: Extract this to a Conditions class or action.
-     * Along with the evaluateFieldConditions method in the SeoVariables class.
-     */
-    protected function isDisabledFeature(): bool
-    {
-        $fieldConditions = collect($this->field->conditions())
-            ->flatten()
-            ->map(fn ($condition) => Str::remove('custom ', $condition))
-            ->flip();
-
-        $conditions = Conditions::all()->intersectByKeys($fieldConditions);
-
-        // The feature is enabled if there are no conditions.
-        if ($conditions->isEmpty()) {
-            return false;
-        }
-
-        $data = GetDefaultsData::handle($this->field->parent());
-
-        $evaluatedConditions = $conditions->map(fn ($condition) => app($condition)::handle($data));
-
-        // The feature is disabled if the conditions evaluate to false.
-        return $evaluatedConditions->filter()->isEmpty();
     }
 }
