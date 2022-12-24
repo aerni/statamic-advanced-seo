@@ -2,20 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Stache;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Collection;
-use Statamic\GraphQL\ResolvesValues;
-use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Localization;
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Fields\Blueprint;
+use Statamic\GraphQL\ResolvesValues;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoVariables implements Localization, Augmentable
