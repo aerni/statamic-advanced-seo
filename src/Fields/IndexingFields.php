@@ -64,7 +64,7 @@ class IndexingFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('section_sitemap.display'),
                     'instructions' => $this->trans('section_sitemap.instructions'),
-                    'feature' => Sitemap::class
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -77,7 +77,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
-                    'feature' => Sitemap::class
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -90,7 +90,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
-                    'feature' => Sitemap::class
+                    'feature' => Sitemap::class,
                 ],
             ],
         ];
