@@ -3,8 +3,9 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\Sitemap;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Statamic\Facades\Fieldset;
 
@@ -12,11 +13,14 @@ class OnPageSeoFields extends BaseFields
 {
     use HasAssetField;
 
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->titleAndDescription(),
-            $this->socialImages(),
+            $this->socialImagesGenerator(),
+            $this->socialImagesGeneratorFields(),
+            $this->openGraphImage(),
+            $this->twitterImage(),
             $this->canonicalUrl(),
             $this->indexing(),
             $this->sitemap(),
@@ -24,7 +28,7 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
-    public function titleAndDescription(): array
+    protected function titleAndDescription(): array
     {
         return [
             [
@@ -89,22 +93,8 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
-    public function socialImages(): array
+    protected function socialImagesGenerator(): array
     {
-        return collect([
-            $this->socialImagesGenerator(),
-            $this->socialImagesGeneratorFields(),
-            $this->openGraphImage(),
-            $this->twitterImage(),
-        ])->flatten(1)->toArray();
-    }
-
-    public function socialImagesGenerator(): array
-    {
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return [];
-        }
-
         $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',
@@ -113,6 +103,7 @@ class OnPageSeoFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.instructions'),
                     'listable' => 'hidden',
+                    'feature' => SocialImagesGenerator::class,
                 ],
             ],
             [
@@ -124,6 +115,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
+                    'feature' => SocialImagesGenerator::class,
                     'field' => [
                         'type' => 'toggle',
                     ],
@@ -131,6 +123,8 @@ class OnPageSeoFields extends BaseFields
             ],
         ]);
 
+        // TODO: We should probably not conditionally add it … like any other field.
+        // We could hide it with a feature field.
         // Make themes selectable if we've got more than one. If not, use a hidden field with the default theme instead.
         if (SocialImageTheme::all()->count() > 1) {
             $fields->push([
@@ -142,6 +136,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
+                    'feature' => SocialImagesGenerator::class,
                     'if' => [
                         'seo_generate_social_images.value' => 'true',
                     ],
@@ -164,6 +159,7 @@ class OnPageSeoFields extends BaseFields
                 'field' => [
                     'type' => 'hidden',
                     'default' => SocialImageTheme::fieldtypeDefault(),
+                    'feature' => SocialImagesGenerator::class,
                     'if' => [
                         'seo_generate_social_images.value' => 'true',
                     ],
@@ -181,6 +177,7 @@ class OnPageSeoFields extends BaseFields
                     'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
+                    'feature' => SocialImagesGenerator::class,
                     'if' => [
                         'seo_generate_social_images.value' => 'true',
                     ],
@@ -195,6 +192,7 @@ class OnPageSeoFields extends BaseFields
                     'read_only' => true,
                     'listable' => 'hidden',
                     'width' => 50,
+                    'feature' => SocialImagesGenerator::class,
                     'if' => [
                         'seo_generate_social_images.value' => 'true',
                     ],
@@ -205,12 +203,10 @@ class OnPageSeoFields extends BaseFields
         return $fields->toArray();
     }
 
-    public function socialImagesGeneratorFields(): array
+    // TODO: Should we remove this? Because the user can now customize their SEO fieldset how they want.
+    // We just need to make sure they can add a `feature` so the fields are hidden the rest of the social images generator fields are.
+    protected function socialImagesGeneratorFields(): array
     {
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return [];
-        }
-
         $fieldset = Fieldset::setDirectory(resource_path('fieldsets'))->find('social_images_generator');
 
         if (! $fieldset) {
@@ -226,11 +222,13 @@ class OnPageSeoFields extends BaseFields
                 'seo_generate_social_images.value' => 'true',
             ];
 
+            $field['field']['feature'] = SocialImagesGenerator::class;
+
             return $field;
         })->toArray();
     }
 
-    public function openGraphImage(): array
+    protected function openGraphImage(): array
     {
         $fields = [
             [
@@ -303,16 +301,17 @@ class OnPageSeoFields extends BaseFields
             ],
         ];
 
+        // TODO: Does this still work?
         // Make sure the `seo_og_image` field isn't hidden if the entry's collection
         // has been removed from the social images generator config in the site defaults.
-        if (isset($this->data) && ! ShowSocialImagesGeneratorFields::handle($this->data)) {
+        if (isset($this->data) && ! SocialImagesGenerator::enabled($this->data)) {
             unset($fields[1]['field']['if']);
         }
 
         return $fields;
     }
 
-    public function twitterImage(): array
+    protected function twitterImage(): array
     {
         $fields = [
             [
@@ -434,9 +433,10 @@ class OnPageSeoFields extends BaseFields
             ],
         ];
 
+        // TODO: Does this still work?
         // Make sure the `seo_twitter_summary_image` and `seo_twitter_summary_large_image` field isn't hidden if the entry's collection
         // has been removed from the social images generator config in the site defaults.
-        if (isset($this->data) && ! ShowSocialImagesGeneratorFields::handle($this->data)) {
+        if (isset($this->data) && ! SocialImagesGenerator::enabled($this->data)) {
             unset($fields[2]['field']['if']['seo_generate_social_images.value']);
             unset($fields[3]['field']['if']['seo_generate_social_images.value']);
         }
@@ -444,7 +444,7 @@ class OnPageSeoFields extends BaseFields
         return $fields;
     }
 
-    public function canonicalUrl(): array
+    protected function canonicalUrl(): array
     {
         return [
             [
@@ -521,7 +521,7 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
-    public function indexing(): array
+    protected function indexing(): array
     {
         return [
             [
@@ -565,7 +565,7 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
-    public function sitemap(): array
+    protected function sitemap(): array
     {
         return [
             [
@@ -574,11 +574,11 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.instructions'),
+                    'feature' => Sitemap::class,
                     'if' => [
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
-                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                 ],
             ],
             [
@@ -590,11 +590,11 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
+                    'feature' => Sitemap::class,
                     'if' => [
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
-                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                     'field' => [
                         'type' => 'toggle',
                     ],
@@ -610,12 +610,12 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
                     'width' => 50,
+                    'feature' => Sitemap::class,
                     'if' => [
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
                     ],
-                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                     'field' => [
                         'type' => 'select',
                         'options' => [
@@ -650,12 +650,12 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
                     'width' => 50,
+                    'feature' => Sitemap::class,
                     'if' => [
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
                     ],
-                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                     'field' => [
                         'type' => 'select',
                         'options' => [
@@ -679,7 +679,7 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
-    public function jsonLd(): array
+    protected function jsonLd(): array
     {
         return [
             [

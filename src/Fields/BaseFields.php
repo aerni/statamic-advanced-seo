@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Features\FeaturesManager;
 use Aerni\AdvancedSeo\Support\Helpers;
 
 abstract class BaseFields implements Fields
@@ -33,17 +32,6 @@ abstract class BaseFields implements Fields
         return collect($this->get())->mapWithKeys(function ($field) {
             return [$field['handle'] => $field['field']];
         })->toArray();
-    }
-
-    protected function isEnabledFeature(string $feature): ?bool
-    {
-        if (! isset($this->data)) {
-            return null;
-        }
-
-        $enabled = FeaturesManager::enabled($feature, $this->data);
-
-        return $enabled ?? null;
     }
 
     protected function trans(string $key, array $placeholders = []): ?string

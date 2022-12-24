@@ -1,13 +1,13 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Conditions;
+namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 
-class ShowSocialImagesGeneratorFields
+class SocialImagesGenerator
 {
-    public static function handle(DefaultsData $data): bool
+    public static function enabled(DefaultsData $data): bool
     {
         // Don't show the generator section if the generator is disabled.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {

@@ -4,12 +4,13 @@ namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
 class SocialMediaFields extends BaseFields
 {
     use HasAssetField;
 
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->socialImagesGenerator(),
@@ -20,10 +21,6 @@ class SocialMediaFields extends BaseFields
 
     protected function socialImagesGenerator(): array
     {
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'section_social_images_generator',
@@ -32,6 +29,7 @@ class SocialMediaFields extends BaseFields
                     'display' => $this->trans('section_social_images_generator.display'),
                     'instructions' => $this->trans('section_social_images_generator.instructions'),
                     'listable' => 'hidden',
+                    'feature' => SocialImagesGenerator::class,
                 ],
             ],
             [
@@ -43,6 +41,7 @@ class SocialMediaFields extends BaseFields
                     'icon' => 'collections',
                     'mode' => 'select',
                     'listable' => 'hidden',
+                    'feature' => SocialImagesGenerator::class,
                     // 'width' => 50,
                 ],
             ],

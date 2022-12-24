@@ -2,13 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Features\Favicons;
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 
 class FaviconsFields extends BaseFields
 {
     use HasAssetField;
 
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->favicons(),
@@ -16,12 +17,8 @@ class FaviconsFields extends BaseFields
         ];
     }
 
-    public function favicons(): array
+    protected function favicons(): array
     {
-        if (! config('advanced-seo.favicons.enabled', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'section_favicon',
@@ -30,6 +27,7 @@ class FaviconsFields extends BaseFields
                     'display' => $this->trans('section_favicon.display'),
                     'instructions' => $this->trans('section_favicon.instructions'),
                     'listable' => 'hidden',
+                    'feature' => Favicons::class,
                 ],
             ],
             [
@@ -40,6 +38,7 @@ class FaviconsFields extends BaseFields
                     'container' => config('advanced-seo.favicons.container', 'assets'),
                     'folder' => 'favicons',
                     'localizable' => false,
+                    'feature' => Favicons::class,
                     'validate' => [
                         'image',
                         'mimes:svg',
@@ -49,7 +48,7 @@ class FaviconsFields extends BaseFields
         ];
     }
 
-    public function faviconsGenerator(): array
+    protected function faviconsGenerator(): array
     {
         if (! config('advanced-seo.favicons.enabled', true) || ! config('advanced-seo.favicons.generator.enabled', false)) {
             return [];

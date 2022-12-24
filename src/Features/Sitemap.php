@@ -1,13 +1,13 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Conditions;
+namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 
-class ShowSitemapFields
+class Sitemap
 {
-    public static function handle(DefaultsData $data): bool
+    public static function enabled(DefaultsData $data): bool
     {
         if (! config('advanced-seo.sitemap.enabled', true)) {
             return false;

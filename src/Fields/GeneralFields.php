@@ -9,14 +9,14 @@ class GeneralFields extends BaseFields
 {
     use HasAssetField;
 
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->general(),
         ];
     }
 
-    public function general(): array
+    protected function general(): array
     {
         return [
             [

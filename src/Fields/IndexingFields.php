@@ -2,11 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Features\Sitemap;
+use Aerni\AdvancedSeo\Features\SiteVerification;
 use Aerni\AdvancedSeo\Models\Defaults;
 
 class IndexingFields extends BaseFields
 {
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->crawling(),
@@ -62,7 +64,7 @@ class IndexingFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('section_sitemap.display'),
                     'instructions' => $this->trans('section_sitemap.instructions'),
-                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
+                    'feature' => Sitemap::class
                 ],
             ],
             [
@@ -75,7 +77,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
-                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
+                    'feature' => Sitemap::class
                 ],
             ],
             [
@@ -88,7 +90,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
-                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
+                    'feature' => Sitemap::class
                 ],
             ],
         ];
@@ -96,10 +98,6 @@ class IndexingFields extends BaseFields
 
     protected function siteVerification(): array
     {
-        if (! config('advanced-seo.site_verification', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'section_verification',
@@ -107,6 +105,7 @@ class IndexingFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('section_verification.display'),
                     'instructions' => $this->trans('section_verification.instructions'),
+                    'feature' => SiteVerification::class,
                 ],
             ],
             [
@@ -118,6 +117,7 @@ class IndexingFields extends BaseFields
                     'input_type' => 'text',
                     'listable' => 'hidden',
                     'width' => 50,
+                    'feature' => SiteVerification::class,
                 ],
             ],
             [
@@ -129,6 +129,7 @@ class IndexingFields extends BaseFields
                     'input_type' => 'text',
                     'listable' => 'hidden',
                     'width' => 50,
+                    'feature' => SiteVerification::class,
                 ],
             ],
         ];

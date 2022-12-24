@@ -26,23 +26,25 @@ abstract class BaseBlueprint implements Contract
 
     public function get(): BlueprintFields
     {
-        return Blueprint::make()
+        $blueprint = Blueprint::make()
             ->setHandle($this->handle())
             ->setContents(['sections' => $this->processSections()]);
+
+        return $this->removeDisabledFeatureFields($blueprint);
     }
 
-    public function enabledFeatureFields(): array
+    protected function removeDisabledFeatureFields(BlueprintFields $blueprint): BlueprintFields
     {
-        return collect($this->items())->filter(function ($field) {
-            $enabledFeature = $field['enabled_feature'] ?? null;
+        if (! isset($this->data)) {
+            return $blueprint;
+        }
 
-            // Fields that are not linked to a feature should always be part of the blueprint
-            if (is_null($enabledFeature)) {
-                return true;
-            }
+        $blueprint->fields()->all()
+            ->filter(fn ($field) => $field->get('feature'))
+            ->filter(fn ($field) => ! resolve($field->get('feature'))::enabled($this->data))
+            ->each(fn ($field) => $blueprint->removeField($field->handle()));
 
-            return $enabledFeature;
-        })->toArray();
+        return $blueprint;
     }
 
     public function items(): array

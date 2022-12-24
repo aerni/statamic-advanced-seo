@@ -2,20 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Features\Sitemap;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
 class ContentDefaultsFields extends BaseFields
 {
     use HasAssetField;
 
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->titleAndDescription(),
-            $this->socialImages(),
+            $this->socialImagesGenerator(),
+            $this->openGraphImage(),
+            $this->twitterImage(),
             $this->canonicalUrl(),
             $this->indexing(),
             $this->sitemap(),
@@ -23,7 +27,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function titleAndDescription(): array
+    protected function titleAndDescription(): array
     {
         return [
             [
@@ -78,21 +82,8 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function socialImages(): array
+    protected function socialImagesGenerator(): array
     {
-        return collect([
-            $this->socialImagesGenerator(),
-            $this->openGraphImage(),
-            $this->twitterImage(),
-        ])->flatten(1)->toArray();
-    }
-
-    public function socialImagesGenerator(): array
-    {
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return [];
-        }
-
         $fields = collect([
             [
                 'handle' => 'seo_section_social_images_generator',
@@ -101,6 +92,7 @@ class ContentDefaultsFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.default_instructions'),
                     'listable' => 'hidden',
+                    'feature' => SocialImagesGenerator::class,
                 ],
             ],
             [
@@ -113,10 +105,13 @@ class ContentDefaultsFields extends BaseFields
                     'icon' => 'toggle',
                     'localizable' => true,
                     'listable' => 'hidden',
+                    'feature' => SocialImagesGenerator::class,
                 ],
             ],
         ]);
 
+        // TODO: We should probably not conditionally add it … like any other field.
+        // We could hide it with a feature field.
         if (SocialImageTheme::all()->count() > 1) {
             $fields->push([
                 'handle' => 'seo_social_images_theme',
@@ -134,6 +129,7 @@ class ContentDefaultsFields extends BaseFields
                     'cast_booleans' => false,
                     'localizable' => true,
                     'listable' => 'hidden',
+                    'feature' => SocialImagesGenerator::class,
                 ],
             ]);
         }
@@ -141,7 +137,7 @@ class ContentDefaultsFields extends BaseFields
         return $fields->toArray();
     }
 
-    public function openGraphImage(): array
+    protected function openGraphImage(): array
     {
         return [
             [
@@ -201,7 +197,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function twitterImage(): array
+    protected function twitterImage(): array
     {
         return [
             [
@@ -292,7 +288,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function canonicalUrl(): array
+    protected function canonicalUrl(): array
     {
         return [
             [
@@ -356,7 +352,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function indexing(): array
+    protected function indexing(): array
     {
         return [
             [
@@ -394,12 +390,8 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function sitemap(): array
+    protected function sitemap(): array
     {
-        if (! config('advanced-seo.sitemap.enabled', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'seo_section_sitemap',
@@ -407,6 +399,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.default_instructions'),
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -418,6 +411,7 @@ class ContentDefaultsFields extends BaseFields
                     'default' => Defaults::data('collections')->get('seo_sitemap_enabled'),
                     'listable' => 'hidden',
                     'localizable' => true,
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -449,6 +443,7 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -476,12 +471,13 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
+                    'feature' => Sitemap::class,
                 ],
             ],
         ];
     }
 
-    public function jsonLd(): array
+    protected function jsonLd(): array
     {
         return [
             [
