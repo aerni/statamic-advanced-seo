@@ -27,11 +27,6 @@ class ShowSitemapFields
             return true;
         }
 
-        // If we have a global noindex, the sitemap shouldn't be indexable.
-        if ($config->value('noindex')) {
-            return false;
-        }
-
         // Check if the collection/taxonomy is set to be excluded from the sitemap
         $excluded = $config->value("excluded_{$data->type}") ?? [];
 
