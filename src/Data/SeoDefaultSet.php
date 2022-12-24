@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
@@ -19,6 +20,7 @@ class SeoDefaultSet implements Contract
 {
     use ExistsAsFile;
     use FluentlyGetsAndSets;
+    use HasDefaultsData;
 
     protected string $handle;
     protected string $type;
@@ -201,9 +203,8 @@ class SeoDefaultSet implements Contract
     {
         $blueprint = Defaults::blueprint("{$this->type}::{$this->handle}");
 
-        return resolve($blueprint)
-            ->make()
-            ->data(new DefaultsData(type: $this->type, handle: $this->handle))
+        return resolve($blueprint)->make()
+            ->data($this->defaultsData())
             ->get();
     }
 

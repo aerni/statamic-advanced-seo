@@ -55,10 +55,6 @@ class IndexingFields extends BaseFields
 
     protected function sitemap(): array
     {
-        if (! config('advanced-seo.sitemap.enabled', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'section_sitemap',
@@ -66,6 +62,7 @@ class IndexingFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('section_sitemap.display'),
                     'instructions' => $this->trans('section_sitemap.instructions'),
+                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                 ],
             ],
             [
@@ -78,6 +75,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
+                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                 ],
             ],
             [
@@ -90,6 +88,7 @@ class IndexingFields extends BaseFields
                     'listable' => 'hidden',
                     'localizable' => true,
                     'width' => 50,
+                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                 ],
             ],
         ];

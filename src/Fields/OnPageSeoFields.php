@@ -574,10 +574,6 @@ class OnPageSeoFields extends BaseFields
 
     public function sitemap(): array
     {
-        if (! config('advanced-seo.sitemap.enabled', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'seo_section_sitemap',
@@ -590,6 +586,7 @@ class OnPageSeoFields extends BaseFields
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
+                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                 ],
             ],
             [
@@ -606,6 +603,7 @@ class OnPageSeoFields extends BaseFields
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
+                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                     'field' => [
                         'type' => 'toggle',
                     ],
@@ -627,6 +625,7 @@ class OnPageSeoFields extends BaseFields
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
                     ],
+                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                     'field' => [
                         'type' => 'select',
                         'options' => [
@@ -667,6 +666,7 @@ class OnPageSeoFields extends BaseFields
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
                     ],
+                    'enabled_feature' => $this->isEnabledFeature('sitemap'),
                     'field' => [
                         'type' => 'select',
                         'options' => [

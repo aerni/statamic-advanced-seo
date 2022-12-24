@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Models\Conditions;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -44,11 +43,10 @@ class OnPageSeoBlueprintSubscriber
 
         /**
          * These are the fields that we will end up adding to the blueprint.
-         * '$this->data' is used to remove fields under certain conditions. (STILL TRUE?)
+         * We are passing $this->data so we can evaluate some values depending on it.
+         * Though I don't think we actually need this anymore?
          */
-        $seoFields = OnPageSeoBlueprint::make()->data($this->data)
-            ->get()->fields()->all()
-            ->filter(fn ($field) => ! $this->isDisabledFeature($field)); // We don't want to add any fields of disabled features
+        $seoFields = OnPageSeoBlueprint::make()->data($this->data)->get()->fields()->all();
 
         // Get all the linked SEO fieldset fields that the user explicitly added to the blueprint.
         $linkedSeoFieldsetFields = $event->blueprint->fields()->all()
@@ -116,35 +114,6 @@ class OnPageSeoBlueprintSubscriber
             ->map(fn ($field) => $field->config()) // We need the config to ensure the field below.
             ->map(fn ($config) => array_merge($config, ['if' => 'hideMeAndDoNotSaveData'])) // Add condition to hide the field and save no data.
             ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
-    }
-
-    /**
-     * Evaluate if a field belongs to a disabled feature. If it does, we won't add it to the blueprint.
-     * This ensures that we can remove any disabled feature field when augmenting the page data in GetPageData.
-     * This is only necessary for GraphQL, as we can't remove e.g. social image generator fields on a per blueprint basis.
-     *
-     * TODO: Extract this to a Conditions class or action.
-     * Along with the evaluateFieldConditions method in the SeoVariables class.
-     * Or should we move this into the Blueprint class?
-     */
-    protected function isDisabledFeature(Field $field): bool
-    {
-        $fieldConditions = collect($field->conditions())
-            ->flatten()
-            ->map(fn ($condition) => Str::remove('custom ', $condition))
-            ->flip();
-
-        $conditions = Conditions::all()->intersectByKeys($fieldConditions);
-
-        // The feature is enabled if there are no conditions.
-        if ($conditions->isEmpty()) {
-            return false;
-        }
-
-        $evaluatedConditions = $conditions->map(fn ($condition) => app($condition)::handle($this->data));
-
-        // The feature is disabled if the conditions evaluate to false.
-        return $evaluatedConditions->filter()->isEmpty();
     }
 
     protected function shouldExtendBlueprint(Event $event): bool

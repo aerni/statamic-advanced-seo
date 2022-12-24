@@ -2,20 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Conditions\ShowSitemapFields;
-use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Data\Localization;
+use Statamic\Support\Arr;
+use Statamic\Facades\Site;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
+use Illuminate\Support\Collection;
 use Statamic\GraphQL\ResolvesValues;
-use Statamic\Support\Arr;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Statamic\Fields\Blueprint;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoVariables implements Localization, Augmentable
@@ -26,6 +26,7 @@ class SeoVariables implements Localization, Augmentable
     use HasAugmentedInstance;
     use HasOrigin;
     use ResolvesValues;
+    use HasDefaultsData;
 
     protected SeoDefaultSet $set;
     protected string $locale;
@@ -128,40 +129,11 @@ class SeoVariables implements Localization, Augmentable
         // Get the default value of each field from the blueprint.
         $defaultData = $this->blueprint()->fields()->all()->map->defaultValue();
 
-        // Remove any field whose custom condition evaluates to false.
-        $defaultData = $this->evaluateFieldConditions($defaultData);
+        // TODO: We used to evaluate the conditions so we don't save default values of disabled features to file.
+        // Should we really do this?
 
         // Only keep default fields with values that should be saved to file.
-        $defaultData = $defaultData->filter(fn ($value) => $value !== null && $value !== []);
-
-        return $defaultData;
-    }
-
-    /**
-     * TODO: Extract this to a Conditions class or action.
-     * Along with the isDisabledFeature method in the SourceFieldtype class.
-     */
-    protected function evaluateFieldConditions(Collection $values): Collection
-    {
-        $defaultsData = new DefaultsData(type: $this->type(), handle: $this->handle(), locale: $this->locale());
-
-        $evaluatedConditions = collect([
-            'showSocialImagesGeneratorFields' => ShowSocialImagesGeneratorFields::handle($defaultsData),
-            'showSitemapFields' => ShowSitemapFields::handle($defaultsData),
-        ]);
-
-        $fieldsToRemove = $this->blueprint()->fields()->all()
-            ->map(fn ($field) => array_flatten($field->conditions()))
-            ->filter()
-            ->filter(function ($conditions) use ($evaluatedConditions) {
-                // Only keep fields whose conditions evaluate to false.
-                return collect($conditions)
-                    ->map(fn ($condition) => $evaluatedConditions->get($condition))
-                    ->filter()
-                    ->isEmpty();
-            });
-
-        return $values->diffKeys($fieldsToRemove);
+        return $defaultData->filter(fn ($value) => $value !== null && $value !== []);
     }
 
     public function withDefaultData(): self
@@ -204,6 +176,11 @@ class SeoVariables implements Localization, Augmentable
         return false;
     }
 
+    public function sites(): Collection
+    {
+        return $this->seoSet()->sites();
+    }
+
     public function site()
     {
         return Site::get($this->locale());
@@ -214,9 +191,11 @@ class SeoVariables implements Localization, Augmentable
         return "seo::{$this->id()}";
     }
 
-    public function blueprint()
+    public function blueprint(): Blueprint
     {
-        return $this->seoSet()->blueprint();
+        return $this->seoSet()
+            ->defaultsData($this->defaultsData())
+            ->blueprint();
     }
 
     protected function getOriginByString($origin)

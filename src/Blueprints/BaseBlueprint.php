@@ -31,6 +31,20 @@ abstract class BaseBlueprint implements Contract
             ->setContents(['sections' => $this->processSections()]);
     }
 
+    public function enabledFeatureFields(): array
+    {
+        return collect($this->items())->filter(function ($field) {
+            $enabledFeature = $field['enabled_feature'] ?? null;
+
+            // Fields that are not linked to a feature should always be part of the blueprint
+            if (is_null($enabledFeature)) {
+                return true;
+            }
+
+            return $enabledFeature;
+        })->toArray();
+    }
+
     public function items(): array
     {
         return $this->get()->fields()->all()->mapWithKeys(function ($field, $handle) {
