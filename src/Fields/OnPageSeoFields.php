@@ -113,7 +113,6 @@ class OnPageSeoFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.instructions'),
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ],
             [
@@ -125,7 +124,6 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
-                    'if' => 'showSocialImagesGeneratorFields',
                     'field' => [
                         'type' => 'toggle',
                     ],
@@ -145,7 +143,6 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'select-fieldtype',
                     'if' => [
-                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                     'field' => [
@@ -168,7 +165,6 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'hidden',
                     'default' => SocialImageTheme::fieldtypeDefault(),
                     'if' => [
-                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                 ],
@@ -186,7 +182,6 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
-                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                 ],
@@ -201,7 +196,6 @@ class OnPageSeoFields extends BaseFields
                     'listable' => 'hidden',
                     'width' => 50,
                     'if' => [
-                        'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                         'seo_generate_social_images.value' => 'true',
                     ],
                 ],
@@ -229,7 +223,6 @@ class OnPageSeoFields extends BaseFields
 
             // Hide the fields if the toggle is off.
             $field['field']['if'] = [
-                'showSocialImagesGeneratorFields' => 'custom showSocialImagesGeneratorFields',
                 'seo_generate_social_images.value' => 'true',
             ];
 
@@ -582,7 +575,6 @@ class OnPageSeoFields extends BaseFields
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.instructions'),
                     'if' => [
-                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
@@ -599,7 +591,6 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'toggle-fieldtype',
                     'if' => [
-                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                     ],
@@ -620,7 +611,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'select-fieldtype',
                     'width' => 50,
                     'if' => [
-                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',
@@ -661,7 +651,6 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'select-fieldtype',
                     'width' => 50,
                     'if' => [
-                        'showSitemapFields' => 'custom showSitemapFields',
                         'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals current',
                         'seo_sitemap_enabled.value' => 'true',

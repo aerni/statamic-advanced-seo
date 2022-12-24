@@ -101,7 +101,6 @@ class ContentDefaultsFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.default_instructions'),
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ],
             [
@@ -114,7 +113,6 @@ class ContentDefaultsFields extends BaseFields
                     'icon' => 'toggle',
                     'localizable' => true,
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ],
         ]);
@@ -136,7 +134,6 @@ class ContentDefaultsFields extends BaseFields
                     'cast_booleans' => false,
                     'localizable' => true,
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGeneratorFields',
                 ],
             ]);
         }
@@ -410,7 +407,6 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.default_instructions'),
-                    'if' => 'showSitemapFields',
                 ],
             ],
             [
@@ -422,7 +418,6 @@ class ContentDefaultsFields extends BaseFields
                     'default' => Defaults::data('collections')->get('seo_sitemap_enabled'),
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'if' => 'showSitemapFields',
                 ],
             ],
             [
@@ -454,7 +449,6 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'if' => 'showSitemapFields',
                 ],
             ],
             [
@@ -482,7 +476,6 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'if' => 'showSitemapFields',
                 ],
             ],
         ];
