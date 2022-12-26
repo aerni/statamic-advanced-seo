@@ -129,9 +129,6 @@ class SeoVariables implements Localization, Augmentable
         // Get the default value of each field from the blueprint.
         $defaultData = $this->blueprint()->fields()->all()->map->defaultValue();
 
-        // TODO: We used to evaluate the conditions so we don't save default values of disabled features to file.
-        // Should we really do this?
-
         // Only keep default fields with values that should be saved to file.
         return $defaultData->filter(fn ($value) => $value !== null && $value !== []);
     }
@@ -163,10 +160,11 @@ class SeoVariables implements Localization, Augmentable
             $data = Arr::removeNullValues($data);
         }
 
-        /**
-         * TODO: Should we remove any values that don't have a field on the blueprint?
-         * This should also take the conditions into consideration. This ensures that fields of deactivated features will be removed.
-         */
+        // Get the keys of the blueprint fields that should be saved to file. This excludes any disabled feature fields.
+        $blueprintFields = $this->blueprint()->fields()->all()->keys()->flip()->all();
+
+        // We only want to keep values of fields that exist in the blueprint.
+        $data = array_intersect_key($data, $blueprintFields);
 
         return $data;
     }
