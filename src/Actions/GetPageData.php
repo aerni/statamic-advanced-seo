@@ -19,7 +19,7 @@ class GetPageData
          */
         $fields = OnPageSeoBlueprint::make()
             ->data(GetDefaultsData::handle($model))
-            ->enabledFeatureFields();
+            ->items();
 
         return match (true) {
             ($model instanceof Context) => $model->intersectByKeys($fields),
