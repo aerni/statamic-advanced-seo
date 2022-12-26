@@ -148,13 +148,16 @@ class SeoVariables implements Localization, Augmentable
         return $this;
     }
 
+    public function blueprintFields(): array
+    {
+        // Get the field keys of the processed blueprint. This excludes any fields of disabled features.
+        return $this->blueprint()->fields()->all()->keys()->all();
+    }
+
     public function fileData(): array
     {
-        // Get the keys of the blueprint fields that should be saved to file. This excludes any disabled feature fields.
-        $saveableFields = $this->blueprint()->fields()->all()->keys();
-
         // We only want to keep values of fields that exist in the blueprint.
-        $data = $this->data()->only($saveableFields)->all();
+        $data = $this->data()->only($this->blueprintFields())->all();
 
         if (Site::hasMultiple() && $this->hasOrigin()) {
             $data['origin'] = $this->origin()->locale();
