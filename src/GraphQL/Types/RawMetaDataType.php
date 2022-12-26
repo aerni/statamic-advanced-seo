@@ -32,7 +32,7 @@ class RawMetaDataType extends Type
     private function resolver(): callable
     {
         return function (Collection $values, $args, $context, ResolveInfo $info) {
-            return $values->get("seo_{$info->fieldName}");
+            return $values->get("seo_{$info->fieldName}")?->value();
         };
     }
 }
