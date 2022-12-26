@@ -115,15 +115,15 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $blueprint = $set->blueprint();
+        $localization = $set->in($site)->determineOrigin($content->sites());
+
+        $blueprint = $localization->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
         $fields->validate();
 
         $values = $fields->process()->values();
-
-        $localization = $set->in($site)->determineOrigin($content->sites());
 
         $localization->hasOrigin()
             ? $localization->data($values->only($request->input('_localized')))
