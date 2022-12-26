@@ -25,8 +25,11 @@ class SeoVariables implements Localization, Augmentable
     use FluentlyGetsAndSets;
     use HasAugmentedInstance;
     use HasOrigin;
-    use ResolvesValues;
     use HasDefaultsData;
+
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
 
     protected SeoDefaultSet $set;
     protected string $locale;
@@ -216,6 +219,15 @@ class SeoVariables implements Localization, Augmentable
             : $this->origin($origin);
 
         return $this;
+    }
+
+    public function resolveGqlValue(string $field)
+    {
+        if (! in_array($field, $this->blueprintFields())) {
+            return null;
+        }
+
+        return $this->traitResolveGqlValue($field);
     }
 
     public function newAugmentedInstance(): Augmented
