@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Facades\Blink;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Statamic\Facades\Blink;
 
 class EvaluateFeature
 {
