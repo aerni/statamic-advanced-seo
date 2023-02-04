@@ -7,7 +7,6 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
-use Statamic\Facades\Fieldset;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -18,7 +17,6 @@ class OnPageSeoFields extends BaseFields
         return [
             $this->titleAndDescription(),
             $this->socialImagesGenerator(),
-            $this->socialImagesGeneratorFields(),
             $this->openGraphImage(),
             $this->twitterImage(),
             $this->canonicalUrl(),
@@ -178,31 +176,6 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
-    }
-
-    // TODO: Should we remove this? Because the user can now customize their SEO fieldset how they want.
-    // We just need to make sure they can add a `feature` so the fields are hidden the rest of the social images generator fields are.
-    protected function socialImagesGeneratorFields(): array
-    {
-        $fieldset = Fieldset::setDirectory(resource_path('fieldsets'))->find('social_images_generator');
-
-        if (! $fieldset) {
-            return [];
-        }
-
-        return collect($fieldset->contents()['fields'])->map(function ($field) {
-            // Prefix the field handles to avoid naming conflicts.
-            $field['handle'] = "seo_social_images_{$field['handle']}";
-
-            // Hide the fields if the toggle is off.
-            $field['field']['if'] = [
-                'seo_generate_social_images.value' => 'true',
-            ];
-
-            $field['field']['feature'] = SocialImagesGenerator::class;
-
-            return $field;
-        })->toArray();
     }
 
     protected function openGraphImage(): array
