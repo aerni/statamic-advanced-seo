@@ -180,7 +180,7 @@ class OnPageSeoFields extends BaseFields
 
     protected function openGraphImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_og',
                 'field' => [
@@ -250,20 +250,11 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
-
-        // TODO: Does this still work?
-        // Make sure the `seo_og_image` field isn't hidden if the entry's collection
-        // has been removed from the social images generator config in the site defaults.
-        if (isset($this->data) && ! SocialImagesGenerator::enabled($this->data)) {
-            unset($fields[1]['field']['if']);
-        }
-
-        return $fields;
     }
 
     protected function twitterImage(): array
     {
-        $fields = [
+        return [
             [
                 'handle' => 'seo_section_twitter',
                 'field' => [
@@ -382,16 +373,6 @@ class OnPageSeoFields extends BaseFields
                 ],
             ],
         ];
-
-        // TODO: Does this still work?
-        // Make sure the `seo_twitter_summary_image` and `seo_twitter_summary_large_image` field isn't hidden if the entry's collection
-        // has been removed from the social images generator config in the site defaults.
-        if (isset($this->data) && ! SocialImagesGenerator::enabled($this->data)) {
-            unset($fields[2]['field']['if']['seo_generate_social_images.value']);
-            unset($fields[3]['field']['if']['seo_generate_social_images.value']);
-        }
-
-        return $fields;
     }
 
     protected function canonicalUrl(): array
