@@ -95,7 +95,7 @@ class OnPageSeoFields extends BaseFields
 
     protected function socialImagesGenerator(): array
     {
-        $fields = collect([
+        return [
             [
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
@@ -121,13 +121,7 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
-        ]);
-
-        // TODO: We should probably not conditionally add it … like any other field.
-        // We could hide it with a feature field.
-        // Make themes selectable if we've got more than one. If not, use a hidden field with the default theme instead.
-        if (SocialImageTheme::all()->count() > 1) {
-            $fields->push([
+            [
                 'handle' => 'seo_social_images_theme',
                 'field' => [
                     'type' => 'seo_source',
@@ -135,7 +129,7 @@ class OnPageSeoFields extends BaseFields
                     'instructions' => $this->trans('seo_social_images_theme.instructions'),
                     'default' => '@default',
                     'localizable' => true,
-                    'classes' => 'select-fieldtype',
+                    'classes' => SocialImageTheme::all()->count() == 1 ? 'hidden' : 'select-fieldtype', // Hide the field in the CP if there is only one theme,
                     'feature' => SocialImagesGenerator::class,
                     'if' => [
                         'seo_generate_social_images.value' => 'true',
@@ -152,22 +146,7 @@ class OnPageSeoFields extends BaseFields
                         'cast_booleans' => false,
                     ],
                 ],
-            ]);
-        } else {
-            $fields->push([
-                'handle' => 'seo_social_images_theme',
-                'field' => [
-                    'type' => 'hidden',
-                    'default' => SocialImageTheme::fieldtypeDefault(),
-                    'feature' => SocialImagesGenerator::class,
-                    'if' => [
-                        'seo_generate_social_images.value' => 'true',
-                    ],
-                ],
-            ]);
-        }
-
-        $fields->push(
+            ],
             [
                 'handle' => 'seo_generated_og_image',
                 'field' => [
@@ -198,9 +177,7 @@ class OnPageSeoFields extends BaseFields
                     ],
                 ],
             ],
-        );
-
-        return $fields->toArray();
+        ];
     }
 
     // TODO: Should we remove this? Because the user can now customize their SEO fieldset how they want.

@@ -84,7 +84,7 @@ class ContentDefaultsFields extends BaseFields
 
     protected function socialImagesGenerator(): array
     {
-        $fields = collect([
+        return [
             [
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
@@ -108,12 +108,7 @@ class ContentDefaultsFields extends BaseFields
                     'feature' => SocialImagesGenerator::class,
                 ],
             ],
-        ]);
-
-        // TODO: We should probably not conditionally add it … like any other field.
-        // We could hide it with a feature field.
-        if (SocialImageTheme::all()->count() > 1) {
-            $fields->push([
+            [
                 'handle' => 'seo_social_images_theme',
                 'field' => [
                     'type' => 'select',
@@ -129,12 +124,11 @@ class ContentDefaultsFields extends BaseFields
                     'cast_booleans' => false,
                     'localizable' => true,
                     'listable' => 'hidden',
+                    'classes' => SocialImageTheme::all()->count() == 1 ? 'hidden' : '', // Hide the field in the CP if there is only one theme
                     'feature' => SocialImagesGenerator::class,
                 ],
-            ]);
-        }
-
-        return $fields->toArray();
+            ],
+        ];
     }
 
     protected function openGraphImage(): array
