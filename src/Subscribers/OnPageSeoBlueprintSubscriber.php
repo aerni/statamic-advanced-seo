@@ -60,19 +60,29 @@ class OnPageSeoBlueprintSubscriber
          * Any SEO field, that doesn't exist in the fieldset will be added as a hidden field to ensure the addon's functionality.
          */
         if ($linkedSeoFieldsetFields->isEmpty()) {
-            // The fields I want to show by default.
+            // The fields that should be shown by default.
             $seoFieldsetFields = Fieldset::find('advanced-seo::main')->fields()->all();
 
-            // All non-SEO fields the user might have added to the fieldset.
-            $customUserFields = $seoFieldsetFields->filter(fn ($field) => $field->type() !== 'advanced_seo');
-
-            $visibleFields = $seoFieldsetFields
+            // Swap the fieldset fields with the actual field from the OnPageSeoBlueprint.
+            $seoFieldsWithConfig = $seoFieldsetFields
                 ->filter(fn ($field) => $field->type() === 'advanced_seo') // Remove any field that isn't of type `advanced_seo`
                 ->filter(fn ($field) => $seoFields->has($field->config()['field'])) // Remove any field that isn't an actual SEO field
                 ->map(fn ($field) => $seoFields->get($field->config()['field'])) // Get the field from the OnPageSeoBlueprint fields
                 ->mapWithKeys(fn ($field) => [$field->handle() => $field]) // Make sure to set the correct handle
-                ->merge($customUserFields) // Include custom user fields
                 ->map(fn ($field) => $field->config()); // We need the config to ensure the field below
+
+            // All non-SEO fields the user might have added to the fieldset.
+            $customUserFields = $seoFieldsetFields
+                ->filter(fn ($field) => $field->type() !== 'advanced_seo')
+                ->map(fn ($field) => $field->config());
+
+            // Merge the SEO fields with the user-defined fields.
+            $allFields = $seoFieldsWithConfig->merge($customUserFields);
+
+            // The fields that should be visible in the CP in the correct order.
+            $visibleFields = $seoFieldsetFields
+                ->intersectByKeys($allFields) // Respect each field's position from the fieldset.
+                ->merge($allFields); // Merge the preparated fields.
 
             // Add all visible fields to the blueprint.
             $event->blueprint->ensureFieldsInSection($visibleFields, 'SEO');
