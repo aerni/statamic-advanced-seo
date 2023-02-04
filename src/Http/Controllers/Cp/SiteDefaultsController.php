@@ -105,20 +105,21 @@ class SiteDefaultsController extends BaseDefaultsController
     {
         $this->authorize("edit seo {$handle} defaults");
 
+        $set = $this->set($handle);
+
         $site = $request->site ?? Site::selected()->handle();
 
-        $set = $this->set($handle);
         $sites = Site::all()->map->handle();
 
-        $blueprint = $set->blueprint();
+        $localization = $set->in($site)->determineOrigin($sites);
+
+        $blueprint = $localization->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
         $fields->validate();
 
         $values = $fields->process()->values();
-
-        $localization = $set->in($site)->determineOrigin($sites);
 
         $localization->hasOrigin()
             ? $localization->data($values->only($request->input('_localized')))

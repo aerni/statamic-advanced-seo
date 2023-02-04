@@ -4,8 +4,8 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Events\Dispatcher;
 use Statamic\Events;
@@ -44,7 +44,7 @@ class SocialImagesGeneratorSubscriber
     {
         $data = $this->getDataFromEvent($event);
 
-        if (! ShowSocialImagesGeneratorFields::handle($data)) {
+        if (! SocialImagesGenerator::enabled($data)) {
             return;
         }
 
