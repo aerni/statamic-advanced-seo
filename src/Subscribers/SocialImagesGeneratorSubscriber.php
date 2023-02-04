@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
+use Aerni\AdvancedSeo\Actions\DeleteSocialImages;
 use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
@@ -29,6 +30,13 @@ class SocialImagesGeneratorSubscriber
     public function generateSocialImages(Event $event): void
     {
         if (! ShouldGenerateSocialImages::handle($event->entry)) {
+            return;
+        }
+
+        // Delete the images so we can create a new one on the next request.
+        if (! config('advanced-seo.social_images.generator.generate_on_save', true)) {
+            DeleteSocialImages::handle($event->entry);
+
             return;
         }
 

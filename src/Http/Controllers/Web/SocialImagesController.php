@@ -33,10 +33,16 @@ class SocialImagesController extends Controller
             ?? $model['templates']->get('default') // If no theme is set, use the default theme.
             ?? $model['templates']->first(); // If the default doesn't exist either, fall back to the first theme.
 
+        $data = $data->merge($model)
+            ->toAugmentedCollection()
+            // We need to remove those fields to prevent an infinite loop when an image is generated in the augment method of the SocialImageFieldtype.
+            ->except('seo_generated_og_image', 'seo_generated_twitter_image')
+            ->toArray();
+
         $view = (new View)
             ->template($template)
             ->layout($model['layout'])
-            ->with($data->merge($model)->toAugmentedArray());
+            ->with($data);
 
         return response($view)->header('X-Robots-Tag', 'noindex, nofollow');
     }

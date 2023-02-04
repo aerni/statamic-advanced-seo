@@ -12,7 +12,6 @@ use Statamic\GraphQL\Types\AssetInterface;
 class SocialImageFieldtype extends Fieldtype
 {
     protected $selectable = false;
-    protected static $generating = false;
 
     public function preload(): ?array
     {
@@ -25,10 +24,16 @@ class SocialImageFieldtype extends Fieldtype
         $type = $this->config()['image_type'];
         $image = SocialImage::all($parent)->get($type);
 
+        $generateOnSaveMessage = config('queue.default') === 'sync'
+            ? trans('advanced-seo::messages.social_images_generator_save_sync')
+            : trans('advanced-seo::messages.social_images_generator_save_queue');
+
+        $message = config('advanced-seo.social_images.generator.generate_on_save', true)
+            ? $generateOnSaveMessage
+            : trans('advanced-seo::messages.social_images_generator_on_demand');
+
         return [
-            'message' => config('queue.default') === 'sync'
-                ? trans('advanced-seo::messages.social_images_generator_save_sync')
-                : trans('advanced-seo::messages.social_images_generator_save_queue'),
+            'message' => $message,
             'image' => $image->asset()?->absoluteUrl(),
         ];
     }
@@ -44,7 +49,7 @@ class SocialImageFieldtype extends Fieldtype
         $type = $this->config()['image_type'];
         $image = SocialImage::all($parent)->get($type);
 
-        return $image->asset();
+        return $image->asset() ?? $image->generate()->asset();
     }
 
     public function toGqlType()
