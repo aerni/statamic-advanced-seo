@@ -75,6 +75,7 @@ class MigrateSiteNamePosition extends UpdateScript
 
         // Set the site name position on terms.
         Term::all()
+            ->filter(fn ($term) => ! $term->hasOrigin()) // Only set on default site.
             ->filter(fn ($term) => $term->has('seo_title'))
             ->each(fn ($term) => $term->set('seo_site_name_position', '@default')->save());
 
