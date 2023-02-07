@@ -41,22 +41,23 @@ class SocialMediaFields extends BaseFields
                     'icon' => 'collections',
                     'mode' => 'select',
                     'listable' => 'hidden',
+                    'width' => 50,
                     'feature' => SocialImagesGenerator::class,
-                    // 'width' => 50,
                 ],
             ],
-            // [
-            //     'handle' => 'social_images_generator_taxonomies',
-            //     'field' => [
-            //         'type' => 'taxonomies',
-            //         'icon' => 'taxonomy',
-            //         'mode' => 'select',
-            //         'display' => 'Taxonomies',
-            //         'instructions' => 'Enable the generator for the selected taxonomies.',
-            //         'listable' => 'hidden',
-            //         'width' => 50,
-            //     ],
-            // ],
+            [
+                'handle' => 'social_images_generator_taxonomies',
+                'field' => [
+                    'type' => 'taxonomies',
+                    'display' => $this->trans('social_images_generator_taxonomies.display'),
+                    'instructions' => $this->trans('social_images_generator_taxonomies.instructions'),
+                    'icon' => 'taxonomy',
+                    'mode' => 'select',
+                    'listable' => 'hidden',
+                    'width' => 50,
+                    'feature' => SocialImagesGenerator::class,
+                ],
+            ],
         ];
     }
 

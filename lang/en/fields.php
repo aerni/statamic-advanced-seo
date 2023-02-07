@@ -384,6 +384,11 @@ return [
         'instructions' => 'Enable the generator for the selected collections.',
     ],
 
+    'social_images_generator_taxonomies' => [
+        'display' => 'Taxonomies',
+        'instructions' => 'Enable the generator for the selected taxonomies.',
+    ],
+
     'section_og' => [
         'display' => 'Open Graph',
         'instructions' => 'Configure the site-wide Open Graph settings.',
