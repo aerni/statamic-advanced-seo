@@ -14,24 +14,24 @@ class SocialImagesGenerator
             return false;
         }
 
+        // Always show the generator setting fields in the social media defaults.
+        if ($data->type === 'site' && $data->handle === 'social_media') {
+            return true;
+        }
+
         $disabled = config("advanced-seo.disabled.{$data->type}", []);
 
-        // Check if the collection/taxonomy is set to be disabled globally.
+        // Hide the generator if the collection/taxonomy is disabled in the config.
         if (in_array($data->handle, $disabled)) {
             return false;
         }
 
-        // Terms are not yet supported.
-        if ($data->type === 'taxonomies') {
-            return false;
-        }
-
-        $enabledCollections = Seo::find('site', 'social_media')
+        $enabled = Seo::find('site', 'social_media')
             ?->in($data->locale)
-            ?->value('social_images_generator_collections') ?? [];
+            ?->value("social_images_generator_{$data->type}") ?? [];
 
-        // Don't show the generator section if the collection is not configured.
-        if ($data->type === 'collections' && ! in_array($data->handle, $enabledCollections)) {
+        // Don't show the generator section if the collection/taxonomy is not configured.
+        if (! in_array($data->handle, $enabled)) {
             return false;
         }
 
