@@ -114,27 +114,29 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootAddonPermissions(): self
     {
-        Permission::group('advanced-seo', 'Advanced SEO', function () {
-            Defaults::enabled()->groupBy('type')->each(function ($items, $group) {
-                Permission::register("view seo {$group} defaults", function ($permission) use ($group, $items) {
-                    $permission
-                        ->label('View ' . ucfirst($group))
-                        ->children([
-                            Permission::make('view seo {group} defaults')
-                                ->label('View :group')
-                                ->replacements('group', function () use ($items) {
-                                    return $items->map(function ($item) {
-                                        return [
-                                            'value' => $item['handle'],
-                                            'label' => $item['title'],
-                                        ];
-                                    });
-                                })
-                                ->children([
-                                    Permission::make('edit seo {group} defaults')
-                                        ->label('Edit :group'),
-                                ]),
-                        ]);
+        Permission::extend(function () {
+            Permission::group('advanced-seo', 'Advanced SEO', function () {
+                Defaults::enabled()->groupBy('type')->each(function ($items, $group) {
+                    Permission::register("view seo {$group} defaults", function ($permission) use ($group, $items) {
+                        $permission
+                            ->label('View '.ucfirst($group))
+                            ->children([
+                                Permission::make('view seo {group} defaults')
+                                    ->label('View :group')
+                                    ->replacements('group', function () use ($items) {
+                                        return $items->map(function ($item) {
+                                            return [
+                                                'value' => $item['handle'],
+                                                'label' => $item['title'],
+                                            ];
+                                        });
+                                    })
+                                    ->children([
+                                        Permission::make('edit seo {group} defaults')
+                                            ->label('Edit :group'),
+                                    ]),
+                            ]);
+                    });
                 });
             });
         });
