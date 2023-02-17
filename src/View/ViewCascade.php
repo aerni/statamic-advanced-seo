@@ -81,7 +81,7 @@ class ViewCascade extends BaseCascade
     {
         $siteNamePosition = $this->get('site_name_position');
         $titleSeparator = $this->get('title_separator');
-        $siteName = $this->get('site_name') ?? config('app.name');
+        $siteName = $this->get('site_name') ?? Site::current()->name();
 
         return match (true) {
             ($siteNamePosition == 'end') => "{$this->pageTitle()} {$titleSeparator} {$siteName}",
