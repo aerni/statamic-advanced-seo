@@ -61,7 +61,7 @@ class ViewCascade extends BaseCascade
         ]);
     }
 
-    protected function pageTitle(): string
+    protected function pageTitle(): ?string
     {
         // Handle taxonomy page.
         if ($this->model->get('terms') instanceof TermQueryBuilder) {
@@ -77,23 +77,30 @@ class ViewCascade extends BaseCascade
         return $this->get('title') ?? $this->model->get('title');
     }
 
+    public function siteName(): string
+    {
+        return $this->get('site_name') ?? Site::current()->name();
+    }
+
     public function title(): string
     {
         $siteNamePosition = $this->get('site_name_position');
         $titleSeparator = $this->get('title_separator');
-        $siteName = $this->get('site_name') ?? Site::current()->name();
+        $siteName = $this->siteName();
+        $pageTitle = $this->pageTitle();
 
         return match (true) {
-            ($siteNamePosition == 'end') => "{$this->pageTitle()} {$titleSeparator} {$siteName}",
-            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->pageTitle()}",
-            ($siteNamePosition == 'disabled') => $this->pageTitle(),
-            default => "{$this->pageTitle()} {$titleSeparator} {$siteName}",
+            (! $pageTitle) => $siteName,
+            ($siteNamePosition == 'end') => "{$pageTitle} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$pageTitle}",
+            ($siteNamePosition == 'disabled') => $pageTitle,
+            default => "{$pageTitle} {$titleSeparator} {$siteName}",
         };
     }
 
-    public function ogTitle(): string
+    public function ogTitle(): ?string
     {
-        return $this->get('og_title') ?? $this->pageTitle();
+        return $this->get('og_title') ?? $this->pageTitle() ?? $this->siteName();
     }
 
     public function ogImage(): ?Asset
@@ -110,9 +117,9 @@ class ViewCascade extends BaseCascade
             ->all();
     }
 
-    public function twitterTitle(): string
+    public function twitterTitle(): ?string
     {
-        return $this->get('twitter_title') ?? $this->pageTitle();
+        return $this->get('twitter_title') ?? $this->pageTitle() ?? $this->siteName();
     }
 
     public function twitterCard(): string
