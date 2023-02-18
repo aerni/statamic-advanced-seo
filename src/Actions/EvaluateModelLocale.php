@@ -28,7 +28,7 @@ class EvaluateModelLocale
             ($model instanceof Taxonomy) => self::taxonomy(),
             ($model instanceof Term) => self::term($model),
             ($model instanceof TermBlueprintFound) => self::termBlueprintFound(),
-            ($model instanceof Context) => $model->get('site')->handle(),
+            ($model instanceof Context) => $model->get('site')?->handle(),
             ($model instanceof DefaultsData) => $model->locale,
             default => null
         };

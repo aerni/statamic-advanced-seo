@@ -248,7 +248,7 @@ class ViewCascade extends BaseCascade
         return $hreflang;
     }
 
-    public function canonical(): string
+    public function canonical(): ?string
     {
         $type = $this->get('canonical_type');
 
@@ -321,7 +321,7 @@ class ViewCascade extends BaseCascade
     {
         $type = $this->get('site_json_ld_type');
 
-        if ($type == 'none') {
+        if (! $type || $type == 'none') {
             return null;
         }
 
