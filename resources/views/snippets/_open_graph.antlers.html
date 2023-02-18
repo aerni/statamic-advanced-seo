@@ -1,8 +1,20 @@
-<meta property="og:site_name" content="{{ seo:site_name }}">
 <meta property="og:type" content="website">
-<meta property="og:locale" content="{{ seo:locale }}">
-<meta property="og:title" content="{{ seo:og_title }}">
-<meta property="og:url" content="{{ seo:canonical }}">
+
+{{ if seo:site_name }}
+    <meta property="og:site_name" content="{{ seo:site_name }}">
+{{ /if }}
+
+{{ if seo:locale }}
+    <meta property="og:locale" content="{{ seo:locale }}">
+{{ /if }}
+
+{{ if seo:og_title }}
+    <meta property="og:title" content="{{ seo:og_title }}">
+{{ /if }}
+
+{{ if seo:canonical }}
+    <meta property="og:url" content="{{ seo:canonical }}">
+{{ /if }}
 
 {{ if seo:hreflang }}
     {{ seo:hreflang }}

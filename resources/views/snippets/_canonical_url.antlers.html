@@ -1,4 +1,6 @@
-<link rel="canonical" href="{{ seo:canonical }}">
+{{ if seo:canonical }}
+    <link rel="canonical" href="{{ seo:canonical }}">
+{{ /if }}
 
 {{ if seo:prev_url }}
     <link href="{{ seo:prev_url }}" rel="prev" />

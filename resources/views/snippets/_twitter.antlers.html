@@ -1,5 +1,10 @@
-<meta name="twitter:card" content="{{ seo:twitter_card }}">
-<meta name="twitter:title" content="{{ seo:twitter_title }}">
+{{ if seo:twitter_card }}
+    <meta name="twitter:card" content="{{ seo:twitter_card }}">
+{{ /if }}
+
+{{ if seo:twitter_title }}
+    <meta name="twitter:title" content="{{ seo:twitter_title }}">
+{{ /if }}
 
 {{ if seo:twitter_description }}
     <meta name="twitter:description" content="{{ seo:twitter_description }}">
