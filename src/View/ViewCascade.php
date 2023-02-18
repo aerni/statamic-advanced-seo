@@ -41,6 +41,7 @@ class ViewCascade extends BaseCascade
     public function computedKeys(): Collection
     {
         return collect([
+            'site_name',
             'title',
             'og_image',
             'og_image_preset',
