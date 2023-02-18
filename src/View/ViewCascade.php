@@ -99,7 +99,7 @@ class ViewCascade extends BaseCascade
         };
     }
 
-    public function ogTitle(): ?string
+    public function ogTitle(): string
     {
         return $this->get('og_title') ?? $this->pageTitle() ?? $this->siteName();
     }
@@ -118,7 +118,7 @@ class ViewCascade extends BaseCascade
             ->all();
     }
 
-    public function twitterTitle(): ?string
+    public function twitterTitle(): string
     {
         return $this->get('twitter_title') ?? $this->pageTitle() ?? $this->siteName();
     }
