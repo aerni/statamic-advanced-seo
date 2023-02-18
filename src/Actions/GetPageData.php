@@ -30,7 +30,8 @@ class GetPageData
         }
 
         return $model->intersectByKeys($fields)
-            ->map(fn ($value, $field) => $value instanceof Value
+            ->map(
+                fn ($value, $field) => $value instanceof Value
                 ? $value
                 : $fields->get($field)->setValue($value)->augment()->value()
             );
