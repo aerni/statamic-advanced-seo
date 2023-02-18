@@ -24,8 +24,8 @@ class ShouldProcessViewCascade
             return false;
         }
 
-        // Don't process the cascade for custom routes, as they don't have the necessary data to compose the SEO cascade.
-        if (Helpers::isCustomRoute()) {
+        // Don't process the cascade for any custom route that doesn't explicitly want to use Advanced SEO.
+        if (Helpers::isCustomRoute() && ! $context->bool('seo_enabled')) {
             return false;
         }
 

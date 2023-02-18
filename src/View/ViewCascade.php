@@ -334,10 +334,12 @@ class ViewCascade extends BaseCascade
                 : null;
         }
 
+        $siteUrl = $this->model->get('site')?->absoluteUrl() ?? Site::current()->absoluteUrl();
+
         if ($type == 'organization') {
             $schema = Schema::organization()
                 ->name($this->get('organization_name'))
-                ->url($this->model->get('site')->absoluteUrl());
+                ->url($siteUrl);
 
             if ($logo = $this->get('organization_logo')) {
                 $logo = Schema::imageObject()
@@ -352,7 +354,7 @@ class ViewCascade extends BaseCascade
         if ($type == 'person') {
             $schema = Schema::person()
                 ->name($this->get('person_name'))
-                ->url($this->model->get('site')->absoluteUrl());
+                ->url($siteUrl);
         }
 
         return $schema->toScript();
