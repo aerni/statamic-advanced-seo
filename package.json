@@ -9,7 +9,8 @@
     },
     "dependencies": {
         "vue": "^2.6.14",
-        "marked": "^4.0.10"
+        "marked": "^4.0.10",
+        "underscore": "~1.13.2"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.5",
