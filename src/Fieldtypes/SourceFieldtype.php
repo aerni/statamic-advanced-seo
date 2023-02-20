@@ -25,7 +25,7 @@ class SourceFieldtype extends Fieldtype
     {
         return match ($data) {
             '@default' => ['source' => 'default', 'value' => $this->sourceFieldDefaultValue()],
-            '@auto' => ['source' => 'auto', 'value' => $this->sourceFieldtype()->preProcess(null)],
+            '@auto' => ['source' => 'auto', 'value' => $this->autoValue()],
             '@null' => ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess(null)],
             default => ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess($data)],
         };
@@ -77,10 +77,7 @@ class SourceFieldtype extends Fieldtype
         }
 
         if ($data === '@auto') {
-            $field = $this->field->config()['auto'];
-            $parent = $this->field->parent();
-
-            return $parent->$field;
+            return $this->autoValue();
         }
 
         if ($data === '@null') {
@@ -137,6 +134,11 @@ class SourceFieldtype extends Fieldtype
     protected function sourceFieldDefaultMeta(): mixed
     {
         return $this->sourceField()->setValue($this->defaultValueFromCascade())->preProcess()->meta();
+    }
+
+    protected function autoValue(): mixed
+    {
+        return $this->field->parent()->{$this->config('auto')};
     }
 
     protected function sourceFieldMeta(): mixed
