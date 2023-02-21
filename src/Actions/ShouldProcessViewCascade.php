@@ -9,6 +9,11 @@ class ShouldProcessViewCascade
 {
     public static function handle(Context $context): bool
     {
+        // Don't process the cascade if it has been processed before.
+        if ($context->has('seo')) {
+            return false;
+        }
+
         // Don't process the cascade for collections that are excluded in the config.
         if ($context->has('is_entry') && in_array($context->get('collection')->raw()->handle(), config('advanced-seo.disabled.collections', []))) {
             return false;

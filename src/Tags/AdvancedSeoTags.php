@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Tags;
 
-use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
 use Illuminate\View\View;
 use Statamic\Tags\Tags;
 
@@ -26,7 +25,7 @@ class AdvancedSeoTags extends Tags
      */
     public function head(): ?View
     {
-        if (! $this->shouldRenderView()) {
+        if (! $this->context->has('seo')) {
             return null;
         }
 
@@ -38,7 +37,7 @@ class AdvancedSeoTags extends Tags
      */
     public function body(): ?View
     {
-        if (! $this->shouldRenderView()) {
+        if (! $this->context->has('seo')) {
             return null;
         }
 
@@ -51,14 +50,6 @@ class AdvancedSeoTags extends Tags
     public function dump(): void
     {
         dd($this->context->get('seo'));
-    }
-
-    /**
-     * Determines if we should render the Advanced SEO views.
-     */
-    protected function shouldRenderView(): bool
-    {
-        return ShouldProcessViewCascade::handle($this->context);
     }
 
     /**

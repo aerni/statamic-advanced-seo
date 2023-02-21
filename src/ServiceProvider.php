@@ -185,12 +185,6 @@ class ServiceProvider extends AddonServiceProvider
         View::composer('*', function ($view) {
             $data = new Context($view->getData());
 
-            // Don't process the cascade if it has been added before.
-            if ($data->has('seo')) {
-                return;
-            }
-
-            // Check if we should process the cascade.
             if (! ShouldProcessViewCascade::handle($data)) {
                 return;
             }
