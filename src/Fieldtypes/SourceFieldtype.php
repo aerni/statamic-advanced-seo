@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\View\SourceFieldtypeCascade;
 use Illuminate\Contracts\Support\Arrayable;
@@ -138,7 +139,14 @@ class SourceFieldtype extends Fieldtype
 
     protected function autoValue(): mixed
     {
-        return $this->field->parent()->{$this->config('auto')};
+        $parent = $this->field->parent();
+        $field = $this->config('auto');
+
+        return match (true) {
+            ($parent instanceof Entry) => $parent->$field,
+            ($parent instanceof Term) => $parent->in(EvaluateModelLocale::handle($parent))->$field,
+            default => null
+        };
     }
 
     protected function sourceFieldMeta(): mixed
