@@ -2,7 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
+use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
@@ -17,24 +18,24 @@ class GenerateSocialImages extends Command
 
     public function handle(): void
     {
-        $entries = Entry::all()->filter(fn ($entry) => ShouldGenerateSocialImages::handle($entry));
+        $entries = Entry::all()->filter(fn ($entry) => SocialImagesGenerator::enabled(GetDefaultsData::handle($entry)));
 
         if ($entries->isEmpty()) {
-            $this->info("There are no images to generate");
+            $this->info('There are no images to generate');
 
             return;
         }
 
         if (config('queue.default') === 'sync') {
-            $this->info("Generating social images ...");
+            $this->info('Generating social images ...');
             $this->withProgressBar($entries, fn ($entry) => GenerateSocialImagesJob::dispatch($entry));
             $this->newLine();
-            $this->info("<info>[✓]</info> The social images have been succesfully generated");
+            $this->info('<info>[✓]</info> The social images have been succesfully generated');
 
             return;
         }
 
         $entries->each(fn ($entry) => GenerateSocialImagesJob::dispatch($entry));
-        $this->info("The social images are being generated in the background");
+        $this->info('The social images are being generated in the background');
     }
 }
