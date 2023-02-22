@@ -38,6 +38,10 @@ use Statamic\Tags\Context;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    protected $actions = [
+        Actions\Statamic\GenerateSocialImages::class,
+    ];
+
     protected $commands = [
         Commands\GenerateSocialImages::class,
         Commands\MakeTheme::class,
