@@ -43,10 +43,12 @@ class OnPageSeoBlueprintSubscriber
 
         /**
          * These are the fields that we will end up adding to the blueprint.
-         * We are passing $this->data so we can evaluate some values depending on it.
-         * Though I don't think we actually need this anymore?
+         * We are passing $this->data to evaluate the feature of each field to determine if a field should be in the blueprint or not.
+         * We also filter out any field that already exists in the blueprint.
+         * This ensures that we don't merge the SEO field configs with fields the user might have added manually, e.g. when using a computed field.
          */
-        $seoFields = OnPageSeoBlueprint::make()->data($this->data)->get()->fields()->all();
+        $seoFields = OnPageSeoBlueprint::make()->data($this->data)->get()->fields()->all()
+            ->filter(fn ($field, $handle) => ! $event->blueprint->hasField($handle));
 
         // Get all the linked SEO fieldset fields that the user explicitly added to the blueprint.
         $linkedSeoFieldsetFields = $event->blueprint->fields()->all()
