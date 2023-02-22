@@ -143,8 +143,8 @@ class OnPageSeoBlueprintSubscriber
             return false;
         }
 
-        // Don't add fields for any requests other than the one of the current entry/term.
-        if (Statamic::isCpRoute() && ! $this->isCurrentCpRoute($event)) {
+        // Don't add fields to any other CP route other than the entry/term view and when performing an action on the listing view (necesarry for the social images generator action to work).
+        if (Statamic::isCpRoute() && ! $this->isModelCpRoute($event) && ! $this->isActionCpRoute()) {
             return false;
         }
 
@@ -156,7 +156,7 @@ class OnPageSeoBlueprintSubscriber
         return in_array($this->data->handle, config("advanced-seo.disabled.{$this->data->type}", []));
     }
 
-    protected function isCurrentCpRoute(Event $event): bool
+    protected function isModelCpRoute(Event $event): bool
     {
         // Has a value if editing or localizing an existing entry/term.
         $id = $this->data->type === 'collections' ? $event->entry?->id() : $event->term?->slug();
@@ -169,6 +169,11 @@ class OnPageSeoBlueprintSubscriber
          * But we only want to extend the blueprint for the current localization.
          * Otherwise we will have issue evaluating conditional fields, e.g. the sitemap fields.
          */
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), $this->data->type, $id ?? $createLocale]);
+        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->data->type, $id ?? $createLocale]);
+    }
+
+    protected function isActionCpRoute(): bool
+    {
+        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->data->type, $this->data->handle, 'actions']);
     }
 }
