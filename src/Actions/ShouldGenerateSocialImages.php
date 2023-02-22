@@ -3,14 +3,21 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Statamic;
 
 class ShouldGenerateSocialImages
 {
     public static function handle(Entry $entry): bool
     {
         // Don't generate if we're first localiting an entry.
-        if (str_contains(request()->path(), 'localize')) {
+        if (Statamic::isCpRoute() && Str::contains(request()->path(), 'localize')) {
+            return false;
+        }
+
+        // Don't generate if the user is performing an action on the listing view.
+        if (Statamic::isCpRoute() && Str::contains(request()->path(), 'actions')) {
             return false;
         }
 
