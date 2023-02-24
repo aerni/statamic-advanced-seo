@@ -47,10 +47,10 @@ class OnPageSeoFields extends BaseFields
                     'auto' => 'title',
                     'localizable' => true,
                     'classes' => 'text-fieldtype',
+                    'antlers' => true,
                     'field' => [
                         'type' => 'text',
                         'character_limit' => 60,
-                        'antlers' => false,
                     ],
                 ],
             ],
@@ -63,6 +63,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'textarea-fieldtype',
+                    'antlers' => true,
                     'field' => [
                         'type' => 'textarea',
                         'character_limit' => 160,
@@ -226,10 +227,10 @@ class OnPageSeoFields extends BaseFields
                     'auto' => 'seo_title',
                     'localizable' => true,
                     'classes' => 'text-fieldtype',
+                    'antlers' => true,
                     'field' => [
                         'type' => 'text',
                         'character_limit' => 70,
-                        'antlers' => false,
                     ],
                 ],
             ],
@@ -243,6 +244,7 @@ class OnPageSeoFields extends BaseFields
                     'auto' => 'seo_description',
                     'localizable' => true,
                     'classes' => 'textarea-fieldtype',
+                    'antlers' => true,
                     'field' => [
                         'type' => 'textarea',
                         'character_limit' => 200,
@@ -349,10 +351,10 @@ class OnPageSeoFields extends BaseFields
                     'auto' => 'seo_title',
                     'localizable' => true,
                     'classes' => 'text-fieldtype',
+                    'antlers' => true,
                     'field' => [
                         'type' => 'text',
                         'character_limit' => 70,
-                        'antlers' => false,
                     ],
                 ],
             ],
@@ -366,6 +368,7 @@ class OnPageSeoFields extends BaseFields
                     'auto' => 'seo_description',
                     'localizable' => true,
                     'classes' => 'textarea-fieldtype',
+                    'antlers' => true,
                     'field' => [
                         'type' => 'textarea',
                         'character_limit' => 200,
@@ -437,6 +440,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'text-fieldtype',
+                    'antlers' => true,
                     'if' => [
                         'seo_canonical_type.value' => 'equals custom',
                     ],
@@ -630,6 +634,7 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'code-fieldtype',
+                    'antlers' => true,
                     'field' => [
                         'type' => 'code',
                         'theme' => 'material',
