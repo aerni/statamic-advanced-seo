@@ -168,6 +168,9 @@ class SourceFieldtype extends Fieldtype
 
         $parent = $parent->toAugmentedArray();
 
+        // Prevent infinite loop by removing the field if it's part of the data.
+        $data = Str::of($data)->remove("@field:{$this->field->handle()}")->trim();
+
         preg_match_all('/@field:([A-z\d+-_]+)/', $data, $matches);
 
         $fieldValues = [];
