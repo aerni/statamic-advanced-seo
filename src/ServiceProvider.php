@@ -49,9 +49,10 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $fieldtypes = [
+        Fieldtypes\AdvancedSeoFieldtype::class,
+        Fieldtypes\ComputedValueFieldtype::class,
         Fieldtypes\SocialImageFieldtype::class,
         Fieldtypes\SourceFieldtype::class,
-        Fieldtypes\AdvancedSeoFieldtype::class,
     ];
 
     // protected $listen = [

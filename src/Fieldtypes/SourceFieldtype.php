@@ -12,6 +12,7 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -74,11 +75,19 @@ class SourceFieldtype extends Fieldtype
         $data = $data ?? $this->field->defaultValue();
 
         if ($data === '@default') {
-            return $this->sourceFieldtype()->augment($this->defaultValueFromCascade());
+            $value = $this->sourceFieldtype()->augment($this->defaultValueFromCascade());
+
+            return is_string($data) && Str::contains($value, '@field')
+                ? $this->sourceFieldtype()->augment($this->parseFieldValues($value))
+                : $value;
         }
 
         if ($data === '@auto') {
             return $this->autoValue();
+        }
+
+        if (is_string($data) && Str::contains($data, '@field')) {
+            return $this->sourceFieldtype()->augment($this->parseFieldValues($data));
         }
 
         if ($data === '@null') {
@@ -147,6 +156,30 @@ class SourceFieldtype extends Fieldtype
             ($parent instanceof Term) => $parent->in(EvaluateModelLocale::handle($parent))->$field,
             default => null
         };
+    }
+
+    protected function parseFieldValues($data): mixed
+    {
+        $parent = $this->field->parent();
+
+        if ($parent instanceof Term) {
+            $parent = $parent->in(EvaluateModelLocale::handle($parent));
+        }
+
+        $parent = $parent->toAugmentedArray();
+
+        // Prevent infinite loop by removing the field if it's part of the data.
+        $data = Str::of($data)->remove("@field:{$this->field->handle()}")->trim();
+
+        preg_match_all('/@field:([A-z\d+-_]+)/', $data, $matches);
+
+        $fieldValues = [];
+
+        foreach ($matches[1] as $field) {
+            $fieldValues["@field:{$field}"] = Antlers::parser()->getVariable($field, $parent);
+        }
+
+        return strtr($data, $fieldValues);
     }
 
     protected function sourceFieldMeta(): mixed
