@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Fieldtypes\ComputedValueFieldtype;
+use Aerni\AdvancedSeo\Fieldtypes\CascadeFieldtype;
 use Statamic\Data\AbstractAugmented;
 use Statamic\Fields\Value;
 
@@ -25,7 +25,7 @@ class AugmentedCascade extends AbstractAugmented
         return new Value(
             $value,
             $handle,
-            app(ComputedValueFieldtype::class), // Add a dummy fieldtype to enable Value objects to parse Antlers.
+            app(CascadeFieldtype::class), // Add a dummy fieldtype to enable Value objects to parse Antlers.
             $this->data
         );
     }

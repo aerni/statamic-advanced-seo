@@ -50,7 +50,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $fieldtypes = [
         Fieldtypes\AdvancedSeoFieldtype::class,
-        Fieldtypes\ComputedValueFieldtype::class,
+        Fieldtypes\CascadeFieldtype::class,
         Fieldtypes\SocialImageFieldtype::class,
         Fieldtypes\SourceFieldtype::class,
     ];

@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class ComputedValueFieldtype extends Fieldtype
+class CascadeFieldtype extends Fieldtype
 {
     protected $selectable = false;
 
