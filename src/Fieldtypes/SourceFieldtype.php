@@ -39,6 +39,11 @@ class SourceFieldtype extends Fieldtype
             return $data;
         }
 
+        // Dont't save the value if it's the same as the field's default. We don't want to unnecessarily spam the entry data.
+        if (Str::contains($this->config('default'), $data['source'])) {
+            return null;
+        }
+
         if ($data['source'] === 'default') {
             return '@default';
         }
