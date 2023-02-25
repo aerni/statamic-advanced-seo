@@ -22,16 +22,11 @@ class AugmentedCascade extends AbstractAugmented
 
     protected function wrapValue($value, $handle)
     {
-        $fields = $this->blueprintFields();
-
-        /**
-         * Add a dummy fieldtype for any field that doesn't have a fieldtype.
-         * This is needed so that we can parse Antlers in the view.
-         * Antlers can only be parsed if the Value object has a fieldtype.
-         */
-        $fieldtype = $fields->get($handle)?->fieldtype()
-            ?? new ComputedValueFieldtype();
-
-        return new Value($value, $handle, $fieldtype, $this->data);
+        return new Value(
+            $value,
+            $handle,
+            app(ComputedValueFieldtype::class), // Add a dummy fieldtype to enable Value objects to parse Antlers.
+            $this->data
+        );
     }
 }
