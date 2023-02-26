@@ -9,11 +9,11 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.0]
-        laravel: [8.*]
+        laravel: [9.*]
         stability: [prefer-lowest, prefer-stable]
         include:
-          - laravel: 8.*
-            testbench: ^6.24
+          - laravel: 9.*
+            testbench: ^7.1
 
     name: PHP ${{ matrix.php }} – Laravel ${{ matrix.laravel }} - ${{ matrix.stability }}
 
