@@ -40,8 +40,7 @@ class SeoProMigrator extends BaseMigrator
 
         return $nonSeoFields
             ->merge($migratedSeoFields)
-            ->pipe(fn ($data) => $this->transform($data, $oldData))
-            ->pipe(fn ($data) => $this->parse($data));
+            ->pipe(fn ($data) => $this->transform($data, $oldData));
     }
 
     protected function transform(Collection $data, ?Collection $oldData = null): Collection
@@ -58,15 +57,11 @@ class SeoProMigrator extends BaseMigrator
             'seo_twitter_summary_large_image' => $image ?? null,
         ])->filter();
 
-        return $data->merge($transformed);
-    }
-
-    protected function parse(Collection $data): Collection
-    {
-        $parsed = $data
-            ->filter(fn ($value) => Str::contains($value, '@seo:'))
-            ->map(fn ($value) => $data->get(Str::remove('@seo:', $value)));
-
-        return $data->merge($parsed)->filter();
+        return $data
+            ->merge($transformed)
+            ->map(fn ($value) => Str::contains($value, '@seo:')
+                ? Str::replace('@seo:', '@field:', $value)
+                : $value
+            );
     }
 }
