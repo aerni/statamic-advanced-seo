@@ -39,6 +39,7 @@ class GraphQlCascade extends BaseCascade
     public function computedKeys(): Collection
     {
         return collect([
+            'site_name',
             'title',
             'og_image',
             'og_image_preset',
@@ -61,23 +62,30 @@ class GraphQlCascade extends BaseCascade
         return $this->get('title') ?? $this->model->get('title');
     }
 
+    public function siteName(): string
+    {
+        return $this->get('site_name') ?? $this->model->site()->name();
+    }
+
     public function title(): string
     {
         $siteNamePosition = $this->get('site_name_position');
         $titleSeparator = $this->get('title_separator');
-        $siteName = $this->get('site_name') ?? config('app.name');
+        $siteName = $this->siteName();
+        $pageTitle = $this->pageTitle();
 
         return match (true) {
-            ($siteNamePosition == 'end') => "{$this->pageTitle()} {$titleSeparator} {$siteName}",
-            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$this->pageTitle()}",
-            ($siteNamePosition == 'disabled') => $this->pageTitle(),
-            default => "{$this->pageTitle()} {$titleSeparator} {$siteName}",
+            (! $pageTitle) => $siteName,
+            ($siteNamePosition == 'end') => "{$pageTitle} {$titleSeparator} {$siteName}",
+            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$pageTitle}",
+            ($siteNamePosition == 'disabled') => $pageTitle,
+            default => "{$pageTitle} {$titleSeparator} {$siteName}",
         };
     }
 
     public function ogTitle(): string
     {
-        return $this->get('og_title') ?? $this->pageTitle();
+        return $this->get('og_title') ?? $this->pageTitle() ?? $this->siteName();
     }
 
     public function ogImage(): ?Asset
@@ -96,7 +104,7 @@ class GraphQlCascade extends BaseCascade
 
     public function twitterTitle(): string
     {
-        return $this->get('twitter_title') ?? $this->pageTitle();
+        return $this->get('twitter_title') ?? $this->pageTitle() ?? $this->siteName();
     }
 
     public function twitterImage(): ?Asset

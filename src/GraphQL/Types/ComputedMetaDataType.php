@@ -20,6 +20,10 @@ class ComputedMetaDataType extends Type
     public function fields(): array
     {
         return [
+            'site_name' => [
+                'type' => GraphQl::string(),
+                'resolve' => $this->resolver(),
+            ],
             'title' => [
                 'type' => GraphQl::string(),
                 'resolve' => $this->resolver(),
