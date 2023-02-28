@@ -6,7 +6,7 @@ return [
         'config' => [
             'field' => [
                 'display' => 'Field',
-                'instructions' => 'Choose the Advanced SEO field this field should represent',
+                'instructions' => 'The Advanced SEO field you want to use.',
             ],
         ]
     ],
