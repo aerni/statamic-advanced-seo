@@ -28,8 +28,8 @@ class SeoDefaultsType extends Type
                 ],
                 'resolve' => fn ($root, $args) => $args,
             ],
-            'collections' => new ContentDefaultsField,
-            'taxonomies' => new ContentDefaultsField,
+            'collection' => new ContentDefaultsField,
+            'taxonomy' => new ContentDefaultsField,
         ];
     }
 }
