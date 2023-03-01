@@ -34,7 +34,7 @@ class Helpers
             'Statamic\Http\Controllers\FrontendController@index',
         ]);
 
-        $controllerAction = request()->route()->getAction('controller');
+        $controllerAction = request()->route()?->getAction('controller');
 
         return $allowedControllerActions->doesntContain($controllerAction);
     }
