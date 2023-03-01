@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^8.0",
-        "laravel/framework": "^8.77 || ^9.0",
+        "laravel/framework": "^9.0",
         "spatie/browsershot": "^3.52",
         "spatie/laravel-ray": "^1.26",
         "spatie/schema-org": "^3.8",
@@ -25,9 +25,8 @@
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.19",
-        "nunomaduro/collision": "^5.10 || ^6.1",
-        "orchestra/testbench": "^6.24 || 7.1",
+        "nunomaduro/collision": "^6.1",
+        "orchestra/testbench": "7.1",
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {

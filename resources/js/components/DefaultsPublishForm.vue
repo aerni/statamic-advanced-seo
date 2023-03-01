@@ -89,7 +89,7 @@
 </style>
 
 <script>
-import HasHiddenFields from '../../../vendor/statamic/cms/resources/js/components/data-list/HasHiddenFields';
+import HasHiddenFields from '../../../vendor/statamic/cms/resources/js/components/publish/HasHiddenFields';
 
 export default {
 

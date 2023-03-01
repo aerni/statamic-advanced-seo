@@ -1,0 +1,18 @@
+title: 'Advanced SEO (Main)'
+fields:
+  -
+    import: 'advanced-seo::title_and_description'
+  -
+    import: 'advanced-seo::social_images_generator'
+  -
+    import: 'advanced-seo::open_graph'
+  -
+    import: 'advanced-seo::twitter'
+  -
+    import: 'advanced-seo::canonical_url'
+  -
+    import: 'advanced-seo::indexing'
+  -
+    import: 'advanced-seo::sitemap'
+  -
+    import: 'advanced-seo::json_ld'

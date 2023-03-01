@@ -2,9 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Features\Cloudflare;
+use Aerni\AdvancedSeo\Features\Fathom;
+use Aerni\AdvancedSeo\Features\GoogleTagManager;
+
 class AnalyticsFields extends BaseFields
 {
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->fathom(),
@@ -15,10 +19,6 @@ class AnalyticsFields extends BaseFields
 
     protected function fathom(): array
     {
-        if (! config('advanced-seo.analytics.fathom', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'section_fathom',
@@ -26,6 +26,7 @@ class AnalyticsFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('section_fathom.display'),
                     'instructions' => $this->trans('section_fathom.instructions'),
+                    'feature' => Fathom::class,
                 ],
             ],
             [
@@ -35,6 +36,7 @@ class AnalyticsFields extends BaseFields
                     'display' => $this->trans('use_fathom.display'),
                     'instructions' => $this->trans('use_fathom.instructions'),
                     'listable' => false,
+                    'feature' => Fathom::class,
                 ],
             ],
             [
@@ -47,6 +49,7 @@ class AnalyticsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'antlers' => true,
+                    'feature' => Fathom::class,
                     'validate' => [
                         'required_if:use_fathom,true',
                     ],
@@ -65,6 +68,7 @@ class AnalyticsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'antlers' => true,
+                    'feature' => Fathom::class,
                     'if' => [
                         'use_fathom' => 'equals true',
                     ],
@@ -78,6 +82,7 @@ class AnalyticsFields extends BaseFields
                     'instructions' => $this->trans('fathom_spa.instructions'),
                     'icon' => 'toggle',
                     'listable' => 'hidden',
+                    'feature' => Fathom::class,
                     'validate' => [
                         'required_if:use_fathom,true',
                     ],
@@ -91,10 +96,6 @@ class AnalyticsFields extends BaseFields
 
     protected function cloudflare(): array
     {
-        if (! config('advanced-seo.analytics.cloudflare_analytics', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'section_cloudflare_web_analytics',
@@ -102,6 +103,7 @@ class AnalyticsFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('section_cloudflare_web_analytics.display'),
                     'instructions' => $this->trans('section_cloudflare_web_analytics.instructions'),
+                    'feature' => Cloudflare::class,
                 ],
             ],
             [
@@ -111,6 +113,7 @@ class AnalyticsFields extends BaseFields
                     'display' => $this->trans('use_cloudflare_web_analytics.display'),
                     'instructions' => $this->trans('use_cloudflare_web_analytics.instructions'),
                     'listable' => false,
+                    'feature' => Cloudflare::class,
                 ],
             ],
             [
@@ -122,6 +125,7 @@ class AnalyticsFields extends BaseFields
                     'input_type' => 'text',
                     'width' => 50,
                     'listable' => 'hidden',
+                    'feature' => Cloudflare::class,
                     'validate' => [
                         'required_if:use_cloudflare_web_analytics,true',
                     ],
@@ -135,10 +139,6 @@ class AnalyticsFields extends BaseFields
 
     protected function googleTagManager(): array
     {
-        if (! config('advanced-seo.analytics.google_tag_manager', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'section_google_tag_manager',
@@ -146,6 +146,7 @@ class AnalyticsFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('section_google_tag_manager.display'),
                     'instructions' => $this->trans('section_google_tag_manager.instructions'),
+                    'feature' => GoogleTagManager::class,
                 ],
             ],
             [
@@ -155,6 +156,7 @@ class AnalyticsFields extends BaseFields
                     'display' => $this->trans('use_google_tag_manager.display'),
                     'instructions' => $this->trans('use_google_tag_manager.instructions'),
                     'listable' => false,
+                    'feature' => GoogleTagManager::class,
                 ],
             ],
             [
@@ -166,6 +168,7 @@ class AnalyticsFields extends BaseFields
                     'input_type' => 'text',
                     'width' => 50,
                     'listable' => 'hidden',
+                    'feature' => GoogleTagManager::class,
                     'validate' => [
                         'required_if:use_google_tag_manager,true',
                     ],

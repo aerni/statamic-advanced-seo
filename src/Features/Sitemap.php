@@ -1,13 +1,13 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Conditions;
+namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Facades\Seo;
 
-class ShowSitemapFields
+class Sitemap
 {
-    public static function handle(DefaultsData $data): bool
+    public static function enabled(DefaultsData $data): bool
     {
         if (! config('advanced-seo.sitemap.enabled', true)) {
             return false;
@@ -25,11 +25,6 @@ class ShowSitemapFields
         // If there is no config, the sitemap should be indexable.
         if (is_null($config)) {
             return true;
-        }
-
-        // If we have a global noindex, the sitemap shouldn't be indexable.
-        if ($config->value('noindex')) {
-            return false;
         }
 
         // Check if the collection/taxonomy is set to be excluded from the sitemap

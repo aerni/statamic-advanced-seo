@@ -2,8 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
-use Aerni\AdvancedSeo\View\Cascade;
+use Aerni\AdvancedSeo\View\SourceFieldtypeCascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Assets\Asset;
@@ -11,6 +12,7 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -25,7 +27,7 @@ class SourceFieldtype extends Fieldtype
     {
         return match ($data) {
             '@default' => ['source' => 'default', 'value' => $this->sourceFieldDefaultValue()],
-            '@auto' => ['source' => 'auto', 'value' => $this->sourceFieldtype()->preProcess(null)],
+            '@auto' => ['source' => 'auto', 'value' => $this->autoValue()],
             '@null' => ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess(null)],
             default => ['source' => 'custom', 'value' => $this->sourceFieldtype()->preProcess($data)],
         };
@@ -35,6 +37,11 @@ class SourceFieldtype extends Fieldtype
     {
         if ($data === null) {
             return $data;
+        }
+
+        // Dont't save the value if it's the same as the field's default. We don't want to unnecessarily spam the entry data.
+        if (Str::contains($this->config('default'), $data['source'])) {
+            return null;
         }
 
         if ($data['source'] === 'default') {
@@ -73,14 +80,19 @@ class SourceFieldtype extends Fieldtype
         $data = $data ?? $this->field->defaultValue();
 
         if ($data === '@default') {
-            return $this->sourceFieldtype()->augment($this->defaultValueFromCascade());
+            $value = $this->sourceFieldtype()->augment($this->defaultValueFromCascade());
+
+            return is_string($data) && Str::contains($value, '@field')
+                ? $this->sourceFieldtype()->augment($this->parseFieldValues($value))
+                : $value;
         }
 
         if ($data === '@auto') {
-            $field = $this->field->config()['auto'];
-            $parent = $this->field->parent();
+            return $this->autoValue();
+        }
 
-            return $parent->$field;
+        if (is_string($data) && Str::contains($data, '@field')) {
+            return $this->sourceFieldtype()->augment($this->parseFieldValues($data));
         }
 
         if ($data === '@null') {
@@ -114,6 +126,11 @@ class SourceFieldtype extends Fieldtype
         return $this->augment($value);
     }
 
+    public function toGqlType(): mixed
+    {
+        return $this->sourceFieldtype()->toGqlType();
+    }
+
     protected function sourceField(): Field
     {
         return new Field(null, $this->config('field'));
@@ -134,6 +151,42 @@ class SourceFieldtype extends Fieldtype
         return $this->sourceField()->setValue($this->defaultValueFromCascade())->preProcess()->meta();
     }
 
+    protected function autoValue(): mixed
+    {
+        $parent = $this->field->parent();
+        $field = $this->config('auto');
+
+        return match (true) {
+            ($parent instanceof Entry) => $parent->$field,
+            ($parent instanceof Term) => $parent->in(EvaluateModelLocale::handle($parent))->$field,
+            default => null
+        };
+    }
+
+    protected function parseFieldValues($data): mixed
+    {
+        $parent = $this->field->parent();
+
+        if ($parent instanceof Term) {
+            $parent = $parent->in(EvaluateModelLocale::handle($parent));
+        }
+
+        $parent = $parent->toAugmentedArray();
+
+        // Prevent infinite loop by removing the field if it's part of the data.
+        $data = Str::of($data)->remove("@field:{$this->field->handle()}")->trim();
+
+        preg_match_all('/@field:([A-z\d+-_]+)/', $data, $matches);
+
+        $fieldValues = [];
+
+        foreach ($matches[1] as $field) {
+            $fieldValues["@field:{$field}"] = Antlers::parser()->getVariable($field, $parent);
+        }
+
+        return strtr($data, $fieldValues);
+    }
+
     protected function sourceFieldMeta(): mixed
     {
         return $this->sourceField()->setValue($this->sourceFieldValue())->preProcess()->meta();
@@ -146,13 +199,14 @@ class SourceFieldtype extends Fieldtype
 
     protected function defaultValueFromCascade(): mixed
     {
-        $data = Blink::once('advanced-seo::source-fieldtype::parent', fn () => GetDefaultsData::handle($this->field->parent()));
+        $data = GetDefaultsData::handle($this->field->parent());
 
+        // We can't get any data on default views like '/cp/advanced-seo/collections/pages'.
         if (! $data) {
             return null;
         }
 
-        $cascade = Blink::once("advanced-seo::cascade::fieldtype", fn () => Cascade::from($data)->processForFieldtype());
+        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$data->id()}", fn () => SourceFieldtypeCascade::from($data));
 
         $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 

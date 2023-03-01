@@ -41,6 +41,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
         // Create a localization for each of the provided sites. This triggers a save on the set.
         // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
         // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
+        // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
         $set = $set->createLocalizations($content->sites());
 
         $localization = $set->in($site);
@@ -114,15 +115,15 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $blueprint = $set->blueprint();
+        $localization = $set->in($site)->determineOrigin($content->sites());
+
+        $blueprint = $localization->blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
         $fields->validate();
 
         $values = $fields->process()->values();
-
-        $localization = $set->in($site)->determineOrigin($content->sites());
 
         $localization->hasOrigin()
             ? $localization->data($values->only($request->input('_localized')))

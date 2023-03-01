@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Commands;
 
 use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
 use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
-use Aerni\AdvancedSeo\Migrators\SetupMigrator;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 
@@ -27,7 +26,6 @@ class Migrate extends Command
     protected function migrations(): array
     {
         return [
-            'Setup (no addon)' => SetupMigrator::class,
             'Aardvark SEO' => AardvarkSeoMigrator::class,
             'SEO Pro' => SeoProMigrator::class,
         ];

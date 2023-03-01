@@ -1,0 +1,23 @@
+title: 'Advanced SEO (Indexing)'
+fields:
+  -
+    handle: seo_section_indexing
+    field:
+      type: advanced_seo
+      display: 'Indexing'
+      field: seo_section_indexing
+      visibility: hidden
+  -
+    handle: seo_noindex
+    field:
+      type: advanced_seo
+      display: 'Noindex'
+      field: seo_noindex
+      visibility: hidden
+  -
+    handle: seo_nofollow
+    field:
+      type: advanced_seo
+      display: 'Nofollow'
+      field: seo_nofollow
+      visibility: hidden

@@ -2,12 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -17,6 +20,7 @@ class SeoDefaultSet implements Contract
 {
     use ExistsAsFile;
     use FluentlyGetsAndSets;
+    use HasDefaultsData;
 
     protected string $handle;
     protected string $type;
@@ -51,7 +55,19 @@ class SeoDefaultSet implements Contract
 
     public function sites(): Collection
     {
-        return $this->localizations()->map->locale()->values();
+        $allSites = Site::all()->keys();
+
+        if ($parent = $this->parent()) {
+            // Only return sites from the parent that are configured in Statamic's sites config
+            return $parent->sites()->intersect($allSites)->values();
+        }
+
+        return $allSites;
+    }
+
+    public function defaultSite(): string
+    {
+        return $this->sites()->first();
     }
 
     public function selectedSite(): string
@@ -60,7 +76,7 @@ class SeoDefaultSet implements Contract
 
         return $this->sites()->contains($selectedSite)
             ? $selectedSite
-            : $this->sites()->first();
+            : $this->defaultSite();
     }
 
     public function title(): string
@@ -84,7 +100,7 @@ class SeoDefaultSet implements Contract
 
         if (! Site::hasMultiple()) {
             $data['data'] = Arr::removeNullValues(
-                $this->in(Site::default()->handle())->data()->all()
+                $this->inDefaultSite()->data()->all()
             );
         }
 
@@ -111,6 +127,10 @@ class SeoDefaultSet implements Contract
             ->save();
     }
 
+    /**
+     * TODO: We can probably refactor this to not accept a sites array but get the sites from the parent() instead.
+     * But this might only work for collection and taxonomy defaults. What to do with site defaults that don't have a parent?
+     */
     public function ensureLocalizations(Collection $sites): self
     {
         // We only want to handle sites that are configured in Statamic's sites config.
@@ -171,7 +191,7 @@ class SeoDefaultSet implements Contract
 
     public function inDefaultSite(): ?SeoVariables
     {
-        return $this->in(Site::default()->handle());
+        return $this->in($this->defaultSite());
     }
 
     public function existsIn(string $locale): bool
@@ -183,10 +203,23 @@ class SeoDefaultSet implements Contract
     {
         $blueprint = Defaults::blueprint("{$this->type}::{$this->handle}");
 
-        return resolve($blueprint)
-            ->make()
-            ->data(new DefaultsData(type: $this->type, handle: $this->handle))
+        return resolve($blueprint)->make()
+            ->data($this->defaultsData())
             ->get();
+    }
+
+    public function parent(): mixed
+    {
+        return match (true) {
+            ($this->type() === 'collections') => CollectionFacade::findByHandle($this->handle()),
+            ($this->type() === 'taxonomies') => Taxonomy::findByHandle($this->handle()),
+            default => null,
+        };
+    }
+
+    public function isEnabled(): bool
+    {
+        return Defaults::isEnabled("{$this->type()}::{$this->handle()}");
     }
 
     public function save(): self

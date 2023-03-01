@@ -4,6 +4,8 @@ namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\Sitemap;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
 
@@ -11,11 +13,13 @@ class ContentDefaultsFields extends BaseFields
 {
     use HasAssetField;
 
-    public function sections(): array
+    protected function sections(): array
     {
         return [
             $this->titleAndDescription(),
-            $this->socialImages(),
+            $this->socialImagesGenerator(),
+            $this->openGraphImage(),
+            $this->twitterImage(),
             $this->canonicalUrl(),
             $this->indexing(),
             $this->sitemap(),
@@ -23,7 +27,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function titleAndDescription(): array
+    protected function titleAndDescription(): array
     {
         return [
             [
@@ -78,22 +82,9 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function socialImages(): array
+    protected function socialImagesGenerator(): array
     {
-        return collect([
-            $this->socialImagesGenerator(),
-            $this->openGraphImage(),
-            $this->twitterImage(),
-        ])->flatten(1)->toArray();
-    }
-
-    public function socialImagesGenerator(): array
-    {
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
-            return [];
-        }
-
-        $fields = collect([
+        return [
             [
                 'handle' => 'seo_section_social_images_generator',
                 'field' => [
@@ -101,7 +92,7 @@ class ContentDefaultsFields extends BaseFields
                     'display' => $this->trans('seo_section_social_images_generator.display'),
                     'instructions' => $this->trans('seo_section_social_images_generator.default_instructions'),
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGeneratorFields',
+                    'feature' => SocialImagesGenerator::class,
                 ],
             ],
             [
@@ -114,13 +105,10 @@ class ContentDefaultsFields extends BaseFields
                     'icon' => 'toggle',
                     'localizable' => true,
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGeneratorFields',
+                    'feature' => SocialImagesGenerator::class,
                 ],
             ],
-        ]);
-
-        if (SocialImageTheme::all()->count() > 1) {
-            $fields->push([
+            [
                 'handle' => 'seo_social_images_theme',
                 'field' => [
                     'type' => 'select',
@@ -136,15 +124,14 @@ class ContentDefaultsFields extends BaseFields
                     'cast_booleans' => false,
                     'localizable' => true,
                     'listable' => 'hidden',
-                    'if' => 'showSocialImagesGeneratorFields',
+                    'classes' => SocialImageTheme::all()->count() == 1 ? 'hidden' : '', // Hide the field in the CP if there is only one theme
+                    'feature' => SocialImagesGenerator::class,
                 ],
-            ]);
-        }
-
-        return $fields->toArray();
+            ],
+        ];
     }
 
-    public function openGraphImage(): array
+    protected function openGraphImage(): array
     {
         return [
             [
@@ -204,7 +191,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function twitterImage(): array
+    protected function twitterImage(): array
     {
         return [
             [
@@ -295,7 +282,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function canonicalUrl(): array
+    protected function canonicalUrl(): array
     {
         return [
             [
@@ -359,7 +346,7 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function indexing(): array
+    protected function indexing(): array
     {
         return [
             [
@@ -397,12 +384,8 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
-    public function sitemap(): array
+    protected function sitemap(): array
     {
-        if (! config('advanced-seo.sitemap.enabled', true)) {
-            return [];
-        }
-
         return [
             [
                 'handle' => 'seo_section_sitemap',
@@ -410,7 +393,7 @@ class ContentDefaultsFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('seo_section_sitemap.display'),
                     'instructions' => $this->trans('seo_section_sitemap.default_instructions'),
-                    'if' => 'showSitemapFields',
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -422,7 +405,7 @@ class ContentDefaultsFields extends BaseFields
                     'default' => Defaults::data('collections')->get('seo_sitemap_enabled'),
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'if' => 'showSitemapFields',
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -454,7 +437,7 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'if' => 'showSitemapFields',
+                    'feature' => Sitemap::class,
                 ],
             ],
             [
@@ -482,13 +465,13 @@ class ContentDefaultsFields extends BaseFields
                     'width' => 50,
                     'listable' => 'hidden',
                     'localizable' => true,
-                    'if' => 'showSitemapFields',
+                    'feature' => Sitemap::class,
                 ],
             ],
         ];
     }
 
-    public function jsonLd(): array
+    protected function jsonLd(): array
     {
         return [
             [

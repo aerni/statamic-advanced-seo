@@ -13,4 +13,9 @@ class DefaultsData
         public ?Collection $sites = null,
     ) {
     }
+
+    public function id(): string
+    {
+        return "{$this->type}::{$this->handle}::{$this->locale}";
+    }
 }

@@ -2,8 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Conditions\ShowSitemapFields;
-use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -14,6 +13,8 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Blueprint;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -24,6 +25,11 @@ class SeoVariables implements Localization, Augmentable
     use FluentlyGetsAndSets;
     use HasAugmentedInstance;
     use HasOrigin;
+    use HasDefaultsData;
+
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
 
     protected SeoDefaultSet $set;
     protected string $locale;
@@ -126,37 +132,8 @@ class SeoVariables implements Localization, Augmentable
         // Get the default value of each field from the blueprint.
         $defaultData = $this->blueprint()->fields()->all()->map->defaultValue();
 
-        // Remove any field whose custom condition evaluates to false.
-        $defaultData = $this->evaluateFieldConditions($defaultData);
-
         // Only keep default fields with values that should be saved to file.
-        $defaultData = $defaultData->filter(fn ($value) => $value !== null && $value !== []);
-
-        return $defaultData;
-    }
-
-    // TODO: Probably makes sense to extract this into its own Conditions class.
-    protected function evaluateFieldConditions(Collection $values): Collection
-    {
-        $defaultsData = new DefaultsData(type: $this->type(), handle: $this->handle(), locale: $this->locale());
-
-        $evaluatedConditions = collect([
-            'showSocialImagesGeneratorFields' => ShowSocialImagesGeneratorFields::handle($defaultsData),
-            'showSitemapFields' => ShowSitemapFields::handle($defaultsData),
-        ]);
-
-        $fieldsToRemove = $this->blueprint()->fields()->all()
-            ->map(fn ($field) => array_flatten($field->conditions()))
-            ->filter()
-            ->filter(function ($conditions) use ($evaluatedConditions) {
-                // Only keep fields whose conditions evaluate to false.
-                return collect($conditions)
-                    ->map(fn ($condition) => $evaluatedConditions->get($condition))
-                    ->filter()
-                    ->isEmpty();
-            });
-
-        return $values->diffKeys($fieldsToRemove);
+        return $defaultData->filter(fn ($value) => $value !== null && $value !== []);
     }
 
     public function withDefaultData(): self
@@ -174,9 +151,16 @@ class SeoVariables implements Localization, Augmentable
         return $this;
     }
 
+    public function blueprintFields(): array
+    {
+        // Get the field keys of the processed blueprint. This excludes any fields of disabled features.
+        return $this->blueprint()->fields()->all()->keys()->all();
+    }
+
     public function fileData(): array
     {
-        $data = $this->data()->all();
+        // We only want to keep values of fields that exist in the blueprint.
+        $data = $this->data()->only($this->blueprintFields())->all();
 
         if (Site::hasMultiple() && $this->hasOrigin()) {
             $data['origin'] = $this->origin()->locale();
@@ -186,17 +170,17 @@ class SeoVariables implements Localization, Augmentable
             $data = Arr::removeNullValues($data);
         }
 
-        /**
-         * TODO: Should we remove any values that don't have a field on the blueprint?
-         * This should also take the conditions into consideration. This ensures that fields of deactivated features will be removed.
-         */
-
         return $data;
     }
 
     protected function shouldRemoveNullsFromFileData()
     {
         return false;
+    }
+
+    public function sites(): Collection
+    {
+        return $this->seoSet()->sites();
     }
 
     public function site()
@@ -209,9 +193,11 @@ class SeoVariables implements Localization, Augmentable
         return "seo::{$this->id()}";
     }
 
-    public function blueprint()
+    public function blueprint(): Blueprint
     {
-        return $this->seoSet()->blueprint();
+        return $this->seoSet()
+            ->defaultsData($this->defaultsData())
+            ->blueprint();
     }
 
     protected function getOriginByString($origin)
@@ -219,6 +205,7 @@ class SeoVariables implements Localization, Augmentable
         return $this->seoSet()->in($origin);
     }
 
+    // TODO: Might be able to not accept $sites but use $this->seoSet->sites() instead.
     public function determineOrigin(Collection $sites): self
     {
         $defaultSite = Site::default()->handle();
@@ -232,6 +219,15 @@ class SeoVariables implements Localization, Augmentable
             : $this->origin($origin);
 
         return $this;
+    }
+
+    public function resolveGqlValue(string $field)
+    {
+        if (! in_array($field, $this->blueprintFields())) {
+            return null;
+        }
+
+        return $this->traitResolveGqlValue($field);
     }
 
     public function newAugmentedInstance(): Augmented

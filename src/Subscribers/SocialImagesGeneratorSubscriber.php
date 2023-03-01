@@ -5,8 +5,8 @@ namespace Aerni\AdvancedSeo\Subscribers;
 use Aerni\AdvancedSeo\Actions\DeleteSocialImages;
 use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Conditions\ShowSocialImagesGeneratorFields;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Events\Dispatcher;
 use Statamic\Events;
@@ -42,7 +42,7 @@ class SocialImagesGeneratorSubscriber
 
         // Show a toast message if we are using the queue.
         if (config('queue.default') !== 'sync') {
-            Toast::info('Generating the social images in the background');
+            Toast::info(__('advanced-seo::messages.social_images_generator_generating_queue'));
         }
 
         GenerateSocialImagesJob::dispatch($event->entry);
@@ -52,7 +52,7 @@ class SocialImagesGeneratorSubscriber
     {
         $data = $this->getDataFromEvent($event);
 
-        if (! ShowSocialImagesGeneratorFields::handle($data)) {
+        if (! SocialImagesGenerator::enabled($data)) {
             return;
         }
 

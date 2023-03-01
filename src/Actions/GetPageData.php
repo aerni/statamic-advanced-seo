@@ -4,20 +4,36 @@ namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Illuminate\Support\Collection;
-use Statamic\Facades\Blink;
-use Statamic\Tags\Context;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Fields\Value;
 
 class GetPageData
 {
-    public static function handle(Context $context): Collection
+    public static function handle(mixed $model): Collection
     {
-        if (! $data = GetDefaultsData::handle($context)) {
-            return collect();
+        $blueprint = OnPageSeoBlueprint::make();
+
+        /**
+         * We only want to return data of enabled features.
+         * This ensures that we don't return any values of conditionally hidden fields.
+         * This would typically happen when a feature like the social images generator has been disabled.
+         */
+        if ($data = GetDefaultsData::handle($model)) {
+            $blueprint->data($data);
         }
 
-        return Blink::once(
-            "advanced-seo::page::{$data->locale}",
-            fn () => $context->intersectByKeys(OnPageSeoBlueprint::make()->data($data)->items())
-        );
+        $fields = $blueprint->get()->fields()->all();
+
+        if ($model instanceof Entry || $model instanceof Term) {
+            return $model->toAugmentedCollection($fields->keys()->toArray());
+        }
+
+        return $model->intersectByKeys($fields)
+            ->map(
+                fn ($value, $field) => $value instanceof Value
+                ? $value
+                : $fields->get($field)->setValue($value)->augment()->value()
+            );
     }
 }

@@ -13,26 +13,29 @@ class SocialImageFieldtype extends Fieldtype
 {
     protected $selectable = false;
 
-    public function preload(): array
+    public function preload(): ?array
     {
         $parent = $this->field->parent();
 
-        $meta = [
-            'message' => config('advanced-seo.social_images.generator.generate_on_save', true)
-                ? trans('advanced-seo::messages.social_images_generator_on_save')
-                : trans('advanced-seo::messages.social_images_generator_on_demand'),
-        ];
-
         if (! $parent instanceof Entry) {
-            return $meta;
+            return null;
         }
 
         $type = $this->config()['image_type'];
         $image = SocialImage::all($parent)->get($type);
 
-        $meta['image'] = $image->asset()?->absoluteUrl();
+        $generateOnSaveMessage = config('queue.default') === 'sync'
+            ? trans('advanced-seo::messages.social_images_generator_save_sync')
+            : trans('advanced-seo::messages.social_images_generator_save_queue');
 
-        return $meta;
+        $message = config('advanced-seo.social_images.generator.generate_on_save', true)
+            ? $generateOnSaveMessage
+            : trans('advanced-seo::messages.social_images_generator_on_demand');
+
+        return [
+            'message' => $message,
+            'image' => $image->asset()?->absoluteUrl(),
+        ];
     }
 
     public function augment($value): ?Asset

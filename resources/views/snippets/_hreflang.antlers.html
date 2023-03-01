@@ -1,3 +1,5 @@
-{{ hreflang }}
-    <link rel='alternate' href="{{ url }}" hreflang="{{ locale }}" >
-{{ /hreflang }}
+{{ if seo:hreflang }}
+    {{ seo:hreflang }}
+        <link rel='alternate' href="{{ url }}" hreflang="{{ locale }}" >
+    {{ /seo:hreflang }}
+{{ /if }}
