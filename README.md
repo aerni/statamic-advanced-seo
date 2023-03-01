@@ -3,19 +3,21 @@
 # Advanced SEO
 Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project’s needs.
 
-[Read the documentation](https://aerni.gitbook.io/advanced-seo/) to learn how to install, setup and use this Advanced SEO.
+[Read the documentation](https://aerni.gitbook.io/advanced-seo/) to learn how to install, setup and use Advanced SEO.
 
 ## Features
 - Multi-site support
-- Site defaults
-- Content defaults
-- Excellent user experience leveraging a custom source fieldtype
+- Site, collection & taxonomy defaults
+- Excellent user experience leveraging a custom fieldtype
 - Social images generator
+- Sitemaps for collections & taxonomies
+- Sitemaps for custom routes
+- Customizable On-Page SEO blueprint
+- GraphQL support
 - Fine-grained user permissions
-- Simple migration from Aardvark SEO and SEO Pro
-- Sitemap
-- Support for Statamic’s Git integration
-- Highly flexible by design
+- Metadata for custom routes
+- Migration command for SEO Pro and Aardvark SEO
+- Support for Statamic’s git integration
 
 ## License
 Advanced SEO is paid software with an open-source codebase. If you want to use it in production, you’ll need to [buy a license from the Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
