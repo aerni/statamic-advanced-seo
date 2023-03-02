@@ -6,7 +6,7 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 [Read the documentation](https://aerni.gitbook.io/advanced-seo/) to learn how to install, setup and use Advanced SEO.
 
 ## What's new in version 2.0
-- Support for GraphQL
+- Extensive support for GraphQL
 - Ability to customize the SEO fields in the blueprint of your entries and terms
 - Support for variables in any `text`, `textarea`, and `code` field
 - Ability to use Advanced SEO with any custom `Statamic::route()` and `Route::get()`
