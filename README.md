@@ -5,6 +5,14 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 
 [Read the documentation](https://aerni.gitbook.io/advanced-seo/) to learn how to install, setup and use Advanced SEO.
 
+## What's new in version 2.0
+- Support for GraphQL
+- Ability to customize the SEO fields in the blueprint of your entries and terms
+- Support for variables in any text, textarea and code field
+- Ability to use Advanced SEO with any custom `Statamic::route()` and `Route::get()`
+- New action to generate the social images from the entries listing view
+- All the data is now available in Antlers in the `seo` array
+
 ## Features
 - Multi-site support
 - Site, collection & taxonomy defaults
