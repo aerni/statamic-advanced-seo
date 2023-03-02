@@ -7,8 +7,8 @@ Advanced SEO is a comprehensive solution providing you with all the tools you ne
 
 ## What's new in version 2.0
 - Extensive support for GraphQL
-- Ability to customize the SEO fields in the blueprint of your entries and terms
 - Support for variables in any `text`, `textarea`, and `code` field
+- Ability to customize the SEO fields in the blueprint of your entries and terms
 - Ability to use Advanced SEO with any custom `Statamic::route()` and `Route::get()`
 - New action to generate the social images from the entries listing view
 - All the data is now available in Antlers in the `seo` array
