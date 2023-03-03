@@ -25,6 +25,7 @@ class SocialImage
 
         Browsershot::url($this->templateUrl())
             ->windowSize($this->model['width'], $this->model['height'])
+            ->waitUntilNetworkIdle()
             ->save($this->absolutePath());
 
         $this->container()->makeAsset($this->path())->save();
