@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Actions\DeleteSocialImages;
 use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
+use Aerni\AdvancedSeo\Jobs\DeleteSocialImagesJob;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Events\Dispatcher;
 use Statamic\Events;
@@ -35,7 +35,7 @@ class SocialImagesGeneratorSubscriber
 
         // Delete the images so we can create a new one on the next request.
         if (! config('advanced-seo.social_images.generator.generate_on_save', true)) {
-            DeleteSocialImages::handle($event->entry);
+            DeleteSocialImagesJob::dispatch($event->entry);
 
             return;
         }

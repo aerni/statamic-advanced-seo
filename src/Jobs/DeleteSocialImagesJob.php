@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Statamic\Contracts\Entries\Entry;
 
-class GenerateSocialImagesJob implements ShouldQueue
+class DeleteSocialImagesJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -22,6 +22,6 @@ class GenerateSocialImagesJob implements ShouldQueue
 
     public function handle(): void
     {
-        SocialImage::all($this->entry)->each->generate();
+        SocialImage::all($this->entry)->each->delete();
     }
 }
