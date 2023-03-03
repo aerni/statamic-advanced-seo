@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Jobs;
 
-use Aerni\AdvancedSeo\Actions\ClearImageGlideCache;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,9 +22,6 @@ class GenerateSocialImagesJob implements ShouldQueue
 
     public function handle(): void
     {
-        SocialImage::all($this->entry)
-            ->each(fn ($image) => $image->generate())
-            // TODO: Do we still need this, as we are now generating an actual asset?
-            ->each(fn ($image) => ClearImageGlideCache::handle($image->path()));
+        SocialImage::all($this->entry)->each->generate();
     }
 }
