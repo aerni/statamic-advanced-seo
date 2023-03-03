@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
 use Aerni\AdvancedSeo\Actions\GetDefaultsData;
 use Aerni\AdvancedSeo\View\SourceFieldtypeCascade;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
@@ -104,11 +105,7 @@ class SourceFieldtype extends Fieldtype
 
     public function preProcessValidatable(mixed $value): mixed
     {
-        if ($value === null) {
-            return $value;
-        }
-
-        return $value['value'];
+        return Arr::get($value, 'value');
     }
 
     public function rules(): array
