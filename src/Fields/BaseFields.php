@@ -24,7 +24,11 @@ abstract class BaseFields implements Fields
 
     public function get(): array
     {
-        return array_flatten($this->sections(), 1);
+        return [
+            [
+                'fields' => array_flatten($this->sections(), 1),
+            ],
+        ];
     }
 
     public function items(): array
