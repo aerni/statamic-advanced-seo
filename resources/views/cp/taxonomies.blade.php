@@ -8,7 +8,7 @@
     </div>
 
     <div class="widgets @container flex flex-wrap -mx-4">
-        <div class="w-full px-4 mb-8 widget md:w-full">
+        <div class="w-full px-4 widget md:w-full">
             <div class="p-0 card content">
                 <div class="flex items-start px-8 py-8 border-b">
                     <div class="w-8 h-8 mr-4 text-gray-800">

@@ -8,7 +8,7 @@
     </div>
 
     <div class="widgets @container flex flex-wrap -mx-4">
-        <div class="w-full px-4 mb-8 widget md:w-full">
+        <div class="w-full px-4 widget md:w-full">
             <div class="p-0 card content">
                 <div class="flex flex-wrap p-4">
                     @foreach (Aerni\AdvancedSeo\Models\Defaults::enabledInType('site') as $site)
