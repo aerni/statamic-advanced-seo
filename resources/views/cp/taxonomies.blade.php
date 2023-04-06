@@ -7,7 +7,7 @@
         <h1>{{ __('advanced-seo::messages.taxonomies') }}</h1>
     </div>
 
-    <div class="widgets @container flex flex-wrap -mx-4 py-2">
+    <div class="widgets @container flex flex-wrap -mx-4">
         <div class="w-full px-4 mb-8 widget md:w-full">
             <div class="p-0 card content">
                 <div class="flex items-start px-8 py-8 border-b">
