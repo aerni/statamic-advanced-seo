@@ -1,6 +1,6 @@
 <template>
 
-    <div class="remove-border-bottom">
+    <div>
         <breadcrumb :url="computedBreadcrumbs.url" :title="computedBreadcrumbs.text" />
 
         <div class="flex items-center mb-6">
@@ -51,7 +51,7 @@
                     @focus="container.$emit('focus', $event)"
                     @blur="container.$emit('blur', $event)"
                 >
-                    <template>
+                    <template #actions="{ shouldShowSidebar }">
 
                         <div class="p-4" v-if="shouldShowSites">
                             <label class="mb-2 font-medium publish-field-label" v-text="__('Sites')" />
@@ -85,12 +85,6 @@
     </div>
 
 </template>
-
-<style scoped>
-.remove-border-bottom >>> .publish-sidebar .publish-section-actions {
-    border-bottom-width: 0;
-}
-</style>
 
 <script>
 import HasHiddenFields from '../../../vendor/statamic/cms/resources/js/components/publish/HasHiddenFields';
