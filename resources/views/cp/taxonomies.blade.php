@@ -12,7 +12,7 @@
             <div class="p-0 card content">
                 <div class="flex items-start p-4 border-b">
                     <div class="w-8 h-8 mr-2 text-blue">
-                        @cp_svg('tags')
+                        @cp_svg('icons/default/tags')
                     </div>
                     <div class="flex-1 mt-sm">
                         <h2>{{ __('advanced-seo::messages.taxonomies') }}</h2>
