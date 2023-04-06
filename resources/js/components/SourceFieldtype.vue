@@ -102,7 +102,8 @@ export default {
         },
 
         autoFieldDisplay() {
-            let fields = this.store.blueprint.sections.flatMap(section => section.fields)
+            let sections = this.store.blueprint.tabs.flatMap(tab => tab.sections)
+            let fields = sections.flatMap(section => section.fields)
 
             return _.find(fields, {'handle': this.autoFieldHandle}).display
         },
