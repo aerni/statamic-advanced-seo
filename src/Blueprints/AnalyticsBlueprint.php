@@ -11,7 +11,7 @@ class AnalyticsBlueprint extends BaseBlueprint
         return 'analytics';
     }
 
-    protected function sections(): array
+    protected function tabs(): array
     {
         return [
             'analytics' => AnalyticsFields::class,

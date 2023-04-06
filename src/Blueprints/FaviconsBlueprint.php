@@ -11,7 +11,7 @@ class FaviconsBlueprint extends BaseBlueprint
         return 'favicons';
     }
 
-    protected function sections(): array
+    protected function tabs(): array
     {
         return [
             'favicons' => FaviconsFields::class,

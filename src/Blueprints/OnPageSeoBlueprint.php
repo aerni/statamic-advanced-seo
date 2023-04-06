@@ -11,7 +11,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
         return 'content';
     }
 
-    protected function sections(): array
+    protected function tabs(): array
     {
         return [
             'seo' => OnPageSeoFields::class,

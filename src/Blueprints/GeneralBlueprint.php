@@ -11,7 +11,7 @@ class GeneralBlueprint extends BaseBlueprint
         return 'general';
     }
 
-    protected function sections(): array
+    protected function tabs(): array
     {
         return [
             'general' => GeneralFields::class,
