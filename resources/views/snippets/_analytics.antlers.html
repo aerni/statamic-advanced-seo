@@ -3,7 +3,7 @@
     {{# Fathom #}}
     {{ if seo:use_fathom }}
         <script
-            src="https://{{ seo:fathom_domain ?? 'cdn.usefathom.com' }}/script.js"
+            src="https://{{ $seo:fathom_domain ?? 'cdn.usefathom.com' }}/script.js"
             data-site="{{ seo:fathom_id }}"
             defer
             {{ if seo:fathom_spa }}data-spa='auto'{{ /if }}
