@@ -60,7 +60,7 @@ class SeoProMigrator extends BaseMigrator
         return $data
             ->merge($transformed)
             ->map(
-                fn ($value) => Str::contains($value, '@seo:')
+                fn ($value) => is_string($value) && Str::contains($value, '@seo:')
                 ? Str::replace('@seo:', '@field:', $value)
                 : $value
             );
