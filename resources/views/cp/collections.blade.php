@@ -12,7 +12,7 @@
             <div class="p-0 card content">
                 <div class="flex items-start px-8 py-8 border-b">
                     <div class="w-8 h-8 mr-4 text-gray-800">
-                        @cp_svg('icons/default/content-writing')
+                        @cp_svg('icons/light/content-writing')
                     </div>
                     <div class="flex-1">
                         <h3 class="mb-2 text-blue">{{ __('advanced-seo::messages.collections') }}</h3>
