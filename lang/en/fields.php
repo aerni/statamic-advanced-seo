@@ -220,11 +220,6 @@ return [
         'instructions' => 'Add your site ID.',
     ],
 
-    'fathom_domain' => [
-        'display' => 'Custom Domain',
-        'instructions' => 'Add an optional custom domain.',
-    ],
-
     'fathom_spa' => [
         'display' => 'SPA Mode',
         'instructions' => 'Activate if your site is a single page application.',
