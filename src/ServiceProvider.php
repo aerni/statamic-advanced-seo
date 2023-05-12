@@ -83,12 +83,13 @@ class ServiceProvider extends AddonServiceProvider
         'web' => __DIR__.'/../routes/web.php',
     ];
 
-    protected $scripts = [
-        __DIR__.'/../resources/dist/js/cp.js',
-    ];
-
-    protected $stylesheets = [
-        __DIR__.'/../resources/dist/css/cp.css',
+    protected $vite = [
+        'input' => [
+            'resources/js/cp.js',
+            'resources/css/cp.css',
+        ],
+        'publicDirectory' => 'resources/dist',
+        'hotFile' => __DIR__.'/../resources/dist/hot',
     ];
 
     protected $policies = [
