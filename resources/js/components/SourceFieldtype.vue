@@ -4,7 +4,7 @@
 
         <div class="self-start button-group-fieldtype-wrapper">
             <div class="seo-h-auto btn-group source-btn-group">
-                <button class="btn seo-h-auto seo-text-xs" style="padding: 1px 5px;"
+                <button class="h-auto seo-text-[12px] seo-px-2 seo-py-1 btn"
                     v-for="(option, index) in sourceOptions"
                     :key="index"
                     ref="button"
@@ -42,7 +42,7 @@
                     read-only="true"
                     handle="source_value">
                 </component>
-                <div class="mt-1 help-block">
+                <div class="mt-2 mb-0 help-block">
                     <span
                         v-if="fieldSource === 'auto'"
                         v-html="__('advanced-seo::messages.field_source_description.auto', {title: this.autoFieldDisplay, handle: this.autoFieldHandle})"
