@@ -11,7 +11,7 @@ class SocialMediaBlueprint extends BaseBlueprint
         return 'social';
     }
 
-    protected function sections(): array
+    protected function tabs(): array
     {
         return [
             'social' => SocialMediaFields::class,

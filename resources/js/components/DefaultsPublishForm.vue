@@ -1,25 +1,23 @@
 <template>
 
-    <div class="remove-border-bottom">
-        <header class="mb-3">
-            <breadcrumb :url="computedBreadcrumbs.url" :title="computedBreadcrumbs.text" />
+    <div>
+        <breadcrumb :url="computedBreadcrumbs.url" :title="computedBreadcrumbs.text" />
 
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+        <div class="flex items-center mb-6">
+            <h1 class="flex-1" v-text="title" />
 
-                <div class="flex pt-px text-2xs text-grey-60" v-if="readOnly">
-                    <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
-                </div>
-
-                <button
-                    v-if="!readOnly"
-                    class="ml-2 btn-primary min-w-100"
-                    :class="{ 'opacity-25': !canSave }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="__('Save')" />
+            <div class="flex pt-px mr-4 text-gray-600 text-2xs" v-if="readOnly">
+                <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
-        </header>
+
+            <button
+                v-if="!readOnly"
+                class="flex items-center ml-4 btn-primary"
+                :disabled="!canSave"
+                @click.prevent="save"
+                v-text="__('Save')"
+            />
+        </div>
 
         <publish-container
             ref="container"
@@ -41,12 +39,11 @@
                     :is="component.name"
                     :container="container"
                     v-bind="component.props"
+                    v-on="component.events"
                 />
-                <publish-sections
+                <publish-tabs
                     :read-only="readOnly"
                     :syncable="hasOrigin"
-                    :can-toggle-labels="true"
-                    :enable-sidebar="shouldShowSites"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
                     @synced="syncField"
@@ -55,38 +52,39 @@
                     @blur="container.$emit('blur', $event)"
                 >
                     <template #actions="{ shouldShowSidebar }">
-                        <div class="p-2" v-if="shouldShowSites">
-                            <label class="mb-1 font-medium publish-field-label" v-text="__('Sites')" />
+
+                        <div class="p-4" v-if="shouldShowSites">
+                            <label class="mb-2 font-medium publish-field-label" v-text="__('Sites')" />
                             <div
                                 v-for="option in localizations"
                                 :key="option.handle"
-                                class="flex items-center px-2 py-1 -mx-2 text-sm cursor-pointer"
-                                :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
+                                class="flex items-center px-4 py-2 -mx-4 text-sm cursor-pointer"
+                                :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
                                 @click="localizationSelected(option)"
                             >
                                 <div class="flex items-center flex-1">
                                     {{ option.name }}
-                                    <loading-graphic :size="14" text="" class="flex items-center ml-1" style="padding-bottom: 0.05em;" v-if="localizing === option.handle"/>
+                                    <loading-graphic
+                                        :size="14"
+                                        text=""
+                                        class="ml-2"
+                                        v-if="localizing && localizing.handle === option.handle"
+                                    />
                                 </div>
                                 <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                 <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
                                 <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                             </div>
                         </div>
+
                     </template>
-                </publish-sections>
+                </publish-tabs>
             </div>
 
         </publish-container>
     </div>
 
 </template>
-
-<style scoped>
-.remove-border-bottom >>> .publish-sidebar .publish-section-actions {
-    border-bottom-width: 0;
-}
-</style>
 
 <script>
 import HasHiddenFields from '../../../vendor/statamic/cms/resources/js/components/publish/HasHiddenFields';

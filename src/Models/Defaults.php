@@ -23,7 +23,7 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::class,
                 'data' => __DIR__.'/../../content/general.yaml',
                 'enabled' => true,
-                'icon' => 'sites',
+                'icon' => 'icons/light/sites',
                 'type_icon' => 'earth',
             ],
             [
@@ -34,7 +34,7 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::class,
                 'data' => __DIR__.'/../../content/indexing.yaml',
                 'enabled' => true,
-                'icon' => 'structures',
+                'icon' => 'icons/light/structures',
                 'type_icon' => 'earth',
             ],
             [
@@ -45,7 +45,7 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint::class,
                 'data' => __DIR__.'/../../content/social_media.yaml',
                 'enabled' => true,
-                'icon' => 'assets',
+                'icon' => 'icons/light/assets',
                 'type_icon' => 'earth',
             ],
             [
@@ -56,7 +56,7 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
                 'data' => __DIR__.'/../../content/analytics.yaml',
                 'enabled' => collect(config('advanced-seo.analytics'))->reject(fn ($value, $key) => $key === 'environments')->filter()->isNotEmpty(),
-                'icon' => 'charts',
+                'icon' => 'icons/light/charts',
                 'type_icon' => 'earth',
             ],
             [
@@ -67,35 +67,35 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::class,
                 'data' => __DIR__.'/../../content/favicons.yaml',
                 'enabled' => config('advanced-seo.favicons.enabled', false),
-                'icon' => 'color',
+                'icon' => 'icons/light/color',
                 'type_icon' => 'earth',
             ],
         ];
 
         $collections = CollectionFacade::all()->map(function ($collection) {
             return [
-                'id' => 'collections::' . $collection->handle(),
+                'id' => 'collections::'.$collection->handle(),
                 'type' => 'collections',
                 'handle' => $collection->handle(),
                 'title' => $collection->title(),
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($collection->handle(), config('advanced-seo.disabled.collections', [])),
-                'icon' => 'content-writing',
+                'icon' => 'icons/light/content-writing',
                 'type_icon' => 'content-writing',
             ];
         })->sortBy('handle');
 
         $taxonomies = Taxonomy::all()->map(function ($taxonomy) {
             return [
-                'id' => 'taxonomies::' . $taxonomy->handle(),
+                'id' => 'taxonomies::'.$taxonomy->handle(),
                 'type' => 'taxonomies',
                 'handle' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($taxonomy->handle(), config('advanced-seo.disabled.taxonomies', [])),
-                'icon' => 'tags',
+                'icon' => 'icons/light/tags',
                 'type_icon' => 'tags',
             ];
         })->sortBy('handle');

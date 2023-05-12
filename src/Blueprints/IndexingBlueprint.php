@@ -11,7 +11,7 @@ class IndexingBlueprint extends BaseBlueprint
         return 'indexing';
     }
 
-    protected function sections(): array
+    protected function tabs(): array
     {
         return [
             'indexing' => IndexingFields::class,

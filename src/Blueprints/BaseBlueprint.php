@@ -29,7 +29,7 @@ abstract class BaseBlueprint implements Contract
     {
         $blueprint = Blueprint::make()
             ->setHandle($this->handle())
-            ->setContents(['sections' => $this->processSections()]);
+            ->setContents(['tabs' => $this->processedTabs()]);
 
         return $this->removeDisabledFeatureFields($blueprint);
     }
@@ -55,19 +55,21 @@ abstract class BaseBlueprint implements Contract
         })->toArray();
     }
 
-    protected function processSections(): array
+    protected function processedTabs(): array
     {
-        return collect($this->sections())->map(function ($section, $handle) {
+        return collect($this->tabs())->map(function ($tab, $handle) {
             return [
                 'display' => Str::slugToTitle($handle),
-                'fields' => isset($this->data) ? $section::make()->data($this->data)->get() : $section::make()->get(),
+                'sections' => isset($this->data)
+                    ? $tab::make()->data($this->data)->get()
+                    : $tab::make()->get(),
             ];
-        })->filter(function ($section) {
-            return ! empty($section['fields']);
-        })->all();
+        })
+        ->filter(fn ($tab) => ! empty($tab['sections']))
+        ->all();
     }
 
-    abstract protected function sections(): array;
+    abstract protected function tabs(): array;
 
     abstract protected function handle(): string;
 }

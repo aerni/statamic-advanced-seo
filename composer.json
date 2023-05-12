@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": "^8.0",
-        "laravel/framework": "^9.0",
-        "spatie/browsershot": "^3.52",
-        "spatie/laravel-ray": "^1.26",
-        "spatie/schema-org": "^3.8",
-        "statamic/cms": "~3.4.0",
+        "laravel/framework": "^9.0 || ^10.0",
+        "spatie/browsershot": "^3.57",
+        "spatie/laravel-ray": "^1.32",
+        "spatie/schema-org": "^3.14",
+        "statamic/cms": "^4.0",
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {

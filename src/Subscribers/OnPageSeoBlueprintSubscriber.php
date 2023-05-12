@@ -91,7 +91,7 @@ class OnPageSeoBlueprintSubscriber
             ->merge($allFields); // Merge the preparated fields.
 
         // Add all visible fields to the blueprint.
-        $event->blueprint->ensureFieldsInSection($visibleFields, 'SEO');
+        $event->blueprint->ensureFieldsInTab($visibleFields, 'SEO');
 
         // All other SEO fields that are not part of the fieldset and should not be visible.
         $fieldsToHide = collect($seoFields)->diffKeys($visibleFields);
