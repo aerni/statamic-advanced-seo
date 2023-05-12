@@ -59,22 +59,6 @@ class AnalyticsFields extends BaseFields
                 ],
             ],
             [
-                'handle' => 'fathom_domain',
-                'field' => [
-                    'type' => 'text',
-                    'display' => $this->trans('fathom_domain.display'),
-                    'instructions' => $this->trans('fathom_domain.instructions'),
-                    'input_type' => 'text',
-                    'width' => 50,
-                    'listable' => 'hidden',
-                    'antlers' => true,
-                    'feature' => Fathom::class,
-                    'if' => [
-                        'use_fathom' => 'equals true',
-                    ],
-                ],
-            ],
-            [
                 'handle' => 'fathom_spa',
                 'field' => [
                     'type' => 'toggle',
@@ -82,6 +66,7 @@ class AnalyticsFields extends BaseFields
                     'instructions' => $this->trans('fathom_spa.instructions'),
                     'icon' => 'toggle',
                     'listable' => 'hidden',
+                    'width' => 50,
                     'feature' => Fathom::class,
                     'validate' => [
                         'required_if:use_fathom,true',
