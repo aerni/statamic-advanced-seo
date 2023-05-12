@@ -4,7 +4,7 @@
             <img class="rounded-md" :src="this.image">
         </div>
 
-        <div v-else class="p-3 text-center border rounded" style="border-color: #c4ccd4; background-color: #fafcff">
+        <div v-else class="p-3 text-center bg-gray-200 border rounded">
             <small class="mb-0 help-block">{{ this.meta.message }}</small>
         </div>
     </div>
