@@ -13,12 +13,12 @@
                 <div class="flex flex-wrap p-4">
                     @foreach (Aerni\AdvancedSeo\Models\Defaults::enabledInType('site') as $site)
                         @can("view seo {$site['handle']} defaults")
-                            <a href="{{ cp_route('advanced-seo.site.edit', $site['handle']) }}" class="flex items-start w-full p-4 rounded-md lg:w-1/2 hover:bg-gray-200 group">
-                                <div class="w-8 h-8 mr-4 text-gray-800">
+                            <a href="{{ cp_route('advanced-seo.site.edit', $site['handle']) }}" class="flex items-start w-full p-4 rounded-md lg:w-1/2 hover:seo-bg-blue-100 group">
+                                <div class="w-8 h-8 mr-4 text-blue">
                                     @cp_svg($site['icon'])
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="mb-2 text-blue">{{ __("advanced-seo::messages.{$site['handle']}") }}</h3>
+                                    <h3 class="mb-2 text-lg text-gray-800 group-hover:text-blue">{{ __("advanced-seo::messages.{$site['handle']}") }}</h3>
                                     <p>{{ __("advanced-seo::messages.{$site['handle']}_description") }}</p>
                                 </div>
                             </a>
