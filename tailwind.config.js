@@ -1,13 +1,8 @@
 module.exports = {
     prefix: 'seo-',
-
-    content: [
-        './resources/views/**/*.html',
-        './resources/views/**/*.php',
-        './resources/js/**/*.js',
-        './resources/js/**/*.vue',
+    presets: [
+      require('./vendor/statamic/cms/tailwind.config.js'),
     ],
-
     corePlugins: {
         preflight: false,
     },
