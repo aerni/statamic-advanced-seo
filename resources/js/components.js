@@ -1,6 +1,6 @@
-import DefaultsPublishForm from './components/DefaultsPublishForm'
-import SocialImageFieldtype from './components/SocialImageFieldtype'
-import SourceFieldtype from './components/SourceFieldtype'
+import DefaultsPublishForm from './components/DefaultsPublishForm.vue'
+import SocialImageFieldtype from './components/SocialImageFieldtype.vue'
+import SourceFieldtype from './components/SourceFieldtype.vue'
 
 Statamic.booting(() => {
     Statamic.component('defaults-publish-form', DefaultsPublishForm)
