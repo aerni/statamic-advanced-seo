@@ -33,9 +33,10 @@ abstract class BaseFields implements Fields
 
     public function items(): array
     {
-        return collect($this->get())->mapWithKeys(function ($field) {
-            return [$field['handle'] => $field['field']];
-        })->toArray();
+        return collect($this->get())
+            ->flatten(2)
+            ->mapWithKeys(fn ($field) => [$field['handle'] => $field['field']])
+            ->toArray();
     }
 
     protected function trans(string $key, array $placeholders = []): ?string
