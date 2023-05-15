@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
-use Rebing\GraphQL\Support\Type;
-use Illuminate\Contracts\View\View;
 use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Illuminate\Contracts\View\View;
+use Rebing\GraphQL\Support\Type;
+use Statamic\Facades\GraphQL;
 
 class RenderedViewsType extends Type
 {
