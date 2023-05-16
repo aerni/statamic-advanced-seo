@@ -1,5 +1,14 @@
-{{# Outputs the site and entry JSON-LD Schema #}}
-{{ seo:schema }}
+{{# Outputs the site JSON-LD Schema #}}
+{{ if seo:site_schema }}
+    <script type="application/ld+json">{{ seo:site_schema }}</script>
+{{ /if }}
+
+{{# Outputs the page JSON-LD Schema #}}
+{{ if seo:page_schema }}
+    <script type="application/ld+json">{{ seo:page_schema }}</script>
+{{ /if }}
 
 {{# Outputs the breadcrumbs #}}
-{{ seo:breadcrumbs }}
+{{ if seo:breadcrumbs }}
+    <script type="application/ld+json">{{ seo:breadcrumbs }}</script>
+{{ /if }}
