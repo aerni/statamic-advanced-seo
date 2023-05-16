@@ -172,7 +172,7 @@ class GraphQlCascade extends BaseCascade
         return $hreflang;
     }
 
-    public function canonical(): string
+    public function canonical(): ?string
     {
         $type = $this->get('canonical_type');
 
@@ -276,7 +276,7 @@ class GraphQlCascade extends BaseCascade
         return $this;
     }
 
-    protected function buildUrl(mixed $model): string
+    protected function buildUrl(mixed $model): ?string
     {
         return $this->baseUrl
             ? URL::assemble($this->baseUrl, $model->url())

@@ -57,7 +57,8 @@ class ViewCascade extends BaseCascade
             'canonical',
             'prev_url',
             'next_url',
-            'schema',
+            'site_schema',
+            'page_schema',
             'breadcrumbs',
         ]);
     }
@@ -311,14 +312,7 @@ class ViewCascade extends BaseCascade
             : null;
     }
 
-    public function schema(): ?string
-    {
-        $schema = $this->siteSchema().$this->entrySchema();
-
-        return ! empty($schema) ? $schema : null;
-    }
-
-    protected function siteSchema(): ?string
+    public function siteSchema(): ?string
     {
         $type = $this->get('site_json_ld_type');
 
@@ -327,11 +321,7 @@ class ViewCascade extends BaseCascade
         }
 
         if ($type == 'custom') {
-            $data = $this->get('site_json_ld');
-
-            return $data
-                ? '<script type="application/ld+json">'.$data.'</script>'
-                : null;
+            return $this->get('site_json_ld');
         }
 
         $siteUrl = $this->model->get('site')?->absoluteUrl() ?? Site::current()->absoluteUrl();
@@ -357,16 +347,12 @@ class ViewCascade extends BaseCascade
                 ->url($siteUrl);
         }
 
-        return $schema->toScript();
+        return json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE);
     }
 
-    protected function entrySchema(): ?string
+    public function pageSchema(): ?string
     {
-        $data = $this->get('json_ld')?->value();
-
-        return $data
-            ? '<script type="application/ld+json">'.$data.'</script>'
-            : null;
+        return $this->get('json_ld')?->value();
     }
 
     public function breadcrumbs(): ?string
@@ -388,7 +374,9 @@ class ViewCascade extends BaseCascade
                 ->item($crumb['url']);
         })->all();
 
-        return Schema::breadcrumbList()->itemListElement($listItems);
+        $breadcrumbs = Schema::breadcrumbList()->itemListElement($listItems);
+
+        return json_encode($breadcrumbs->toArray(), JSON_UNESCAPED_UNICODE);
     }
 
     protected function breadcrumbsListItems(): Collection

@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
 use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Illuminate\Contracts\View\View;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 
@@ -20,12 +21,17 @@ class RenderedViewsType extends Type
         return [
             'head' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::head', ['seo' => $cascade->toAugmentedArray()]),
+                'resolve' => fn (GraphQlCascade $cascade) => $this->formatView(view('advanced-seo::head', ['seo' => $cascade->toAugmentedArray()])),
             ],
             'body' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn (GraphQlCascade $cascade) => view('advanced-seo::body', ['seo' => $cascade->toAugmentedArray()]),
+                'resolve' => fn (GraphQlCascade $cascade) => $this->formatView(view('advanced-seo::body', ['seo' => $cascade->toAugmentedArray()])),
             ],
         ];
+    }
+
+    protected function formatView(View $view): string
+    {
+        return preg_replace('/\s+/', ' ', $view->render());
     }
 }
