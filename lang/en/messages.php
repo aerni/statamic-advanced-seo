@@ -48,4 +48,6 @@ return [
 
     'commit_message' => 'SEO defaults saved',
 
+    'pixels' => 'pixels',
+
 ];

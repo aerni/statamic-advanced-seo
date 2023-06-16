@@ -3,48 +3,48 @@
 return [
 
     'seo_section_title_description' => [
-        'display' => 'Title & Description',
-        'instructions' => 'Configure the title and description of this :type.',
-        'default_instructions' => 'Configure the default title and description of your :type.',
+        'display' => 'Titel & Beschreibung',
+        'instructions' => 'Konfiguriere den Titel und die Beschreibung dieses :Types.',
+        'default_instructions' => 'Konfiguriere den Titel und die Beschreibung deiner :Type.',
     ],
 
     'seo_title' => [
-        'display' => 'Meta Title',
-        'instructions' => 'Set the meta title of this :type.',
-        'default_instructions' => 'Set the default meta title of your :type.',
+        'display' => 'Meta-Titel',
+        'instructions' => 'Definiere den Meta-Titel dieses :Types.',
+        'default_instructions' => 'Definiere den Meta-Titel deiner :Type.',
     ],
 
     'seo_description' => [
-        'display' => 'Meta Description',
-        'instructions' => 'Set the meta description of this :type.',
-        'default_instructions' => 'Set the default meta description of your :type.',
+        'display' => 'Meta-Beschreibung',
+        'instructions' => 'Definiere die Meta-Beschreibung dieses :Types.',
+        'default_instructions' => 'Definiere die Meta-Beschreibung deiner :Type.',
     ],
 
     'seo_site_name_position' => [
-        'display' => 'Site Name Position',
-        'instructions' => 'Set the site name position for the meta title of this :type.',
-        'default_instructions' => 'Set the default site name position for the meta title of your :type.',
-        'end' => 'End',
+        'display' => 'Position Website-Name',
+        'instructions' => 'Definiere die Position des Website-Namens im Meta-Titel dieses :Types.',
+        'default_instructions' => 'Definiere die Position des Website-Namens im Meta-Titel deiner :Type.',
+        'end' => 'Ende',
         'start' => 'Start',
-        'disabled' => 'Disabled',
+        'disabled' => 'Deaktiviert',
     ],
 
     'seo_section_social_images_generator' => [
         'display' => 'Social Images Generator',
-        'instructions' => 'Configure the generator settings of this :type.',
-        'default_instructions' => 'Configure the default generator settings of your :type.',
+        'instructions' => 'Konfiguriere die Generator-Einstellungen dieses :Types',
+        'default_instructions' => 'Konfiguriere die Generator-Einstellungen deiner :Type.',
     ],
 
     'seo_generate_social_images' => [
-        'display' => 'Generate Social Images',
-        'instructions' => 'Activate to use the social images generator for this :type.',
-        'default_instructions' => 'Activate to use the social images generator for your :type by default.',
+        'display' => 'Generiere Social Images',
+        'instructions' => 'Aktiviere diese Option, um die Social Images für diesen :Type zu generieren.',
+        'default_instructions' => 'Aktiviere diese Option, um die Social Images deiner :Type zu generieren.',
     ],
 
     'seo_social_images_theme' => [
         'display' => 'Theme',
-        'instructions' => 'Choose the social images theme for this :type.',
-        'default_instructions' => 'Choose the default social images theme for your :type.',
+        'instructions' => 'Wähle das Social Images Theme dieses :Types.',
+        'default_instructions' => 'Wähle das Social Images Theme deiner :Type.',
     ],
 
     'seo_generated_og_image' => [
@@ -57,356 +57,356 @@ return [
 
     'seo_section_og' => [
         'display' => 'Open Graph',
-        'instructions' => 'Configure the Open Graph settings of this :type.',
-        'default_instructions' => 'Configure the default Open Graph settings of your :type.',
+        'instructions' => 'Konfiguriere die Open-Graph-Einstellungen dieses :Type.',
+        'default_instructions' => 'Konfiguriere die Open-Graph-Voreinstellungen deiner :Type.',
     ],
 
     'seo_og_image' => [
-        'display' => 'Open Graph Image',
-        'instructions' => 'Add an Open Graph image for this :type. It will be cropped to :size.',
-        'default_instructions' => 'Add a default Open Graph image for your :type. It will be cropped to :size.',
+        'display' => 'Open Graph Bild',
+        'instructions' => 'Füge ein Open-Graph-Bild für diesen :Type hinzu. Es wird auf :size zugeschnitten.',
+        'default_instructions' => 'Füge ein Open-Graph-Bild für deine :Type hinzu. Es wird auf :size zugeschnitten.',
     ],
 
     'seo_og_title' => [
-        'display' => 'Open Graph Title',
-        'instructions' => 'Set the Open Graph title of this :type.',
-        'default_instructions' => 'Set the default Open Graph title of your :type.',
+        'display' => 'Open Graph-Titel',
+        'instructions' => 'Legen Sie den Open Graph-Titel für diesen :type fest.',
+        'default_instructions' => 'Legen Sie den Standard-Open Graph-Titel für Ihren :type fest.',
     ],
 
     'seo_og_description' => [
-        'display' => 'Open Graph Description',
-        'instructions' => 'Set the Open Graph description of this :type.',
-        'default_instructions' => 'Set the default Open Graph description of your :type.',
+        'display' => 'Open Graph-Beschreibung',
+        'instructions' => 'Legen Sie die Open Graph-Beschreibung für diesen :type fest.',
+        'default_instructions' => 'Legen Sie die Standard-Open Graph-Beschreibung für Ihren :type fest.',
     ],
 
     'seo_section_twitter' => [
         'display' => 'Twitter',
-        'instructions' => 'Configure the Twitter settings of this :type.',
-        'default_instructions' => 'Configure the default Twitter settings of your :type.',
+        'instructions' => 'Konfigurieren Sie die Twitter-Einstellungen für diesen :type.',
+        'default_instructions' => 'Konfigurieren Sie die Standard-Twitter-Einstellungen für Ihren :type.',
     ],
 
     'seo_twitter_card' => [
-        'display' => 'Twitter Card',
-        'instructions' => 'Choose the type of card to use when sharing this :type.',
-        'default_instructions' => 'Choose the default type of card to use when sharing your :type.',
-        'summary' => 'Regular',
-        'summary_large_image' => 'Large Image',
+        'display' => 'Twitter-Karte',
+        'instructions' => 'Wählen Sie den Kartentyp aus, der verwendet werden soll, wenn Sie diesen :type teilen.',
+        'default_instructions' => 'Wählen Sie den Standardkartentyp aus, der verwendet werden soll, wenn Sie Ihren :type teilen.',
+        'summary' => 'Normal',
+        'summary_large_image' => 'Großes Bild',
     ],
 
     'seo_twitter_summary_image' => [
-        'display' => 'Twitter Summary Image',
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to :size.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to :size.',
+        'display' => 'Twitter-Zusammenfassungsbild',
+        'instructions' => 'Fügen Sie ein Twitter-Bild für diesen :type hinzu. Es wird auf :size zugeschnitten.',
+        'default_instructions' => 'Fügen Sie ein Standard-Twitter-Bild für Ihren :type hinzu. Es wird auf :size zugeschnitten.',
     ],
 
     'seo_twitter_summary_large_image' => [
-        'display' => 'Twitter Summary Large Image',
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to :size.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to :size.',
+        'display' => 'Twitter-Zusammenfassung mit großem Bild',
+        'instructions' => 'Fügen Sie ein Twitter-Bild für diesen :type hinzu. Es wird auf :size zugeschnitten.',
+        'default_instructions' => 'Fügen Sie ein Standard-Twitter-Bild für Ihren :type hinzu. Es wird auf :size zugeschnitten.',
     ],
 
     'seo_twitter_title' => [
-        'display' => 'Twitter Title',
-        'instructions' => 'Set the Twitter title of this :type.',
-        'default_instructions' => 'Set the default Twitter title of your :type.',
+        'display' => 'Twitter-Titel',
+        'instructions' => 'Legen Sie den Twitter-Titel für diesen :type fest.',
+        'default_instructions' => 'Legen Sie den Standard-Twitter-Titel für Ihren :type fest.',
     ],
 
     'seo_twitter_description' => [
-        'display' => 'Twitter Description',
-        'instructions' => 'Set the Twitter description of this :type.',
-        'default_instructions' => 'Set the default Twitter description of your :type.',
+        'display' => 'Twitter-Beschreibung',
+        'instructions' => 'Legen Sie die Twitter-Beschreibung für diesen :type fest.',
+        'default_instructions' => 'Legen Sie die Standard-Twitter-Beschreibung für Ihren :type fest.',
     ],
 
     'seo_section_canonical_url' => [
-        'display' => 'Canonical URL',
-        'instructions' => 'Configure the canonical URL settings of this :type.',
-        'default_instructions' => 'Configure the default canonical URL settings of your :type.',
+        'display' => 'Kanonische URL',
+        'instructions' => 'Konfigurieren Sie die Einstellungen für die kanonische URL dieses :type.',
+        'default_instructions' => 'Konfigurieren Sie die Standard-Einstellungen für die kanonische URL Ihres :type.',
     ],
 
     'seo_canonical_type' => [
-        'display' => 'Canonical URL',
-        'instructions' => 'Where should the canonical URL of this :type point to.',
-        'default_instructions' => 'Where should the default canonical URL of your :type point to.',
-        'current' => 'Current :type',
-        'other' => 'Other Entry',
-        'custom' => 'Custom URL',
+        'display' => 'Kanonische URL',
+        'instructions' => 'Wohin sollte die kanonische URL dieses :type zeigen?',
+        'default_instructions' => 'Wohin sollte die standardmäßige kanonische URL Ihres :type zeigen?',
+        'current' => 'Aktueller :type',
+        'other' => 'Anderer Eintrag',
+        'custom' => 'Benutzerdefinierte URL',
     ],
 
     'seo_canonical_entry' => [
-        'display' => 'Entry',
-        'instructions' => 'Choose the entry with the original content.',
-        'default_instructions' => 'Choose the entry with the original content.',
+        'display' => 'Eintrag',
+        'instructions' => 'Wählen Sie den Eintrag mit dem Originalinhalt aus.',
+        'default_instructions' => 'Wählen Sie den Eintrag mit dem Originalinhalt aus.',
     ],
 
     'seo_canonical_custom' => [
         'display' => 'URL',
-        'instructions' => 'A fully qualified URL starting with https://.',
-        'default_instructions' => 'A fully qualified URL starting with https://.',
+        'instructions' => 'Eine vollständige URL, die mit https:// beginnt.',
+        'default_instructions' => 'Eine vollständige URL, die mit https:// beginnt.',
     ],
 
     'seo_section_indexing' => [
-        'display' => 'Indexing',
-        'instructions' => 'Configure the indexing settings of this :type.',
-        'default_instructions' => 'Configure the default indexing settings of your :type.',
+        'display' => 'Indexierung',
+        'instructions' => 'Konfigurieren Sie die Indexierungseinstellungen dieses :type.',
+        'default_instructions' => 'Konfigurieren Sie die standardmäßigen Indexierungseinstellungen Ihres :type.',
     ],
 
     'seo_noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Prevent this :type from being indexed by search engines.',
-        'default_instructions' => 'Prevent your :type from being indexed by search engines.',
+        'instructions' => 'Verhindere, dass dieser :type von Suchmaschinen indexiert wird.',
+        'default_instructions' => 'Verhindere, dass Ihr :type von Suchmaschinen indexiert wird.',
     ],
 
     'seo_nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Prevent site crawlers from following links on this :type\'s page.',
-        'default_instructions' => 'Prevent site crawlers from following links on your :type\' pages.',
+        'instructions' => 'Verhindere, dass Suchmaschinen-Crawler Links auf der Seite dieses :type verfolgen.',
+        'default_instructions' => 'Verhindere, dass Suchmaschinen-Crawler Links auf Ihren :type-Seiten verfolgen.',
     ],
 
     'seo_section_sitemap' => [
         'display' => 'Sitemap',
-        'instructions' => 'Configure the sitemap settings of this :type.',
-        'default_instructions' => 'Configure the default sitemap settings of your :type.',
+        'instructions' => 'Konfiguriere die Sitemap-Einstellungen dieses :type.',
+        'default_instructions' => 'Konfiguriere die standardmäßigen Sitemap-Einstellungen deines :type.',
     ],
 
     'seo_sitemap_enabled' => [
-        'display' => 'Enabled',
-        'instructions' => 'Choose to add or remove this :type from the sitemap.',
-        'default_instructions' => 'Choose to add or remove your :type from the sitemap.',
+        'display' => 'Aktiviert',
+        'instructions' => 'Wähle aus, ob dieser :type der Sitemap hinzugefügt oder daraus entfernt werden soll.',
+        'default_instructions' => 'Wähle aus, ob dein :type der Sitemap hinzugefügt oder daraus entfernt werden soll.',
     ],
 
     'seo_sitemap_priority' => [
-        'display' => 'Priority',
-        'instructions' => 'Choose the sitemap priority of this :type. 1.0 is the most important.',
-        'default_instructions' => 'Choose the default sitemap priority of your :type. 1.0 is the most important.',
+        'display' => 'Priorität',
+        'instructions' => 'Wähle die Sitemap-Priorität dieses :type aus. 1.0 ist am wichtigsten.',
+        'default_instructions' => 'Wähle die standardmäßige Sitemap-Priorität deines :type aus. 1.0 ist am wichtigsten.',
     ],
 
     'seo_sitemap_change_frequency' => [
-        'display' => 'Change Frequency',
-        'instructions' => 'Choose the frequency in which search engines should crawl this :type.',
-        'default_instructions' => 'Choose the default frequency in which search engines should crawl your :type.',
-        'always' => 'Always',
-        'hourly' => 'Hourly',
-        'daily' => 'Daily',
-        'weekly' => 'Weekly',
-        'monthly' => 'Monthly',
-        'yearly' => 'Yearly',
-        'never' => 'Never',
+        'display' => 'Änderungsfrequenz',
+        'instructions' => 'Wähle die Häufigkeit aus, mit der Suchmaschinen dieses :type durchsuchen sollten.',
+        'default_instructions' => 'Wähle die standardmäßige Häufigkeit aus, mit der Suchmaschinen deinen :type durchsuchen sollten.',
+        'always' => 'Immer',
+        'hourly' => 'Stündlich',
+        'daily' => 'Täglich',
+        'weekly' => 'Wöchentlich',
+        'monthly' => 'Monatlich',
+        'yearly' => 'Jährlich',
+        'never' => 'Nie',
     ],
 
     'seo_section_json_ld' => [
         'display' => 'JSON-ld Schema',
-        'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this :type.',
-        'default_instructions' => 'Add default custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for your :type.',
+        'instructions' => 'Fügen Sie benutzerdefiniertes JSON-LD für diesen :type hinzu.',
+        'default_instructions' => 'Fügen Sie standardmäßiges benutzerdefiniertes JSON-LD für Ihren :type hinzu.',
     ],
 
     'seo_json_ld' => [
         'display' => 'JSON-LD Schema',
-        'instructions' => 'The structured data of this :type. This will be wrapped in the appropriate script tag.',
-        'default_instructions' => 'The default structured data of your :type. This will be wrapped in the appropriate script tag.',
+        'instructions' => 'Die strukturierten Daten dieses :type. Diese werden in den entsprechenden Skript-Tag eingebettet.',
+        'default_instructions' => 'Die standardmäßigen strukturierten Daten Ihres :type. Diese werden in den entsprechenden Skript-Tag eingebettet.',
     ],
 
     'section_fathom' => [
         'display' => 'Fathom',
-        'instructions' => 'Use [Fathom](https://usefathom.com) as a privacy-friendly alternative to Google Analytics.',
+        'instructions' => 'Verwenden Sie Fathom als datenschutzfreundliche Alternative zu Google Analytics.',
     ],
 
     'use_fathom' => [
         'display' => 'Fathom',
-        'instructions' => 'Add the Fathom tracking script to your head.',
+        'instructions' => 'Fügen Sie das Fathom-Tracking-Skript zu Ihrem Head-Bereich hinzu.',
     ],
 
     'fathom_id' => [
-        'display' => 'Site ID',
-        'instructions' => 'Add your site ID.',
+        'display' => 'Site-ID',
+        'instructions' => 'Fügen Sie Ihre Site-ID hinzu.',
     ],
 
     'fathom_spa' => [
-        'display' => 'SPA Mode',
-        'instructions' => 'Activate if your site is a single page application.',
+        'display' => 'SPA-Modus',
+        'instructions' => 'Aktivieren Sie dies, wenn Ihre Website eine Single-Page-Anwendung ist.',
     ],
 
     'section_cloudflare_web_analytics' => [
         'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'Use [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics) as a privacy-friendly alternative to Google Analytics.',
+        'instructions' => 'Verwenden Sie Cloudflare Web Analytics als datenschutzfreundliche Alternative zu Google Analytics.',
     ],
 
     'use_cloudflare_web_analytics' => [
         'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'Add the Cloudflare tracking script to your head.',
+        'instructions' => 'Fügen Sie das Cloudflare-Tracking-Skript zu Ihrem Head-Bereich hinzu.',
     ],
 
     'cloudflare_web_analytics' => [
-        'display' => 'Beacon Token',
-        'instructions' => 'Add your beacon token.',
+        'display' => 'Beacon-Token',
+        'instructions' => 'Fügen Sie Ihr Beacon-Token hinzu.',
     ],
 
     'section_google_tag_manager' => [
         'display' => 'Google Tag Manager',
-        'instructions' => 'Use [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager) to track your users. You are `required by privacy law` to get your user\'s consent before loading any tracking scripts. You also need to inform them about what data you collect and what you intent to do with it.',
+        'instructions' => 'Verwenden Sie Google Tag Manager, um Ihre Benutzer zu verfolgen. Sie sind "gemäß den Datenschutzgesetzen verpflichtet", die Zustimmung Ihrer Benutzer einzuholen, bevor Sie irgendwelche Tracking-Skripte laden. Sie müssen sie auch über die Daten informieren, die Sie sammeln, und was Sie damit beabsichtigen.',
     ],
 
     'use_google_tag_manager' => [
         'display' => 'Google Tag Manager',
-        'instructions' => 'Add the Google Tag Manager tracking scripts.',
+        'instructions' => 'Fügen Sie die Google Tag Manager-Tracking-Skripte hinzu.',
     ],
 
     'google_tag_manager' => [
-        'display' => 'Container ID',
-        'instructions' => 'Add your container ID.',
+        'display' => 'Container-ID',
+        'instructions' => 'Fügen Sie Ihre Container-ID hinzu.',
     ],
 
     'section_favicon' => [
         'display' => 'Favicon',
-        'instructions' => 'Configure the favicon of your site.',
+        'instructions' => 'Konfigurieren Sie das Favicon Ihrer Website.',
     ],
 
     'favicon_svg' => [
         'display' => 'Favicon (SVG)',
-        'instructions' => 'Add your favicon as SVG file.',
+        'instructions' => 'Fügen Sie Ihr Favicon als SVG-Datei hinzu.',
     ],
 
     'section_titles' => [
-        'display' => 'Titles',
-        'instructions' => 'Configure the appearance of your page titles.',
+        'display' => 'Titel',
+        'instructions' => 'Konfigurieren Sie das Erscheinungsbild Ihrer Seitentitel.',
     ],
 
     'site_name' => [
-        'display' => 'Site Name',
-        'instructions' => 'The site name is added to your meta titles.',
+        'display' => 'Website-Name',
+        'instructions' => 'Der Website-Name wird Ihren Meta-Titeln hinzugefügt.',
     ],
 
     'title_separator' => [
-        'display' => 'Title Separator',
-        'instructions' => 'This separates the site name and page title.',
+        'display' => 'Trennzeichen für Titel',
+        'instructions' => 'Dieses Zeichen trennt den Website-Namen und den Seitentitel.',
     ],
 
     'section_knowledge_graph' => [
-        'display' => 'Basic Information',
-        'instructions' => 'Add basic [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) information about this site.',
+        'display' => 'Grundlegende Informationen',
+        'instructions' => 'Fügen Sie grundlegende JSON-LD-Informationen zu dieser Website hinzu.',
     ],
 
     'site_json_ld_type' => [
-        'display' => 'Content Type',
-        'instructions' => 'The type of content this site represents.',
-        'none' => 'None',
-        'organization' => 'Organization',
+        'display' => 'Inhaltstyp',
+        'instructions' => 'Der Typ des Inhalts, den diese Website repräsentiert.',
+        'none' => 'Keiner',
+        'organization' => 'Organisation',
         'person' => 'Person',
-        'custom' => 'Custom',
+        'custom' => 'Benutzerdefiniert',
     ],
 
     'organization_name' => [
-        'display' => 'Organization Name',
-        'instructions' => "The name of this site's organization.",
+        'display' => 'Organisationsname',
+        'instructions' => 'Der Name der Organisation dieser Website.',
     ],
 
     'organization_logo' => [
-        'display' => 'Organization Logo',
-        'instructions' => 'Add the logo with a minimum size of 112 x 112 pixels.',
+        'display' => 'Organisationslogo',
+        'instructions' => 'Fügen Sie das Logo mit einer Mindestgröße von 112 x 112 Pixeln hinzu.',
     ],
 
     'person_name' => [
-        'display' => 'Person Name',
-        'instructions' => "The name of this site's person.",
+        'display' => 'Personenname',
+        'instructions' => 'Der Name der Person dieser Website.',
     ],
 
     'site_json_ld' => [
         'display' => 'JSON-LD Schema',
-        'instructions' => 'Structured data that will be added to every page. This will be wrapped in the appropriate script tag.',
+        'instructions' => 'Strukturierte Daten, die auf jeder Seite hinzugefügt werden. Diese werden in den entsprechenden Skript-Tag eingebunden.',
     ],
 
     'section_breadcrumbs' => [
         'display' => 'Breadcrumbs',
-        'instructions' => "Breadcrumbs help your users understand your site by indicating each page's position in the hierarchy.",
+        'instructions' => 'Breadcrumbs helfen Ihren Benutzern, Ihre Website zu verstehen, indem sie die Position jeder Seite in der Hierarchie anzeigen.',
     ],
 
     'use_breadcrumbs' => [
         'display' => 'Breadcrumbs',
-        'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your pages.',
+        'instructions' => 'Fügen Sie Breadcrumbs zu Ihren Seiten hinzu.',
     ],
 
     'section_crawling' => [
         'display' => 'Crawling',
-        'instructions' => 'Configure the crawling settings of your site. These settings will take precedence over their counterparts on entries and terms.',
+        'instructions' => 'Konfigurieren Sie die Crawling-Einstellungen Ihrer Website. Diese Einstellungen haben Vorrang vor entsprechenden Einstellungen in Einträgen und Begriffen.',
     ],
 
     'noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Prevent your site from being indexed by search engines.',
+        'instructions' => 'Verhindern Sie, dass Ihre Website von Suchmaschinen indexiert wird.',
     ],
 
     'nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Prevent site crawlers from following any links on your site.',
+        'instructions' => 'Verhindern Sie, dass Suchmaschinen-Crawler Links auf Ihrer Website verfolgen.',
     ],
 
     'section_sitemap' => [
         'display' => 'Sitemap',
-        'instructions' => 'Configure the sitemap settings of your site.',
+        'instructions' => 'Konfigurieren Sie die Sitemap-Einstellungen Ihrer Website.',
     ],
 
     'excluded_collections' => [
-        'display' => 'Collections',
-        'instructions' => 'Collections you want to exclude from the sitemap.',
+        'display' => 'Sammlungen',
+        'instructions' => 'Sammlungen, die Sie aus der Sitemap ausschließen möchten.',
     ],
 
     'excluded_taxonomies' => [
-        'display' => 'Taxonomies',
-        'instructions' => 'Taxonomies you want to exclude from the sitemap.',
+        'display' => 'Taxonomien',
+        'instructions' => 'Taxonomien, die Sie aus der Sitemap ausschließen möchten.',
     ],
 
     'section_verification' => [
-        'display' => 'Site verification',
-        'instructions' => 'Verify your ownership of this site.',
+        'display' => 'Seitenverifizierung',
+        'instructions' => 'Verifizieren Sie den Besitz Ihrer Website.',
     ],
 
     'google_site_verification_code' => [
-        'display' => 'Google Verification Code',
-        'instructions' => 'Add your Google verification code. You can get it in [Google Search Console](https://search.google.com/search-console).',
+        'display' => 'Google-Verifizierungscode',
+        'instructions' => 'Fügen Sie Ihren Google-Verifizierungscode hinzu. Sie können ihn in der Google Search Console erhalten.',
     ],
 
     'bing_site_verification_code' => [
-        'display' => 'Bing Verification Code',
-        'instructions' => 'Add your Bing verification code. You can get it in [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
+        'display' => 'Bing-Verifizierungscode',
+        'instructions' => 'Fügen Sie Ihren Bing-Verifizierungscode hinzu. Sie können ihn in den Bing Webmaster-Tools erhalten.',
     ],
 
     'section_social_images_generator' => [
-        'display' => 'Social Images Generator',
-        'instructions' => 'Configurate the settings of the social images generator.',
+        'display' => 'Generator für Social-Media-Bilder',
+        'instructions' => 'Konfigurieren Sie die Einstellungen des Generators für Social-Media-Bilder.',
     ],
 
     'social_images_generator_collections' => [
-        'display' => 'Collections',
-        'instructions' => 'Enable the generator for the selected collections.',
+        'display' => 'Sammlungen',
+        'instructions' => 'Aktivieren Sie den Generator für die ausgewählten Sammlungen.',
     ],
 
     'section_og' => [
         'display' => 'Open Graph',
-        'instructions' => 'Configure the site-wide Open Graph settings.',
+        'instructions' => 'Konfigurieren Sie die siteweiten Open Graph-Einstellungen.',
     ],
 
     'og_image' => [
-        'display' => 'Open Graph Image',
-        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+        'display' => 'Open Graph-Bild',
+        'instructions' => 'Dieses Bild wird verwendet, wenn keines im Inhalt festgelegt wurde. Es wird auf :size zugeschnitten.',
     ],
 
     'section_twitter' => [
         'display' => 'Twitter',
-        'instructions' => 'Configure the site-wide Twitter settings.',
+        'instructions' => 'Konfigurieren Sie die siteweiten Twitter-Einstellungen.',
     ],
 
     'twitter_summary_image' => [
-        'display' => 'Twitter Summary Image',
-        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+        'display' => 'Twitter Zusammenfassungs-Bild',
+        'instructions' => 'Dieses Bild wird verwendet, wenn keines im Inhalt festgelegt wurde. Es wird auf :size zugeschnitten.',
     ],
 
     'twitter_summary_large_image' => [
-        'display' => 'Twitter Summary Large Image',
-        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+        'display' => 'Twitter Zusammenfassungs-Bild (groß)',
+        'instructions' => 'Dieses Bild wird verwendet, wenn keines im Inhalt festgelegt wurde. Es wird auf :size zugeschnitten.',
     ],
 
     'twitter_handle' => [
-        'display' => 'Twitter Username',
-        'instructions' => 'Add your Twitter username.',
+        'display' => 'Twitter-Benutzername',
+        'instructions' => 'Fügen Sie Ihren Twitter-Benutzernamen hinzu.',
     ],
 
 ];

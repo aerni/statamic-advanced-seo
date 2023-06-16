@@ -5,8 +5,8 @@ return [
     'advanced_seo' => [
         'config' => [
             'field' => [
-                'display' => 'Field',
-                'instructions' => 'The Advanced SEO field you want to use. Make sure to set the `handle` of this field to the one shown in the dropdown.',
+                'display' => 'Feld',
+                'instructions' => 'Das Advanced SEO-Feld, das Sie verwenden möchten. Stellen Sie sicher, dass Sie den handle dieses Feldes auf den im Dropdown-Menü angezeigten Wert setzen.',
             ],
         ],
     ],

@@ -53,6 +53,8 @@ class SocialImageRepository
     {
         $type = $this->findModel($type);
 
-        return "{$type['width']} x {$type['height']} pixels";
+        $pixels = __('advanced-seo::messages.pixels');
+
+        return "{$type['width']} x {$type['height']} {$pixels}";
     }
 }

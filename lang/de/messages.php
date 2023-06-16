@@ -1,51 +1,53 @@
 <?php
 
 return [
-    'site' => 'Site',
+    'site' => 'Website',
 
-    'general' => 'General',
-    'general_description' => 'Configure general information about your site.',
+    'general' => 'Allgemein',
+    'general_description' => 'Konfiguriere allgemeine Informationen deiner Website.',
 
-    'indexing' => 'Indexing',
-    'indexing_description' => 'Configure settings like crawling and sitemap.',
+    'indexing' => 'Indexierung',
+    'indexing_description' => 'Konfiguriere Einstellungen wie Crawling und Sitemap.',
 
     'social_media' => 'Social Media',
-    'social_media_description' => 'Configure fallback images and profile information.',
+    'social_media_description' => 'Konfiguriere Fallback-Bilder und Profilinformationen.',
 
     'analytics' => 'Analytics',
-    'analytics_description' => 'Configure analytics trackers like Fathom.',
+    'analytics_description' => 'Konfiguriere analytische Tracker wie Fathom.',
 
     'favicons' => 'Favicons',
-    'favicons_description' => 'Configure the favicon of your site.',
+    'favicons_description' => 'Konfiguriere das Favicon deiner Website',
 
-    'collections' => 'Collections',
-    'collections_description' => 'Customize the default data of your collection entries. Choose a collection below.',
+    'collections' => 'Sammlungen',
+    'collections_description' => 'Passe die Voreinstellungen deiner Einträge an. Wähle unten eine Sammlung aus.',
 
-    'taxonomies' => 'Taxonomies',
-    'taxonomies_description' => 'Customize the default data of your taxonomy terms. Choose a taxonomy below.',
+    'taxonomies' => 'Taxonomien',
+    'taxonomies_description' => 'Passe die Voreinstellungen deiner Begriffe an. Wähle unten eine Taxonomie aus.',
 
-    'social_images_generator_save_sync' => 'Save the entry to generate the image.',
-    'social_images_generator_save_queue' => 'Save the entry to generate the image in the background.',
-    'social_images_generator_generating_queue' => 'Generating the social images in the background.',
-    'social_images_generator_generated' => 'The social images have been successfully generated.',
-    'social_images_generator_on_demand' => 'The image will be generated the first time you visit the URL of this entry.',
+    'social_images_generator_save_sync' => 'Speichere den Eintrag, um das Bild zu generieren.',
+    'social_images_generator_save_queue' => 'Speichere den Eintrag, um das Bild im Hintergrund zu generieren.',
+    'social_images_generator_generating_queue' => 'Generiere die Social-Media-Bilder im Hintergrund.',
+    'social_images_generator_generated' => 'Die Social-Media-Bilder wurden erfolgreich generiert.',
+    'social_images_generator_on_demand' => 'Das Bild wird generiert, wenn du zum ersten Mal die URL dieses Eintrags besuchst.',
 
     'field_sources' => [
-        'auto' => 'Auto',
-        'default' => 'Default',
-        'custom' => 'Custom',
+        'auto' => 'Automatisch',
+        'default' => 'Voreinstellung',
+        'custom' => 'Benutzerdefiniert',
     ],
 
     'field_source_description' => [
-        'auto' => 'The value is inherited from the <code>:title (:handle)</code> field.',
-        'defaults' => 'The value is inherited from the <code>:title</code> defaults.',
+        'auto' => 'Der Wert wird vom Feld <code>:title (:handle)</code> geerbt.',
+        'defaults' => 'Der Wert wird von den <code>:title</code>-Voreinstellungen geerbt.',
     ],
 
-    'entry' => 'Entry',
-    'entries' => 'Entries',
-    'term' => 'Term',
-    'terms' => 'Terms',
+    'entry' => 'Eintrag',
+    'entries' => 'Einträge',
+    'term' => 'Begriff',
+    'terms' => 'Begriffe',
 
-    'commit_message' => 'SEO defaults saved',
+    'commit_message' => 'SEO-Voreinstellungen gespeichert',
+
+    'pixels' => 'pixels',
 
 ];
