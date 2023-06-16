@@ -12,6 +12,7 @@ class Migrate extends Command
     use RunsInPlease;
 
     protected $signature = 'seo:migrate';
+
     protected $description = 'Migrate your existing content';
 
     public function handle(): void

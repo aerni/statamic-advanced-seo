@@ -13,6 +13,7 @@ use Statamic\Stache\Stores\Store;
 class SeoDefaultsRepository implements Contract
 {
     protected Stache $stache;
+
     protected Store $store;
 
     public function __construct(Stache $stache)

@@ -27,14 +27,14 @@ class GenerateFavicons implements ShouldQueue
             ->augmentedValue('favicon_svg')
             ->value();
 
-        $exportPath = Path::tidy($favicon->container()->diskPath() . '/' . $favicon->folder());
+        $exportPath = Path::tidy($favicon->container()->diskPath().'/'.$favicon->folder());
 
         $svg = File::get($favicon->resolvedPath());
 
         $iOSBackground = $event->defaults->inDefaultSite()->get('favicon_ios_color');
 
-        $this->createThumbnail($svg, $exportPath . '/apple-touch-icon.png', 180, 180, $iOSBackground, 15);
-        $this->createThumbnail($svg, $exportPath . '/android-chrome-512x512.png', 512, 512, 'transparent', false);
+        $this->createThumbnail($svg, $exportPath.'/apple-touch-icon.png', 180, 180, $iOSBackground, 15);
+        $this->createThumbnail($svg, $exportPath.'/android-chrome-512x512.png', 512, 512, 'transparent', false);
     }
 
     private function createThumbnail($svg, $exportPath, $width, $height, $background, $border)
