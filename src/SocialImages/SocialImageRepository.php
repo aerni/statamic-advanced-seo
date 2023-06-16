@@ -39,7 +39,7 @@ class SocialImageRepository
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => $this->route(theme: '{seo_social_images_theme}', type: "twitter_{seo_twitter_card}", id: '{id}'),
+                'format' => $this->route(theme: '{seo_social_images_theme}', type: 'twitter_{seo_twitter_card}', id: '{id}'),
             ],
         ];
     }

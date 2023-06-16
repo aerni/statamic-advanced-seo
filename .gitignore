@@ -1,11 +1,9 @@
 .antlers.json
-.composer.lock
 .DS_Store
 .idea
 .env
 .phpunit.result.cache
-.php_cs.cache
-.php-cs-fixer.cache
+composer.lock
 coverage
 node_modules
 tests/__fixtures__/content/*.yaml

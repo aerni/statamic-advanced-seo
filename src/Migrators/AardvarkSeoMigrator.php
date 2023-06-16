@@ -49,8 +49,8 @@ class AardvarkSeoMigrator extends BaseMigrator
     protected function transformJsonLd(string $value): string
     {
         return Str::of($value)
-            ->remove("<script type=\"application/ld+json\">")
-            ->remove("</script>")
+            ->remove('<script type="application/ld+json">')
+            ->remove('</script>')
             ->replaceFirst("\n", null);
     }
 }

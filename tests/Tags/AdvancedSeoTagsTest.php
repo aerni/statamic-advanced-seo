@@ -8,6 +8,7 @@ use Aerni\AdvancedSeo\Tests\TestCase;
 class AdvancedSeoTagsTest extends TestCase
 {
     protected AdvancedSeoTags $tag;
+
     protected $context = ['foo' => 'bar'];
 
     public function setUp(): void

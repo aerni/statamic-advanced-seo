@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionDefaultsController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SiteDefaultsController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\TaxonomyDefaultsController;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionDefaultsController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/site', [SiteDefaultsController::class, 'index'])->name('site.index');

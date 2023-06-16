@@ -26,12 +26,12 @@ class SeoVariables implements Localization, Augmentable
     use HasAugmentedInstance;
     use HasOrigin;
     use HasDefaultsData;
-
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
 
     protected SeoDefaultSet $set;
+
     protected string $locale;
 
     public function __construct()

@@ -257,14 +257,14 @@ class GraphQlCascade extends BaseCascade
 
             return Data::findByUri(Str::ensureLeft($uri, '/'), $this->model->site()->handle());
         })
-        ->filter()
-        ->reverse()
-        ->values()
-        ->map(fn ($model, $key) => [
-            'position' => $key + 1,
-            'title' => method_exists($model, 'title') ? $model->title() : $model->value('title'),
-            'url' => $this->buildUrl($model),
-        ]);
+            ->filter()
+            ->reverse()
+            ->values()
+            ->map(fn ($model, $key) => [
+                'position' => $key + 1,
+                'title' => method_exists($model, 'title') ? $model->title() : $model->value('title'),
+                'url' => $this->buildUrl($model),
+            ]);
 
         return $crumbs;
     }

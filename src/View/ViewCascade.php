@@ -389,16 +389,16 @@ class ViewCascade extends BaseCascade
 
             return Data::findByUri(Str::ensureLeft($uri, '/'), Site::current()->handle());
         })
-        ->filter()
-        ->reverse()
-        ->values()
-        ->map(function ($item, $key) {
-            return [
-                'position' => $key + 1,
-                'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
-                'url' => $item->absoluteUrl(),
-            ];
-        });
+            ->filter()
+            ->reverse()
+            ->values()
+            ->map(function ($item, $key) {
+                return [
+                    'position' => $key + 1,
+                    'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
+                    'url' => $item->absoluteUrl(),
+                ];
+            });
 
         return $crumbs;
     }

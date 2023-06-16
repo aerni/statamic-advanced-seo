@@ -47,7 +47,7 @@ abstract class BaseSitemap implements Sitemap
 
     public function clearCache(): void
     {
-        Cache::forget("advanced-seo::sitemaps::index");
+        Cache::forget('advanced-seo::sitemaps::index');
         Cache::forget("advanced-seo::sitemaps::{$this->id()}");
     }
 
