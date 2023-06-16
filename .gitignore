@@ -1,5 +1,5 @@
 .antlers.json
-.composer.lock
+composer.lock
 .DS_Store
 .idea
 .env
