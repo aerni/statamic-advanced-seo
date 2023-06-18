@@ -11,13 +11,14 @@ use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\ChildStore;
 use Statamic\Support\Arr;
 use Symfony\Component\Finder\SplFileInfo;
+use Statamic\Facades\Path;
 
 class SeoDefaultsStore extends ChildStore
 {
     public function getItemFilter(SplFileInfo $file): bool
     {
         // Only get the SeoDefaultSet that exists in the root. Don't get the SeoVariables.
-        return substr_count($file->getRelativePathname(), '/') === 0
+        return substr_count(Path::tidy($file->getRelativePathname()), '/') === 0
             && $file->getExtension() === 'yaml';
     }
 
