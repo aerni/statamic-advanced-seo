@@ -21,9 +21,9 @@ return [
     ],
 
     'seo_site_name_position' => [
-        'display' => 'Position Website-Name',
-        'instructions' => 'Definiere die Position des Website-Namens im Meta-Titel dieses :Types.',
-        'default_instructions' => 'Definiere die Position des Website-Namens im Meta-Titel deiner :Type.',
+        'display' => 'Position Websitename',
+        'instructions' => 'Definiere die Position des Websitenamens im Meta-Titel dieses :Types.',
+        'default_instructions' => 'Definiere die Position des Websitenamens im Meta-Titel deiner :Type.',
         'end' => 'Ende',
         'start' => 'Start',
         'disabled' => 'Deaktiviert',
@@ -36,7 +36,7 @@ return [
     ],
 
     'seo_generate_social_images' => [
-        'display' => 'Generiere Social Images',
+        'display' => 'Social Images generieren',
         'instructions' => 'Aktiviere diese Option, um die Social Images für diesen :Type zu generieren.',
         'default_instructions' => 'Aktiviere diese Option, um die Social Images deiner :Type zu generieren.',
     ],
@@ -57,19 +57,19 @@ return [
 
     'seo_section_og' => [
         'display' => 'Open Graph',
-        'instructions' => 'Konfiguriere die Open-Graph-Einstellungen dieses :Type.',
-        'default_instructions' => 'Konfiguriere die Open-Graph-Voreinstellungen deiner :Type.',
+        'instructions' => 'Konfiguriere die Open Graph Einstellungen dieses :Type.',
+        'default_instructions' => 'Konfiguriere die Open Graph Voreinstellungen deiner :Type.',
     ],
 
     'seo_og_image' => [
         'display' => 'Open Graph Bild',
-        'instructions' => 'Füge ein Open-Graph-Bild für diesen :Type hinzu. Es wird auf :size zugeschnitten.',
-        'default_instructions' => 'Füge ein Open-Graph-Bild für deine :Type hinzu. Es wird auf :size zugeschnitten.',
+        'instructions' => 'Füge ein Open Graph Bild für diesen :Type hinzu. Es wird auf :size zugeschnitten.',
+        'default_instructions' => 'Füge ein Open Graph Bild für deine :Type hinzu. Es wird auf :size zugeschnitten.',
     ],
 
     'seo_og_title' => [
-        'display' => 'Open Graph-Titel',
-        'instructions' => 'Legen Sie den Open Graph-Titel für diesen :type fest.',
+        'display' => 'Open Graph Titel',
+        'instructions' => 'Legen Sie den Open Graph Titel für diesen :type fest.',
         'default_instructions' => 'Legen Sie den Standard-Open Graph-Titel für Ihren :type fest.',
     ],
 
