@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Statamic\Extend\Manifest;
-use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Statamic;
 
