@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
 use Aerni\AdvancedSeo\View\GraphQlCascade;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\View\View;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
@@ -21,11 +22,34 @@ class RenderedViewsType extends Type
         return [
             'head' => [
                 'type' => GraphQL::string(),
-                'resolve' => fn (GraphQlCascade $cascade) => $this->formatView(view('advanced-seo::head', ['seo' => $cascade->toAugmentedArray()])),
+                'args' => $this->args(),
+                'resolve' => $this->resolveHead(),
             ],
             'body' => [
                 'type' => GraphQL::string(),
                 'resolve' => fn (GraphQlCascade $cascade) => $this->formatView(view('advanced-seo::body', ['seo' => $cascade->toAugmentedArray()])),
+            ],
+        ];
+    }
+
+    private function resolveHead(): callable
+    {
+        return function (GraphQlCascade $cascade, $args, $context, ResolveInfo $info) {
+            $data = $cascade->baseUrl($args['baseUrl'] ?? null)->toAugmentedArray();
+            $view = view('advanced-seo::head', ['seo' => $data]);
+
+            return $this->formatView($view);
+        };
+    }
+
+    private function args(): array
+    {
+        return [
+            'baseUrl' => [
+                'name' => 'baseUrl',
+                'description' => 'Change the base URL if your frontend is hosted on another domain than Statamic',
+                'type' => GraphQL::string(),
+                'rules' => ['url'],
             ],
         ];
     }
