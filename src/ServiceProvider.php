@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
 use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
@@ -18,7 +19,9 @@ use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 use Aerni\AdvancedSeo\Models\Defaults;
@@ -206,6 +209,7 @@ class ServiceProvider extends AddonServiceProvider
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
             GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoDefaultsQuery::class);
+            GraphQL::addQuery(SeoSitemapQuery::class);
 
             GraphQL::addType(AnalyticsDefaultsType::class);
             GraphQL::addType(ComputedMetaDataType::class);
@@ -216,10 +220,11 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(IndexingDefaultsType::class);
             GraphQL::addType(RawMetaDataType::class);
             GraphQL::addType(RenderedViewsType::class);
-            GraphQL::addType(ContentDefaultsType::class);
-            GraphQL::addType(SeoMetaType::class);
             GraphQL::addType(SeoDefaultsType::class);
+            GraphQL::addType(SeoMetaType::class);
+            GraphQL::addType(SeoSitemapType::class);
             GraphQL::addType(SiteDefaultsType::class);
+            GraphQL::addType(SitemapAlternatesType::class);
             GraphQL::addType(SocialImagePresetType::class);
             GraphQL::addType(SocialMediaDefaultsType::class);
 
