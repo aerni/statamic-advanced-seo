@@ -43,7 +43,7 @@ class SeoProMigrator extends BaseMigrator
             ->pipe(fn ($data) => $this->transform($data, $oldData));
     }
 
-    protected function transform(Collection $data, ?Collection $oldData = null): Collection
+    protected function transform(Collection $data, Collection $oldData = null): Collection
     {
         $robots = Arr::get($oldData, 'robots', []);
         $image = Arr::get($oldData, 'image');
