@@ -18,6 +18,12 @@ class SeoSitemapQuery extends Query
     public function args(): array
     {
         return [
+            'handle' => [
+                'type' => GraphQL::string(),
+            ],
+            'type' => [
+                'type' => GraphQL::string(),
+            ],
             'site' => [
                 'type' => GraphQL::string(),
             ],
@@ -31,12 +37,22 @@ class SeoSitemapQuery extends Query
 
     public function resolve($root, $args)
     {
-        $sitemapUrls = Sitemap::all()->flatMap->urls();
+        $sitemaps = Sitemap::all();
+
+        if ($handle = $args['handle'] ?? null) {
+            $sitemaps = $sitemaps->filter(fn ($sitemap) => $sitemap->handle() === $handle);
+        }
+
+        if ($type = $args['type'] ?? null) {
+            $sitemaps = $sitemaps->filter(fn ($sitemap) => $sitemap->type() === $type);
+        }
+
+        $sitemapUrls = $sitemaps->flatMap->urls();
 
         if ($site = $args['site'] ?? null) {
             $sitemapUrls = $sitemapUrls->where('site', $site);
         }
 
-        return $sitemapUrls;
+        return $sitemapUrls->isNotEmpty() ? $sitemapUrls : null;
     }
 }
