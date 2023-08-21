@@ -50,6 +50,11 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         return number_format($this->entry->seo_sitemap_priority->value(), 1);
     }
 
+    public function site(): string
+    {
+        return $this->entry->site()->handle();
+    }
+
     public function isCanonicalUrl(): bool
     {
         return match ($this->entry->seo_canonical_type->value()) {

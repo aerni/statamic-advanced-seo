@@ -15,6 +15,15 @@ class SeoSitemapQuery extends Query
         'description' => 'The Advanced SEO sitemap',
     ];
 
+    public function args(): array
+    {
+        return [
+            'site' => [
+                'type' => GraphQL::string(),
+            ],
+        ];
+    }
+
     public function type(): Type
     {
         return GraphQL::listOf(GraphQL::type(SeoSitemapType::NAME));
@@ -22,9 +31,12 @@ class SeoSitemapQuery extends Query
 
     public function resolve($root, $args)
     {
-        // TODO: Don't return anything if sitemaps are disabled?
-        // throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
+        $sitemapUrls = Sitemap::all()->flatMap->urls();
 
-        return Sitemap::all()->flatMap->urls();
+        if ($site = $args['site'] ?? null) {
+            $sitemapUrls = $sitemapUrls->where('site', $site);
+        }
+
+        return $sitemapUrls;
     }
 }

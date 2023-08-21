@@ -16,6 +16,8 @@ abstract class BaseSitemapUrl implements SitemapUrl
 
     abstract public function priority(): string|self|null;
 
+    abstract public function site(): string|self;
+
     public function isCanonicalUrl(): bool
     {
         return true;
@@ -38,6 +40,7 @@ abstract class BaseSitemapUrl implements SitemapUrl
             'lastmod' => $this->lastmod(),
             'changefreq' => $this->changefreq(),
             'priority' => $this->priority(),
+            'site' => $this->site(),
         ];
     }
 }

@@ -49,6 +49,11 @@ class TermSitemapUrl extends BaseSitemapUrl
         return number_format($this->term->seo_sitemap_priority->value(), 1);
     }
 
+    public function site(): string
+    {
+        return $this->term->site()->handle();
+    }
+
     public function isCanonicalUrl(): bool
     {
         return match ($this->term->seo_canonical_type->value()) {

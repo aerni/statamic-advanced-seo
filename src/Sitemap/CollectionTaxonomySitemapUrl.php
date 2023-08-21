@@ -57,6 +57,11 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         return Defaults::data('taxonomies')->get('seo_sitemap_priority');
     }
 
+    public function site(): string
+    {
+        return $this->site;
+    }
+
     protected function lastModifiedTaxonomyTerm(): ?Term
     {
         return $this->taxonomy->queryTerms()

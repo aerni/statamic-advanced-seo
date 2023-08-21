@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Site;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class CustomSitemapUrl extends BaseSitemapUrl
@@ -76,6 +77,13 @@ class CustomSitemapUrl extends BaseSitemapUrl
 
                 return $priority;
             })
+            ->args(func_get_args());
+    }
+
+    public function site(string $site = null): string|self
+    {
+        return $this->fluentlyGetOrSet('site')
+            ->getter(fn () => $this->site ?? Site::default()->handle())
             ->args(func_get_args());
     }
 }
