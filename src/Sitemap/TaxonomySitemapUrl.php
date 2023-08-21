@@ -28,13 +28,13 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
         return $this->taxonomy->absoluteUrl();
     }
 
-    public function alternates(): array
+    public function alternates(): ?array
     {
         $taxonomies = $this->taxonomies();
 
         // We only want alternate URLs if there are at least two terms.
         if ($taxonomies->count() <= 1) {
-            return [];
+            return null;
         }
 
         return $taxonomies->map(function ($taxonomy, $site) {

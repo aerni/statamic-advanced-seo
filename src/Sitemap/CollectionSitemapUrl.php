@@ -19,13 +19,13 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         return $this->entry->absoluteUrl();
     }
 
-    public function alternates(): array
+    public function alternates(): ?array
     {
         $entries = $this->entries();
 
         // We only want alternate URLs if there are at least two entries.
         if ($entries->count() <= 1) {
-            return [];
+            return null;
         }
 
         return $entries->map(fn ($entry) => [

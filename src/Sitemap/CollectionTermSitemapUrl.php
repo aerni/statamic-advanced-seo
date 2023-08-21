@@ -18,13 +18,13 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
         return $this->term->absoluteUrl();
     }
 
-    public function alternates(): array
+    public function alternates(): ?array
     {
         $terms = $this->terms();
 
         // We only want alternate URLs if there are at least two terms.
         if ($terms->count() <= 1) {
-            return [];
+            return null;
         }
 
         return $terms->map(fn ($term) => [
