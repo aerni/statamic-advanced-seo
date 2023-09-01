@@ -18,8 +18,8 @@ use Statamic\Tags\Context;
 
 abstract class BaseCascade implements Augmentable
 {
-    use HasAugmentedInstance;
     use ContainsData;
+    use HasAugmentedInstance;
 
     public function __construct(protected Context|DefaultsData|Entry|Term $model)
     {
