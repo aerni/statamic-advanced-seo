@@ -10,13 +10,13 @@ use Statamic\Facades\Site;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Entry $entry)
+    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap)
     {
     }
 
     public function loc(): string
     {
-        return $this->entry->absoluteUrl();
+        return $this->absoluteUrl($this->entry);
     }
 
     public function alternates(): ?array
@@ -30,7 +30,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
         return $entries->map(fn ($entry) => [
             'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
-            'href' => $entry->absoluteUrl(),
+            'href' => $this->absoluteUrl($entry),
         ])->toArray();
     }
 

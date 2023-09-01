@@ -15,7 +15,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->term->absoluteUrl();
+        return $this->absoluteUrl($this->term);
     }
 
     public function alternates(): ?array
@@ -29,7 +29,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
         return $terms->map(fn ($term) => [
             'hreflang' => Helpers::parseLocale(Site::get($term->locale())->locale()),
-            'href' => $term->absoluteUrl(),
+            'href' => $this->absoluteUrl($term),
         ])->toArray();
     }
 

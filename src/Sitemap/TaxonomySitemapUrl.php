@@ -25,7 +25,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->taxonomy->absoluteUrl();
+        return $this->absoluteUrl($this->taxonomy);
     }
 
     public function alternates(): ?array
@@ -43,7 +43,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
             return [
                 'hreflang' => Helpers::parseLocale(Site::current()->locale()),
-                'href' => $taxonomy->absoluteUrl(),
+                'href' => $this->absoluteUrl($taxonomy),
             ];
         })->toArray();
     }

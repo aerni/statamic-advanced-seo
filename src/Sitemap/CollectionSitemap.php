@@ -15,7 +15,7 @@ class CollectionSitemap extends BaseSitemap
     public function urls(): Collection
     {
         return $this->entries()
-            ->map(fn ($entry) => (new CollectionSitemapUrl($entry))->toArray())
+            ->map(fn ($entry) => (new CollectionSitemapUrl($entry, $this))->toArray())
             ->filter();
     }
 

@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -11,7 +12,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Sitemap
 {
-    use FluentlyGetsAndSets;
+    use FluentlyGetsAndSets, HasBaseUrl;
 
     abstract public function urls(): Collection;
 

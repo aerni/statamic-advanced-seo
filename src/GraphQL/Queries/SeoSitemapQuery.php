@@ -18,6 +18,9 @@ class SeoSitemapQuery extends Query
     public function args(): array
     {
         return [
+            'baseUrl' => [
+                'type' => GraphQL::string(),
+            ],
             'handle' => [
                 'type' => GraphQL::string(),
             ],
@@ -37,7 +40,8 @@ class SeoSitemapQuery extends Query
 
     public function resolve($root, $args)
     {
-        $sitemaps = Sitemap::all();
+        $sitemaps = Sitemap::all()
+            ->each(fn ($sitemap) => $sitemap->baseUrl($args['baseUrl'] ?? null));
 
         if ($handle = $args['handle'] ?? null) {
             $sitemaps = $sitemaps->filter(fn ($sitemap) => $sitemap->handle() === $handle);

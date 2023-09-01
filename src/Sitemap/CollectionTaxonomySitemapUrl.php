@@ -83,7 +83,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     protected function getUrl(Taxonomy $taxonomy, string $site): string
     {
-        $siteUrl = Site::get($site)->absoluteUrl();
+        $siteUrl = $this->absoluteUrl(Site::get($site));
         $taxonomyHandle = $taxonomy->handle();
         $collectionHandle = $taxonomy->collection()->handle();
 
