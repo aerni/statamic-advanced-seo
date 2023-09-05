@@ -44,11 +44,11 @@ class SeoSitemapQuery extends Query
             ->each(fn ($sitemap) => $sitemap->baseUrl($args['baseUrl'] ?? null));
 
         if ($handle = $args['handle'] ?? null) {
-            $sitemaps = $sitemaps->filter(fn ($sitemap) => $sitemap->handle() === $handle);
+            $sitemaps = $sitemaps->filter(fn ($sitemap) => $handle === $sitemap->handle());
         }
 
         if ($type = $args['type'] ?? null) {
-            $sitemaps = $sitemaps->filter(fn ($sitemap) => $sitemap->type() === $type);
+            $sitemaps = $sitemaps->filter(fn ($sitemap) => $type === $sitemap->type());
         }
 
         $sitemapUrls = $sitemaps->flatMap->urls();
