@@ -20,15 +20,22 @@ class SeoSitemapQuery extends Query
         return [
             'baseUrl' => [
                 'type' => GraphQL::string(),
+                'description' => 'Change the base URL if your frontend is hosted on another domain than Statamic',
+                'rules' => ['url'],
             ],
             'handle' => [
                 'type' => GraphQL::string(),
+                'description' => 'Filter the results by the handle of a collection, taxonomy, or custom sitemap',
             ],
             'type' => [
                 'type' => GraphQL::string(),
+                'description' => 'Filter the results by type. Either `collection`, `taxonomy`, or `custom`.',
+                'rules' => ['in:collection,taxonomy,custom'],
             ],
             'site' => [
                 'type' => GraphQL::string(),
+                'description' => 'Filter the results by site',
+                'rules' => ['in:collection,taxonomy,custom'],
             ],
         ];
     }
