@@ -20,7 +20,7 @@ class SeoSitemapType extends Type
             'alternates' => [
                 'type' => GraphQL::listOf(GraphQL::type(SitemapAlternatesType::NAME)),
                 'description' => 'The Advanced SEO sitemap alternates',
-                'resolve' => fn (array $sitemap) => $sitemap['alternates'], // TODO: Return null if empty. Should do this in the CollectionSitemapUrl class.
+                'resolve' => fn (array $sitemap) => $sitemap['alternates'],
             ],
             'changefreq' => [
                 'type' => GraphQL::string(),
