@@ -1,18 +1,19 @@
 <?php
 
-namespace Aerni\AdvancedSeo\GraphQL\Queries;
+namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
-use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use Aerni\AdvancedSeo\Sitemap\SitemapIndex;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
+use Rebing\GraphQL\Support\Field;
 use Statamic\Facades\GraphQL;
-use Statamic\GraphQL\Queries\Query;
 
-class SeoSitemapQuery extends Query
+class SitemapField extends Field
 {
     protected $attributes = [
-        'name' => 'seoSitemap',
-        'description' => 'The Advanced SEO sitemap',
+        'description' => 'The Advanced SEO collection, taxonomy, or custom sitemap',
     ];
 
     public function args(): array
@@ -27,35 +28,28 @@ class SeoSitemapQuery extends Query
                 'type' => GraphQL::string(),
                 'description' => 'Filter the results by the handle of a collection, taxonomy, or custom sitemap',
             ],
-            'type' => [
-                'type' => GraphQL::string(),
-                'description' => 'Filter the results by type. Either `collection`, `taxonomy`, or `custom`.',
-                'rules' => ['in:collection,taxonomy,custom'],
-            ],
             'site' => [
                 'type' => GraphQL::string(),
                 'description' => 'Filter the results by site',
-                'rules' => ['in:collection,taxonomy,custom'],
             ],
         ];
     }
 
     public function type(): Type
     {
-        return GraphQL::listOf(GraphQL::type(SeoSitemapType::NAME));
+        return GraphQl::listOf(GraphQL::type(SeoSitemapType::NAME));
     }
 
-    public function resolve($root, $args)
+    public function resolve($root, $args, $context, ResolveInfo $info): ?Collection
     {
-        $sitemaps = Sitemap::all()
-            ->each(fn ($sitemap) => $sitemap->baseUrl($args['baseUrl'] ?? null));
+        $sitemaps = (new SitemapIndex)->{"{$info->fieldName}Sitemaps"}();
+
+        if ($baseUrl = $args['baseUrl'] ?? null) {
+            $sitemaps = $sitemaps->each(fn ($sitemap) => $sitemap->baseUrl($baseUrl));
+        }
 
         if ($handle = $args['handle'] ?? null) {
             $sitemaps = $sitemaps->filter(fn ($sitemap) => $handle === $sitemap->handle());
-        }
-
-        if ($type = $args['type'] ?? null) {
-            $sitemaps = $sitemaps->filter(fn ($sitemap) => $type === $sitemap->type());
         }
 
         $sitemapUrls = $sitemaps->flatMap->urls();
