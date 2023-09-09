@@ -208,8 +208,8 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGraphQL(): self
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
-            GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoDefaultsQuery::class);
+            GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoSitemapsQuery::class);
 
             GraphQL::addType(AnalyticsDefaultsType::class);
@@ -222,10 +222,9 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(RawMetaDataType::class);
             GraphQL::addType(RenderedViewsType::class);
             GraphQL::addType(SeoDefaultsType::class);
+            GraphQL::addType(SeoMetaType::class);
             GraphQL::addType(SeoSitemapsType::class);
             GraphQL::addType(SeoSitemapType::class);
-            GraphQL::addType(SeoDefaultsType::class);
-            GraphQL::addType(SeoMetaType::class);
             GraphQL::addType(SiteDefaultsType::class);
             GraphQL::addType(SitemapAlternatesType::class);
             GraphQL::addType(SocialImagePresetType::class);
