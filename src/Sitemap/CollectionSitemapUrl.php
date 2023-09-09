@@ -10,27 +10,27 @@ use Statamic\Facades\Site;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Entry $entry)
+    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap)
     {
     }
 
     public function loc(): string
     {
-        return $this->entry->absoluteUrl();
+        return $this->absoluteUrl($this->entry);
     }
 
-    public function alternates(): array
+    public function alternates(): ?array
     {
         $entries = $this->entries();
 
         // We only want alternate URLs if there are at least two entries.
         if ($entries->count() <= 1) {
-            return [];
+            return null;
         }
 
         return $entries->map(fn ($entry) => [
             'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
-            'href' => $entry->absoluteUrl(),
+            'href' => $this->absoluteUrl($entry),
         ])->toArray();
     }
 
@@ -48,6 +48,11 @@ class CollectionSitemapUrl extends BaseSitemapUrl
     {
         // Make sure we actually return `0.0` and `1.0`.
         return number_format($this->entry->seo_sitemap_priority->value(), 1);
+    }
+
+    public function site(): string
+    {
+        return $this->entry->site()->handle();
     }
 
     public function isCanonicalUrl(): bool

@@ -25,16 +25,16 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->taxonomy->absoluteUrl();
+        return $this->absoluteUrl($this->taxonomy);
     }
 
-    public function alternates(): array
+    public function alternates(): ?array
     {
         $taxonomies = $this->taxonomies();
 
         // We only want alternate URLs if there are at least two terms.
         if ($taxonomies->count() <= 1) {
-            return [];
+            return null;
         }
 
         return $taxonomies->map(function ($taxonomy, $site) {
@@ -43,7 +43,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
             return [
                 'hreflang' => Helpers::parseLocale(Site::current()->locale()),
-                'href' => $taxonomy->absoluteUrl(),
+                'href' => $this->absoluteUrl($taxonomy),
             ];
         })->toArray();
     }
@@ -65,6 +65,11 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
     public function priority(): string
     {
         return Defaults::data('taxonomies')->get('seo_sitemap_priority');
+    }
+
+    public function site(): string
+    {
+        return $this->site;
     }
 
     protected function lastModifiedTaxonomyTerm(): ?Term

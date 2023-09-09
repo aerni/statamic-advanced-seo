@@ -29,7 +29,7 @@ class SitemapRepository
 
     public function find(string $id): ?Sitemap
     {
-        return $this->all()->first(fn ($sitemap) => $sitemap->id() === $id);
+        return $this->all()->first(fn ($sitemap) => $id === $sitemap->id());
     }
 
     public function clearCache(): void

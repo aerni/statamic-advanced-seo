@@ -3,6 +3,11 @@
 namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Contracts\SitemapUrl;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\URL;
+use Statamic\Sites\Site;
 
 abstract class BaseSitemapUrl implements SitemapUrl
 {
@@ -15,6 +20,8 @@ abstract class BaseSitemapUrl implements SitemapUrl
     abstract public function changefreq(): string|self|null;
 
     abstract public function priority(): string|self|null;
+
+    abstract public function site(): string|self;
 
     public function isCanonicalUrl(): bool
     {
@@ -38,6 +45,14 @@ abstract class BaseSitemapUrl implements SitemapUrl
             'lastmod' => $this->lastmod(),
             'changefreq' => $this->changefreq(),
             'priority' => $this->priority(),
+            'site' => $this->site(),
         ];
+    }
+
+    protected function absoluteUrl(Entry|Taxonomy|Term|Site $model): string
+    {
+        return $this->sitemap->baseUrl()
+            ? URL::assemble($this->sitemap->baseUrl(), $model->url())
+            : $model->absoluteUrl();
     }
 }
