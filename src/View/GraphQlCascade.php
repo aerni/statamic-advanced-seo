@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View;
 
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -16,9 +17,7 @@ use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
-    use HasComputedData;
-
-    protected ?string $baseUrl = null;
+    use HasBaseUrl, HasComputedData;
 
     public function __construct(Entry|Term $model)
     {
@@ -162,10 +161,10 @@ class GraphQlCascade extends BaseCascade
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
             ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
             ->map(fn ($model) => [
-                'url' => $this->buildUrl($model),
+                'url' => $this->absoluteUrl($model),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
             ])->push([
-                'url' => $this->buildUrl($root),
+                'url' => $this->absoluteUrl($root),
                 'locale' => 'x-default',
             ])->all();
 
@@ -177,14 +176,14 @@ class GraphQlCascade extends BaseCascade
         $type = $this->get('canonical_type');
 
         if ($type == 'other' && $this->has('canonical_entry')) {
-            return $this->buildUrl($this->get('canonical_entry'));
+            return $this->absoluteUrl($this->get('canonical_entry'));
         }
 
         if ($type == 'custom' && $this->has('canonical_custom')) {
             return $this->get('canonical_custom');
         }
 
-        return $this->buildUrl($this->model);
+        return $this->absoluteUrl($this->model);
     }
 
     public function siteSchema(): ?string
@@ -202,11 +201,11 @@ class GraphQlCascade extends BaseCascade
         if ($type == 'organization') {
             $schema = Schema::organization()
                 ->name($this->get('organization_name'))
-                ->url($this->buildUrl($this->model->site()));
+                ->url($this->absoluteUrl($this->model->site()));
 
             if ($logo = $this->get('organization_logo')) {
                 $logo = Schema::imageObject()
-                    ->url($this->buildUrl($logo))
+                    ->url($this->absoluteUrl($logo))
                     ->width($logo->width())
                     ->height($logo->height());
 
@@ -217,7 +216,7 @@ class GraphQlCascade extends BaseCascade
         if ($type == 'person') {
             $schema = Schema::person()
                 ->name($this->get('person_name'))
-                ->url($this->buildUrl($this->model->site()));
+                ->url($this->absoluteUrl($this->model->site()));
         }
 
         return json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE);
@@ -257,29 +256,22 @@ class GraphQlCascade extends BaseCascade
 
             return Data::findByUri(Str::ensureLeft($uri, '/'), $this->model->site()->handle());
         })
-        ->filter()
-        ->reverse()
-        ->values()
-        ->map(fn ($model, $key) => [
-            'position' => $key + 1,
-            'title' => method_exists($model, 'title') ? $model->title() : $model->value('title'),
-            'url' => $this->buildUrl($model),
-        ]);
+            ->filter()
+            ->reverse()
+            ->values()
+            ->map(fn ($model, $key) => [
+                'position' => $key + 1,
+                'title' => method_exists($model, 'title') ? $model->title() : $model->value('title'),
+                'url' => $this->absoluteUrl($model),
+            ]);
 
         return $crumbs;
     }
 
-    public function baseUrl(?string $baseUrl): self
+    protected function absoluteUrl(mixed $model): ?string
     {
-        $this->baseUrl = $baseUrl;
-
-        return $this;
-    }
-
-    protected function buildUrl(mixed $model): ?string
-    {
-        return $this->baseUrl
-            ? URL::assemble($this->baseUrl, $model->url())
+        return $this->baseUrl()
+            ? URL::assemble($this->baseUrl(), $model->url())
             : $model->absoluteUrl();
     }
 }

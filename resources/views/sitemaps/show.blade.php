@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
+@php
+echo '<?xml version="1.0" encoding="utf-8"?>';
+echo '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>';
+@endphp
 
 <urlset
     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"

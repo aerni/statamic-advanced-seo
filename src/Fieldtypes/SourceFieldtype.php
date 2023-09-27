@@ -22,6 +22,7 @@ use Statamic\Fieldtypes\Code;
 class SourceFieldtype extends Fieldtype
 {
     protected static $handle = 'seo_source';
+
     protected $selectable = false;
 
     public function preProcess(mixed $data): array

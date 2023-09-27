@@ -14,6 +14,7 @@ class GenerateSocialImages extends Command
     use RunsInPlease;
 
     protected $signature = 'seo:generate-images';
+
     protected $description = 'Generate all your social images';
 
     public function handle(): void

@@ -65,8 +65,8 @@ abstract class BaseBlueprint implements Contract
                     : $tab::make()->get(),
             ];
         })
-        ->filter(fn ($tab) => ! empty($tab['sections']))
-        ->all();
+            ->filter(fn ($tab) => ! empty($tab['sections']))
+            ->all();
     }
 
     abstract protected function tabs(): array;

@@ -14,7 +14,7 @@ class TestCase extends OrchestraTestCase
     {
         parent::setUp();
 
-        Stache::store('seo')->directory(__DIR__ . '/__fixtures__/content/seo');
+        Stache::store('seo')->directory(__DIR__.'/__fixtures__/content/seo');
 
         $uses = array_flip(class_uses_recursive(static::class));
 
@@ -79,7 +79,7 @@ class TestCase extends OrchestraTestCase
         ];
 
         foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__ . "/../vendor/statamic/cms/config/{$config}.php"));
+            $app['config']->set("statamic.$config", require(__DIR__."/../vendor/statamic/cms/config/{$config}.php"));
         }
 
         // Creat two site for multi site testing
@@ -92,16 +92,16 @@ class TestCase extends OrchestraTestCase
         $app['config']->set('statamic.users.repository', 'file');
 
         // Set the content paths for our stache stores
-        $app['config']->set('statamic.stache.stores.taxonomies.directory', __DIR__ . '/__fixtures__/content/taxonomies');
-        $app['config']->set('statamic.stache.stores.terms.directory', __DIR__ . '/__fixtures__/content/taxonomies');
-        $app['config']->set('statamic.stache.stores.collections.directory', __DIR__ . '/__fixtures__/content/collections');
-        $app['config']->set('statamic.stache.stores.entries.directory', __DIR__ . '/__fixtures__/content/collections');
-        $app['config']->set('statamic.stache.stores.navigation.directory', __DIR__ . '/__fixtures__/content/navigation');
-        $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__ . '/__fixtures__/content/trees/collections');
-        $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__ . '/__fixtures__/content/trees/navigation');
-        $app['config']->set('statamic.stache.stores.globals.directory', __DIR__ . '/__fixtures__/content/globals');
-        $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__ . '/__fixtures__/content/assets');
-        $app['config']->set('statamic.stache.stores.users.directory', __DIR__ . '/__fixtures__/users');
+        $app['config']->set('statamic.stache.stores.taxonomies.directory', __DIR__.'/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.terms.directory', __DIR__.'/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.collections.directory', __DIR__.'/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.navigation.directory', __DIR__.'/__fixtures__/content/navigation');
+        $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/__fixtures__/content/trees/collections');
+        $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/__fixtures__/content/trees/navigation');
+        $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
+        $app['config']->set('statamic.stache.stores.users.directory', __DIR__.'/__fixtures__/users');
 
         // Assume the pro edition for our tests
         $app['config']->set('statamic.editions.pro', true);
@@ -110,6 +110,6 @@ class TestCase extends OrchestraTestCase
         $app['config']->set('statamic.git.enabled', true);
 
         // Define the addon config for our tests
-        $app['config']->set('advanced-seo', require(__DIR__ . '/../config/advanced-seo.php'));
+        $app['config']->set('advanced-seo', require(__DIR__.'/../config/advanced-seo.php'));
     }
 }

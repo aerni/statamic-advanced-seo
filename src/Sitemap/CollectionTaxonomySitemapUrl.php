@@ -21,13 +21,13 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         return $this->getUrl($this->taxonomy, $this->site);
     }
 
-    public function alternates(): array
+    public function alternates(): ?array
     {
         $taxonomies = $this->taxonomies();
 
         // We only want alternate URLs if there are at least two terms.
         if ($taxonomies->count() <= 1) {
-            return [];
+            return null;
         }
 
         return $taxonomies->map(function ($taxonomy, $site) {
@@ -57,6 +57,11 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         return Defaults::data('taxonomies')->get('seo_sitemap_priority');
     }
 
+    public function site(): string
+    {
+        return $this->site;
+    }
+
     protected function lastModifiedTaxonomyTerm(): ?Term
     {
         return $this->taxonomy->queryTerms()
@@ -78,7 +83,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     protected function getUrl(Taxonomy $taxonomy, string $site): string
     {
-        $siteUrl = Site::get($site)->absoluteUrl();
+        $siteUrl = $this->absoluteUrl(Site::get($site));
         $taxonomyHandle = $taxonomy->handle();
         $collectionHandle = $taxonomy->collection()->handle();
 

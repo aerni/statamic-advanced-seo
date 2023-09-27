@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -11,15 +12,15 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Site;
-use Statamic\Fields\Field;
 use Statamic\Statamic;
 
 class OnPageSeoBlueprintSubscriber
 {
     use GetsEventData;
+
+    protected DefaultsData $data;
 
     public function subscribe(Dispatcher $events): array
     {

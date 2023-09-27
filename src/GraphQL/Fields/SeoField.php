@@ -22,7 +22,7 @@ class SeoField extends Field
         return GraphQL::type(SeoMetaType::NAME);
     }
 
-    protected function resolve(Entry|Term $model): Entry|Term|Null
+    protected function resolve(Entry|Term $model): Entry|Term|null
     {
         // Only resolve the data if the collection or taxonomy wasn't disabled in the config
         return IsEnabledModel::handle($model) ? $model : null;

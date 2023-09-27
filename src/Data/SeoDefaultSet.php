@@ -23,7 +23,9 @@ class SeoDefaultSet implements Contract
     use HasDefaultsData;
 
     protected string $handle;
+
     protected string $type;
+
     protected array $localizations;
 
     public function id(): string

@@ -15,21 +15,21 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->term->absoluteUrl();
+        return $this->absoluteUrl($this->term);
     }
 
-    public function alternates(): array
+    public function alternates(): ?array
     {
         $terms = $this->terms();
 
         // We only want alternate URLs if there are at least two terms.
         if ($terms->count() <= 1) {
-            return [];
+            return null;
         }
 
         return $terms->map(fn ($term) => [
             'hreflang' => Helpers::parseLocale(Site::get($term->locale())->locale()),
-            'href' => $term->absoluteUrl(),
+            'href' => $this->absoluteUrl($term),
         ])->toArray();
     }
 
@@ -47,6 +47,11 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
     {
         // Make sure we actually return `0.0` and `1.0`.
         return number_format($this->term->seo_sitemap_priority->value(), 1);
+    }
+
+    public function site(): string
+    {
+        return $this->term->site()->handle();
     }
 
     public function isCanonicalUrl(): bool

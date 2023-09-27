@@ -18,20 +18,20 @@ use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class SeoVariables implements Localization, Augmentable
+class SeoVariables implements Augmentable, Localization
 {
     use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
     use HasAugmentedInstance;
-    use HasOrigin;
     use HasDefaultsData;
-
+    use HasOrigin;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
 
     protected SeoDefaultSet $set;
+
     protected string $locale;
 
     public function __construct()

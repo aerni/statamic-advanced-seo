@@ -24,7 +24,7 @@ class CreateSocialImagesTheme extends UpdateScript
             return;
         }
 
-        File::ensureDirectoryExists(resource_path("views/social_images/default"));
+        File::ensureDirectoryExists(resource_path('views/social_images/default'));
 
         $filesToMove->each(function ($file) {
             $path = resource_path("views/social_images/{$file}");

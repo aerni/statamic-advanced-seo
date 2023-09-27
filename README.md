@@ -3,7 +3,7 @@
 # Advanced SEO
 Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project’s needs.
 
-[Read the documentation](https://aerni.gitbook.io/advanced-seo/) to learn how to install, setup and use Advanced SEO.
+[Read the documentation](https://advanced-seo.michaelaerni.ch) to learn how to install, setup and use Advanced SEO.
 
 ## What's new in version 2.0
 - Extensive GraphQL support

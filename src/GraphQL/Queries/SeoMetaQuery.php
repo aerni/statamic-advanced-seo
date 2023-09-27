@@ -37,7 +37,7 @@ class SeoMetaQuery extends Query
         return GraphQL::type(SeoMetaType::NAME);
     }
 
-    public function resolve($root, $args): Entry|Term|Null
+    public function resolve($root, $args): Entry|Term|null
     {
         $model = Data::find($args['id']);
 
