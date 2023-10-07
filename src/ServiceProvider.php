@@ -197,6 +197,7 @@ class ServiceProvider extends AddonServiceProvider
             ...Arr::wrap(config('advanced-seo.view_composer', '*')),
             'advanced-seo::head',
             'advanced-seo::body',
+            'social_images.*',
         ];
 
         View::composer($views, function ($view) {
