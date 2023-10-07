@@ -42,6 +42,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | View Composer
+    |--------------------------------------------------------------------------
+    |
+    | Configure the views that the Advanced SEO view composer should apply to.
+    | The view composer is responsible for making the SEO data available in your views.
+    | By default, this is set to '*' to apply to all views, but you can change
+    | this to an array of specific views to limit the view composer's application.
+    |
+    */
+
+    'view_composer' => '*',
+
+    /*
+    |--------------------------------------------------------------------------
     | Social Images
     |--------------------------------------------------------------------------
     |
@@ -248,18 +262,5 @@ return [
     */
 
     'site_verification' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | View Composer
-    |--------------------------------------------------------------------------
-    |
-    | Configure the views that the Advanced SEO view composer will apply to.
-    | By default, this is set to '*' to apply to all views, but you can change
-    | this to an array of specific views to limit the view composer's application.
-    |
-    */
-
-    'view_composer' => '*',
 
 ];
