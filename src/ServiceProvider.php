@@ -28,6 +28,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\View\ViewCascade;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\View;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Git;
@@ -192,7 +193,14 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootCascade(): self
     {
-        View::composer('*', function ($view) {
+        $views = [
+            ...Arr::wrap(config('advanced-seo.view_composer', '*')),
+            'advanced-seo::head',
+            'advanced-seo::body',
+            'social_images.*',
+        ];
+
+        View::composer($views, function ($view) {
             $data = new Context($view->getData());
 
             if (! ShouldProcessViewCascade::handle($data)) {
