@@ -243,7 +243,7 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (this.isBase) {
                 window.history.replaceState({}, '', localization.url);
