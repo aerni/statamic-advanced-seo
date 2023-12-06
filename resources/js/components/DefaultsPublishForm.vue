@@ -249,7 +249,11 @@ export default {
                 window.history.replaceState({}, '', localization.url);
             }
 
-            this.$axios.get(localization.url).then(response => {
+            this.editLocalization(localization);
+        },
+
+        editLocalization(localization) {
+            return this.$axios.get(localization.url).then(response => {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
 
@@ -268,8 +272,6 @@ export default {
                 this.localizing = false;
 
                 this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
-            })
-        },
             })
         },
 
