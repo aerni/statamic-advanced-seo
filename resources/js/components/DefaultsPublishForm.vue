@@ -12,7 +12,7 @@
 
             <button
                 v-if="!readOnly"
-                class="flex items-center ml-4 btn-primary"
+                class="btn-primary"
                 :disabled="!canSave"
                 @click.prevent="save"
                 v-text="__('Save')"
