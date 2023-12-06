@@ -220,14 +220,15 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
-
             if (e.response && e.response.status === 422) {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+            } else if (e.response) {
+                this.$toast.error(e.response.data.message);
             } else {
-                this.$toast.error(__('Something went wrong'));
+                this.$toast.error(e || 'Something went wrong');
             }
         },
 
