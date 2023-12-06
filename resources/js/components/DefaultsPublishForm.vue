@@ -245,11 +245,11 @@ export default {
 
             this.localizing = localization;
 
+            this.editLocalization(localization);
+
             if (this.isBase) {
                 window.history.replaceState({}, '', localization.url);
             }
-
-            this.editLocalization(localization);
         },
 
         editLocalization(localization) {
