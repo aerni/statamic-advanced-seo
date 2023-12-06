@@ -303,7 +303,7 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });
@@ -317,6 +317,8 @@ export default {
         clearTimeout(this.trackDirtyStateTimeout);
     },
 
+    destroyed() {
+        this.quickSaveKeyBinding.destroy();
     }
 
 }
