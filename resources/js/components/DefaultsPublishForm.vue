@@ -53,7 +53,7 @@
                 >
                     <template #actions="{ shouldShowSidebar }">
 
-                        <div class="p-4" v-if="shouldShowSites">
+                        <div class="p-4 card" v-if="shouldShowSites">
                             <label class="mb-2 font-medium publish-field-label" v-text="__('Sites')" />
                             <div
                                 v-for="option in localizations"
