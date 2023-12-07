@@ -20,6 +20,7 @@
         </div>
 
         <publish-container
+            v-if="fieldset"
             ref="container"
             :name="publishContainer"
             :blueprint="fieldset"
@@ -53,8 +54,7 @@
                     @blur="container.$emit('blur', $event)"
                 >
                     <template #actions="{ shouldShowSidebar }">
-
-                        <div class="p-4 card" v-if="shouldShowSites">
+                        <div class="p-4 card" v-if="localizations.length > 1">
                             <label class="mb-2 font-medium publish-field-label" v-text="__('Sites')" />
                             <div
                                 v-for="option in localizations"
@@ -145,10 +145,6 @@ export default {
     },
 
     computed: {
-
-        shouldShowSites() {
-            return this.localizations.length > 1;
-        },
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
