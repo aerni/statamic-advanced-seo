@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <breadcrumb :url="computedBreadcrumbs.url" :title="computedBreadcrumbs.text" />
+        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[0].url" :title="breadcrumbs[0].text" />
 
         <div class="flex items-center mb-6">
             <h1 class="flex-1" v-text="title" />
@@ -12,14 +12,15 @@
 
             <button
                 v-if="!readOnly"
-                class="flex items-center ml-4 btn-primary"
+                class="btn-primary"
                 :disabled="!canSave"
                 @click.prevent="save"
-                v-text="__('Save')"
+                v-text="__('Save Changes')"
             />
         </div>
 
         <publish-container
+            v-if="fieldset"
             ref="container"
             :name="publishContainer"
             :blueprint="fieldset"
@@ -30,17 +31,10 @@
             :site="site"
             :localized-fields="localizedFields"
             :is-root="isRoot"
+            :track-dirty-state="trackDirtyState"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, components, setFieldMeta }">
-                <component
-                    v-for="component in components"
-                    :key="component.name"
-                    :is="component.name"
-                    :container="container"
-                    v-bind="component.props"
-                    v-on="component.events"
-                />
+            <div>
                 <publish-tabs
                     :read-only="readOnly"
                     :syncable="hasOrigin"
@@ -52,8 +46,7 @@
                     @blur="container.$emit('blur', $event)"
                 >
                     <template #actions="{ shouldShowSidebar }">
-
-                        <div class="p-4" v-if="shouldShowSites">
+                        <div class="p-4 card" v-if="localizations.length > 1">
                             <label class="mb-2 font-medium publish-field-label" v-text="__('Sites')" />
                             <div
                                 v-for="option in localizations"
@@ -62,21 +55,24 @@
                                 :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
                                 @click="localizationSelected(option)"
                             >
-                                <div class="flex items-center flex-1">
+                                <div class="flex items-center flex-1" :class="{ 'line-through': !option.exists }">
+                                    <span class="mr-2 little-dot" :class="{
+                                        'bg-green-600': option.published,
+                                        'bg-gray-500': !option.published,
+                                        'bg-red-500': !option.exists
+                                    }" />
                                     {{ option.name }}
                                     <loading-graphic
                                         :size="14"
                                         text=""
                                         class="ml-2"
-                                        v-if="localizing && localizing.handle === option.handle"
-                                    />
+                                        v-if="localizing && localizing.handle === option.handle" />
                                 </div>
                                 <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                 <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
                                 <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                             </div>
                         </div>
-
                     </template>
                 </publish-tabs>
             </div>
@@ -122,6 +118,7 @@ export default {
             actions: this.initialActions,
             saving: false,
             localizing: false,
+            trackDirtyState: true,
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: _.clone(this.initialValues),
@@ -136,14 +133,13 @@ export default {
             errors: {},
             isRoot: this.initialIsRoot,
             readOnly: this.initialReadOnly,
+
+            quickSaveKeyBinding: null,
+            quickSave: false,
         }
     },
 
     computed: {
-
-        shouldShowSites() {
-            return this.localizations.length > 1;
-        },
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
@@ -165,21 +161,6 @@ export default {
             return this.$dirty.has(this.publishContainer);
         },
 
-        activeLocalization() {
-            return _.findWhere(this.localizations, { active: true });
-        },
-
-        originLocalization() {
-            return _.findWhere(this.localizations, { origin: true });
-        },
-
-        computedBreadcrumbs() {
-            return {
-                'url': this.breadcrumbs[0].url,
-                'text': this.breadcrumbs[0].text
-            }
-        }
-
     },
 
     watch: {
@@ -198,7 +179,10 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
@@ -213,19 +197,21 @@ export default {
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
+                this.quickSave = false;
             }).catch(e => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
             this.saving = false;
-
             if (e.response && e.response.status === 422) {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+            } else if (e.response) {
+                this.$toast.error(e.response.data.message);
             } else {
-                this.$toast.error(__('Something went wrong'));
+                this.$toast.error(e || 'Something went wrong');
             }
         },
 
@@ -240,13 +226,20 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
+
+            this.editLocalization(localization);
 
             if (this.isBase) {
                 window.history.replaceState({}, '', localization.url);
             }
+        },
 
-            this.$axios.get(localization.url).then(response => {
+        editLocalization(localization) {
+            return this.$axios.get(localization.url).then(response => {
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -260,7 +253,8 @@ export default {
                 this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.clearDirtyState());
+
+                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })
         },
 
@@ -292,14 +286,23 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
+            this.quickSave = true;
             this.save();
         });
     },
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
+    },
+
+    destroyed() {
+        this.quickSaveKeyBinding.destroy();
     }
 
 }
