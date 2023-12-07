@@ -34,15 +34,7 @@
             :track-dirty-state="trackDirtyState"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, components, setFieldMeta }">
-                <component
-                    v-for="component in components"
-                    :key="component.name"
-                    :is="component.name"
-                    :container="container"
-                    v-bind="component.props"
-                    v-on="component.events"
-                />
+            <div>
                 <publish-tabs
                     :read-only="readOnly"
                     :syncable="hasOrigin"
