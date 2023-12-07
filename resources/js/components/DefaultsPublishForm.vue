@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <breadcrumb :url="computedBreadcrumbs.url" :title="computedBreadcrumbs.text" />
+        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[0].url" :title="breadcrumbs[0].text" />
 
         <div class="flex items-center mb-6">
             <h1 class="flex-1" v-text="title" />
@@ -174,13 +174,6 @@ export default {
         originLocalization() {
             return _.findWhere(this.localizations, { origin: true });
         },
-
-        computedBreadcrumbs() {
-            return {
-                'url': this.breadcrumbs[0].url,
-                'text': this.breadcrumbs[0].text
-            }
-        }
 
     },
 
