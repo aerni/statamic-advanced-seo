@@ -15,7 +15,7 @@
                 class="btn-primary"
                 :disabled="!canSave"
                 @click.prevent="save"
-                v-text="__('Save')"
+                v-text="__('Save Changes')"
             />
         </div>
 
@@ -156,7 +156,7 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && !this.somethingIsLoading;
+            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
         },
 
         isBase() {
