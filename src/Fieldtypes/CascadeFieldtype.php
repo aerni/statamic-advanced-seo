@@ -8,7 +8,7 @@ class CascadeFieldtype extends Fieldtype
 {
     protected $selectable = false;
 
-    public function config(string $key = null, $fallback = null)
+    public function config(?string $key = null, $fallback = null)
     {
         $config = collect([
             'antlers' => true,

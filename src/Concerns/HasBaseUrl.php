@@ -10,7 +10,7 @@ trait HasBaseUrl
 
     protected ?string $baseUrl = null;
 
-    public function baseUrl(string $baseUrl = null): self|string|null
+    public function baseUrl(?string $baseUrl = null): self|string|null
     {
         return $this->fluentlyGetOrSet('baseUrl')->args(func_get_args());
     }

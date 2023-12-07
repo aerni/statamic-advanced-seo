@@ -15,12 +15,12 @@ class CustomSitemapUrl extends BaseSitemapUrl
     {
     }
 
-    public function loc(string $loc = null): string|self
+    public function loc(?string $loc = null): string|self
     {
         return $this->fluentlyGetOrSet('loc')->args(func_get_args());
     }
 
-    public function alternates(array $alternates = null): array|self|null
+    public function alternates(?array $alternates = null): array|self|null
     {
         return $this->fluentlyGetOrSet('alternates')
             ->setter(function ($alternates) {
@@ -34,7 +34,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
             ->args(func_get_args());
     }
 
-    public function lastmod(Carbon $lastmod = null): string|self|null
+    public function lastmod(?Carbon $lastmod = null): string|self|null
     {
         return $this->fluentlyGetOrSet('lastmod')
             ->getter(fn () => $this->lastmod ?? now()->format('Y-m-d\TH:i:sP'))
@@ -42,7 +42,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
             ->args(func_get_args());
     }
 
-    public function changefreq(string $changefreq = null): string|self|null
+    public function changefreq(?string $changefreq = null): string|self|null
     {
         return $this->fluentlyGetOrSet('changefreq')
             ->getter(fn () => $this->changefreq ?? Defaults::data('collections')->get('seo_sitemap_change_frequency'))
@@ -57,7 +57,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
             ->args(func_get_args());
     }
 
-    public function priority(string $priority = null): string|self|null
+    public function priority(?string $priority = null): string|self|null
     {
         return $this->fluentlyGetOrSet('priority')
             ->getter(fn () => $this->priority ?? Defaults::data('collections')->get('seo_sitemap_priority'))
@@ -72,7 +72,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
             ->args(func_get_args());
     }
 
-    public function site(string $site = null): string|self
+    public function site(?string $site = null): string|self
     {
         return $this->fluentlyGetOrSet('site')
             ->getter(fn () => $this->site ?? Site::default()->handle())
