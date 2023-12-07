@@ -86,6 +86,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
                     'name' => Site::get($site)->name(),
                     'active' => $site === $requestLocalization->locale(),
                     'exists' => $exists,
+                    'published' => true,
                     'root' => $exists ? $localization->isRoot() : false,
                     'origin' => $exists ? $localization->locale() === optional($requestLocalization->origin())->locale() : null,
                     'url' => $exists ? $localization->editUrl() : null,

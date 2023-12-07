@@ -55,21 +55,24 @@
                                 :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
                                 @click="localizationSelected(option)"
                             >
-                                <div class="flex items-center flex-1">
+                                <div class="flex items-center flex-1" :class="{ 'line-through': !option.exists }">
+                                    <span class="mr-2 little-dot" :class="{
+                                        'bg-green-600': option.published,
+                                        'bg-gray-500': !option.published,
+                                        'bg-red-500': !option.exists
+                                    }" />
                                     {{ option.name }}
                                     <loading-graphic
                                         :size="14"
                                         text=""
                                         class="ml-2"
-                                        v-if="localizing && localizing.handle === option.handle"
-                                    />
+                                        v-if="localizing && localizing.handle === option.handle" />
                                 </div>
                                 <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                 <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
                                 <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                             </div>
                         </div>
-
                     </template>
                 </publish-tabs>
             </div>
