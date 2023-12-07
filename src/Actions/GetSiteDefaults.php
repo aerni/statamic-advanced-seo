@@ -17,6 +17,10 @@ class GetSiteDefaults
             return collect();
         }
 
+        /**
+         * TODO: Instead of using the overriding code at the bottom, we might be able to refactor this to something similar to the GetPageData action.
+         * Instead of augmenting all the default values upfront, we could get the blueprint of each site default and then add the values to each blueprint field.
+         */
         return Blink::once("advanced-seo::site::{$locale}", function () use ($locale, $data) {
             $siteDefaults = Defaults::enabledInType('site')
                 ->flatMap(fn ($model) => GetAugmentedDefaults::handle(
@@ -35,7 +39,7 @@ class GetSiteDefaults
              */
             $overrides = $siteDefaults->intersectByKeys($data)
                 ->map(fn ($originalValue, $key) => new Value(
-                    value: $data->get($key),
+                    value: ($value = $data->get($key)) instanceof Value ? $value->raw() : $value,
                     handle: $originalValue->handle(),
                     fieldtype: $originalValue->fieldtype(),
                     augmentable: $originalValue->augmentable()
