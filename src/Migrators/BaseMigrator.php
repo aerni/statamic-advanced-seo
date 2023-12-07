@@ -60,7 +60,7 @@ abstract class BaseMigrator
      * We are piping the data through this method to transform
      * any values that need to be different and also add new ones.
      */
-    protected function transform(Collection $data, Collection $oldData = null): Collection
+    protected function transform(Collection $data, ?Collection $oldData = null): Collection
     {
         return $data;
     }

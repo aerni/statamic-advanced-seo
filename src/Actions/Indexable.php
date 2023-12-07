@@ -10,7 +10,7 @@ use Statamic\Facades\Blink;
 
 class Indexable
 {
-    public static function handle(Entry|Term|Taxonomy $model, string $locale = null): bool
+    public static function handle(Entry|Term|Taxonomy $model, ?string $locale = null): bool
     {
         $locale = $locale ?? $model->locale();
 

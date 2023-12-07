@@ -8,7 +8,7 @@ trait HasDefaultsData
 {
     protected $defaultsData;
 
-    public function defaultsData(DefaultsData $data = null): DefaultsData|self
+    public function defaultsData(?DefaultsData $data = null): DefaultsData|self
     {
         return $this->fluentlyGetOrSet('defaultsData')
             ->getter(function ($data) {
