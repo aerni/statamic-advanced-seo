@@ -161,14 +161,6 @@ export default {
             return this.$dirty.has(this.publishContainer);
         },
 
-        activeLocalization() {
-            return _.findWhere(this.localizations, { active: true });
-        },
-
-        originLocalization() {
-            return _.findWhere(this.localizations, { origin: true });
-        },
-
     },
 
     watch: {
