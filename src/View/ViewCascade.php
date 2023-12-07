@@ -162,6 +162,10 @@ class ViewCascade extends BaseCascade
 
     public function indexing(): ?string
     {
+        if (! in_array(app()->environment(), config('advanced-seo.crawling.environments', []))) {
+            $this->merge(['noindex' => true, 'nofollow' => true]);
+        }
+
         $indexing = collect([
             'noindex' => $this->get('noindex'),
             'nofollow' => $this->get('nofollow'),
