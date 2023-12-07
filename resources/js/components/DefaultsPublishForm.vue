@@ -138,6 +138,9 @@ export default {
             errors: {},
             isRoot: this.initialIsRoot,
             readOnly: this.initialReadOnly,
+
+            quickSaveKeyBinding: null,
+            quickSave: false,
         }
     },
 
@@ -193,7 +196,10 @@ export default {
         },
 
         save() {
-            if (!this.canSave) return;
+            if (! this.canSave) {
+                this.quickSave = false;
+                return;
+            }
 
             this.saving = true;
             this.clearErrors();
@@ -208,6 +214,7 @@ export default {
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
+                this.quickSave = false;
             }).catch(e => this.handleAxiosError(e));
         },
 
@@ -298,6 +305,7 @@ export default {
     mounted() {
         this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
+            this.quickSave = true;
             this.save();
         });
     },
