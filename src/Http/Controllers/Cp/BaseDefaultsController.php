@@ -8,7 +8,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
