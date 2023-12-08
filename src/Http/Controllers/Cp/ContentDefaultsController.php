@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
@@ -27,22 +26,19 @@ abstract class ContentDefaultsController extends BaseDefaultsController
     {
         throw_unless(Defaults::isEnabled("{$this->type}::{$handle}"), new NotFoundHttpException);
 
-        $this->authorize("view seo {$handle} defaults");
-
         $set = $this->set($handle);
-        $content = $this->content($handle);
 
-        $requestedSite = $request->site ?? Site::selected()->handle();
+        $this->authorize('view', [SeoVariables::class, $set]);
 
-        // Select the requested site if it exists in the sites configuration of the collection/taxonomy.
-        // Fall back to the default site or first site in the array.
-        $site = $this->evaluateSite($content->sites(), $requestedSite);
+        $site = $request->site ?? Site::selected()->handle();
+
+        $sites = $this->content($handle)->sites();
 
         // Create a localization for each of the provided sites. This triggers a save on the set.
         // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
         // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
-        $set = $set->createLocalizations($content->sites());
+        $set = $set->createLocalizations($sites);
 
         $localization = $set->in($site);
 
@@ -53,8 +49,6 @@ abstract class ContentDefaultsController extends BaseDefaultsController
         if ($hasOrigin = $localization->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($localization->origin(), $blueprint);
         }
-
-        $user = User::fromUser($request->user());
 
         // This variable solely exists to prevent variable conflict in $viewData['localizations'].
         $requestLocalization = $localization;
@@ -77,7 +71,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'localizations' => $content->sites()->map(function ($site) use ($set, $requestLocalization) {
+            'localizations' => $this->authorizedSites($set)->map(function ($site) use ($set, $requestLocalization) {
                 $localization = $set->in($site);
                 $exists = $localization !== null;
 
@@ -93,7 +87,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
                 ];
             })->values()->all(),
             'breadcrumbs' => $this->breadcrumbs(),
-            'readOnly' => $user->cant("edit seo {$handle} defaults"),
+            'readOnly' => User::current()->cant("edit seo {$handle} defaults"),
             'contentType' => $this->type,
         ];
 
@@ -109,14 +103,15 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
     public function update(string $handle, Request $request): void
     {
-        $this->authorize("edit seo {$handle} defaults");
-
         $set = $this->set($handle);
-        $content = $this->content($handle);
+
+        $this->authorize('edit', [SeoVariables::class, $set]);
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $localization = $set->in($site)->determineOrigin($content->sites());
+        $sites = $this->content($handle)->sites();
+
+        $localization = $set->in($site)->determineOrigin($sites);
 
         $blueprint = $localization->blueprint();
 
@@ -143,17 +138,6 @@ abstract class ContentDefaultsController extends BaseDefaultsController
                 'url' => cp_route("advanced-seo.{$this->type}.index"),
             ],
         ]);
-    }
-
-    protected function evaluateSite(Collection $sites, string $site): string
-    {
-        if ($sites->contains($site)) {
-            return $site;
-        }
-
-        $defaultSite = Site::default()->handle();
-
-        return $sites->contains($defaultSite) ? $defaultSite : $sites->first();
     }
 
     abstract protected function set(string $handle): mixed;

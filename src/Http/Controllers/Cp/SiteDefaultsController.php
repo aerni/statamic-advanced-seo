@@ -28,9 +28,9 @@ class SiteDefaultsController extends BaseDefaultsController
     {
         throw_unless(Defaults::isEnabled("site::{$handle}"), new NotFoundHttpException);
 
-        $this->authorize("view seo {$handle} defaults");
-
         $set = $this->set($handle);
+
+        $this->authorize('view', [SeoVariables::class, $set]);
 
         $site = $request->site ?? Site::selected()->handle();
 
@@ -48,8 +48,6 @@ class SiteDefaultsController extends BaseDefaultsController
         if ($hasOrigin = $localization->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($localization->origin(), $blueprint);
         }
-
-        $user = User::fromUser($request->user());
 
         // This variable solely exists to prevent variable conflict in $viewData['localizations'].
         $requestLocalization = $localization;
@@ -72,7 +70,7 @@ class SiteDefaultsController extends BaseDefaultsController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'localizations' => $sites->map(function ($site) use ($set, $requestLocalization) {
+            'localizations' => $this->authorizedSites($set)->map(function ($site) use ($set, $requestLocalization) {
                 $localization = $set->in($site);
                 $exists = $localization !== null;
 
@@ -88,7 +86,7 @@ class SiteDefaultsController extends BaseDefaultsController
                 ];
             })->values()->all(),
             'breadcrumbs' => $this->breadcrumbs(),
-            'readOnly' => $user->cant("edit seo {$handle} defaults"),
+            'readOnly' => User::current()->cant("edit seo {$handle} defaults"),
             'contentType' => 'site',
         ];
 
@@ -104,9 +102,9 @@ class SiteDefaultsController extends BaseDefaultsController
 
     public function update(string $handle, Request $request): void
     {
-        $this->authorize("edit seo {$handle} defaults");
-
         $set = $this->set($handle);
+
+        $this->authorize('edit', [SeoVariables::class, $set]);
 
         $site = $request->site ?? Site::selected()->handle();
 

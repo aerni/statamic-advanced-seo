@@ -12,7 +12,7 @@
             <div class="p-0 card content">
                 <div class="flex flex-wrap p-4">
                     @foreach (Aerni\AdvancedSeo\Models\Defaults::enabledInType('site') as $site)
-                        @can("view seo {$site['handle']} defaults")
+                        @can('view', [\Aerni\AdvancedSeo\Data\SeoVariables::class, $site['set']])
                             <a href="{{ cp_route('advanced-seo.site.edit', $site['handle']) }}" class="flex items-start w-full p-4 rounded-md lg:w-1/2 hover:seo-bg-blue-100 group">
                                 <div class="w-8 h-8 mr-4 text-blue">
                                     @cp_svg($site['icon'])

@@ -129,19 +129,19 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootAddonNav(): self
     {
         Nav::extend(function ($nav) {
-            Defaults::enabled()->groupBy('type')->each(function ($items, $type) use ($nav) {
+            Defaults::enabled()->groupBy('type')->each(function ($defaults, $type) use ($nav) {
                 $nav->create(ucfirst($type))
                     ->section('SEO')
                     ->can('index', [SeoVariables::class, $type])
                     ->route("advanced-seo.{$type}.index")
                     ->active("advanced-seo/{$type}")
-                    ->icon($items->first()['type_icon'])
+                    ->icon($defaults->first()['type_icon'])
                     ->children(
-                        $items->map(function ($item) use ($nav, $type) {
-                            return $nav->item($item['title'])
-                                ->can('view', [SeoVariables::class, $item['handle']])
-                                ->route("advanced-seo.{$item['type']}.edit", $item['handle'])
-                                ->active("advanced-seo/{$type}/{$item['handle']}");
+                        $defaults->map(function ($default) use ($nav, $type) {
+                            return $nav->item($default['title'])
+                                ->can('view', [SeoVariables::class, $default['set']])
+                                ->route("advanced-seo.{$default['type']}.edit", $default['handle'])
+                                ->active("advanced-seo/{$type}/{$default['handle']}");
                         })->toArray()
                     );
             });

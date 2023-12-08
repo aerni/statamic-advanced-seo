@@ -2,9 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -26,5 +29,10 @@ abstract class BaseDefaultsController extends CpController
             ->preProcess();
 
         return [$fields->values()->all(), $fields->meta()->all()];
+    }
+
+    protected function authorizedSites(SeoDefaultSet $set): Collection
+    {
+        return $set->sites()->intersect(Site::authorized());
     }
 }
