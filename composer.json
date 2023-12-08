@@ -21,7 +21,7 @@
         "spatie/browsershot": "^3.57",
         "spatie/laravel-ray": "^1.32",
         "spatie/schema-org": "^3.14",
-        "statamic/cms": "^4.0",
+        "statamic/cms": "^4.27",
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {
