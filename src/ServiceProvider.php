@@ -2,44 +2,45 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
-use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Statamic\Statamic;
+use Statamic\Facades\Git;
+use Statamic\Tags\Context;
+use Illuminate\Support\Arr;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Facades\View;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\View\ViewCascade;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\View;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Git;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
-use Statamic\Tags\Context;
+use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -129,19 +130,19 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootAddonNav(): self
     {
         Nav::extend(function ($nav) {
-            Defaults::enabled()->groupBy('type')->each(function ($items, $type) use ($nav) {
+            Defaults::enabled()->groupBy('type')->each(function ($defaults, $type) use ($nav) {
                 $nav->create(ucfirst($type))
                     ->section('SEO')
                     ->can('index', [SeoVariables::class, $type])
                     ->route("advanced-seo.{$type}.index")
                     ->active("advanced-seo/{$type}")
-                    ->icon($items->first()['type_icon'])
+                    ->icon($defaults->first()['type_icon'])
                     ->children(
-                        $items->map(function ($item) use ($nav, $type) {
-                            return $nav->item($item['title'])
-                                ->can('view', [SeoVariables::class, $item['handle']])
-                                ->route("advanced-seo.{$item['type']}.edit", $item['handle'])
-                                ->active("advanced-seo/{$type}/{$item['handle']}");
+                        $defaults->map(function ($default) use ($nav, $type) {
+                            return $nav->item($default['title'])
+                                ->can('view', [SeoVariables::class, $default['set']])
+                                ->route("advanced-seo.{$default['type']}.edit", $default['handle'])
+                                ->active("advanced-seo/{$type}/{$default['handle']}");
                         })->toArray()
                     );
             });

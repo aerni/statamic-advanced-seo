@@ -21,7 +21,7 @@
                 </div>
                 <div class="px-6 py-6">
                     @foreach (Aerni\AdvancedSeo\Models\Defaults::enabledInType('taxonomies') as $taxonomy)
-                        @can("view seo {$taxonomy['handle']} defaults")
+                        @can('view', [\Aerni\AdvancedSeo\Data\SeoVariables::class, $taxonomy['set']])
                             <a href="{{ cp_route('advanced-seo.taxonomies.edit', $taxonomy['handle']) }}" class="block px-3 py-2 -mx-1 text-sm rounded-md hover:seo-bg-blue-100">{{ $taxonomy['title'] }}</a>
                         @endcan
                     @endforeach
