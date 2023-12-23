@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Fields;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SiteVerification;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Statamic\Support\Str;
 
 class IndexingFields extends BaseFields
 {
@@ -26,7 +25,7 @@ class IndexingFields extends BaseFields
                 'field' => [
                     'type' => 'section',
                     'display' => $this->trans('section_crawling.display'),
-                    'instructions' => $this->trans('section_crawling.instructions', ['environments' => Str::makeSentenceList(config('advanced-seo.crawling.environments'))]),
+                    'instructions' => $this->trans('section_crawling.instructions'),
                 ],
             ],
             [

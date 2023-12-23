@@ -326,7 +326,7 @@ return [
 
     'section_crawling' => [
         'display' => 'Crawling',
-        'instructions' => 'These settings take precedence over their counterparts on entries and terms. To prevent unwanted crawling, the robots meta tag is automatically added in all environments other than :environments.',
+        'instructions' => 'Configure the crawling settings of your site. These settings will take precedence over their counterparts on entries and terms.',
     ],
 
     'noindex' => [
