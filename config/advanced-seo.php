@@ -193,7 +193,7 @@ return [
         | Environments
         |--------------------------------------------------------------------------
         |
-        | Ensure that the site is only crawled in the configured environments.
+        | Configure the environments in which you want the sites to be crawled.
         | The robots meta tag will be set to `noindex, nofollow` in all other environments.
         |
         */
