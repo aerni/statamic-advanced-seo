@@ -40,7 +40,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
         $set = $set->createLocalizations($sites);
 
-        $localization = $set->in($site);
+        $localization = $set->in($site) ?? $set->inDefaultSite();
 
         $blueprint = $localization->blueprint();
 
