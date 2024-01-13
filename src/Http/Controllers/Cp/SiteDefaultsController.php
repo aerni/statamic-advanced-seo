@@ -18,17 +18,6 @@ class SiteDefaultsController extends BaseDefaultsController
 {
     protected string $type = 'site';
 
-    public function index(): View
-    {
-        if (! $this->hasDefaultsForSelectedSite()) {
-            $this->flashDefaultsUnavailable();
-        }
-
-        $this->authorize('index', [SeoVariables::class, 'site']);
-
-        return view('advanced-seo::cp.site');
-    }
-
     public function edit(Request $request, string $handle): mixed
     {
         throw_unless(Defaults::isEnabled("site::{$handle}"), new NotFoundHttpException);

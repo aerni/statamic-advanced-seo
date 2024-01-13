@@ -16,7 +16,16 @@ use Statamic\Http\Controllers\CP\CpController;
 
 abstract class BaseDefaultsController extends CpController
 {
-    abstract public function index(): View;
+    public function index(): View
+    {
+        if (! $this->hasDefaultsForSelectedSite()) {
+            $this->flashDefaultsUnavailable();
+        }
+
+        $this->authorize('index', [SeoVariables::class, $this->type]);
+
+        return view("advanced-seo::cp.{$this->type}");
+    }
 
     abstract public function edit(Request $request, string $handle): mixed;
 

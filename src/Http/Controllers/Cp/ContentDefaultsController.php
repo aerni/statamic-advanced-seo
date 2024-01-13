@@ -14,17 +14,6 @@ use Statamic\Facades\User;
 
 abstract class ContentDefaultsController extends BaseDefaultsController
 {
-    public function index(): View
-    {
-        if (! $this->hasDefaultsForSelectedSite()) {
-            $this->flashDefaultsUnavailable();
-        }
-
-        $this->authorize('index', [SeoVariables::class, $this->type]);
-
-        return view("advanced-seo::cp.{$this->type}");
-    }
-
     public function edit(Request $request, string $handle): mixed
     {
         throw_unless(Defaults::isEnabled("{$this->type}::{$handle}"), new NotFoundHttpException);
