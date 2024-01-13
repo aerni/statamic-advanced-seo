@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Stache;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Statamic\Data\DataCollection;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
