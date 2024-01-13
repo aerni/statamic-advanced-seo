@@ -32,14 +32,6 @@ class SeoDefaultsRepository implements Contract
         return $this->store->store($type)->getItem($handle);
     }
 
-    public function findById(string $id): ?SeoDefaultSet
-    {
-        $type = Str::before($id, '::');
-        $handle = Str::after($id, '::');
-
-        return $this->find($type, $handle);
-    }
-
     public function findOrMake(string $type, string $handle): SeoDefaultSet
     {
         return $this->find($type, $handle) ?? $this->make()->type($type)->handle($handle);
