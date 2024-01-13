@@ -30,11 +30,8 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $this->authorize('view', [SeoVariables::class, $set]);
 
-        // TODO: Can just get the sites from the set.
-        $sites = Site::all()->map->handle();
-
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
-        $set = $set->createLocalizations($sites);
+        $set = $set->createLocalizations($set->sites());
 
         $localization = $set->in($site);
 
@@ -105,10 +102,7 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        // TODO: Can just get the sites from the set.
-        $sites = Site::all()->map->handle();
-
-        $localization = $set->in($site)->determineOrigin($sites);
+        $localization = $set->in($site)->determineOrigin($set->sites());
 
         $blueprint = $localization->blueprint();
 

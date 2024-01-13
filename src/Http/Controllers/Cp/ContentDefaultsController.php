@@ -26,14 +26,11 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
         $this->authorize('view', [SeoVariables::class, $set]);
 
-        // TODO: Can just get the sites from the set.
-        $sites = $this->content($handle)->sites();
-
         // Create a localization for each of the provided sites. This triggers a save on the set.
         // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
         // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
-        $set = $set->createLocalizations($sites);
+        $set = $set->createLocalizations($set->sites());
 
         $localization = $set->in($site);
 
@@ -104,10 +101,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        // TODO: Can just get the sites from the set.
-        $sites = $this->content($handle)->sites();
-
-        $localization = $set->in($site)->determineOrigin($sites);
+        $localization = $set->in($site)->determineOrigin($set->sites());
 
         $blueprint = $localization->blueprint();
 
