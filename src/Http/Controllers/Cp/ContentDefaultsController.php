@@ -24,7 +24,7 @@ abstract class ContentDefaultsController extends BaseDefaultsController
         if (! $hasDefaultsForSite) {
             session()->flash('error', __('There are no :type defaults available on site ":handle".', [
                 'type' => str_singular($this->type),
-                'handle' => Site::selected()->name()
+                'handle' => Site::selected()->name(),
             ]));
 
             throw new NotFoundHttpException();

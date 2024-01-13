@@ -11,7 +11,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
@@ -27,7 +26,7 @@ class SiteDefaultsController extends BaseDefaultsController
         if (! $hasDefaultsForSite) {
             session()->flash('error', __('There are no :type defaults available on site ":handle".', [
                 'type' => 'Site',
-                'handle' => Site::selected()->name()
+                'handle' => Site::selected()->name(),
             ]));
 
             throw new NotFoundHttpException();
