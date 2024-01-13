@@ -26,7 +26,7 @@ class Defaults extends Model
                 'enabled' => true,
                 'icon' => 'icons/light/sites',
                 'type_icon' => 'earth',
-                'set' => Seo::findById('site::general'),
+                'set' => Seo::findOrMake('site', 'general'),
             ],
             [
                 'id' => 'site::indexing',
@@ -38,7 +38,7 @@ class Defaults extends Model
                 'enabled' => true,
                 'icon' => 'icons/light/structures',
                 'type_icon' => 'earth',
-                'set' => Seo::findById('site::indexing'),
+                'set' => Seo::findOrMake('site', 'indexing'),
             ],
             [
                 'id' => 'site::social_media',
@@ -50,7 +50,7 @@ class Defaults extends Model
                 'enabled' => true,
                 'icon' => 'icons/light/assets',
                 'type_icon' => 'earth',
-                'set' => Seo::findById('site::social_media'),
+                'set' => Seo::findOrMake('site', 'social_media'),
             ],
             [
                 'id' => 'site::analytics',
@@ -62,7 +62,7 @@ class Defaults extends Model
                 'enabled' => collect(config('advanced-seo.analytics'))->reject(fn ($value, $key) => $key === 'environments')->filter()->isNotEmpty(),
                 'icon' => 'icons/light/charts',
                 'type_icon' => 'earth',
-                'set' => Seo::findById('site::analytics'),
+                'set' => Seo::findOrMake('site', 'analytics'),
             ],
             [
                 'id' => 'site::favicons',
@@ -74,7 +74,7 @@ class Defaults extends Model
                 'enabled' => config('advanced-seo.favicons.enabled', false),
                 'icon' => 'icons/light/color',
                 'type_icon' => 'earth',
-                'set' => Seo::findById('site::favicons'),
+                'set' => Seo::findOrMake('site', 'favicons'),
             ],
         ];
 
@@ -89,7 +89,7 @@ class Defaults extends Model
                 'enabled' => ! in_array($collection->handle(), config('advanced-seo.disabled.collections', [])),
                 'icon' => 'icons/light/content-writing',
                 'type_icon' => 'content-writing',
-                'set' => Seo::findById('collections::'.$collection->handle()),
+                'set' => Seo::findOrMake('collections', $collection->handle()),
             ];
         })->sortBy('handle');
 
@@ -104,7 +104,7 @@ class Defaults extends Model
                 'enabled' => ! in_array($taxonomy->handle(), config('advanced-seo.disabled.taxonomies', [])),
                 'icon' => 'icons/light/tags',
                 'type_icon' => 'tags',
-                'set' => Seo::findById('taxonomies::'.$taxonomy->handle()),
+                'set' => Seo::findOrMake('taxonomies', $taxonomy->handle()),
             ];
         })->sortBy('handle');
 
