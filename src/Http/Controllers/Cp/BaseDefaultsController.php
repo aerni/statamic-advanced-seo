@@ -2,17 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Statamic\Facades\Site;
-use Illuminate\Http\Request;
-use Statamic\CP\Breadcrumbs;
-use Statamic\Fields\Blueprint;
-use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Site;
+use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 abstract class BaseDefaultsController extends CpController
