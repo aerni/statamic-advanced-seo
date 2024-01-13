@@ -52,7 +52,7 @@ abstract class BaseDefaultsController extends CpController
     protected function hasDefaultsForSelectedSite(): bool
     {
         return Defaults::enabledInType($this->type)
-            ->filter(fn ($default) => $default['set']->sites()->contains(Site::selected()->handle()))
+            ->filter(fn ($default) => $default['set']->availableOnSite(Site::selected()->handle()))
             ->isNotEmpty();
     }
 
