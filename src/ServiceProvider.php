@@ -34,6 +34,7 @@ use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Git;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
+use Statamic\Facades\Site;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Providers\AddonServiceProvider;
@@ -129,22 +130,25 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootAddonNav(): self
     {
         Nav::extend(function ($nav) {
-            Defaults::enabled()->groupBy('type')->each(function ($defaults, $type) use ($nav) {
-                $nav->create(ucfirst($type))
-                    ->section('SEO')
-                    ->can('index', [SeoVariables::class, $type])
-                    ->route("advanced-seo.{$type}.index")
-                    ->active("advanced-seo/{$type}")
-                    ->icon($defaults->first()['type_icon'])
-                    ->children(
-                        $defaults->map(function ($default) use ($nav, $type) {
-                            return $nav->item($default['title'])
-                                ->can('view', [SeoVariables::class, $default['set']])
-                                ->route("advanced-seo.{$default['type']}.edit", $default['handle'])
-                                ->active("advanced-seo/{$type}/{$default['handle']}");
-                        })->toArray()
-                    );
-            });
+            Defaults::enabled()
+                ->filter(fn ($default) => $default['set']->sites()->contains(Site::selected()->handle()))
+                ->groupBy('type')
+                ->each(function ($defaults, $type) use ($nav) {
+                    $nav->create(ucfirst($type))
+                        ->section('SEO')
+                        ->can('index', [SeoVariables::class, $type])
+                        ->route("advanced-seo.{$type}.index")
+                        ->active("advanced-seo/{$type}")
+                        ->icon($defaults->first()['type_icon'])
+                        ->children(
+                            $defaults->map(function ($default) use ($nav, $type) {
+                                return $nav->item($default['title'])
+                                    ->can('view', [SeoVariables::class, $default['set']])
+                                    ->route("advanced-seo.{$default['type']}.edit", $default['handle'])
+                                    ->active("advanced-seo/{$type}/{$default['handle']}");
+                            })->toArray()
+                        );
+                });
         });
 
         return $this;

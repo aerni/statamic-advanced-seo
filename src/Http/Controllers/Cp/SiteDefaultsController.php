@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
@@ -10,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
@@ -17,7 +19,19 @@ class SiteDefaultsController extends BaseDefaultsController
 {
     public function index(): View
     {
-        throw_unless(Defaults::enabledInType('site')->isNotEmpty(), new NotFoundHttpException);
+        $hasDefaultsForSite = Defaults::enabledInType('site')
+            ->filter(fn ($default) => $default['set']->sites()->contains(Site::selected()->handle()))
+            ->isNotEmpty();
+
+        // TODO: Can we tidy this up with the $this->ensureSetIsAvailableOnSite() method instead?
+        if (! $hasDefaultsForSite) {
+            session()->flash('error', __('There are no :type defaults available on site ":handle".', [
+                'type' => 'Site',
+                'handle' => Site::selected()->name()
+            ]));
+
+            throw new NotFoundHttpException();
+        }
 
         $this->authorize('index', [SeoVariables::class, 'site']);
 
@@ -38,6 +52,10 @@ class SiteDefaultsController extends BaseDefaultsController
 
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
         $set = $set->createLocalizations($sites);
+
+        if ($response = $this->ensureSetIsAvailableOnSite($set, $site)) {
+            return $response;
+        }
 
         $localization = $set->in($site);
 

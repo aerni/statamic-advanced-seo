@@ -6,9 +6,12 @@ use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Policies\Concerns\HasMultisitePolicy;
 
 class SeoVariablesPolicy
 {
+    use HasMultisitePolicy;
+
     public function index($user, string $type): bool
     {
         return Defaults::enabledInType($type)
@@ -18,28 +21,17 @@ class SeoVariablesPolicy
 
     public function view($user, SeoDefaultSet $set): bool
     {
-        if (! $this->userCanAccessSite($set)) {
-            return false;
-        }
+        $user = User::fromUser($user);
 
-        return User::fromUser($user)
-            ->hasPermission("view seo {$set->handle()} defaults");
+        return $user->hasPermission("view seo {$set->handle()} defaults")
+            && $this->userCanAccessAnySite($user, $set->sites());
     }
 
     public function edit($user, SeoDefaultSet $set): bool
     {
-        if (! $this->userCanAccessSite($set)) {
-            return false;
-        }
+        $user = User::fromUser($user);
 
-        return User::fromUser($user)
-            ->hasPermission("edit seo {$set->handle()} defaults");
-    }
-
-    protected function userCanAccessSite(SeoDefaultSet $set): bool
-    {
-        return $set->sites()
-            ->intersect(Site::authorized()) // Removes sites the user is not authorized for.
-            ->contains(request()->site ?? Site::selected()->handle()); // Checks if the user is authorized for the requested site.
+        return $user->hasPermission("edit seo {$set->handle()} defaults")
+            && $this->userCanAccessAnySite($user, $set->sites());
     }
 }
