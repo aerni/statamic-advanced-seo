@@ -61,9 +61,8 @@ abstract class BaseDefaultsController extends CpController
 
     protected function flashDefaultsUnavailable(): void
     {
-        session()->now('error', __('There are no :type defaults available on site ":handle".', [
+        session()->now('error', __('There are no :type defaults available for the selected site.', [
             'type' => str_singular($this->type),
-            'handle' => Site::selected()->name()
         ]));
 
         throw new NotFoundHttpException();
@@ -72,7 +71,10 @@ abstract class BaseDefaultsController extends CpController
     protected function redirectToIndex(SeoDefaultSet $set, string $site): RedirectResponse
     {
         return redirect(cp_route("advanced-seo.{$set->type()}.index"))
-            ->with('error', __('The ":set" defaults are not available on site ":handle".', ['set' => $set->title(), 'handle' => Site::get($site)->name()]));
+            ->with('error', __('The :set :type is not available in the selected site.', [
+                'set' => $set->title(),
+                'type' => str_singular($this->type),
+            ]));
     }
 
     protected function breadcrumbs(): Breadcrumbs
