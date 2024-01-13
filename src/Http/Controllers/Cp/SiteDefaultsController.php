@@ -20,7 +20,7 @@ class SiteDefaultsController extends BaseDefaultsController
 
     public function edit(Request $request, string $handle): mixed
     {
-        throw_unless(Defaults::isEnabled("site::{$handle}"), new NotFoundHttpException);
+        throw_unless(Defaults::isEnabled("{$this->type}::{$handle}"), new NotFoundHttpException);
 
         $set = $this->set($handle);
 
@@ -86,7 +86,7 @@ class SiteDefaultsController extends BaseDefaultsController
             })->values()->all(),
             'breadcrumbs' => $this->breadcrumbs(),
             'readOnly' => User::current()->cant("edit seo {$handle} defaults"),
-            'contentType' => 'site',
+            'contentType' => $this->type,
         ];
 
         if ($request->wantsJson()) {
@@ -133,8 +133,8 @@ class SiteDefaultsController extends BaseDefaultsController
     {
         return new Breadcrumbs([
             [
-                'text' => __('advanced-seo::messages.site'),
-                'url' => cp_route('advanced-seo.site.index'),
+                'text' => __("advanced-seo::messages.{$this->type}"),
+                'url' => cp_route("advanced-seo.{$this->type}.index"),
             ],
         ]);
     }
