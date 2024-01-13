@@ -79,7 +79,7 @@ class TestCase extends OrchestraTestCase
         ];
 
         foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__."/../vendor/statamic/cms/config/{$config}.php"));
+            $app['config']->set("statamic.$config", require (__DIR__."/../vendor/statamic/cms/config/{$config}.php"));
         }
 
         // Creat two site for multi site testing
@@ -110,6 +110,6 @@ class TestCase extends OrchestraTestCase
         $app['config']->set('statamic.git.enabled', true);
 
         // Define the addon config for our tests
-        $app['config']->set('advanced-seo', require(__DIR__.'/../config/advanced-seo.php'));
+        $app['config']->set('advanced-seo', require (__DIR__.'/../config/advanced-seo.php'));
     }
 }
