@@ -56,7 +56,7 @@ abstract class BaseDefaultsController extends CpController
     protected function defaults(): Collection
     {
         return Defaults::enabledInType($this->type)
-            ->filter(fn ($default) => $default['set']->availableOnSite(Site::selected()->handle()));
+            ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()));
     }
 
     protected function flashDefaultsUnavailable(): void

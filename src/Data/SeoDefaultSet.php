@@ -67,7 +67,7 @@ class SeoDefaultSet implements Contract
         return $allSites;
     }
 
-    public function availableOnSite(string $site): bool
+    public function availableInSite(string $site): bool
     {
         return $this->sites()->contains($site);
     }

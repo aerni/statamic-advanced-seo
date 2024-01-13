@@ -131,7 +131,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         Nav::extend(function ($nav) {
             Defaults::enabled()
-                ->filter(fn ($default) => $default['set']->availableOnSite(Site::selected()->handle()))
+                ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
                 ->groupBy('type')
                 ->each(function ($defaults, $type) use ($nav) {
                     $nav->create(ucfirst($type))

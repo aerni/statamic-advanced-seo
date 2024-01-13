@@ -24,7 +24,7 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        if (! $set->availableOnSite($site)) {
+        if (! $set->availableInSite($site)) {
             return $this->redirectToIndex($set, $site);
         }
 
