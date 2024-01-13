@@ -20,13 +20,8 @@
                     </div>
                 </div>
                 <div class="px-6 py-6">
-                    {{-- TODO: Move this into a controller to tidy up. --}}
-                    @foreach (Aerni\AdvancedSeo\Models\Defaults::enabledInType('collections') as $collection)
-                        @if ($collection['set']->sites()->contains(Statamic\Facades\Site::selected()->handle()))
-                            @can('view', [\Aerni\AdvancedSeo\Data\SeoVariables::class, $collection['set']])
-                                <a href="{{ cp_route('advanced-seo.collections.edit', $collection['handle']) }}" class="block px-3 py-2 -mx-1 text-sm rounded-md hover:seo-bg-blue-100">{{ $collection['title'] }}</a>
-                            @endcan
-                        @endif
+                    @foreach ($defaults as $default)
+                        <a href="{{ cp_route('advanced-seo.collections.edit', $default['handle']) }}" class="block px-3 py-2 -mx-1 text-sm rounded-md hover:seo-bg-blue-100">{{ $default['title'] }}</a>
                     @endforeach
                 </div>
             </div>

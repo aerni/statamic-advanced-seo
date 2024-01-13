@@ -19,13 +19,17 @@ abstract class BaseDefaultsController extends CpController
 {
     public function index(): View
     {
-        if (! $this->hasDefaultsForSelectedSite()) {
+        $defaults = $this->defaults();
+
+        if ($defaults->isEmpty()) {
             $this->flashDefaultsUnavailable();
         }
 
         $this->authorize('index', [SeoVariables::class, $this->type]);
 
-        return view("advanced-seo::cp.{$this->type}");
+        return view("advanced-seo::cp.{$this->type}", [
+            'defaults' => $defaults,
+        ]);
     }
 
     abstract public function edit(Request $request, string $handle): mixed;
@@ -49,11 +53,10 @@ abstract class BaseDefaultsController extends CpController
         return $set->sites()->intersect(Site::authorized());
     }
 
-    protected function hasDefaultsForSelectedSite(): bool
+    protected function defaults(): Collection
     {
         return Defaults::enabledInType($this->type)
-            ->filter(fn ($default) => $default['set']->availableOnSite(Site::selected()->handle()))
-            ->isNotEmpty();
+            ->filter(fn ($default) => $default['set']->availableOnSite(Site::selected()->handle()));
     }
 
     protected function flashDefaultsUnavailable(): void
