@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Statamic\Facades\Site;
 use Illuminate\Http\Request;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Fields\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
@@ -69,5 +70,15 @@ abstract class BaseDefaultsController extends CpController
     {
         return redirect(cp_route("advanced-seo.{$set->type()}.index"))
             ->with('error', __('The ":set" defaults are not available on site ":handle".', ['set' => $set->title(), 'handle' => Site::get($site)->name()]));
+    }
+
+    protected function breadcrumbs(): Breadcrumbs
+    {
+        return new Breadcrumbs([
+            [
+                'text' => __("advanced-seo::messages.{$this->type}"),
+                'url' => cp_route("advanced-seo.{$this->type}.index"),
+            ],
+        ]);
     }
 }

@@ -7,9 +7,7 @@ use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -127,16 +125,6 @@ class SiteDefaultsController extends BaseDefaultsController
         $localization = $localization->save();
 
         SeoDefaultSetSaved::dispatch($localization->seoSet());
-    }
-
-    protected function breadcrumbs(): Breadcrumbs
-    {
-        return new Breadcrumbs([
-            [
-                'text' => __("advanced-seo::messages.{$this->type}"),
-                'url' => cp_route("advanced-seo.{$this->type}.index"),
-            ],
-        ]);
     }
 
     protected function set(string $handle): SeoDefaultSet
