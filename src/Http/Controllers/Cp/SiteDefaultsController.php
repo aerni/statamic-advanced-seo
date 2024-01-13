@@ -16,20 +16,12 @@ use Statamic\Facades\User;
 
 class SiteDefaultsController extends BaseDefaultsController
 {
+    protected string $type = 'site';
+
     public function index(): View
     {
-        $hasDefaultsForSite = Defaults::enabledInType('site')
-            ->filter(fn ($default) => $default['set']->sites()->contains(Site::selected()->handle()))
-            ->isNotEmpty();
-
-        // TODO: Can we tidy this up with the $this->ensureSetIsAvailableOnSite() method instead?
-        if (! $hasDefaultsForSite) {
-            session()->flash('error', __('There are no :type defaults available on site ":handle".', [
-                'type' => 'Site',
-                'handle' => Site::selected()->name(),
-            ]));
-
-            throw new NotFoundHttpException();
+        if (! $this->hasDefaultsForSelectedSite()) {
+            $this->flashDefaultsUnavailable();
         }
 
         $this->authorize('index', [SeoVariables::class, 'site']);
@@ -43,18 +35,19 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $set = $this->set($handle);
 
-        $this->authorize('view', [SeoVariables::class, $set]);
-
         $site = $request->site ?? Site::selected()->handle();
 
+        if (! $set->availableOnSite($site)) {
+            return $this->redirectToIndex($set, $site);
+        }
+
+        $this->authorize('view', [SeoVariables::class, $set]);
+
+        // TODO: Can just get the sites from the set.
         $sites = Site::all()->map->handle();
 
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
         $set = $set->createLocalizations($sites);
-
-        if ($response = $this->ensureSetIsAvailableOnSite($set, $site)) {
-            return $response;
-        }
 
         $localization = $set->in($site);
 
@@ -125,6 +118,7 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $site = $request->site ?? Site::selected()->handle();
 
+        // TODO: Can just get the sites from the set.
         $sites = Site::all()->map->handle();
 
         $localization = $set->in($site)->determineOrigin($sites);
