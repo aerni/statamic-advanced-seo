@@ -173,7 +173,8 @@ class SeoDefaultsController extends CpController
     protected function defaults(): Collection
     {
         return Defaults::enabledInType($this->type)
-            ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()));
+            ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
+            ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]));
     }
 
     protected function flashDefaultsUnavailable(): void
