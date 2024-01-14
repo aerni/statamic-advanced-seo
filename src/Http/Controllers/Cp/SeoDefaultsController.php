@@ -7,14 +7,40 @@ use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
+use Statamic\Http\Controllers\CP\CpController;
 
-class SiteDefaultsController extends BaseDefaultsController
+class SeoDefaultsController extends CpController
 {
-    protected string $type = 'site';
+    protected string $type;
+
+    public function __construct(Request $request)
+    {
+        $this->type = $request->segments()[2];
+    }
+
+    public function index(): View
+    {
+        $defaults = $this->defaults();
+
+        if ($defaults->isEmpty()) {
+            $this->flashDefaultsUnavailable();
+        }
+
+        $this->authorize('index', [SeoVariables::class, $this->type]);
+
+        return view("advanced-seo::cp.{$this->type}", [
+            'defaults' => $defaults,
+        ]);
+    }
 
     public function edit(Request $request, string $handle): mixed
     {
@@ -30,6 +56,9 @@ class SiteDefaultsController extends BaseDefaultsController
 
         $this->authorize('view', [SeoVariables::class, $set]);
 
+        // Create a localization for each of the provided sites. This triggers a save on the set.
+        // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
+        // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
         $set = $set->createLocalizations($set->sites());
 
@@ -94,7 +123,7 @@ class SiteDefaultsController extends BaseDefaultsController
         ]));
     }
 
-    public function update(string $handle, Request $request): void
+    public function update(Request $request, string $handle): void
     {
         $set = $this->set($handle);
 
@@ -123,6 +152,55 @@ class SiteDefaultsController extends BaseDefaultsController
 
     protected function set(string $handle): SeoDefaultSet
     {
-        return Seo::findOrMake('site', $handle);
+        return Seo::findOrMake($this->type, $handle);
+    }
+
+    protected function extractFromFields(SeoVariables $localization, Blueprint $blueprint): array
+    {
+        $fields = $blueprint
+            ->fields()
+            ->addValues($localization->values()->all())
+            ->preProcess();
+
+        return [$fields->values()->all(), $fields->meta()->all()];
+    }
+
+    protected function authorizedSites(SeoDefaultSet $set): Collection
+    {
+        return $set->sites()->intersect(Site::authorized());
+    }
+
+    protected function defaults(): Collection
+    {
+        return Defaults::enabledInType($this->type)
+            ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()));
+    }
+
+    protected function flashDefaultsUnavailable(): void
+    {
+        session()->now('error', __('There are no :type defaults available for the selected site.', [
+            'type' => str_singular($this->type),
+        ]));
+
+        throw new NotFoundHttpException();
+    }
+
+    protected function redirectToIndex(SeoDefaultSet $set, string $site): RedirectResponse
+    {
+        return redirect(cp_route("advanced-seo.{$set->type()}.index"))
+            ->with('error', __('The :set :type is not available in the selected site.', [
+                'set' => $set->title(),
+                'type' => str_singular($this->type),
+            ]));
+    }
+
+    protected function breadcrumbs(): Breadcrumbs
+    {
+        return new Breadcrumbs([
+            [
+                'text' => __("advanced-seo::messages.{$this->type}"),
+                'url' => cp_route("advanced-seo.{$this->type}.index"),
+            ],
+        ]);
     }
 }
