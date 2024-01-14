@@ -1,20 +1,18 @@
 <?php
 
-use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionDefaultsController;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\SiteDefaultsController;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\TaxonomyDefaultsController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoDefaultsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
-    Route::get('/site', [SiteDefaultsController::class, 'index'])->name('site.index');
-    Route::get('/site/{default}', [SiteDefaultsController::class, 'edit'])->name('site.edit');
-    Route::patch('/site/{default}', [SiteDefaultsController::class, 'update'])->name('site.update');
+    Route::get('/site', [SeoDefaultsController::class, 'index'])->name('site.index');
+    Route::get('/site/{default}', [SeoDefaultsController::class, 'edit'])->name('site.edit');
+    Route::patch('/site/{default}', [SeoDefaultsController::class, 'update'])->name('site.update');
 
-    Route::get('/collections', [CollectionDefaultsController::class, 'index'])->name('collections.index');
-    Route::get('/collections/{collection}', [CollectionDefaultsController::class, 'edit'])->name('collections.edit');
-    Route::patch('/collections/{collection}', [CollectionDefaultsController::class, 'update'])->name('collections.update');
+    Route::get('/collections', [SeoDefaultsController::class, 'index'])->name('collections.index');
+    Route::get('/collections/{collection}', [SeoDefaultsController::class, 'edit'])->name('collections.edit');
+    Route::patch('/collections/{collection}', [SeoDefaultsController::class, 'update'])->name('collections.update');
 
-    Route::get('/taxonomies', [TaxonomyDefaultsController::class, 'index'])->name('taxonomies.index');
-    Route::get('/taxonomies/{taxonomy}', [TaxonomyDefaultsController::class, 'edit'])->name('taxonomies.edit');
-    Route::patch('/taxonomies/{taxonomy}', [TaxonomyDefaultsController::class, 'update'])->name('taxonomies.update');
+    Route::get('/taxonomies', [SeoDefaultsController::class, 'index'])->name('taxonomies.index');
+    Route::get('/taxonomies/{taxonomy}', [SeoDefaultsController::class, 'edit'])->name('taxonomies.edit');
+    Route::patch('/taxonomies/{taxonomy}', [SeoDefaultsController::class, 'update'])->name('taxonomies.update');
 });
