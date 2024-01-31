@@ -20,13 +20,6 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class SeoDefaultsController extends CpController
 {
-    protected string $type;
-
-    public function __construct(Request $request)
-    {
-        $this->type = $request->segments()[2];
-    }
-
     public function index(): View
     {
         $defaults = $this->defaults();
@@ -35,16 +28,16 @@ class SeoDefaultsController extends CpController
             $this->flashDefaultsUnavailable();
         }
 
-        $this->authorize('index', [SeoVariables::class, $this->type]);
+        $this->authorize('index', [SeoVariables::class, $this->type()]);
 
-        return view("advanced-seo::cp.{$this->type}", [
+        return view("advanced-seo::cp.{$this->type()}", [
             'defaults' => $defaults,
         ]);
     }
 
     public function edit(Request $request, string $handle): mixed
     {
-        throw_unless(Defaults::isEnabled("{$this->type}::{$handle}"), new NotFoundHttpException);
+        throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
 
         $set = $this->set($handle);
 
@@ -110,7 +103,7 @@ class SeoDefaultsController extends CpController
             })->values()->all(),
             'breadcrumbs' => $this->breadcrumbs(),
             'readOnly' => User::current()->cant("edit seo {$handle} defaults"),
-            'contentType' => $this->type,
+            'contentType' => $this->type(),
         ];
 
         if ($request->wantsJson()) {
@@ -152,7 +145,7 @@ class SeoDefaultsController extends CpController
 
     protected function set(string $handle): SeoDefaultSet
     {
-        return Seo::findOrMake($this->type, $handle);
+        return Seo::findOrMake($this->type(), $handle);
     }
 
     protected function extractFromFields(SeoVariables $localization, Blueprint $blueprint): array
@@ -172,7 +165,7 @@ class SeoDefaultsController extends CpController
 
     protected function defaults(): Collection
     {
-        return Defaults::enabledInType($this->type)
+        return Defaults::enabledInType($this->type())
             ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
             ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]));
     }
@@ -180,7 +173,7 @@ class SeoDefaultsController extends CpController
     protected function flashDefaultsUnavailable(): void
     {
         session()->now('error', __('There are no :type defaults available for the selected site.', [
-            'type' => str_singular($this->type),
+            'type' => str_singular($this->type()),
         ]));
 
         throw new NotFoundHttpException();
@@ -191,7 +184,7 @@ class SeoDefaultsController extends CpController
         return redirect(cp_route("advanced-seo.{$set->type()}.index"))
             ->with('error', __('The :set :type is not available in the selected site.', [
                 'set' => $set->title(),
-                'type' => str_singular($this->type),
+                'type' => str_singular($this->type()),
             ]));
     }
 
@@ -199,9 +192,14 @@ class SeoDefaultsController extends CpController
     {
         return new Breadcrumbs([
             [
-                'text' => __("advanced-seo::messages.{$this->type}"),
-                'url' => cp_route("advanced-seo.{$this->type}.index"),
+                'text' => __("advanced-seo::messages.{$this->type()}"),
+                'url' => cp_route("advanced-seo.{$this->type()}.index"),
             ],
         ]);
+    }
+
+    protected function type(): string
+    {
+        return request()->segments()[2];
     }
 }
