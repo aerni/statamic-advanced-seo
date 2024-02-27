@@ -38,6 +38,7 @@ class FaviconsFields extends BaseFields
                     'container' => config('advanced-seo.favicons.container', 'assets'),
                     'folder' => 'favicons',
                     'localizable' => false,
+                    'localizable' => true,
                     'feature' => Favicons::class,
                     'validate' => [
                         'image',
