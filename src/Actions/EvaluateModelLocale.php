@@ -28,7 +28,7 @@ class EvaluateModelLocale
             ($model instanceof Taxonomy) => self::taxonomy(),
             ($model instanceof Term) => self::term($model),
             ($model instanceof TermBlueprintFound) => self::termBlueprintFound(),
-            ($model instanceof Context) => $model->get('site')?->handle() ?? Site::current()->handle(),
+            ($model instanceof Context) => self::context($model),
             ($model instanceof DefaultsData) => $model->locale,
             default => null
         };
@@ -86,5 +86,12 @@ class EvaluateModelLocale
         return Statamic::isCpRoute()
             ? basename(request()->path())
             : Site::current()->handle();
+    }
+
+    protected static function context(Context $context): string
+    {
+        return $context->get('locale')
+            ?? $context->get('site')?->handle()
+            ?? Site::current()->handle();
     }
 }
