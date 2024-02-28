@@ -86,7 +86,7 @@ class GeneralFields extends BaseFields
                         'custom' => $this->trans('site_json_ld_type.custom'),
                     ],
                     'default' => Defaults::data('site::general')->get('site_json_ld_type'),
-                    'localizable' => false,
+                    'localizable' => true,
                     'listable' => false,
 
                 ],
@@ -181,6 +181,7 @@ class GeneralFields extends BaseFields
                     'display' => $this->trans('use_breadcrumbs.display'),
                     'instructions' => $this->trans('use_breadcrumbs.instructions'),
                     'default' => Defaults::data('site::general')->get('use_breadcrumbs'),
+                    'localizable' => true,
                     'listable' => false,
                 ],
             ],

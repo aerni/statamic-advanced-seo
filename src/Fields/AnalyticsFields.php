@@ -36,6 +36,7 @@ class AnalyticsFields extends BaseFields
                     'display' => $this->trans('use_fathom.display'),
                     'instructions' => $this->trans('use_fathom.instructions'),
                     'listable' => false,
+                    'localizable' => true,
                     'feature' => Fathom::class,
                 ],
             ],
@@ -48,6 +49,7 @@ class AnalyticsFields extends BaseFields
                     'input_type' => 'text',
                     'width' => 50,
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'antlers' => true,
                     'feature' => Fathom::class,
                     'validate' => [
@@ -66,6 +68,7 @@ class AnalyticsFields extends BaseFields
                     'instructions' => $this->trans('fathom_spa.instructions'),
                     'icon' => 'toggle',
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'width' => 50,
                     'feature' => Fathom::class,
                     'validate' => [
@@ -98,6 +101,7 @@ class AnalyticsFields extends BaseFields
                     'display' => $this->trans('use_cloudflare_web_analytics.display'),
                     'instructions' => $this->trans('use_cloudflare_web_analytics.instructions'),
                     'listable' => false,
+                    'localizable' => true,
                     'feature' => Cloudflare::class,
                 ],
             ],
@@ -110,6 +114,7 @@ class AnalyticsFields extends BaseFields
                     'input_type' => 'text',
                     'width' => 50,
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'feature' => Cloudflare::class,
                     'validate' => [
                         'required_if:use_cloudflare_web_analytics,true',
@@ -141,6 +146,7 @@ class AnalyticsFields extends BaseFields
                     'display' => $this->trans('use_google_tag_manager.display'),
                     'instructions' => $this->trans('use_google_tag_manager.instructions'),
                     'listable' => false,
+                    'localizable' => true,
                     'feature' => GoogleTagManager::class,
                 ],
             ],
@@ -153,6 +159,7 @@ class AnalyticsFields extends BaseFields
                     'input_type' => 'text',
                     'width' => 50,
                     'listable' => 'hidden',
+                    'localizable' => true,
                     'feature' => GoogleTagManager::class,
                     'validate' => [
                         'required_if:use_google_tag_manager,true',
