@@ -35,18 +35,28 @@ class SocialImageRepository
         return [
             [
                 'label' => 'Open Graph Image',
-                'format' => $this->route(theme: '{seo_social_images_theme}', type: 'open_graph', id: '{id}'),
+                'format' => $this->route(
+                    siteUrl: '{site:permalink}',
+                    theme: "{test}",
+                    type: 'open_graph',
+                    id: '{id}'
+                ),
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => $this->route(theme: '{seo_social_images_theme}', type: 'twitter_{seo_twitter_card}', id: '{id}'),
+                'format' => $this->route(
+                    siteUrl: '{site:permalink}',
+                    theme: '{test}',
+                    type: 'twitter_{seo_twitter_card}',
+                    id: '{id}'
+                ),
             ],
         ];
     }
 
-    public function route(string $theme, string $type, string $id): string
+    public function route(string $siteUrl, string $theme, string $type, string $id): string
     {
-        return "/!/advanced-seo/social-images/{$theme}/{$type}/{$id}";
+        return "{$siteUrl}/social-images/{$theme}/{$type}/{$id}";
     }
 
     public function sizeString(string $type): string

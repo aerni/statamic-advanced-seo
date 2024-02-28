@@ -70,7 +70,8 @@ class SocialImage
 
     protected function templateUrl(): string
     {
-        return url('/').SocialImageApi::route(
+        return SocialImageApi::route(
+            siteUrl: $this->entry->site()->absoluteUrl(),
             theme: $this->entry->seo_social_images_theme ?? SocialImageTheme::fieldtypeDefault(),
             type: $this->model['type'],
             id: $this->entry->id,
