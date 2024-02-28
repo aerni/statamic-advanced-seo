@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Aerni\AdvancedSeo\Http\Controllers\Web\SitemapController;
 use Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController;
+use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Site;
 
 Route::name('advanced-seo.')->group(function () {

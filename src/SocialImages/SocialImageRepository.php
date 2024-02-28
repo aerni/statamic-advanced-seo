@@ -37,7 +37,7 @@ class SocialImageRepository
                 'label' => 'Open Graph Image',
                 'format' => $this->route(
                     siteUrl: '{site:permalink}',
-                    theme: "{test}",
+                    theme: '{test}',
                     type: 'open_graph',
                     id: '{id}'
                 ),
