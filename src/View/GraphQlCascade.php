@@ -156,8 +156,8 @@ class GraphQlCascade extends BaseCascade
             ? $this->model->sites()
             : $this->model->taxonomy()->sites();
 
-        $root = $this->model instanceof Entry
-            ? $this->model->root()
+        $origin = $this->model instanceof Entry
+            ? $this->model->origin() ?? $this->model
             : $this->model->inDefaultLocale();
 
         $hreflang = $sites->map(fn ($locale) => $this->model->in($locale))
@@ -168,7 +168,7 @@ class GraphQlCascade extends BaseCascade
                 'url' => $this->absoluteUrl($model),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
             ])->push([
-                'url' => $this->absoluteUrl($root),
+                'url' => $this->absoluteUrl($origin),
                 'locale' => 'x-default',
             ])->all();
 

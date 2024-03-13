@@ -242,8 +242,8 @@ class ViewCascade extends BaseCascade
             ? $data->sites()
             : $data->taxonomy()->sites();
 
-        $root = $data instanceof Entry
-            ? $data->root()
+        $origin = $data instanceof Entry
+            ? $data->origin() ?? $data
             : $data->inDefaultLocale();
 
         $hreflang = $sites->map(fn ($locale) => $data->in($locale))
@@ -254,7 +254,7 @@ class ViewCascade extends BaseCascade
                 'url' => $model->absoluteUrl(),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
             ])->push([
-                'url' => $root->absoluteUrl(),
+                'url' => $origin->absoluteUrl(),
                 'locale' => 'x-default',
             ])->all();
 
