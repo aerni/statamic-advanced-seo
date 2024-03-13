@@ -242,13 +242,20 @@ class ViewCascade extends BaseCascade
             ? $data->sites()
             : $data->taxonomy()->sites();
 
+        $root = $data instanceof Entry
+            ? $data->root()
+            : $data->inDefaultLocale();
+
         $hreflang = $sites->map(fn ($locale) => $data->in($locale))
-            ->filter() // A model might no exist in a site. So we need to remove it to prevent calling methods on null
+            ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
             ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
             ->map(fn ($model) => [
                 'url' => $model->absoluteUrl(),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
+            ])->push([
+                'url' => $root->absoluteUrl(),
+                'locale' => 'x-default',
             ])->all();
 
         return $hreflang;

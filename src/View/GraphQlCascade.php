@@ -161,7 +161,7 @@ class GraphQlCascade extends BaseCascade
             : $this->model->inDefaultLocale();
 
         $hreflang = $sites->map(fn ($locale) => $this->model->in($locale))
-            ->filter() // A model might no exist in a site. So we need to remove it to prevent calling methods on null
+            ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
             ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
             ->map(fn ($model) => [
