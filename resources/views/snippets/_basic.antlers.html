@@ -1,7 +1,7 @@
 {{ if seo:title }}
-    <title>{{ seo:title }}</title>
+    <title>{{ seo:title | strip_tags }}</title>
 {{ /if }}
 
 {{ if seo:description }}
-    <meta name="description" content="{{ seo:description }}">
+    <meta name="description" content="{{ seo:description | strip_tags }}">
 {{ /if }}

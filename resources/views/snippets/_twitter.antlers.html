@@ -3,11 +3,11 @@
 {{ /if }}
 
 {{ if seo:twitter_title }}
-    <meta name="twitter:title" content="{{ seo:twitter_title }}">
+    <meta name="twitter:title" content="{{ seo:twitter_title | strip_tags }}">
 {{ /if }}
 
 {{ if seo:twitter_description }}
-    <meta name="twitter:description" content="{{ seo:twitter_description }}">
+    <meta name="twitter:description" content="{{ seo:twitter_description | strip_tags }}">
 {{ /if }}
 
 {{ if seo:twitter_handle }}
