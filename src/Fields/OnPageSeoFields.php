@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Illuminate\Support\Str;
 
 class OnPageSeoFields extends BaseFields
 {
@@ -401,7 +402,7 @@ class OnPageSeoFields extends BaseFields
                     'field' => [
                         'type' => 'button_group',
                         'options' => [
-                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(str_singular($this->typePlaceholder()))]),
+                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->typePlaceholder()))]),
                             'other' => $this->trans('seo_canonical_type.other'),
                             'custom' => $this->trans('seo_canonical_type.custom'),
                         ],

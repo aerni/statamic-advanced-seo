@@ -8,6 +8,7 @@ use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Illuminate\Support\Str;
 
 class ContentDefaultsFields extends BaseFields
 {
@@ -300,7 +301,7 @@ class ContentDefaultsFields extends BaseFields
                     'display' => $this->trans('seo_canonical_type.display'),
                     'instructions' => $this->trans('seo_canonical_type.default_instructions'),
                     'options' => [
-                        'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(str_singular($this->typePlaceholder()))]),
+                        'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->typePlaceholder()))]),
                         'other' => $this->trans('seo_canonical_type.other'),
                         'custom' => $this->trans('seo_canonical_type.custom'),
                     ],

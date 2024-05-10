@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
@@ -173,7 +174,7 @@ class SeoDefaultsController extends CpController
     protected function flashDefaultsUnavailable(): void
     {
         session()->now('error', __('There are no :type defaults available for the selected site.', [
-            'type' => str_singular($this->type()),
+            'type' => Str::singular($this->type()),
         ]));
 
         throw new NotFoundHttpException();
@@ -184,7 +185,7 @@ class SeoDefaultsController extends CpController
         return redirect(cp_route("advanced-seo.{$set->type()}.index"))
             ->with('error', __('The :set :type is not available in the selected site.', [
                 'set' => $set->title(),
-                'type' => str_singular($this->type()),
+                'type' => Str::singular($this->type()),
             ]));
     }
 

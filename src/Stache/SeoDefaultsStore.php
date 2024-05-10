@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Stache;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Str;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
@@ -91,7 +92,7 @@ class SeoDefaultsStore extends ChildStore
 
     protected function extractAttributesFromPath(string $path): array
     {
-        $relative = str_after($path, $this->parent->directory());
+        $relative = Str::after($path, $this->parent->directory());
         $type = pathinfo($relative, PATHINFO_DIRNAME);
         $handle = pathinfo($relative, PATHINFO_FILENAME);
 
