@@ -170,7 +170,7 @@ class GraphQlCascade extends BaseCascade
             ])->push([
                 'url' => $this->absoluteUrl($origin),
                 'locale' => 'x-default',
-            ])->all();
+            ])->all(); // TODO: The default should only be in there when it is published
 
         return $hreflang;
     }
