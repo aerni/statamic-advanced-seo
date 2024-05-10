@@ -29,7 +29,7 @@ class SeoDefaultsStore extends ChildStore
     {
         $data = YAML::file($path)->parse($contents);
 
-        return Site::hasMultiple()
+        return Site::multiEnabled()
             ? $this->makeMultiSiteDefaultFromFile($path)
             : $this->makeSingleSiteDefaultFromFile($path, $data);
     }
@@ -103,7 +103,7 @@ class SeoDefaultsStore extends ChildStore
     {
         parent::save($set);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             Site::all()->each(function ($site) use ($set) {
                 $site = $site->handle();
                 $set->existsIn($site) ? $set->in($site)->writeFile() : $set->makeLocalization($site)->deleteFile();
@@ -115,7 +115,7 @@ class SeoDefaultsStore extends ChildStore
     {
         parent::delete($set);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $set->localizations()->each(function ($localization) {
                 $localization->deleteFile();
             });

@@ -105,7 +105,7 @@ class SeoDefaultSet implements Contract
             'title' => $this->title(),
         ];
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             $data['data'] = Arr::removeNullValues(
                 $this->inDefaultSite()->data()->all()
             );
