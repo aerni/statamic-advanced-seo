@@ -232,7 +232,7 @@ class ViewCascade extends BaseCascade
         }
 
         // Handle entries and term show page.
-        $data = Data::find($this->model->get('id'));
+        $data = Data::find($this->model->value('id'));
 
         if (! $data) {
             return null;
