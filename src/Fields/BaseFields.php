@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Illuminate\Support\Arr;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Arr;
 
 abstract class BaseFields implements Fields
 {
