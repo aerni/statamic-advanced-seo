@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Fields;
 use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Arr;
 
 abstract class BaseFields implements Fields
 {
@@ -26,7 +27,7 @@ abstract class BaseFields implements Fields
     {
         return [
             [
-                'fields' => array_flatten($this->sections(), 1),
+                'fields' => Arr::flatten($this->sections(), 1),
             ],
         ];
     }

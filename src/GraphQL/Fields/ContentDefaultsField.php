@@ -7,6 +7,8 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Rebing\GraphQL\Support\Field;
 use Statamic\Facades\GraphQL;
 
@@ -37,7 +39,7 @@ class ContentDefaultsField extends Field
 
     protected function resolve($root, $args, $context, ResolveInfo $info): ?SeoVariables
     {
-        $set = Seo::find(str_plural($info->fieldName), $args['handle']);
+        $set = Seo::find(Str::plural($info->fieldName), $args['handle']);
 
         if (! $set) {
             return null;
@@ -47,7 +49,7 @@ class ContentDefaultsField extends Field
             return null;
         }
 
-        return array_has($args, 'site')
+        return Arr::has($args, 'site')
             ? $set->in($args['site'])
             : $set->inDefaultSite();
     }

@@ -17,18 +17,18 @@
     ],
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^9.0 || ^10.0",
+        "laravel/framework": "^10.0 || ^11.0",
         "spatie/browsershot": "^4.0",
         "spatie/image": "^3.4",
         "spatie/laravel-ray": "^1.32",
         "spatie/schema-org": "^3.14",
-        "statamic/cms": "^4.27",
+        "statamic/cms": "^5.3",
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {
-        "nunomaduro/collision": "^6.1",
-        "orchestra/testbench": "7.1",
-        "phpunit/phpunit": "^9.5"
+        "nunomaduro/collision": "^7.0 || ^8.0",
+        "orchestra/testbench": "^8.0 || ^9.0",
+        "phpunit/phpunit": "^10.0"
     },
     "autoload": {
         "psr-4": {

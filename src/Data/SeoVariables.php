@@ -73,7 +73,7 @@ class SeoVariables implements Augmentable, Localization
     {
         return vsprintf('%s/%s%s.yaml', [
             Stache::store('seo')->store($this->type())->directory(),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::multiEnabled() ? $this->locale().'/' : '',
             $this->handle(),
         ]);
     }
@@ -100,7 +100,7 @@ class SeoVariables implements Augmentable, Localization
     {
         $params = [$this->handle()];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $params['site'] = $this->locale();
         }
 
@@ -162,7 +162,7 @@ class SeoVariables implements Augmentable, Localization
         // We only want to keep values of fields that exist in the blueprint.
         $data = $this->data()->only($this->blueprintFields())->all();
 
-        if (Site::hasMultiple() && $this->hasOrigin()) {
+        if (Site::multiEnabled() && $this->hasOrigin()) {
             $data['origin'] = $this->origin()->locale();
         }
 

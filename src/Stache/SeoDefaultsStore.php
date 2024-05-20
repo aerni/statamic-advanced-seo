@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Stache;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Str;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
@@ -28,7 +29,7 @@ class SeoDefaultsStore extends ChildStore
     {
         $data = YAML::file($path)->parse($contents);
 
-        return Site::hasMultiple()
+        return Site::multiEnabled()
             ? $this->makeMultiSiteDefaultFromFile($path)
             : $this->makeSingleSiteDefaultFromFile($path, $data);
     }
@@ -91,7 +92,7 @@ class SeoDefaultsStore extends ChildStore
 
     protected function extractAttributesFromPath(string $path): array
     {
-        $relative = str_after($path, $this->parent->directory());
+        $relative = Str::after($path, $this->parent->directory());
         $type = pathinfo($relative, PATHINFO_DIRNAME);
         $handle = pathinfo($relative, PATHINFO_FILENAME);
 
@@ -102,7 +103,7 @@ class SeoDefaultsStore extends ChildStore
     {
         parent::save($set);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             Site::all()->each(function ($site) use ($set) {
                 $site = $site->handle();
                 $set->existsIn($site) ? $set->in($site)->writeFile() : $set->makeLocalization($site)->deleteFile();
@@ -114,7 +115,7 @@ class SeoDefaultsStore extends ChildStore
     {
         parent::delete($set);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $set->localizations()->each(function ($localization) {
                 $localization->deleteFile();
             });
