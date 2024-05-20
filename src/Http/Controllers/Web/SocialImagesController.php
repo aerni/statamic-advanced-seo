@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\View\View;
 
@@ -35,6 +36,8 @@ class SocialImagesController extends Controller
 
         // Prevent an infinite loop when an image is generated in the augment method of the SocialImageFieldtype.
         $data->set('seo_generate_social_images', false);
+
+        Site::setCurrent($data->site()->handle());
 
         $view = (new View)
             ->template($template)
