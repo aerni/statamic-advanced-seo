@@ -61,7 +61,7 @@ class SeoDefaultSet implements Contract
 
         if ($parent = $this->parent()) {
             // Only return sites from the parent that are configured in Statamic's sites config
-            return $parent->sites()->intersect($allSites)->values();
+            return $allSites->filter(fn ($site) => $parent->sites()->contains($site));
         }
 
         return $allSites;
