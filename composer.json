@@ -22,7 +22,7 @@
         "spatie/image": "^3.4",
         "spatie/laravel-ray": "^1.32",
         "spatie/schema-org": "^3.14",
-        "statamic/cms": "^5.0",
+        "statamic/cms": "^5.3",
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {
