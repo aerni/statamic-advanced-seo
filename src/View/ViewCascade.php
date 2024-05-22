@@ -183,7 +183,7 @@ class ViewCascade extends BaseCascade
     {
         // Handles collection taxonomy index page.
         if ($this->model->has('segment_2') && $this->model->get('terms') instanceof TermQueryBuilder) {
-            $taxonomy = $this->model->get('title')->augmentable();
+            $taxonomy = $this->model->get('page');
 
             return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
                 $site = Site::get($site);
@@ -200,7 +200,7 @@ class ViewCascade extends BaseCascade
 
         // Handles collection taxonomy show page.
         if ($this->model->has('segment_3') && $this->model->value('is_term') === true) {
-            $localizedTerm = $this->model->get('title')->augmentable();
+            $localizedTerm = $this->model->get('page');
 
             return $localizedTerm->taxonomy()->sites()
                 ->map(fn ($locale) => [
@@ -211,7 +211,7 @@ class ViewCascade extends BaseCascade
 
         // Handles taxonomy index page.
         if ($this->model->has('segment_1') && $this->model->get('terms') instanceof TermQueryBuilder) {
-            $taxonomy = $this->model->get('terms')->first()->taxonomy();
+            $taxonomy = $this->model->get('page');
 
             $initialSite = Site::current()->handle();
 
