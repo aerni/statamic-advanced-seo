@@ -4,20 +4,21 @@
         "dev": "vite",
         "build": "vite build"
     },
+    "type": "module",
     "dependencies": {
-        "marked": "^4.0.10",
-        "underscore": "~1.13.2",
+        "marked": "^4.3.0",
+        "underscore": "~1.13.6",
         "uniqid": "^5.4.0",
-        "vue": "^2.6.14"
+        "vue": "^2.7.16"
     },
     "devDependencies": {
         "@tailwindcss/container-queries": "^0.1.1",
-        "@tailwindcss/typography": "^0.5.9",
-        "@vitejs/plugin-vue2": "^2.2.0",
-        "autoprefixer": "^10.4.5",
-        "laravel-vite-plugin": "^0.7.6",
-        "postcss": "^8.4.12",
-        "tailwindcss": "^3.0.24",
-        "vite": "^4.3.9"
+        "@tailwindcss/typography": "^0.5.13",
+        "@vitejs/plugin-vue2": "^2.3.1",
+        "autoprefixer": "^10.4.19",
+        "laravel-vite-plugin": "^1.0.4",
+        "postcss": "^8.4.38",
+        "tailwindcss": "^3.4.3",
+        "vite": "^5.2.11"
     }
 }
