@@ -9,15 +9,15 @@
 
     <div class="widgets @container flex flex-wrap -mx-4">
         <div class="w-full px-4 widget md:w-full">
-            <div class="p-0 card content">
+            <div class="p-0 card card-lg content">
                 <div class="flex flex-wrap p-4">
                     @foreach ($defaults as $default)
-                        <a href="{{ cp_route('advanced-seo.site.edit', $default['handle']) }}" class="flex items-start w-full p-4 rounded-md lg:w-1/2 hover:seo-bg-blue-100 group">
-                            <div class="w-8 h-8 mr-4 text-blue">
+                        <a href="{{ cp_route('advanced-seo.site.edit', $default['handle']) }}" class="w-full p-4 border border-transparent rounded-md md:items-start md:flex lg:w-1/2 hover:bg-gray-200 dark:hover:bg-dark-575 dark:hover:border-dark-400 group">
+                            <div class="w-8 h-8 mr-4 text-gray-800 dark:text-dark-175">
                                 @cp_svg($default['icon'])
                             </div>
-                            <div class="flex-1">
-                                <h3 class="mb-2 text-lg text-gray-800 group-hover:text-blue">{{ __("advanced-seo::messages.{$default['handle']}") }}</h3>
+                            <div class="flex-1 text-blue">
+                                <h3>{{ __("advanced-seo::messages.{$default['handle']}") }}</h3>
                                 <p>{{ __("advanced-seo::messages.{$default['handle']}_description") }}</p>
                             </div>
                         </a>
