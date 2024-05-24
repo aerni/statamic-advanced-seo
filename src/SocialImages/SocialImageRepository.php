@@ -30,16 +30,16 @@ class SocialImageRepository
         return new SocialImage($entry, $this->findModel("twitter_{$entry->seo_twitter_card}"));
     }
 
-    public function previewTargets(): array
+    public function previewTargets(Entry $entry): array
     {
         return [
             [
                 'label' => 'Open Graph Image',
-                'format' => $this->route(theme: '{seo_social_images_theme}', type: 'open_graph', id: '{id}'),
+                'format' => $this->route(theme: $entry->seo_social_images_theme, type: 'open_graph', id: '{id}'),
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => $this->route(theme: '{seo_social_images_theme}', type: 'twitter_{seo_twitter_card}', id: '{id}'),
+                'format' => $this->route(theme: $entry->seo_social_images_theme, type: "twitter_{$entry->seo_twitter_card}", id: '{id}'),
             ],
         ];
     }

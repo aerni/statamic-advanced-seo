@@ -57,6 +57,6 @@ class SocialImagesGeneratorSubscriber
         }
 
         // TODO: This has to change when implementing for taxonomies.
-        $this->getProperty($event)?->collection()->addPreviewTargets(SocialImage::previewTargets());
+        $this->getProperty($event)?->collection()->addPreviewTargets(SocialImage::previewTargets($event->entry));
     }
 }
