@@ -52,7 +52,7 @@
                                 v-for="option in localizations"
                                 :key="option.handle"
                                 class="flex items-center px-4 py-2 -mx-4 text-sm cursor-pointer"
-                                :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
+                                :class="option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400'"
                                 @click="localizationSelected(option)"
                             >
                                 <div class="flex items-center flex-1" :class="{ 'line-through': !option.exists }">
@@ -68,9 +68,9 @@
                                         class="ml-2"
                                         v-if="localizing && localizing.handle === option.handle" />
                                 </div>
-                                <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                                <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
-                                <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                                <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
+                                <div class="badge-sm bg-blue dark:bg-dark-blue-175" v-if="option.active" v-text="__('Active')" />
+                                <div class="badge-sm bg-purple dark:bg-purple-dark" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                             </div>
                         </div>
                     </template>
