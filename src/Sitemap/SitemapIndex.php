@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
+use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
@@ -22,7 +23,8 @@ class SitemapIndex
     {
         return $this->collectionSitemaps()
             ->merge($this->taxonomySitemaps())
-            ->merge($this->customSitemaps());
+            ->merge($this->customSitemaps())
+            ->filter(fn (Sitemap $sitemap) => $sitemap->urls()->isNotEmpty());
     }
 
     public function collectionSitemaps(): Collection

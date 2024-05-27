@@ -35,12 +35,8 @@ class SitemapController extends Controller
         throw_unless($sitemap = Sitemap::find("{$type}::{$handle}"), new NotFoundHttpException);
 
         $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", Sitemap::cacheExpiry(), function () use ($sitemap) {
-            $urls = $sitemap->urls();
-
-            throw_unless($urls->isNotEmpty(), new NotFoundHttpException);
-
             return view('advanced-seo::sitemaps.show', [
-                'urls' => $urls,
+                'urls' => $sitemap->urls(),
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ])->render();
         });
