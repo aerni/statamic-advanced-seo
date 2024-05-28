@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\SocialImages;
 
 use Aerni\AdvancedSeo\Models\SocialImage as SocialImageModel;
+use Aerni\AdvancedSeo\Models\SocialImageTheme;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
