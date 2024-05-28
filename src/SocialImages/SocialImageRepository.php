@@ -35,11 +35,11 @@ class SocialImageRepository
         return [
             [
                 'label' => 'Open Graph Image',
-                'format' => $this->route(theme: $entry->seo_social_images_theme, type: 'open_graph', id: '{id}'),
+                'format' => $this->route(theme: $entry->seo_social_images_theme ?? SocialImageTheme::fieldtypeDefault(), type: 'open_graph', id: '{id}'),
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => $this->route(theme: $entry->seo_social_images_theme, type: "twitter_{$entry->seo_twitter_card}", id: '{id}'),
+                'format' => $this->route(theme: $entry->seo_social_images_theme ?? SocialImageTheme::fieldtypeDefault(), type: "twitter_{$entry->seo_twitter_card}", id: '{id}'),
             ],
         ];
     }
