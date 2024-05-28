@@ -2,20 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Statamic\Events;
-use Statamic\Statamic;
-use Statamic\Events\Event;
-use Statamic\Facades\Site;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Statamic\Facades\CP\Toast;
-use Illuminate\Events\Dispatcher;
-use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\DeleteSocialImagesJob;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
-use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Aerni\AdvancedSeo\Actions\ShouldGenerateSocialImages;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
+use Statamic\Events;
+use Statamic\Events\Event;
+use Statamic\Facades\CP\Toast;
+use Statamic\Statamic;
 
 class SocialImagesGeneratorSubscriber
 {
