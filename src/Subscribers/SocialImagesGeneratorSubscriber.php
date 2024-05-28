@@ -9,9 +9,11 @@ use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\DeleteSocialImagesJob;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
 use Statamic\Facades\CP\Toast;
+use Statamic\Statamic;
 
 class SocialImagesGeneratorSubscriber
 {
@@ -50,13 +52,26 @@ class SocialImagesGeneratorSubscriber
 
     public function addPreviewTargets(Event $event): void
     {
-        $data = $this->getDataFromEvent($event);
-
-        if (! SocialImagesGenerator::enabled($data)) {
+        if (! $this->shouldAddPreviewTargets($event)) {
             return;
         }
 
-        // TODO: This has to change when implementing for taxonomies.
         $this->getProperty($event)?->collection()->addPreviewTargets(SocialImage::previewTargets($event->entry));
+    }
+
+    protected function shouldAddPreviewTargets(Event $event): bool
+    {
+        // Only add preview targets in the CP.
+        if (! Statamic::isCpRoute()) {
+            return false;
+        }
+
+        // Only add preview targets when editing an existing entry.
+        if (! Str::containsAll(request()->path(), ['collections', $event->entry?->id()])) {
+            return false;
+        }
+
+        // Only add preview targets when the generator is enabled.
+        return SocialImagesGenerator::enabled($this->getDataFromEvent($event));
     }
 }
