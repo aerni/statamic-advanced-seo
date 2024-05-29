@@ -8,7 +8,7 @@ echo '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>';
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     advanced-seo-version="{{ $version }}"
 >
-    @foreach ($urls as $url)
+    @foreach ($sitemap->urls() as $url)
         <url>
             <loc>{{ $url['loc'] }}</loc>
 

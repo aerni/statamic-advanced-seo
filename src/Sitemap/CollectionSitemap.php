@@ -12,7 +12,7 @@ class CollectionSitemap extends BaseSitemap
     {
     }
 
-    public function urls(): Collection
+    protected function collectUrls(): Collection
     {
         return $this->entries()
             ->map(fn ($entry) => (new CollectionSitemapUrl($entry, $this))->toArray())

@@ -12,7 +12,7 @@ class TaxonomySitemap extends BaseSitemap
     {
     }
 
-    public function urls(): Collection
+    protected function collectUrls(): Collection
     {
         return $this->taxonomyUrls()
             ->merge($this->collectionTaxonomyUrls())

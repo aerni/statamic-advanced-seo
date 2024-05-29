@@ -14,7 +14,16 @@ abstract class BaseSitemap implements Sitemap
 {
     use FluentlyGetsAndSets, HasBaseUrl;
 
-    abstract public function urls(): Collection;
+    abstract protected function collectUrls(): Collection;
+
+    public function urls(): Collection
+    {
+        return Cache::remember(
+            "advanced-seo::sitemaps::{$this->id()}",
+            config('advanced-seo.sitemap.expiry', 60) * 60,
+            fn () => $this->collectUrls()
+        );
+    }
 
     public function handle(): string
     {
@@ -48,7 +57,6 @@ abstract class BaseSitemap implements Sitemap
 
     public function clearCache(): void
     {
-        Cache::forget('advanced-seo::sitemaps::index');
         Cache::forget("advanced-seo::sitemaps::{$this->id()}");
     }
 

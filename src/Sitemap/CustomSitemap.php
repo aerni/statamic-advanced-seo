@@ -18,7 +18,7 @@ class CustomSitemap extends BaseSitemap
         return $this;
     }
 
-    public function urls(): Collection
+    protected function collectUrls(): Collection
     {
         return $this->urls->map->toArray();
     }
