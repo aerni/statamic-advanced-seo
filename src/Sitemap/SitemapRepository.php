@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Statamic\Facades\Collection as CollectionApi;
-use Statamic\Facades\Taxonomy as TaxonomyApi;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Statamic\Facades\Taxonomy as TaxonomyApi;
+use Statamic\Facades\Collection as CollectionApi;
 
 class SitemapRepository
 {
@@ -38,7 +39,9 @@ class SitemapRepository
 
     public function find(string $id): ?Sitemap
     {
-        return $this->all()->first(fn ($sitemap) => $id === $sitemap->id());
+        $method = Str::before($id, '::') . 'Sitemaps';
+
+        return $this->$method()->first(fn ($sitemap) => $id === $sitemap->id());
     }
 
     public function collectionSitemaps(): Collection
