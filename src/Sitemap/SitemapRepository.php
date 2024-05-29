@@ -33,8 +33,7 @@ class SitemapRepository
     {
         return $this->collectionSitemaps()
             ->merge($this->taxonomySitemaps())
-            ->merge($this->customSitemaps())
-            ->filter(fn (Sitemap $sitemap) => $sitemap->urls()->isNotEmpty());
+            ->merge($this->customSitemaps());
     }
 
     public function find(string $id): ?Sitemap
@@ -44,12 +43,16 @@ class SitemapRepository
 
     public function collectionSitemaps(): Collection
     {
-        return CollectionApi::all()->map(fn ($collection) => new CollectionSitemap($collection));
+        return CollectionApi::all()
+            ->map(fn ($collection) => new CollectionSitemap($collection))
+            ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty());
     }
 
     public function taxonomySitemaps(): Collection
     {
-        return TaxonomyApi::all()->map(fn ($taxonomy) => new TaxonomySitemap($taxonomy));
+        return TaxonomyApi::all()
+            ->map(fn ($taxonomy) => new TaxonomySitemap($taxonomy))
+            ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty());
     }
 
     public function customSitemaps(): Collection
