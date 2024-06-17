@@ -20,7 +20,7 @@ class SitemapController extends Controller
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
         return response()->withHeaders($this->headers)
-            ->view('advanced-seo::sitemaps.index', [
+            ->view('advanced-seo::sitemap.index', [
                 'sitemaps' => Sitemap::all(),
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ]);
@@ -33,7 +33,7 @@ class SitemapController extends Controller
         throw_unless($sitemap = Sitemap::find("{$type}::{$handle}"), new NotFoundHttpException);
 
         return response()->withHeaders($this->headers)
-            ->view('advanced-seo::sitemaps.show', [
+            ->view('advanced-seo::sitemap.show', [
                 'sitemap' => $sitemap,
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ]);
@@ -43,7 +43,7 @@ class SitemapController extends Controller
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        $content = file_get_contents(__DIR__.'/../../../../resources/xsl/sitemap.xsl');
+        $content = file_get_contents(__DIR__.'/../../../../resources/views/sitemap/sitemap.xsl');
 
         return response($content)->withHeaders($this->headers);
     }
