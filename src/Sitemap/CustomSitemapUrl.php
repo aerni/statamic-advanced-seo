@@ -18,8 +18,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
         protected ?string $changefreq = null,
         protected ?string $priority = null,
         protected ?string $site = null,
-    )
-    {
+    ) {
     }
 
     public function loc(?string $loc = null): string|self
