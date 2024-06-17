@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 
 class CustomSitemap extends BaseSitemap
 {
+    protected Collection $urls;
+
     public function __construct(protected string $handle)
     {
         $this->urls = collect();
