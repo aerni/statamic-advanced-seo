@@ -24,10 +24,10 @@ class EvaluateModelLocale
             ($model instanceof SeoDefaultSet) => self::seoDefaultSet($model),
             ($model instanceof Collection) => self::collection(),
             ($model instanceof Entry) => $model->locale(),
-            ($model instanceof EntryBlueprintFound) => self::entryBlueprintFound(),
+            ($model instanceof EntryBlueprintFound) => self::entryBlueprintFound($model),
             ($model instanceof Taxonomy) => self::taxonomy(),
             ($model instanceof Term) => self::term($model),
-            ($model instanceof TermBlueprintFound) => self::termBlueprintFound(),
+            ($model instanceof TermBlueprintFound) => self::termBlueprintFound($model),
             ($model instanceof Context) => $model->get('site')?->handle() ?? Site::current()->handle(),
             ($model instanceof DefaultsData) => $model->locale,
             default => null
@@ -60,11 +60,29 @@ class EvaluateModelLocale
         return Site::selected()->handle();
     }
 
-    protected static function entryBlueprintFound(): string
+    protected static function entryBlueprintFound(EntryBlueprintFound $model): string
     {
-        return Statamic::isCpRoute()
-            ? basename(request()->path())
-            : Site::current()->handle();
+        // If we're not in the CP, simply return the current locale.
+        if (! Statamic::isCpRoute()) {
+            return Site::current()->handle();
+        }
+
+        $requestLocale = request()->get('site');
+
+        // If the request contains a valid site, use it.
+        if ($model->blueprint->parent()->sites()->contains($requestLocale)) {
+            return $requestLocale;
+        };
+
+        $pathLocale = basename(request()->path());
+
+        // If the request path is a valid site, use it.
+        if ($model->blueprint->parent()->sites()->contains($pathLocale)) {
+            return $pathLocale;
+        };
+
+        // Return the selected site if no locale has been evaluated so far.
+        return Site::selected()->handle();
     }
 
     protected static function taxonomy(): string
@@ -81,10 +99,28 @@ class EvaluateModelLocale
             : $model->locale();
     }
 
-    protected static function termBlueprintFound(): string
+    protected static function termBlueprintFound(TermBlueprintFound $model): string
     {
-        return Statamic::isCpRoute()
-            ? basename(request()->path())
-            : Site::current()->handle();
+        // If we're not in the CP, simply return the current locale.
+        if (! Statamic::isCpRoute()) {
+            return Site::current()->handle();
+        }
+
+        $requestLocale = request()->get('site');
+
+        // If the request contains a valid site, use it.
+        if ($model->blueprint->parent()->sites()->contains($requestLocale)) {
+            return $requestLocale;
+        };
+
+        $pathLocale = basename(request()->path());
+
+        // If the request path is a valid site, use it.
+        if ($model->blueprint->parent()->sites()->contains($pathLocale)) {
+            return $pathLocale;
+        };
+
+        // Return the selected site if no locale has been evaluated so far.
+        return Site::selected()->handle();
     }
 }

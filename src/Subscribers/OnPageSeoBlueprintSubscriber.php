@@ -10,6 +10,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use PHPUnit\TextUI\Help;
 use Statamic\Events;
 use Statamic\Events\Event;
 use Statamic\Facades\Fieldset;
@@ -38,6 +39,8 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
+        // Only extend it once per data.
+
         /**
          * The following code determines which seo fields should be added to the blueprint.
          * This is an important concept, as we will only return data of ensured blueprint fields
@@ -50,6 +53,7 @@ class OnPageSeoBlueprintSubscriber
          */
         $seoFields = OnPageSeoBlueprint::make()->data($this->data)->get()->fields()->all();
 
+        // TODO: This check fails because the blueprint fields contain ensured fields of previous cycles.
         $usesDefaultSeoBlueprint = $seoFields
             ->intersectByKeys($event->blueprint->fields()->all())
             ->isEmpty();
@@ -159,25 +163,55 @@ class OnPageSeoBlueprintSubscriber
 
     protected function shouldExtendBlueprint(Event $event): bool
     {
-        // Don't add fields if the collection/taxonomy is excluded in the config.
         if ($this->isDisabledType()) {
             return false;
         }
 
-        // Don't add fields in the blueprint builder.
-        if (Helpers::isBlueprintCpRoute()) {
+        if ($this->isDisallowedRoute()) {
+            ray('disallowed route');
             return false;
         }
 
-        // Don't add fields on any addon views in the CP.
-        if (Helpers::isAddonCpRoute()) {
-            return false;
+        // if (! $this->isAllowedRoute()) {
+        //     // ray($event, request()->route()->getName(), $this->data)->label('Disallowed CP Route');
+        //     return false;
+        // }
+
+        /**
+         * The BlueprintFound event is called for every localization.
+         * But we only want to extend the blueprint for the current localization.
+         * Otherwise we will have issue evaluating conditional fields, e.g. the sitemap fields.
+         */
+
+         // TODO: Maybe we don't even need this as it is only called once anyways?
+        if (Helpers::isEntryCreateRoute()) {
+            ray($event, basename(request()->path()) === request()->route()->originalParameter('site'))->label('Entry Create Route');
+            return basename(request()->path()) === request()->route()->originalParameter('site');
         }
 
-        // Don't add fields to any other CP route other than the entry/term view and when performing an action on the listing view (necesarry for the social images generator action to work).
-        if (Statamic::isCpRoute() && ! $this->isModelCpRoute($event) && ! $this->isActionCpRoute()) {
-            return false;
+        if (Helpers::isEntryEditRoute()) {
+            ray($event, $event->entry?->id() === request()->route()->originalParameter('entry'))->label('Entry Edit Route');
+            return $event->entry?->id() === request()->route()->originalParameter('entry');
         }
+
+        if (Helpers::isTermCreateRoute()) {
+            ray($event)->label('Term Create Route');
+            // return basename(request()->path()) === request()->route()->originalParameter('site');
+        }
+
+        // TODO: Might not need this as a localized terms share the same blueprint.
+        // But we still only want to extend it with the correct locale data. So how does it work?
+        if (Helpers::isTermEditRoute()) {
+            ray($event)->label('Term Edit Route');
+            // return $event->term?->slug() === request()->route()->originalParameter('term');
+        }
+
+        ray($event)->label('Passed');
+
+        // // Don't add fields to any other CP route other than the entry/term view and when performing an action on the listing view (necesarry for the social images generator action to work).
+        // if (Statamic::isCpRoute() && ! $this->isModelCpRoute($event) && ! $this->isActionCpRoute()) {
+        //     return false;
+        // }
 
         return true;
     }
@@ -185,6 +219,33 @@ class OnPageSeoBlueprintSubscriber
     protected function isDisabledType(): bool
     {
         return in_array($this->data->handle, config("advanced-seo.disabled.{$this->data->type}", []));
+    }
+
+    protected function isDisallowedRoute(): bool
+    {
+        // TODO: Why am I disallowing those routes in the first place?
+        // The blueprint route I think is to prevent the fields being saved to the blueprint?
+        return collect([
+            Helpers::isBlueprintCpRoute(),
+            Helpers::isAddonCpRoute()
+        ])->filter()->isNotEmpty();
+    }
+
+    protected function isAllowedRoute(): bool
+    {
+        // TODO: It gets too complicated having to whitelist every possible route.
+        // Can we remove this and default to extending the blueprint while making sure to only do it once?
+        return in_array(request()->route()?->getName(), [
+            'statamic.site',
+            'statamic.cp.collections.entries.create',
+            'statamic.cp.collections.entries.edit',
+            'statamic.cp.collections.entries.actions.run',
+            'statamic.cp.taxonomies.terms.create',
+            'statamic.cp.taxonomies.terms.edit',
+            'statamic.cp.taxonomies.terms.actions.run',
+            // TODO: Add the social images route?
+            // TODO: Add GraphQL route?
+        ]);
     }
 
     protected function isModelCpRoute(Event $event): bool
@@ -201,10 +262,5 @@ class OnPageSeoBlueprintSubscriber
          * Otherwise we will have issue evaluating conditional fields, e.g. the sitemap fields.
          */
         return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->data->type, $id ?? $createLocale]);
-    }
-
-    protected function isActionCpRoute(): bool
-    {
-        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->data->type, $this->data->handle, 'actions']);
     }
 }

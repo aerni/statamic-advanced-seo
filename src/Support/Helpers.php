@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Support;
 
+use Statamic\Statamic;
 use Illuminate\Support\Str;
 
 class Helpers
@@ -13,14 +14,39 @@ class Helpers
         return \WhiteCube\Lingua\Service::create($parsed)->toW3C();
     }
 
+    public static function isActionCpRoute(): bool
+    {
+        return Statamic::isCpRoute() && Str::contains(request()->path(), 'actions');
+    }
+
     public static function isAddonCpRoute(): bool
     {
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
+        return Statamic::isCpRoute() && Str::contains(request()->path(), 'advanced-seo');
     }
 
     public static function isBlueprintCpRoute(): bool
     {
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints']);
+        return Statamic::isCpRoute() && Str::contains(request()->path(), 'blueprints');
+    }
+
+    public static function isEntryCreateRoute(): bool
+    {
+        return request()->route()?->getName() === 'statamic.cp.collections.entries.create';
+    }
+
+    public static function isEntryEditRoute(): bool
+    {
+        return request()->route()?->getName() === 'statamic.cp.collections.entries.edit';
+    }
+
+    public static function isTermCreateRoute(): bool
+    {
+        return request()->route()?->getName() === 'statamic.cp.taxonomies.terms.create';
+    }
+
+    public static function isTermEditRoute(): bool
+    {
+        return request()->route()?->getName() === 'statamic.cp.taxonomies.terms.edit';
     }
 
     /**
