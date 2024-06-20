@@ -18,11 +18,22 @@ abstract class BaseSitemap implements Sitemap
 
     public function urls(): Collection
     {
-        return Cache::remember(
+        // dd(Cache::get("advanced-seo::sitemaps::{$this->id()}"));
+        // return $this->collectUrls();
+        // Exclude collection from sitemap and save -> will clear the cache
+        // Save the collection, now the cache should be empty and the URLs be fetched again
+        // But somehow it isnt't. Why?
+        ray(Cache::get("advanced-seo::sitemaps::{$this->id()}"))->label('Has Cached Sitemaps');
+
+        $urls = Cache::remember(
             "advanced-seo::sitemaps::{$this->id()}",
             config('advanced-seo.sitemap.expiry', 60) * 60,
             fn () => $this->collectUrls()
         );
+
+        ray(Cache::get("advanced-seo::sitemaps::{$this->id()}"))->label('Newly Cached Sitemaps');
+
+        return $urls;
     }
 
     public function handle(): string
@@ -44,6 +55,7 @@ abstract class BaseSitemap implements Sitemap
 
     public function url(): string
     {
+        // TODO: Should this be the APP_URL or default site URL?
         $baseUrl = config('app.url');
         $filename = "sitemap-{$this->type()}-{$this->handle()}.xml";
 
@@ -52,12 +64,28 @@ abstract class BaseSitemap implements Sitemap
 
     public function lastmod(): ?string
     {
+        // TODO: This probably returns an exception when lastmod doesn't exist.
+        // But should returning null be allowed even?
         return $this->urls()->sortByDesc('lastmod')->first()['lastmod'];
     }
 
-    public function clearCache(): void
+    public function clearCache(): self
     {
+        ray('Clearing Cache');
         Cache::forget("advanced-seo::sitemaps::{$this->id()}");
+
+        return $this;
+    }
+
+    public function refreshCache(): self
+    {
+        $this->clearCache();
+
+        ray('Refreshing Cache');
+
+        $this->urls();
+
+        return $this;
     }
 
     public function __call(string $name, array $arguments): mixed

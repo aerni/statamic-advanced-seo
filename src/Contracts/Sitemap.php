@@ -18,5 +18,7 @@ interface Sitemap
 
     public function lastmod(): ?string;
 
-    public function clearCache(): void;
+    public function clearCache(): self;
+
+    public function refreshCache(): self;
 }

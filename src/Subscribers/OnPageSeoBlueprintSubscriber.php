@@ -35,6 +35,7 @@ class OnPageSeoBlueprintSubscriber
         $this->data = $this->getDataFromEvent($event);
 
         if (! $this->shouldExtendBlueprint($event)) {
+            ray(request()->path());
             return;
         }
 
@@ -157,8 +158,20 @@ class OnPageSeoBlueprintSubscriber
             ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
     }
 
+    // TODO: Should we even disallow any routes at all?
+    // Or should we simply have some special treatment for creating/editing an entry?
+
     protected function shouldExtendBlueprint(Event $event): bool
     {
+        // TODO: Adding this allows us to add the fields when a collection is saved so we can clear the sitemap cache.
+        if (request()->path() === 'cp/collections/pages') {
+            return true;
+        }
+
+        if (request()->path() === 'cp/advanced-seo/site/indexing') {
+            return true;
+        }
+
         // Don't add fields if the collection/taxonomy is excluded in the config.
         if ($this->isDisabledType()) {
             return false;

@@ -2,11 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Contracts\Sitemap;
-use Illuminate\Support\Collection;
+use Statamic\Statamic;
 use Illuminate\Support\Str;
-use Statamic\Facades\Collection as CollectionApi;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Statamic\Facades\Taxonomy as TaxonomyApi;
+use Statamic\Facades\Collection as CollectionApi;
 
 class SitemapRepository
 {
@@ -66,5 +67,10 @@ class SitemapRepository
     public function clearCache(): void
     {
         $this->all()->each->clearCache();
+    }
+
+    public function refreshCache(): void
+    {
+        $this->all()->each->refreshCache();
     }
 }
