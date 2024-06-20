@@ -8,9 +8,7 @@ use Statamic\Contracts\Entries\Collection as EntriesCollection;
 
 class CollectionSitemap extends BaseSitemap
 {
-    public function __construct(protected EntriesCollection $model)
-    {
-    }
+    public function __construct(protected EntriesCollection $model) {}
 
     protected function collectUrls(): Collection
     {

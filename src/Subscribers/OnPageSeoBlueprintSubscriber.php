@@ -36,6 +36,7 @@ class OnPageSeoBlueprintSubscriber
 
         if (! $this->shouldExtendBlueprint($event)) {
             ray(request()->path());
+
             return;
         }
 

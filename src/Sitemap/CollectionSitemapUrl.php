@@ -10,9 +10,7 @@ use Statamic\Facades\Site;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap)
-    {
-    }
+    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap) {}
 
     public function loc(): string
     {

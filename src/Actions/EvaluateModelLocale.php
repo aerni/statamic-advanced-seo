@@ -74,14 +74,14 @@ class EvaluateModelLocale
         // If the request contains a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($requestLocale)) {
             return $requestLocale;
-        };
+        }
 
         $pathLocale = basename(request()->path());
 
         // If the request path is a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($pathLocale)) {
             return $pathLocale;
-        };
+        }
 
         // Return the selected site if no locale has been evaluated so far.
         return Site::selected()->handle();
@@ -115,14 +115,14 @@ class EvaluateModelLocale
         // If the request contains a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($requestLocale)) {
             return $requestLocale;
-        };
+        }
 
         $pathLocale = basename(request()->path());
 
         // If the request path is a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($pathLocale)) {
             return $pathLocale;
-        };
+        }
 
         // Return the selected site if no locale has been evaluated so far.
         return Site::selected()->handle();
