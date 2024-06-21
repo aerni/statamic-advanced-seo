@@ -35,8 +35,6 @@ class OnPageSeoBlueprintSubscriber
             return;
         }
 
-        // Only extend it once per data.
-
         /**
          * The following code determines which seo fields should be added to the blueprint.
          * This is an important concept, as we will only return data of ensured blueprint fields
@@ -56,6 +54,36 @@ class OnPageSeoBlueprintSubscriber
         $usesDefaultSeoBlueprint
             ? $this->handleDefaultBlueprint($event, $seoFields)
             : $this->handleCustomizedBlueprint($event, $seoFields);
+    }
+
+    protected function shouldExtendBlueprint(Event $event): bool
+    {
+        // Don't add the fields if the collection/taxonomy is disabled.
+        if (Helpers::isDisabled($this->data->type, $this->data->handle)) {
+            return false;
+        }
+
+        // Ensure the collection/taxonomy defaults view doesn't break.
+        if (Helpers::isAddonCpRoute()) {
+            return false;
+        }
+
+        // Ensure the fields won't be saved to file when editing a blueprint.
+        if (Helpers::isBlueprintCpRoute()) {
+            return false;
+        }
+
+        /**
+         * TODO: This can be removed when the Statamic PR is merged that ensures a unique blueprint instance.
+         * The BlueprintFound event is called for every localization.
+         * But we only want to extend the blueprint for the current localization.
+         * Otherwise we will have issue evaluating conditional fields, e.g. the sitemap fields.
+         */
+        if (Helpers::isEntryEditRoute()) {
+            return $event->entry?->id() === request()->route()->originalParameter('entry');
+        }
+
+        return true;
     }
 
     /**
@@ -154,35 +182,5 @@ class OnPageSeoBlueprintSubscriber
         $fieldsToHide->map(fn ($field) => $field->config()) // We need the config to ensure the field below.
             ->map(fn ($config) => array_merge($config, ['if' => ['hide_me_and_do_not_save_data' => true]])) // Add condition to hide the field and save no data.
             ->each(fn ($config, $handle) => $event->blueprint->ensureField($handle, $config));
-    }
-
-    protected function shouldExtendBlueprint(Event $event): bool
-    {
-        // Don't add the fields if the collection/taxonomy is disabled.
-        if (Helpers::isDisabled($this->data->type, $this->data->handle)) {
-            return false;
-        }
-
-        // Ensure the collection/taxonomy defaults view doesn't break.
-        if (Helpers::isAddonCpRoute()) {
-            return false;
-        }
-
-        // Ensure the fields won't be saved to file when editing a blueprint.
-        if (Helpers::isBlueprintCpRoute()) {
-            return false;
-        }
-
-        /**
-         * TODO: This can be removed when the Statamic PR is merged that ensures a unique blueprint instance.
-         * The BlueprintFound event is called for every localization.
-         * But we only want to extend the blueprint for the current localization.
-         * Otherwise we will have issue evaluating conditional fields, e.g. the sitemap fields.
-         */
-        if (Helpers::isEntryEditRoute()) {
-            return $event->entry?->id() === request()->route()->originalParameter('entry');
-        }
-
-        return true;
     }
 }
