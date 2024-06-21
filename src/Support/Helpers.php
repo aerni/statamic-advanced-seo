@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Support;
 
+use Aerni\AdvancedSeo\Data\DefaultsData;
 use Statamic\Statamic;
 use Illuminate\Support\Str;
 
@@ -14,9 +15,9 @@ class Helpers
         return \WhiteCube\Lingua\Service::create($parsed)->toW3C();
     }
 
-    public static function isActionCpRoute(): bool
+    public static function isDisabled(string $type, string $handle): bool
     {
-        return Statamic::isCpRoute() && Str::contains(request()->path(), 'actions');
+        return in_array($handle, config("advanced-seo.disabled.{$type}", []));
     }
 
     public static function isAddonCpRoute(): bool
@@ -29,24 +30,9 @@ class Helpers
         return Statamic::isCpRoute() && Str::contains(request()->path(), 'blueprints');
     }
 
-    public static function isEntryCreateRoute(): bool
-    {
-        return request()->route()?->getName() === 'statamic.cp.collections.entries.create';
-    }
-
     public static function isEntryEditRoute(): bool
     {
         return request()->route()?->getName() === 'statamic.cp.collections.entries.edit';
-    }
-
-    public static function isTermCreateRoute(): bool
-    {
-        return request()->route()?->getName() === 'statamic.cp.taxonomies.terms.create';
-    }
-
-    public static function isTermEditRoute(): bool
-    {
-        return request()->route()?->getName() === 'statamic.cp.taxonomies.terms.edit';
     }
 
     /**
@@ -55,13 +41,6 @@ class Helpers
      */
     public static function isCustomRoute(): bool
     {
-        $allowedControllerActions = collect([
-            'Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController@show',
-            'Statamic\Http\Controllers\FrontendController@index',
-        ]);
-
-        $controllerAction = request()->route()?->getAction('controller');
-
-        return $allowedControllerActions->doesntContain($controllerAction);
+        return ! in_array(request()->route()?->getName(), ['statamic.site', 'social_images.show']);
     }
 }

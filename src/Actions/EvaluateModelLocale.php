@@ -2,19 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
-use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events\EntryBlueprintFound;
-use Statamic\Events\TermBlueprintFound;
-use Statamic\Facades\Entry as EntryFacade;
-use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\Facades\Site;
 use Statamic\Tags\Context;
+use Illuminate\Support\Str;
+use Statamic\Taxonomies\Term;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Events\TermBlueprintFound;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Statamic\Events\EntryBlueprintFound;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class EvaluateModelLocale
 {
@@ -27,6 +28,7 @@ class EvaluateModelLocale
             ($model instanceof EntryBlueprintFound) => self::entryBlueprintFound($model),
             ($model instanceof Taxonomy) => self::taxonomy(),
             ($model instanceof Term) => self::term($model),
+            ($model instanceof LocalizedTerm) => $model->locale(),
             ($model instanceof TermBlueprintFound) => self::termBlueprintFound($model),
             ($model instanceof Context) => $model->get('site')?->handle() ?? Site::current()->handle(),
             ($model instanceof DefaultsData) => $model->locale,
@@ -72,14 +74,14 @@ class EvaluateModelLocale
         // If the request contains a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($requestLocale)) {
             return $requestLocale;
-        };
+        }
 
         $pathLocale = basename(request()->path());
 
         // If the request path is a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($pathLocale)) {
             return $pathLocale;
-        };
+        }
 
         // Return the selected site if no locale has been evaluated so far.
         return Site::selected()->handle();
@@ -94,6 +96,10 @@ class EvaluateModelLocale
 
     protected static function term(Term $model): string
     {
+        /**
+         * In the CP, a term always returns the default locale, no matter which locale is being viewed.
+         * As a workaround, we are getting the locale from the path instead.
+         */
         return Statamic::isCpRoute()
             ? basename(request()->path())
             : $model->locale();
@@ -111,14 +117,14 @@ class EvaluateModelLocale
         // If the request contains a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($requestLocale)) {
             return $requestLocale;
-        };
+        }
 
         $pathLocale = basename(request()->path());
 
         // If the request path is a valid site, use it.
         if ($model->blueprint->parent()->sites()->contains($pathLocale)) {
             return $pathLocale;
-        };
+        }
 
         // Return the selected site if no locale has been evaluated so far.
         return Site::selected()->handle();
