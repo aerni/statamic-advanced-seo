@@ -2,8 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Tags;
 
-use Aerni\AdvancedSeo\Tags\AdvancedSeoTags;
-
 class AdvancedSeoDirective
 {
     public function __construct(protected AdvancedSeoTags $tags)

@@ -11,9 +11,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
 {
     use FluentlyGetsAndSets;
 
-    public function __construct(protected string $loc)
-    {
-    }
+    public function __construct(protected string $loc) {}
 
     public function loc(?string $loc = null): string|self
     {
