@@ -33,7 +33,6 @@ use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
@@ -45,6 +44,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Aerni\AdvancedSeo\View\CascadeComposer;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -201,43 +201,14 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootCascade(): self
     {
-        $views = [
+        View::composer([
             ...Arr::wrap(config('advanced-seo.view_composer', '*')),
             'advanced-seo::head',
             'advanced-seo::body',
             'social_images.*',
-        ];
-
-        View::composer($views, function ($view) {
-            $context = new Context($view->getData());
-
-            if (! ShouldProcessViewCascade::handle($context)) {
-                return;
-            }
-
-            if (! $context->has('current_template')) {
-                $context = $context->merge($this->getContextFromCascade());
-            }
-
-            $view->with('seo', ViewCascade::from($context));
-        });
+        ], CascadeComposer::class);
 
         return $this;
-    }
-
-    protected function getContextFromCascade(): array
-    {
-        $cascade = Cascade::instance();
-
-        /**
-         * If the cascade has not yet been hydrated, ensure it is hydrated.
-         * This is important for people using custom route/controller/view implementations.
-         */
-        if (empty($cascade->toArray())) {
-            $cascade->hydrate();
-        }
-
-        return $cascade->toArray();
     }
 
     protected function bootBladeDirective(): self
