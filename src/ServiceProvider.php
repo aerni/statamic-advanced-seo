@@ -113,17 +113,17 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
-            ->bootAddonStores()
-            ->bootAddonNav()
-            ->bootAddonPermissions()
+            ->bootStores()
+            ->bootNav()
+            ->bootPermissions()
             ->bootGit()
-            ->bootCascade()
+            ->bootViewCascade()
             ->bootBladeDirective()
             ->bootGraphQL()
             ->autoPublishConfig();
     }
 
-    protected function bootAddonStores(): self
+    protected function bootStores(): self
     {
         $seoStore = app(SeoStore::class)->directory(config('advanced-seo.directory'));
 
@@ -132,7 +132,7 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function bootAddonNav(): self
+    protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
             Defaults::enabled()
@@ -158,7 +158,7 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function bootAddonPermissions(): self
+    protected function bootPermissions(): self
     {
         Permission::extend(function () {
             Permission::group('advanced-seo', 'Advanced SEO', function () {
@@ -199,7 +199,7 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function bootCascade(): self
+    protected function bootViewCascade(): self
     {
         View::composer([
             ...Arr::wrap(config('advanced-seo.view_composer', '*')),
