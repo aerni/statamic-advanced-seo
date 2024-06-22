@@ -2,46 +2,49 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
-use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Statamic\Statamic;
+use Statamic\Facades\Git;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Tags\Context;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Cascade;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\View\ViewCascade;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\View;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Git;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\Data\SeoVariables;
 use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
-use Statamic\Tags\Context;
+use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
+use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -115,6 +118,7 @@ class ServiceProvider extends AddonServiceProvider
             ->bootAddonPermissions()
             ->bootGit()
             ->bootCascade()
+            ->bootBladeDirective()
             ->bootGraphQL()
             ->autoPublishConfig();
     }
@@ -205,13 +209,41 @@ class ServiceProvider extends AddonServiceProvider
         ];
 
         View::composer($views, function ($view) {
-            $data = new Context($view->getData());
+            $context = new Context($view->getData());
 
-            if (! ShouldProcessViewCascade::handle($data)) {
+            if (! ShouldProcessViewCascade::handle($context)) {
                 return;
             }
 
-            $view->with('seo', ViewCascade::from($data)->toAugmentedArray());
+            if (! $context->has('current_template')) {
+                $context = $context->merge($this->getContextFromCascade());
+            }
+
+            $view->with('seo', ViewCascade::from($context));
+        });
+
+        return $this;
+    }
+
+    protected function getContextFromCascade(): array
+    {
+        $cascade = Cascade::instance();
+
+        /**
+         * If the cascade has not yet been hydrated, ensure it is hydrated.
+         * This is important for people using custom route/controller/view implementations.
+         */
+        if (empty($cascade->toArray())) {
+            $cascade->hydrate();
+        }
+
+        return $cascade->toArray();
+    }
+
+    protected function bootBladeDirective(): self
+    {
+        Blade::directive('seo', function ($tag) {
+            return "<?php echo \Facades\Aerni\AdvancedSeo\Tags\AdvancedSeoDirective::render($tag, \$__data) ?>";
         });
 
         return $this;
