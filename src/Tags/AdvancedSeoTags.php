@@ -23,16 +23,24 @@ class AdvancedSeoTags extends Tags
     /**
      * Renders the head view.
      */
-    public function head(): View
+    public function head(): ?View
     {
+        if (! $this->context->has('seo')) {
+            return null;
+        }
+
         return view('advanced-seo::head', $this->context->all());
     }
 
     /**
      * Renders the body view.
      */
-    public function body(): View
+    public function body(): ?View
     {
+        if (! $this->context->has('seo')) {
+            return null;
+        }
+
         return view('advanced-seo::body', $this->context->all());
     }
 

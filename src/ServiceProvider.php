@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Actions\ShouldProcessViewCascade;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
@@ -27,8 +26,9 @@ use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\View\ViewCascade;
+use Aerni\AdvancedSeo\View\CascadeComposer;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Git;
@@ -41,7 +41,6 @@ use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Stache\Stache;
 use Statamic\Statamic;
-use Statamic\Tags\Context;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -110,16 +109,17 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
-            ->bootAddonStores()
-            ->bootAddonNav()
-            ->bootAddonPermissions()
+            ->bootStores()
+            ->bootNav()
+            ->bootPermissions()
             ->bootGit()
-            ->bootCascade()
+            ->bootViewCascade()
+            ->bootBladeDirective()
             ->bootGraphQL()
             ->autoPublishConfig();
     }
 
-    protected function bootAddonStores(): self
+    protected function bootStores(): self
     {
         $seoStore = app(SeoStore::class)->directory(config('advanced-seo.directory'));
 
@@ -128,7 +128,7 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function bootAddonNav(): self
+    protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
             Defaults::enabled()
@@ -154,7 +154,7 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function bootAddonPermissions(): self
+    protected function bootPermissions(): self
     {
         Permission::extend(function () {
             Permission::group('advanced-seo', 'Advanced SEO', function () {
@@ -195,23 +195,22 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function bootCascade(): self
+    protected function bootViewCascade(): self
     {
-        $views = [
+        View::composer([
             ...Arr::wrap(config('advanced-seo.view_composer', '*')),
             'advanced-seo::head',
             'advanced-seo::body',
             'social_images.*',
-        ];
+        ], CascadeComposer::class);
 
-        View::composer($views, function ($view) {
-            $data = new Context($view->getData());
+        return $this;
+    }
 
-            if (! ShouldProcessViewCascade::handle($data)) {
-                return;
-            }
-
-            $view->with('seo', ViewCascade::from($data)->toAugmentedArray());
+    protected function bootBladeDirective(): self
+    {
+        Blade::directive('seo', function ($tag) {
+            return "<?php echo \Facades\Aerni\AdvancedSeo\Tags\AdvancedSeoDirective::render($tag, \$__data) ?>";
         });
 
         return $this;

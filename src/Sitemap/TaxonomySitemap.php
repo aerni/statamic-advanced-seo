@@ -8,9 +8,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class TaxonomySitemap extends BaseSitemap
 {
-    public function __construct(protected Taxonomy $model)
-    {
-    }
+    public function __construct(protected Taxonomy $model) {}
 
     public function urls(): Collection
     {

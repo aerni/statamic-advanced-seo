@@ -11,8 +11,7 @@ class DefaultsData
         public string $handle,
         public ?string $locale = null,
         public ?Collection $sites = null,
-    ) {
-    }
+    ) {}
 
     public function id(): string
     {

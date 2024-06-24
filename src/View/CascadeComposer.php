@@ -1,13 +1,45 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Actions;
+namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Contracts\View\View;
+use Statamic\Facades\Cascade;
 use Statamic\Tags\Context;
 
-class ShouldProcessViewCascade
+class CascadeComposer
 {
-    public static function handle(Context $context): bool
+    public function compose(View $view): void
+    {
+        $context = new Context($view->getData());
+
+        if (! $context->has('current_template')) {
+            $context = $this->getContextFromCascade($context);
+        }
+
+        if (! $this->shouldProcessCascade($context)) {
+            return;
+        }
+
+        $view->with('seo', ViewCascade::from($context));
+    }
+
+    protected function getContextFromCascade(Context $context): Context
+    {
+        $cascade = Cascade::instance();
+
+        /**
+         * If the cascade has not yet been hydrated, ensure it is hydrated.
+         * This is important for people using custom route/controller/view implementations.
+         */
+        if (empty($cascade->toArray())) {
+            $cascade->hydrate();
+        }
+
+        return $context->merge($cascade->toArray());
+    }
+
+    protected function shouldProcessCascade(Context $context): bool
     {
         // Don't process the cascade if it has been processed before.
         if ($context->has('seo')) {
