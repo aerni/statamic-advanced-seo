@@ -2,20 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Statamic;
-use Statamic\Facades\Site;
-use Statamic\Tags\Context;
-use Illuminate\Support\Str;
-use Statamic\Taxonomies\Term;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Events\TermBlueprintFound;
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Statamic\Events\EntryBlueprintFound;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Collection;
-use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Events\EntryBlueprintFound;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Site;
+use Statamic\Statamic;
+use Statamic\Tags\Context;
+use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Taxonomies\Term;
 
 class EvaluateModelLocale
 {
