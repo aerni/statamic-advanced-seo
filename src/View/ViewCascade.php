@@ -182,69 +182,16 @@ class ViewCascade extends BaseCascade
 
     public function hreflang(): ?array
     {
-        // Handles collection taxonomy page.
-        if ($this->model->has('segment_2') && $this->model->get('terms') instanceof TermQueryBuilder) {
-            $taxonomy = $this->model->get('page');
+        return match (true) {
+            ($this->model->has('segment_2') && $this->model->get('terms') instanceof TermQueryBuilder) => $this->collectionTaxonomyHreflang(),
+            ($this->model->has('segment_3') && $this->model->value('is_term') === true) => $this->collectionTermHreflang(),
+            ($this->model->has('segment_1') && $this->model->get('terms') instanceof TermQueryBuilder) => $this->taxonomyHreflang(),
+            default => $this->entryAndTermHreflang(),
+        };
+    }
 
-            return $taxonomy->sites()
-                ->map(fn ($site) => [
-                    'url' => $this->getCollectionTaxonomyUrl($taxonomy, $site),
-                    'locale' => Helpers::parseLocale(Site::get($site)->locale()),
-                ])
-                ->push([
-                    'url' => $this->getCollectionTaxonomyUrl($taxonomy, $taxonomy->sites()->first()),
-                    'locale' => 'x-default',
-                ])
-                ->all();
-        }
-
-        // Handles collection term page.
-        if ($this->model->has('segment_3') && $this->model->value('is_term') === true) {
-            $localizedTerm = $this->model->get('page');
-
-            return $localizedTerm->taxonomy()->sites()
-                ->map(fn ($locale) => [
-                    'url' => $localizedTerm->in($locale)->absoluteUrl(),
-                    'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
-                ])
-                ->push([
-                    'url' => $localizedTerm->origin()->absoluteUrl(),
-                    'locale' => 'x-default',
-                ])
-                ->all();
-        }
-
-        // Handles taxonomy page.
-        if ($this->model->has('segment_1') && $this->model->get('terms') instanceof TermQueryBuilder) {
-            $taxonomy = $this->model->get('page');
-
-            $initialSite = Site::current()->handle();
-
-            $hreflang = $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
-                // Set the current site so we can get the localized absolute URLs of the taxonomy.
-                Site::setCurrent($locale);
-
-                return [
-                    'url' => $taxonomy->absoluteUrl(),
-                    'locale' => Helpers::parseLocale(Site::current()->locale()),
-                ];
-            });
-
-            // We need to set the site to the taxonomy origin site so that we can get to correct URL of the taxonomy.
-            Site::setCurrent($taxonomy->sites()->first());
-
-            $hreflang->push([
-                'url' => $taxonomy->absoluteUrl(),
-                'locale' => 'x-default',
-            ]);
-
-            // Reset the site to the original.
-            Site::setCurrent($initialSite);
-
-            return $hreflang->toArray();
-        }
-
-        // Handle entries and term page.
+    protected function entryAndTermHreflang(): ?array
+    {
         $data = Data::find($this->model->value('id'));
 
         if (! $data) {
@@ -259,7 +206,7 @@ class ViewCascade extends BaseCascade
             ? $data->origin() ?? $data
             : $data->inDefaultLocale();
 
-        $hreflang = $sites->map(fn ($locale) => $data->in($locale))
+        return $sites->map(fn ($locale) => $data->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
             ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
             ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
@@ -273,8 +220,68 @@ class ViewCascade extends BaseCascade
             ])
             ->values()
             ->all();
+    }
 
-        return $hreflang;
+    protected function taxonomyHreflang(): array
+    {
+        $taxonomy = $this->model->get('page');
+
+        $initialSite = Site::current()->handle();
+
+        $hreflang = $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
+            // Set the current site so we can get the localized absolute URLs of the taxonomy.
+            Site::setCurrent($locale);
+
+            return [
+                'url' => $taxonomy->absoluteUrl(),
+                'locale' => Helpers::parseLocale(Site::current()->locale()),
+            ];
+        });
+
+        // We need to set the site to the taxonomy origin site so that we can get to correct URL of the taxonomy.
+        Site::setCurrent($taxonomy->sites()->first());
+
+        $hreflang->push([
+            'url' => $taxonomy->absoluteUrl(),
+            'locale' => 'x-default',
+        ]);
+
+        // Reset the site to the original.
+        Site::setCurrent($initialSite);
+
+        return $hreflang->all();
+    }
+
+    protected function collectionTaxonomyHreflang(): array
+    {
+        $taxonomy = $this->model->get('page');
+
+        return $taxonomy->sites()
+            ->map(fn ($site) => [
+                'url' => $this->getCollectionTaxonomyUrl($taxonomy, $site),
+                'locale' => Helpers::parseLocale(Site::get($site)->locale()),
+            ])
+            ->push([
+                'url' => $this->getCollectionTaxonomyUrl($taxonomy, $taxonomy->sites()->first()),
+                'locale' => 'x-default',
+            ])
+            ->all();
+    }
+
+    protected function collectionTermHreflang(): array
+    {
+        $localizedTerm = $this->model->get('page');
+
+        return $localizedTerm->taxonomy()->sites()
+            ->map(fn ($locale) => [
+                'url' => $localizedTerm->in($locale)->absoluteUrl(),
+                'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+            ])
+            ->push([
+                'url' => $localizedTerm->origin()->absoluteUrl(),
+                'locale' => 'x-default',
+            ])
+            ->all();
     }
 
     protected function getCollectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
