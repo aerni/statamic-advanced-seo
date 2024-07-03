@@ -253,10 +253,13 @@ class ViewCascade extends BaseCascade
             ->map(fn ($model) => [
                 'url' => $model->absoluteUrl(),
                 'locale' => Helpers::parseLocale($model->site()->locale()),
-            ])->push([
-                'url' => $origin->absoluteUrl(),
+            ])
+            ->push([
+                'url' => $origin->published() ? $origin->absoluteUrl() : $data->absoluteUrl(),
                 'locale' => 'x-default',
-            ])->all(); // TODO: The default should only be in there when it is published
+            ])
+            ->values()
+            ->all();
 
         return $hreflang;
     }
