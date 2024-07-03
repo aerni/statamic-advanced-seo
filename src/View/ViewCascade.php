@@ -202,29 +202,40 @@ class ViewCascade extends BaseCascade
             ? $data->sites()
             : $data->taxonomy()->sites();
 
+        $hreflang = $sites
+            ->map(fn ($locale) => $data->in($locale))
+            ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
+            ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
+            ->filter(fn ($model) => $model->url()); // Remove any entries/terms with no route
+
+        if ($hreflang->count() < 2) {
+            return null;
+        }
+
+        $hreflang->transform(fn ($model) => [
+            'url' => $model->absoluteUrl(),
+            'locale' => Helpers::parseLocale($model->site()->locale()),
+        ]);
+
         $origin = $data instanceof Entry
             ? $data->origin() ?? $data
             : $data->inDefaultLocale();
 
-        return $sites->map(fn ($locale) => $data->in($locale))
-            ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
-            ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
-            ->filter(fn ($model) => $model->url()) // Remove any entries/terms with no route
-            ->map(fn ($model) => [
-                'url' => $model->absoluteUrl(),
-                'locale' => Helpers::parseLocale($model->site()->locale()),
-            ])
-            ->push([
-                'url' => $origin->published() ? $origin->absoluteUrl() : $data->absoluteUrl(),
-                'locale' => 'x-default',
-            ])
-            ->values()
-            ->all();
+        return $hreflang->push([
+            'url' => $origin->published() ? $origin->absoluteUrl() : $data->absoluteUrl(),
+            'locale' => 'x-default',
+        ])
+        ->values()
+        ->all();
     }
 
-    protected function taxonomyHreflang(): array
+    protected function taxonomyHreflang(): ?array
     {
         $taxonomy = $this->model->get('page');
+
+        if ($taxonomy->sites()->count() < 2) {
+            return null;
+        };
 
         $initialSite = Site::current()->handle();
 
@@ -252,9 +263,13 @@ class ViewCascade extends BaseCascade
         return $hreflang->all();
     }
 
-    protected function collectionTaxonomyHreflang(): array
+    protected function collectionTaxonomyHreflang(): ?array
     {
         $taxonomy = $this->model->get('page');
+
+        if ($taxonomy->sites()->count() < 2) {
+            return null;
+        };
 
         return $taxonomy->sites()
             ->map(fn ($site) => [
@@ -268,9 +283,13 @@ class ViewCascade extends BaseCascade
             ->all();
     }
 
-    protected function collectionTermHreflang(): array
+    protected function collectionTermHreflang(): ?array
     {
         $localizedTerm = $this->model->get('page');
+
+        if ($localizedTerm->taxonomy()->sites()->count() < 2) {
+            return null;
+        };
 
         return $localizedTerm->taxonomy()->sites()
             ->map(fn ($locale) => [
