@@ -2,21 +2,22 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Data\HasComputedData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Assets\Asset;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Statamic\Facades\Blink;
+use Spatie\SchemaOrg\Schema;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Data\HasComputedData;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Stache\Query\TermQueryBuilder;
 
 class ViewCascade extends BaseCascade
 {
@@ -181,24 +182,23 @@ class ViewCascade extends BaseCascade
 
     public function hreflang(): ?array
     {
-        // Handles collection taxonomy index page.
+        // Handles collection taxonomy page.
         if ($this->model->has('segment_2') && $this->model->get('terms') instanceof TermQueryBuilder) {
             $taxonomy = $this->model->get('page');
 
-            return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
-                $site = Site::get($site);
-                $siteUrl = $site->absoluteUrl();
-                $taxonomyHandle = $taxonomy->handle();
-                $collectionHandle = $taxonomy->collection()->handle();
-
-                return [
-                    'url' => URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}"),
-                    'locale' => Helpers::parseLocale($site->locale()),
-                ];
-            })->all();
+            return $taxonomy->sites()
+                ->map(fn ($site) => [
+                    'url' => $this->getCollectionTaxonomyUrl($taxonomy, $site),
+                    'locale' => Helpers::parseLocale(Site::get($site)->locale())
+                ])
+                ->push([
+                    'url' => $this->getCollectionTaxonomyUrl($taxonomy, $taxonomy->sites()->first()),
+                    'locale' => 'x-default',
+                ])
+                ->all();
         }
 
-        // Handles collection taxonomy show page.
+        // Handles collection term page.
         if ($this->model->has('segment_3') && $this->model->value('is_term') === true) {
             $localizedTerm = $this->model->get('page');
 
@@ -206,32 +206,45 @@ class ViewCascade extends BaseCascade
                 ->map(fn ($locale) => [
                     'url' => $localizedTerm->in($locale)->absoluteUrl(),
                     'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
-                ])->all();
+                ])
+                ->push([
+                    'url' => $localizedTerm->origin()->absoluteUrl(),
+                    'locale' => 'x-default',
+                ])
+                ->all();
         }
 
-        // Handles taxonomy index page.
+        // Handles taxonomy page.
         if ($this->model->has('segment_1') && $this->model->get('terms') instanceof TermQueryBuilder) {
             $taxonomy = $this->model->get('page');
 
             $initialSite = Site::current()->handle();
 
-            $data = $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
+            $hreflang = $taxonomy->sites()->map(function ($locale) use ($taxonomy) {
                 // Set the current site so we can get the localized absolute URLs of the taxonomy.
                 Site::setCurrent($locale);
 
                 return [
                     'url' => $taxonomy->absoluteUrl(),
-                    'locale' => Helpers::parseLocale(Site::get($locale)->locale()),
+                    'locale' => Helpers::parseLocale(Site::current()->locale()),
                 ];
-            })->toArray();
+            });
+
+            // We need to set the site to the taxonomy origin site so that we can get to correct URL of the taxonomy.
+            Site::setCurrent($taxonomy->sites()->first());
+
+            $hreflang->push([
+                'url' => $taxonomy->absoluteUrl(),
+                'locale' => 'x-default',
+            ]);
 
             // Reset the site to the original.
             Site::setCurrent($initialSite);
 
-            return $data;
+            return $hreflang->toArray();
         }
 
-        // Handle entries and term show page.
+        // Handle entries and term page.
         $data = Data::find($this->model->value('id'));
 
         if (! $data) {
@@ -262,6 +275,15 @@ class ViewCascade extends BaseCascade
             ->all();
 
         return $hreflang;
+    }
+
+    protected function getCollectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
+    {
+        $siteUrl = Site::get($site)->absoluteUrl();
+        $taxonomyHandle = $taxonomy->handle();
+        $collectionHandle = $taxonomy->collection()->handle();
+
+        return URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}");
     }
 
     public function canonical(): ?string
