@@ -30,11 +30,11 @@ class CollectionSitemapUrl extends BaseSitemapUrl
             'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
             'href' => $this->absoluteUrl($entry),
         ])
-        ->put('x-default', [
-            'hreflang' => 'x-default',
-            'href' => $this->absoluteUrl($this->entry->origin() ?? $this->entry),
-        ])
-        ->toArray();
+            ->put('x-default', [
+                'hreflang' => 'x-default',
+                'href' => $this->absoluteUrl($this->entry->origin() ?? $this->entry),
+            ])
+            ->toArray();
     }
 
     public function lastmod(): string

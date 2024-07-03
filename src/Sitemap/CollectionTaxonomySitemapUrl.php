@@ -34,11 +34,11 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
                 'href' => $this->getUrl($taxonomy, $site),
             ];
         })
-        ->put('x-default', [
-            'hreflang' => 'x-default',
-            'href' => $this->getUrl($this->taxonomy, $this->taxonomy->sites()->first()),
-        ])
-        ->toArray();
+            ->put('x-default', [
+                'hreflang' => 'x-default',
+                'href' => $this->getUrl($this->taxonomy, $this->taxonomy->sites()->first()),
+            ])
+            ->toArray();
     }
 
     public function lastmod(): string
