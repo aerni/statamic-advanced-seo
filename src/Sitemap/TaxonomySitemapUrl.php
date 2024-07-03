@@ -37,7 +37,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        return $taxonomies->map(function ($taxonomy, $site) {
+        $hreflang = $taxonomies->map(function ($taxonomy, $site) {
             // We need to set the site so that we can get to correct URL of the taxonomy.
             Site::setCurrent($site);
 
@@ -45,7 +45,15 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
                 'hreflang' => Helpers::parseLocale(Site::current()->locale()),
                 'href' => $this->absoluteUrl($taxonomy),
             ];
-        })->toArray();
+        });
+
+        // We need to set the site to the taxonomy origin site so that we can get to correct URL of the taxonomy.
+        Site::setCurrent($this->taxonomy->sites()->first());
+
+        return $hreflang->put('x-default', [
+            'hreflang' => 'x-default',
+            'href' => $this->absoluteUrl($this->taxonomy),
+        ])->toArray();
     }
 
     public function lastmod(): string

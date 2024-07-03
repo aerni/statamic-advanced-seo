@@ -29,10 +29,12 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         return $entries->map(fn ($entry) => [
             'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
             'href' => $this->absoluteUrl($entry),
-        ])->put('x-default', [
+        ])
+        ->put('x-default', [
             'hreflang' => 'x-default',
             'href' => $this->absoluteUrl($this->entry->origin() ?? $this->entry),
-        ])->toArray();  // TODO: The default should only be in there when it is published. Also only when indexable?
+        ])
+        ->toArray();
     }
 
     public function lastmod(): string
