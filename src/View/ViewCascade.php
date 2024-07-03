@@ -2,22 +2,22 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
-use Statamic\Tags\Context;
-use Statamic\Facades\Blink;
-use Spatie\SchemaOrg\Schema;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Assets\Asset;
-use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Data\HasComputedData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Data\HasComputedData;
+use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Support\Str;
+use Statamic\Tags\Context;
 
 class ViewCascade extends BaseCascade
 {
@@ -189,7 +189,7 @@ class ViewCascade extends BaseCascade
             return $taxonomy->sites()
                 ->map(fn ($site) => [
                     'url' => $this->getCollectionTaxonomyUrl($taxonomy, $site),
-                    'locale' => Helpers::parseLocale(Site::get($site)->locale())
+                    'locale' => Helpers::parseLocale(Site::get($site)->locale()),
                 ])
                 ->push([
                     'url' => $this->getCollectionTaxonomyUrl($taxonomy, $taxonomy->sites()->first()),
