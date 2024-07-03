@@ -27,6 +27,6 @@ class ShouldGenerateSocialImages
         }
 
         // Only generate if the social images generator is turned on.
-        return $entry->seo_generate_social_images;
+        return $entry->seo_generate_social_images ?? false;
     }
 }
