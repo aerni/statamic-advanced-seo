@@ -33,7 +33,12 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
                 'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
                 'href' => $this->getUrl($taxonomy, $site),
             ];
-        })->toArray();
+        })
+            ->put('x-default', [
+                'hreflang' => 'x-default',
+                'href' => $this->getUrl($this->taxonomy, $this->taxonomy->sites()->first()),
+            ])
+            ->toArray();
     }
 
     public function lastmod(): string

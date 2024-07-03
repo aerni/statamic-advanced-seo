@@ -28,7 +28,12 @@ class TermSitemapUrl extends BaseSitemapUrl
         return $terms->map(fn ($term) => [
             'hreflang' => Helpers::parseLocale(Site::get($term->locale())->locale()),
             'href' => $this->absoluteUrl($term),
-        ])->toArray();
+        ])
+            ->put('x-default', [
+                'hreflang' => 'x-default',
+                'href' => $this->absoluteUrl($this->term->origin()),
+            ])
+            ->toArray();
     }
 
     public function lastmod(): string
