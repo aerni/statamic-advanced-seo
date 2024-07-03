@@ -2,18 +2,19 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
-use Aerni\AdvancedSeo\Data\HasComputedData;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Assets\Asset;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Data;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Spatie\SchemaOrg\Schema;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Data\HasComputedData;
 
 class GraphQlCascade extends BaseCascade
 {
@@ -152,6 +153,10 @@ class GraphQlCascade extends BaseCascade
 
     public function hreflang(): ?array
     {
+        if (! Site::multiEnabled()) {
+            return null;
+        }
+
         $sites = $this->model instanceof Entry
             ? $this->model->sites()
             : $this->model->taxonomy()->sites();

@@ -182,6 +182,10 @@ class ViewCascade extends BaseCascade
 
     public function hreflang(): ?array
     {
+        if (! Site::multiEnabled()) {
+            return null;
+        }
+
         return match (true) {
             ($this->model->has('segment_2') && $this->model->get('terms') instanceof TermQueryBuilder) => $this->collectionTaxonomyHreflang(),
             ($this->model->has('segment_3') && $this->model->value('is_term') === true) => $this->collectionTermHreflang(),

@@ -19,6 +19,10 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
     public function alternates(): ?array
     {
+        if (! Site::multiEnabled()) {
+            return null;
+        }
+
         $entries = $this->entries();
 
         // We only want alternate URLs if there are at least two entries.

@@ -21,6 +21,10 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     public function alternates(): ?array
     {
+        if (! Site::multiEnabled()) {
+            return null;
+        }
+
         $taxonomies = $this->taxonomies();
 
         // We only want alternate URLs if there are at least two terms.

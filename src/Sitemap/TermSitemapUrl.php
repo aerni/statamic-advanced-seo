@@ -18,6 +18,10 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     public function alternates(): ?array
     {
+        if (! Site::multiEnabled()) {
+            return null;
+        }
+
         $terms = $this->terms();
 
         // We only want alternate URLs if there are at least two terms.
