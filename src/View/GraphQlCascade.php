@@ -153,13 +153,13 @@ class GraphQlCascade extends BaseCascade
 
     public function hreflang(): ?array
     {
-        if (! Site::multiEnabled()) {
-            return null;
-        }
-
         $sites = $this->model instanceof Entry
             ? $this->model->sites()
             : $this->model->taxonomy()->sites();
+
+        if ($sites->count() < 2) {
+            return null;
+        }
 
         $hreflang = $sites
             ->map(fn ($locale) => $this->model->in($locale))

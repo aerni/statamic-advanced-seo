@@ -206,6 +206,10 @@ class ViewCascade extends BaseCascade
             ? $data->sites()
             : $data->taxonomy()->sites();
 
+        if ($sites->count() < 2) {
+            return null;
+        };
+
         $hreflang = $sites
             ->map(fn ($locale) => $data->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
