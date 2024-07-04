@@ -2,19 +2,19 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
-use Spatie\SchemaOrg\Schema;
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
+use Aerni\AdvancedSeo\Data\HasComputedData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Data\HasComputedData;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
@@ -184,8 +184,8 @@ class GraphQlCascade extends BaseCascade
             'url' => $origin->published() ? $this->absoluteUrl($origin) : $this->absoluteUrl($this->model),
             'locale' => 'x-default',
         ])
-        ->values()
-        ->all();
+            ->values()
+            ->all();
     }
 
     public function canonical(): ?string

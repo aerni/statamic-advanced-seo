@@ -208,7 +208,7 @@ class ViewCascade extends BaseCascade
 
         if ($sites->count() < 2) {
             return null;
-        };
+        }
 
         $hreflang = $sites
             ->map(fn ($locale) => $data->in($locale))
@@ -233,8 +233,8 @@ class ViewCascade extends BaseCascade
             'url' => $origin->published() ? $origin->absoluteUrl() : $data->absoluteUrl(),
             'locale' => 'x-default',
         ])
-        ->values()
-        ->all();
+            ->values()
+            ->all();
     }
 
     protected function taxonomyHreflang(): ?array
@@ -243,7 +243,7 @@ class ViewCascade extends BaseCascade
 
         if ($taxonomy->sites()->count() < 2) {
             return null;
-        };
+        }
 
         $initialSite = Site::current()->handle();
 
@@ -277,7 +277,7 @@ class ViewCascade extends BaseCascade
 
         if ($taxonomy->sites()->count() < 2) {
             return null;
-        };
+        }
 
         return $taxonomy->sites()
             ->map(fn ($site) => [
@@ -297,7 +297,7 @@ class ViewCascade extends BaseCascade
 
         if ($localizedTerm->taxonomy()->sites()->count() < 2) {
             return null;
-        };
+        }
 
         return $localizedTerm->taxonomy()->sites()
             ->map(fn ($locale) => [
