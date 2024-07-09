@@ -6,6 +6,8 @@ use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\View\Concerns\HasAbsoluteUrl;
+use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Assets\Asset;
@@ -18,7 +20,10 @@ use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {
-    use HasBaseUrl, HasComputedData;
+    use HasAbsoluteUrl;
+    use HasBaseUrl;
+    use HasComputedData;
+    use HasHreflang;
 
     public function __construct(Entry|Term $model)
     {
@@ -153,39 +158,11 @@ class GraphQlCascade extends BaseCascade
 
     public function hreflang(): ?array
     {
-        $sites = $this->model instanceof Entry
-            ? $this->model->sites()
-            : $this->model->taxonomy()->sites();
-
-        if ($sites->count() < 2) {
+        if (! Site::multiEnabled()) {
             return null;
         }
 
-        $hreflang = $sites
-            ->map(fn ($locale) => $this->model->in($locale))
-            ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
-            ->filter(fn ($model) => $model->published()) // Remove any unpublished entries/terms
-            ->filter(fn ($model) => $model->url()); // Remove any entries/terms with no route
-
-        if ($hreflang->count() < 2) {
-            return null;
-        }
-
-        $hreflang->transform(fn ($model) => [
-            'url' => $this->absoluteUrl($model),
-            'locale' => Helpers::parseLocale($model->site()->locale()),
-        ]);
-
-        $origin = $this->model instanceof Entry
-            ? $this->model->origin() ?? $this->model
-            : $this->model->inDefaultLocale();
-
-        return $hreflang->push([
-            'url' => $origin->published() ? $this->absoluteUrl($origin) : $this->absoluteUrl($this->model),
-            'locale' => 'x-default',
-        ])
-            ->values()
-            ->all();
+        return $this->entryAndTermHreflang($this->model);
     }
 
     public function canonical(): ?string
@@ -283,12 +260,5 @@ class GraphQlCascade extends BaseCascade
             ]);
 
         return $crumbs;
-    }
-
-    protected function absoluteUrl(mixed $model): ?string
-    {
-        return $this->baseUrl()
-            ? URL::assemble($this->baseUrl(), $model->url())
-            : $model->absoluteUrl();
     }
 }
