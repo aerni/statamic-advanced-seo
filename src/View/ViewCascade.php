@@ -192,7 +192,6 @@ class ViewCascade extends BaseCascade
             ($this->contextIsEntryOrTerm()) => $this->entryAndTermHreflang($this->model->get('id')->resolve()->augmentable()), // TODO: Remove resolve() once https://github.com/statamic/cms/pull/10417 is merged.
             ($this->contextIsTaxonomy()) => $this->taxonomyHreflang($this->model->get('page')),
             ($this->contextIsCollectionTaxonomy()) => $this->collectionTaxonomyHreflang($this->model->get('page')),
-            ($this->contextIsCollectionTerm()) => $this->collectionTermHreflang($this->model->get('page')),
             default => null
         };
     }

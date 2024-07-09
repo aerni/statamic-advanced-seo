@@ -129,41 +129,6 @@ trait HasHreflang
         ])->values()->all();
     }
 
-    protected function collectionTermHreflang(LocalizedTerm $term): ?array
-    {
-        if (! $this->isIndexable($term)) {
-            return null;
-        }
-
-        $sites = $term->taxonomy()->sites();
-
-        if ($sites->count() < 2) {
-            return null;
-        }
-
-        $hreflang = $sites
-            ->map(fn ($locale) => $term->in($locale))
-            ->filter($this->isIndexable(...));
-
-        if ($hreflang->count() < 2) {
-            return null;
-        }
-
-        $hreflang->transform(fn ($term) => [
-            'url' => $term->absoluteUrl(),
-            'locale' => Helpers::parseLocale($term->site()->locale()),
-        ]);
-
-        $origin = $term->origin();
-
-        $xDefault = $this->isIndexable($origin) ? $origin : $term;
-
-        return $hreflang->push([
-            'url' => $xDefault->absoluteUrl(),
-            'locale' => 'x-default',
-        ])->values()->all();
-    }
-
     protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
         $siteUrl = Site::get($site)->absoluteUrl();
