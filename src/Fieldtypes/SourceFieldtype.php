@@ -84,7 +84,7 @@ class SourceFieldtype extends Fieldtype
         if ($data === '@default') {
             $value = $this->sourceFieldtype()->augment($this->defaultValueFromCascade());
 
-            return is_string($data) && Str::contains($value, '@field')
+            return is_string($value) && Str::contains($value, '@field')
                 ? $this->sourceFieldtype()->augment($this->parseFieldValues($value))
                 : $value;
         }
