@@ -290,11 +290,11 @@ class ViewCascade extends BaseCascade
     {
         $type = $this->get('canonical_type');
 
-        if ($type == 'other' && $this->has('canonical_entry')) {
+        if ($type == 'other' && $this->get('canonical_entry')) {
             return $this->get('canonical_entry')->absoluteUrl();
         }
 
-        if ($type == 'custom' && $this->has('canonical_custom')) {
+        if ($type == 'custom' && $this->get('canonical_custom')) {
             return $this->get('canonical_custom');
         }
 
