@@ -20,10 +20,20 @@ class AugmentedCascade extends AbstractAugmented
             ->unique()->sort()->values()->all();
     }
 
-    protected function wrapValue($value, $handle)
+    protected function wrapDataMethodInvokable(string $method, string $handle)
     {
         return new Value(
-            $value,
+            fn () => $this->data->$method(),
+            $handle,
+            app(CascadeFieldtype::class), // Add a dummy fieldtype to enable Value objects to parse Antlers.
+            $this->data
+        );
+    }
+
+    protected function wrapDeferredValue($handle)
+    {
+        return new Value(
+            fn () => $this->getFromData($handle),
             $handle,
             app(CascadeFieldtype::class), // Add a dummy fieldtype to enable Value objects to parse Antlers.
             $this->data
