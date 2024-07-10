@@ -18,16 +18,15 @@ trait EvaluatesIndexability
 
     protected function isIndexableSite(string $locale): bool
     {
-        // If crawling is disabled, the site should not be indexed.
-        if (! in_array(app()->environment(), config('advanced-seo.crawling.environments', []))) {
+        if (! $this->crawlingIsEnabled()) {
             return false;
         }
 
-        $siteNoindex = Seo::find('site', 'indexing')
-            ?->in($locale)
-            ?->noindex;
+        return ! Seo::find('site', 'indexing')?->in($locale)?->noindex;
+    }
 
-        // If noindex is enabled, the site is should not be indexed.
-        return ! $siteNoindex;
+    protected function crawlingIsEnabled(): bool
+    {
+        return in_array(app()->environment(), config('advanced-seo.crawling.environments', []));
     }
 }
