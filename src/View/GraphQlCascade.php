@@ -2,22 +2,22 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
-use Spatie\SchemaOrg\Schema;
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
+use Aerni\AdvancedSeo\Data\HasComputedData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
+use Aerni\AdvancedSeo\View\Concerns\HasAbsoluteUrl;
+use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Data\HasComputedData;
-use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
-use Aerni\AdvancedSeo\View\Concerns\HasAbsoluteUrl;
-use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
 {

@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\View\Concerns;
 
-use Statamic\Tags\Context;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Sites\Site;
+use Statamic\Tags\Context;
 use Statamic\Taxonomies\LocalizedTerm;
 
 trait EvaluatesIndexability
