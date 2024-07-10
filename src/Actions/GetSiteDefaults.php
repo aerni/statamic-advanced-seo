@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;
-use Statamic\Facades\Blink;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
 
 class GetSiteDefaults
 {
