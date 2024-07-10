@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Concerns\EvaluatesContextType;
+use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
@@ -22,6 +23,7 @@ use Statamic\Tags\Context;
 class ViewCascade extends BaseCascade
 {
     use EvaluatesContextType;
+    use EvaluatesIndexability;
     use HasComputedData;
     use HasHreflang;
 
@@ -198,6 +200,10 @@ class ViewCascade extends BaseCascade
 
     public function canonical(): ?string
     {
+        if (! $this->isIndexable($this->model)) {
+            return null;
+        }
+
         $type = $this->get('canonical_type');
 
         if ($type == 'other' && $this->get('canonical_entry')) {
