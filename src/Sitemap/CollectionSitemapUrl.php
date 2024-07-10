@@ -17,6 +17,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         return $this->absoluteUrl($this->entry);
     }
 
+    // TODO: Can we use the entryAndTermHreflang method from the HasHreflang trait as the code is just a copy of it.
     public function alternates(): ?array
     {
         if (! Site::multiEnabled()) {

@@ -9,6 +9,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blink;
 
+// TODO: Merge this action with the EvaluatesIndexability trait as they are very similar.
 class Indexable
 {
     use EvaluatesIndexability;
