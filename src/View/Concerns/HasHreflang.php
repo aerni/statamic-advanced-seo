@@ -16,7 +16,7 @@ trait HasHreflang
 
     protected function entryAndTermHreflang(Entry|LocalizedTerm $model): ?array
     {
-        if (! $this->isIndexable($model)) {
+        if (! $this->shouldIncludeHreflang($model)) {
             return null;
         }
 
@@ -31,7 +31,7 @@ trait HasHreflang
         $hreflang = $sites
             ->map(fn ($locale) => $model->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
-            ->filter($this->isIndexable(...));
+            ->filter($this->shouldIncludeHreflang(...));
 
         if ($hreflang->count() < 2) {
             return null;
@@ -44,7 +44,7 @@ trait HasHreflang
 
         $origin = $model->origin() ?? $model;
 
-        $xDefault = $this->isIndexable($origin) ? $origin : $model;
+        $xDefault = $this->shouldIncludeHreflang($origin) ? $origin : $model;
 
         return $hreflang->push([
             'url' => $this->absoluteUrl($xDefault),
@@ -135,5 +135,19 @@ trait HasHreflang
         $collectionHandle = $taxonomy->collection()->handle();
 
         return URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}");
+    }
+
+    protected function shouldIncludeHreflang(Entry|LocalizedTerm $model): bool
+    {
+        if ($this->canonicalPointsToAnotherUrl($model)) {
+            return false;
+        }
+
+        return $this->isIndexable($model);
+    }
+
+    protected function canonicalPointsToAnotherUrl(Entry|LocalizedTerm $model): bool
+    {
+        return $model->seo_canonical_type != 'current';
     }
 }
