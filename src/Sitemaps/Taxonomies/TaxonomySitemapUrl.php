@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Statamic\Facades\Site;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
@@ -73,6 +74,10 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             return $term->lastModified()->format('Y-m-d\TH:i:sP');
         }
 
+        return Cache::rememberForever(
+            "advanced-seo::sitemaps::taxonomy::{$this->taxonomy}::lastmod",
+            fn () => now()->format('Y-m-d\TH:i:sP')
+        );
     }
 
     public function changefreq(): string
