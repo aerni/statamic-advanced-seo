@@ -111,16 +111,14 @@ class TaxonomySitemap extends BaseSitemap
         })->values();
     }
 
+    /**
+     * Get all the collections that use this taxonomy and attach the each collection
+     * to a new instance of the taxonomy so that we can get the correct absolute URL
+     * of the collection terms later.
+     */
     protected function taxonomyCollections(): Collection
     {
-        // Get all the collections that use this taxonomy.
-        $taxonomyCollections = $this->model->collections();
-
-        /**
-         * Attach each collection to a new instance of the taxonomy
-         * so that we can get the correct absolute URL of the collection terms later.
-         */
-        return $taxonomyCollections->map(function ($collection) {
+        return $this->model->collections()->map(function ($collection) {
             return $collection->taxonomies()
                 ->first(fn ($taxonomy) => $taxonomy->handle() === $this->handle())
                 ->collection($collection);
