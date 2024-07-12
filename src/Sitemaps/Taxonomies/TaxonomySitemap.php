@@ -64,20 +64,13 @@ class TaxonomySitemap extends BaseSitemap
 
     public function collectionTaxonomies(): Collection
     {
-        $taxonomies = $this->taxonomyCollections();
-
-        // We only want to return the terms if the template exists.
-        if (! view()->exists($taxonomies->first()?->template())) {
-            return collect();
-        }
-
-        return $taxonomies->flatMap(function ($taxonomy) {
-            return $taxonomy->collection()->sites()
-                ->map(fn ($site) => [
-                    'taxonomy' => $taxonomy,
-                    'site' => $site,
-                ]);
-        })->filter(fn ($item) => Indexable::handle($item['taxonomy'], $item['site']));
+        return $this->taxonomyCollections()
+            ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
+            ->flatMap(function ($taxonomy) {
+                return $taxonomy->collection()->sites()
+                    ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
+            })
+            ->filter(fn ($item) => Indexable::handle($item['taxonomy'], $item['site']));
     }
 
     public function terms(Taxonomy $taxonomy): Collection
