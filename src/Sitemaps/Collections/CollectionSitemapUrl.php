@@ -26,10 +26,6 @@ class CollectionSitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        if (! Indexable::handle($this->entry)) {
-            return null;
-        }
-
         $sites = $this->entry->sites();
 
         if ($sites->count() < 2) {
