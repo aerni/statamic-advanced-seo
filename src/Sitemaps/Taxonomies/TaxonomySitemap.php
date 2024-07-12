@@ -62,17 +62,6 @@ class TaxonomySitemap extends BaseSitemap
             ->mapWithKeys(fn ($site) => [$site => $this->model]);
     }
 
-    public function collectionTaxonomies(): Collection
-    {
-        return $this->taxonomyCollections()
-            ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
-            ->flatMap(function ($taxonomy) {
-                return $taxonomy->collection()->sites()
-                    ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
-            })
-            ->filter(fn ($item) => Indexable::handle($item['taxonomy'], $item['site']));
-    }
-
     public function terms(Taxonomy $taxonomy): Collection
     {
         $terms = $taxonomy->queryTerms()->get();
@@ -84,6 +73,17 @@ class TaxonomySitemap extends BaseSitemap
 
         // We only want indexable terms.
         return $terms->filter(Indexable::handle(...));
+    }
+
+    public function collectionTaxonomies(): Collection
+    {
+        return $this->taxonomyCollections()
+            ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
+            ->flatMap(function ($taxonomy) {
+                return $taxonomy->collection()->sites()
+                    ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
+            })
+            ->filter(fn ($item) => Indexable::handle($item['taxonomy'], $item['site']));
     }
 
     public function collectionTerms(): Collection
