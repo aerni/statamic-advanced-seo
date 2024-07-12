@@ -55,7 +55,10 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
             return $terms->lastModified()->format('Y-m-d\TH:i:sP');
         }
 
-        return now()->format('Y-m-d\TH:i:sP');
+        return Cache::rememberForever(
+            "advanced-seo::sitemaps::taxonomy::{$this->taxonomy}::lastmod",
+            fn () => now()->format('Y-m-d\TH:i:sP')
+        );
     }
 
     public function changefreq(): string
