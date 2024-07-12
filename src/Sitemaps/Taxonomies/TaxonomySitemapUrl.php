@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Statamic\Facades\Site;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -39,7 +38,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $sites = $this->taxonomies()->keys();
+        $sites = $this->sitemap->taxonomies()->keys();
 
         if ($sites->count() < 2) {
             return null;
@@ -101,10 +100,5 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             ->where('site', $this->site)
             ->orderByDesc('last_modified')
             ->first();
-    }
-
-    protected function taxonomies(): Collection
-    {
-        return $this->sitemap->taxonomies();
     }
 }
