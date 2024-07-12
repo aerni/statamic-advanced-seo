@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Actions\Indexable;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 
