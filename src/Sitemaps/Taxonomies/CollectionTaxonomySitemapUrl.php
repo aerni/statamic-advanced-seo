@@ -19,7 +19,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->getUrl($this->taxonomy, $this->site);
+        return $this->collectionTaxonomyUrl($this->taxonomy, $this->site);
     }
 
     public function alternates(): ?array
@@ -35,7 +35,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         }
 
         $hreflang = $sites->map(fn ($site) => [
-            'href' => $this->getUrl($this->taxonomy, $site),
+            'href' => $this->collectionTaxonomyUrl($this->taxonomy, $site),
             'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
         ]);
 
@@ -44,7 +44,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         $xDefaultSite = $sites->contains($originSite) ? $originSite : $this->site;
 
         return $hreflang->push([
-            'href' => $this->getUrl($this->taxonomy, $xDefaultSite),
+            'href' => $this->collectionTaxonomyUrl($this->taxonomy, $xDefaultSite),
             'hreflang' => 'x-default',
         ])->values()->all();
     }
@@ -92,7 +92,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
             ->mapwithKeys(fn ($item) => [$item['site'] => $item['taxonomy']]);
     }
 
-    protected function getUrl(Taxonomy $taxonomy, string $site): string
+    protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
         $siteUrl = $this->absoluteUrl(Site::get($site));
         $taxonomyHandle = $taxonomy->handle();
