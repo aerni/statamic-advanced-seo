@@ -83,9 +83,6 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
     public function isCanonicalUrl(): bool
     {
-        return match ($this->entry->seo_canonical_type->value()) {
-            'current' => true,
-            default => false,
-        };
+        return $this->entry->seo_canonical_type == 'current';
     }
 }

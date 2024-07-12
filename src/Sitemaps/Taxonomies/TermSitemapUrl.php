@@ -70,10 +70,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     public function isCanonicalUrl(): bool
     {
-        return match ($this->term->seo_canonical_type->value()) {
-            'current' => true,
-            default => false,
-        };
+        return $this->term->seo_canonical_type == 'current';
     }
 
     protected function terms(): Collection
