@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Statamic\Facades\Site;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Actions\Indexable;
@@ -26,7 +25,9 @@ class TermSitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $terms = $this->terms();
+        $terms = $this->term->term()
+            ->localizations()
+            ->filter(Indexable::handle(...));
 
         if ($terms->count() < 2) {
             return null;
@@ -71,12 +72,5 @@ class TermSitemapUrl extends BaseSitemapUrl
     public function isCanonicalUrl(): bool
     {
         return $this->term->seo_canonical_type == 'current';
-    }
-
-    protected function terms(): Collection
-    {
-        return $this->sitemap
-            ->terms($this->term->taxonomy())
-            ->filter(fn ($term) => $term->id() === $this->term->id());
     }
 }
