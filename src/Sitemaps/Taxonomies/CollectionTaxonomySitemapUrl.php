@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 use Statamic\Facades\URL;
 use Statamic\Facades\Site;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
@@ -51,8 +52,8 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     public function lastmod(): string
     {
-        if ($terms = $this->lastModifiedTaxonomyTerm()) {
-            return $terms->lastModified()->format('Y-m-d\TH:i:sP');
+        if ($term = $this->lastModifiedTaxonomyTerm()) {
+            return $term->lastModified()->format('Y-m-d\TH:i:sP');
         }
 
         return Cache::rememberForever(
@@ -80,8 +81,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
     {
         return $this->taxonomy->queryTerms()
             ->where('site', $this->site)
-            ->get()
-            ->sortByDesc(fn ($term) => $term->lastModified())
+            ->orderByDesc('last_modified')
             ->first();
     }
 
