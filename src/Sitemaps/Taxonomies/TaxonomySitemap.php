@@ -58,8 +58,8 @@ class TaxonomySitemap extends BaseSitemap
         }
 
         return $this->model->sites()
-            ->mapWithKeys(fn ($site) => [$site => $this->model])
-            ->filter(fn ($taxonomy, $site) => Indexable::handle($taxonomy, $site));
+            ->filter(fn ($site) => Indexable::handle($this->model, $site))
+            ->mapWithKeys(fn ($site) => [$site => $this->model]);
     }
 
     public function collectionTaxonomies(): Collection
