@@ -89,9 +89,8 @@ class TaxonomySitemap extends BaseSitemap
             return collect();
         }
 
-        return $terms
-            ->filter(fn ($term) => $term->taxonomy()->sites()->contains($term->locale())) // We only want terms of sites that are configured on the taxonomy.
-            ->filter(fn ($term) => Indexable::handle($term)); // We only want indexable terms.
+        // We only want indexable terms.
+        return $terms->filter(Indexable::handle(...));
     }
 
     public function collectionTerms(): Collection
