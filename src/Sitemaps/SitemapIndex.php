@@ -1,10 +1,13 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps;
 
 use Illuminate\Support\Collection;
-use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
+use Statamic\Facades\Collection as CollectionFacade;
+use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
+use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
 
 class SitemapIndex
 {

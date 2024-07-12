@@ -1,8 +1,9 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 
 class CustomSitemap extends BaseSitemap
 {

@@ -1,14 +1,17 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Collections;
 
-use Aerni\AdvancedSeo\Actions\Indexable;
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 use Statamic\Contracts\Entries\Collection as EntriesCollection;
 
 class CollectionSitemap extends BaseSitemap
 {
-    public function __construct(protected EntriesCollection $model) {}
+    public function __construct(protected EntriesCollection $model)
+    {
+    }
 
     public function urls(): Collection
     {

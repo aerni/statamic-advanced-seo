@@ -1,10 +1,11 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
-use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Support\Carbon;
 use Statamic\Facades\Site;
+use Illuminate\Support\Carbon;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class CustomSitemapUrl extends BaseSitemapUrl
@@ -18,7 +19,8 @@ class CustomSitemapUrl extends BaseSitemapUrl
         protected ?string $changefreq = null,
         protected ?string $priority = null,
         protected ?string $site = null,
-    ) {}
+    ) {
+    }
 
     public function loc(?string $loc = null): string|self
     {

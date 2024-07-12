@@ -1,14 +1,17 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Actions\Indexable;
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class TaxonomySitemap extends BaseSitemap
 {
-    public function __construct(protected Taxonomy $model) {}
+    public function __construct(protected Taxonomy $model)
+    {
+    }
 
     public function urls(): Collection
     {

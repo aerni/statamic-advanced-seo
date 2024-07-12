@@ -1,9 +1,11 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
 
 class SitemapRepository
 {

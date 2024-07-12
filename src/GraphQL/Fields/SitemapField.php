@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
-use Aerni\AdvancedSeo\Sitemap\SitemapIndex;
+use Aerni\AdvancedSeo\Sitemaps\SitemapIndex;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
@@ -37,7 +37,7 @@ class SitemapField extends Field
 
     public function type(): Type
     {
-        return GraphQl::listOf(GraphQL::type(SeoSitemapType::NAME));
+        return GraphQL::listOf(GraphQL::type(SeoSitemapType::NAME));
     }
 
     public function resolve($root, $args, $context, ResolveInfo $info): ?Collection

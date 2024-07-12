@@ -1,34 +1,25 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
+use Statamic\Facades\URL;
+use Statamic\Facades\Site;
+use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Site;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 
-class TaxonomySitemapUrl extends BaseSitemapUrl
+class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 {
-    protected string $initialSite;
-
     public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap)
     {
-        $this->initialSite = Site::current()->handle();
-
-        // We need to set the site so that we can get to correct URL of the taxonomy.
-        Site::setCurrent($site);
-    }
-
-    public function __destruct()
-    {
-        Site::setCurrent($this->initialSite);
     }
 
     public function loc(): string
     {
-        return $this->absoluteUrl($this->taxonomy);
+        return $this->getUrl($this->taxonomy, $this->site);
     }
 
     public function alternates(): ?array
@@ -43,25 +34,17 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $hreflang = $sites->map(function ($site) {
-            // Set the site so we can get the localized absolute URLs of the taxonomy.
-            Site::setCurrent($site);
-
-            return [
-                'href' => $this->absoluteUrl($this->taxonomy),
-                'hreflang' => Helpers::parseLocale(Site::current()->locale()),
-            ];
-        });
+        $hreflang = $sites->map(fn ($site) => [
+            'href' => $this->getUrl($this->taxonomy, $site),
+            'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
+        ]);
 
         $originSite = $this->taxonomy->sites()->first();
 
         $xDefaultSite = $sites->contains($originSite) ? $originSite : $this->site;
 
-        // Set the site so we can get the localized absolute URL for the x-default.
-        Site::setCurrent($xDefaultSite);
-
         return $hreflang->push([
-            'href' => $this->absoluteUrl($this->taxonomy),
+            'href' => $this->getUrl($this->taxonomy, $xDefaultSite),
             'hreflang' => 'x-default',
         ])->values()->all();
     }
@@ -101,6 +84,20 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     protected function taxonomies(): Collection
     {
-        return $this->sitemap->taxonomies();
+        return $this->sitemap->collectionTaxonomies()
+            ->filter(function ($item) {
+                return $item['taxonomy']->handle() === $this->taxonomy->handle()
+                    && $item['taxonomy']->collection()->handle() === $this->taxonomy->collection()->handle();
+            })
+            ->mapwithKeys(fn ($item) => [$item['site'] => $item['taxonomy']]);
+    }
+
+    protected function getUrl(Taxonomy $taxonomy, string $site): string
+    {
+        $siteUrl = $this->absoluteUrl(Site::get($site));
+        $taxonomyHandle = $taxonomy->handle();
+        $collectionHandle = $taxonomy->collection()->handle();
+
+        return URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}");
     }
 }

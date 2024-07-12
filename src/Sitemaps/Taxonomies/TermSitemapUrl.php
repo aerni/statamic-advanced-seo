@@ -1,16 +1,19 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Actions\Indexable;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 
 class TermSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Term $term, protected TaxonomySitemap $sitemap) {}
+    public function __construct(protected Term $term, protected TaxonomySitemap $sitemap)
+    {
+    }
 
     public function loc(): string
     {
