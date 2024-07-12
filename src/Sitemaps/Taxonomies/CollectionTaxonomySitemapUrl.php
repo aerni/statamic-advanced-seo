@@ -95,6 +95,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
             ->mapwithKeys(fn ($item) => [$item['site'] => $item['taxonomy']]);
     }
 
+    // TODO: Should be able to remove this once https://github.com/statamic/cms/pull/10439 is merged.
     protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
         $siteUrl = $this->absoluteUrl(Site::get($site));

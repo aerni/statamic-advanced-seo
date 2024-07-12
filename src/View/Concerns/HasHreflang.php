@@ -128,6 +128,7 @@ trait HasHreflang
         ])->values()->all();
     }
 
+    // TODO: Should be able to remove this once https://github.com/statamic/cms/pull/10439 is merged.
     protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
         $siteUrl = Site::get($site)->absoluteUrl();
