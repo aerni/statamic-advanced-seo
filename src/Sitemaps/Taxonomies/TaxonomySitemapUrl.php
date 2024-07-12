@@ -69,11 +69,10 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     public function lastmod(): string
     {
-        if ($terms = $this->lastModifiedTaxonomyTerm()) {
-            return $terms->lastModified()->format('Y-m-d\TH:i:sP');
+        if ($term = $this->lastModifiedTaxonomyTerm()) {
+            return $term->lastModified()->format('Y-m-d\TH:i:sP');
         }
 
-        return now()->format('Y-m-d\TH:i:sP');
     }
 
     public function changefreq(): string
@@ -95,8 +94,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
     {
         return $this->taxonomy->queryTerms()
             ->where('site', $this->site)
-            ->get()
-            ->sortByDesc(fn ($term) => $term->lastModified())
+            ->orderByDesc('last_modified')
             ->first();
     }
 
