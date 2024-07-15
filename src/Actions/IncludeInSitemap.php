@@ -18,10 +18,6 @@ class IncludeInSitemap
 
     public function handle(Entry|Term|Taxonomy $model, ?string $locale = null): bool
     {
-        if (! $this->crawlingIsEnabled()) {
-            return false;
-        }
-
         $locale ??= $model->locale();
 
         return Blink::once("{$model->id()}::{$locale}", function () use ($model, $locale) {
@@ -51,15 +47,7 @@ class IncludeInSitemap
 
     protected function modelIsIndexable(Entry|Term|Taxonomy $model, string $locale): bool
     {
-        $config = Seo::find('site', 'indexing')?->in($locale);
-
-        // If there is no config, the sitemap should be indexable.
-        if (is_null($config)) {
-            return true;
-        }
-
-        // If we have a global noindex, the sitemap shouldn't be indexable.
-        if ($config->value('noindex')) {
+        if (! $this->isIndexableSite($locale)) {
             return false;
         }
 
