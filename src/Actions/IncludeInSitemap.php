@@ -22,7 +22,7 @@ class IncludeInSitemap
             return false;
         }
 
-        $locale = $locale ?? $model->locale();
+        $locale ??= $model->locale();
 
         return Blink::once("{$model->id()}::{$locale}", function () use ($model, $locale) {
             return match (true) {
