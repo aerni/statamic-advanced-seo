@@ -10,6 +10,8 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 trait EvaluatesIndexability
 {
+    use EvaluatesContextType;
+
     protected function isIndexable(Context|Entry|LocalizedTerm|Site $model): bool
     {
         return match (true) {
@@ -22,7 +24,7 @@ trait EvaluatesIndexability
 
     protected function isIndexableContext(Context $context): bool
     {
-        $model = $this->contextIsEntryOrTerm()
+        $model = $this->contextIsEntryOrTerm($context)
             ? $context->get('id')->augmentable()
             : $context->get('site');
 

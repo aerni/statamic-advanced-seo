@@ -2,25 +2,26 @@
 
 namespace Aerni\AdvancedSeo\View\Concerns;
 
-use Statamic\Contracts\Entries\Collection;
+use Statamic\Tags\Context;
 use Statamic\Taxonomies\Taxonomy;
+use Statamic\Contracts\Entries\Collection;
 
 trait EvaluatesContextType
 {
-    protected function contextIsEntryOrTerm(): bool
+    protected function contextIsEntryOrTerm(Context $context): bool
     {
-        return $this->model->value('is_entry') || $this->model->value('is_term');
+        return $context->value('is_entry') || $context->value('is_term');
     }
 
-    protected function contextIsTaxonomy(): bool
+    protected function contextIsTaxonomy(Context $context): bool
     {
-        return $this->model->get('page') instanceof Taxonomy
-            && $this->model->get('page')->collection() === null;
+        return $context->get('page') instanceof Taxonomy
+            && $context->get('page')->collection() === null;
     }
 
-    protected function contextIsCollectionTaxonomy(): bool
+    protected function contextIsCollectionTaxonomy(Context $context): bool
     {
-        return $this->model->get('page') instanceof Taxonomy
-            && $this->model->get('page')->collection() instanceof Collection;
+        return $context->get('page') instanceof Taxonomy
+            && $context->get('page')->collection() instanceof Collection;
     }
 }
