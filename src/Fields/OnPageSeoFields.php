@@ -20,8 +20,8 @@ class OnPageSeoFields extends BaseFields
             $this->socialImagesGenerator(),
             $this->openGraphImage(),
             $this->twitterImage(),
-            $this->canonicalUrl(),
             $this->indexing(),
+            $this->canonicalUrl(),
             $this->sitemap(),
             $this->jsonLd(),
         ];
@@ -379,6 +379,50 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
+    protected function indexing(): array
+    {
+        return [
+            [
+                'handle' => 'seo_section_indexing',
+                'field' => [
+                    'type' => 'section',
+                    'display' => $this->trans('seo_section_indexing.display'),
+                    'instructions' => $this->trans('seo_section_indexing.instructions'),
+                ],
+            ],
+            [
+                'handle' => 'seo_noindex',
+                'field' => [
+                    'type' => 'seo_source',
+                    'display' => $this->trans('seo_noindex.display'),
+                    'instructions' => $this->trans('seo_noindex.instructions'),
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'toggle-fieldtype',
+                    'width' => 50,
+                    'field' => [
+                        'type' => 'toggle',
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_nofollow',
+                'field' => [
+                    'type' => 'seo_source',
+                    'display' => $this->trans('seo_nofollow.display'),
+                    'instructions' => $this->trans('seo_nofollow.instructions'),
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'toggle-fieldtype',
+                    'width' => 50,
+                    'field' => [
+                        'type' => 'toggle',
+                    ],
+                ],
+            ],
+        ];
+    }
+
     protected function canonicalUrl(): array
     {
         return [
@@ -459,50 +503,6 @@ class OnPageSeoFields extends BaseFields
                         'validate' => [
                             'required_if:seo_canonical_type,custom',
                         ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function indexing(): array
-    {
-        return [
-            [
-                'handle' => 'seo_section_indexing',
-                'field' => [
-                    'type' => 'section',
-                    'display' => $this->trans('seo_section_indexing.display'),
-                    'instructions' => $this->trans('seo_section_indexing.instructions'),
-                ],
-            ],
-            [
-                'handle' => 'seo_noindex',
-                'field' => [
-                    'type' => 'seo_source',
-                    'display' => $this->trans('seo_noindex.display'),
-                    'instructions' => $this->trans('seo_noindex.instructions'),
-                    'default' => '@default',
-                    'localizable' => true,
-                    'classes' => 'toggle-fieldtype',
-                    'width' => 50,
-                    'field' => [
-                        'type' => 'toggle',
-                    ],
-                ],
-            ],
-            [
-                'handle' => 'seo_nofollow',
-                'field' => [
-                    'type' => 'seo_source',
-                    'display' => $this->trans('seo_nofollow.display'),
-                    'instructions' => $this->trans('seo_nofollow.instructions'),
-                    'default' => '@default',
-                    'localizable' => true,
-                    'classes' => 'toggle-fieldtype',
-                    'width' => 50,
-                    'field' => [
-                        'type' => 'toggle',
                     ],
                 ],
             ],

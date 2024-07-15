@@ -21,8 +21,8 @@ class ContentDefaultsFields extends BaseFields
             $this->socialImagesGenerator(),
             $this->openGraphImage(),
             $this->twitterImage(),
-            $this->canonicalUrl(),
             $this->indexing(),
+            $this->canonicalUrl(),
             $this->sitemap(),
             $this->jsonLd(),
         ];
@@ -283,6 +283,44 @@ class ContentDefaultsFields extends BaseFields
         ];
     }
 
+    protected function indexing(): array
+    {
+        return [
+            [
+                'handle' => 'seo_section_indexing',
+                'field' => [
+                    'type' => 'section',
+                    'display' => $this->trans('seo_section_indexing.display'),
+                    'instructions' => $this->trans('seo_section_indexing.default_instructions'),
+                ],
+            ],
+            [
+                'handle' => 'seo_noindex',
+                'field' => [
+                    'type' => 'toggle',
+                    'display' => $this->trans('seo_noindex.display'),
+                    'instructions' => $this->trans('seo_noindex.default_instructions'),
+                    'default' => Defaults::data('collections')->get('seo_noindex'),
+                    'listable' => 'hidden',
+                    'localizable' => true,
+                    'width' => 50,
+                ],
+            ],
+            [
+                'handle' => 'seo_nofollow',
+                'field' => [
+                    'type' => 'toggle',
+                    'display' => $this->trans('seo_nofollow.display'),
+                    'instructions' => $this->trans('seo_nofollow.default_instructions'),
+                    'default' => Defaults::data('collections')->get('seo_nofollow'),
+                    'listable' => 'hidden',
+                    'localizable' => true,
+                    'width' => 50,
+                ],
+            ],
+        ];
+    }
+
     protected function canonicalUrl(): array
     {
         return [
@@ -342,44 +380,6 @@ class ContentDefaultsFields extends BaseFields
                     'validate' => [
                         'required_if:seo_canonical_type,custom',
                     ],
-                ],
-            ],
-        ];
-    }
-
-    protected function indexing(): array
-    {
-        return [
-            [
-                'handle' => 'seo_section_indexing',
-                'field' => [
-                    'type' => 'section',
-                    'display' => $this->trans('seo_section_indexing.display'),
-                    'instructions' => $this->trans('seo_section_indexing.default_instructions'),
-                ],
-            ],
-            [
-                'handle' => 'seo_noindex',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => $this->trans('seo_noindex.display'),
-                    'instructions' => $this->trans('seo_noindex.default_instructions'),
-                    'default' => Defaults::data('collections')->get('seo_noindex'),
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'width' => 50,
-                ],
-            ],
-            [
-                'handle' => 'seo_nofollow',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => $this->trans('seo_nofollow.display'),
-                    'instructions' => $this->trans('seo_nofollow.default_instructions'),
-                    'default' => Defaults::data('collections')->get('seo_nofollow'),
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'width' => 50,
                 ],
             ],
         ];
