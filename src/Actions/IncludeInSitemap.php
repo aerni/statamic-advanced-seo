@@ -11,7 +11,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
 
 // TODO: Merge this action with the EvaluatesIndexability trait as they are very similar.
-class Indexable
+class IncludeInSitemap
 {
     use AsAction;
     use EvaluatesIndexability;

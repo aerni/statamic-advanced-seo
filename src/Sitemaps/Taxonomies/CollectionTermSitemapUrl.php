@@ -6,7 +6,7 @@ use Statamic\Facades\Site;
 use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 
 class CollectionTermSitemapUrl extends BaseSitemapUrl
@@ -39,7 +39,7 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
         $origin = $this->term->origin();
 
-        $xDefault = Indexable::run($origin) ? $origin : $this->term;
+        $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->term;
 
         return $hreflang->push([
             'href' => $this->absoluteUrl($xDefault),

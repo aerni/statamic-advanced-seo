@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 
@@ -58,7 +58,7 @@ class TaxonomySitemap extends BaseSitemap
         }
 
         return $this->model->sites()
-            ->filter(fn ($site) => Indexable::run($this->model, $site))
+            ->filter(fn ($site) => IncludeInSitemap::run($this->model, $site))
             ->mapWithKeys(fn ($site) => [$site => $this->model]);
     }
 
@@ -72,7 +72,7 @@ class TaxonomySitemap extends BaseSitemap
         }
 
         // We only want indexable terms.
-        return $terms->filter(Indexable::run(...));
+        return $terms->filter(IncludeInSitemap::run(...));
     }
 
     public function collectionTaxonomies(): Collection
@@ -83,7 +83,7 @@ class TaxonomySitemap extends BaseSitemap
                 return $taxonomy->collection()->sites()
                     ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
             })
-            ->filter(fn ($item) => Indexable::run($item['taxonomy'], $item['site']));
+            ->filter(fn ($item) => IncludeInSitemap::run($item['taxonomy'], $item['site']));
     }
 
     public function collectionTerms(): Collection
@@ -99,7 +99,7 @@ class TaxonomySitemap extends BaseSitemap
                 ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
                 ->where('locale', '=', $term->locale()) // We only want entries with the same locale as the term.
                 ->get()
-                ->filter(fn ($entry) => Indexable::run($entry))
+                ->filter(fn ($entry) => IncludeInSitemap::run($entry))
                 ->isNotEmpty();
         })->values();
     }

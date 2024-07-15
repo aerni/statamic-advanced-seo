@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Sitemaps\Collections;
 use Statamic\Facades\Site;
 use Statamic\Contracts\Entries\Entry;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
@@ -35,7 +35,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         $hreflang = $sites
             ->map(fn ($locale) => $this->entry->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
-            ->filter(Indexable::run(...));
+            ->filter(IncludeInSitemap::run(...));
 
         if ($hreflang->count() < 2) {
             return null;
@@ -48,7 +48,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
         $origin = $this->entry->origin() ?? $this->entry;
 
-        $xDefault = Indexable::run($origin) ? $origin : $this->entry;
+        $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->entry;
 
         return $hreflang->push([
             'href' => $this->absoluteUrl($xDefault),

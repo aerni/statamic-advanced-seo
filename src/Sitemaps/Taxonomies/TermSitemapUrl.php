@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 use Statamic\Facades\Site;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 
 class TermSitemapUrl extends BaseSitemapUrl
@@ -27,7 +27,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
         $terms = $this->term->term()
             ->localizations()
-            ->filter(Indexable::run(...));
+            ->filter(IncludeInSitemap::run(...));
 
         if ($terms->count() < 2) {
             return null;
@@ -40,7 +40,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
         $origin = $this->term->origin();
 
-        $xDefault = Indexable::run($origin) ? $origin : $this->term;
+        $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->term;
 
         return $hreflang->push([
             'href' => $this->absoluteUrl($xDefault),
