@@ -27,7 +27,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
         $terms = $this->term->term()
             ->localizations()
-            ->filter(Indexable::handle(...));
+            ->filter(Indexable::run(...));
 
         if ($terms->count() < 2) {
             return null;
@@ -40,7 +40,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
         $origin = $this->term->origin();
 
-        $xDefault = Indexable::handle($origin) ? $origin : $this->term;
+        $xDefault = Indexable::run($origin) ? $origin : $this->term;
 
         return $hreflang->push([
             'href' => $this->absoluteUrl($xDefault),

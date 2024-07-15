@@ -39,7 +39,7 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
         $origin = $this->term->origin();
 
-        $xDefault = Indexable::handle($origin) ? $origin : $this->term;
+        $xDefault = Indexable::run($origin) ? $origin : $this->term;
 
         return $hreflang->push([
             'href' => $this->absoluteUrl($xDefault),

@@ -2,21 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blink;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Concerns\AsAction;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
 
 // TODO: Merge this action with the EvaluatesIndexability trait as they are very similar.
 class Indexable
 {
+    use AsAction;
     use EvaluatesIndexability;
 
-    public static function handle(Entry|Term|Taxonomy $model, ?string $locale = null): bool
+    public function handle(Entry|Term|Taxonomy $model, ?string $locale = null): bool
     {
-        if (! (new self)->crawlingIsEnabled()) {
+        if (! $this->crawlingIsEnabled()) {
             return false;
         }
 
@@ -24,30 +26,30 @@ class Indexable
 
         return Blink::once("{$model->id()}::{$locale}", function () use ($model, $locale) {
             return match (true) {
-                ($model instanceof Entry) => self::isIndexableEntry($model),
-                ($model instanceof Term) => self::isIndexableTerm($model),
-                ($model instanceof Taxonomy) => self::isIndexableTaxonomy($model, $locale),
+                ($model instanceof Entry) => $this->isIndexableEntry($model),
+                ($model instanceof Term) => $this->isIndexableTerm($model),
+                ($model instanceof Taxonomy) => $this->isIndexableTaxonomy($model, $locale),
                 'default' => true,
             };
         });
     }
 
-    protected static function isIndexableEntry(Entry $entry): bool
+    protected function isIndexableEntry(Entry $entry): bool
     {
-        return self::modelIsIndexable($entry, $entry->locale) && self::contentIsIndexable($entry);
+        return $this->modelIsIndexable($entry, $entry->locale) && $this->contentIsIndexable($entry);
     }
 
-    protected static function isIndexableTerm(Term $term): bool
+    protected function isIndexableTerm(Term $term): bool
     {
-        return self::modelIsIndexable($term, $term->locale) && self::contentIsIndexable($term);
+        return $this->modelIsIndexable($term, $term->locale) && $this->contentIsIndexable($term);
     }
 
-    protected static function isIndexableTaxonomy(Taxonomy $taxonomy, string $locale): bool
+    protected function isIndexableTaxonomy(Taxonomy $taxonomy, string $locale): bool
     {
-        return self::modelIsIndexable($taxonomy, $locale);
+        return $this->modelIsIndexable($taxonomy, $locale);
     }
 
-    protected static function modelIsIndexable(Entry|Term|Taxonomy $model, string $locale): bool
+    protected function modelIsIndexable(Entry|Term|Taxonomy $model, string $locale): bool
     {
         $config = Seo::find('site', 'indexing')?->in($locale);
 
@@ -71,7 +73,7 @@ class Indexable
         return ! in_array($handle, $excluded);
     }
 
-    protected static function contentIsIndexable(Entry|Term $model): bool
+    protected function contentIsIndexable(Entry|Term $model): bool
     {
         // Don't index models that are not published.
         if ($model->published() === false) {
