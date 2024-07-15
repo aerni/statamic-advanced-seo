@@ -51,14 +51,13 @@ class IncludeInSitemap
             return false;
         }
 
-        $type = EvaluateModelType::handle($model);
-        $handle = EvaluateModelHandle::handle($model);
-
         // Check if the collection/taxonomy is set to be excluded from the sitemap
-        $excluded = $config->value("excluded_{$type}") ?? [];
+        $excluded = Seo::find('site', 'indexing')
+            ?->in($locale)
+            ?->value('excluded_'.EvaluateModelType::handle($model)) ?? [];
 
         // If the collection/taxonomy is excluded, the sitemap shouldn't be indexable.
-        return ! in_array($handle, $excluded);
+        return ! in_array(EvaluateModelHandle::handle($model), $excluded);
     }
 
     protected function contentIsIndexable(Entry|Term $model): bool
