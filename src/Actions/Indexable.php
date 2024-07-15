@@ -49,16 +49,6 @@ class Indexable
 
     protected static function modelIsIndexable(Entry|Term|Taxonomy $model, string $locale): bool
     {
-        $type = EvaluateModelType::handle($model);
-        $handle = EvaluateModelHandle::handle($model);
-
-        $disabled = config("advanced-seo.disabled.{$type}", []);
-
-        // Check if the collection/taxonomy is set to be disabled globally.
-        if (in_array($handle, $disabled)) {
-            return false;
-        }
-
         $config = Seo::find('site', 'indexing')?->in($locale);
 
         // If there is no config, the sitemap should be indexable.
@@ -70,6 +60,9 @@ class Indexable
         if ($config->value('noindex')) {
             return false;
         }
+
+        $type = EvaluateModelType::handle($model);
+        $handle = EvaluateModelHandle::handle($model);
 
         // Check if the collection/taxonomy is set to be excluded from the sitemap
         $excluded = $config->value("excluded_{$type}") ?? [];

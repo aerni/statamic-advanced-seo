@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
+use Aerni\AdvancedSeo\Actions\IsEnabledModel;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
@@ -30,12 +31,18 @@ class SitemapIndex
 
     public function collectionSitemaps(): Collection
     {
-        return CollectionFacade::all()->map(fn ($collection) => new CollectionSitemap($collection));
+        return CollectionFacade::all()
+            ->filter(IsEnabledModel::handle(...))
+            ->map(fn ($collection) => new CollectionSitemap($collection))
+            ->values();
     }
 
     public function taxonomySitemaps(): Collection
     {
-        return TaxonomyFacade::all()->map(fn ($taxonomy) => new TaxonomySitemap($taxonomy));
+        return TaxonomyFacade::all()
+            ->filter(IsEnabledModel::handle(...))
+            ->map(fn ($taxonomy) => new TaxonomySitemap($taxonomy))
+            ->values();
     }
 
     public function customSitemaps(): Collection
