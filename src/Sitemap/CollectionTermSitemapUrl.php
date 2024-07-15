@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Statamic\Facades\Site;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
 
 class CollectionTermSitemapUrl extends BaseSitemapUrl
 {
