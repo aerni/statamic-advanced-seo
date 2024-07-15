@@ -11,16 +11,19 @@ use Statamic\Facades\Site;
 
 class TaxonomySitemapUrl extends BaseSitemapUrl
 {
+    protected string $initialSite;
+
     public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap)
     {
+        $this->initialSite = Site::current()->handle();
+
         // We need to set the site so that we can get to correct URL of the taxonomy.
-        $this->previousSite = Site::current()->handle();
         Site::setCurrent($site);
     }
 
     public function __destruct()
     {
-        Site::setCurrent($this->previousSite);
+        Site::setCurrent($this->initialSite);
     }
 
     public function loc(): string
@@ -34,30 +37,33 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $taxonomies = $this->taxonomies();
+        $sites = $this->taxonomies()->keys();
 
-        // We only want alternate URLs if there are at least two terms.
-        if ($taxonomies->count() <= 1) {
+        if ($sites->count() < 2) {
             return null;
         }
 
-        $hreflang = $taxonomies->map(function ($taxonomy, $site) {
-            // We need to set the site so that we can get to correct URL of the taxonomy.
+        $hreflang = $sites->map(function ($site) {
+            // Set the site so we can get the localized absolute URLs of the taxonomy.
             Site::setCurrent($site);
 
             return [
+                'href' => $this->absoluteUrl($this->taxonomy),
                 'hreflang' => Helpers::parseLocale(Site::current()->locale()),
-                'href' => $this->absoluteUrl($taxonomy),
             ];
         });
 
-        // We need to set the site to the taxonomy origin site so that we can get to correct URL of the taxonomy.
-        Site::setCurrent($this->taxonomy->sites()->first());
+        $originSite = $this->taxonomy->sites()->first();
 
-        return $hreflang->put('x-default', [
-            'hreflang' => 'x-default',
+        $xDefaultSite = $sites->contains($originSite) ? $originSite : $this->site;
+
+        // Set the site so we can get the localized absolute URL for the x-default.
+        Site::setCurrent($xDefaultSite);
+
+        return $hreflang->push([
             'href' => $this->absoluteUrl($this->taxonomy),
-        ])->toArray();
+            'hreflang' => 'x-default',
+        ])->values()->all();
     }
 
     public function lastmod(): string

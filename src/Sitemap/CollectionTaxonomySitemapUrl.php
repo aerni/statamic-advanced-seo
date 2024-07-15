@@ -25,24 +25,25 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $taxonomies = $this->taxonomies();
+        $sites = $this->taxonomies()->keys();
 
-        // We only want alternate URLs if there are at least two terms.
-        if ($taxonomies->count() <= 1) {
+        if ($sites->count() < 2) {
             return null;
         }
 
-        return $taxonomies->map(function ($taxonomy, $site) {
-            return [
-                'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
-                'href' => $this->getUrl($taxonomy, $site),
-            ];
-        })
-            ->put('x-default', [
-                'hreflang' => 'x-default',
-                'href' => $this->getUrl($this->taxonomy, $this->taxonomy->sites()->first()),
-            ])
-            ->toArray();
+        $hreflang = $sites->map(fn ($site) => [
+            'href' => $this->getUrl($this->taxonomy, $site),
+            'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
+        ]);
+
+        $originSite = $this->taxonomy->sites()->first();
+
+        $xDefaultSite = $sites->contains($originSite) ? $originSite : $this->site;
+
+        return $hreflang->push([
+            'href' => $this->getUrl($this->taxonomy, $xDefaultSite),
+            'hreflang' => 'x-default',
+        ])->values()->all();
     }
 
     public function lastmod(): string

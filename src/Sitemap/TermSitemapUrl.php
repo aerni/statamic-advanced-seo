@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Sitemap;
 
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Actions\Indexable;
 
 class TermSitemapUrl extends BaseSitemapUrl
 {
@@ -24,20 +25,23 @@ class TermSitemapUrl extends BaseSitemapUrl
 
         $terms = $this->terms();
 
-        // We only want alternate URLs if there are at least two terms.
-        if ($terms->count() <= 1) {
+        if ($terms->count() < 2) {
             return null;
         }
 
-        return $terms->map(fn ($term) => [
-            'hreflang' => Helpers::parseLocale(Site::get($term->locale())->locale()),
+        $hreflang = $terms->map(fn ($term) => [
             'href' => $this->absoluteUrl($term),
-        ])
-            ->put('x-default', [
-                'hreflang' => 'x-default',
-                'href' => $this->absoluteUrl($this->term->origin()),
-            ])
-            ->toArray();
+            'hreflang' => Helpers::parseLocale($term->site()->locale()),
+        ]);
+
+        $origin = $this->term->origin();
+
+        $xDefault = Indexable::handle($origin) ? $origin : $this->term;
+
+        return $hreflang->push([
+            'href' => $this->absoluteUrl($xDefault),
+            'hreflang' => 'x-default',
+        ])->values()->all();
     }
 
     public function lastmod(): string
@@ -71,7 +75,8 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     protected function terms(): Collection
     {
-        return $this->sitemap->terms($this->term->taxonomy())
+        return $this->sitemap
+            ->terms($this->term->taxonomy())
             ->filter(fn ($term) => $term->id() === $this->term->id());
     }
 }
