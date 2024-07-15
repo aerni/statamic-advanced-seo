@@ -388,6 +388,9 @@ class OnPageSeoFields extends BaseFields
                     'type' => 'section',
                     'display' => $this->trans('seo_section_canonical_url.display'),
                     'instructions' => $this->trans('seo_section_canonical_url.instructions'),
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
                 ],
             ],
             [
@@ -399,6 +402,9 @@ class OnPageSeoFields extends BaseFields
                     'default' => '@default',
                     'localizable' => true,
                     'classes' => 'button_group-fieldtype',
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
                     'field' => [
                         'type' => 'button_group',
                         'options' => [
@@ -419,6 +425,7 @@ class OnPageSeoFields extends BaseFields
                     'localizable' => true,
                     'classes' => 'relationship-fieldtype',
                     'if' => [
+                        'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals other',
                     ],
                     'field' => [
@@ -443,6 +450,7 @@ class OnPageSeoFields extends BaseFields
                     'classes' => 'text-fieldtype',
                     'antlers' => true,
                     'if' => [
+                        'seo_noindex.value' => 'false',
                         'seo_canonical_type.value' => 'equals custom',
                     ],
                     'field' => [
