@@ -50,7 +50,6 @@ class TaxonomySitemap extends BaseSitemap
 
     public function taxonomies(): Collection
     {
-        // We only want to return the taxonomy if the template exists.
         if (! view()->exists($this->model->template())) {
             return collect();
         }
@@ -64,12 +63,10 @@ class TaxonomySitemap extends BaseSitemap
     {
         $terms = $taxonomy->queryTerms()->get();
 
-        // We only want to return the terms if the template exists.
         if (! view()->exists($terms->first()?->template())) {
             return collect();
         }
 
-        // We only want indexable terms.
         return $terms->filter(IncludeInSitemap::run(...));
     }
 
