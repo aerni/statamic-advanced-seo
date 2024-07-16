@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
+use Illuminate\Support\Collection;
 
 class CustomSitemap extends BaseSitemap
 {

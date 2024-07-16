@@ -2,21 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 
 class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap)
-    {
-    }
+    public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap) {}
 
     public function loc(): string
     {

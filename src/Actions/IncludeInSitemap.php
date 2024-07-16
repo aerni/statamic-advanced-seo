@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Facades\Blink;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Concerns\AsAction;
-use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
 
 class IncludeInSitemap
 {

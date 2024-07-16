@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
+use Illuminate\Support\Collection;
 
 class SitemapRepository
 {

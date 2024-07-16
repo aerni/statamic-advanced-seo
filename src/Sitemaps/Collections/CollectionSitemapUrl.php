@@ -2,17 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Collections;
 
-use Statamic\Facades\Site;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\Site;
 
 class CollectionSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap)
-    {
-    }
+    public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap) {}
 
     public function loc(): string
     {

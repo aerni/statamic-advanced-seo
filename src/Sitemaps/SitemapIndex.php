@@ -3,12 +3,12 @@
 namespace Aerni\AdvancedSeo\Sitemaps;
 
 use Aerni\AdvancedSeo\Actions\IsEnabledModel;
-use Illuminate\Support\Collection;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
-use Statamic\Facades\Collection as CollectionFacade;
-use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
 class SitemapIndex
 {

@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\View\Concerns;
 
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Tags\Context;
 use Statamic\Taxonomies\Taxonomy;
-use Statamic\Contracts\Entries\Collection;
 
 trait EvaluatesContextType
 {

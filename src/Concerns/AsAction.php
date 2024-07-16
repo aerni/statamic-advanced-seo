@@ -14,7 +14,8 @@ trait AsAction
 
     /**
      * @see static::handle()
-     * @param mixed ...$arguments
+     *
+     * @param  mixed  ...$arguments
      * @return mixed
      */
     public static function run(...$arguments)
