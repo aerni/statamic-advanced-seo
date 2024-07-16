@@ -86,20 +86,14 @@ class TaxonomySitemap extends BaseSitemap
 
     public function collectionTerms(): Collection
     {
-        // Get the terms of each collection taxonomy.
-        $collectionTerms = $this->taxonomyCollections()
-            ->flatMap(fn ($taxonomy) => $this->terms($taxonomy));
+        $terms = $this->model->queryTerms()->get();
 
-        // Filter the terms by the entries they are used on.
-        return $collectionTerms->filter(function ($term) {
-            return $term->queryEntries()
-                ->where('published', '!=', false) // We only want published entries.
-                ->where('uri', '!=', null) // We only want entries that have a route. This works for both single and per-site collection routes.
-                ->where('locale', '=', $term->locale()) // We only want entries with the same locale as the term.
-                ->get()
-                ->filter(fn ($entry) => IncludeInSitemap::run($entry))
-                ->isNotEmpty();
-        })->values();
+        return $this->model->collections()
+            ->flatMap(function ($collection) use ($terms) {
+                return $terms->map(fn ($term) => $term->fresh()->collection($collection));
+            })
+            ->filter(fn ($term) => view()->exists($term->template()))
+            ->filter(fn ($term) => IncludeInSitemap::run($term->taxonomy(), $term->locale()));
     }
 
     /**
