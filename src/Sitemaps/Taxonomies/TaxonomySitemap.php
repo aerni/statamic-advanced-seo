@@ -16,14 +16,14 @@ class TaxonomySitemap extends BaseSitemap
         return $this->taxonomyUrls()
             ->merge($this->collectionTaxonomyUrls())
             ->merge($this->termUrls())
-            ->merge($this->collectionTermUrls())
-            ->values();
+            ->merge($this->collectionTermUrls());
     }
 
     protected function taxonomyUrls(): Collection
     {
         return $this->taxonomies()
             ->map(fn ($taxonomy, $site) => (new TaxonomySitemapUrl($taxonomy, $site, $this))->toArray())
+            ->filter()
             ->values();
     }
 
@@ -31,21 +31,24 @@ class TaxonomySitemap extends BaseSitemap
     {
         return $this->collectionTaxonomies()
             ->map(fn ($item) => (new CollectionTaxonomySitemapUrl($item['taxonomy'], $item['site'], $this))->toArray())
-            ->filter();
+            ->filter()
+            ->values();
     }
 
     protected function termUrls(): Collection
     {
         return $this->terms($this->model)
             ->map(fn ($term) => (new TermSitemapUrl($term, $this))->toArray())
-            ->filter();
+            ->filter()
+            ->values();
     }
 
     protected function collectionTermUrls(): Collection
     {
         return $this->collectionTerms()
             ->map(fn ($term) => (new CollectionTermSitemapUrl($term, $this))->toArray())
-            ->filter();
+            ->filter()
+            ->values();
     }
 
     public function taxonomies(): Collection
