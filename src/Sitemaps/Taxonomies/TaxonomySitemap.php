@@ -37,7 +37,7 @@ class TaxonomySitemap extends BaseSitemap
 
     protected function termUrls(): Collection
     {
-        return $this->terms($this->model)
+        return $this->terms()
             ->map(fn ($term) => (new TermSitemapUrl($term, $this))->toArray())
             ->filter()
             ->values();
@@ -62,9 +62,9 @@ class TaxonomySitemap extends BaseSitemap
             ->mapWithKeys(fn ($site) => [$site => $this->model]);
     }
 
-    public function terms(Taxonomy $taxonomy): Collection
+    protected function terms(): Collection
     {
-        $terms = $taxonomy->queryTerms()->get();
+        $terms = $this->model->queryTerms()->get();
 
         if (! view()->exists($terms->first()?->template())) {
             return collect();
