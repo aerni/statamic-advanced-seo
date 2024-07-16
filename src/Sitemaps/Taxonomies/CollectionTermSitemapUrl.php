@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Statamic\Facades\Site;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Taxonomies\Term;
-use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
 
 class CollectionTermSitemapUrl extends BaseSitemapUrl
 {
