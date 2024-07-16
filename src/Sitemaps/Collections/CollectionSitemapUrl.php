@@ -72,7 +72,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
     public function site(): string
     {
-        return $this->entry->site()->handle();
+        return $this->entry->locale();
     }
 
     public function isCanonicalUrl(): bool
