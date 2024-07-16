@@ -10,7 +10,6 @@ use Aerni\AdvancedSeo\Concerns\AsAction;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
 
-// TODO: Merge this action with the EvaluatesIndexability trait as they are very similar.
 class IncludeInSitemap
 {
     use AsAction;
@@ -20,42 +19,25 @@ class IncludeInSitemap
     {
         $locale ??= $model->locale();
 
-        return Blink::once("{$model->id()}::{$locale}", function () use ($model, $locale) {
-            return match (true) {
-                ($model instanceof Entry) => $this->isIndexableEntry($model),
-                ($model instanceof Term) => $this->isIndexableTerm($model),
-                ($model instanceof Taxonomy) => $this->isIndexableTaxonomy($model, $locale),
-                'default' => true,
-            };
+        return Blink::once("{$model->id()}::{$locale}", fn () => match (true) {
+            $model instanceof Entry => $this->includeEntryOrTermInSitemap($model),
+            $model instanceof Term => $this->includeEntryOrTermInSitemap($model),
+            $model instanceof Taxonomy => $this->includeTaxonomyInSitemap($model, $locale)
         });
     }
 
-    protected function isIndexableEntry(Entry $entry): bool
+    protected function includeEntryOrTermInSitemap(Entry|Term $model): bool
     {
-        return $this->modelIsIndexable($entry, $entry->locale) && $this->contentIsIndexable($entry);
+        return ! $this->isExcludedFromSitemap($model, $model->locale)
+            && $this->isIndexableEntryOrTerm($model)
+            && $model->seo_sitemap_enabled
+            && $model->seo_canonical_type == 'current';
     }
 
-    protected function isIndexableTerm(Term $term): bool
+    protected function includeTaxonomyInSitemap(Taxonomy $taxonomy, string $locale): bool
     {
-        return $this->modelIsIndexable($term, $term->locale) && $this->contentIsIndexable($term);
-    }
-
-    protected function isIndexableTaxonomy(Taxonomy $taxonomy, string $locale): bool
-    {
-        return $this->modelIsIndexable($taxonomy, $locale);
-    }
-
-    protected function modelIsIndexable(Entry|Term|Taxonomy $model, string $locale): bool
-    {
-        if (! $this->isIndexableSite($locale)) {
-            return false;
-        }
-
-        if ($this->isExcludedFromSitemap($model, $locale)) {
-            return false;
-        }
-
-        return true;
+        return ! $this->isExcludedFromSitemap($taxonomy, $locale)
+            && $this->isIndexableSite($locale);
     }
 
     protected function isExcludedFromSitemap(Entry|Term|Taxonomy $model, string $locale): bool
@@ -65,35 +47,5 @@ class IncludeInSitemap
             ?->value('excluded_'.EvaluateModelType::handle($model)) ?? [];
 
         return in_array(EvaluateModelHandle::handle($model), $excluded);
-    }
-
-    protected function contentIsIndexable(Entry|Term $model): bool
-    {
-        // Don't index models that are not published.
-        if ($model->published() === false) {
-            return false;
-        }
-
-        // Don't index models that have no URI.
-        if ($model->uri() === null) {
-            return false;
-        }
-
-        // If the sitemap is disabled, we shouldn't index the model.
-        if (! $model->seo_sitemap_enabled) {
-            return false;
-        }
-
-        // Check if noindex is enabled.
-        if ($model->seo_noindex) {
-            return false;
-        }
-
-        // If the canonical type isn't current, we shouldn't index the model.
-        if ($model->seo_canonical_type != 'current') {
-            return false;
-        }
-
-        return true;
     }
 }
