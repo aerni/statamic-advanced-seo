@@ -141,11 +141,8 @@ trait HasHreflang
 
     protected function shouldIncludeHreflang(Entry|LocalizedTerm $model): bool
     {
-        if ($this->canonicalPointsToAnotherUrl($model)) {
-            return false;
-        }
-
-        return $this->isIndexable($model);
+        return ! $this->canonicalPointsToAnotherUrl($model)
+            && $this->isIndexableEntryOrTerm($model);
     }
 
     protected function canonicalPointsToAnotherUrl(Entry|LocalizedTerm $model): bool
