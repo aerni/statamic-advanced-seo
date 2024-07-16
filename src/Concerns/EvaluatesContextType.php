@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\View\Concerns;
+namespace Aerni\AdvancedSeo\Concerns;
 
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Tags\Context;

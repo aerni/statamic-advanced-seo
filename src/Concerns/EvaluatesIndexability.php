@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\View\Concerns;
+namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;

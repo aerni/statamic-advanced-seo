@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Concerns\AsAction;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
+use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;

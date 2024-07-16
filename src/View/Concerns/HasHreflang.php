@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\View\Concerns;
 
-use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Taxonomies\LocalizedTerm;
+use Statamic\Facades\Site;
 use Statamic\Taxonomies\Taxonomy;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Taxonomies\LocalizedTerm;
+use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 
 trait HasHreflang
 {
