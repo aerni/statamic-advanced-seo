@@ -75,7 +75,18 @@ class TaxonomySitemap extends BaseSitemap
 
     public function collectionTaxonomies(): Collection
     {
-        return $this->taxonomyCollections()
+        /**
+         * Get all the collections that use this taxonomy and attach each collection
+         * to a new instance of the taxonomy so that we can get the correct absolute URL
+         * of the collection terms later.
+         */
+        $taxonomyCollections = $this->model->collections()->map(function ($collection) {
+            return $collection->taxonomies()
+                ->first(fn ($taxonomy) => $taxonomy->handle() === $this->handle())
+                ->collection($collection);
+        });
+
+        return $taxonomyCollections
             ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
             ->flatMap(function ($taxonomy) {
                 return $taxonomy->collection()->sites()
@@ -94,19 +105,5 @@ class TaxonomySitemap extends BaseSitemap
             })
             ->filter(fn ($term) => view()->exists($term->template()))
             ->filter(fn ($term) => IncludeInSitemap::run($term->taxonomy(), $term->locale()));
-    }
-
-    /**
-     * Get all the collections that use this taxonomy and attach the each collection
-     * to a new instance of the taxonomy so that we can get the correct absolute URL
-     * of the collection terms later.
-     */
-    protected function taxonomyCollections(): Collection
-    {
-        return $this->model->collections()->map(function ($collection) {
-            return $collection->taxonomies()
-                ->first(fn ($taxonomy) => $taxonomy->handle() === $this->handle())
-                ->collection($collection);
-        });
     }
 }
