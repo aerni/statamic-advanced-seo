@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
-use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Contracts\Taxonomies\Term;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 
 class CollectionTermSitemapUrl extends BaseSitemapUrl
 {
@@ -52,23 +53,17 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
     public function changefreq(): string
     {
-        return $this->term->seo_sitemap_change_frequency;
+        return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
     }
 
     public function priority(): string
     {
-        // Make sure we actually return `0.0` and `1.0`.
-        return number_format($this->term->seo_sitemap_priority->value(), 1);
+        return Defaults::data('taxonomies')->get('seo_sitemap_priority');
     }
 
     public function site(): string
     {
         return $this->term->locale();
-    }
-
-    public function isCanonicalUrl(): bool
-    {
-        return $this->term->seo_canonical_type == 'current';
     }
 
     protected function terms(): Collection
