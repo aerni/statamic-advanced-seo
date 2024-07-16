@@ -8,7 +8,7 @@ use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 
-class CollectionSitemapUrl extends BaseSitemapUrl
+class EntrySitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap) {}
 
