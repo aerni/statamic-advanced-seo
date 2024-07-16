@@ -39,13 +39,10 @@ trait EvaluatesIndexability
             && ! $model->seo_noindex; // Models with noindex should not be indexed.
     }
 
-    protected function isIndexableSite(string $locale): bool
+    protected function isIndexableSite(string $site): bool
     {
-        if (! $this->crawlingIsEnabled()) {
-            return false;
-        }
-
-        return ! Seo::find('site', 'indexing')?->in($locale)?->noindex;
+        return $this->crawlingIsEnabled()
+            && ! Seo::find('site', 'indexing')?->in($site)?->noindex;
     }
 
     protected function crawlingIsEnabled(): bool
