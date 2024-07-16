@@ -140,8 +140,8 @@ return [
 
     'seo_canonical_custom' => [
         'display' => 'URL',
-        'instructions' => 'A fully qualified URL starting with https://.',
-        'default_instructions' => 'A fully qualified URL starting with https://.',
+        'instructions' => 'A fully qualified and [active URL](https://laravel.com/docs/11.x/validation#rule-active-url).',
+        'default_instructions' => 'A fully qualified and [active URL](https://laravel.com/docs/11.x/validation#rule-active-url).',
     ],
 
     'seo_section_indexing' => [

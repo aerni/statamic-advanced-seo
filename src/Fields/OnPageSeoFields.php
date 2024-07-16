@@ -502,6 +502,7 @@ class OnPageSeoFields extends BaseFields
                         'input_type' => 'url',
                         'validate' => [
                             'required_if:seo_canonical_type,custom',
+                            'active_url',
                         ],
                     ],
                 ],
