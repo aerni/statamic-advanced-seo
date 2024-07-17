@@ -2,12 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
-use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Statamic\Facades\URL;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use Statamic\Facades\URL;
+use Statamic\Contracts\Query\Builder;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Sitemap
@@ -50,6 +51,16 @@ abstract class BaseSitemap implements Sitemap
     {
         Cache::forget('advanced-seo::sitemaps::index');
         Cache::forget("advanced-seo::sitemaps::{$this->id()}");
+    }
+
+    protected function includeInSitemapQuery(Builder $query): Builder
+    {
+        return $query
+            ->where('published', true)
+            ->whereNotNull('url')
+            ->where('seo_noindex', false)
+            ->where('seo_sitemap_enabled', true)
+            ->where('seo_canonical_type', 'current');
     }
 
     public function __call(string $name, array $arguments): mixed
