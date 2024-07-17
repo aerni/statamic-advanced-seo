@@ -94,9 +94,16 @@ class TaxonomySitemap extends BaseSitemap
 
         return $this->model->collections()
             ->flatMap(function ($collection) use ($terms) {
-                return $terms->map(fn ($term) => $term->fresh()->collection($collection));
+                return $terms->map(fn ($term) => $term->fresh()->collection($collection)); // Need to get a fresh instance of the Term, else we'll override the previously set collection.
             })
             ->filter(fn ($term) => view()->exists($term->template()))
+            ->filter(function ($term) {
+                // Only allow sites that have been set on both the taxonomy and the collection
+                return $term->taxonomy()->sites()
+                    ->merge($term->collection()->sites())
+                    ->duplicates()
+                    ->contains($term->locale());
+            })
             ->filter(fn ($term) => IncludeInSitemap::run($term->taxonomy(), $term->locale()));
     }
 
