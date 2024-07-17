@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Statamic\Facades\URL;
-use Illuminate\Support\Str;
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Query\Builder;
-use Aerni\AdvancedSeo\Contracts\Sitemap;
-use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
+use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Sitemap
