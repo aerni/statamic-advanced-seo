@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
-use Statamic\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Field;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Facades\Sitemap;
-use GraphQL\Type\Definition\ResolveInfo;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
+use Rebing\GraphQL\Support\Field;
+use Statamic\Facades\GraphQL;
 
 class SitemapField extends Field
 {
