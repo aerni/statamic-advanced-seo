@@ -2,15 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
+use Illuminate\Support\Str;
+use Statamic\Facades\Taxonomy;
 use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Actions\IsEnabledModel;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
+use Statamic\Facades\Collection as CollectionFacade;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
-use Statamic\Facades\Collection as CollectionFacade;
-use Statamic\Facades\Taxonomy;
 
 class SitemapRepository
 {
@@ -43,7 +44,9 @@ class SitemapRepository
 
     public function find(string $id): ?Sitemap
     {
-        return $this->all()->first(fn ($sitemap) => $id === $sitemap->id());
+        $method = Str::before($id, '::') . 'Sitemaps';
+
+        return $this->$method()->first(fn ($sitemap) => $id === $sitemap->id());
     }
 
     public function collectionSitemaps(): Collection
