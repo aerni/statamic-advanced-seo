@@ -55,7 +55,7 @@ class SitemapController extends Controller
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        $path = __DIR__.'/../../../../resources/xsl/sitemap.xsl';
+        $path = __DIR__.'/../../../../resources/views/sitemaps/sitemap.xsl';
 
         return response(file_get_contents($path))->withHeaders([
             'Content-Type' => 'text/xsl',
