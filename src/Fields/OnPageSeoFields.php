@@ -20,8 +20,8 @@ class OnPageSeoFields extends BaseFields
             $this->socialImagesGenerator(),
             $this->openGraphImage(),
             $this->twitterImage(),
-            $this->canonicalUrl(),
             $this->indexing(),
+            $this->canonicalUrl(),
             $this->sitemap(),
             $this->jsonLd(),
         ];
@@ -379,84 +379,6 @@ class OnPageSeoFields extends BaseFields
         ];
     }
 
-    protected function canonicalUrl(): array
-    {
-        return [
-            [
-                'handle' => 'seo_section_canonical_url',
-                'field' => [
-                    'type' => 'section',
-                    'display' => $this->trans('seo_section_canonical_url.display'),
-                    'instructions' => $this->trans('seo_section_canonical_url.instructions'),
-                ],
-            ],
-            [
-                'handle' => 'seo_canonical_type',
-                'field' => [
-                    'type' => 'seo_source',
-                    'display' => $this->trans('seo_canonical_type.display'),
-                    'instructions' => $this->trans('seo_canonical_type.instructions'),
-                    'default' => '@default',
-                    'localizable' => true,
-                    'classes' => 'button_group-fieldtype',
-                    'field' => [
-                        'type' => 'button_group',
-                        'options' => [
-                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->typePlaceholder()))]),
-                            'other' => $this->trans('seo_canonical_type.other'),
-                            'custom' => $this->trans('seo_canonical_type.custom'),
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'handle' => 'seo_canonical_entry',
-                'field' => [
-                    'type' => 'seo_source',
-                    'display' => $this->trans('seo_canonical_entry.display'),
-                    'instructions' => $this->trans('seo_canonical_entry.instructions'),
-                    'default' => '@default',
-                    'localizable' => true,
-                    'classes' => 'relationship-fieldtype',
-                    'if' => [
-                        'seo_canonical_type.value' => 'equals other',
-                    ],
-                    'field' => [
-                        'type' => 'entries',
-                        'component' => 'relationship',
-                        'mode' => 'stack',
-                        'max_items' => 1,
-                        'validate' => [
-                            'required_if:seo_canonical_type,other',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'handle' => 'seo_canonical_custom',
-                'field' => [
-                    'type' => 'seo_source',
-                    'display' => $this->trans('seo_canonical_custom.display'),
-                    'instructions' => $this->trans('seo_canonical_custom.instructions'),
-                    'default' => '@default',
-                    'localizable' => true,
-                    'classes' => 'text-fieldtype',
-                    'antlers' => true,
-                    'if' => [
-                        'seo_canonical_type.value' => 'equals custom',
-                    ],
-                    'field' => [
-                        'type' => 'text',
-                        'input_type' => 'url',
-                        'validate' => [
-                            'required_if:seo_canonical_type,custom',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
     protected function indexing(): array
     {
         return [
@@ -495,6 +417,93 @@ class OnPageSeoFields extends BaseFields
                     'width' => 50,
                     'field' => [
                         'type' => 'toggle',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function canonicalUrl(): array
+    {
+        return [
+            [
+                'handle' => 'seo_section_canonical_url',
+                'field' => [
+                    'type' => 'section',
+                    'display' => $this->trans('seo_section_canonical_url.display'),
+                    'instructions' => $this->trans('seo_section_canonical_url.instructions'),
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_canonical_type',
+                'field' => [
+                    'type' => 'seo_source',
+                    'display' => $this->trans('seo_canonical_type.display'),
+                    'instructions' => $this->trans('seo_canonical_type.instructions'),
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'button_group-fieldtype',
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                    ],
+                    'field' => [
+                        'type' => 'button_group',
+                        'options' => [
+                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->typePlaceholder()))]),
+                            'other' => $this->trans('seo_canonical_type.other'),
+                            'custom' => $this->trans('seo_canonical_type.custom'),
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_canonical_entry',
+                'field' => [
+                    'type' => 'seo_source',
+                    'display' => $this->trans('seo_canonical_entry.display'),
+                    'instructions' => $this->trans('seo_canonical_entry.instructions'),
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'relationship-fieldtype',
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                        'seo_canonical_type.value' => 'equals other',
+                    ],
+                    'field' => [
+                        'type' => 'entries',
+                        'component' => 'relationship',
+                        'mode' => 'stack',
+                        'max_items' => 1,
+                        'validate' => [
+                            'required_if:seo_canonical_type,other',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'handle' => 'seo_canonical_custom',
+                'field' => [
+                    'type' => 'seo_source',
+                    'display' => $this->trans('seo_canonical_custom.display'),
+                    'instructions' => $this->trans('seo_canonical_custom.instructions'),
+                    'default' => '@default',
+                    'localizable' => true,
+                    'classes' => 'text-fieldtype',
+                    'antlers' => true,
+                    'if' => [
+                        'seo_noindex.value' => 'false',
+                        'seo_canonical_type.value' => 'equals custom',
+                    ],
+                    'field' => [
+                        'type' => 'text',
+                        'input_type' => 'url',
+                        'validate' => [
+                            'required_if:seo_canonical_type,custom',
+                            'active_url',
+                        ],
                     ],
                 ],
             ],

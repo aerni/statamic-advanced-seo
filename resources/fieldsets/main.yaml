@@ -9,9 +9,9 @@ fields:
   -
     import: 'advanced-seo::twitter'
   -
-    import: 'advanced-seo::canonical_url'
-  -
     import: 'advanced-seo::indexing'
+  -
+    import: 'advanced-seo::canonical_url'
   -
     import: 'advanced-seo::sitemap'
   -

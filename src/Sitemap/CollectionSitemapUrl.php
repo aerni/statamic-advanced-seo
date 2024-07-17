@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Sitemap;
 
 use Aerni\AdvancedSeo\Actions\Indexable;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 
@@ -19,22 +18,42 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
     public function alternates(): ?array
     {
-        $entries = $this->entries();
-
-        // We only want alternate URLs if there are at least two entries.
-        if ($entries->count() <= 1) {
+        if (! Site::multiEnabled()) {
             return null;
         }
 
-        return $entries->map(fn ($entry) => [
-            'hreflang' => Helpers::parseLocale(Site::get($entry->locale())->locale()),
-            'href' => $this->absoluteUrl($entry),
-        ])
-            ->put('x-default', [
-                'hreflang' => 'x-default',
-                'href' => $this->absoluteUrl($this->entry->origin() ?? $this->entry),
-            ])
-            ->toArray();
+        if (! Indexable::handle($this->entry)) {
+            return null;
+        }
+
+        $sites = $this->entry->sites();
+
+        if ($sites->count() < 2) {
+            return null;
+        }
+
+        $hreflang = $sites
+            ->map(fn ($locale) => $this->entry->in($locale))
+            ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
+            ->filter(Indexable::handle(...));
+
+        if ($hreflang->count() < 2) {
+            return null;
+        }
+
+        $hreflang->transform(fn ($model) => [
+            'href' => $this->absoluteUrl($model),
+            'hreflang' => Helpers::parseLocale($model->site()->locale()),
+        ]);
+
+        $origin = $this->entry->origin() ?? $this->entry;
+
+        $xDefault = Indexable::handle($origin) ? $origin : $this->entry;
+
+        return $hreflang->push([
+            'href' => $this->absoluteUrl($xDefault),
+            'hreflang' => 'x-default',
+        ])->values()->all();
     }
 
     public function lastmod(): string
@@ -64,14 +83,5 @@ class CollectionSitemapUrl extends BaseSitemapUrl
             'current' => true,
             default => false,
         };
-    }
-
-    protected function entries(): Collection
-    {
-        $root = $this->entry->root();
-        $descendants = $root->descendants();
-
-        return collect([$root->locale() => $root])->merge($descendants)
-            ->filter(fn ($entry) => Indexable::handle($entry));
     }
 }

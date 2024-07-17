@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
@@ -10,8 +11,14 @@ use Statamic\Facades\Blink;
 
 class Indexable
 {
+    use EvaluatesIndexability;
+
     public static function handle(Entry|Term|Taxonomy $model, ?string $locale = null): bool
     {
+        if (! (new self)->crawlingIsEnabled()) {
+            return false;
+        }
+
         $locale = $locale ?? $model->locale();
 
         return Blink::once("{$model->id()}::{$locale}", function () use ($model, $locale) {
