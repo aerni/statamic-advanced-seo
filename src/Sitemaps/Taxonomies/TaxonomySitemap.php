@@ -76,9 +76,10 @@ class TaxonomySitemap extends BaseSitemap
     public function collectionTaxonomies(): Collection
     {
         return $this->model->collections()
-            ->map(fn ($collection) => clone $this->model->collection($collection))
+            ->map(fn ($collection) => $this->freshTaxonomy()->collection($collection)) // Need to get a fresh instance of the Taxonomy, else we'll override the previously set collection.
             ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
             ->flatMap(function ($taxonomy) {
+                // Only allow sites that have been set on both the taxonomy and the collection
                 return $taxonomy->sites()
                     ->merge($taxonomy->collection()->sites())
                     ->duplicates()
@@ -97,5 +98,10 @@ class TaxonomySitemap extends BaseSitemap
             })
             ->filter(fn ($term) => view()->exists($term->template()))
             ->filter(fn ($term) => IncludeInSitemap::run($term->taxonomy(), $term->locale()));
+    }
+
+    protected function freshTaxonomy(): Taxonomy
+    {
+        return \Statamic\Facades\Taxonomy::find($this->model->id());
     }
 }
