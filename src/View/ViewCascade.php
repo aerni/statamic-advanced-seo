@@ -231,6 +231,10 @@ class ViewCascade extends BaseCascade
 
     public function prevUrl(): ?string
     {
+        if (! $this->isIndexable($this->model)) {
+            return null;
+        }
+
         if (! $paginator = Blink::get('tag-paginator')) {
             return null;
         }
@@ -251,6 +255,10 @@ class ViewCascade extends BaseCascade
 
     public function nextUrl(): ?string
     {
+        if (! $this->isIndexable($this->model)) {
+            return null;
+        }
+
         if (! $paginator = Blink::get('tag-paginator')) {
             return null;
         }
