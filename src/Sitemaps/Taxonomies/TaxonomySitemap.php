@@ -79,7 +79,9 @@ class TaxonomySitemap extends BaseSitemap
             ->map(fn ($collection) => clone $this->model->collection($collection))
             ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
             ->flatMap(function ($taxonomy) {
-                return $taxonomy->collection()->sites()
+                return $taxonomy->sites()
+                    ->merge($taxonomy->collection()->sites())
+                    ->duplicates()
                     ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
             })
             ->filter(fn ($item) => IncludeInSitemap::run($item['taxonomy'], $item['site']));
