@@ -53,7 +53,7 @@ class SitemapRepository
     {
         return CollectionFacade::all()
             ->filter(IsEnabledModel::handle(...))
-            ->map(fn ($collection) => new CollectionSitemap($collection))
+            ->mapInto(CollectionSitemap::class)
             ->values();
     }
 
@@ -61,7 +61,7 @@ class SitemapRepository
     {
         return Taxonomy::all()
             ->filter(IsEnabledModel::handle(...))
-            ->map(fn ($taxonomy) => new TaxonomySitemap($taxonomy))
+            ->mapInto(TaxonomySitemap::class)
             ->values();
     }
 
