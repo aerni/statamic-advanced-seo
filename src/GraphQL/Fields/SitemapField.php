@@ -40,7 +40,7 @@ class SitemapField extends Field
         return GraphQL::listOf(GraphQL::type(SeoSitemapType::NAME));
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $info): ?Collection
+    public function resolve($root, $args, $context, ResolveInfo $info): ?array
     {
         $sitemaps = Sitemap::{"{$info->fieldName}Sitemaps"}();
 
@@ -55,9 +55,9 @@ class SitemapField extends Field
         $sitemapUrls = $sitemaps->flatMap->urls();
 
         if ($site = $args['site'] ?? null) {
-            $sitemapUrls = $sitemapUrls->where('site', $site);
+            $sitemapUrls = $sitemapUrls->filter(fn ($url) => $url->site() === $site);
         }
 
-        return $sitemapUrls->isNotEmpty() ? $sitemapUrls : null;
+        return $sitemapUrls->isNotEmpty() ? $sitemapUrls->toArray() : null;
     }
 }
