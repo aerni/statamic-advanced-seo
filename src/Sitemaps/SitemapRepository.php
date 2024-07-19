@@ -46,6 +46,10 @@ class SitemapRepository
     {
         $method = Str::before($id, '::').'Sitemaps';
 
+        if (! method_exists($this, $method)) {
+            return null;
+        }
+
         return $this->$method()->first(fn ($sitemap) => $id === $sitemap->id());
     }
 
