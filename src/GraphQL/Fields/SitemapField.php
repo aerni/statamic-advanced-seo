@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
 use Rebing\GraphQL\Support\Field;
 use Statamic\Facades\GraphQL;
 
