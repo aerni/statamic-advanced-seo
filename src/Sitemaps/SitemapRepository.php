@@ -32,7 +32,7 @@ class SitemapRepository
         $this->customSitemaps = $this->customSitemaps()
             ->push($sitemap)
             ->unique(fn ($sitemap) => $sitemap->handle())
-            ->toArray();
+            ->all();
     }
 
     public function all(): Collection

@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Sitemaps;
 
 use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -11,7 +12,7 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-abstract class BaseSitemap implements Sitemap
+abstract class BaseSitemap implements Sitemap, Arrayable
 {
     use FluentlyGetsAndSets, HasBaseUrl;
 
@@ -46,7 +47,7 @@ abstract class BaseSitemap implements Sitemap
 
     public function lastmod(): ?string
     {
-        return $this->urls()->sortByDesc('lastmod')->first()['lastmod'];
+        return $this->urls()->sortByDesc('lastmod')->first()['lastmod'] ?? null;
     }
 
     public function clearCache(): void
@@ -63,6 +64,14 @@ abstract class BaseSitemap implements Sitemap
             ->where('seo_noindex', false)
             ->where('seo_sitemap_enabled', true)
             ->where('seo_canonical_type', 'current');
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'url' => $this->url(),
+            'lastmod' => $this->lastmod(),
+        ];
     }
 
     public function __call(string $name, array $arguments): mixed
