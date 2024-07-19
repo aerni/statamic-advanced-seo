@@ -13,42 +13,40 @@ class TaxonomySitemap extends BaseSitemap
 
     public function urls(): Collection
     {
-        return $this->taxonomyUrls()
+        if (isset($this->urls)) {
+            return $this->urls;
+        }
+
+        return $this->urls = $this->taxonomyUrls()
             ->merge($this->termUrls())
             ->merge($this->collectionTaxonomyUrls())
-            ->merge($this->collectionTermUrls());
+            ->merge($this->collectionTermUrls())
+            ->filter()
+            ->values();
     }
 
     protected function taxonomyUrls(): Collection
     {
         return $this->taxonomies()
-            ->map(fn ($taxonomy, $site) => (new TaxonomySitemapUrl($taxonomy, $site, $this))->toArray())
-            ->filter()
-            ->values();
+            ->map(fn ($taxonomy, $site) => (new TaxonomySitemapUrl($taxonomy, $site, $this))->toArray());
     }
 
     protected function termUrls(): Collection
     {
         return $this->terms()
-            ->map(fn ($term) => (new TermSitemapUrl($term, $this))->toArray())
-            ->filter()
-            ->values();
+            ->map(fn ($term) => (new TermSitemapUrl($term, $this))->toArray());
     }
 
     protected function collectionTaxonomyUrls(): Collection
     {
         return $this->collectionTaxonomies()
-            ->map(fn ($item) => (new CollectionTaxonomySitemapUrl($item['taxonomy'], $item['site'], $this))->toArray())
-            ->filter()
-            ->values();
+            ->map(fn ($item) => (new CollectionTaxonomySitemapUrl($item['taxonomy'], $item['site'], $this))->toArray());
     }
 
     protected function collectionTermUrls(): Collection
     {
         return $this->collectionTerms()
-            ->map(fn ($term) => (new CollectionTermSitemapUrl($term, $this))->toArray())
-            ->filter()
-            ->values();
+            ->map(fn ($term) => (new CollectionTermSitemapUrl($term, $this))->toArray());
     }
 
     public function taxonomies(): Collection

@@ -13,10 +13,13 @@ class CollectionSitemap extends BaseSitemap
 
     public function urls(): Collection
     {
-        return $this->entries()
+        if (isset($this->urls)) {
+            return $this->urls;
+        }
+
+        return $this->urls = $this->entries()
             ->map(fn ($entry) => (new EntrySitemapUrl($entry, $this))->toArray())
-            ->filter()
-            ->values();
+            ->filter();
     }
 
     protected function entries(): Collection

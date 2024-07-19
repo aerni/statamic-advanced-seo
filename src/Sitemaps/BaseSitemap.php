@@ -15,6 +15,8 @@ abstract class BaseSitemap implements Sitemap
 {
     use FluentlyGetsAndSets, HasBaseUrl;
 
+    protected Collection $urls;
+
     abstract public function urls(): Collection;
 
     public function handle(): string
