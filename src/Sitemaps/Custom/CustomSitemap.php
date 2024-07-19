@@ -21,6 +21,6 @@ class CustomSitemap extends BaseSitemap
 
     public function urls(): Collection
     {
-        return $this->urls->map->toArray();
+        return $this->urls;
     }
 }

@@ -47,7 +47,7 @@ abstract class BaseSitemap implements Sitemap, Arrayable
 
     public function lastmod(): ?string
     {
-        return $this->urls()->sortByDesc('lastmod')->first()['lastmod'] ?? null;
+        return $this->urls()->sortByDesc('lastmod')->first()?->lastmod();
     }
 
     public function clearCache(): void
