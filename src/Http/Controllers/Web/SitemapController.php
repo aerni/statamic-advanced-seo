@@ -15,44 +15,44 @@ class SitemapController extends Controller
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        $sitemaps = Sitemap::all()
-            ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty())
-            ->toArray();
-
-        $view = Cache::remember('advanced-seo::sitemaps::index', Sitemap::cacheExpiry(), function () use ($sitemaps) {
-            return view('advanced-seo::sitemaps.index', [
-                'sitemaps' => $sitemaps,
-                'version' => Addon::get('aerni/advanced-seo')->version(),
-            ])->render();
+        $sitemaps = Cache::remember('advanced-seo::sitemaps::index', Sitemap::cacheExpiry(), function () {
+            return Sitemap::all()
+                ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty())
+                ->toArray();
         });
 
-        return response($view)->withHeaders([
-            'Content-Type' => 'text/xml',
-            'X-Robots-Tag' => 'noindex, nofollow',
-        ]);
+        throw_unless($sitemaps, new NotFoundHttpException);
+
+        return response()
+            ->view('advanced-seo::sitemaps.index', [
+                'sitemaps' => $sitemaps,
+                'version' => Addon::get('aerni/advanced-seo')->version(),
+            ])
+            ->header('Content-Type', 'text/xml')
+            ->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
     public function show(string $type, string $handle): Response
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
 
-        throw_unless($sitemap = Sitemap::find("{$type}::{$handle}"), new NotFoundHttpException);
+        $id = "{$type}::{$handle}";
 
-        $view = Cache::remember("advanced-seo::sitemaps::{$type}::{$handle}", Sitemap::cacheExpiry(), function () use ($sitemap) {
-            $urls = $sitemap->urls();
+        $urls = Cache::remember(
+            "advanced-seo::sitemaps::{$id}",
+            Sitemap::cacheExpiry(),
+            fn () => Sitemap::find($id)?->urls()
+        );
 
-            throw_unless($urls->isNotEmpty(), new NotFoundHttpException);
+        throw_unless($urls, new NotFoundHttpException);
 
-            return view('advanced-seo::sitemaps.show', [
+        return response()
+            ->view('advanced-seo::sitemaps.show', [
                 'urls' => $urls,
                 'version' => Addon::get('aerni/advanced-seo')->version(),
-            ])->render();
-        });
-
-        return response($view)->withHeaders([
-            'Content-Type' => 'text/xml',
-            'X-Robots-Tag' => 'noindex, nofollow',
-        ]);
+            ])
+            ->header('Content-Type', 'text/xml')
+            ->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
     public function xsl(): Response
@@ -61,9 +61,8 @@ class SitemapController extends Controller
 
         $path = __DIR__.'/../../../../resources/views/sitemaps/sitemap.xsl';
 
-        return response(file_get_contents($path))->withHeaders([
-            'Content-Type' => 'text/xsl',
-            'X-Robots-Tag' => 'noindex, nofollow',
-        ]);
+        return response(file_get_contents($path))
+            ->header('Content-Type', 'text/xsl')
+            ->header('X-Robots-Tag', 'noindex, nofollow');
     }
 }
