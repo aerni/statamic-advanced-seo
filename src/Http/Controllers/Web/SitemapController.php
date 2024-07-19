@@ -17,14 +17,15 @@ class SitemapController extends Controller
 
         $sitemaps = Cache::remember('advanced-seo::sitemaps::index', Sitemap::cacheExpiry(), function () {
             return Sitemap::all()
-                ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty());
+                ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty())
+                ->toArray();
         });
 
-        throw_if($sitemaps->isEmpty(), new NotFoundHttpException);
+        throw_unless($sitemaps, new NotFoundHttpException);
 
         return response()
             ->view('advanced-seo::sitemaps.index', [
-                'sitemaps' => $sitemaps->toArray(),
+                'sitemaps' => $sitemaps,
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ])
             ->header('Content-Type', 'text/xml')
@@ -40,14 +41,14 @@ class SitemapController extends Controller
         $urls = Cache::remember(
             "advanced-seo::sitemaps::{$id}",
             Sitemap::cacheExpiry(),
-            fn () => Sitemap::find($id)?->urls()
+            fn () => Sitemap::find($id)?->urls()->toArray()
         );
 
-        throw_if($urls->isEmpty(), new NotFoundHttpException);
+        throw_unless($urls, new NotFoundHttpException);
 
         return response()
             ->view('advanced-seo::sitemaps.show', [
-                'urls' => $urls->toArray(),
+                'urls' => $urls,
                 'version' => Addon::get('aerni/advanced-seo')->version(),
             ])
             ->header('Content-Type', 'text/xml')
