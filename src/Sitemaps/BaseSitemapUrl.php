@@ -10,7 +10,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
 
-abstract class BaseSitemapUrl implements SitemapUrl, Arrayable
+abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 {
     abstract public function loc(): string|self;
 

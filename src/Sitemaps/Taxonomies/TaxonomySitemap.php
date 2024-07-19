@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 
 class TaxonomySitemap extends BaseSitemap
 {

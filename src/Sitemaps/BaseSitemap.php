@@ -12,7 +12,7 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-abstract class BaseSitemap implements Sitemap, Arrayable
+abstract class BaseSitemap implements Arrayable, Sitemap
 {
     use FluentlyGetsAndSets, HasBaseUrl;
 
