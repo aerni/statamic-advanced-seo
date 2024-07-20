@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\View;
 
+use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
+use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\View\Concerns\EvaluatesContextType;
-use Aerni\AdvancedSeo\View\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
@@ -191,9 +191,9 @@ class ViewCascade extends BaseCascade
         }
 
         return match (true) {
-            ($this->contextIsEntryOrTerm()) => $this->entryAndTermHreflang($this->model->get('id')->resolve()->augmentable()), // TODO: Remove resolve() once https://github.com/statamic/cms/pull/10417 is merged.
-            ($this->contextIsTaxonomy()) => $this->taxonomyHreflang($this->model->get('page')),
-            ($this->contextIsCollectionTaxonomy()) => $this->collectionTaxonomyHreflang($this->model->get('page')),
+            ($this->contextIsEntryOrTerm($this->model)) => $this->entryAndTermHreflang($this->model->get('id')->augmentable()),
+            ($this->contextIsTaxonomy($this->model)) => $this->taxonomyHreflang($this->model->get('page')),
+            ($this->contextIsCollectionTaxonomy($this->model)) => $this->collectionTaxonomyHreflang($this->model->get('page')),
             default => null
         };
     }

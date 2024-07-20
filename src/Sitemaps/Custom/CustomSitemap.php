@@ -1,13 +1,12 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 use Illuminate\Support\Collection;
 
 class CustomSitemap extends BaseSitemap
 {
-    protected Collection $urls;
-
     public function __construct(protected string $handle)
     {
         $this->urls = collect();
@@ -22,6 +21,6 @@ class CustomSitemap extends BaseSitemap
 
     public function urls(): Collection
     {
-        return $this->urls->map->toArray();
+        return $this->urls;
     }
 }

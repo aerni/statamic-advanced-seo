@@ -1,33 +1,23 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 
 class TaxonomySitemapUrl extends BaseSitemapUrl
 {
-    protected string $initialSite;
-
-    public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap)
-    {
-        $this->initialSite = Site::current()->handle();
-
-        // We need to set the site so that we can get to correct URL of the taxonomy.
-        Site::setCurrent($site);
-    }
-
-    public function __destruct()
-    {
-        Site::setCurrent($this->initialSite);
-    }
+    public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap) {}
 
     public function loc(): string
     {
+        Site::setCurrent($this->site);
+
         return $this->absoluteUrl($this->taxonomy);
     }
 
@@ -37,7 +27,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $sites = $this->taxonomies()->keys();
+        $sites = $this->sitemap->taxonomies()->keys();
 
         if ($sites->count() < 2) {
             return null;
@@ -68,11 +58,14 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
 
     public function lastmod(): string
     {
-        if ($terms = $this->lastModifiedTaxonomyTerm()) {
-            return $terms->lastModified()->format('Y-m-d\TH:i:sP');
+        if ($term = $this->lastModifiedTaxonomyTerm()) {
+            return $term->lastModified()->format('Y-m-d\TH:i:sP');
         }
 
-        return now()->format('Y-m-d\TH:i:sP');
+        return Cache::rememberForever(
+            "advanced-seo::sitemaps::taxonomy::{$this->taxonomy}::lastmod",
+            fn () => now()->format('Y-m-d\TH:i:sP')
+        );
     }
 
     public function changefreq(): string
@@ -94,13 +87,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
     {
         return $this->taxonomy->queryTerms()
             ->where('site', $this->site)
-            ->get()
-            ->sortByDesc(fn ($term) => $term->lastModified())
+            ->orderByDesc('last_modified')
             ->first();
-    }
-
-    protected function taxonomies(): Collection
-    {
-        return $this->sitemap->taxonomies();
     }
 }

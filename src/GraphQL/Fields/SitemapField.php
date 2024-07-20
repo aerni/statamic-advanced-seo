@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
+use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
-use Aerni\AdvancedSeo\Sitemap\SitemapIndex;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
 use Rebing\GraphQL\Support\Field;
 use Statamic\Facades\GraphQL;
 
@@ -37,12 +36,12 @@ class SitemapField extends Field
 
     public function type(): Type
     {
-        return GraphQl::listOf(GraphQL::type(SeoSitemapType::NAME));
+        return GraphQL::listOf(GraphQL::type(SeoSitemapType::NAME));
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $info): ?Collection
+    public function resolve($root, $args, $context, ResolveInfo $info): ?array
     {
-        $sitemaps = (new SitemapIndex)->{"{$info->fieldName}Sitemaps"}();
+        $sitemaps = Sitemap::{"{$info->fieldName}Sitemaps"}();
 
         if ($baseUrl = $args['baseUrl'] ?? null) {
             $sitemaps = $sitemaps->each(fn ($sitemap) => $sitemap->baseUrl($baseUrl));
@@ -55,9 +54,9 @@ class SitemapField extends Field
         $sitemapUrls = $sitemaps->flatMap->urls();
 
         if ($site = $args['site'] ?? null) {
-            $sitemapUrls = $sitemapUrls->where('site', $site);
+            $sitemapUrls = $sitemapUrls->filter(fn ($url) => $url->site() === $site);
         }
 
-        return $sitemapUrls->isNotEmpty() ? $sitemapUrls : null;
+        return $sitemapUrls->isNotEmpty() ? $sitemapUrls->toArray() : null;
     }
 }

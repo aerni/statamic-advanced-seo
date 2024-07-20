@@ -1,14 +1,14 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 
-class CollectionTermSitemapUrl extends BaseSitemapUrl
+class TermSitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Term $term, protected TaxonomySitemap $sitemap) {}
 
@@ -23,7 +23,9 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $terms = $this->terms();
+        $terms = $this->term->term()
+            ->localizations()
+            ->filter(IncludeInSitemap::run(...));
 
         if ($terms->count() < 2) {
             return null;
@@ -36,7 +38,7 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
         $origin = $this->term->origin();
 
-        $xDefault = Indexable::handle($origin) ? $origin : $this->term;
+        $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->term;
 
         return $hreflang->push([
             'href' => $this->absoluteUrl($xDefault),
@@ -62,23 +64,11 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
     public function site(): string
     {
-        return $this->term->site()->handle();
+        return $this->term->locale();
     }
 
-    public function isCanonicalUrl(): bool
+    public function canonicalTypeIsCurrent(): bool
     {
-        return match ($this->term->seo_canonical_type->value()) {
-            'current' => true,
-            default => false,
-        };
-    }
-
-    protected function terms(): Collection
-    {
-        return $this->sitemap->collectionTerms()
-            ->filter(function ($term) {
-                return $term->id() === $this->term->id()
-                    && $term->term()->collection()->handle() === $this->term->term()->collection()->handle();
-            });
+        return $this->term->seo_canonical_type == 'current';
     }
 }

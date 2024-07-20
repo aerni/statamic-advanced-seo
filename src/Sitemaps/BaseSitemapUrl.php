@@ -1,15 +1,16 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps;
 
 use Aerni\AdvancedSeo\Contracts\SitemapUrl;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
 
-abstract class BaseSitemapUrl implements SitemapUrl
+abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 {
     abstract public function loc(): string|self;
 
@@ -23,22 +24,13 @@ abstract class BaseSitemapUrl implements SitemapUrl
 
     abstract public function site(): string|self;
 
-    public function isCanonicalUrl(): bool
+    public function canonicalTypeIsCurrent(): bool
     {
         return true;
     }
 
-    /**
-     * We need to cast the data to an array so that we can get the correct url of taxonomies in the view.
-     * That's because we are temporarily setting the current site in \Aerni\AdvancedSeo\Sitemap\TaxonomySitemapUrl::class,
-     * which won't have any effect if we are directly accessing the data methods in the view instead.
-     */
-    public function toArray(): ?array
+    public function toArray(): array
     {
-        if (! $this->isCanonicalUrl()) {
-            return null;
-        }
-
         return [
             'loc' => $this->loc(),
             'alternates' => $this->alternates(),

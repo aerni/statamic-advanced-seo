@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View\Concerns;
 
+use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
@@ -128,6 +129,7 @@ trait HasHreflang
         ])->values()->all();
     }
 
+    // TODO: Should be able to remove this once https://github.com/statamic/cms/pull/10439 is merged.
     protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
         $siteUrl = Site::get($site)->absoluteUrl();
@@ -139,11 +141,8 @@ trait HasHreflang
 
     protected function shouldIncludeHreflang(Entry|LocalizedTerm $model): bool
     {
-        if ($this->canonicalPointsToAnotherUrl($model)) {
-            return false;
-        }
-
-        return $this->isIndexable($model);
+        return ! $this->canonicalPointsToAnotherUrl($model)
+            && $this->isIndexableEntryOrTerm($model);
     }
 
     protected function canonicalPointsToAnotherUrl(Entry|LocalizedTerm $model): bool

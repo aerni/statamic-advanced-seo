@@ -1,8 +1,9 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Site;
 use Statamic\Support\Traits\FluentlyGetsAndSets;

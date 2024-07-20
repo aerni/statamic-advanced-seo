@@ -1,10 +1,12 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
@@ -16,7 +18,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->getUrl($this->taxonomy, $this->site);
+        return $this->collectionTaxonomyUrl($this->taxonomy, $this->site);
     }
 
     public function alternates(): ?array
@@ -32,7 +34,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         }
 
         $hreflang = $sites->map(fn ($site) => [
-            'href' => $this->getUrl($this->taxonomy, $site),
+            'href' => $this->collectionTaxonomyUrl($this->taxonomy, $site),
             'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
         ]);
 
@@ -41,18 +43,21 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         $xDefaultSite = $sites->contains($originSite) ? $originSite : $this->site;
 
         return $hreflang->push([
-            'href' => $this->getUrl($this->taxonomy, $xDefaultSite),
+            'href' => $this->collectionTaxonomyUrl($this->taxonomy, $xDefaultSite),
             'hreflang' => 'x-default',
         ])->values()->all();
     }
 
     public function lastmod(): string
     {
-        if ($terms = $this->lastModifiedTaxonomyTerm()) {
-            return $terms->lastModified()->format('Y-m-d\TH:i:sP');
+        if ($term = $this->lastModifiedTaxonomyTerm()) {
+            return $term->lastModified()->format('Y-m-d\TH:i:sP');
         }
 
-        return now()->format('Y-m-d\TH:i:sP');
+        return Cache::rememberForever(
+            "advanced-seo::sitemaps::taxonomy::{$this->taxonomy}::lastmod",
+            fn () => now()->format('Y-m-d\TH:i:sP')
+        );
     }
 
     public function changefreq(): string
@@ -74,8 +79,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
     {
         return $this->taxonomy->queryTerms()
             ->where('site', $this->site)
-            ->get()
-            ->sortByDesc(fn ($term) => $term->lastModified())
+            ->orderByDesc('last_modified')
             ->first();
     }
 
@@ -89,7 +93,8 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
             ->mapwithKeys(fn ($item) => [$item['site'] => $item['taxonomy']]);
     }
 
-    protected function getUrl(Taxonomy $taxonomy, string $site): string
+    // TODO: Should be able to remove this once https://github.com/statamic/cms/pull/10439 is merged.
+    protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
         $siteUrl = $this->absoluteUrl(Site::get($site));
         $taxonomyHandle = $taxonomy->handle();

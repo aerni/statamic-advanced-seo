@@ -1,13 +1,14 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Sitemap;
+namespace Aerni\AdvancedSeo\Sitemaps\Collections;
 
-use Aerni\AdvancedSeo\Actions\Indexable;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 
-class CollectionSitemapUrl extends BaseSitemapUrl
+class EntrySitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Entry $entry, protected CollectionSitemap $sitemap) {}
 
@@ -16,13 +17,10 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         return $this->absoluteUrl($this->entry);
     }
 
+    // TODO: Can we use the entryAndTermHreflang method from the HasHreflang trait as the code is just a copy of it.
     public function alternates(): ?array
     {
         if (! Site::multiEnabled()) {
-            return null;
-        }
-
-        if (! Indexable::handle($this->entry)) {
             return null;
         }
 
@@ -35,7 +33,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
         $hreflang = $sites
             ->map(fn ($locale) => $this->entry->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
-            ->filter(Indexable::handle(...));
+            ->filter(IncludeInSitemap::run(...));
 
         if ($hreflang->count() < 2) {
             return null;
@@ -48,7 +46,7 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
         $origin = $this->entry->origin() ?? $this->entry;
 
-        $xDefault = Indexable::handle($origin) ? $origin : $this->entry;
+        $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->entry;
 
         return $hreflang->push([
             'href' => $this->absoluteUrl($xDefault),
@@ -74,14 +72,11 @@ class CollectionSitemapUrl extends BaseSitemapUrl
 
     public function site(): string
     {
-        return $this->entry->site()->handle();
+        return $this->entry->locale();
     }
 
-    public function isCanonicalUrl(): bool
+    public function canonicalTypeIsCurrent(): bool
     {
-        return match ($this->entry->seo_canonical_type->value()) {
-            'current' => true,
-            default => false,
-        };
+        return $this->entry->seo_canonical_type == 'current';
     }
 }

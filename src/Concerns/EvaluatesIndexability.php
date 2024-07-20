@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\View\Concerns;
+namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Entry;
@@ -10,6 +10,8 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 trait EvaluatesIndexability
 {
+    use EvaluatesContextType;
+
     protected function isIndexable(Context|Entry|LocalizedTerm|Site $model): bool
     {
         return match (true) {
@@ -22,7 +24,7 @@ trait EvaluatesIndexability
 
     protected function isIndexableContext(Context $context): bool
     {
-        $model = $this->contextIsEntryOrTerm()
+        $model = $this->contextIsEntryOrTerm($context)
             ? $context->get('id')->augmentable()
             : $context->get('site');
 
@@ -37,13 +39,10 @@ trait EvaluatesIndexability
             && ! $model->seo_noindex; // Models with noindex should not be indexed.
     }
 
-    protected function isIndexableSite(string $locale): bool
+    protected function isIndexableSite(string $site): bool
     {
-        if (! $this->crawlingIsEnabled()) {
-            return false;
-        }
-
-        return ! Seo::find('site', 'indexing')?->in($locale)?->noindex;
+        return $this->crawlingIsEnabled()
+            && ! Seo::find('site', 'indexing')?->in($site)?->noindex;
     }
 
     protected function crawlingIsEnabled(): bool

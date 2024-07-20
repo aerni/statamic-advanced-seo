@@ -5,14 +5,12 @@ echo '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>';
 
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" advanced-seo-version="{{ $version }}">
     @foreach ($sitemaps as $sitemap)
-        @if ($sitemap->urls()->count() >= 1)
-            <sitemap>
-                <loc>{{ $sitemap->url() }}</loc>
+        <sitemap>
+            <loc>{{ $sitemap['url'] }}</loc>
 
-                @if($sitemap->lastmod())
-                    <lastmod>{{ $sitemap->lastmod() }}</lastmod>
-                @endif
-            </sitemap>
-        @endif
+            @isset($sitemap['lastmod'])
+                <lastmod>{{ $sitemap['lastmod'] }}</lastmod>
+            @endisset
+        </sitemap>
     @endforeach
 </sitemapindex>
