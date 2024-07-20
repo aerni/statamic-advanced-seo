@@ -24,8 +24,7 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 
     abstract public function site(): string|self;
 
-    // TODO: Can we use the canonicalPointsToAnotherUrl method instead? It's the same logic.
-    public function isCanonicalUrl(): bool
+    public function canonicalTypeIsCurrent(): bool
     {
         return true;
     }

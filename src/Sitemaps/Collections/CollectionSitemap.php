@@ -19,7 +19,7 @@ class CollectionSitemap extends BaseSitemap
 
         return $this->urls = $this->entries()
             ->map(fn ($entry) => new EntrySitemapUrl($entry, $this))
-            ->filter(fn ($url) => $url->isCanonicalUrl());
+            ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
     }
 
     protected function entries(): Collection

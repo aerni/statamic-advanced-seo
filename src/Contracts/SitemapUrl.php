@@ -16,5 +16,5 @@ interface SitemapUrl
 
     public function site(): string|self;
 
-    public function isCanonicalUrl(): bool;
+    public function canonicalTypeIsCurrent(): bool;
 }

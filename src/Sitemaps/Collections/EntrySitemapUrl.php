@@ -75,7 +75,7 @@ class EntrySitemapUrl extends BaseSitemapUrl
         return $this->entry->locale();
     }
 
-    public function isCanonicalUrl(): bool
+    public function canonicalTypeIsCurrent(): bool
     {
         return $this->entry->seo_canonical_type == 'current';
     }

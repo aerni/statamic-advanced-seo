@@ -21,7 +21,7 @@ class TaxonomySitemap extends BaseSitemap
             ->merge($this->termUrls())
             ->merge($this->collectionTaxonomyUrls())
             ->merge($this->collectionTermUrls())
-            ->filter(fn ($url) => $url->isCanonicalUrl());
+            ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
     }
 
     protected function taxonomyUrls(): Collection
