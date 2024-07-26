@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
-use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
+use Statamic\Facades\Blink;
 use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 
 class TaxonomySitemap extends BaseSitemap
 {
@@ -13,15 +14,13 @@ class TaxonomySitemap extends BaseSitemap
 
     public function urls(): Collection
     {
-        if (isset($this->urls)) {
-            return $this->urls;
-        }
-
-        return $this->urls = $this->taxonomyUrls()
-            ->merge($this->termUrls())
-            ->merge($this->collectionTaxonomyUrls())
-            ->merge($this->collectionTermUrls())
-            ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
+        return Blink::once($this->filename(), function () {
+            return $this->taxonomyUrls()
+                ->merge($this->termUrls())
+                ->merge($this->collectionTaxonomyUrls())
+                ->merge($this->collectionTermUrls())
+                ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
+        });
     }
 
     protected function taxonomyUrls(): Collection

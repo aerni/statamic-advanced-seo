@@ -13,6 +13,7 @@ class Sitemap
             return false;
         }
 
+        // TODO: We could use Defaults::isEnabled() instead.
         $disabled = config("advanced-seo.disabled.{$data->type}", []);
 
         // Check if the collection/taxonomy is set to be disabled globally.
