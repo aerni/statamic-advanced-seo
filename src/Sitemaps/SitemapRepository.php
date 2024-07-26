@@ -17,48 +17,24 @@ class SitemapRepository
     {
     }
 
-    public function extend(Closure $callback)
+    public function register(Closure|string $sitemap): void
     {
-        $this->extensions[] = $callback;
+        $this->extensions[] = $sitemap;
     }
 
-    // TODO: Rename method
     public function make(string $handle): CustomSitemap
     {
         return new CustomSitemap($handle);
     }
 
-    // TODO: Rename method
     public function makeUrl(string $loc): CustomSitemapUrl
     {
         return new CustomSitemapUrl($loc);
     }
 
-    // TODO: Rename method
     public function add(Sitemap $sitemap): void
     {
         $this->sitemapIndex->add($sitemap);
-    }
-
-    public function boot(): void
-    {
-        foreach ($this->extensions as $callback) {
-            $callback();
-        }
-
-        /**
-         * Ensure we don't boot extensions multiple times during the same request,
-         * which could happen if the `index()` and `all()` methods are called.
-         * TODO: Once we drop support for Laravel 10, we could use Laravel's new once() helper instead.
-         */
-        $this->extensions = [];
-    }
-
-    public function all(): Collection
-    {
-        $this->boot();
-
-        return $this->sitemapIndex->sitemaps();
     }
 
     public function index(): SitemapIndex
@@ -66,6 +42,13 @@ class SitemapRepository
         $this->boot();
 
         return $this->sitemapIndex;
+    }
+
+    public function all(): Collection
+    {
+        $this->boot();
+
+        return $this->sitemapIndex->sitemaps();
     }
 
     public function find(string $id): ?Sitemap
@@ -84,5 +67,21 @@ class SitemapRepository
             config('advanced-seo.sitemap.path', storage_path('statamic/sitemaps')),
             $path
         );
+    }
+
+    protected function boot(): void
+    {
+        foreach ($this->extensions as $extension) {
+            $extension instanceof Closure
+                ? $this->add($extension())
+                : $this->add(app($extension));
+        }
+
+        /**
+         * TODO: Once we drop support for Laravel 10, we could use Laravel's new once() helper instead.
+         * Ensure we don't boot extensions multiple times during the same request,
+         * which could happen if the `index()` and `all()` methods are called in the same request.
+         */
+        $this->extensions = [];
     }
 }
