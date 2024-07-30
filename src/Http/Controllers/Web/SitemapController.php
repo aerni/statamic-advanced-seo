@@ -25,9 +25,9 @@ class SitemapController extends Controller
         return SitemapRepository::index();
     }
 
-    public function show(string $type, string $handle): Sitemap
+    public function show(string $id): Sitemap
     {
-        return throw_unless(SitemapRepository::find("{$type}::{$handle}"), NotFoundHttpException::class);
+        return throw_unless(SitemapRepository::find($id), NotFoundHttpException::class);
     }
 
     public function xsl(): Response

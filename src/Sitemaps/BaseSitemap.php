@@ -6,9 +6,7 @@ use Statamic\Facades\URL;
 use Illuminate\Support\Str;
 use Statamic\Facades\Addon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Query\Builder;
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
@@ -39,7 +37,7 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 
     public function id(): string
     {
-        return "{$this->type()}::{$this->handle()}";
+        return Str::slug("{$this->type()}-{$this->handle()}");
     }
 
     public function url(): string
@@ -106,7 +104,7 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 
     public function filename(): string
     {
-        return "{$this->type()}-{$this->handle()}-sitemap.xml";
+        return "{$this->id()}.xml";
     }
 
     public function file(): ?string

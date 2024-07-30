@@ -5,6 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('advanced-seo.')->group(function () {
     Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
-    Route::get('/{type}-{handle}-sitemap.xml', [SitemapController::class, 'show'])->name('sitemap.show');
+    Route::get('/{id}.xml', [SitemapController::class, 'show'])->name('sitemap.show');
     Route::get('/sitemap.xsl', [SitemapController::class, 'xsl'])->name('sitemap.xsl');
 });
