@@ -17,9 +17,9 @@ class SitemapRepository
     {
     }
 
-    public function register(Closure|string $sitemap): void
+    public function register(Closure|array|string $extensions): void
     {
-        $this->extensions[] = $sitemap;
+        $this->extensions[] = $extensions;
     }
 
     public function make(string $handle): CustomSitemap
@@ -71,11 +71,11 @@ class SitemapRepository
 
     protected function boot(): void
     {
-        foreach ($this->extensions as $extension) {
-            $extension instanceof Closure
-                ? $this->add($extension())
-                : $this->add(app($extension));
-        }
+        collect($this->extensions)
+            ->map(fn ($extension) => $extension instanceof Closure ? $extension() : $extension)
+            ->flatten()
+            ->map(fn ($sitemap) => $sitemap instanceof Sitemap ? $sitemap : app($sitemap))
+            ->each(fn ($sitemap) => $this->add($sitemap));
 
         /**
          * TODO: Once we drop support for Laravel 10, we could use Laravel's new once() helper instead.
