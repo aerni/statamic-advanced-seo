@@ -42,7 +42,7 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 
     public function url(): string
     {
-        return URL::tidy(config('app.url')."/{$this->filename()}");
+        return URL::tidy(config('app.url')."/sitemaps/{$this->filename()}");
     }
 
     public function lastmod(): ?string
