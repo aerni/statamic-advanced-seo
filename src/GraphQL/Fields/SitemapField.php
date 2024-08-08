@@ -41,7 +41,7 @@ class SitemapField extends Field
 
     public function resolve($root, $args, $context, ResolveInfo $info): ?array
     {
-        $sitemaps = Sitemap::{"{$info->fieldName}Sitemaps"}();
+        $sitemaps = Sitemap::all()->filter(fn ($sitemap) => $sitemap->type() === $info->fieldName);
 
         if ($baseUrl = $args['baseUrl'] ?? null) {
             $sitemaps = $sitemaps->each(fn ($sitemap) => $sitemap->baseUrl($baseUrl));
