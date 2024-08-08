@@ -33,7 +33,7 @@ class TaxonomySitemap extends BaseSitemap
     protected function termUrls(): Collection
     {
         return $this->terms()
-            ->map(fn ($term) => new TermSitemapUrl($term, $this));
+            ->map(fn ($term) => new TermSitemapUrl($term));
     }
 
     protected function collectionTaxonomyUrls(): Collection

@@ -16,7 +16,7 @@ class CollectionSitemap extends BaseSitemap
     {
         return Blink::once($this->filename(), function () {
             return $this->entries()
-                ->map(fn ($entry) => new EntrySitemapUrl($entry, $this))
+                ->map(fn ($entry) => new EntrySitemapUrl($entry))
                 ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
         });
     }
