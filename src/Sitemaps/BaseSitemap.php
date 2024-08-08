@@ -22,7 +22,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsable, SitemapFile
 {
-    use FluentlyGetsAndSets, HasBaseUrl;
+    use FluentlyGetsAndSets;
 
     abstract public function urls(): Collection;
 
