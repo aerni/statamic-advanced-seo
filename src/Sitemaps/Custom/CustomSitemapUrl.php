@@ -31,6 +31,13 @@ class CustomSitemapUrl extends BaseSitemapUrl
     public function alternates(?array $alternates = null): array|self|null
     {
         return $this->fluentlyGetOrSet('alternates')
+            ->getter(function ($alternates) {
+                return collect($alternates)->map(function ($alternate) {
+                    $alternate['href'] = $this->absoluteUrl($alternate['href']);
+
+                    return $alternate;
+                })->all();
+            })
             ->setter(function ($alternates) {
                 foreach ($alternates as $alternate) {
                     throw_unless(array_key_exists('href', $alternate), new \Exception("One of your alternate links is missing the 'href' attribute."));
@@ -38,13 +45,6 @@ class CustomSitemapUrl extends BaseSitemapUrl
                 }
 
                 return $alternates;
-            })
-            ->getter(function ($alternates) {
-                return collect($alternates)->map(function ($alternate) {
-                    $alternate['href'] = $this->absoluteUrl($alternate['href']);
-
-                    return $alternate;
-                })->all();
             })
             ->args(func_get_args());
     }
