@@ -14,7 +14,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
 
     public function __construct(
         protected string $loc,
-        protected ?string $alternates = null,
+        protected ?array $alternates = null,
         protected ?string $lastmod = null,
         protected ?string $changefreq = null,
         protected ?string $priority = null,
@@ -23,7 +23,9 @@ class CustomSitemapUrl extends BaseSitemapUrl
 
     public function loc(?string $loc = null): string|self
     {
-        return $this->fluentlyGetOrSet('loc')->args(func_get_args());
+        return $this->fluentlyGetOrSet('loc')
+            ->getter(fn ($loc) => $this->absoluteUrl($loc))
+            ->args(func_get_args());
     }
 
     public function alternates(?array $alternates = null): array|self|null
@@ -36,6 +38,12 @@ class CustomSitemapUrl extends BaseSitemapUrl
                 }
 
                 return $alternates;
+            })
+            ->getter(function ($alternates) {
+                return collect($alternates)->map(function ($alternate) {
+                    $alternate['href'] = $this->absoluteUrl($alternate['href']);
+                    return $alternate;
+                })->all();
             })
             ->args(func_get_args());
     }
