@@ -15,6 +15,6 @@ class AdvancedSeoTagsTest extends TestCase
     {
         parent::setUp();
 
-        $this->tag = (new AdvancedSeoTags())->setContext($this->context);
+        $this->tag = (new AdvancedSeoTags)->setContext($this->context);
     }
 }

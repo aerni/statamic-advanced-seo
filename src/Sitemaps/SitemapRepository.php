@@ -2,20 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Closure;
-use Statamic\Facades\Path;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
+use Closure;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Path;
 
 class SitemapRepository
 {
     protected array $extensions = [];
 
-    public function __construct(protected SitemapIndex $sitemapIndex)
-    {
-    }
+    public function __construct(protected SitemapIndex $sitemapIndex) {}
 
     public function register(Closure|array|string $extensions): void
     {

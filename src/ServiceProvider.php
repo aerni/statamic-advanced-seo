@@ -241,8 +241,8 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(SocialImagePresetType::class);
             GraphQL::addType(SocialMediaDefaultsType::class);
 
-            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField())->toArray());
-            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new SeoField())->toArray());
+            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
+            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
         }
 
         return $this;

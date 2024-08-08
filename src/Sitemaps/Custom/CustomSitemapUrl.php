@@ -42,6 +42,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
             ->getter(function ($alternates) {
                 return collect($alternates)->map(function ($alternate) {
                     $alternate['href'] = $this->absoluteUrl($alternate['href']);
+
                     return $alternate;
                 })->all();
             })

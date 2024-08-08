@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Contracts;
 
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Contracts\Sitemap;
 
 interface SitemapIndex
 {

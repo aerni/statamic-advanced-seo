@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Statamic\Sites\Site;
-use Statamic\Facades\URL;
-use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Contracts\SitemapUrl;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\URL;
+use Statamic\Sites\Site;
 
 abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 {

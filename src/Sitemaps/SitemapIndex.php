@@ -2,24 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Statamic\Facades\Addon;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Taxonomy;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
+use Aerni\AdvancedSeo\Contracts\SitemapFile;
+use Aerni\AdvancedSeo\Contracts\SitemapIndex as Contract;
 use Aerni\AdvancedSeo\Facades\Sitemap as SitemapRepository;
+use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\Responsable;
-use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
-use Statamic\Facades\Collection as CollectionFacade;
-use Aerni\AdvancedSeo\Contracts\SitemapIndex as Contract;
-use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
-use Aerni\AdvancedSeo\Contracts\Sitemap;
-use Aerni\AdvancedSeo\Contracts\SitemapFile;
-use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
-use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Facades\Addon;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy;
 
 class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, SitemapFile
 {

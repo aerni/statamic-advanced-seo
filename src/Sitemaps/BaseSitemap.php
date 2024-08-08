@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Contracts\Sitemap as Contract;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
 use Aerni\AdvancedSeo\Facades\Sitemap;

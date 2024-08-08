@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Statamic\Facades\Blink;
-use Statamic\Contracts\Entries\Entry;
-use Aerni\AdvancedSeo\Features\Sitemap;
-use Statamic\Contracts\Taxonomies\Term;
 use Aerni\AdvancedSeo\Concerns\AsAction;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Taxonomies\Taxonomy;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Features\Sitemap;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Blink;
 
 class IncludeInSitemap
 {

@@ -25,7 +25,7 @@ class SocialImagesController extends Controller
         throw_unless($data = $this->getData($id), new NotFoundHttpException);
 
         // Throw if the data is not an entry or term.
-        throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException());
+        throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException);
 
         // Throw if the social image type is not supported.
         throw_unless($model = SocialImage::findModel(Str::replace('-', '_', $type)), new NotFoundHttpException);

@@ -12,7 +12,7 @@ abstract class BaseMigrator
 {
     public static function run(): void
     {
-        (new static())->process();
+        (new static)->process();
     }
 
     protected function process(): void
