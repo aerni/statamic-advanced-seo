@@ -2,20 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
-use Statamic\Facades\URL;
-use Illuminate\Support\Str;
-use Statamic\Facades\Addon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-use Statamic\Contracts\Query\Builder;
-use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
-use Illuminate\Contracts\Support\Arrayable;
+use Aerni\AdvancedSeo\Contracts\Sitemap as Contract;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
+use Aerni\AdvancedSeo\Facades\Sitemap;
+use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use Statamic\Contracts\Query\Builder;
+use Statamic\Facades\Addon;
+use Statamic\Facades\URL;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Aerni\AdvancedSeo\Contracts\Sitemap as Contract;
 
 abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsable, SitemapFile
 {
@@ -25,14 +28,21 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 
     public function handle(): string
     {
-        return $this->type() === 'custom'
-            ? $this->handle
-            : $this->model->handle();
+        return match (static::class) {
+            CollectionSitemap::class => $this->model->handle(),
+            TaxonomySitemap::class => $this->model->handle(),
+            CustomSitemap::class => $this->handle,
+            default => Str::of(static::class)->afterLast('\\')->remove('Sitemap')->snake(),
+        };
     }
 
     public function type(): string
     {
-        return Str::of(static::class)->afterLast('\\')->remove('Sitemap')->lower();
+        return match (static::class) {
+            CollectionSitemap::class => 'collection',
+            TaxonomySitemap::class => 'taxonomy',
+            default => 'custom',
+        };
     }
 
     public function id(): string
