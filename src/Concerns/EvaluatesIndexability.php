@@ -37,8 +37,6 @@ trait EvaluatesIndexability
             && $model->published() // Unpublished models should not be indexed.
             && $model->url() // Models without a route should not be indexed.
             && ! $model->seo_noindex; // Models with noindex should not be indexed.
-        // TODO: Does this augmented value merge the noindex from the site defaults?
-        // If so, we might not need to check for isIndexableSite() here, as noindex would be checked double.
     }
 
     protected function isIndexableSite(string $site): bool
