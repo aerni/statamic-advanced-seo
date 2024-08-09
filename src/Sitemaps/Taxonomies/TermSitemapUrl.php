@@ -10,7 +10,7 @@ use Statamic\Facades\Site;
 
 class TermSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Term $term, protected TaxonomySitemap $sitemap) {}
+    public function __construct(protected Term $term) {}
 
     public function loc(): string
     {

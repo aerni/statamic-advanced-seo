@@ -41,22 +41,23 @@ class SitemapField extends Field
 
     public function resolve($root, $args, $context, ResolveInfo $info): ?array
     {
-        $sitemaps = Sitemap::{"{$info->fieldName}Sitemaps"}();
+        $sitemaps = Sitemap::all()
+            ->filter(fn ($sitemap) => $sitemap->type() === $info->fieldName)
+            ->when(
+                $handle = data_get($args, 'handle'),
+                fn ($sitemaps) => $sitemaps->filter(fn ($sitemap) => $sitemap->handle() === $handle)
+            );
 
-        if ($baseUrl = $args['baseUrl'] ?? null) {
-            $sitemaps = $sitemaps->each(fn ($sitemap) => $sitemap->baseUrl($baseUrl));
-        }
+        $urls = $sitemaps->flatMap->urls()
+            ->when(
+                $site = data_get($args, 'site'),
+                fn ($urls) => $urls->filter(fn ($url) => $url->site() === $site)
+            )
+            ->when(
+                $baseUrl = data_get($args, 'baseUrl'),
+                fn ($urls) => $urls->each(fn ($url) => $url->baseUrl($baseUrl))
+            );
 
-        if ($handle = $args['handle'] ?? null) {
-            $sitemaps = $sitemaps->filter(fn ($sitemap) => $handle === $sitemap->handle());
-        }
-
-        $sitemapUrls = $sitemaps->flatMap->urls();
-
-        if ($site = $args['site'] ?? null) {
-            $sitemapUrls = $sitemapUrls->filter(fn ($url) => $url->site() === $site);
-        }
-
-        return $sitemapUrls->isNotEmpty() ? $sitemapUrls->toArray() : null;
+        return $urls->isNotEmpty() ? $urls->toArray() : null;
     }
 }

@@ -49,6 +49,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $commands = [
+        Commands\GenerateSitemaps::class,
         Commands\GenerateSocialImages::class,
         Commands\MakeTheme::class,
         Commands\Migrate::class,
@@ -70,7 +71,6 @@ class ServiceProvider extends AddonServiceProvider
     protected $subscribe = [
         \Aerni\AdvancedSeo\Subscribers\ContentDefaultsSubscriber::class,
         \Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber::class,
-        \Aerni\AdvancedSeo\Subscribers\SitemapCacheSubscriber::class,
         \Aerni\AdvancedSeo\Subscribers\SocialImagesGeneratorSubscriber::class,
     ];
 
@@ -241,8 +241,8 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(SocialImagePresetType::class);
             GraphQL::addType(SocialMediaDefaultsType::class);
 
-            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField())->toArray());
-            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new SeoField())->toArray());
+            GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
+            GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
         }
 
         return $this;

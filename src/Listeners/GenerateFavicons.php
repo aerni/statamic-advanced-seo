@@ -51,7 +51,7 @@ class GenerateFavicons implements ShouldQueue
             $ratio = $height / $viewBoxHeight;
         }
 
-        $imagick = new \Imagick();
+        $imagick = new \Imagick;
 
         $imagick->setResolution($viewBoxWidth * $ratio * 2, $viewBoxHeight * $ratio * 2);
         $imagick->setBackgroundColor(new \ImagickPixel($background));

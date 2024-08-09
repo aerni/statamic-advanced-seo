@@ -2,8 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
+use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Contracts\SitemapUrl;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
@@ -12,6 +14,8 @@ use Statamic\Sites\Site;
 
 abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 {
+    use HasBaseUrl;
+
     abstract public function loc(): string|self;
 
     abstract public function alternates(): array|self|null;
@@ -41,10 +45,13 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
         ];
     }
 
-    protected function absoluteUrl(Entry|Taxonomy|Term|Site $model): string
+    protected function absoluteUrl(Entry|Taxonomy|Term|Site|string $model): string
     {
-        return $this->sitemap->baseUrl()
-            ? URL::assemble($this->sitemap->baseUrl(), $model->url())
-            : $model->absoluteUrl();
+        return match (true) {
+            $this->baseUrl() && is_string($model) => URL::assemble($this->baseUrl(), Str::after($model, parse_url($model, PHP_URL_HOST))),
+            $this->baseUrl() => URL::assemble($this->baseUrl(), $model->url()),
+            is_string($model) => $model,
+            default => $model->absoluteUrl(),
+        };
     }
 }

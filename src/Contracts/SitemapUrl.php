@@ -15,6 +15,4 @@ interface SitemapUrl
     public function priority(): string|self|null;
 
     public function site(): string|self;
-
-    public function canonicalTypeIsCurrent(): bool;
 }

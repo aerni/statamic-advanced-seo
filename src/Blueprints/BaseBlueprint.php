@@ -15,7 +15,7 @@ abstract class BaseBlueprint implements Contract
 
     public static function make(): self
     {
-        return new static();
+        return new static;
     }
 
     public function data(DefaultsData $data): self

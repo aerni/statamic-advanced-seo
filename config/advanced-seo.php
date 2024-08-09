@@ -226,14 +226,25 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Cache Expiry
+        | Storage Path
         |--------------------------------------------------------------------------
         |
-        | The sitemap cache expiry in minutes.
+        | The directory where your sitemap files will be located.
         |
         */
 
-        'expiry' => 60,
+        'path' => storage_path('statamic/sitemaps'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Queue
+        |--------------------------------------------------------------------------
+        |
+        | The queue that is used when generating the sitemaps.
+        |
+        */
+
+        'queue' => 'default',
 
     ],
 

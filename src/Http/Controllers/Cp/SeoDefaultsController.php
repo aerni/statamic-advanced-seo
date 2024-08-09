@@ -177,7 +177,7 @@ class SeoDefaultsController extends CpController
             'type' => Str::singular($this->type()),
         ]));
 
-        throw new NotFoundHttpException();
+        throw new NotFoundHttpException;
     }
 
     protected function redirectToIndex(SeoDefaultSet $set, string $site): RedirectResponse

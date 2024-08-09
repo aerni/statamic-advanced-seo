@@ -17,6 +17,4 @@ interface Sitemap
     public function url(): string;
 
     public function lastmod(): ?string;
-
-    public function clearCache(): void;
 }

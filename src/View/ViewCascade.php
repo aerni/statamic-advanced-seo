@@ -167,6 +167,7 @@ class ViewCascade extends BaseCascade
 
     public function indexing(): ?string
     {
+        // TODO: Could use crawlingIsEnabled() method instead.
         if (! in_array(app()->environment(), config('advanced-seo.crawling.environments', []))) {
             $this->merge(['noindex' => true, 'nofollow' => true]);
         }

@@ -51,11 +51,14 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
     public function lastmod(): string
     {
         if ($term = $this->lastModifiedTaxonomyTerm()) {
+            /* Ensure we are getting a fresh last modified date in case that there is no last modified taxonomy term. */
+            Cache::forget("advanced-seo::sitemaps::collection-taxonomy::{$this->taxonomy}::lastmod");
+
             return $term->lastModified()->format('Y-m-d\TH:i:sP');
         }
 
         return Cache::rememberForever(
-            "advanced-seo::sitemaps::taxonomy::{$this->taxonomy}::lastmod",
+            "advanced-seo::sitemaps::collection-taxonomy::{$this->taxonomy}::lastmod",
             fn () => now()->format('Y-m-d\TH:i:sP')
         );
     }

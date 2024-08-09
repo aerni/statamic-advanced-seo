@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Blink;
 
 class TaxonomySitemap extends BaseSitemap
 {
@@ -13,15 +14,13 @@ class TaxonomySitemap extends BaseSitemap
 
     public function urls(): Collection
     {
-        if (isset($this->urls)) {
-            return $this->urls;
-        }
-
-        return $this->urls = $this->taxonomyUrls()
-            ->merge($this->termUrls())
-            ->merge($this->collectionTaxonomyUrls())
-            ->merge($this->collectionTermUrls())
-            ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
+        return Blink::once($this->filename(), function () {
+            return $this->taxonomyUrls()
+                ->merge($this->termUrls())
+                ->merge($this->collectionTaxonomyUrls())
+                ->merge($this->collectionTermUrls())
+                ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
+        });
     }
 
     protected function taxonomyUrls(): Collection
@@ -34,7 +33,7 @@ class TaxonomySitemap extends BaseSitemap
     protected function termUrls(): Collection
     {
         return $this->terms()
-            ->map(fn ($term) => new TermSitemapUrl($term, $this));
+            ->map(fn ($term) => new TermSitemapUrl($term));
     }
 
     protected function collectionTaxonomyUrls(): Collection
