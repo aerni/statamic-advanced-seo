@@ -201,6 +201,9 @@ class SeoDefaultsController extends CpController
 
     protected function type(): string
     {
-        return request()->segments()[2];
+        $segments = request()->segments();
+        $key = array_search('advanced-seo', $segments) + 1;
+
+        return $segments[$key];
     }
 }
