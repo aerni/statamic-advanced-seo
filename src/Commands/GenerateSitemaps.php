@@ -28,6 +28,10 @@ class GenerateSitemaps extends Command
             return error('The sitemap feature is disabled. You need to enable it to generate the sitemaps.');
         }
 
+        if (! in_array(app()->environment(), config('advanced-seo.crawling.environments', []))) {
+            return error('The current environment is protected from being crawled. To generate the sitemaps, you need to add this environment to the crawling config.');
+        }
+
         $this->shouldQueue = $this->option('queue');
 
         if ($this->shouldQueue && config('queue.default') === 'sync') {
