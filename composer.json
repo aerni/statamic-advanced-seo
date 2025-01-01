@@ -19,7 +19,7 @@
         "php": "^8.2",
         "laravel/framework": "^10.0 || ^11.0",
         "laravel/prompts": "^0.1.24",
-        "spatie/browsershot": "^4.0",
+        "spatie/browsershot": "^5.0.5",
         "spatie/image": "^3.4",
         "spatie/laravel-ray": "^1.32",
         "spatie/schema-org": "^3.14",
