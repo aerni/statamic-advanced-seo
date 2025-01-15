@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Addon;
 use Statamic\Facades\URL;
-use Statamic\Query\EloquentQueryBuilder;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsable, SitemapFile
@@ -62,12 +61,9 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 
     protected function includeInSitemapQuery(Builder $query): Builder
     {
-        // The Eloquent driver seems to require a different column name for the URL
-        $urlColumn = $query instanceof EloquentQueryBuilder ? 'uri' : 'url';
-
         return $query
             ->where('published', true)
-            ->whereNotNull($urlColumn);
+            ->whereNotNull('uri');
 
         /**
          * A reminder for my later self. We used to also include the following queries here:
