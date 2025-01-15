@@ -63,7 +63,7 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
     {
         return $query
             ->where('published', true)
-            ->whereNotNull('url');
+            ->whereNotNull('uri');
 
         /**
          * A reminder for my later self. We used to also include the following queries here:
