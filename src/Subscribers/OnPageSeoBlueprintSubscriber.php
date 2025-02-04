@@ -2,19 +2,22 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Statamic\Events;
-use Statamic\Events\Event;
-use Statamic\Facades\Fieldset;
-use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\Events\Event;
+use Statamic\Facades\Site;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Statamic\Facades\Fieldset;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Actions\EvaluateModelParent;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Statamic\Events\EntryBlueprintFound;
+use Statamic\Events\TermBlueprintFound;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -160,7 +163,7 @@ class OnPageSeoBlueprintSubscriber
     protected function shouldExtendBlueprint(Event $event): bool
     {
         // Don't add fields if the collection/taxonomy is excluded in the config.
-        if ($this->isDisabledType()) {
+        if ($this->isDisabledType($event)) {
             return false;
         }
 
@@ -182,9 +185,30 @@ class OnPageSeoBlueprintSubscriber
         return true;
     }
 
-    protected function isDisabledType(): bool
+    /**
+     * TODO: This implementation doesn't yet work as desired because Statamic dispatched an EntryBlueprintFound event
+     * for every localization of an entry. And it's always dispatched for the origin locale first.
+     * So this check below will always enable/disable the SEO tab by the origin locale and not by the locale that's
+     * actually active in the CP. Not sure if there is a way around this issue.
+     * Maybe this PR would fix it: https://github.com/aerni/statamic-advanced-seo/pull/153
+     */
+    protected function isDisabledType(Event $event): bool
     {
-        return in_array($this->data->handle, config("advanced-seo.disabled.{$this->data->type}", []));
+        $disabledByConfig = in_array($this->data->handle, config("advanced-seo.disabled.{$this->data->type}", []));
+
+        if ($disabledByConfig) {
+            return true;
+        }
+
+        /* Term routes are not yet configurable. They always have a route. */
+        if ($event instanceof TermBlueprintFound) {
+            return false;
+        }
+
+        /* An entry's locale is considered disabled if no route was configured for it. */
+        $disabledByRoutes = ! EvaluateModelParent::handle($event)->routes()->has($this->data->locale);
+
+        return $disabledByRoutes;
     }
 
     protected function isModelCpRoute(Event $event): bool
