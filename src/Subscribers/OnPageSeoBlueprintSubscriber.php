@@ -2,22 +2,22 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Statamic\Events;
-use Statamic\Statamic;
-use Statamic\Events\Event;
-use Statamic\Facades\Site;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Statamic\Facades\Fieldset;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Actions\EvaluateModelParent;
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Statamic\Events;
 use Statamic\Events\EntryBlueprintFound;
+use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\Site;
+use Statamic\Statamic;
 
 class OnPageSeoBlueprintSubscriber
 {
