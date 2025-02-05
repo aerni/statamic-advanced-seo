@@ -4,11 +4,13 @@ namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository as StacheRepository;
+use Illuminate\Support\Collection;
 use Statamic\Data\DataCollection;
 
 // TODO: Use Blink.
 class SeoDefaultsRepository extends StacheRepository
 {
+    // TODO: Why is this called on every request even if no SEO data is queried?
     public function find(string $type, string $handle): ?SeoDefaultSet
     {
         $model = app('statamic.eloquent.advanced_seo.model')::query()
@@ -23,13 +25,20 @@ class SeoDefaultsRepository extends StacheRepository
         return app(SeoDefaultSet::class)->fromModel($model);
     }
 
-    public function all(): DataCollection
+    public function all(): Collection
     {
-        $models = app('statamic.eloquent.advanced_seo.model')::all();
+        return app('statamic.eloquent.advanced_seo.model')::all()
+            ->map(fn ($model) => app(SeoDefaultSet::class)::fromModel($model));
+    }
 
-        return DataCollection::make($models)->map(function ($model) {
-            return app(SeoDefaultSet::class)::fromModel($model);
-        });
+    public function allOfType(string $type): DataCollection
+    {
+        $models = app('statamic.eloquent.advanced_seo.model')::query()
+            ->whereType($type)
+            ->get()
+            ->map(fn ($model) => app(SeoDefaultSet::class)::fromModel($model));
+
+        return DataCollection::make($models);
     }
 
     public function save(SeoDefaultSet $set): self
