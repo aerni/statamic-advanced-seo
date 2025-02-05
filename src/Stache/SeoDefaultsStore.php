@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Stache;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Str;

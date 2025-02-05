@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;

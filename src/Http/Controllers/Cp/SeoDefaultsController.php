@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;

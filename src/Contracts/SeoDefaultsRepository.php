@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Illuminate\Support\Collection;
 use Statamic\Data\DataCollection;
 

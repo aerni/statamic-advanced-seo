@@ -102,10 +102,6 @@ class ServiceProvider extends AddonServiceProvider
         \Aerni\AdvancedSeo\Data\SeoVariables::class => \Aerni\AdvancedSeo\Policies\SeoVariablesPolicy::class,
     ];
 
-    public $singletons = [
-        \Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class => \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class,
-    ];
-
     public function bootAddon(): void
     {
         $this
@@ -117,6 +113,31 @@ class ServiceProvider extends AddonServiceProvider
             ->bootBladeDirective()
             ->bootGraphQL()
             ->autoPublishConfig();
+    }
+
+    public function register()
+    {
+        config('statamic.eloquent-driver.advanced_seo.driver', 'file') !== 'eloquent'
+            ? $this->registerStacheStore()
+            : $this->registerEloquentStore();
+    }
+
+    private function registerStacheStore(): self
+    {
+        Statamic::repository(\Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
+
+        return $this;
+    }
+
+    private function registerEloquentStore(): self
+    {
+        Statamic::repository(\Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Eloquent\SeoDefaultsRepository::class);
+
+        $this->app->bind('statamic.eloquent.advanced_seo.model', function () {
+            return config('statamic.eloquent-driver.advanced_seo.model');
+        });
+
+        return $this;
     }
 
     protected function bootStores(): self
