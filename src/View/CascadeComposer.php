@@ -11,7 +11,14 @@ class CascadeComposer
 {
     public function compose(View $view): void
     {
-        $context = new Context($view->getData());
+        /**
+         * This prevents a "Serialization of 'Closure' is not allowed" exception when using the {{ nocache }} tag.
+         * The issue is caused by closures in the config array. We don't need this value for the ViewCascade
+         * so we can safely remove it here. See: https://github.com/aerni/statamic-advanced-seo/issues/175
+         */
+        $values = collect($view->getData())->except('config');
+
+        $context = new Context($values);
 
         if (! $context->has('current_template')) {
             $context = $this->getContextFromCascade($context);
