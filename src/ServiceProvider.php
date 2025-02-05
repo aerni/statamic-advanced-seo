@@ -112,6 +112,7 @@ class ServiceProvider extends AddonServiceProvider
             ->bootViewCascade()
             ->bootBladeDirective()
             ->bootGraphQL()
+            ->bootMigrations()
             ->autoPublishConfig();
     }
 
@@ -265,6 +266,15 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
             GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
         }
+
+        return $this;
+    }
+
+    protected function bootMigrations(): self
+    {
+        $this->publishes([
+            __DIR__.'/../database/migrations/2025_02_05_100000_create_seo_defaults_table.php' => database_path('migrations/2025_02_05_100000_create_seo_defaults_table.php'),
+        ], 'statamic-eloquent-advanced-seo-migrations');
 
         return $this;
     }
