@@ -53,7 +53,7 @@ class SeoDefaultsRepository extends StacheRepository
     public static function bindings(): array
     {
         return [
-            \Aerni\AdvancedSeo\Contracts\SeoDefaultSet::class => \Aerni\AdvancedSeo\Eloquent\SeoDefaultSet::class
+            \Aerni\AdvancedSeo\Contracts\SeoDefaultSet::class => \Aerni\AdvancedSeo\Eloquent\SeoDefaultSet::class,
         ];
     }
 }

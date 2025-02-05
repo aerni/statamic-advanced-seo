@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\DefaultsData;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;

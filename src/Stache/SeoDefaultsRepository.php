@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Stache;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
 use Illuminate\Support\Collection;
 use Statamic\Data\DataCollection;
 use Statamic\Stache\Stache;
@@ -67,7 +67,7 @@ class SeoDefaultsRepository implements Contract
     public static function bindings(): array
     {
         return [
-            \Aerni\AdvancedSeo\Contracts\SeoDefaultSet::class => \Aerni\AdvancedSeo\Data\SeoDefaultSet::class
+            \Aerni\AdvancedSeo\Contracts\SeoDefaultSet::class => \Aerni\AdvancedSeo\Data\SeoDefaultSet::class,
         ];
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
-use Illuminate\Support\Arr;
-use Illuminate\Database\Eloquent\Model;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet as FileEntry;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet as FileEntry;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class SeoDefaultSet extends FileEntry
 {
