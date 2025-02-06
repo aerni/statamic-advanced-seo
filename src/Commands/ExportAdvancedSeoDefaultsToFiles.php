@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Closure;
-use Statamic\Statamic;
-use Illuminate\Console\Command;
-use Statamic\Console\RunsInPlease;
-use Illuminate\Support\Facades\Facade;
-use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as SeoDefaultsRepositoryContract;
 use Aerni\AdvancedSeo\Eloquent\SeoDefaultModel;
 use Aerni\AdvancedSeo\Eloquent\SeoDefaultSet;
+use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository;
+use Closure;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Facade;
+use Statamic\Console\RunsInPlease;
+use Statamic\Statamic;
 
 class ExportAdvancedSeoDefaultsToFiles extends Command
 {

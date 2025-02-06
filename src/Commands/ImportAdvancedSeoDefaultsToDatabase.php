@@ -2,15 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Statamic\Statamic;
-use Illuminate\Console\Command;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Console\RunsInPlease;
-use Illuminate\Support\Facades\Facade;
-use Aerni\AdvancedSeo\Eloquent\SeoDefaultSet as EloquentSeoDefaultSet;
-use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as SeoDefaultSetContract;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as SeoDefaultsRepositoryContract;
+use Aerni\AdvancedSeo\Eloquent\SeoDefaultSet as EloquentSeoDefaultSet;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Facade;
+use Statamic\Console\RunsInPlease;
+use Statamic\Statamic;
 
 class ImportAdvancedSeoDefaultsToDatabase extends Command
 {
