@@ -2,45 +2,46 @@
 
 namespace Aerni\AdvancedSeo;
 
+use Statamic\Statamic;
+use Statamic\Facades\Git;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Illuminate\Support\Arr;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Facades\Statamic\Console\Processes\Composer;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\View\CascadeComposer;
+use Statamic\Providers\AddonServiceProvider;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\View\CascadeComposer;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\View;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Git;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\GraphQL\Types\EntryInterface;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -118,6 +119,12 @@ class ServiceProvider extends AddonServiceProvider
 
     public function register()
     {
+        if (! Composer::isInstalled('statamic/eloquent-driver')) {
+            return $this->registerStacheStore();
+        }
+
+        $this->ensureEloquentConfig();
+
         config('statamic.eloquent-driver.advanced_seo.driver', 'file') !== 'eloquent'
             ? $this->registerStacheStore()
             : $this->registerEloquentStore();
@@ -125,14 +132,26 @@ class ServiceProvider extends AddonServiceProvider
 
     private function registerStacheStore(): self
     {
-        Statamic::repository(\Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
+
+        return $this;
+    }
+
+    private function ensureEloquentConfig(): self
+    {
+        $config = array_merge([
+            'driver' => 'eloquent',
+            'model' => \Aerni\AdvancedSeo\Eloquent\SeoDefaultModel::class,
+        ], config()->get('statamic.eloquent-driver.advanced_seo', []));
+
+        config()->set('statamic.eloquent-driver.advanced_seo', $config);
 
         return $this;
     }
 
     private function registerEloquentStore(): self
     {
-        Statamic::repository(\Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Eloquent\SeoDefaultsRepository::class);
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, Eloquent\SeoDefaultsRepository::class);
 
         $this->app->bind('statamic.eloquent.advanced_seo.model', function () {
             return config('statamic.eloquent-driver.advanced_seo.model');
