@@ -106,7 +106,7 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
-            ->bootStores()
+            ->bootStacheStore()
             ->bootNav()
             ->bootPermissions()
             ->bootGit()
@@ -117,27 +117,20 @@ class ServiceProvider extends AddonServiceProvider
             ->autoPublishConfig();
     }
 
-    public function register()
+    public function register(): void
     {
-        if (! Composer::isInstalled('statamic/eloquent-driver')) {
-            return $this->registerStacheStore();
-        }
-
-        $this->ensureEloquentConfig();
-
-        config('statamic.eloquent-driver.advanced_seo.driver', 'file') !== 'eloquent'
-            ? $this->registerStacheStore()
-            : $this->registerEloquentStore();
+        $this->usesEloquentDriver()
+            ? $this->registerEloquentDriver()
+            : $this->registerStacheDriver();
     }
 
-    private function registerStacheStore(): self
+    protected function usesEloquentDriver(): bool
     {
-        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
-
-        return $this;
+        return Composer::isInstalled('statamic/eloquent-driver')
+            && config('statamic.eloquent-driver.advanced_seo.driver') === 'eloquent';
     }
 
-    private function ensureEloquentConfig(): self
+    protected function registerEloquentDriver(): void
     {
         $config = array_merge([
             'driver' => 'eloquent',
@@ -146,21 +139,19 @@ class ServiceProvider extends AddonServiceProvider
 
         config()->set('statamic.eloquent-driver.advanced_seo', $config);
 
-        return $this;
-    }
-
-    private function registerEloquentStore(): self
-    {
         Statamic::repository(Contracts\SeoDefaultsRepository::class, Eloquent\SeoDefaultsRepository::class);
 
         $this->app->bind('statamic.eloquent.advanced_seo.model', function () {
             return config('statamic.eloquent-driver.advanced_seo.model');
         });
-
-        return $this;
     }
 
-    protected function bootStores(): self
+    protected function registerStacheDriver(): void
+    {
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
+    }
+
+    protected function bootStacheStore(): self
     {
         $seoStore = app(SeoStore::class)->directory(config('advanced-seo.directory'));
 
