@@ -19,13 +19,12 @@ class SeoDefaultSet extends StacheSeoDefaultSet
             ->model($model);
 
         $model->data->each(function ($data, $site) use ($seoDefaultSet) {
-            $variables = $seoDefaultSet->makeLocalization($site);
-
-            $variables
+            $localization = $seoDefaultSet
+                ->makeLocalization($site)
                 ->merge(Arr::except($data, 'origin'))
                 ->origin(Arr::get($data, 'origin'));
 
-            $seoDefaultSet->addLocalization($variables);
+            $seoDefaultSet->addLocalization($localization);
         });
 
         return $seoDefaultSet;
@@ -40,11 +39,16 @@ class SeoDefaultSet extends StacheSeoDefaultSet
     {
         $class = app('statamic.eloquent.advanced_seo.model');
 
+        /* Only keep data of configured sites. */
+        $data = $source->localizations()
+            ->intersectByKeys($source->sites()->flip())
+            ->map->fileData();
+
         return $class::firstOrNew([
             'type' => $source->type(),
             'handle' => $source->handle(),
         ])->fill([
-            'data' => $source->localizations()->map->fileData(),
+            'data' => $data,
         ]);
     }
 
