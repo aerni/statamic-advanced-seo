@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
-use Statamic\Facades\Site;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Eloquent\Model;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet as StacheSeoDefaultSet;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as SeoDefaultSetContract;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet as StacheSeoDefaultSet;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Statamic\Facades\Site;
 
 class SeoDefaultSet extends StacheSeoDefaultSet
 {
