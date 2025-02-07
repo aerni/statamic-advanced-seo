@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Commands;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as SeoDefaultsRepositoryContract;
-use Aerni\AdvancedSeo\Eloquent\SeoDefaultModel;
 use Aerni\AdvancedSeo\Eloquent\SeoDefaultSet;
 use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository;
 use Closure;
@@ -51,7 +50,7 @@ class ExportAdvancedSeoDefaultsToFiles extends Command
 
     private function exportAdvancedSeoDefaults()
     {
-        $this->withProgressBar(SeoDefaultModel::all(), function ($model) {
+        $this->withProgressBar(app('statamic.eloquent.advanced_seo.model')::all(), function ($model) {
             SeoDefaultSet::fromModel($model)->save();
         });
 
