@@ -27,7 +27,7 @@ class ExportAdvancedSeoDefaultsToFiles extends Command
      *
      * @var string
      */
-    protected $description = 'Export eloquent Advanced SEO defaults to file based.';
+    protected $description = 'Exports eloquent-based Advanced SEO defaults to flat files.';
 
     /**
      * Execute the console command.
