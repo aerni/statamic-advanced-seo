@@ -2,10 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Tests;
 
-use ReflectionClass;
-use Statamic\Testing\AddonTestCase;
 use Aerni\AdvancedSeo\ServiceProvider;
-use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+use Statamic\Testing\AddonTestCase;
 
 abstract class TestCase extends AddonTestCase
 {
