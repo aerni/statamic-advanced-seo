@@ -2,16 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet as FileEntry;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as SeoDefaultSetContract;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet as StacheSeoDefaultSet;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
-class SeoDefaultSet extends FileEntry
+class SeoDefaultSet extends StacheSeoDefaultSet
 {
     protected Model $model;
 
-    public static function fromModel(Model $model)
+    public static function fromModel(Model $model): SeoDefaultSetContract
     {
         $seoDefaultSet = (new static)
             ->type($model->type)
@@ -36,7 +36,7 @@ class SeoDefaultSet extends FileEntry
         return self::makeModelFromContract($this);
     }
 
-    public static function makeModelFromContract(Contract $source): Model
+    public static function makeModelFromContract(SeoDefaultSetContract $source): Model
     {
         $class = app('statamic.eloquent.advanced_seo.model');
 
