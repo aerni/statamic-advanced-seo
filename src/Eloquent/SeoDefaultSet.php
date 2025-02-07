@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as SeoDefaultSetContract;
-use Aerni\AdvancedSeo\Data\SeoDefaultSet as StacheSeoDefaultSet;
-use Illuminate\Database\Eloquent\Model;
+use Statamic\Facades\Site;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
+use Aerni\AdvancedSeo\Data\SeoDefaultSet as StacheSeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as SeoDefaultSetContract;
 
 class SeoDefaultSet extends StacheSeoDefaultSet
 {
@@ -17,6 +18,14 @@ class SeoDefaultSet extends StacheSeoDefaultSet
             ->type($model->type)
             ->handle($model->handle)
             ->model($model);
+
+        if (! Site::multiEnabled()) {
+            $localization = $seoDefaultSet
+                ->makeLocalization(Site::default()->handle())
+                ->merge($model->data);
+
+            return $seoDefaultSet->addLocalization($localization);
+        }
 
         $model->data->each(function ($data, $site) use ($seoDefaultSet) {
             $localization = $seoDefaultSet
@@ -39,10 +48,10 @@ class SeoDefaultSet extends StacheSeoDefaultSet
     {
         $class = app('statamic.eloquent.advanced_seo.model');
 
-        /* Only keep data of configured sites. */
         $data = $source->localizations()
-            ->intersectByKeys($source->sites()->flip())
-            ->map->fileData();
+            ->intersectByKeys($source->sites()->flip()) /* Only keep data of configured sites. */
+            ->map->fileData()
+            ->when(! Site::multiEnabled(), fn ($data) => $data->first()); /* Don't key data by site when not using multi-site. */
 
         return $class::firstOrNew([
             'type' => $source->type(),
