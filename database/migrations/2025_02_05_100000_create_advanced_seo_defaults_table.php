@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create($this->prefix('seo_defaults'), function (Blueprint $table) {
+        Schema::create($this->prefix('advanced_seo_defaults'), function (Blueprint $table) {
             $table->id();
             $table->string('type');
             $table->string('handle')->unique();
@@ -19,6 +19,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists($this->prefix('seo_defaults'));
+        Schema::dropIfExists($this->prefix('advanced_seo_defaults'));
     }
 };

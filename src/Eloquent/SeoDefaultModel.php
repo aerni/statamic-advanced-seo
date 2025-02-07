@@ -9,7 +9,7 @@ class SeoDefaultModel extends BaseModel
 {
     protected $guarded = [];
 
-    protected $table = 'seo_defaults';
+    protected $table = 'advanced_seo_defaults';
 
     protected $casts = [
         'data' => AsCollection::class,
