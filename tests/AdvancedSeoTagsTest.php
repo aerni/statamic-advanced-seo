@@ -2,10 +2,10 @@
 
 namespace Tests;
 
-use Illuminate\Contracts\View\View;
-use Aerni\AdvancedSeo\Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Aerni\AdvancedSeo\Tags\AdvancedSeoTags;
+use Aerni\AdvancedSeo\Tests\TestCase;
+use Illuminate\Contracts\View\View;
+use PHPUnit\Framework\Attributes\Test;
 
 class AdvancedSeoTagsTest extends TestCase
 {

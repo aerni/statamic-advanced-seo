@@ -2,11 +2,11 @@
 
 namespace Tests;
 
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Aerni\AdvancedSeo\Data\SeoDefaultSet;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Tests\TestCase;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 
 class SeoDefaultsRepositoryTest extends TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Tests;
 
+use Aerni\AdvancedSeo\ServiceProvider;
 use ReflectionClass;
 use Statamic\Testing\AddonTestCase;
-use Aerni\AdvancedSeo\ServiceProvider;
 
 abstract class TestCase extends AddonTestCase
 {
