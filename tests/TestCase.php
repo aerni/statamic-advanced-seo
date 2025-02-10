@@ -35,6 +35,4 @@ abstract class TestCase extends AddonTestCase
 
         parent::teardown();
     }
-
-
 }
