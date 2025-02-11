@@ -2,9 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Tests;
 
-use Statamic\Testing\AddonTestCase;
 use Aerni\AdvancedSeo\ServiceProvider;
-use Aerni\AdvancedSeo\Tests\UseEloquentDriver;
+use Statamic\Testing\AddonTestCase;
 
 abstract class TestCase extends AddonTestCase
 {

@@ -2,7 +2,4 @@
 
 namespace Aerni\AdvancedSeo\Tests;
 
-trait UseEloquentDriver
-{
-
-}
+trait UseEloquentDriver {}
