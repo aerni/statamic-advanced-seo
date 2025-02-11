@@ -1,7 +1,10 @@
 <?php
 
-beforeEach(function () {
-    copy(__DIR__.'/__fixtures__/composer.eloquent.lock', __DIR__.'/../vendor/orchestra/testbench-core/laravel/composer.lock');
-});
+use Facades\Statamic\Console\Processes\Composer;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository;
 
-it('test', function () {});
+pest()->use(Aerni\AdvancedSeo\Tests\UseEloquentDriver::class);
+
+it('test', function () {
+    dd(app(SeoDefaultsRepository::class));
+});
