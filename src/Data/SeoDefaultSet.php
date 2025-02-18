@@ -30,14 +30,7 @@ class SeoDefaultSet implements Contract
 
     public function id(): string
     {
-        return $this->handle();
-
-        /**
-         * TODO: It would be nice to simply call $set->id in the ContentDefaultsController and SiteDefaultsController.
-         * But if we change the ID to consist of the type and handle, everything breaks.
-         * It looks like an issue with the Stache. Have to investigate this come more.
-         */
-        // return "{$this->type()}::{$this->handle()}";
+        return "{$this->type()}::{$this->handle()}";
     }
 
     public function handle($handle = null)
