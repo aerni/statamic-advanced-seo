@@ -28,7 +28,7 @@ class SeoDefaultsRepository implements Contract
 
     public function find(string $type, string $handle): ?SeoDefaultSet
     {
-        return $this->store->store($type)->getItem($handle);
+        return $this->store->store($type)->getItem("{$type}::{$handle}");
     }
 
     public function findOrMake(string $type, string $handle): SeoDefaultSet

@@ -76,9 +76,7 @@ class SeoDefaultsController extends CpController
             'actions' => [
                 'save' => $localization->updateUrl(),
             ],
-            // TODO: Make this work with $set->id()
-            // 'values' => array_merge($values, ['id' => $set->id()]),
-            'values' => array_merge($values, ['id' => "{$set->type()}::{$set->handle()}"]),
+            'values' => array_merge($values, ['id' => $set->id()]),
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'locale' => $localization->locale(),
