@@ -48,45 +48,12 @@ class ServiceProvider extends AddonServiceProvider
         Actions\Statamic\GenerateSocialImages::class,
     ];
 
-    protected $commands = [
-        Commands\GenerateSitemaps::class,
-        Commands\GenerateSocialImages::class,
-        Commands\MakeTheme::class,
-        Commands\Migrate::class,
+    protected $policies = [
+        SeoVariables::class => Policies\SeoVariablesPolicy::class,
     ];
 
-    protected $fieldtypes = [
-        Fieldtypes\AdvancedSeoFieldtype::class,
-        Fieldtypes\CascadeFieldtype::class,
-        Fieldtypes\SocialImageFieldtype::class,
-        Fieldtypes\SourceFieldtype::class,
-    ];
-
-    // protected $listen = [
-    //     \Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class => [
-    //         \Aerni\AdvancedSeo\Listeners\GenerateFavicons::class,
-    //     ],
-    // ];
-
-    protected $subscribe = [
-        \Aerni\AdvancedSeo\Subscribers\ContentDefaultsSubscriber::class,
-        \Aerni\AdvancedSeo\Subscribers\OnPageSeoBlueprintSubscriber::class,
-        \Aerni\AdvancedSeo\Subscribers\SocialImagesGeneratorSubscriber::class,
-    ];
-
-    protected $tags = [
-        Tags\AdvancedSeoTags::class,
-    ];
-
-    protected $updateScripts = [
-        Updates\CreateSocialImagesTheme::class,
-        Updates\MigrateSiteNamePosition::class,
-    ];
-
-    protected $routes = [
-        'actions' => __DIR__.'/../routes/actions.php',
-        'cp' => __DIR__.'/../routes/cp.php',
-        'web' => __DIR__.'/../routes/web.php',
+    public $singletons = [
+        Contracts\SeoDefaultsRepository::class => \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class,
     ];
 
     protected $vite = [
@@ -96,14 +63,6 @@ class ServiceProvider extends AddonServiceProvider
         ],
         'publicDirectory' => 'resources/dist',
         'hotFile' => __DIR__.'/../resources/dist/hot',
-    ];
-
-    protected $policies = [
-        \Aerni\AdvancedSeo\Data\SeoVariables::class => \Aerni\AdvancedSeo\Policies\SeoVariablesPolicy::class,
-    ];
-
-    public $singletons = [
-        \Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository::class => \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class,
     ];
 
     public function bootAddon(): void
