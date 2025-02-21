@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Sitemaps;
 
 use Aerni\AdvancedSeo\Contracts\Sitemap as Contract;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
+use Aerni\AdvancedSeo\Contracts\SitemapUrl;
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
@@ -130,9 +131,55 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
     {
         File::ensureDirectoryExists(Sitemap::path());
 
-        File::put($this->path(), $this->render());
+        File::put($this->path(), $this->prettifyXml($this->render()));
 
         return $this;
+    }
+
+    // TODO: Should we hold off on updating the url and then update all at once instead of updating the file multiple times?
+    // Also, might be a good idea to move this method into the SitemapUrl class?
+    public function updateUrl(SitemapUrl $url): self
+    {
+        $sitemap = str($this->file());
+
+        // Remove item from sitemap
+        if (! $url->includeInSitemap()) {
+            $pattern = '/<url id="' . preg_quote($url->id(), '/') . '".*?<\/url>/s';
+
+            $updatedSitemap = preg_replace($pattern, '', $sitemap);
+
+            File::put($this->path(), $this->prettifyXml($updatedSitemap));
+
+            return $this;
+        }
+
+        // Add item to sitemap
+        if (! $sitemap->contains($url->id())) {
+            $updatedSitemap = $sitemap->replaceLast('</urlset>', "{$url->render()}</urlset>");
+
+            File::put($this->path(), $this->prettifyXml($updatedSitemap));
+
+            return $this;
+        };
+
+        // Update existing item
+        $target = $sitemap->betweenFirst("<url id=\"{$url->id()}\">", '</url>');
+        $replacement = str($url->render())->betweenFirst("<url id=\"{$url->id()}\">", '</url>');
+        $updatedSitemap = $sitemap->replace($target, $replacement);
+
+        File::put($this->path(), $this->prettifyXml($updatedSitemap));
+
+        return $this;
+    }
+
+    protected function prettifyXml(string $xml): string
+    {
+        $dom = new \DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml);
+
+        return $dom->saveXML();
     }
 
     public function __call(string $name, array $arguments): mixed

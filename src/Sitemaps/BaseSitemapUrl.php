@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Sitemaps;
 use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Contracts\SitemapUrl;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -12,7 +13,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
 
-abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
+abstract class BaseSitemapUrl implements Arrayable, SitemapUrl, Renderable
 {
     use HasBaseUrl;
 
@@ -28,6 +29,9 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 
     abstract public function site(): string|self;
 
+    // TODO: This is only a temporary solution until the id() is implemented in all sitemaps.
+    // abstract public function id(): string|self;
+
     public function canonicalTypeIsCurrent(): bool
     {
         return true;
@@ -36,6 +40,7 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
     public function toArray(): array
     {
         return [
+            'id' => method_exists($this, 'id') ? $this->id() : null, // TODO: This is only a temporary solution until the id() is implemented in all sitemaps.
             'loc' => $this->loc(),
             'alternates' => $this->alternates(),
             'lastmod' => $this->lastmod(),
@@ -43,6 +48,11 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
             'priority' => $this->priority(),
             'site' => $this->site(),
         ];
+    }
+
+    public function render(): string
+    {
+        return view('advanced-seo::sitemaps.url', ['url' => $this->toArray()])->render();
     }
 
     protected function absoluteUrl(Entry|Taxonomy|Term|Site|string $model): string

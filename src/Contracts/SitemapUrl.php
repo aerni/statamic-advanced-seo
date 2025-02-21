@@ -15,4 +15,7 @@ interface SitemapUrl
     public function priority(): string|self|null;
 
     public function site(): string|self;
+
+    // TODO: This is only a temporary solution until the id() is implemented in all sitemaps.
+    // public function id(): string|self;
 }

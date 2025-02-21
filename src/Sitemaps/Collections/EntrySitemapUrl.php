@@ -2,15 +2,25 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Collections;
 
-use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
-use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
+use Statamic\Contracts\Entries\Entry;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 
 class EntrySitemapUrl extends BaseSitemapUrl
 {
     public function __construct(protected Entry $entry) {}
+
+    public function includeInSitemap(): bool
+    {
+        return IncludeInSitemap::run($this->entry);
+    }
+
+    public function id(): string
+    {
+        return $this->entry->id();
+    }
 
     public function loc(): string
     {
