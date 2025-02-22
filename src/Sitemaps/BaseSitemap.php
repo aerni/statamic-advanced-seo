@@ -2,12 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps;
 
+use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Contracts\Sitemap as Contract;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
 use Aerni\AdvancedSeo\Contracts\SitemapUrl;
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Collections\EntrySitemapUrl;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
@@ -23,6 +26,8 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsable, SitemapFile
 {
     use FluentlyGetsAndSets;
+
+    protected Collection $urls;
 
     abstract public function urls(): Collection;
 
@@ -96,7 +101,7 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
     public function render(): string
     {
         return view('advanced-seo::sitemaps.show', [
-            'urls' => $this->toArray()['urls'],
+            'urls' => isset($this->urls) ? $this->urls->toArray() : $this->toArray()['urls'],
             'version' => Addon::get('aerni/advanced-seo')->version(),
         ])->render();
     }
@@ -136,42 +141,70 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
         return $this;
     }
 
-    // TODO: Should we hold off on updating the url and then update all at once instead of updating the file multiple times?
-    // Also, might be a good idea to move this method into the SitemapUrl class?
-    public function updateUrl(SitemapUrl $url): self
+    public function loadUrlsFromFile(): bool|self
     {
-        $sitemap = str($this->file());
+        $sitemap = simplexml_load_string($this->file());
 
-        // Remove item from sitemap
-        if (! $url->includeInSitemap()) {
-            $pattern = '/<url id="' . preg_quote($url->id(), '/') . '".*?<\/url>/s';
-
-            $updatedSitemap = preg_replace($pattern, '', $sitemap);
-
-            File::put($this->path(), $this->prettifyXml($updatedSitemap));
-
-            return $this;
+        if (! $sitemap) {
+            return false;
         }
 
-        // Add item to sitemap
-        if (! $sitemap->contains($url->id())) {
-            $updatedSitemap = $sitemap->replaceLast('</urlset>', "{$url->render()}</urlset>");
+        $sitemap->registerXPathNamespace('xhtml', 'http://www.w3.org/1999/xhtml');
 
-            File::put($this->path(), $this->prettifyXml($updatedSitemap));
+        $urls = [];
 
-            return $this;
-        };
+        foreach ($sitemap->url as $url) {
+            $alternates = collect($url->xpath("xhtml:link"))
+                ->map(fn ($element) =>  [
+                    'hreflang' => ((array) $element)['@attributes']['hreflang'],
+                    'href' => ((array) $element)['@attributes']['href'],
+                ])->all();
 
-        // Update existing item
-        $target = $sitemap->betweenFirst("<url id=\"{$url->id()}\">", '</url>');
-        $replacement = str($url->render())->betweenFirst("<url id=\"{$url->id()}\">", '</url>');
-        $updatedSitemap = $sitemap->replace($target, $replacement);
+            $urls[] = new CustomSitemapUrl(
+                loc: $url->loc,
+                alternates: $alternates,
+                lastmod: $url->lastmod,
+                changefreq: $url->changefreq,
+                priority: $url->priority
+            );
+        }
 
-        File::put($this->path(), $this->prettifyXml($updatedSitemap));
+        $this->urls = collect($urls);
 
         return $this;
     }
 
+    public function updateUrls($entry): self
+    {
+        collect()
+            ->push($root = $entry->root())
+            ->merge($root->descendants())
+            ->each(fn ($entry) => $this->updateUrl($entry));
+
+        return $this;
+    }
+
+    // TODO: Probably a good idea to use an id() instead of absoluteUrl() to prevent issues if routes or slugs change.
+    public function updateUrl($entry): self
+    {
+        if (! IncludeInSitemap::run($entry)) {
+            $this->urls = $this->urls->reject(fn ($url) => $url->loc() === $entry->absoluteUrl());
+
+            return $this;
+        }
+
+        $itemToReplace = $this->urls->search(fn ($url) => $url->loc() === $entry->absoluteUrl());
+
+        if ($itemToReplace !== false) {
+            $this->urls = $this->urls->replace([$itemToReplace => new EntrySitemapUrl($entry)]);
+        } else {
+            $this->urls->push(new EntrySitemapUrl($entry));
+        }
+
+        return $this;
+    }
+
+    // TODO: Implement this in SitemapIndex and other sitemaps as well.
     protected function prettifyXml(string $xml): string
     {
         $dom = new \DOMDocument('1.0');
