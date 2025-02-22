@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
+use Aerni\AdvancedSeo\Facades\Sitemap;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Dispatcher;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Illuminate\Bus\Queueable;
-use Illuminate\Events\Dispatcher;
-use Aerni\AdvancedSeo\Facades\Sitemap;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SitemapsSubscriber implements ShouldQueue
 {
@@ -35,7 +35,7 @@ class SitemapsSubscriber implements ShouldQueue
         // Maybe it's a better idea to construct a fresh sitemap without using the repository?
         if (! $sitemap = Sitemap::find("collection-{$event->entry->collectionHandle()}")?->loadUrlsFromFile()) {
             return;
-        };
+        }
 
         $sitemap->updateUrls($event->entry)->save();
     }

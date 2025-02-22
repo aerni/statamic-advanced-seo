@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Sitemaps;
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Contracts\Sitemap as Contract;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
-use Aerni\AdvancedSeo\Contracts\SitemapUrl;
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
 use Aerni\AdvancedSeo\Sitemaps\Collections\EntrySitemapUrl;
@@ -154,8 +153,8 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
         $urls = [];
 
         foreach ($sitemap->url as $url) {
-            $alternates = collect($url->xpath("xhtml:link"))
-                ->map(fn ($element) =>  [
+            $alternates = collect($url->xpath('xhtml:link'))
+                ->map(fn ($element) => [
                     'hreflang' => ((array) $element)['@attributes']['hreflang'],
                     'href' => ((array) $element)['@attributes']['href'],
                 ])->all();

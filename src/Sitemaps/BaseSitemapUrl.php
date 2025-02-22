@@ -13,7 +13,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
 
-abstract class BaseSitemapUrl implements Arrayable, SitemapUrl, Renderable
+abstract class BaseSitemapUrl implements Arrayable, Renderable, SitemapUrl
 {
     use HasBaseUrl;
 
