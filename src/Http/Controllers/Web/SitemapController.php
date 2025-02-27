@@ -14,19 +14,19 @@ class SitemapController extends Controller
 {
     use EvaluatesIndexability;
 
-    public function __construct()
+    public function index(): SitemapIndex
     {
         throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
         throw_unless($this->crawlingIsEnabled(), new NotFoundHttpException);
-    }
 
-    public function index(): SitemapIndex
-    {
         return SitemapRepository::index();
     }
 
     public function show(string $id): Sitemap
     {
+        throw_unless(config('advanced-seo.sitemap.enabled'), new NotFoundHttpException);
+        throw_unless($this->crawlingIsEnabled(), new NotFoundHttpException);
+
         return throw_unless(SitemapRepository::find($id), NotFoundHttpException::class);
     }
 
