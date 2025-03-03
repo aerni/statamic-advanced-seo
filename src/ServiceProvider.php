@@ -50,7 +50,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $policies = [
-        \Aerni\AdvancedSeo\Data\SeoVariables::class => \Aerni\AdvancedSeo\Policies\SeoVariablesPolicy::class,
+        SeoVariables::class => Policies\SeoVariablesPolicy::class,
     ];
 
     protected $vite = [
@@ -93,7 +93,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $config = array_merge([
             'driver' => 'eloquent',
-            'model' => \Aerni\AdvancedSeo\Eloquent\SeoDefaultModel::class,
+            'model' => Eloquent\SeoDefaultModel::class,
         ], config()->get('statamic.eloquent-driver.advanced_seo', []));
 
         config()->set('statamic.eloquent-driver.advanced_seo', $config);
@@ -180,7 +180,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGit(): self
     {
         if (config('statamic.git.enabled')) {
-            Git::listen(\Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class);
+            Git::listen(Events\SeoDefaultSetSaved::class);
         }
 
         return $this;
