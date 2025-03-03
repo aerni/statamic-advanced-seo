@@ -30,7 +30,7 @@
         "laravel/pint": "^1.21",
         "nunomaduro/collision": "^7.0 || ^8.0",
         "orchestra/testbench": "^8.0 || ^9.2 || ^10.0",
-        "pestphp/pest": "^2.36 || ^3.0",
+        "pestphp/pest": "^3.0",
         "statamic/eloquent-driver": "^4.19"
     },
     "autoload": {
