@@ -27,6 +27,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Stache\SeoStore;
 use Aerni\AdvancedSeo\View\CascadeComposer;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
@@ -52,10 +53,6 @@ class ServiceProvider extends AddonServiceProvider
         SeoVariables::class => Policies\SeoVariablesPolicy::class,
     ];
 
-    public $singletons = [
-        Contracts\SeoDefaultsRepository::class => \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class,
-    ];
-
     protected $vite = [
         'input' => [
             'resources/js/cp.js',
@@ -68,17 +65,52 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
-            ->bootStores()
+            ->bootStacheStore()
             ->bootNav()
             ->bootPermissions()
             ->bootGit()
             ->bootViewCascade()
             ->bootBladeDirective()
             ->bootGraphQL()
+            ->bootMigrations()
             ->autoPublishConfig();
     }
 
-    protected function bootStores(): self
+    public function register(): void
+    {
+        $this->usesEloquentDriver()
+            ? $this->registerEloquentDriver()
+            : $this->registerStacheDriver();
+    }
+
+    protected function usesEloquentDriver(): bool
+    {
+        return Composer::isInstalled('statamic/eloquent-driver')
+            && config('statamic.eloquent-driver.advanced_seo.driver') === 'eloquent';
+    }
+
+    protected function registerEloquentDriver(): void
+    {
+        $config = array_merge([
+            'driver' => 'eloquent',
+            'model' => Eloquent\SeoDefaultModel::class,
+        ], config()->get('statamic.eloquent-driver.advanced_seo', []));
+
+        config()->set('statamic.eloquent-driver.advanced_seo', $config);
+
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, Eloquent\SeoDefaultsRepository::class);
+
+        $this->app->bind('statamic.eloquent.advanced_seo.model', function () {
+            return config('statamic.eloquent-driver.advanced_seo.model');
+        });
+    }
+
+    protected function registerStacheDriver(): void
+    {
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
+    }
+
+    protected function bootStacheStore(): self
     {
         $seoStore = app(SeoStore::class)->directory(config('advanced-seo.directory'));
 
@@ -148,7 +180,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGit(): self
     {
         if (config('statamic.git.enabled')) {
-            Git::listen(\Aerni\AdvancedSeo\Events\SeoDefaultSetSaved::class);
+            Git::listen(Events\SeoDefaultSetSaved::class);
         }
 
         return $this;
@@ -203,6 +235,15 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
             GraphQL::addField(TermInterface::NAME, 'seo', fn () => (new SeoField)->toArray());
         }
+
+        return $this;
+    }
+
+    protected function bootMigrations(): self
+    {
+        $this->publishes([
+            __DIR__.'/../database/migrations/2025_02_05_100000_create_advanced_seo_defaults_table.php' => database_path('migrations/2025_02_05_100000_create_advanced_seo_defaults_table.php'),
+        ], 'statamic-eloquent-advanced-seo-migrations');
 
         return $this;
     }
