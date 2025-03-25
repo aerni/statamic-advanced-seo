@@ -21,17 +21,7 @@ abstract class TestCase extends AddonTestCase
         $app['config']->set('advanced-seo.directory', __DIR__.'/__fixtures__/content/seo');
 
         if ($this->usesEloquentDriver()) {
-            $eloquentDriverConfig = array_merge(
-                require (__DIR__.'/../vendor/statamic/eloquent-driver/config/eloquent-driver.php'),
-                [
-                    'advanced_seo' => [
-                        'driver' => 'eloquent',
-                        'model' => Eloquent\SeoDefaultModel::class,
-                    ],
-                ]
-            );
-
-            $app['config']->set('statamic.eloquent-driver', $eloquentDriverConfig);
+            $app['config']->set('advanced-seo.driver', 'eloquent');
         }
     }
 

@@ -13,7 +13,7 @@ class SeoDefaultsRepository extends StacheRepository
     public function find(string $type, string $handle): ?SeoDefaultSet
     {
         return Blink::once("eloquent-advanced-seo-defaults-{$type}-{$handle}", function () use ($type, $handle) {
-            $model = app('statamic.eloquent.advanced_seo.model')::query()
+            $model = app('advanced_seo.model')::query()
                 ->whereType($type)
                 ->whereHandle($handle)
                 ->first();
@@ -27,7 +27,7 @@ class SeoDefaultsRepository extends StacheRepository
     public function all(): Collection
     {
         return Blink::once('eloquent-advanced-seo-defaults', function () {
-            return app('statamic.eloquent.advanced_seo.model')::all()
+            return app('advanced_seo.model')::all()
                 ->map(fn ($model) => app(SeoDefaultSet::class)::fromModel($model));
         });
     }
@@ -35,7 +35,7 @@ class SeoDefaultsRepository extends StacheRepository
     public function allOfType(string $type): DataCollection
     {
         return Blink::once("eloquent-advanced-seo-defaults-{$type}", function () use ($type) {
-            $models = app('statamic.eloquent.advanced_seo.model')::query()
+            $models = app('advanced_seo.model')::query()
                 ->whereType($type)
                 ->get()
                 ->map(fn ($model) => app(SeoDefaultSet::class)::fromModel($model));

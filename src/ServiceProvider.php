@@ -86,23 +86,14 @@ class ServiceProvider extends AddonServiceProvider
     protected function usesEloquentDriver(): bool
     {
         return Composer::isInstalled('statamic/eloquent-driver')
-            && config('statamic.eloquent-driver.advanced_seo.driver') === 'eloquent';
+            && config('advanced-seo.driver') === 'eloquent';
     }
 
     protected function registerEloquentDriver(): void
     {
-        $config = array_merge([
-            'driver' => 'eloquent',
-            'model' => Eloquent\SeoDefaultModel::class,
-        ], config()->get('statamic.eloquent-driver.advanced_seo', []));
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Eloquent\SeoDefaultsRepository::class);
 
-        config()->set('statamic.eloquent-driver.advanced_seo', $config);
-
-        Statamic::repository(Contracts\SeoDefaultsRepository::class, Eloquent\SeoDefaultsRepository::class);
-
-        $this->app->bind('statamic.eloquent.advanced_seo.model', function () {
-            return config('statamic.eloquent-driver.advanced_seo.model');
-        });
+        $this->app->bind('advanced_seo.model', \Aerni\AdvancedSeo\Eloquent\SeoDefaultModel::class);
     }
 
     protected function registerStacheDriver(): void

@@ -50,7 +50,7 @@ class ExportAdvancedSeoDefaultsToFiles extends Command
 
     private function exportAdvancedSeoDefaults()
     {
-        $this->withProgressBar(app('statamic.eloquent.advanced_seo.model')::all(), function ($model) {
+        $this->withProgressBar(app('advanced_seo.model')::all(), function ($model) {
             SeoDefaultSet::fromModel($model)->save();
         });
 

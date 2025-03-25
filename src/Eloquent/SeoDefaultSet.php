@@ -46,7 +46,7 @@ class SeoDefaultSet extends StacheSeoDefaultSet
 
     public static function makeModelFromContract(SeoDefaultSetContract $source): Model
     {
-        $class = app('statamic.eloquent.advanced_seo.model');
+        $class = app('advanced_seo.model');
 
         $data = $source->localizations()
             ->intersectByKeys($source->sites()->flip()) /* Only keep data of configured sites. */

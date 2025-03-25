@@ -4,10 +4,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Database Driver
+    |--------------------------------------------------------------------------
+    |
+    | Choose the driver for storing data. This can either be 'file' or 'eloquent'.
+    |
+    */
+
+    'driver' => 'file',
+
+    /*
+    |--------------------------------------------------------------------------
     | Store Directory
     |--------------------------------------------------------------------------
     |
-    | You may customize the directory in which Advanced SEO saves its data.
+    | The directory in which Advanced SEO saves its data when using the file driver.
     |
     */
 
