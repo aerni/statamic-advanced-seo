@@ -16,7 +16,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 
-class SwitchToStache extends Command
+class SwitchToFile extends Command
 {
     use RunsInPlease;
 
@@ -25,7 +25,7 @@ class SwitchToStache extends Command
      *
      * @var string
      */
-    protected $signature = 'seo:switch-to-stache';
+    protected $signature = 'seo:switch-to-file';
 
     /**
      * The console command description.
@@ -44,13 +44,13 @@ class SwitchToStache extends Command
         }
 
         $this
-            ->switchToStacheDriver()
+            ->switchToFileDriver()
             ->migrateContent();
 
         info('Advanced SEO is now using flat-files to store its data.');
     }
 
-    protected function switchToStacheDriver(): self
+    protected function switchToFileDriver(): self
     {
         $this->callSilently('vendor:publish', [
             '--tag' => 'advanced-seo-config',
@@ -59,7 +59,7 @@ class SwitchToStache extends Command
         $config = file_get_contents(config_path('advanced-seo.php'));
 
         if (preg_match("/('driver'\s*=>\s*)'[^']*'/", $config)) {
-            $config = preg_replace("/('driver'\s*=>\s*)'[^']*'/", "\${1}'stache'", $config, 1);
+            $config = preg_replace("/('driver'\s*=>\s*)'[^']*'/", "\${1}'file'", $config, 1);
         } else {
             $driver = <<<'EOD'
                 /*
@@ -67,11 +67,11 @@ class SwitchToStache extends Command
                 | Database Driver
                 |--------------------------------------------------------------------------
                 |
-                | Choose the driver for storing data. This can either be 'stache' or 'eloquent'.
+                | Choose the driver for storing data. This can either be 'file' or 'eloquent'.
                 |
                 */
 
-                'driver' => 'stache',
+                'driver' => 'file',
             EOD;
 
             $config = preg_replace("/return\s*\[/", "return [\n\n$driver", $config, 1);
@@ -79,7 +79,7 @@ class SwitchToStache extends Command
 
         file_put_contents(config_path('advanced-seo.php'), $config);
 
-        info('Updated config to use the stache driver.');
+        info('Updated config to use the file driver.');
 
         return $this;
     }

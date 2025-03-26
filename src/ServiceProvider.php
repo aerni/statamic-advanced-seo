@@ -80,7 +80,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->usesEloquentDriver()
             ? $this->registerEloquentDriver()
-            : $this->registerStacheDriver();
+            : $this->registerFileDriver();
     }
 
     protected function usesEloquentDriver(): bool
@@ -96,7 +96,7 @@ class ServiceProvider extends AddonServiceProvider
         $this->app->bind('advanced_seo.model', \Aerni\AdvancedSeo\Eloquent\SeoDefaultModel::class);
     }
 
-    protected function registerStacheDriver(): void
+    protected function registerFileDriver(): void
     {
         Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
     }

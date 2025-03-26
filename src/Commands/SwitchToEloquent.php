@@ -69,7 +69,7 @@ class SwitchToEloquent extends Command
                 | Database Driver
                 |--------------------------------------------------------------------------
                 |
-                | Choose the driver for storing data. This can either be 'stache' or 'eloquent'.
+                | Choose the driver for storing data. This can either be 'file' or 'eloquent'.
                 |
                 */
 
