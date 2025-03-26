@@ -81,7 +81,7 @@ class SwitchToEloquent extends Command
 
         file_put_contents(config_path('advanced-seo.php'), $config);
 
-        info('Updated config to use the eloquent driver.');
+        info('Updated config to use the Eloquent driver.');
 
         return $this;
     }
@@ -98,7 +98,7 @@ class SwitchToEloquent extends Command
 
         info('Published and migrated the Advanced SEO migrations.');
 
-        if (! confirm('Do you want to import existing Advanced SEO data into the database?')) {
+        if (! confirm('Do you want to import existing data from flat-files to the database?')) {
             return $this;
         }
 
@@ -116,7 +116,7 @@ class SwitchToEloquent extends Command
 
         $this->newline(2);
 
-        info('Imported existing data into the database.');
+        info('Imported data into the database.');
 
         return $this;
     }

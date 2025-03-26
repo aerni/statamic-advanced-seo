@@ -79,14 +79,14 @@ class SwitchToFile extends Command
 
         file_put_contents(config_path('advanced-seo.php'), $config);
 
-        info('Updated config to use the file driver.');
+        info('Updated config to use the File driver.');
 
         return $this;
     }
 
     protected function migrateContent(): self
     {
-        if (! confirm('Do you want to export existing Advanced SEO data to flat-files?')) {
+        if (! confirm('Do you want to export existing data from the database to flat-files?')) {
             return $this;
         }
 
@@ -102,7 +102,7 @@ class SwitchToFile extends Command
 
         $this->newline(2);
 
-        info('Exported existing data to flat-files.');
+        info('Exported data to flat-files.');
 
         return $this;
     }
