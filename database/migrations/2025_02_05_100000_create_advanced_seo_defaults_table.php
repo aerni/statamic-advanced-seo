@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create($this->prefix('advanced_seo_defaults'), function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->string('handle')->unique();
+            $table->string('handle');
             $table->jsonb('data');
             $table->timestamps();
         });
