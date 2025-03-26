@@ -234,7 +234,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->publishes([
             __DIR__.'/../database/migrations/2025_02_05_100000_create_advanced_seo_defaults_table.php' => database_path('migrations/2025_02_05_100000_create_advanced_seo_defaults_table.php'),
-        ], 'statamic-eloquent-advanced-seo-migrations');
+        ], 'advanced-seo-migrations');
 
         return $this;
     }
