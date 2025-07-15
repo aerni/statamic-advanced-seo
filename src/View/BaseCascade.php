@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Actions\GetContentDefaults;
 use Aerni\AdvancedSeo\Actions\GetPageData;
 use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Facades\Statamic\Modifiers\CoreModifiers;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -67,6 +68,13 @@ abstract class BaseCascade implements Augmentable
     protected function removeSectionFields(): self
     {
         $this->data = $this->data->filter(fn ($item, $key) => ! Str::contains($key, 'section_'));
+
+        return $this;
+    }
+
+    protected function sanitizeStrings(): self
+    {
+        $this->data = $this->data->map(fn ($item, $key) => is_string($item) ? CoreModifiers::sanitize($item, []) : $item);
 
         return $this;
     }

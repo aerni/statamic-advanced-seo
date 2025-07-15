@@ -40,6 +40,7 @@ class ViewCascade extends BaseCascade
             ->removeSeoPrefix()
             ->removeSectionFields()
             ->ensureOverrides()
+            ->sanitizeStrings()
             ->sortKeys();
     }
 
