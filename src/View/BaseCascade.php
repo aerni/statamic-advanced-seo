@@ -2,19 +2,20 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Actions\GetContentDefaults;
-use Aerni\AdvancedSeo\Actions\GetPageData;
-use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Data\ContainsData;
-use Statamic\Data\HasAugmentedInstance;
 use Statamic\Support\Str;
 use Statamic\Tags\Context;
+use Statamic\Data\ContainsData;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Facades\Statamic\Modifiers\CoreModifiers;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Data\HasAugmentedInstance;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Statamic\Contracts\Data\Augmentable;
+use Aerni\AdvancedSeo\Actions\GetPageData;
+use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
+use Aerni\AdvancedSeo\Actions\GetContentDefaults;
 
 abstract class BaseCascade implements Augmentable
 {
@@ -67,6 +68,13 @@ abstract class BaseCascade implements Augmentable
     protected function removeSectionFields(): self
     {
         $this->data = $this->data->filter(fn ($item, $key) => ! Str::contains($key, 'section_'));
+
+        return $this;
+    }
+
+    protected function sanitizeStrings(): self
+    {
+        $this->data = $this->data->map(fn ($item, $key) => is_string($item) ? CoreModifiers::sanitize($item, []) : $item);
 
         return $this;
     }
