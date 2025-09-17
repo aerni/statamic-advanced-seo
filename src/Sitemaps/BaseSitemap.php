@@ -56,7 +56,7 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 
     public function lastmod(): ?string
     {
-        return $this->urls()->sortByDesc('lastmod')->first()?->lastmod();
+        return $this->urls()->sortByDesc(fn ($url) => $url->lastmod())->first()?->lastmod();
     }
 
     protected function includeInSitemapQuery(Builder $query): Builder
