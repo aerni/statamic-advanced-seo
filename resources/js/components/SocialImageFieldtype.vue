@@ -11,6 +11,8 @@
 </template>
 
 <script>
+    import { FieldtypeMixin as Fieldtype } from '@statamic/cms';
+
     export default {
         mixins: [Fieldtype],
 
@@ -28,7 +30,9 @@
         },
 
         watch: {
-            '$store.state.publish.base.site': function () {
+            // TODO: This should watch the publish container's site instead
+            // '$store.state.publish.base.site': function () {
+            'publishContainer.site': function () {
                 this.image = this.meta.image
             },
         },

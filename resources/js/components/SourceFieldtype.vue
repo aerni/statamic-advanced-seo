@@ -59,8 +59,9 @@
 </template>
 
 <script>
-export default {
+import { FieldtypeMixin as Fieldtype } from '@statamic/cms';
 
+export default {
     mixins: [Fieldtype],
 
     data() {
@@ -146,7 +147,9 @@ export default {
         },
 
         store() {
-            return this.$store.state.publish.base
+            // TODO: This should watch the publish container's site instead
+            // return this.$store.state.publish.base
+            return this.publishContainer
         }
 
     },

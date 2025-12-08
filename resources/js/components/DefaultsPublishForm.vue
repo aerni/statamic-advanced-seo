@@ -83,6 +83,7 @@
 </template>
 
 <script>
+// TODO: This mixin doesn't exist anymore.
 import HasHiddenFields from '../../../vendor/statamic/cms/resources/js/components/publish/HasHiddenFields';
 
 export default {
