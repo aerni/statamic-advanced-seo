@@ -1,6 +1,3 @@
 <div class="-my-4">
-    @include('statamic::partials.docs-callout', [
-        'topic' => 'Advanced SEO',
-        'url' => 'https://statamic.com/addons/aerni/advanced-seo'
-    ])
+    <ui-docs-callout topic="Advanced SEO" url="https://advanced-seo.michaelaerni.ch" />
 </div>
