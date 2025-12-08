@@ -121,13 +121,11 @@ class ServiceProvider extends AddonServiceProvider
                     $nav->create(ucfirst($type))
                         ->section('SEO')
                         ->route("advanced-seo.{$type}.index")
-                        ->active("advanced-seo/{$type}")
                         ->icon($defaults->first()['type_icon'])
                         ->children(
                             $defaults->map(function ($default) use ($nav, $type) {
                                 return $nav->item($default['title'])
-                                    ->route("advanced-seo.{$default['type']}.edit", $default['handle'])
-                                    ->active("advanced-seo/{$type}/{$default['handle']}");
+                                    ->route("advanced-seo.{$default['type']}.edit", $default['handle']);
                             })->toArray()
                         );
                 });
