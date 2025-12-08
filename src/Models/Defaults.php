@@ -87,8 +87,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($collection->handle(), config('advanced-seo.disabled.collections', [])),
-                'icon' => 'icons/light/content-writing',
-                'type_icon' => 'content-writing',
+                'icon' => 'collections',
+                'type_icon' => 'collections',
                 'set' => Seo::findOrMake('collections', $collection->handle()),
             ];
         })->sortBy('handle');
@@ -102,8 +102,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($taxonomy->handle(), config('advanced-seo.disabled.taxonomies', [])),
-                'icon' => 'icons/light/tags',
-                'type_icon' => 'tags',
+                'icon' => 'taxonomies',
+                'type_icon' => 'taxonomies',
                 'set' => Seo::findOrMake('taxonomies', $taxonomy->handle()),
             ];
         })->sortBy('handle');
