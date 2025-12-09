@@ -79,9 +79,9 @@ export default {
         },
 
         fieldComponent() {
-            let type = this.config.field.type
-            let component = this.config.field.component
-            let field = component || type // Use the component name if it's an entries fieldtype.
+            const type = this.config.field.type
+            const component = this.config.field.component
+            const field = component || type // Use the component name if it's an entries fieldtype.
 
             return field.replace('.', '-') + '-fieldtype'
         },
@@ -95,14 +95,14 @@ export default {
         },
 
         autoFieldDisplay() {
-            let sections = this.store.blueprint.tabs.flatMap(tab => tab.sections)
-            let fields = sections.flatMap(section => section.fields)
+            const sections = this.store.blueprint.tabs.flatMap(tab => tab.sections)
+            const fields = sections.flatMap(section => section.fields)
 
             return fields.find(field => field.handle === this.autoFieldHandle)?.display
         },
 
         autoFieldValue() {
-            let value = this.store.values[this.autoFieldHandle]
+            const value = this.store.values[this.autoFieldHandle]
 
             return typeof value === 'object' && value !== null
                 ? value.value
@@ -118,7 +118,7 @@ export default {
         },
 
         sourceOptions() {
-            let options = [
+            const options = [
                 { label: __('advanced-seo::messages.field_sources.default'), value: SOURCE_TYPES.DEFAULT },
                 { label: __('advanced-seo::messages.field_sources.custom'), value: SOURCE_TYPES.CUSTOM },
             ]
