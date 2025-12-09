@@ -54,7 +54,8 @@ export default {
 
     data() {
         return {
-            customValue: null,
+            // Caches the user's custom input so it can be restored when switching back to custom mode
+            cachedCustomValue: null,
         }
     },
 
@@ -171,14 +172,14 @@ export default {
             const handlers = {
                 [SOURCE_TYPES.AUTO]: () => this.updateFieldValue(this.autoFieldValue),
                 [SOURCE_TYPES.DEFAULT]: () => this.updateFieldValue(this.fieldDefault),
-                [SOURCE_TYPES.CUSTOM]: () => this.updateFieldValue(this.customValue === null ? this.fieldDefault : this.customValue),
+                [SOURCE_TYPES.CUSTOM]: () => this.updateFieldValue(this.cachedCustomValue ?? this.fieldDefault),
             }
 
             handlers[source]?.()
         },
 
         site() {
-            this.customValue = null
+            this.cachedCustomValue = null
             this.updateAutoFieldValue()
         },
     },
@@ -221,7 +222,7 @@ export default {
         },
 
         updateCustomValue(value) {
-            this.customValue = value
+            this.cachedCustomValue = value
         },
 
         updateFieldMeta(meta) {
