@@ -4,7 +4,7 @@
         <ButtonGroup>
             <Button
                 v-for="(option, index) in sourceOptions"
-                :key="index"
+                :key="option.value"
                 :text="option.label || option.value"
                 size="xs"
                 :variant="fieldSource === option.value ? 'pressed' : 'default'"
