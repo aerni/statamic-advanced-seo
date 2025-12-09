@@ -54,8 +54,6 @@ export default {
 
     data() {
         return {
-            autoBindChangeWatcher: false,
-            changeWatcherWatchDeep: false,
             customValue: null,
         }
     },
