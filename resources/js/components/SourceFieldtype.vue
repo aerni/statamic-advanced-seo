@@ -19,14 +19,14 @@
             :config="fieldConfig"
             :meta="fieldMeta"
             :value="fieldValue"
-            :read-only="fieldSource !== 'custom' || isReadOnly"
+            :read-only="!isCustomSource || isReadOnly"
             handle="source_value"
-            @meta-updated="fieldSource === 'custom' ? updateFieldMeta : undefined"
-            @update:modelValue="fieldSource === 'custom' ? updateCustomFieldValue : undefined"
+            @meta-updated="isCustomSource ? updateFieldMeta : undefined"
+            @update:modelValue="isCustomSource ? updateCustomFieldValue : undefined"
         />
 
         <Description
-            v-if="fieldSource !== 'custom'"
+            v-if="!isCustomSource"
             :text="sourceDescription"
         />
 
@@ -36,6 +36,12 @@
 <script>
 import { FieldtypeMixin as Fieldtype } from '@statamic/cms';
 import { Button, ButtonGroup, Description } from '@statamic/cms/ui';
+
+const SOURCE_TYPES = {
+    AUTO: 'auto',
+    DEFAULT: 'default',
+    CUSTOM: 'custom',
+};
 
 export default {
     mixins: [Fieldtype],
@@ -58,6 +64,10 @@ export default {
 
         fieldSource() {
             return this.value.source
+        },
+
+        isCustomSource() {
+            return this.fieldSource === SOURCE_TYPES.CUSTOM
         },
 
         fieldDefault() {
@@ -109,12 +119,12 @@ export default {
 
         sourceOptions() {
             let options = [
-                { label: __('advanced-seo::messages.field_sources.default'), value: 'default' },
-                { label: __('advanced-seo::messages.field_sources.custom'), value: 'custom' },
+                { label: __('advanced-seo::messages.field_sources.default'), value: SOURCE_TYPES.DEFAULT },
+                { label: __('advanced-seo::messages.field_sources.custom'), value: SOURCE_TYPES.CUSTOM },
             ]
 
             if (this.autoFieldHandle) {
-                options.unshift({ label: __('advanced-seo::messages.field_sources.auto'), value: 'auto' })
+                options.unshift({ label: __('advanced-seo::messages.field_sources.auto'), value: SOURCE_TYPES.AUTO })
             }
 
             if (this.config.options) {
@@ -126,14 +136,14 @@ export default {
 
         sourceDescription() {
             const descriptions = {
-                auto: () => __('advanced-seo::messages.field_source_description.auto', {
+                [SOURCE_TYPES.AUTO]: () => __('advanced-seo::messages.field_source_description.auto', {
                     title: this.autoFieldDisplay,
                     handle: this.autoFieldHandle,
                 }),
-                default: () => __('advanced-seo::messages.field_source_description.defaults', {
+                [SOURCE_TYPES.DEFAULT]: () => __('advanced-seo::messages.field_source_description.defaults', {
                     title: this.meta.title,
                 }),
-                custom: () => '',
+                [SOURCE_TYPES.CUSTOM]: () => '',
             }
 
             return descriptions[this.fieldSource]?.() || ''
@@ -161,9 +171,9 @@ export default {
 
         fieldSource(source) {
             // console.log('Update source:', source)
-            if (source === 'auto') this.updateFieldValue(this.autoFieldValue)
-            if (source === 'default') this.updateFieldValue(this.fieldDefault)
-            if (source === 'custom') this.updateFieldValue((this.customValue === null) ? this.fieldDefault : this.customValue)
+            if (source === SOURCE_TYPES.AUTO) this.updateFieldValue(this.autoFieldValue)
+            if (source === SOURCE_TYPES.DEFAULT) this.updateFieldValue(this.fieldDefault)
+            if (source === SOURCE_TYPES.CUSTOM) this.updateFieldValue((this.customValue === null) ? this.fieldDefault : this.customValue)
         },
 
         site() {
@@ -174,13 +184,13 @@ export default {
 
     mounted() {
         this.updateAutoFieldValue()
-        if (this.fieldSource === 'custom') this.updateCustomValue(this.fieldValue)
+        if (this.fieldSource === SOURCE_TYPES.CUSTOM) this.updateCustomValue(this.fieldValue)
     },
 
     methods: {
 
         updateAutoFieldValue() {
-            if (this.fieldSource === 'auto') this.value.value = this.autoFieldValue
+            if (this.fieldSource === SOURCE_TYPES.AUTO) this.value.value = this.autoFieldValue
         },
 
         updateFieldSource(source) {
