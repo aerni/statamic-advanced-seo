@@ -13,7 +13,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -102,7 +101,6 @@ class SeoDefaultsController extends CpController
                     'url' => $exists ? $localization->editUrl() : null,
                 ];
             })->values()->all(),
-            'breadcrumbs' => $this->breadcrumbs(),
             'readOnly' => User::current()->cant("edit seo {$handle} defaults"),
             'contentType' => $this->type(),
         ];
@@ -189,16 +187,6 @@ class SeoDefaultsController extends CpController
                 'set' => $set->title(),
                 'type' => Str::singular($this->type()),
             ]));
-    }
-
-    protected function breadcrumbs(): Breadcrumbs
-    {
-        return new Breadcrumbs([
-            [
-                'text' => __("advanced-seo::messages.{$this->type()}"),
-                'url' => cp_route("advanced-seo.{$this->type()}.index"),
-            ],
-        ]);
     }
 
     protected function type(): string

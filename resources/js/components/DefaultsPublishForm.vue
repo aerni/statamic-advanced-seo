@@ -1,8 +1,6 @@
 <template>
 
     <div>
-        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[0].url" :title="breadcrumbs[0].text" />
-
         <div class="flex items-center mb-6">
             <h1 class="flex-1" v-text="title" />
 
@@ -105,7 +103,6 @@ export default {
         initialOriginValues: Object,
         initialOriginMeta: Object,
         initialSite: String,
-        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         isCreating: Boolean,
