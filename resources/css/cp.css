@@ -1,1 +1,1 @@
-@import "tailwindcss" prefix(seo);
+@import "@statamic/cms/tailwind.css";

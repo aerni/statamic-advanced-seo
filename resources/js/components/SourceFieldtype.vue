@@ -1,68 +1,50 @@
 <template>
+    <div class="mt-4 space-y-2">
 
-    <div class="flex flex-col seo-mt-4">
+        <ButtonGroup>
+            <Button
+                v-for="(option, index) in sourceOptions"
+                :key="index"
+                :text="option.label || option.value"
+                size="xs"
+                :variant="fieldSource === option.value ? 'pressed' : 'default'"
+                :disabled="isReadOnly"
+                @click="updateFieldSource(option.value)"
+            />
+        </ButtonGroup>
 
-        <div class="self-start button-group-fieldtype-wrapper">
-            <div class="seo-h-auto btn-group source-btn-group">
-                <button class="h-auto seo-text-[12px] seo-px-2 seo-py-1 btn"
-                    v-for="(option, index) in sourceOptions"
-                    :key="index"
-                    ref="button"
-                    :name="name"
-                    @click="updateFieldSource($event.target.value)"
-                    :value="option.value"
-                    :class="{'active': fieldSource === option.value}"
-                    :disabled="isReadOnly"
-                    v-text="option.label || option.value"
-                />
-            </div>
-        </div>
+        <Component
+            :is="fieldComponent"
+            :name="name"
+            :config="fieldConfig"
+            :meta="fieldMeta"
+            :value="fieldValue"
+            :read-only="fieldSource !== 'custom' || isReadOnly"
+            handle="source_value"
+            @meta-updated="fieldSource === 'custom' ? updateFieldMeta : undefined"
+            @update:modelValue="fieldSource === 'custom' ? updateCustomFieldValue : undefined"
+        />
 
-        <div class="seo-mt-2.5">
-            <div v-if="fieldSource === 'custom'">
-                <component
-                    :is="fieldComponent"
-                    :name="name"
-                    :config="fieldConfig"
-                    :meta="fieldMeta"
-                    :value="fieldValue"
-                    :read-only="isReadOnly"
-                    handle="source_value"
-                    @meta-updated="updateFieldMeta"
-                    @input="updateCustomFieldValue">
-                </component>
-            </div>
-            <div v-else>
-                <component
-                    :is="fieldComponent"
-                    :name="name"
-                    :config="fieldConfig"
-                    :meta="fieldMeta"
-                    :value="fieldValue"
-                    read-only="true"
-                    handle="source_value">
-                </component>
-                <div class="mt-2 mb-0 help-block">
-                    <span
-                        v-if="fieldSource === 'auto'"
-                        v-html="__('advanced-seo::messages.field_source_description.auto', {title: this.autoFieldDisplay, handle: this.autoFieldHandle})"
-                    ></span>
-                    <span
-                        v-else
-                        v-html="__('advanced-seo::messages.field_source_description.defaults', {title: this.meta.title})"
-                    ></span>
-                </div>
-            </div>
-        </div>
+        <Description
+            v-if="fieldSource !== 'custom'"
+            :text="sourceDescription"
+        />
 
     </div>
 </template>
 
 <script>
 import { FieldtypeMixin as Fieldtype } from '@statamic/cms';
+import { Button, ButtonGroup, Description } from '@statamic/cms/ui';
 
 export default {
     mixins: [Fieldtype],
+
+    components: {
+        Button,
+        ButtonGroup,
+        Description,
+    },
 
     data() {
         return {
@@ -106,7 +88,7 @@ export default {
             let sections = this.store.blueprint.tabs.flatMap(tab => tab.sections)
             let fields = sections.flatMap(section => section.fields)
 
-            return _.find(fields, {'handle': this.autoFieldHandle}).display
+            return fields.find(field => field.handle === this.autoFieldHandle)?.display
         },
 
         autoFieldValue() {
@@ -142,6 +124,21 @@ export default {
             return options
         },
 
+        sourceDescription() {
+            const descriptions = {
+                auto: () => __('advanced-seo::messages.field_source_description.auto', {
+                    title: this.autoFieldDisplay,
+                    handle: this.autoFieldHandle,
+                }),
+                default: () => __('advanced-seo::messages.field_source_description.defaults', {
+                    title: this.meta.title,
+                }),
+                custom: () => '',
+            }
+
+            return descriptions[this.fieldSource]?.() || ''
+        },
+
         site() {
             return this.store.site
         },
@@ -150,8 +147,7 @@ export default {
             // TODO: This should watch the publish container's site instead
             // return this.$store.state.publish.base
             return this.publishContainer
-        }
-
+        },
     },
 
     watch: {
@@ -188,7 +184,9 @@ export default {
         },
 
         updateFieldSource(source) {
-            if (this.fieldSource !== source) this.value.source = source
+            if (this.fieldSource !== source) {
+                this.value.source = source
+            }
         },
 
         updateFieldValue(value) {
