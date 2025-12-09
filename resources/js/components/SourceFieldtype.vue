@@ -168,10 +168,13 @@ export default {
         },
 
         fieldSource(source) {
-            // console.log('Update source:', source)
-            if (source === SOURCE_TYPES.AUTO) this.updateFieldValue(this.autoFieldValue)
-            if (source === SOURCE_TYPES.DEFAULT) this.updateFieldValue(this.fieldDefault)
-            if (source === SOURCE_TYPES.CUSTOM) this.updateFieldValue((this.customValue === null) ? this.fieldDefault : this.customValue)
+            const handlers = {
+                [SOURCE_TYPES.AUTO]: () => this.updateFieldValue(this.autoFieldValue),
+                [SOURCE_TYPES.DEFAULT]: () => this.updateFieldValue(this.fieldDefault),
+                [SOURCE_TYPES.CUSTOM]: () => this.updateFieldValue(this.customValue === null ? this.fieldDefault : this.customValue),
+            }
+
+            handlers[source]?.()
         },
 
         site() {
