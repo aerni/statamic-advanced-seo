@@ -191,19 +191,28 @@ export default {
     methods: {
 
         updateAutoFieldValue() {
-            if (this.fieldSource === SOURCE_TYPES.AUTO) this.value.value = this.autoFieldValue
+            if (this.fieldSource === SOURCE_TYPES.AUTO) {
+                this.update({
+                    ...this.value,
+                    value: this.autoFieldValue,
+                })
+            }
         },
 
         updateFieldSource(source) {
             if (this.fieldSource !== source) {
-                this.value.source = source
+                this.update({
+                    ...this.value,
+                    source,
+                })
             }
         },
 
         updateFieldValue(value) {
-            // console.log('Update value:', value)
-            this.value.value = value
-            this.update(this.value)
+            this.update({
+                ...this.value,
+                value,
+            })
         },
 
         updateCustomFieldValue(value) {
@@ -212,12 +221,14 @@ export default {
         },
 
         updateCustomValue(value) {
-            // console.log('Update custom:', value)
             this.customValue = value
         },
 
         updateFieldMeta(meta) {
-            this.meta.meta = meta || this.fieldMeta
+            this.updateMeta({
+                ...this.meta,
+                meta: meta || this.fieldMeta,
+            })
         },
 
     },
