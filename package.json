@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "dev": "vite",
+        "dev": "rm -rf resources/dist/build && vite",
         "build": "vite build"
     },
     "type": "module",

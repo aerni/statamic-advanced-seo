@@ -7,11 +7,12 @@ use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Inertia\Response;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
@@ -21,7 +22,7 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class SeoDefaultsController extends CpController
 {
-    public function index(): View
+    public function index(): Response
     {
         $defaults = $this->defaults();
 
@@ -31,8 +32,9 @@ class SeoDefaultsController extends CpController
 
         $this->authorize('index', [SeoVariables::class, $this->type()]);
 
-        return view("advanced-seo::cp.{$this->type()}", [
+        return Inertia::render($this->view(), [
             'defaults' => $defaults,
+            'title' => __("advanced-seo::messages.{$this->type()}"),
         ]);
     }
 
@@ -167,7 +169,8 @@ class SeoDefaultsController extends CpController
     {
         return Defaults::enabledInType($this->type())
             ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
-            ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]));
+            ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
+            ->values();
     }
 
     protected function flashDefaultsUnavailable(): void
@@ -204,5 +207,15 @@ class SeoDefaultsController extends CpController
         $key = array_search('advanced-seo', $segments) + 1;
 
         return $segments[$key];
+    }
+
+    protected function view(): string
+    {
+        return match ($this->type()) {
+            'site' => 'advanced-seo::Site/Index',
+            'collections' => 'advanced-seo::Collections/Index',
+            'taxonomies' => 'advanced-seo::Taxonomies/Index',
+            default => throw new NotFoundHttpException,
+        };
     }
 }

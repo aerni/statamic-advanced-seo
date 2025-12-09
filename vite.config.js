@@ -5,16 +5,12 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
-        laravel({
-            input: [
-                'resources/js/cp.js',
-                'resources/css/cp.css'
-            ],
-            refresh: true,
-            publicDirectory: 'resources/dist',
-            hotFile: 'resources/dist/hot',
-        }),
         statamic(),
         tailwindcss(),
+        laravel({
+            input: ['resources/js/cp.js', 'resources/css/cp.css'],
+            hotFile: 'resources/dist/hot',
+            publicDirectory: 'resources/dist',
+        }),
     ],
 });
