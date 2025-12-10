@@ -182,21 +182,21 @@ export default {
     methods: {
 
         updateAutoFieldValue() {
-            if (this.fieldSource === SOURCE_TYPES.AUTO) {
-                this.update({
-                    ...this.value,
-                    value: this.autoFieldValue,
-                })
-            }
+            if (this.fieldSource !== SOURCE_TYPES.AUTO) return
+
+            this.update({
+                ...this.value,
+                value: this.autoFieldValue,
+            })
         },
 
         updateFieldSource(source) {
-            if (this.fieldSource !== source) {
-                this.update({
-                    ...this.value,
-                    source,
-                })
-            }
+            if (this.fieldSource === source) return
+
+            this.update({
+                ...this.value,
+                source,
+            })
         },
 
         updateFieldValue(value) {
