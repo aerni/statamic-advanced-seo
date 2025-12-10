@@ -10,7 +10,7 @@ class AdvancedSeoFieldtype extends Fieldtype
 {
     protected static $title = 'Advanced SEO';
 
-    protected $icon = 'seo-search-graph';
+    protected $icon = 'search-magnifying-glass';
 
     protected function options(): Collection
     {
