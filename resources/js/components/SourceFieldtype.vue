@@ -162,7 +162,7 @@ export default {
             const handlers = {
                 [SOURCE_TYPES.AUTO]: () => this.updateFieldValue(this.autoFieldValue),
                 [SOURCE_TYPES.DEFAULT]: () => this.updateFieldValue(this.fieldDefault),
-                [SOURCE_TYPES.CUSTOM]: () => this.updateFieldValue(this.cachedCustomValue ?? this.fieldDefault),
+                [SOURCE_TYPES.CUSTOM]: () => this.updateFieldValue(this.cachedCustomValue ?? this.fieldValue ?? this.fieldDefault),
             }
 
             handlers[source]?.()
