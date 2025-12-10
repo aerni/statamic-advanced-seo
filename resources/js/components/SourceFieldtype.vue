@@ -147,10 +147,6 @@ export default {
 
             return descriptions[this.fieldSource]?.() || ''
         },
-
-        site() {
-            return this.publishContainer.site
-        },
     },
 
     watch: {
@@ -172,7 +168,7 @@ export default {
             handlers[source]?.()
         },
 
-        site() {
+        'publishContainer.site'() {
             this.cachedCustomValue = null
             this.updateAutoFieldValue()
         },
