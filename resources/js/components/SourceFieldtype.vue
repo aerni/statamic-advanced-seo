@@ -21,8 +21,8 @@
             :value="fieldValue"
             :read-only="!isCustomSource || isReadOnly"
             handle="source_value"
-            @meta-updated="isCustomSource ? updateFieldMeta : undefined"
-            @update:modelValue="isCustomSource ? updateCustomFieldValue : undefined"
+            @meta-updated="updateCustomFieldMeta"
+            @update:model-value="updateCustomFieldValue"
         />
 
         <Description
@@ -207,6 +207,8 @@ export default {
         },
 
         updateCustomFieldValue(value) {
+            if (!this.isCustomSource) return
+
             this.updateCachedCustomValue(value)
             this.updateFieldValue(value)
         },
@@ -215,7 +217,9 @@ export default {
             this.cachedCustomValue = value
         },
 
-        updateFieldMeta(meta) {
+        updateCustomFieldMeta(meta) {
+            if (!this.isCustomSource) return
+
             this.updateMeta({
                 ...this.meta,
                 meta: meta || this.fieldMeta,
