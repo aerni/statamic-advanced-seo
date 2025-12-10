@@ -3,13 +3,13 @@
 
         <ButtonGroup>
             <Button
-                v-for="(option, index) in sourceOptions"
-                :key="option.value"
-                :text="option.label || option.value"
+                v-for="(source, index) in fieldSources"
+                :key="source.value"
+                :text="source.label || source.value"
                 size="xs"
-                :variant="fieldSource === option.value ? 'pressed' : 'default'"
+                :variant="fieldSource === source.value ? 'pressed' : 'default'"
                 :disabled="isReadOnly"
-                @click="updateFieldSource(option.value)"
+                @click="updateFieldSource(source.value)"
             />
         </ButtonGroup>
 
@@ -112,36 +112,42 @@ export default {
             return this.config.auto
         },
 
-        sourceOptions() {
-            const options = [
-                { label: __('advanced-seo::messages.field_sources.default'), value: SOURCE_TYPES.DEFAULT },
-                { label: __('advanced-seo::messages.field_sources.custom'), value: SOURCE_TYPES.CUSTOM },
+        fieldSources() {
+            const sources = [
+                {
+                    value: SOURCE_TYPES.DEFAULT,
+                    label: __('advanced-seo::messages.field_sources.default'),
+                    description: __('advanced-seo::messages.field_source_description.defaults', {
+                        title: this.meta.title,
+                    }),
+                },
+                {
+                    value: SOURCE_TYPES.CUSTOM,
+                    label: __('advanced-seo::messages.field_sources.custom'),
+                    description: '',
+                },
             ]
 
             if (this.autoFieldHandle) {
-                options.unshift({ label: __('advanced-seo::messages.field_sources.auto'), value: SOURCE_TYPES.AUTO })
+                sources.unshift({
+                    value: SOURCE_TYPES.AUTO,
+                    label: __('advanced-seo::messages.field_sources.auto'),
+                    description: __('advanced-seo::messages.field_source_description.auto', {
+                        title: this.autoFieldDisplay,
+                        handle: this.autoFieldHandle,
+                    }),
+                })
             }
 
             if (this.config.options) {
-                return options.filter(option => this.config.options.includes(option.value))
+                return sources.filter(source => this.config.options.includes(source.value))
             }
 
-            return options
+            return sources
         },
 
         sourceDescription() {
-            const descriptions = {
-                [SOURCE_TYPES.AUTO]: () => __('advanced-seo::messages.field_source_description.auto', {
-                    title: this.autoFieldDisplay,
-                    handle: this.autoFieldHandle,
-                }),
-                [SOURCE_TYPES.DEFAULT]: () => __('advanced-seo::messages.field_source_description.defaults', {
-                    title: this.meta.title,
-                }),
-                [SOURCE_TYPES.CUSTOM]: () => '',
-            }
-
-            return descriptions[this.fieldSource]?.() || ''
+            return this.fieldSources.find(source => source.value === this.fieldSource).description
         },
     },
 
