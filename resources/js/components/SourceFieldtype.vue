@@ -3,9 +3,9 @@
 
         <ButtonGroup>
             <Button
-                v-for="(source, index) in fieldSources"
+                v-for="(source) in fieldSources"
                 :key="source.value"
-                :text="source.label || source.value"
+                :text="source.label"
                 size="xs"
                 :variant="fieldSource === source.value ? 'pressed' : 'default'"
                 :disabled="isReadOnly"
