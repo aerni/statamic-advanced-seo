@@ -176,7 +176,7 @@ export default {
 
     mounted() {
         this.updateAutoFieldValue()
-        if (this.fieldSource === SOURCE_TYPES.CUSTOM) this.updateCustomValue(this.fieldValue)
+        if (this.fieldSource === SOURCE_TYPES.CUSTOM) this.updateCachedCustomValue(this.fieldValue)
     },
 
     methods: {
@@ -207,11 +207,11 @@ export default {
         },
 
         updateCustomFieldValue(value) {
-            this.updateCustomValue(value)
+            this.updateCachedCustomValue(value)
             this.updateFieldValue(value)
         },
 
-        updateCustomValue(value) {
+        updateCachedCustomValue(value) {
             this.cachedCustomValue = value
         },
 
