@@ -21,8 +21,8 @@
             :value="fieldValue"
             :read-only="isReadOnly || !isCustomSource"
             handle="source_value"
-            @meta-updated="updateFieldMeta"
-            @update:model-value="updateFieldValue"
+            @update:meta="updateFieldMeta"
+            @update:value="updateFieldValue"
         />
 
         <Description
