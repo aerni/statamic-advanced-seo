@@ -19,10 +19,10 @@
             :config="fieldConfig"
             :meta="fieldMeta"
             :value="fieldValue"
-            :read-only="!isCustomSource || isReadOnly"
+            :read-only="isReadOnly || !isCustomSource"
             handle="source_value"
-            @meta-updated="updateCustomFieldMeta"
-            @update:model-value="updateCustomFieldValue"
+            @meta-updated="updateFieldMeta"
+            @update:model-value="updateFieldValue"
         />
 
         <Description
@@ -52,13 +52,6 @@ export default {
         Description,
     },
 
-    data() {
-        return {
-            // Caches the user's custom input so it can be restored when switching back to custom mode
-            cachedCustomValue: null,
-        }
-    },
-
     computed: {
 
         fieldSource() {
@@ -74,7 +67,13 @@ export default {
         },
 
         fieldValue() {
-            return this.value.value
+            const values = {
+                [SOURCE_TYPES.AUTO]: this.autoFieldValue,
+                [SOURCE_TYPES.DEFAULT]: this.fieldDefault,
+                [SOURCE_TYPES.CUSTOM]: this.value.value,
+            }
+
+            return values[this.fieldSource]
         },
 
         fieldComponent() {
@@ -112,10 +111,6 @@ export default {
             return this.config.auto
         },
 
-        fieldIsSynced() {
-            return this.$parent.$parent.isSynced
-        },
-
         sourceOptions() {
             const options = [
                 { label: __('advanced-seo::messages.field_sources.default'), value: SOURCE_TYPES.DEFAULT },
@@ -149,81 +144,19 @@ export default {
         },
     },
 
-    watch: {
-        autoFieldValue() {
-            this.updateAutoFieldValue()
-        },
-
-        fieldIsSynced(value) {
-            if (value === true) this.updateAutoFieldValue()
-        },
-
-        fieldSource(source) {
-            const handlers = {
-                [SOURCE_TYPES.AUTO]: () => this.updateFieldValue(this.autoFieldValue),
-                [SOURCE_TYPES.DEFAULT]: () => this.updateFieldValue(this.fieldDefault),
-                [SOURCE_TYPES.CUSTOM]: () => this.updateFieldValue(this.cachedCustomValue ?? this.fieldValue ?? this.fieldDefault),
-            }
-
-            handlers[source]?.()
-        },
-
-        'publishContainer.site'() {
-            this.cachedCustomValue = null
-            this.updateAutoFieldValue()
-        },
-    },
-
-    mounted() {
-        this.updateAutoFieldValue()
-        if (this.fieldSource === SOURCE_TYPES.CUSTOM) this.updateCachedCustomValue(this.fieldValue)
-    },
-
     methods: {
-
-        updateAutoFieldValue() {
-            if (this.fieldSource !== SOURCE_TYPES.AUTO) return
-
-            this.update({
-                ...this.value,
-                value: this.autoFieldValue,
-            })
-        },
 
         updateFieldSource(source) {
             if (this.fieldSource === source) return
-
-            this.update({
-                ...this.value,
-                source,
-            })
+            this.update({ source: source, value: this.value.value })
         },
 
         updateFieldValue(value) {
-            this.update({
-                ...this.value,
-                value,
-            })
+            this.update({ source: this.fieldSource, value: value})
         },
 
-        updateCustomFieldValue(value) {
-            if (!this.isCustomSource) return
-
-            this.updateCachedCustomValue(value)
-            this.updateFieldValue(value)
-        },
-
-        updateCachedCustomValue(value) {
-            this.cachedCustomValue = value
-        },
-
-        updateCustomFieldMeta(meta) {
-            if (!this.isCustomSource) return
-
-            this.updateMeta({
-                ...this.meta,
-                meta: meta || this.fieldMeta,
-            })
+        updateFieldMeta(meta) {
+            this.updateMeta({ ...this.meta, meta: meta || this.fieldMeta })
         },
 
     },
