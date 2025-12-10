@@ -94,14 +94,14 @@ export default {
         },
 
         autoFieldDisplay() {
-            const sections = this.store.blueprint.tabs.flatMap(tab => tab.sections)
+            const sections = this.publishContainer.blueprint.tabs.flatMap(tab => tab.sections)
             const fields = sections.flatMap(section => section.fields)
 
             return fields.find(field => field.handle === this.autoFieldHandle)?.display
         },
 
         autoFieldValue() {
-            const value = this.store.values[this.autoFieldHandle]
+            const value = this.publishContainer.values[this.autoFieldHandle]
 
             return typeof value === 'object' && value !== null
                 ? value.value
@@ -149,13 +149,7 @@ export default {
         },
 
         site() {
-            return this.store.site
-        },
-
-        store() {
-            // TODO: This should watch the publish container's site instead
-            // return this.$store.state.publish.base
-            return this.publishContainer
+            return this.publishContainer.site
         },
     },
 
