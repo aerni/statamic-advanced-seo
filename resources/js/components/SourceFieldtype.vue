@@ -62,15 +62,24 @@ export default {
             return this.fieldSource === SOURCE_TYPES.CUSTOM
         },
 
-        fieldDefault() {
+        autoFieldValue() {
+            const value = this.publishContainer.values[this.autoFieldHandle]
+            return value && typeof value === 'object' ? value.value : value
+        },
+
+        defaultFieldValue() {
             return this.meta.default
+        },
+
+        customFieldValue() {
+            return this.value.value
         },
 
         fieldValue() {
             const values = {
                 [SOURCE_TYPES.AUTO]: this.autoFieldValue,
-                [SOURCE_TYPES.DEFAULT]: this.fieldDefault,
-                [SOURCE_TYPES.CUSTOM]: this.value.value,
+                [SOURCE_TYPES.DEFAULT]: this.defaultFieldValue,
+                [SOURCE_TYPES.CUSTOM]: this.customFieldValue,
             }
 
             return values[this.fieldSource]
@@ -97,12 +106,6 @@ export default {
             const fields = sections.flatMap(section => section.fields)
 
             return fields.find(field => field.handle === this.autoFieldHandle)?.display
-        },
-
-        autoFieldValue() {
-            const value = this.publishContainer.values[this.autoFieldHandle]
-
-            return value && typeof value === 'object' ? value.value : value
         },
 
         autoFieldHandle() {
@@ -146,7 +149,7 @@ export default {
 
         updateFieldSource(source) {
             if (this.fieldSource === source) return
-            this.update({ source: source, value: this.value.value })
+            this.update({ source: source, value: this.customFieldValue })
         },
 
         updateFieldValue(value) {
