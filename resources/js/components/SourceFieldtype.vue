@@ -102,9 +102,7 @@ export default {
         autoFieldValue() {
             const value = this.publishContainer.values[this.autoFieldHandle]
 
-            return typeof value === 'object' && value !== null
-                ? value.value
-                : value
+            return value && typeof value === 'object' ? value.value : value
         },
 
         autoFieldHandle() {
