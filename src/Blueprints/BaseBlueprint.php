@@ -33,21 +33,18 @@ abstract class BaseBlueprint implements Contract
 
     public function items(): array
     {
-        return $this->get()->fields()->all()->mapWithKeys(function ($field, $handle) {
-            return [$handle => $field->config()];
-        })->toArray();
+        return $this->get()->fields()->all()
+            ->mapWithKeys(fn ($field, $handle) => [$handle => $field->config()])
+            ->toArray();
     }
 
     protected function processedTabs(): array
     {
-        return collect($this->tabs())->map(function ($tab, $handle) {
-            return [
+        return collect($this->tabs())
+            ->map(fn ($tab, $handle) => [
                 'display' => Str::slugToTitle($handle),
-                'sections' => isset($this->data)
-                    ? $tab::make()->data($this->data)->get()
-                    : $tab::make()->get(),
-            ];
-        })
+                'sections' => isset($this->data) ? $tab::make()->data($this->data)->get() : $tab::make()->get(),
+            ])
             ->filter(fn ($tab) => ! empty($tab['sections']))
             ->all();
     }
