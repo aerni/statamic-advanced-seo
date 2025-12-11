@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Actions\EvaluateFeature;
 use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Statamic\Facades\Blueprint;
@@ -27,25 +26,9 @@ abstract class BaseBlueprint implements Contract
 
     public function get(): BlueprintFields
     {
-        $blueprint = Blueprint::make()
+        return Blueprint::make()
             ->setHandle($this->handle())
             ->setContents(['tabs' => $this->processedTabs()]);
-
-        return $this->removeDisabledFeatureFields($blueprint);
-    }
-
-    protected function removeDisabledFeatureFields(BlueprintFields $blueprint): BlueprintFields
-    {
-        if (! isset($this->data)) {
-            return $blueprint;
-        }
-
-        $blueprint->fields()->all()
-            ->filter(fn ($field) => $field->get('feature'))
-            ->filter(fn ($field) => ! EvaluateFeature::handle($field->get('feature'), $this->data))
-            ->each(fn ($field) => $blueprint->removeField($field->handle()));
-
-        return $blueprint;
     }
 
     public function items(): array
