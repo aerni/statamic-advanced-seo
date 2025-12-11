@@ -65,13 +65,6 @@ abstract class BaseCascade implements Augmentable
         return $this;
     }
 
-    protected function removeSectionFields(): self
-    {
-        $this->data = $this->data->filter(fn ($item, $key) => ! Str::contains($key, 'section_'));
-
-        return $this;
-    }
-
     protected function sanitizeStrings(): self
     {
         $this->data = $this->data->map(fn ($item, $key) => is_string($item) ? CoreModifiers::sanitize($item, []) : $item);

@@ -19,7 +19,6 @@ class AnalyticsDefaultsType extends Type
     public function fields(): array
     {
         return AnalyticsBlueprint::make()->get()->fields()->toGql()
-            ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_')) // Remove all section fields, as they don't have any data anyways.
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 

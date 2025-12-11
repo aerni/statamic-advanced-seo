@@ -38,7 +38,6 @@ class ViewCascade extends BaseCascade
             ->withSiteDefaults()
             ->withPageData()
             ->removeSeoPrefix()
-            ->removeSectionFields()
             ->ensureOverrides()
             ->sanitizeStrings()
             ->sortKeys();

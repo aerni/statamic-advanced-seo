@@ -19,7 +19,6 @@ class GeneralDefaultsType extends Type
     public function fields(): array
     {
         return GeneralBlueprint::make()->get()->fields()->toGql()
-            ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_')) // Remove all section fields, as they don't have any data anyways.
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 
