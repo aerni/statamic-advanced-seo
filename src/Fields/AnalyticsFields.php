@@ -20,62 +20,58 @@ class AnalyticsFields extends BaseFields
     protected function fathom(): array
     {
         return [
-            [
-                'handle' => 'section_fathom',
-                'field' => [
-                    'type' => 'section',
-                    'display' => $this->trans('section_fathom.display'),
-                    'instructions' => $this->trans('section_fathom.instructions'),
-                    'feature' => Fathom::class,
-                ],
-            ],
-            [
-                'handle' => 'use_fathom',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => $this->trans('use_fathom.display'),
-                    'instructions' => $this->trans('use_fathom.instructions'),
-                    'listable' => false,
-                    'localizable' => true,
-                    'feature' => Fathom::class,
-                ],
-            ],
-            [
-                'handle' => 'fathom_id',
-                'field' => [
-                    'type' => 'text',
-                    'display' => $this->trans('fathom_id.display'),
-                    'instructions' => $this->trans('fathom_id.instructions'),
-                    'input_type' => 'text',
-                    'width' => 50,
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'antlers' => true,
-                    'feature' => Fathom::class,
-                    'validate' => [
-                        'required_if:use_fathom,true',
-                    ],
-                    'if' => [
-                        'use_fathom' => 'equals true',
+            'display' => $this->trans('section_fathom.display'),
+            'instructions' => $this->trans('section_fathom.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'use_fathom',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('use_fathom.display'),
+                        'instructions' => $this->trans('use_fathom.instructions'),
+                        'listable' => false,
+                        'localizable' => true,
+                        'feature' => Fathom::class,
                     ],
                 ],
-            ],
-            [
-                'handle' => 'fathom_spa',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => $this->trans('fathom_spa.display'),
-                    'instructions' => $this->trans('fathom_spa.instructions'),
-                    'icon' => 'toggle',
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'width' => 50,
-                    'feature' => Fathom::class,
-                    'validate' => [
-                        'required_if:use_fathom,true',
+                [
+                    'handle' => 'fathom_id',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('fathom_id.display'),
+                        'instructions' => $this->trans('fathom_id.instructions'),
+                        'input_type' => 'text',
+                        'width' => 50,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'antlers' => true,
+                        'feature' => Fathom::class,
+                        'validate' => [
+                            'required_if:use_fathom,true',
+                        ],
+                        'if' => [
+                            'use_fathom' => 'equals true',
+                        ],
                     ],
-                    'if' => [
-                        'use_fathom' => 'equals true',
+                ],
+                [
+                    'handle' => 'fathom_spa',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('fathom_spa.display'),
+                        'instructions' => $this->trans('fathom_spa.instructions'),
+                        'icon' => 'toggle',
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
+                        'feature' => Fathom::class,
+                        'validate' => [
+                            'required_if:use_fathom,true',
+                        ],
+                        'if' => [
+                            'use_fathom' => 'equals true',
+                        ],
                     ],
                 ],
             ],
@@ -85,42 +81,38 @@ class AnalyticsFields extends BaseFields
     protected function cloudflare(): array
     {
         return [
-            [
-                'handle' => 'section_cloudflare_web_analytics',
-                'field' => [
-                    'type' => 'section',
-                    'display' => $this->trans('section_cloudflare_web_analytics.display'),
-                    'instructions' => $this->trans('section_cloudflare_web_analytics.instructions'),
-                    'feature' => Cloudflare::class,
-                ],
-            ],
-            [
-                'handle' => 'use_cloudflare_web_analytics',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => $this->trans('use_cloudflare_web_analytics.display'),
-                    'instructions' => $this->trans('use_cloudflare_web_analytics.instructions'),
-                    'listable' => false,
-                    'localizable' => true,
-                    'feature' => Cloudflare::class,
-                ],
-            ],
-            [
-                'handle' => 'cloudflare_web_analytics',
-                'field' => [
-                    'type' => 'text',
-                    'display' => $this->trans('cloudflare_web_analytics.display'),
-                    'instructions' => $this->trans('cloudflare_web_analytics.instructions'),
-                    'input_type' => 'text',
-                    'width' => 50,
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'feature' => Cloudflare::class,
-                    'validate' => [
-                        'required_if:use_cloudflare_web_analytics,true',
+            'display' => $this->trans('section_cloudflare_web_analytics.display'),
+            'instructions' => $this->trans('section_cloudflare_web_analytics.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'use_cloudflare_web_analytics',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('use_cloudflare_web_analytics.display'),
+                        'instructions' => $this->trans('use_cloudflare_web_analytics.instructions'),
+                        'listable' => false,
+                        'localizable' => true,
+                        'feature' => Cloudflare::class,
                     ],
-                    'if' => [
-                        'use_cloudflare_web_analytics' => 'equals true',
+                ],
+                [
+                    'handle' => 'cloudflare_web_analytics',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('cloudflare_web_analytics.display'),
+                        'instructions' => $this->trans('cloudflare_web_analytics.instructions'),
+                        'input_type' => 'text',
+                        'width' => 50,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'feature' => Cloudflare::class,
+                        'validate' => [
+                            'required_if:use_cloudflare_web_analytics,true',
+                        ],
+                        'if' => [
+                            'use_cloudflare_web_analytics' => 'equals true',
+                        ],
                     ],
                 ],
             ],
@@ -130,42 +122,38 @@ class AnalyticsFields extends BaseFields
     protected function googleTagManager(): array
     {
         return [
-            [
-                'handle' => 'section_google_tag_manager',
-                'field' => [
-                    'type' => 'section',
-                    'display' => $this->trans('section_google_tag_manager.display'),
-                    'instructions' => $this->trans('section_google_tag_manager.instructions'),
-                    'feature' => GoogleTagManager::class,
-                ],
-            ],
-            [
-                'handle' => 'use_google_tag_manager',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => $this->trans('use_google_tag_manager.display'),
-                    'instructions' => $this->trans('use_google_tag_manager.instructions'),
-                    'listable' => false,
-                    'localizable' => true,
-                    'feature' => GoogleTagManager::class,
-                ],
-            ],
-            [
-                'handle' => 'google_tag_manager',
-                'field' => [
-                    'type' => 'text',
-                    'display' => $this->trans('google_tag_manager.display'),
-                    'instructions' => $this->trans('google_tag_manager.instructions'),
-                    'input_type' => 'text',
-                    'width' => 50,
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'feature' => GoogleTagManager::class,
-                    'validate' => [
-                        'required_if:use_google_tag_manager,true',
+            'display' => $this->trans('section_google_tag_manager.display'),
+            'instructions' => $this->trans('section_google_tag_manager.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'use_google_tag_manager',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('use_google_tag_manager.display'),
+                        'instructions' => $this->trans('use_google_tag_manager.instructions'),
+                        'listable' => false,
+                        'localizable' => true,
+                        'feature' => GoogleTagManager::class,
                     ],
-                    'if' => [
-                        'use_google_tag_manager' => 'equals true',
+                ],
+                [
+                    'handle' => 'google_tag_manager',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('google_tag_manager.display'),
+                        'instructions' => $this->trans('google_tag_manager.instructions'),
+                        'input_type' => 'text',
+                        'width' => 50,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'feature' => GoogleTagManager::class,
+                        'validate' => [
+                            'required_if:use_google_tag_manager,true',
+                        ],
+                        'if' => [
+                            'use_google_tag_manager' => 'equals true',
+                        ],
                     ],
                 ],
             ],
