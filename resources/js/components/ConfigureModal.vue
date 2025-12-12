@@ -1,6 +1,6 @@
 <script setup>
 import { Modal, Icon, Field, Heading, Select, Button, } from '@statamic/cms/ui';
-import { ref, onMounted, getCurrentInstance } from 'vue';
+import { ref, onMounted, getCurrentInstance, computed } from 'vue';
 
 const instance = getCurrentInstance();
 const { $axios } = instance.appContext.config.globalProperties;
@@ -10,6 +10,7 @@ const props = defineProps({ route: String });
 
 const open = ref(true);
 const busy = ref(false);
+const initialSites = ref(null);
 const sites = ref(null);
 const error = ref(null);
 
@@ -18,6 +19,16 @@ const siteOriginOptions = (site) => {
 		.map((s) => ({ value: s.handle, label: __(s.name) }))
 		.filter((s) => s.value !== site.handle);
 };
+
+const isDirty = computed(() => {
+	if (!sites.value || !initialSites.value) return false;
+
+	return sites.value.some((site, index) => {
+		return site.origin !== initialSites.value[index].origin;
+	});
+});
+
+const canSave = computed(() => isDirty.value && !busy.value);
 
 const save = () => {
 	busy.value = true;
@@ -49,6 +60,7 @@ onMounted(() => {
 	$axios.get(props.route)
 		.then((response) => {
 			sites.value = response.data.sites;
+			initialSites.value = structuredClone(response.data.sites);
 		})
 		.catch((error) => {
 			Statamic.$toast.error(__('Something went wrong'));
@@ -123,7 +135,7 @@ onMounted(() => {
 				<Button
 					type="submit"
 					variant="primary"
-					:disabled="busy"
+					:disabled="!canSave"
 					:text="__('Save')"
 					@click="save"
 				/>
