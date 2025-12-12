@@ -51,7 +51,7 @@ class SeoVariables implements Augmentable, Localization
 
     public function id(): string
     {
-        return $this->seoSet()->id();
+        return "{$this->seoSet()->id()}::{$this->locale()}";
     }
 
     public function handle(): string
@@ -93,6 +93,15 @@ class SeoVariables implements Augmentable, Localization
             'site' => $this->cpUrl('advanced-seo.site.update'),
             'collections' => $this->cpUrl('advanced-seo.collections.update'),
             'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.update'),
+        ][$this->type()];
+    }
+
+    public function configureUrl()
+    {
+        return [
+            'site' => $this->cpUrl('advanced-seo.site.configure.edit'),
+            'collections' => $this->cpUrl('advanced-seo.collections.configure.edit'),
+            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.configure.edit'),
         ][$this->type()];
     }
 

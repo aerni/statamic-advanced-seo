@@ -41,7 +41,9 @@ class SeoDefaultsController extends CpController
     {
         throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
 
-        $set = $this->set($handle);
+        $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
+
+        $set = $defaults['set'];
 
         $site = $request->site ?? Site::selected()->handle();
 
@@ -71,22 +73,17 @@ class SeoDefaultsController extends CpController
         $requestLocalization = $localization;
 
         $viewData = [
-            'title' => $set->title(),
-            'reference' => $localization->reference(),
-            'editing' => true,
-            'actions' => [
-                'save' => $localization->updateUrl(),
-            ],
-            'values' => array_merge($values, ['id' => $set->id()]),
-            'meta' => $meta,
+            'title' => $defaults['title'],
+            'icon' => $defaults['icon'],
             'blueprint' => $blueprint->toPublishArray(),
-            'locale' => $localization->locale(),
-            'localizedFields' => $localization->data()->keys()->all(),
-            'isRoot' => $localization->isRoot(),
-            'hasOrigin' => $hasOrigin,
-            'originValues' => $originValues ?? null,
-            'originMeta' => $originMeta ?? null,
-            'localizations' => $this->authorizedSites($set)->map(function ($site) use ($set, $requestLocalization) {
+            'initialReference' => $localization->reference(),
+            'initialValues' => $values,
+            'initialMeta' => $meta,
+            'initialSite' => $site,
+            'initialHasOrigin' => $hasOrigin,
+            'initialOriginValues' => $originValues ?? null,
+            'initialOriginMeta' => $originMeta ?? null,
+            'initialLocalizations' => $this->authorizedSites($set)->map(function ($site) use ($set, $requestLocalization) {
                 $localization = $set->in($site);
                 $exists = $localization !== null;
 
@@ -101,18 +98,17 @@ class SeoDefaultsController extends CpController
                     'url' => $exists ? $localization->editUrl() : null,
                 ];
             })->values()->all(),
-            'readOnly' => User::current()->cant("edit seo {$handle} defaults"),
-            'contentType' => $this->type(),
+            'initialLocalizedFields' => $localization->data()->keys()->all(),
+            'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
+            'action' => $localization->updateUrl(),
+            'configureUrl' => $localization->configureUrl(),
         ];
 
         if ($request->wantsJson()) {
             return $viewData;
         }
 
-        return view('advanced-seo::cp/edit', array_merge($viewData, [
-            'set' => $set,
-            'variables' => $localization,
-        ]));
+        return Inertia::render('advanced-seo::SeoDefaults/Edit', $viewData);
     }
 
     public function update(Request $request, string $handle): void
