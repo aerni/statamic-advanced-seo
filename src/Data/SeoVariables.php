@@ -214,22 +214,6 @@ class SeoVariables implements Augmentable, Localization
         return $this->seoSet()->in($origin);
     }
 
-    // TODO: Might be able to not accept $sites but use $this->seoSet->sites() instead.
-    public function determineOrigin(Collection $sites): self
-    {
-        $defaultSite = Site::default()->handle();
-
-        $origin = $sites->contains($defaultSite)
-            ? $defaultSite
-            : $sites->first();
-
-        $this->locale === $origin
-            ? $this->origin(null)
-            : $this->origin($origin);
-
-        return $this;
-    }
-
     public function resolveGqlValue(string $field)
     {
         if (! in_array($field, $this->blueprintFields())) {

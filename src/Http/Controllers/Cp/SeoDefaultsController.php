@@ -119,7 +119,7 @@ class SeoDefaultsController extends CpController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $localization = $set->in($site)->determineOrigin($set->sites());
+        $localization = $set->in($site);
 
         $blueprint = $localization->blueprint();
 
