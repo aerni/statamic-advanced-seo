@@ -30,7 +30,7 @@ class SeoDefaultsConfigurationController extends CpController
                 ->map(fn ($site) => [
                     'name' => $site->name(),
                     'handle' => $site->handle(),
-                    'origin' => $set->in($site->handle())?->origin()?->locale(),
+                    'origin' => $set->in($site->handle())->origin()?->locale(),
                 ])
                 ->values(),
         ];
@@ -61,7 +61,7 @@ class SeoDefaultsConfigurationController extends CpController
         }
 
         $request->collect('sites')
-            ->each(fn ($site) => $set->in($site['handle'])?->origin($site['origin']));
+            ->each(fn ($site) => $set->in($site['handle'])->origin($site['origin']));
 
         $set->save();
     }
