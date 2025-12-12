@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref, useTemplateRef, computed, nextTick, getCurrentInstance } from 'vue';
 import { DocsCallout, Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer } from '@statamic/cms/ui';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
-import { Head, router } from '@statamic/cms/inertia';
+import { Head } from '@statamic/cms/inertia';
 import SiteSelector from '../../components/SiteSelector.vue';
 import ConfigureModal from '../../components/ConfigureModal.vue';
 
@@ -93,23 +93,37 @@ const confirmSwitchLocalization = () => {
 	pendingLocalization.value = null;
 };
 
+const updateDataFromResponse = (data) => {
+	reference.value = data.initialReference;
+	values.value = data.initialValues;
+	originValues.value = data.initialOriginValues;
+	originMeta.value = data.initialOriginMeta;
+	meta.value = data.initialMeta;
+	localizations.value = data.initialLocalizations;
+	localizedFields.value = data.initialLocalizedFields;
+	hasOrigin.value = data.initialHasOrigin;
+};
+
 const switchToLocalization = (localization) => {
 	localizing.value = localization.handle;
 
 	window.history.replaceState({}, '', localization.url);
 
 	$axios.get(localization.url).then((response) => {
-		const data = response.data;
-		reference.value = data.initialReference;
-		values.value = data.initialValues;
-		originValues.value = data.initialOriginValues;
-		originMeta.value = data.initialOriginMeta;
-		meta.value = data.initialMeta;
-		localizations.value = data.initialLocalizations;
-		localizedFields.value = data.initialLocalizedFields;
-		hasOrigin.value = data.initialHasOrigin;
+		updateDataFromResponse(response.data);
 		site.value = localization.handle;
 		localizing.value = false;
+		nextTick(() => container.value.clearDirtyState());
+	});
+};
+
+const refreshLocalization = () => {
+	const currentLocalization = localizations.value.find((localization) => localization.handle === site.value);
+
+	if (!currentLocalization) return;
+
+	$axios.get(currentLocalization.url).then((response) => {
+		updateDataFromResponse(response.data);
 		nextTick(() => container.value.clearDirtyState());
 	});
 };
@@ -158,7 +172,7 @@ const switchToLocalization = (localization) => {
         <ConfigureModal
 			v-if="configureModalOpen"
 			:route="configureUrl"
-			@saved="() => router.reload()"
+			@saved="refreshLocalization"
 			@closed="configureModalOpen = false"
 		/>
 
