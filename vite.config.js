@@ -8,8 +8,8 @@ export default defineConfig({
         statamic(),
         tailwindcss(),
         laravel({
+            valetTls: 'statamic-6-advanced-seo.test',
             input: ['resources/js/cp.js', 'resources/css/cp.css'],
-            hotFile: 'resources/dist/hot',
             publicDirectory: 'resources/dist',
         }),
     ],
