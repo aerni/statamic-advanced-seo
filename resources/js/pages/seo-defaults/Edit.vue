@@ -133,7 +133,7 @@ const refreshLocalization = () => {
 
     <div class="max-w-5xl mx-auto">
         <Header :title :icon>
-            <Dropdown v-if="showLocalizationSelector">
+            <Dropdown v-if="!props.readOnly && showLocalizationSelector">
 				<template #trigger>
 					<Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
 				</template>
