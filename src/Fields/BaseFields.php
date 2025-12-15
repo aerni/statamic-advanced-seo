@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Actions\EvaluateFeature;
+use Aerni\AdvancedSeo\Contracts\Fields;
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Support\Helpers;
 
 abstract class BaseFields implements Fields
 {
@@ -32,7 +32,7 @@ abstract class BaseFields implements Fields
         }
 
         return collect($sections)
-            ->map(fn (array $section) =>  [
+            ->map(fn (array $section) => [
                 ...$section,
                 'fields' => collect($section['fields'])
                     ->filter(function (array $field): bool {

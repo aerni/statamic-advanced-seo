@@ -536,58 +536,58 @@ class OnPageSeoFields extends BaseFields
                             'seo_canonical_type.value' => 'equals current',
                             'seo_sitemap_enabled.value' => 'true',
                         ],
-                            'field' => [
-                                'type' => 'select',
-                                'options' => [
-                                    [
-                                        'key' => '0.0',
-                                        'value' => '0.0',
-                                    ],
-                                    [
-                                        'key' => '0.1',
-                                        'value' => '0.1',
-                                    ],
-                                    [
-                                        'key' => '0.2',
-                                        'value' => '0.2',
-                                    ],
-                                    [
-                                        'key' => '0.3',
-                                        'value' => '0.3',
-                                    ],
-                                    [
-                                        'key' => '0.4',
-                                        'value' => '0.4',
-                                    ],
-                                    [
-                                        'key' => '0.5',
-                                        'value' => '0.5',
-                                    ],
-                                    [
-                                        'key' => '0.6',
-                                        'value' => '0.6',
-                                    ],
-                                    [
-                                        'key' => '0.7',
-                                        'value' => '0.7',
-                                    ],
-                                    [
-                                        'key' => '0.8',
-                                        'value' => '0.8',
-                                    ],
-                                    [
-                                        'key' => '0.9',
-                                        'value' => '0.9',
-                                    ],
-                                    [
-                                        'key' => '1.0',
-                                        'value' => '1.0',
-                                    ],
+                        'field' => [
+                            'type' => 'select',
+                            'options' => [
+                                [
+                                    'key' => '0.0',
+                                    'value' => '0.0',
                                 ],
-                                'clearable' => false,
-                                'multiple' => false,
-                                'searchable' => false,
-                                'taggable' => false,
+                                [
+                                    'key' => '0.1',
+                                    'value' => '0.1',
+                                ],
+                                [
+                                    'key' => '0.2',
+                                    'value' => '0.2',
+                                ],
+                                [
+                                    'key' => '0.3',
+                                    'value' => '0.3',
+                                ],
+                                [
+                                    'key' => '0.4',
+                                    'value' => '0.4',
+                                ],
+                                [
+                                    'key' => '0.5',
+                                    'value' => '0.5',
+                                ],
+                                [
+                                    'key' => '0.6',
+                                    'value' => '0.6',
+                                ],
+                                [
+                                    'key' => '0.7',
+                                    'value' => '0.7',
+                                ],
+                                [
+                                    'key' => '0.8',
+                                    'value' => '0.8',
+                                ],
+                                [
+                                    'key' => '0.9',
+                                    'value' => '0.9',
+                                ],
+                                [
+                                    'key' => '1.0',
+                                    'value' => '1.0',
+                                ],
+                            ],
+                            'clearable' => false,
+                            'multiple' => false,
+                            'searchable' => false,
+                            'taggable' => false,
                             'push_tags' => false,
                             'cast_booleans' => false,
                         ],

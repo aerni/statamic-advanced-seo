@@ -123,7 +123,7 @@ class ServiceProvider extends AddonServiceProvider
                         ->route("advanced-seo.{$type}.index")
                         ->icon($defaults->first()['type_icon'])
                         ->children(
-                            $defaults->map(function ($default) use ($nav, $type) {
+                            $defaults->map(function ($default) use ($nav) {
                                 return $nav->item($default['title'])
                                     ->route("advanced-seo.{$default['type']}.edit", $default['handle']);
                             })->toArray()
