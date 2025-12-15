@@ -1,74 +1,55 @@
 <template>
+    <div class="mt-4 space-y-2">
 
-    <div class="flex flex-col seo-mt-4">
+        <ButtonGroup>
+            <Button
+                v-for="(source) in fieldSources"
+                :key="source.value"
+                :text="source.label"
+                size="xs"
+                :variant="fieldSource === source.value ? 'pressed' : 'default'"
+                :disabled="isReadOnly"
+                @click="updateFieldSource(source.value)"
+            />
+        </ButtonGroup>
 
-        <div class="self-start button-group-fieldtype-wrapper">
-            <div class="seo-h-auto btn-group source-btn-group">
-                <button class="h-auto seo-text-[12px] seo-px-2 seo-py-1 btn"
-                    v-for="(option, index) in sourceOptions"
-                    :key="index"
-                    ref="button"
-                    :name="name"
-                    @click="updateFieldSource($event.target.value)"
-                    :value="option.value"
-                    :class="{'active': fieldSource === option.value}"
-                    :disabled="isReadOnly"
-                    v-text="option.label || option.value"
-                />
-            </div>
-        </div>
+        <Component
+            :is="fieldComponent"
+            :name="name"
+            :config="fieldConfig"
+            :meta="fieldMeta"
+            :value="fieldValue"
+            :read-only="isReadOnly || !isCustomSource"
+            handle="source_value"
+            @update:meta="updateFieldMeta"
+            @update:value="updateFieldValue"
+        />
 
-        <div class="seo-mt-2.5">
-            <div v-if="fieldSource === 'custom'">
-                <component
-                    :is="fieldComponent"
-                    :name="name"
-                    :config="fieldConfig"
-                    :meta="fieldMeta"
-                    :value="fieldValue"
-                    :read-only="isReadOnly"
-                    handle="source_value"
-                    @meta-updated="updateFieldMeta"
-                    @input="updateCustomFieldValue">
-                </component>
-            </div>
-            <div v-else>
-                <component
-                    :is="fieldComponent"
-                    :name="name"
-                    :config="fieldConfig"
-                    :meta="fieldMeta"
-                    :value="fieldValue"
-                    read-only="true"
-                    handle="source_value">
-                </component>
-                <div class="mt-2 mb-0 help-block">
-                    <span
-                        v-if="fieldSource === 'auto'"
-                        v-html="__('advanced-seo::messages.field_source_description.auto', {title: this.autoFieldDisplay, handle: this.autoFieldHandle})"
-                    ></span>
-                    <span
-                        v-else
-                        v-html="__('advanced-seo::messages.field_source_description.defaults', {title: this.meta.title})"
-                    ></span>
-                </div>
-            </div>
-        </div>
+        <Description
+            v-if="!isCustomSource"
+            :text="sourceDescription"
+        />
 
     </div>
 </template>
 
 <script>
-export default {
+import { FieldtypeMixin as Fieldtype } from '@statamic/cms';
+import { Button, ButtonGroup, Description } from '@statamic/cms/ui';
 
+const SOURCE_TYPES = {
+    AUTO: 'auto',
+    DEFAULT: 'default',
+    CUSTOM: 'custom',
+};
+
+export default {
     mixins: [Fieldtype],
 
-    data() {
-        return {
-            autoBindChangeWatcher: false,
-            changeWatcherWatchDeep: false,
-            customValue: null,
-        }
+    components: {
+        Button,
+        ButtonGroup,
+        Description,
     },
 
     computed: {
@@ -77,18 +58,37 @@ export default {
             return this.value.source
         },
 
-        fieldDefault() {
+        isCustomSource() {
+            return this.fieldSource === SOURCE_TYPES.CUSTOM
+        },
+
+        autoFieldValue() {
+            const value = this.publishContainer.values[this.autoFieldHandle]
+            return value && typeof value === 'object' ? value.value : value
+        },
+
+        defaultFieldValue() {
             return this.meta.default
         },
 
-        fieldValue() {
+        customFieldValue() {
             return this.value.value
         },
 
+        fieldValue() {
+            const values = {
+                [SOURCE_TYPES.AUTO]: this.autoFieldValue,
+                [SOURCE_TYPES.DEFAULT]: this.defaultFieldValue,
+                [SOURCE_TYPES.CUSTOM]: this.customFieldValue,
+            }
+
+            return values[this.fieldSource]
+        },
+
         fieldComponent() {
-            let type = this.config.field.type
-            let component = this.config.field.component
-            let field = component || type // Use the component name if it's an entries fieldtype.
+            const type = this.config.field.type
+            const component = this.config.field.component
+            const field = component || type // Use the component name if it's an entries fieldtype.
 
             return field.replace('.', '-') + '-fieldtype'
         },
@@ -102,110 +102,68 @@ export default {
         },
 
         autoFieldDisplay() {
-            let sections = this.store.blueprint.tabs.flatMap(tab => tab.sections)
-            let fields = sections.flatMap(section => section.fields)
+            const sections = this.publishContainer.blueprint.tabs.flatMap(tab => tab.sections)
+            const fields = sections.flatMap(section => section.fields)
 
-            return _.find(fields, {'handle': this.autoFieldHandle}).display
-        },
-
-        autoFieldValue() {
-            let value = this.store.values[this.autoFieldHandle]
-
-            return typeof value === 'object' && value !== null
-                ? value.value
-                : value
+            return fields.find(field => field.handle === this.autoFieldHandle)?.display
         },
 
         autoFieldHandle() {
             return this.config.auto
         },
 
-        fieldIsSynced() {
-            return this.$parent.$parent.isSynced
-        },
-
-        sourceOptions() {
-            let options = [
-                { label: __('advanced-seo::messages.field_sources.default'), value: 'default' },
-                { label: __('advanced-seo::messages.field_sources.custom'), value: 'custom' },
+        fieldSources() {
+            const sources = [
+                {
+                    value: SOURCE_TYPES.DEFAULT,
+                    label: __('advanced-seo::messages.field_sources.default'),
+                    description: __('advanced-seo::messages.field_source_description.defaults', {
+                        title: this.meta.title,
+                    }),
+                },
+                {
+                    value: SOURCE_TYPES.CUSTOM,
+                    label: __('advanced-seo::messages.field_sources.custom'),
+                    description: '',
+                },
             ]
 
             if (this.autoFieldHandle) {
-                options.unshift({ label: __('advanced-seo::messages.field_sources.auto'), value: 'auto' })
+                sources.unshift({
+                    value: SOURCE_TYPES.AUTO,
+                    label: __('advanced-seo::messages.field_sources.auto'),
+                    description: __('advanced-seo::messages.field_source_description.auto', {
+                        title: this.autoFieldDisplay,
+                        handle: this.autoFieldHandle,
+                    }),
+                })
             }
 
             if (this.config.options) {
-                return options.filter(option => this.config.options.includes(option.value))
+                return sources.filter(source => this.config.options.includes(source.value))
             }
 
-            return options
+            return sources
         },
 
-        site() {
-            return this.store.site
+        sourceDescription() {
+            return this.fieldSources.find(source => source.value === this.fieldSource).description
         },
-
-        store() {
-            return this.$store.state.publish.base
-        }
-
-    },
-
-    watch: {
-        autoFieldValue() {
-            this.updateAutoFieldValue()
-        },
-
-        fieldIsSynced(value) {
-            if (value === true) this.updateAutoFieldValue()
-        },
-
-        fieldSource(source) {
-            // console.log('Update source:', source)
-            if (source === 'auto') this.updateFieldValue(this.autoFieldValue)
-            if (source === 'default') this.updateFieldValue(this.fieldDefault)
-            if (source === 'custom') this.updateFieldValue((this.customValue === null) ? this.fieldDefault : this.customValue)
-        },
-
-        site() {
-            this.customValue = null
-            this.updateAutoFieldValue()
-        },
-    },
-
-    mounted() {
-        this.updateAutoFieldValue()
-        if (this.fieldSource === 'custom') this.updateCustomValue(this.fieldValue)
     },
 
     methods: {
 
-        updateAutoFieldValue() {
-            if (this.fieldSource === 'auto') this.value.value = this.autoFieldValue
-        },
-
         updateFieldSource(source) {
-            if (this.fieldSource !== source) this.value.source = source
+            if (this.fieldSource === source) return
+            this.update({ source: source, value: this.customFieldValue })
         },
 
         updateFieldValue(value) {
-            // console.log('Update value:', value)
-            this.value.value = value
-            this.update(this.value)
-        },
-
-        updateCustomFieldValue(value) {
-            this.updateCustomValue(value)
-            this.updateFieldValue(value)
-        },
-
-        updateCustomValue(value) {
-            // console.log('Update custom:', value)
-            this.customValue = value
+            this.update({ source: this.fieldSource, value: value})
         },
 
         updateFieldMeta(meta) {
-            this.meta.meta = meta || this.fieldMeta
+            this.updateMeta({ ...this.meta, meta: meta || this.fieldMeta })
         },
 
     },

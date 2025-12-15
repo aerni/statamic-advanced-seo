@@ -17,21 +17,21 @@
     ],
     "require": {
         "php": "^8.2",
-        "laravel/framework": " ^11.0 || ^12.0",
-        "laravel/prompts": "^0.1.24 || ^0.2.0 || ^0.3.0",
-        "spatie/browsershot": "^5.0.5",
-        "spatie/image": "^3.4",
-        "spatie/laravel-ray": "^1.32",
-        "spatie/schema-org": "^3.14",
-        "statamic/cms": "^5.47",
+        "laravel/framework": " ^12.0",
+        "laravel/prompts": "^0.3.0",
+        "spatie/browsershot": "^5.1",
+        "spatie/image": "^3.8",
+        "spatie/laravel-ray": "^1.43",
+        "spatie/schema-org": "^3.23",
+        "statamic/cms": "^6.0",
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {
-        "laravel/pint": "^1.21",
+        "laravel/pint": "^1.26",
         "nunomaduro/collision": "^8.0",
-        "orchestra/testbench": "^9.2 || ^10.0",
-        "pestphp/pest": "^3.0",
-        "statamic/eloquent-driver": "^4.19"
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0",
+        "statamic/eloquent-driver": "dev-master"
     },
     "autoload": {
         "psr-4": {

@@ -11,6 +11,13 @@ class SeoVariablesPolicy
 {
     use HasMultisitePolicy;
 
+    public function before($user)
+    {
+        if (User::fromUser($user)->isSuper()) {
+            return true;
+        }
+    }
+
     public function index($user, string $type): bool
     {
         return Defaults::enabledInType($type)

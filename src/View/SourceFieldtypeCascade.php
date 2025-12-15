@@ -17,7 +17,6 @@ class SourceFieldtypeCascade extends BaseCascade
             ->withSiteDefaults()
             ->withContentDefaults()
             ->removeSeoPrefix()
-            ->removeSectionFields()
             ->ensureOverrides()
             ->sortKeys();
     }

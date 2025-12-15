@@ -1,6 +1,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', $breadcrumbs->title($title))
+@section('title', $title)
 
 @if (count($localizations) > 1)
     @section('wrapper_class', 'max-w-3xl')
@@ -26,7 +26,6 @@
         :initial-origin-values="{{ json_encode($originValues) }}"
         :initial-read-only="{{ $str::bool($readOnly) }}"
         initial-site="{{ $locale }}"
-        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         content-type="{{ $contentType }}"
     ></defaults-publish-form>
 

@@ -21,7 +21,6 @@ class ContentDefaultsType extends Type
     {
         return ContentDefaultsBlueprint::make()->get()->fields()->toGql()
             ->mapWithKeys(fn ($field, $handle) => [Str::remove('seo_', $handle) => $field]) // We want to remove `seo_` from all the field keys
-            ->filter(fn ($field, $handle) => ! Str::contains($handle, 'section_')) // Remove all section fields, as they don't have any data anyways.
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 

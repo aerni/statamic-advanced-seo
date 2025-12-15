@@ -141,8 +141,8 @@ class SeoDefaultSet implements Contract
             $this->in($site) ?? $this->addLocalization($this->makeLocalization($site));
         });
 
-        // Determine the origin and set the default data for each localization based on the provided sites.
-        $this->localizations()->each(fn ($item) => $item->determineOrigin($sites)->withDefaultData());
+        // TODO: Need to ensure that we still get the correct default data. Do we even need this method anymore?
+        $this->localizations()->each(fn ($item) => $item->withDefaultData());
 
         return $this;
     }

@@ -38,7 +38,6 @@ class GraphQlCascade extends BaseCascade
             ->withSiteDefaults()
             ->withPageData()
             ->removeSeoPrefix()
-            ->removeSectionFields()
             ->ensureOverrides()
             ->sortKeys();
     }

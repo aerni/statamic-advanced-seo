@@ -24,8 +24,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::class,
                 'data' => __DIR__.'/../../content/general.yaml',
                 'enabled' => true,
-                'icon' => 'icons/light/sites',
-                'type_icon' => 'earth',
+                'icon' => 'utilities',
+                'type_icon' => 'web',
                 'set' => Seo::findOrMake('site', 'general'),
             ],
             [
@@ -36,8 +36,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::class,
                 'data' => __DIR__.'/../../content/indexing.yaml',
                 'enabled' => true,
-                'icon' => 'icons/light/structures',
-                'type_icon' => 'earth',
+                'icon' => 'hierarchy',
+                'type_icon' => 'web',
                 'set' => Seo::findOrMake('site', 'indexing'),
             ],
             [
@@ -48,8 +48,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint::class,
                 'data' => __DIR__.'/../../content/social_media.yaml',
                 'enabled' => true,
-                'icon' => 'icons/light/assets',
-                'type_icon' => 'earth',
+                'icon' => 'assets',
+                'type_icon' => 'web',
                 'set' => Seo::findOrMake('site', 'social_media'),
             ],
             [
@@ -60,8 +60,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
                 'data' => __DIR__.'/../../content/analytics.yaml',
                 'enabled' => collect(config('advanced-seo.analytics'))->reject(fn ($value, $key) => $key === 'environments')->filter()->isNotEmpty(),
-                'icon' => 'icons/light/charts',
-                'type_icon' => 'earth',
+                'icon' => 'money-graph-bar-increase',
+                'type_icon' => 'web',
                 'set' => Seo::findOrMake('site', 'analytics'),
             ],
             [
@@ -72,8 +72,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::class,
                 'data' => __DIR__.'/../../content/favicons.yaml',
                 'enabled' => config('advanced-seo.favicons.enabled', false),
-                'icon' => 'icons/light/color',
-                'type_icon' => 'earth',
+                'icon' => 'edit-paint-palette',
+                'type_icon' => 'web',
                 'set' => Seo::findOrMake('site', 'favicons'),
             ],
         ];
@@ -87,8 +87,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($collection->handle(), config('advanced-seo.disabled.collections', [])),
-                'icon' => 'icons/light/content-writing',
-                'type_icon' => 'content-writing',
+                'icon' => 'collections',
+                'type_icon' => 'collections',
                 'set' => Seo::findOrMake('collections', $collection->handle()),
             ];
         })->sortBy('handle');
@@ -102,8 +102,8 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($taxonomy->handle(), config('advanced-seo.disabled.taxonomies', [])),
-                'icon' => 'icons/light/tags',
-                'type_icon' => 'tags',
+                'icon' => 'taxonomies',
+                'type_icon' => 'taxonomies',
                 'set' => Seo::findOrMake('taxonomies', $taxonomy->handle()),
             ];
         })->sortBy('handle');

@@ -48,4 +48,5 @@ return [
 
     'commit_message' => 'SEO defaults saved',
 
+    'configure_seo_defaults' => 'Configure SEO Defaults',
 ];

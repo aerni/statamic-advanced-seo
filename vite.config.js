@@ -1,18 +1,16 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import vue from '@vitejs/plugin-vue2';
+import statamic from '@statamic/cms/vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
+        statamic(),
+        tailwindcss(),
         laravel({
-            input: [
-                'resources/js/cp.js',
-                'resources/css/cp.css'
-            ],
-            refresh: true,
+            valetTls: 'statamic-6-advanced-seo.test',
+            input: ['resources/js/cp.js', 'resources/css/cp.css'],
             publicDirectory: 'resources/dist',
-            hotFile: 'resources/dist/hot',
         }),
-        vue(),
     ],
 });

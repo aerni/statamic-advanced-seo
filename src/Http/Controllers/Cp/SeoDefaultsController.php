@@ -7,12 +7,12 @@ use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Statamic\CP\Breadcrumbs;
+use Inertia\Inertia;
+use Inertia\Response;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -21,7 +21,7 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class SeoDefaultsController extends CpController
 {
-    public function index(): View
+    public function index(): Response
     {
         $defaults = $this->defaults();
 
@@ -31,8 +31,9 @@ class SeoDefaultsController extends CpController
 
         $this->authorize('index', [SeoVariables::class, $this->type()]);
 
-        return view("advanced-seo::cp.{$this->type()}", [
+        return Inertia::render($this->view(), [
             'defaults' => $defaults,
+            'title' => __("advanced-seo::messages.{$this->type()}"),
         ]);
     }
 
@@ -40,7 +41,9 @@ class SeoDefaultsController extends CpController
     {
         throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
 
-        $set = $this->set($handle);
+        $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
+
+        $set = $defaults['set'];
 
         $site = $request->site ?? Site::selected()->handle();
 
@@ -70,22 +73,17 @@ class SeoDefaultsController extends CpController
         $requestLocalization = $localization;
 
         $viewData = [
-            'title' => $set->title(),
-            'reference' => $localization->reference(),
-            'editing' => true,
-            'actions' => [
-                'save' => $localization->updateUrl(),
-            ],
-            'values' => array_merge($values, ['id' => $set->id()]),
-            'meta' => $meta,
+            'title' => $defaults['title'],
+            'icon' => $defaults['icon'],
             'blueprint' => $blueprint->toPublishArray(),
-            'locale' => $localization->locale(),
-            'localizedFields' => $localization->data()->keys()->all(),
-            'isRoot' => $localization->isRoot(),
-            'hasOrigin' => $hasOrigin,
-            'originValues' => $originValues ?? null,
-            'originMeta' => $originMeta ?? null,
-            'localizations' => $this->authorizedSites($set)->map(function ($site) use ($set, $requestLocalization) {
+            'initialReference' => $localization->reference(),
+            'initialValues' => $values,
+            'initialMeta' => $meta,
+            'initialSite' => $site,
+            'initialHasOrigin' => $hasOrigin,
+            'initialOriginValues' => $originValues ?? null,
+            'initialOriginMeta' => $originMeta ?? null,
+            'initialLocalizations' => $this->authorizedSites($set)->map(function ($site) use ($set, $requestLocalization) {
                 $localization = $set->in($site);
                 $exists = $localization !== null;
 
@@ -100,19 +98,17 @@ class SeoDefaultsController extends CpController
                     'url' => $exists ? $localization->editUrl() : null,
                 ];
             })->values()->all(),
-            'breadcrumbs' => $this->breadcrumbs(),
-            'readOnly' => User::current()->cant("edit seo {$handle} defaults"),
-            'contentType' => $this->type(),
+            'initialLocalizedFields' => $localization->data()->keys()->all(),
+            'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
+            'action' => $localization->updateUrl(),
+            'configureUrl' => $localization->configureUrl(),
         ];
 
         if ($request->wantsJson()) {
             return $viewData;
         }
 
-        return view('advanced-seo::cp/edit', array_merge($viewData, [
-            'set' => $set,
-            'variables' => $localization,
-        ]));
+        return Inertia::render('advanced-seo::SeoDefaults/Edit', $viewData);
     }
 
     public function update(Request $request, string $handle): void
@@ -123,7 +119,7 @@ class SeoDefaultsController extends CpController
 
         $site = $request->site ?? Site::selected()->handle();
 
-        $localization = $set->in($site)->determineOrigin($set->sites());
+        $localization = $set->in($site);
 
         $blueprint = $localization->blueprint();
 
@@ -167,7 +163,8 @@ class SeoDefaultsController extends CpController
     {
         return Defaults::enabledInType($this->type())
             ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
-            ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]));
+            ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
+            ->values();
     }
 
     protected function flashDefaultsUnavailable(): void
@@ -188,21 +185,21 @@ class SeoDefaultsController extends CpController
             ]));
     }
 
-    protected function breadcrumbs(): Breadcrumbs
-    {
-        return new Breadcrumbs([
-            [
-                'text' => __("advanced-seo::messages.{$this->type()}"),
-                'url' => cp_route("advanced-seo.{$this->type()}.index"),
-            ],
-        ]);
-    }
-
     protected function type(): string
     {
         $segments = request()->segments();
         $key = array_search('advanced-seo', $segments) + 1;
 
         return $segments[$key];
+    }
+
+    protected function view(): string
+    {
+        return match ($this->type()) {
+            'site' => 'advanced-seo::Site/Index',
+            'collections' => 'advanced-seo::Collections/Index',
+            'taxonomies' => 'advanced-seo::Taxonomies/Index',
+            default => throw new NotFoundHttpException,
+        };
     }
 }
