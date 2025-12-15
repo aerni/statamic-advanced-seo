@@ -15,9 +15,24 @@ const sites = ref(null);
 const error = ref(null);
 
 const siteOriginOptions = (site) => {
+	// Build a set of sites that would create circular dependencies
+	const circularSites = new Set([site.handle]);
+
+	// Find all sites that have the current site as their origin (directly or indirectly)
+	const findDependents = (siteHandle) => {
+		sites.value.forEach((site) => {
+			if (site.origin === siteHandle && !circularSites.has(site.handle)) {
+				circularSites.add(site.handle);
+				findDependents(site.handle);
+			}
+		});
+	};
+
+	findDependents(site.handle);
+
 	return sites.value
-		.map((s) => ({ value: s.handle, label: __(s.name) }))
-		.filter((s) => s.value !== site.handle);
+		.map((site) => ({ value: site.handle, label: __(site.name) }))
+		.filter((site) => !circularSites.has(site.value));
 };
 
 const isDirty = computed(() => {

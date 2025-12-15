@@ -44,26 +44,51 @@ class SeoDefaultsConfigurationController extends CpController
 
         $this->authorize('edit', [SeoVariables::class, $set]);
 
-        $setSites = $set->sites();
+        throw_unless($set->sites()->count() > 1, new NotFoundHttpException);
 
-        throw_unless($setSites->count() > 1, new NotFoundHttpException);
+        $this->validateSiteOrigins($request);
 
+        $request->collect('sites')
+            ->each(fn ($site) => $set->in($site['handle'])->origin($site['origin']));
+
+        $set->save();
+    }
+
+    protected function validateSiteOrigins(Request $request): void
+    {
         $request->validate([
             'sites' => 'required|array',
             'sites.*.handle' => 'required|string',
             'sites.*.origin' => 'nullable|string',
         ]);
 
-        if ($request->collect('sites')->map->origin->filter()->count() == count($request->sites)) {
+        $sites = $request->collect('sites');
+
+        // At least one site must not have an origin
+        if ($sites->map->origin->filter()->count() == count($request->sites)) {
             throw ValidationException::withMessages([
                 'sites' => __('statamic::validation.one_site_without_origin'),
             ]);
         }
 
-        $request->collect('sites')
-            ->each(fn ($site) => $set->in($site['handle'])->origin($site['origin']));
+        // Check for circular origin dependencies
+        $originMap = $sites->pluck('origin', 'handle')->filter()->toArray();
 
-        $set->save();
+        foreach ($originMap as $site => $origin) {
+            $visited = [$site];
+            $current = $origin;
+
+            while ($current !== null) {
+                if (in_array($current, $visited)) {
+                    throw ValidationException::withMessages([
+                        'sites' => __('Circular site origin dependencies are not allowed.'),
+                    ]);
+                }
+
+                $visited[] = $current;
+                $current = $originMap[$current] ?? null;
+            }
+        }
     }
 
     protected function type(): string
