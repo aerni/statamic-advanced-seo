@@ -94,17 +94,9 @@ class SeoDefaultSet implements Contract
 
     public function fileData(): array
     {
-        $data = [
+        return [
             'title' => $this->title(),
         ];
-
-        if (! Site::multiEnabled()) {
-            $data['data'] = Arr::removeNullValues(
-                $this->inDefaultSite()->data()->all()
-            );
-        }
-
-        return $data;
     }
 
     public function makeLocalization(string $site): SeoVariables

@@ -71,9 +71,9 @@ class SeoVariables implements Augmentable, Localization
 
     public function path(): string
     {
-        return vsprintf('%s/%s%s.yaml', [
+        return vsprintf('%s/%s/%s.yaml', [
             Stache::store('seo')->store($this->type())->directory(),
-            Site::multiEnabled() ? $this->locale().'/' : '',
+            $this->locale(),
             $this->handle(),
         ]);
     }
@@ -171,15 +171,22 @@ class SeoVariables implements Augmentable, Localization
         // We only want to keep values of fields that exist in the blueprint.
         $data = $this->data()->only($this->blueprintFields())->all();
 
-        if (Site::multiEnabled() && $this->hasOrigin()) {
-            $data['origin'] = $this->origin()->locale();
-        }
-
         if ($this->isRoot()) {
             $data = Arr::removeNullValues($data);
         }
 
-        return $data;
+        // TODO: Use $this->config when implemented.
+        $config = [];
+
+        // Add origin to config if multi-site and has origin
+        if (Site::multiEnabled() && $this->hasOrigin()) {
+            $config['origin'] = $this->origin()->locale();
+        }
+
+        return [
+            'config' => $config,
+            'data' => $data,
+        ];
     }
 
     protected function shouldRemoveNullsFromFileData()

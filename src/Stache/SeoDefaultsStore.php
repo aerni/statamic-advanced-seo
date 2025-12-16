@@ -27,45 +27,17 @@ class SeoDefaultsStore extends ChildStore
 
     public function makeItemFromFile($path, $contents): SeoDefaultSet
     {
-        $data = YAML::file($path)->parse($contents);
-
-        return Site::multiEnabled()
-            ? $this->makeMultiSiteDefaultFromFile($path)
-            : $this->makeSingleSiteDefaultFromFile($path, $data);
-    }
-
-    protected function makeBaseDefaultFromFile(string $path): SeoDefaultSet
-    {
         [$type, $handle] = $this->extractAttributesFromPath($path);
 
-        return Seo::make()
+        $set = Seo::make()
             ->handle($handle)
             ->type($type)
             ->initialPath($path);
-    }
 
-    protected function makeSingleSiteDefaultFromFile(string $path, array $data): SeoDefaultSet
-    {
-        $set = $this->makeBaseDefaultFromFile($path);
-
-        $localization = $set->makeLocalization(Site::default()->handle())
-            ->initialPath($path)
-            ->merge($data['data'] ?? []);
-
-        return $set->addLocalization($localization);
-    }
-
-    protected function makeMultiSiteDefaultFromFile(string $path): SeoDefaultSet
-    {
-        $set = $this->makeBaseDefaultFromFile($path);
-
-        Site::all()->filter(function ($site) use ($set) {
-            return File::exists("{$this->directory()}/{$site->handle()}/{$set->handle()}.yaml");
-        })->map->handle()->map(function ($site) use ($set) {
-            return $this->makeVariables($set, $site);
-        })->filter()->each(function ($variables) use ($set) {
-            $set->addLocalization($variables);
-        });
+        $set->sites()
+            ->map(fn ($site) => $this->makeVariables($set, $site))
+            ->filter()
+            ->each(fn ($variables) => $set->addLocalization($variables));
 
         return $set;
     }
@@ -74,20 +46,44 @@ class SeoDefaultsStore extends ChildStore
     {
         $variables = $set->makeLocalization($site);
 
-        // TODO: cache the reading and parsing of the file
-
         if (! File::exists($path = $variables->path())) {
             return null;
         }
 
-        $data = YAML::file($path)->parse();
+        $parsed = YAML::file($path)->parse();
 
-        $variables
+        // New format with config and data sections
+        if (isset($parsed['config']) && isset($parsed['data'])) {
+            $data = $parsed['data'];
+            $origin = Arr::get($parsed['config'], 'origin');
+        }
+        // Legacy flat format (for backward compatibility during migration)
+        else {
+            $data = Arr::except($parsed, 'origin');
+            $origin = Arr::get($parsed, 'origin');
+        }
+
+        return $variables
             ->initialPath($path)
-            ->merge(Arr::except($data, 'origin'))
-            ->origin(Arr::get($data, 'origin'));
+            ->merge($data)
+            ->origin($origin);
+    }
 
-        return $variables;
+    public function save($set): void
+    {
+        parent::save($set);
+
+        Site::all()->each(function ($site) use ($set) {
+            $site = $site->handle();
+            $set->existsIn($site) ? $set->in($site)->writeFile() : $set->makeLocalization($site)->deleteFile();
+        });
+    }
+
+    public function delete($set): void
+    {
+        parent::delete($set);
+
+        $set->localizations()->each(fn ($localization) => $localization->deleteFile());
     }
 
     protected function extractAttributesFromPath(string $path): array
@@ -97,30 +93,5 @@ class SeoDefaultsStore extends ChildStore
         $handle = pathinfo($relative, PATHINFO_FILENAME);
 
         return [$type, $handle];
-    }
-
-    public function save($set): void
-    {
-        parent::save($set);
-
-        // TODO: This could likely be simplified by using the sites() method on the $set.
-        // See makeModelFromContract() on Eloquent SeoDefaultSet.
-        if (Site::multiEnabled()) {
-            Site::all()->each(function ($site) use ($set) {
-                $site = $site->handle();
-                $set->existsIn($site) ? $set->in($site)->writeFile() : $set->makeLocalization($site)->deleteFile();
-            });
-        }
-    }
-
-    public function delete($set): void
-    {
-        parent::delete($set);
-
-        if (Site::multiEnabled()) {
-            $set->localizations()->each(function ($localization) {
-                $localization->deleteFile();
-            });
-        }
     }
 }
