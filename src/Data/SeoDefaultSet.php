@@ -191,6 +191,11 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
+    public function editUrl()
+    {
+        return cp_route('advanced-seo.collections.configure.edit', $this->handle());
+    }
+
     public function blueprint(): Blueprint
     {
         $blueprint = Defaults::blueprint("{$this->type}::{$this->handle}");

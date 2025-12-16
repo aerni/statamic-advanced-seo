@@ -13,13 +13,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Statamic\CP\Column;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
-class SeoDefaultsController extends CpController
+class CollectionDefaultsController extends CpController
 {
     public function index(): Response
     {
@@ -31,8 +32,14 @@ class SeoDefaultsController extends CpController
 
         $this->authorize('index', [SeoVariables::class, $this->type()]);
 
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('status')->label(__('Status')),
+        ];
+
         return Inertia::render($this->view(), [
-            'defaults' => $defaults,
+            'collections' => $defaults,
+            'columns' => $columns,
             'title' => __("advanced-seo::messages.{$this->type()}"),
         ]);
     }
@@ -166,6 +173,12 @@ class SeoDefaultsController extends CpController
         return Defaults::enabledInType($this->type())
             ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
             ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
+            ->map(fn ($collection) => [
+                ...$collection,
+                'configurable' => User::current()->can('edit', [SeoVariables::class, $collection['set']]),
+                'configure_url' => $collection['set']->editUrl(),
+                'status' => 'enabled',
+            ])
             ->values();
     }
 

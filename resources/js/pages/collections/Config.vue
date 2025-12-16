@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref, useTemplateRef, computed, nextTick, getCurrentInstance } from 'vue';
-import { DocsCallout, Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer } from '@statamic/cms/ui';
+import { DocsCallout, Header, Button, PublishContainer } from '@statamic/cms/ui';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
 import { Head } from '@statamic/cms/inertia';
 import SiteSelector from '../../components/SiteSelector.vue';
@@ -17,12 +17,9 @@ const props = defineProps({
 	initialMeta: Object,
     initialLocalizations: Array,
     initialLocalizedFields: Array,
-    initialHasOrigin: Boolean,
-	initialOriginValues: Object,
-	initialOriginMeta: Object,
     initialSite: String,
-    initialConfigureUrl: String,
     action: String,
+    configureUrl: String,
     readOnly: Boolean,
 });
 
@@ -34,12 +31,7 @@ const errors = ref({});
 const localizing = ref(false);
 const localizations = ref(props.initialLocalizations);
 const localizedFields = ref(props.initialLocalizedFields);
-const hasOrigin = ref(props.initialHasOrigin);
-const originValues = ref(props.initialOriginValues);
-const originMeta = ref(props.initialOriginMeta);
 const site = ref(props.initialSite);
-const configureUrl = ref(props.initialConfigureUrl);
-const syncFieldConfirmationText = ref(__('messages.sync_entry_field_confirmation_text'));
 const pendingLocalization = ref(null);
 const saving = ref(false);
 
@@ -47,12 +39,12 @@ function save() {
 	new Pipeline()
 		.provide({ container, errors, saving })
 		.through([
-			new BeforeSaveHooks('seo-defaults'),
+			new BeforeSaveHooks('seo-defaults-config'),
 			new Request(props.action, 'patch', {
 				site: site.value,
 				_localized: localizedFields.value,
 			}),
-			new AfterSaveHooks('seo-defaults'),
+			new AfterSaveHooks('seo-defaults-config'),
 		])
 		.then((response) => {
 			Statamic.$toast.success(__('Saved'));
@@ -63,15 +55,15 @@ let saveKeyBinding;
 
 onMounted(() => {
 	saveKeyBinding = Statamic.$keys.bindGlobal(['mod+s'], (e) => {
-		e.preventDefault();
-        if (!canSave.value) return;
+        e.preventDefault();
+		if (!canSave.value) return;
 		save();
 	});
 });
 
 onUnmounted(() => saveKeyBinding.destroy());
 
-const isDirty = computed(() => Statamic.$dirty.has('seo-defaults'));
+const isDirty = computed(() => Statamic.$dirty.has('seo-defaults-config'))
 const canSave = computed(() => !props.readOnly && isDirty.value && !saving.value);
 const showLocalizationSelector = computed(() => localizations.value.length > 1);
 
@@ -96,13 +88,9 @@ const confirmSwitchLocalization = () => {
 const updateDataFromResponse = (data) => {
 	reference.value = data.initialReference;
 	values.value = data.initialValues;
-	originValues.value = data.initialOriginValues;
-	originMeta.value = data.initialOriginMeta;
 	meta.value = data.initialMeta;
 	localizations.value = data.initialLocalizations;
 	localizedFields.value = data.initialLocalizedFields;
-	hasOrigin.value = data.initialHasOrigin;
-	configureUrl.value = data.initialConfigureUrl;
 };
 
 const switchToLocalization = (localization) => {
@@ -117,32 +105,12 @@ const switchToLocalization = (localization) => {
 		nextTick(() => container.value.clearDirtyState());
 	});
 };
-
-const refreshLocalization = () => {
-	const currentLocalization = localizations.value.find((localization) => localization.handle === site.value);
-
-	if (!currentLocalization) return;
-
-	$axios.get(currentLocalization.url).then((response) => {
-		updateDataFromResponse(response.data);
-		nextTick(() => container.value.clearDirtyState());
-	});
-};
 </script>
 <template>
     <Head :title />
 
     <div class="max-w-5xl mx-auto">
         <Header :title :icon>
-            <Dropdown v-if="!props.readOnly && showLocalizationSelector">
-				<template #trigger>
-					<Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
-				</template>
-				<DropdownMenu>
-					<DropdownItem :text="__('Configure')" icon="cog" :v-if="canConfigure" :href="configureUrl" />
-				</DropdownMenu>
-			</Dropdown>
-
             <SiteSelector
 				v-if="showLocalizationSelector"
 				:sites="localizations"
@@ -155,19 +123,17 @@ const refreshLocalization = () => {
 
         <PublishContainer
             ref="container"
-            name="seo-defaults"
+            name="seo-defaults-config"
             :reference
             :blueprint
             v-model="values"
             :meta
             :errors
             :site
-            :origin-values
-			:origin-meta
             v-model:modified-fields="localizedFields"
-            :sync-field-confirmation-text
             :track-dirty-state="true"
             :read-only
+            :as-config="true"
         />
 
         <confirmation-modal

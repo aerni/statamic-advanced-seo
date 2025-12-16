@@ -190,11 +190,11 @@ class SeoVariables implements Augmentable, Localization
         }
 
         if (Site::multiEnabled()) {
-            $this->config->put('origin', $this->hasOrigin() ? $this->origin()->locale() : null);
+            $this->config()->set('origin', $this->hasOrigin() ? $this->origin()->locale() : null);
         }
 
         return [
-            'config' => Arr::removeNullValues($this->config->all()),
+            'config' => Arr::removeNullValues($this->config()->data()->all()),
             'data' => $data,
         ];
     }
