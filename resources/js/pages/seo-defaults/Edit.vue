@@ -65,6 +65,7 @@ let saveKeyBinding;
 onMounted(() => {
 	saveKeyBinding = Statamic.$keys.bindGlobal(['mod+s'], (e) => {
 		e.preventDefault();
+        if (!canSave.value) return;
 		save();
 	});
 });
