@@ -2,20 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Data\Localization;
-use Statamic\Data\ContainsData;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasOrigin;
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
+use Statamic\Data\HasOrigin;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Blueprint;
+use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
 use Statamic\GraphQL\ResolvesValues;
-use Statamic\Support\Arr;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoVariables implements Augmentable, Localization
@@ -34,9 +34,23 @@ class SeoVariables implements Augmentable, Localization
 
     protected string $locale;
 
+    protected SeoConfig $config;
+
     public function __construct()
     {
         $this->data = collect();
+        $this->config = new SeoConfig();
+    }
+
+    public function config(?callable $callback = null): SeoConfig|self
+    {
+        if ($callback === null) {
+            return $this->config;
+        }
+
+        $this->config = $callback($this->config);
+
+        return $this;
     }
 
     public function seoSet($set = null)
@@ -175,16 +189,13 @@ class SeoVariables implements Augmentable, Localization
             $data = Arr::removeNullValues($data);
         }
 
-        // TODO: Use $this->config when implemented.
-        $config = [];
-
         // Add origin to config if multi-site and has origin
         if (Site::multiEnabled() && $this->hasOrigin()) {
-            $config['origin'] = $this->origin()->locale();
+            $this->config->put('origin', $this->origin()->locale());
         }
 
         return [
-            'config' => $config,
+            'config' => $this->config->all(),
             'data' => $data,
         ];
     }

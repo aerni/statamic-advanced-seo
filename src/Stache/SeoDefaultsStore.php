@@ -54,19 +54,20 @@ class SeoDefaultsStore extends ChildStore
 
         // New format with config and data sections
         if (isset($parsed['config']) && isset($parsed['data'])) {
-            $data = $parsed['data'];
-            $origin = Arr::get($parsed['config'], 'origin');
+            $parsedConfig = $parsed['config'];
+            $parsedData = $parsed['data'];
         }
         // Legacy flat format (for backward compatibility during migration)
         else {
-            $data = Arr::except($parsed, 'origin');
-            $origin = Arr::get($parsed, 'origin');
+            $parsedConfig = Arr::only($parsed, 'origin');
+            $parsedData = Arr::except($parsed, 'origin');
         }
 
         return $variables
             ->initialPath($path)
-            ->merge($data)
-            ->origin($origin);
+            ->config(fn ($config) => $config->merge($parsedConfig))
+            ->merge($parsedData)
+            ->origin(Arr::get($parsedConfig, 'origin'));
     }
 
     public function save($set): void
