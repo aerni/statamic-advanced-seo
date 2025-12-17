@@ -24,6 +24,7 @@ const props = defineProps({
     initialConfigUrl: String,
     action: String,
     readOnly: Boolean,
+    configurable: Boolean,
 });
 
 const container = useTemplateRef('container');
@@ -134,12 +135,12 @@ const refreshLocalization = () => {
 
     <div class="max-w-5xl mx-auto">
         <Header :title :icon>
-            <Dropdown v-if="!props.readOnly && showLocalizationSelector">
+            <Dropdown v-if="configurable">
 				<template #trigger>
 					<Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
 				</template>
 				<DropdownMenu>
-					<DropdownItem :text="__('Configure')" icon="cog" :v-if="canConfigure" :href="configUrl" />
+					<DropdownItem :text="__('Configure')" icon="cog" :href="configUrl" />
 				</DropdownMenu>
 			</Dropdown>
 

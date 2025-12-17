@@ -131,7 +131,7 @@ class CollectionDefaultsConfigurationController extends CpController
                 'fields' => [
                     'origin' => [
                         'display' => __('Origin'),
-                        'instructions' => __('Choose an origin for this site.'),
+                        'instructions' => __('Values will be inherited from the selected site.'),
                         'type' => 'origin',
                         'if' => [
                             'enabled' => 'true',
@@ -141,48 +141,49 @@ class CollectionDefaultsConfigurationController extends CpController
             ];
         }
 
-        $fields['indexing'] = [
-            'display' => __('Indexing'),
-            'fields' => [
-                'noindex' => [
-                    'type' => 'toggle',
-                    'display' => 'Noindex',
-                    'instructions' => 'Prevent your site from being indexed by search engines.',
-                    'default' => Defaults::data('site::indexing')->get('noindex'),
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'width' => 50,
-                    'if' => [
-                        'enabled' => 'true',
-                    ],
-                ],
-                'nofollow' => [
-                    'type' => 'toggle',
-                    'display' => 'Nofollow',
-                    'instructions' => 'Prevent site crawlers from following any links on your site.',
-                    'default' => Defaults::data('site::indexing')->get('nofollow'),
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'width' => 50,
-                    'if' => [
-                        'enabled' => 'true',
-                    ],
-                ],
-                'sitemap' => [
-                    'type' => 'toggle',
-                    'display' => 'Sitemap',
-                    'instructions' => 'Enable the sitemap for this collection.',
-                    'default' => true,
-                    'listable' => 'hidden',
-                    'localizable' => true,
-                    'width' => 50,
-                    'if' => [
-                        'enabled' => 'true',
-                        'noindex' => 'false',
-                    ],
-                ],
-            ],
-        ];
+        // TODO: Bring these fields back later.
+        // $fields['indexing'] = [
+        //     'display' => __('Indexing'),
+        //     'fields' => [
+        //         'noindex' => [
+        //             'type' => 'toggle',
+        //             'display' => 'Noindex',
+        //             'instructions' => 'Prevent your site from being indexed by search engines.',
+        //             'default' => Defaults::data('site::indexing')->get('noindex'),
+        //             'listable' => 'hidden',
+        //             'localizable' => true,
+        //             'width' => 50,
+        //             'if' => [
+        //                 'enabled' => 'true',
+        //             ],
+        //         ],
+        //         'nofollow' => [
+        //             'type' => 'toggle',
+        //             'display' => 'Nofollow',
+        //             'instructions' => 'Prevent site crawlers from following any links on your site.',
+        //             'default' => Defaults::data('site::indexing')->get('nofollow'),
+        //             'listable' => 'hidden',
+        //             'localizable' => true,
+        //             'width' => 50,
+        //             'if' => [
+        //                 'enabled' => 'true',
+        //             ],
+        //         ],
+        //         'sitemap' => [
+        //             'type' => 'toggle',
+        //             'display' => 'Sitemap',
+        //             'instructions' => 'Enable the sitemap for this collection.',
+        //             'default' => true,
+        //             'listable' => 'hidden',
+        //             'localizable' => true,
+        //             'width' => 50,
+        //             'if' => [
+        //                 'enabled' => 'true',
+        //                 'noindex' => 'false',
+        //             ],
+        //         ],
+        //     ],
+        // ];
 
         return \Statamic\Facades\Blueprint::make()
             ->setParent($localization)

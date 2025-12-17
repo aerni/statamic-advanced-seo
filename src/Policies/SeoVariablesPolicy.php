@@ -13,7 +13,9 @@ class SeoVariablesPolicy
 
     public function before($user)
     {
-        if (User::fromUser($user)->isSuper()) {
+        $user = User::fromUser($user);
+
+        if ($user->isSuper() || $user->hasPermission('configure seo')) {
             return true;
         }
     }
@@ -38,6 +40,14 @@ class SeoVariablesPolicy
         $user = User::fromUser($user);
 
         return $user->hasPermission("edit seo {$set->handle()} defaults")
+            && $this->userCanAccessAnySite($user, $set->sites());
+    }
+
+    public function configure($user, SeoDefaultSet $set): bool
+    {
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('configure seo')
             && $this->userCanAccessAnySite($user, $set->sites());
     }
 }

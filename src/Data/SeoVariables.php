@@ -53,6 +53,11 @@ class SeoVariables implements Augmentable, Localization
         return $this;
     }
 
+    public function enabled(): bool
+    {
+        return $this->config()->get('enabled', true);
+    }
+
     public function seoSet($set = null)
     {
         return $this->fluentlyGetOrSet('set')->args(func_get_args());

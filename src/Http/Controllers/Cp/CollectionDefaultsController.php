@@ -2,23 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
+use Illuminate\Http\RedirectResponse;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Exceptions\AuthorizationException;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 
 class CollectionDefaultsController extends CpController
 {
@@ -54,11 +55,7 @@ class CollectionDefaultsController extends CpController
 
         $site = $request->site?->handle() ?? Site::selected()->handle();
 
-        if (! $set->availableInSite($site)) {
-            return $this->redirectToIndex($set, $site);
-        }
-
-        $this->authorize('view', [SeoVariables::class, $set]);
+        throw_unless($this->canAccessEditView($set, $site), new AuthorizationException());
 
         // Create a localization for each of the provided sites. This triggers a save on the set.
         // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
@@ -90,9 +87,13 @@ class CollectionDefaultsController extends CpController
             'initialHasOrigin' => $hasOrigin,
             'initialOriginValues' => $originValues ?? null,
             'initialOriginMeta' => $originMeta ?? null,
-            'initialLocalizations' => $this->authorizedSites($set)->map(function ($site) use ($set, $requestLocalization) {
+            'initialLocalizations' => $this->authorizedSites($set)->map(function ($site) use ($localization, $set, $requestLocalization) {
                 $localization = $set->in($site);
                 $exists = $localization !== null;
+
+                if (! $localization->enabled()) {
+                    return;
+                }
 
                 return [
                     'handle' => $site,
@@ -104,13 +105,12 @@ class CollectionDefaultsController extends CpController
                     'origin' => $exists ? $localization->locale() === optional($requestLocalization->origin())->locale() : null,
                     'url' => $exists ? $localization->editUrl() : null,
                 ];
-            })->values()->all(),
+            })->filter()->values()->all(),
             'initialLocalizedFields' => $localization->data()->keys()->all(),
             'initialConfigUrl' => $localization->configUrl(),
             'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
+            'configurable' => User::current()->can('configure', [SeoVariables::class, $set]),
             'action' => $localization->updateUrl(),
-            // TODO: Add proper permission if users can configure or not.
-            'canConfigure' => true,
         ];
 
         if ($request->wantsJson()) {
@@ -175,12 +175,25 @@ class CollectionDefaultsController extends CpController
             ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
             ->map(fn ($collection) => [
                 ...$collection,
-                'configurable' => User::current()->can('edit', [SeoVariables::class, $collection['set']]),
-                'edit_url' => $collection['set']->editUrl(),
+                'configurable' => User::current()->can('configure', [SeoVariables::class, $collection['set']]),
+                'edit_url' => $collection['set']->in(Site::selected()->handle())?->editUrl(),
                 'config_url' => $collection['set']->configUrl(),
-                'status' => 'enabled',
+                'enabled_in_selected_site' => $collection['set']->in(Site::selected()->handle())?->enabled() ?? false,
+                'available_in_selected_site' => $this->availableInSelectedSite($collection['set']),
             ])
             ->values();
+    }
+
+    // A site is unavailable to the user if it's disabled or the user doesn't have permissions to view the site.
+    protected function availableInSelectedSite(SeoDefaultSet $set): bool
+    {
+        $localization = $set->in(Site::selected()->handle());
+
+        if (! $localization) {
+            return false;
+        }
+
+        return User::current()->can('view', $localization->site());
     }
 
     protected function flashDefaultsUnavailable(): void
@@ -217,5 +230,26 @@ class CollectionDefaultsController extends CpController
             'taxonomies' => 'advanced-seo::Taxonomies/Index',
             default => throw new NotFoundHttpException,
         };
+    }
+
+    protected function canAccessEditView(SeoDefaultSet $set, string $site): bool
+    {
+        // User can't access if they don't have view permission
+        if (! User::current()->can('view', [SeoVariables::class, $set])) {
+            return false;
+        }
+
+        // User can't access if they don't have permission to view the requested site
+        if (! Site::authorized()->contains($site)) {
+            return false;
+        }
+
+        // User can't access if the set isn't available in the requested site
+        if (! $set->availableInSite($site)) {
+            return false;
+        }
+
+        // User can't access if the set is disabled for the requested site
+        return $set->in($site)->enabled();
     }
 }

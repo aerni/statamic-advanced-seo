@@ -137,6 +137,11 @@ class ServiceProvider extends AddonServiceProvider
     {
         Permission::extend(function () {
             Permission::group('advanced-seo', 'Advanced SEO', function () {
+                Permission::register("configure seo", function ($permission) {
+                    $permission
+                        ->label('Configure Advanced SEO')
+                        ->description('Grants access to all Advanced SEO related permissions');
+                });
                 Defaults::enabled()->groupBy('type')->each(function ($items, $group) {
                     Permission::register("view seo {$group} defaults", function ($permission) use ($group, $items) {
                         $permission
