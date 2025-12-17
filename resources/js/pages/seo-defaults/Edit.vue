@@ -21,7 +21,7 @@ const props = defineProps({
 	initialOriginValues: Object,
 	initialOriginMeta: Object,
     initialSite: String,
-    initialConfigureUrl: String,
+    initialConfigUrl: String,
     action: String,
     readOnly: Boolean,
 });
@@ -38,7 +38,7 @@ const hasOrigin = ref(props.initialHasOrigin);
 const originValues = ref(props.initialOriginValues);
 const originMeta = ref(props.initialOriginMeta);
 const site = ref(props.initialSite);
-const configureUrl = ref(props.initialConfigureUrl);
+const configUrl = ref(props.initialConfigUrl);
 const syncFieldConfirmationText = ref(__('messages.sync_entry_field_confirmation_text'));
 const pendingLocalization = ref(null);
 const saving = ref(false);
@@ -102,7 +102,7 @@ const updateDataFromResponse = (data) => {
 	localizations.value = data.initialLocalizations;
 	localizedFields.value = data.initialLocalizedFields;
 	hasOrigin.value = data.initialHasOrigin;
-	configureUrl.value = data.initialConfigureUrl;
+	configUrl.value = data.initialConfigUrl;
 };
 
 const switchToLocalization = (localization) => {
@@ -139,7 +139,7 @@ const refreshLocalization = () => {
 					<Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
 				</template>
 				<DropdownMenu>
-					<DropdownItem :text="__('Configure')" icon="cog" :v-if="canConfigure" :href="configureUrl" />
+					<DropdownItem :text="__('Configure')" icon="cog" :v-if="canConfigure" :href="configUrl" />
 				</DropdownMenu>
 			</Dropdown>
 

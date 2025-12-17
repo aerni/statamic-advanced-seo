@@ -193,7 +193,12 @@ class SeoDefaultSet implements Contract
 
     public function editUrl()
     {
-        return cp_route('advanced-seo.collections.configure.edit', $this->handle());
+        return cp_route('advanced-seo.collections.defaults.edit', [$this->handle(), Site::selected()]);
+    }
+
+    public function configUrl()
+    {
+        return cp_route('advanced-seo.collections.config.edit', [$this->handle(), Site::selected()]);
     }
 
     public function blueprint(): Blueprint

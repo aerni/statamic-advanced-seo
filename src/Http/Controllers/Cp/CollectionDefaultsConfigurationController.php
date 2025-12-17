@@ -19,7 +19,7 @@ class CollectionDefaultsConfigurationController extends CpController
 
         $set = $defaults['set'];
 
-        $site = $request->site ?? Site::selected()->handle();
+        $site = $request->site?->handle() ?? Site::selected()->handle();
 
         // Implement this or a similar guard.
         // if (! $set->availableInSite($site)) {
@@ -50,11 +50,11 @@ class CollectionDefaultsConfigurationController extends CpController
                     'handle' => $site,
                     'name' => Site::get($site)->name(),
                     'active' => $site === $localization->locale(),
-                    'url' => $set->in($site)->configureUrl(),
+                    'url' => $set->in($site)->configUrl(),
                 ]),
             'initialLocalizedFields' => $localization->config()->data()->keys()->all(),
             'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
-            'action' => cp_route('advanced-seo.collections.configure.update', $set->handle())
+            'action' => cp_route('advanced-seo.collections.config.update', [$set->handle(), $site])
         ];
 
         if ($request->wantsJson()) {

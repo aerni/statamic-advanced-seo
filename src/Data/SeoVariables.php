@@ -2,20 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Stache;
-use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Collection;
-use Statamic\GraphQL\ResolvesValues;
-use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Localization;
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Fields\Blueprint;
+use Statamic\GraphQL\ResolvesValues;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoVariables implements Augmentable, Localization
@@ -95,39 +95,33 @@ class SeoVariables implements Augmentable, Localization
     public function editUrl()
     {
         return [
-            'site' => $this->cpUrl('advanced-seo.site.edit'),
-            'collections' => $this->cpUrl('advanced-seo.collections.edit'),
-            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.edit'),
+            'site' => $this->cpUrl('advanced-seo.site.defaults.edit'),
+            'collections' => $this->cpUrl('advanced-seo.collections.defaults.edit'),
+            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.defaults.edit'),
         ][$this->type()];
     }
 
     public function updateUrl()
     {
         return [
-            'site' => $this->cpUrl('advanced-seo.site.update'),
-            'collections' => $this->cpUrl('advanced-seo.collections.update'),
-            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.update'),
+            'site' => $this->cpUrl('advanced-seo.site.defaults.update'),
+            'collections' => $this->cpUrl('advanced-seo.collections.defaults.update'),
+            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.defaults.update'),
         ][$this->type()];
     }
 
-    public function configureUrl()
+    public function configUrl()
     {
         return [
-            'site' => $this->cpUrl('advanced-seo.site.configure.edit'),
-            'collections' => $this->cpUrl('advanced-seo.collections.configure.edit'),
-            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.configure.edit'),
+            'site' => $this->cpUrl('advanced-seo.site.config.edit'),
+            'collections' => $this->cpUrl('advanced-seo.collections.config.edit'),
+            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.config.edit'),
         ][$this->type()];
     }
 
     protected function cpUrl($route)
     {
-        $params = [$this->handle()];
-
-        if (Site::multiEnabled()) {
-            $params['site'] = $this->locale();
-        }
-
-        return cp_route($route, $params);
+        return cp_route($route, [$this->handle(), $this->locale()]);
     }
 
     public function save(): self

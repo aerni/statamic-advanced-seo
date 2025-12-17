@@ -19,7 +19,7 @@ const props = defineProps({
     initialLocalizedFields: Array,
     initialSite: String,
     action: String,
-    configureUrl: String,
+    configUrl: String,
     readOnly: Boolean,
 });
 

@@ -23,7 +23,7 @@ const props = defineProps({
             @refreshing="() => router.reload()"
         >
             <template #cell-title="{ row: collection }">
-                <Link :href="collection.status === 'enabled' ? cp_url(`advanced-seo/collections/${collection.handle}`) : collection.configure_url" class="flex items-center gap-2">
+                <Link :href="collection.status === 'enabled' ? collection.edit_url : collection.config_url" class="flex items-center gap-2">
                     <Icon :name="collection.icon || 'collections'" />
                     {{ __(collection.title) }}
                 </Link>
@@ -45,8 +45,8 @@ const props = defineProps({
                 </div>
             </template>
             <template #prepended-row-actions="{ row: collection }">
-                <DropdownItem v-if="collection.status === 'enabled'" :text="__('Edit')" icon="edit" :href="cp_url(`advanced-seo/collections/${collection.handle}`)" />
-                <DropdownItem v-if="collection.configurable" :text="__('Configure')" icon="cog" :href="collection.configure_url" />
+                <DropdownItem v-if="collection.status === 'enabled'" :text="__('Edit')" icon="edit" :href="collection.edit_url" />
+                <DropdownItem v-if="collection.configurable" :text="__('Configure')" icon="cog" :href="collection.config_url" />
             </template>
         </Listing>
 

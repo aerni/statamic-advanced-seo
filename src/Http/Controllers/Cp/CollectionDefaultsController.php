@@ -52,7 +52,7 @@ class CollectionDefaultsController extends CpController
 
         $set = $defaults['set'];
 
-        $site = $request->site ?? Site::selected()->handle();
+        $site = $request->site?->handle() ?? Site::selected()->handle();
 
         if (! $set->availableInSite($site)) {
             return $this->redirectToIndex($set, $site);
@@ -106,7 +106,7 @@ class CollectionDefaultsController extends CpController
                 ];
             })->values()->all(),
             'initialLocalizedFields' => $localization->data()->keys()->all(),
-            'initialConfigureUrl' => $localization->configureUrl(),
+            'initialConfigUrl' => $localization->configUrl(),
             'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
             'action' => $localization->updateUrl(),
             // TODO: Add proper permission if users can configure or not.
@@ -176,7 +176,8 @@ class CollectionDefaultsController extends CpController
             ->map(fn ($collection) => [
                 ...$collection,
                 'configurable' => User::current()->can('edit', [SeoVariables::class, $collection['set']]),
-                'configure_url' => $collection['set']->editUrl(),
+                'edit_url' => $collection['set']->editUrl(),
+                'config_url' => $collection['set']->configUrl(),
                 'status' => 'enabled',
             ])
             ->values();

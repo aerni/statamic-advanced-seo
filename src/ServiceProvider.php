@@ -124,7 +124,7 @@ class ServiceProvider extends AddonServiceProvider
                         ->children(
                             $defaults->map(function ($default) use ($nav) {
                                 return $nav->item($default['title'])
-                                    ->route("advanced-seo.{$default['type']}.edit", $default['handle']);
+                                    ->route("advanced-seo.{$default['type']}.defaults.edit", [$default['handle'], Site::selected()]);
                             })->toArray()
                         );
                 });
