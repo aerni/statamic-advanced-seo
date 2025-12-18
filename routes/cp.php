@@ -2,13 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoDefaultsController;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoDashboardController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\DashboardController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionDefaultsController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoDefaultsConfigurationController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionDefaultsConfigurationController;
 
 Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
-    Route::get('/', SeoDashboardController::class)->name('index');
+    Route::get('/', DashboardController::class)->name('index');
 
     Route::get('/site', [SeoDefaultsController::class, 'index'])->name('site.index');
     Route::get('/site/{default}/{site}', [SeoDefaultsController::class, 'edit'])->name('site.defaults.edit');

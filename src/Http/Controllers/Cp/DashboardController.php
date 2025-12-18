@@ -11,7 +11,7 @@ use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
-class SeoDashboardController extends CpController
+class DashboardController extends CpController
 {
     public function __invoke(): Response
     {
@@ -29,14 +29,12 @@ class SeoDashboardController extends CpController
         return Defaults::enabled()
             ->filter(fn ($default) => User::current()->can('edit', [SeoVariables::class, $default['set']]))
             ->keyBy('type')
-            ->map(function ($type) {
-                return [
-                    'type' => $type['type'],
-                    'title' => ucfirst($type['type']),
-                    'route' => cp_route("advanced-seo.{$type['type']}.index"),
-                    'icon' => $type['type'] === 'site' ? 'web' : $type['icon'],
-                ];
-            })
+            ->map(fn ($type) =>  [
+                'type' => $type['type'],
+                'title' => ucfirst($type['type']),
+                'route' => cp_route("advanced-seo.{$type['type']}.index"),
+                'icon' => $type['type'] === 'site' ? 'web' : $type['icon'],
+            ])
             ->values();
     }
 }
