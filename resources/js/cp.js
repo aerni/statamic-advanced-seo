@@ -1,3 +1,4 @@
+import Dashboard from './pages/Dashboard.vue';
 import SiteIndex from './pages/site/Index.vue';
 import CollectionsIndex from './pages/collections/Index.vue';
 import CollectionsConfig from './pages/collections/Config.vue';
@@ -8,6 +9,7 @@ import SocialImageFieldtype from './components/SocialImageFieldtype.vue'
 import OriginFieldtype from './components/OriginFieldtype.vue'
 
 Statamic.booting(() => {
+    Statamic.$inertia.register('advanced-seo::Dashboard', Dashboard)
     Statamic.$inertia.register('advanced-seo::Site/Index', SiteIndex)
     Statamic.$inertia.register('advanced-seo::Collections/Index', CollectionsIndex)
     Statamic.$inertia.register('advanced-seo::Collections/Config', CollectionsConfig)

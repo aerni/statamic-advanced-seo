@@ -112,22 +112,23 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
-            Defaults::enabled()
-                ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
+            $defaults = Defaults::enabled()
                 ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
-                ->groupBy('type')
-                ->each(function ($defaults, $type) use ($nav) {
-                    $nav->create(ucfirst($type))
-                        ->section('SEO')
-                        ->route("advanced-seo.{$type}.index")
-                        ->icon($defaults->first()['type_icon'])
-                        ->children(
-                            $defaults->map(function ($default) use ($nav) {
-                                return $nav->item($default['title'])
-                                    ->route("advanced-seo.{$default['type']}.defaults.edit", [$default['handle'], Site::selected()]);
-                            })->toArray()
-                        );
-                });
+                ->keyBy('type')
+                ->keys();
+
+            if ($defaults->isEmpty()) {
+                return;
+            }
+
+            $nav->tools('SEO')
+                ->route("advanced-seo.index")
+                ->icon('ai-search-spark')
+                ->children(function () use ($nav, $defaults) {
+                    return $defaults
+                        ->map(fn ($type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"))
+                        ->all();
+            });
         });
 
         return $this;

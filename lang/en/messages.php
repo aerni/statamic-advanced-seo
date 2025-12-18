@@ -2,6 +2,7 @@
 
 return [
     'site' => 'Site',
+    'site_description' => 'Configure site-wide settings.',
 
     'general' => 'General',
     'general_description' => 'Configure general information about your site.',
@@ -19,10 +20,10 @@ return [
     'favicons_description' => 'Configure the favicon of your site.',
 
     'collections' => 'Collections',
-    'collections_description' => 'Customize the default data of your collection entries. Choose a collection below.',
+    'collections_description' => 'Configure collections and define default values used by entries.',
 
     'taxonomies' => 'Taxonomies',
-    'taxonomies_description' => 'Customize the default data of your taxonomy terms. Choose a taxonomy below.',
+    'taxonomies_description' => 'Configure taxonomies and define default values used by terms.',
 
     'social_images_generator_save_sync' => 'Save the entry to generate the image.',
     'social_images_generator_save_queue' => 'Save the entry to generate the image in the background.',
