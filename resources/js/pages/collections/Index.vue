@@ -21,6 +21,7 @@ const showLink = (collection) => {
         <Header :title icon="collections" />
 
         <Listing
+            v-if="collections.length"
             :items="collections"
             :columns="columns"
             :allow-search="false"
@@ -56,6 +57,13 @@ const showLink = (collection) => {
                 <DropdownItem v-if="collection.configurable" :text="__('Configure')" icon="cog" :href="collection.config_url" />
             </template>
         </Listing>
+
+        <div
+            v-else
+            class="p-6 text-center text-gray-500 border border-gray-300 border-dashed rounded-lg dark:border-gray-700"
+            v-text="__('No collections configured for this site')"
+        />
+
         <DocsCallout :topic="__('Collection Defaults')" url="https://advanced-seo.michaelaerni.ch/usage/settings-and-defaults" />
     </div>
 </template>
