@@ -151,7 +151,7 @@ const refreshLocalization = () => {
 				@update:modelValue="localizationSelected"
 			/>
 
-            <Button variant="primary" :text="__('Save')" @click="save" :disabled="!canSave" />
+            <Button v-if="!readOnly" variant="primary" :text="__('Save')" @click="save" :disabled="!canSave" />
         </Header>
 
         <PublishContainer
