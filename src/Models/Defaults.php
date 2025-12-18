@@ -87,7 +87,7 @@ class Defaults extends Model
                 'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => true,
-                'icon' => 'collections',
+                'icon' => $collection->icon(),
                 'type_icon' => 'collections',
                 'set' => Seo::findOrMake('collections', $collection->handle()),
             ];

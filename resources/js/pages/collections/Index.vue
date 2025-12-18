@@ -30,11 +30,11 @@ const showLink = (collection) => {
         >
             <template #cell-title="{ row: collection }">
                 <Link v-if="showLink(collection)" :href="collection.enabled_in_selected_site ? collection.edit_url : collection.config_url" class="flex items-center gap-2 select-none">
-                    <Icon :name="collection.icon || 'collections'" />
+                    <Icon :name="collection.icon" />
                     {{ __(collection.title) }}
                 </Link>
-                <div v-else class="flex items-center gap-2 select-none">
-                    <Icon name="security-lock" />
+                <div v-else class="flex items-center gap-2 opacity-50 select-none">
+                    <Icon :name="collection.icon" />
                     {{ __(collection.title) }}
                 </div>
             </template>
