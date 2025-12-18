@@ -191,14 +191,20 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
-    public function editUrl()
+    public function editUrl(): string
     {
-        return cp_route('advanced-seo.collections.defaults.edit', [$this->handle(), Site::selected()]);
+        return match ($this->type()) {
+            'collections' => cp_route('advanced-seo.collections.defaults.edit', [$this->handle(), Site::selected()]),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.defaults.edit', [$this->handle(), Site::selected()]),
+        };
     }
 
-    public function configUrl()
+    public function configUrl(): string
     {
-        return cp_route('advanced-seo.collections.config.edit', [$this->handle(), Site::selected()]);
+        return match ($this->type()) {
+            'collections' => cp_route('advanced-seo.collections.config.edit', [$this->handle(), Site::selected()]),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.config.edit', [$this->handle(), Site::selected()]),
+        };
     }
 
     public function blueprint(): Blueprint

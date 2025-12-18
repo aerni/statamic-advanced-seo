@@ -1,41 +1,70 @@
 <script setup>
-import { Head, Link } from '@statamic/cms/inertia';
-import { Header, Panel, DocsCallout, Icon } from '@statamic/cms/ui';
+import { Head, Link, router } from '@statamic/cms/inertia';
+import { Header, DocsCallout, Icon, Listing, Badge, DropdownItem } from '@statamic/cms/ui';
 
-defineProps({
-    defaults: Array,
-    title: String
+const props = defineProps({
+    title: String,
+    icon: String,
+    items: Array,
+    columns: Array,
 });
+
+const showLink = (item) => {
+    if (item.configurable) return true
+    return item.available_in_selected_site && item.enabled_in_selected_site;
+};
 </script>
 
 <template>
     <Head :title />
 
     <div class="max-w-5xl mx-auto">
-        <Header :title :icon="defaults[0].icon" />
+        <Header :title :icon />
 
-        <section class="space-y-6 starting-style-transition-children">
-            <Panel>
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>{{ __('Taxonomy') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="taxonomy in defaults" :key="taxonomy.handle">
-                        <td>
-                            <div class="flex items-center gap-2">
-                                <Icon :name="taxonomy.icon" class="text-gray-500 me-1" />
-                                <Link :href="cp_url(`advanced-seo/taxonomies/${taxonomy.handle}`)" v-text="__(taxonomy.title)" />
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </Panel>
-		</section>
+        <Listing
+            v-if="items.length"
+            :items="items"
+            :columns="columns"
+            :allow-search="false"
+            :allow-customizing-columns="false"
+            @refreshing="() => router.reload()"
+        >
+            <template #cell-title="{ row: item }">
+                <Link v-if="showLink(item)" :href="item.enabled_in_selected_site ? item.edit_url : item.config_url" class="flex items-center gap-2 select-none">
+                    <Icon :name="item.icon" />
+                    {{ __(item.title) }}
+                </Link>
+                <div v-else class="flex items-center gap-2 opacity-50 select-none">
+                    <Icon :name="item.icon" />
+                    {{ __(item.title) }}
+                </div>
+            </template>
+            <template #cell-status="{ row: item }">
+                <Badge
+                    v-if="item.enabled_in_selected_site"
+                    color="green"
+                    :text="__('Enabled')"
+                    pill
+                />
+                <Badge
+                    v-else
+                    color="default"
+                    :text="__('Disabled')"
+                    pill
+                />
+            </template>
+            <template #prepended-row-actions="{ row: item }">
+                <DropdownItem v-if="item.enabled_in_selected_site" :text="__('Edit')" icon="edit" :href="item.edit_url" />
+                <DropdownItem v-if="item.configurable" :text="__('Configure')" icon="cog" :href="item.config_url" />
+            </template>
+        </Listing>
 
-        <DocsCallout :topic="__('Taxonomy Defaults')" url="https://advanced-seo.michaelaerni.ch/usage/settings-and-defaults" />
+        <div
+            v-else
+            class="p-6 text-center text-gray-500 border border-gray-300 border-dashed rounded-lg dark:border-gray-700"
+            v-text="__(`No ${title} configured for the selected site`)"
+        />
+
+        <DocsCallout :topic="__('Defaults')" url="https://advanced-seo.michaelaerni.ch/usage/settings-and-defaults" />
     </div>
 </template>

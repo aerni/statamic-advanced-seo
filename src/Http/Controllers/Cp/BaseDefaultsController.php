@@ -7,10 +7,8 @@ use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
@@ -21,23 +19,24 @@ use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
-class CollectionDefaultsController extends CpController
+abstract class BaseDefaultsController extends CpController
 {
+    abstract protected function type(): string;
+
+    abstract protected function icon(): string;
+
     public function index(): Response
     {
-        $defaults = $this->defaults();
-
         $this->authorize('index', [SeoVariables::class, $this->type()]);
 
-        $columns = [
-            Column::make('title')->label(__('Title')),
-            Column::make('status')->label(__('Status')),
-        ];
-
-        return Inertia::render($this->view(), [
-            'collections' => $defaults,
-            'columns' => $columns,
+        return Inertia::render('advanced-seo::' . ucfirst($this->type()) . '/Index', [
             'title' => __("advanced-seo::messages.{$this->type()}"),
+            'icon' => $this->icon(),
+            'items' => $this->items(),
+            'columns' => [
+                Column::make('title')->label(__('Title')),
+                Column::make('status')->label(__('Status')),
+            ],
         ]);
     }
 
@@ -164,18 +163,18 @@ class CollectionDefaultsController extends CpController
         return $set->sites()->intersect(Site::authorized());
     }
 
-    protected function defaults(): Collection
+    protected function items(): Collection
     {
         return Defaults::enabledInType($this->type())
             ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
             ->filter(fn ($default) => User::current()->can('edit', [SeoVariables::class, $default['set']]))
-            ->map(fn ($collection) => [
-                ...$collection,
-                'configurable' => User::current()->can('configure', [SeoVariables::class, $collection['set']]),
-                'edit_url' => $collection['set']->in(Site::selected()->handle())?->editUrl(),
-                'config_url' => $collection['set']->configUrl(),
-                'enabled_in_selected_site' => $collection['set']->in(Site::selected()->handle())?->enabled() ?? false,
-                'available_in_selected_site' => $this->availableInSelectedSite($collection['set']),
+            ->map(fn ($default) => [
+                ...$default,
+                'configurable' => User::current()->can('configure', [SeoVariables::class, $default['set']]),
+                'edit_url' => $default['set']->in(Site::selected()->handle())?->editUrl(),
+                'config_url' => $default['set']->configUrl(),
+                'enabled_in_selected_site' => $default['set']->in(Site::selected()->handle())?->enabled() ?? false,
+                'available_in_selected_site' => $this->availableInSelectedSite($default['set']),
             ])
             ->values();
     }
@@ -190,42 +189,6 @@ class CollectionDefaultsController extends CpController
         }
 
         return User::current()->can('view', $localization->site());
-    }
-
-    protected function flashDefaultsUnavailable(): void
-    {
-        session()->now('error', __('There are no :type defaults available for the selected site.', [
-            'type' => Str::singular($this->type()),
-        ]));
-
-        throw new NotFoundHttpException;
-    }
-
-    protected function redirectToIndex(SeoDefaultSet $set, string $site): RedirectResponse
-    {
-        return redirect(cp_route("advanced-seo.{$set->type()}.index"))
-            ->with('error', __('The :set :type is not available in the selected site.', [
-                'set' => $set->title(),
-                'type' => Str::singular($this->type()),
-            ]));
-    }
-
-    protected function type(): string
-    {
-        $segments = request()->segments();
-        $key = array_search('advanced-seo', $segments) + 1;
-
-        return $segments[$key];
-    }
-
-    protected function view(): string
-    {
-        return match ($this->type()) {
-            'site' => 'advanced-seo::Site/Index',
-            'collections' => 'advanced-seo::Collections/Index',
-            'taxonomies' => 'advanced-seo::Taxonomies/Index',
-            default => throw new NotFoundHttpException,
-        };
     }
 
     protected function canAccessEditView(SeoDefaultSet $set, string $site): bool

@@ -9,22 +9,22 @@ use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
-class CollectionDefaultsConfigurationController extends CpController
+abstract class BaseDefaultsConfigController extends CpController
 {
+    abstract protected function type(): string;
+
     public function edit(Request $request, string $handle)
     {
+        throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
+
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
         $set = $defaults['set'];
 
         $site = $request->site?->handle() ?? Site::selected()->handle();
-
-        // Implement this or a similar guard.
-        // if (! $set->availableInSite($site)) {
-        //     return $this->redirectToIndex($set, $site);
-        // }
 
         $this->authorize('edit', [SeoVariables::class, $set]);
 
@@ -37,7 +37,7 @@ class CollectionDefaultsConfigurationController extends CpController
         [$values, $meta] = $this->extractFromFields($localization, $blueprint);
 
         $viewData = [
-            'title' => "Configure {$defaults['title']} Defaults",
+            'title' => "Configure {$defaults['title']}",
             'icon' => 'cog',
             'blueprint' => $blueprint->toPublishArray(),
             'initialReference' => $localization->reference(),
@@ -87,14 +87,6 @@ class CollectionDefaultsConfigurationController extends CpController
             ->config()->merge($values->all());
 
         $localization->save();
-    }
-
-    protected function type(): string
-    {
-        $segments = request()->segments();
-        $key = array_search('advanced-seo', $segments) + 1;
-
-        return $segments[$key];
     }
 
     protected function extractFromFields(SeoVariables $localization, Blueprint $blueprint): array
