@@ -168,7 +168,7 @@ class CollectionDefaultsController extends CpController
     {
         return Defaults::enabledInType($this->type())
             ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
-            ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
+            ->filter(fn ($default) => User::current()->can('edit', [SeoVariables::class, $default['set']]))
             ->map(fn ($collection) => [
                 ...$collection,
                 'configurable' => User::current()->can('configure', [SeoVariables::class, $collection['set']]),
@@ -230,8 +230,8 @@ class CollectionDefaultsController extends CpController
 
     protected function canAccessEditView(SeoDefaultSet $set, string $site): bool
     {
-        // User can't access if they don't have view permission
-        if (! User::current()->can('view', [SeoVariables::class, $set])) {
+        // User can't access if they don't have edit permission
+        if (! User::current()->can('edit', [SeoVariables::class, $set])) {
             return false;
         }
 

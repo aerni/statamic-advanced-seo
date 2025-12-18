@@ -51,7 +51,7 @@ class SeoDefaultsController extends CpController
             return $this->redirectToIndex($set, $site);
         }
 
-        $this->authorize('view', [SeoVariables::class, $set]);
+        $this->authorize('edit', [SeoVariables::class, $set]);
 
         // Create a localization for each of the provided sites. This triggers a save on the set.
         // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
@@ -165,7 +165,7 @@ class SeoDefaultsController extends CpController
     {
         return Defaults::enabledInType($this->type())
             ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
-            ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
+            ->filter(fn ($default) => User::current()->can('edit', [SeoVariables::class, $default['set']]))
             ->values();
     }
 

@@ -113,7 +113,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         Nav::extend(function ($nav) {
             $defaults = Defaults::enabled()
-                ->filter(fn ($default) => User::current()->can('view', [SeoVariables::class, $default['set']]))
+                ->filter(fn ($default) => User::current()->can('edit', [SeoVariables::class, $default['set']]))
                 ->keyBy('type')
                 ->keys();
 
@@ -138,32 +138,16 @@ class ServiceProvider extends AddonServiceProvider
     {
         Permission::extend(function () {
             Permission::group('advanced-seo', 'Advanced SEO', function () {
-                Permission::register("configure seo", function ($permission) {
+                Permission::register('configure seo', function ($permission) {
                     $permission
-                        ->label('Configure Advanced SEO')
-                        ->description('Grants access to all Advanced SEO related permissions');
+                        ->label('Configure Settings & Defaults')
+                        ->description('Grants access to all permissions and allows editing settings and defaults');
                 });
-                Defaults::enabled()->groupBy('type')->each(function ($items, $group) {
-                    Permission::register("view seo {$group} defaults", function ($permission) use ($group, $items) {
-                        $permission
-                            ->label('View '.ucfirst($group))
-                            ->children([
-                                Permission::make('view seo {group} defaults')
-                                    ->label('View :group')
-                                    ->replacements('group', function () use ($items) {
-                                        return $items->map(function ($item) {
-                                            return [
-                                                'value' => $item['handle'],
-                                                'label' => $item['title'],
-                                            ];
-                                        });
-                                    })
-                                    ->children([
-                                        Permission::make('edit seo {group} defaults')
-                                            ->label('Edit :group'),
-                                    ]),
-                            ]);
-                    });
+
+                Permission::register('edit seo defaults', function ($permission) {
+                    $permission
+                        ->label('Edit Defaults')
+                        ->description("Grants access to edit collection and taxonomy defaults");
                 });
             });
         });
