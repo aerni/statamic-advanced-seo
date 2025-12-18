@@ -2,34 +2,30 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
+use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Illuminate\Http\RedirectResponse;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Exceptions\AuthorizationException;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 
 class CollectionDefaultsController extends CpController
 {
     public function index(): Response
     {
         $defaults = $this->defaults();
-
-        if ($defaults->isEmpty()) {
-            $this->flashDefaultsUnavailable();
-        }
 
         $this->authorize('index', [SeoVariables::class, $this->type()]);
 

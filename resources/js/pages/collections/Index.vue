@@ -18,7 +18,7 @@ const showLink = (collection) => {
     <Head :title />
 
     <div class="max-w-5xl mx-auto">
-        <Header :title :icon="collections[0].icon" />
+        <Header :title icon="collections" />
 
         <Listing
             :items="collections"
