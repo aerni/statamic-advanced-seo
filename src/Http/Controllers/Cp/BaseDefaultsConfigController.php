@@ -2,13 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
 use Inertia\Inertia;
-use Statamic\Facades\Site;
+use Statamic\Sites\Site;
 use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -16,7 +18,7 @@ abstract class BaseDefaultsConfigController extends CpController
 {
     abstract protected function type(): string;
 
-    public function edit(Request $request, string $handle)
+    public function edit(Request $request, string $handle, Site $site)
     {
         throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
 
@@ -24,15 +26,15 @@ abstract class BaseDefaultsConfigController extends CpController
 
         $set = $defaults['set'];
 
-        $site = $request->site?->handle() ?? Site::selected()->handle();
+        $this->authorize('configure', [SeoDefaultSet::class, $set, $site]);
 
-        $this->authorize('edit', [SeoVariables::class, $set]);
+        $set = $set->createLocalizations();
 
-        $set = $set->createLocalizations($set->sites());
+        $localization = $set->in($site->handle());
 
-        $localization = $set->in($site);
+        $blueprint = static::editFormBlueprint($localization);
 
-        $blueprint = $this->editFormBlueprint($localization);
+        throw_unless($blueprint->fields()->items()->count(), NotFoundHttpException::class);
 
         [$values, $meta] = $this->extractFromFields($localization, $blueprint);
 
@@ -43,40 +45,39 @@ abstract class BaseDefaultsConfigController extends CpController
             'initialReference' => $localization->reference(),
             'initialValues' => $values,
             'initialMeta' => $meta,
-            'initialSite' => $site,
-            'initialLocalizations' => $set->sites()
-                ->intersect(Site::authorized())
+            'initialSite' => $site->handle(),
+            'initialLocalizations' => GetAuthorizedSites::handle($set)
                 ->map(fn ($site) => [
-                    'handle' => $site,
-                    'name' => Site::get($site)->name(),
-                    'active' => $site === $localization->locale(),
-                    'url' => $set->in($site)->configUrl(),
-                ]),
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                    'active' => $site->handle() === $localization->locale(),
+                    'url' => $set->in($site->handle())->configUrl(),
+                ])->values(),
             'initialLocalizedFields' => $localization->config()->data()->keys()->all(),
-            'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
-            'action' => cp_route('advanced-seo.collections.config.update', [$set->handle(), $site])
+            'readOnly' => User::current()->cant('edit', [SeoDefaultSet::class, $set, $site]),
+            'action' => $localization->configUrl(),
         ];
 
         if ($request->wantsJson()) {
             return $viewData;
         }
 
-        return Inertia::render('advanced-seo::Collections/Config', $viewData);
+        return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Config', $viewData);
     }
 
-    public function update(Request $request, string $handle): void
+    public function update(Request $request, string $handle, Site $site): void
     {
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
         $set = $defaults['set'];
 
-        $this->authorize('edit', [SeoVariables::class, $set]);
+        $this->authorize('configure', [SeoDefaultSet::class, $set, $site]);
 
-        $site = $request->site ?? Site::selected()->handle();
+        $localization = $set->in($site->handle());
 
-        $localization = $set->in($site);
+        $fields = static::editFormBlueprint($localization)->fields()->addValues($request->all());
 
-        $fields = $this->editFormBlueprint($localization)->fields()->addValues($request->all());
+        // TODO: Should we abort here if the blueprint doesn't have any items? Same as in the edit() method?
 
         $fields->validate();
 
@@ -100,10 +101,12 @@ abstract class BaseDefaultsConfigController extends CpController
     }
 
     // TODO: Make this an actual blueprint class.
-    protected function editFormBlueprint(SeoVariables $localization)
+    public static function editFormBlueprint(SeoVariables $localization): Blueprint
     {
-        $fields = [
-            'enabled' => [
+        $fields = [];
+
+        if ($localization->type() !== 'site') {
+            $fields['enabled'] = [
                 'display' => __('Enabled'),
                 'fields' => [
                     'enabled' => [
@@ -113,11 +116,10 @@ abstract class BaseDefaultsConfigController extends CpController
                         'default' => true,
                     ],
                 ],
-            ],
-        ];
+            ];
+        }
 
-        // TODO: This should probably also filter out any sites a user isn't authorized for.
-        if ($localization->sites()->count() > 1) {
+        if (GetAuthorizedSites::handle($localization->seoSet())->count() > 1) {
             $fields['origin'] = [
                 'display' => __('Origin'),
                 'fields' => [
@@ -125,9 +127,10 @@ abstract class BaseDefaultsConfigController extends CpController
                         'display' => __('Origin'),
                         'instructions' => __('Values will be inherited from the selected site.'),
                         'type' => 'origin',
-                        'if' => [
+                        // There is no 'enabled' field for site defaults. This ensures we don't break the blueprint.
+                        'if' => array_filter([
                             'enabled' => 'true',
-                        ],
+                        ], fn () => $localization->type() !== 'site'),
                     ],
                 ],
             ];
@@ -141,7 +144,7 @@ abstract class BaseDefaultsConfigController extends CpController
         //             'type' => 'toggle',
         //             'display' => 'Noindex',
         //             'instructions' => 'Prevent your site from being indexed by search engines.',
-        //             'default' => Defaults::data('site::indexing')->get('noindex'),
+        //             'default' => Defaults::data('SiteFacade::indexing')->get('noindex'),
         //             'listable' => 'hidden',
         //             'localizable' => true,
         //             'width' => 50,
@@ -153,7 +156,7 @@ abstract class BaseDefaultsConfigController extends CpController
         //             'type' => 'toggle',
         //             'display' => 'Nofollow',
         //             'instructions' => 'Prevent site crawlers from following any links on your site.',
-        //             'default' => Defaults::data('site::indexing')->get('nofollow'),
+        //             'default' => Defaults::data('SiteFacade::indexing')->get('nofollow'),
         //             'listable' => 'hidden',
         //             'localizable' => true,
         //             'width' => 50,

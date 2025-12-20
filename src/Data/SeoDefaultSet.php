@@ -106,9 +106,9 @@ class SeoDefaultSet implements Contract
             ->locale($site);
     }
 
-    public function createLocalizations(Collection $sites): self
+    public function createLocalizations(): self
     {
-        return $this->ensureLocalizations($sites)->save();
+        return $this->ensureLocalizations()->save();
     }
 
     public function createOrDeleteLocalizations(Collection $sites): self
@@ -123,10 +123,10 @@ class SeoDefaultSet implements Contract
      * TODO: We can probably refactor this to not accept a sites array but get the sites from the parent() instead.
      * But this might only work for collection and taxonomy defaults. What to do with site defaults that don't have a parent?
      */
-    public function ensureLocalizations(Collection $sites): self
+    public function ensureLocalizations(?Collection $sites = null): self
     {
-        // We only want to handle sites that are configured in Statamic's sites config.
-        $sites = $sites->intersect(Site::all()->keys());
+        // Get sites from the instance if not provided, or ensure custom sites are valid
+        $sites = $sites?->intersect(Site::all()->keys()) ?? $this->sites();
 
         // Make a localization for each site if it doesn't already exist.
         $sites->each(function ($site) {
@@ -194,16 +194,18 @@ class SeoDefaultSet implements Contract
     public function editUrl(): string
     {
         return match ($this->type()) {
-            'collections' => cp_route('advanced-seo.collections.defaults.edit', [$this->handle(), Site::selected()]),
-            'taxonomies' => cp_route('advanced-seo.taxonomies.defaults.edit', [$this->handle(), Site::selected()]),
+            'site' => cp_route('advanced-seo.site.defaults', [$this->handle(), Site::selected()]),
+            'collections' => cp_route('advanced-seo.collections.defaults', [$this->handle(), Site::selected()]),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.defaults', [$this->handle(), Site::selected()]),
         };
     }
 
     public function configUrl(): string
     {
         return match ($this->type()) {
-            'collections' => cp_route('advanced-seo.collections.config.edit', [$this->handle(), Site::selected()]),
-            'taxonomies' => cp_route('advanced-seo.taxonomies.config.edit', [$this->handle(), Site::selected()]),
+            'site' => cp_route('advanced-seo.site.config', [$this->handle(), Site::selected()]),
+            'collections' => cp_route('advanced-seo.collections.config', [$this->handle(), Site::selected()]),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.config', [$this->handle(), Site::selected()]),
         };
     }
 

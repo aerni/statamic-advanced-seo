@@ -97,36 +97,22 @@ class SeoVariables implements Augmentable, Localization
         ]);
     }
 
-    public function editUrl()
+    public function editUrl(): string
     {
-        return [
-            'site' => $this->cpUrl('advanced-seo.site.defaults.edit'),
-            'collections' => $this->cpUrl('advanced-seo.collections.defaults.edit'),
-            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.defaults.edit'),
-        ][$this->type()];
+        return match ($this->type()) {
+            'site' => cp_route('advanced-seo.site.defaults', [$this->handle(), $this->locale()]),
+            'collections' => cp_route('advanced-seo.collections.defaults', [$this->handle(), $this->locale()]),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.defaults', [$this->handle(), $this->locale()]),
+        };
     }
 
-    public function updateUrl()
+    public function configUrl(): string
     {
-        return [
-            'site' => $this->cpUrl('advanced-seo.site.defaults.update'),
-            'collections' => $this->cpUrl('advanced-seo.collections.defaults.update'),
-            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.defaults.update'),
-        ][$this->type()];
-    }
-
-    public function configUrl()
-    {
-        return [
-            'site' => $this->cpUrl('advanced-seo.site.config.edit'),
-            'collections' => $this->cpUrl('advanced-seo.collections.config.edit'),
-            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.config.edit'),
-        ][$this->type()];
-    }
-
-    protected function cpUrl($route)
-    {
-        return cp_route($route, [$this->handle(), $this->locale()]);
+        return match ($this->type()) {
+            'site' => cp_route('advanced-seo.site.config', [$this->handle(), $this->locale()]),
+            'collections' => cp_route('advanced-seo.collections.config', [$this->handle(), $this->locale()]),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.config', [$this->handle(), $this->locale()]),
+        };
     }
 
     public function save(): self

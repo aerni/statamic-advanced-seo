@@ -7,11 +7,12 @@ const props = defineProps({
     icon: String,
     items: Array,
     columns: Array,
+    // docs: Array,
 });
 
 const showLink = (item) => {
     if (item.configurable) return true
-    return item.available_in_selected_site && item.enabled_in_selected_site;
+    return item.enabled;
 };
 </script>
 
@@ -30,7 +31,7 @@ const showLink = (item) => {
             @refreshing="() => router.reload()"
         >
             <template #cell-title="{ row: item }">
-                <Link v-if="showLink(item)" :href="item.enabled_in_selected_site ? item.edit_url : item.config_url" class="flex items-center gap-2 select-none">
+                <Link v-if="showLink(item)" :href="item.enabled ? item.edit_url : item.config_url" class="flex items-center gap-2 select-none">
                     <Icon :name="item.icon" />
                     {{ __(item.title) }}
                 </Link>
@@ -41,7 +42,7 @@ const showLink = (item) => {
             </template>
             <template #cell-status="{ row: item }">
                 <Badge
-                    v-if="item.enabled_in_selected_site"
+                    v-if="item.enabled"
                     color="green"
                     :text="__('Enabled')"
                     pill
@@ -54,7 +55,7 @@ const showLink = (item) => {
                 />
             </template>
             <template #prepended-row-actions="{ row: item }">
-                <DropdownItem v-if="item.enabled_in_selected_site" :text="__('Edit')" icon="edit" :href="item.edit_url" />
+                <DropdownItem v-if="item.enabled" :text="__('Edit')" icon="edit" :href="item.edit_url" />
                 <DropdownItem v-if="item.configurable" :text="__('Configure')" icon="cog" :href="item.config_url" />
             </template>
         </Listing>
@@ -65,6 +66,6 @@ const showLink = (item) => {
             v-text="__(`No ${title} configured for the selected site`)"
         />
 
-        <DocsCallout :topic="__('Defaults')" url="https://advanced-seo.michaelaerni.ch/usage/settings-and-defaults" />
+        <!-- <DocsCallout :topic="__(docs.topic)" :url="docs.url" /> -->
     </div>
 </template>

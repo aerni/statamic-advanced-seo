@@ -2,22 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
-use Statamic\Exceptions\AuthorizationException;
-use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Site;
+use Statamic\Sites\Site;
 use Statamic\Facades\User;
+use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Facades\Site as SiteFacade;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
 
 abstract class BaseDefaultsController extends CpController
 {
@@ -27,9 +28,9 @@ abstract class BaseDefaultsController extends CpController
 
     public function index(): Response
     {
-        $this->authorize('index', [SeoVariables::class, $this->type()]);
+        $this->authorize('viewAny', [SeoDefaultSet::class, $this->type()]);
 
-        return Inertia::render('advanced-seo::' . ucfirst($this->type()) . '/Index', [
+        return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Index', [
             'title' => __("advanced-seo::messages.{$this->type()}"),
             'icon' => $this->icon(),
             'items' => $this->items(),
@@ -40,7 +41,7 @@ abstract class BaseDefaultsController extends CpController
         ]);
     }
 
-    public function edit(Request $request, string $handle): mixed
+    public function edit(Request $request, string $handle, Site $site): mixed
     {
         throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
 
@@ -48,17 +49,15 @@ abstract class BaseDefaultsController extends CpController
 
         $set = $defaults['set'];
 
-        $site = $request->site?->handle() ?? Site::selected()->handle();
-
-        throw_unless($this->canAccessEditView($set, $site), new AuthorizationException());
+        $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
         // Create a localization for each of the provided sites. This triggers a save on the set.
         // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
         // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
         // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
-        $set = $set->createLocalizations($set->sites());
+        $set = $set->createLocalizations();
 
-        $localization = $set->in($site);
+        $localization = $set->in($site->handle());
 
         $blueprint = $localization->blueprint();
 
@@ -78,52 +77,45 @@ abstract class BaseDefaultsController extends CpController
             'initialReference' => $localization->reference(),
             'initialValues' => $values,
             'initialMeta' => $meta,
-            'initialSite' => $site,
+            'initialSite' => $site->handle(),
             'initialHasOrigin' => $hasOrigin,
             'initialOriginValues' => $originValues ?? null,
             'initialOriginMeta' => $originMeta ?? null,
-            'initialLocalizations' => $this->authorizedSites($set)->map(function ($site) use ($localization, $set, $requestLocalization) {
-                $localization = $set->in($site);
-                $exists = $localization !== null;
+            'initialLocalizations' => GetAuthorizedSites::handle($set)->map(function ($site) use ($localization, $set, $requestLocalization) {
+                $localization = $set->in($site->handle());
 
                 if (! $localization->enabled()) {
                     return;
                 }
 
                 return [
-                    'handle' => $site,
-                    'name' => Site::get($site)->name(),
-                    'active' => $site === $requestLocalization->locale(),
-                    'exists' => $exists,
-                    'published' => true,
-                    'root' => $exists ? $localization->isRoot() : false,
-                    'origin' => $exists ? $localization->locale() === optional($requestLocalization->origin())->locale() : null,
-                    'url' => $exists ? $localization->editUrl() : null,
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                    'active' => $site->handle() === $requestLocalization->locale(),
+                    'url' => $localization->editUrl(),
                 ];
             })->filter()->values()->all(),
             'initialLocalizedFields' => $localization->data()->keys()->all(),
             'initialConfigUrl' => $localization->configUrl(),
-            'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
-            'configurable' => User::current()->can('configure', [SeoVariables::class, $set]),
-            'action' => $localization->updateUrl(),
+            'readOnly' => User::current()->cant('edit', [SeoDefaultSet::class, $set, $site]),
+            'configurable' => $this->isConfigurable($set, $site),
+            'action' => $localization->editUrl(),
         ];
 
         if ($request->wantsJson()) {
             return $viewData;
         }
 
-        return Inertia::render('advanced-seo::SeoDefaults/Edit', $viewData);
+        return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Edit', $viewData);
     }
 
-    public function update(Request $request, string $handle): void
+    public function update(Request $request, string $handle, Site $site): void
     {
-        $set = $this->set($handle);
+        $set = Seo::findOrMake($this->type(), $handle);
 
-        $this->authorize('edit', [SeoVariables::class, $set]);
+        $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
-        $site = $request->site ?? Site::selected()->handle();
-
-        $localization = $set->in($site);
+        $localization = $set->in($site->handle());
 
         $blueprint = $localization->blueprint();
 
@@ -143,11 +135,6 @@ abstract class BaseDefaultsController extends CpController
         SeoDefaultSetSaved::dispatch($localization->seoSet());
     }
 
-    protected function set(string $handle): SeoDefaultSet
-    {
-        return Seo::findOrMake($this->type(), $handle);
-    }
-
     protected function extractFromFields(SeoVariables $localization, Blueprint $blueprint): array
     {
         $fields = $blueprint
@@ -158,57 +145,30 @@ abstract class BaseDefaultsController extends CpController
         return [$fields->values()->all(), $fields->meta()->all()];
     }
 
-    protected function authorizedSites(SeoDefaultSet $set): Collection
+    protected function isConfigurable(SeoDefaultSet $set, Site $site): bool
     {
-        return $set->sites()->intersect(Site::authorized());
+        if (User::current()->cant('configure', [SeoDefaultSet::class, $set, $site])) {
+            return false;
+        }
+
+        return BaseDefaultsConfigController::editFormBlueprint($set->in($site->handle()))
+            ->fields()->items()->count() > 0;
     }
 
     protected function items(): Collection
     {
+        $site = SiteFacade::selected();
+
         return Defaults::enabledInType($this->type())
-            ->filter(fn ($default) => $default['set']->availableInSite(Site::selected()->handle()))
-            ->filter(fn ($default) => User::current()->can('edit', [SeoVariables::class, $default['set']]))
+            ->filter(fn ($default) => User::current()->can('view', [SeoDefaultSet::class, $default['set'], $site]))
+            ->each(fn ($default) => $default['set']->ensureLocalizations())
             ->map(fn ($default) => [
                 ...$default,
-                'configurable' => User::current()->can('configure', [SeoVariables::class, $default['set']]),
-                'edit_url' => $default['set']->in(Site::selected()->handle())?->editUrl(),
+                'enabled' => $default['set']->in($site->handle())->enabled(),
+                'configurable' => $this->isConfigurable($default['set'], $site),
+                'edit_url' => $default['set']->in($site->handle())->editUrl(),
                 'config_url' => $default['set']->configUrl(),
-                'enabled_in_selected_site' => $default['set']->in(Site::selected()->handle())?->enabled() ?? false,
-                'available_in_selected_site' => $this->availableInSelectedSite($default['set']),
             ])
             ->values();
-    }
-
-    // A site is unavailable to the user if it's disabled or the user doesn't have permissions to view the site.
-    protected function availableInSelectedSite(SeoDefaultSet $set): bool
-    {
-        $localization = $set->in(Site::selected()->handle());
-
-        if (! $localization) {
-            return false;
-        }
-
-        return User::current()->can('view', $localization->site());
-    }
-
-    protected function canAccessEditView(SeoDefaultSet $set, string $site): bool
-    {
-        // User can't access if they don't have edit permission
-        if (! User::current()->can('edit', [SeoVariables::class, $set])) {
-            return false;
-        }
-
-        // User can't access if they don't have permission to view the requested site
-        if (! Site::authorized()->contains($site)) {
-            return false;
-        }
-
-        // User can't access if the set isn't available in the requested site
-        if (! $set->availableInSite($site)) {
-            return false;
-        }
-
-        // User can't access if the set is disabled for the requested site
-        return $set->in($site)->enabled();
     }
 }

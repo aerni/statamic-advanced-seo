@@ -16,7 +16,7 @@ class OriginFieldtype extends Fieldtype
         $localization = $this->field->parent();
 
         return $localization->sites()
-            // ->intersect(Site::authorized()) // TODO: Probably need this so users only see sites they are authorized for?
+            ->intersect(Site::authorized())
             ->filter(fn ($site) => $site !== $localization->locale())
             ->map(function ($site) {
                 $site = Site::get($site);

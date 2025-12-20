@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref, useTemplateRef, computed, nextTick, getCurrentInstance } from 'vue';
-import { DocsCallout, Header, Button, PublishContainer } from '@statamic/cms/ui';
+import { DocsCallout, Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer } from '@statamic/cms/ui';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
 import { Head } from '@statamic/cms/inertia';
 import SiteSelector from '../../components/SiteSelector.vue';
@@ -17,10 +17,15 @@ const props = defineProps({
 	initialMeta: Object,
     initialLocalizations: Array,
     initialLocalizedFields: Array,
+    initialHasOrigin: Boolean,
+	initialOriginValues: Object,
+	initialOriginMeta: Object,
     initialSite: String,
+    initialConfigUrl: String,
     action: String,
-    configUrl: String,
     readOnly: Boolean,
+    configurable: Boolean,
+    // docs: Array,
 });
 
 const container = useTemplateRef('container');
@@ -31,7 +36,12 @@ const errors = ref({});
 const localizing = ref(false);
 const localizations = ref(props.initialLocalizations);
 const localizedFields = ref(props.initialLocalizedFields);
+const hasOrigin = ref(props.initialHasOrigin);
+const originValues = ref(props.initialOriginValues);
+const originMeta = ref(props.initialOriginMeta);
 const site = ref(props.initialSite);
+const configUrl = ref(props.initialConfigUrl);
+const syncFieldConfirmationText = ref(__('messages.sync_entry_field_confirmation_text'));
 const pendingLocalization = ref(null);
 const saving = ref(false);
 
@@ -39,12 +49,12 @@ function save() {
 	new Pipeline()
 		.provide({ container, errors, saving })
 		.through([
-			new BeforeSaveHooks('seo-defaults-config'),
+			new BeforeSaveHooks('seo-defaults'),
 			new Request(props.action, 'patch', {
 				site: site.value,
 				_localized: localizedFields.value,
 			}),
-			new AfterSaveHooks('seo-defaults-config'),
+			new AfterSaveHooks('seo-defaults'),
 		])
 		.then((response) => {
 			Statamic.$toast.success(__('Saved'));
@@ -55,15 +65,15 @@ let saveKeyBinding;
 
 onMounted(() => {
 	saveKeyBinding = Statamic.$keys.bindGlobal(['mod+s'], (e) => {
-        e.preventDefault();
-		if (!canSave.value) return;
+		e.preventDefault();
+        if (!canSave.value) return;
 		save();
 	});
 });
 
 onUnmounted(() => saveKeyBinding.destroy());
 
-const isDirty = computed(() => Statamic.$dirty.has('seo-defaults-config'))
+const isDirty = computed(() => Statamic.$dirty.has('seo-defaults'));
 const canSave = computed(() => !props.readOnly && isDirty.value && !saving.value);
 const showLocalizationSelector = computed(() => localizations.value.length > 1);
 
@@ -88,9 +98,13 @@ const confirmSwitchLocalization = () => {
 const updateDataFromResponse = (data) => {
 	reference.value = data.initialReference;
 	values.value = data.initialValues;
+	originValues.value = data.initialOriginValues;
+	originMeta.value = data.initialOriginMeta;
 	meta.value = data.initialMeta;
 	localizations.value = data.initialLocalizations;
 	localizedFields.value = data.initialLocalizedFields;
+	hasOrigin.value = data.initialHasOrigin;
+	configUrl.value = data.initialConfigUrl;
 };
 
 const switchToLocalization = (localization) => {
@@ -105,12 +119,32 @@ const switchToLocalization = (localization) => {
 		nextTick(() => container.value.clearDirtyState());
 	});
 };
+
+const refreshLocalization = () => {
+	const currentLocalization = localizations.value.find((localization) => localization.handle === site.value);
+
+	if (!currentLocalization) return;
+
+	$axios.get(currentLocalization.url).then((response) => {
+		updateDataFromResponse(response.data);
+		nextTick(() => container.value.clearDirtyState());
+	});
+};
 </script>
 <template>
     <Head :title />
 
     <div class="max-w-5xl mx-auto">
         <Header :title :icon>
+            <Dropdown v-if="configurable">
+				<template #trigger>
+					<Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+				</template>
+				<DropdownMenu>
+					<DropdownItem :text="__('Configure')" icon="cog" :href="configUrl" />
+				</DropdownMenu>
+			</Dropdown>
+
             <SiteSelector
 				v-if="showLocalizationSelector"
 				:sites="localizations"
@@ -118,22 +152,24 @@ const switchToLocalization = (localization) => {
 				@update:modelValue="localizationSelected"
 			/>
 
-            <Button variant="primary" :text="__('Save')" @click="save" :disabled="!canSave" />
+            <Button v-if="!readOnly" variant="primary" :text="__('Save')" @click="save" :disabled="!canSave" />
         </Header>
 
         <PublishContainer
             ref="container"
-            name="seo-defaults-config"
+            name="seo-defaults"
             :reference
             :blueprint
             v-model="values"
             :meta
             :errors
             :site
+            :origin-values
+			:origin-meta
             v-model:modified-fields="localizedFields"
+            :sync-field-confirmation-text
             :track-dirty-state="true"
             :read-only
-            :as-config="true"
         />
 
         <confirmation-modal
@@ -146,6 +182,6 @@ const switchToLocalization = (localization) => {
 			@cancel="pendingLocalization = null"
 		/>
 
-        <DocsCallout :topic="__('Site Defaults')" url="https://advanced-seo.michaelaerni.ch/usage/settings-and-defaults" />
+        <!-- <DocsCallout :topic="__(docs.topic)" :url="docs.url" /> -->
     </div>
 </template>

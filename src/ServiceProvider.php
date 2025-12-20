@@ -2,46 +2,47 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Statamic;
+use Statamic\Facades\Git;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Illuminate\Support\Arr;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\SeoStore;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\View\CascadeComposer;
+use Statamic\Providers\AddonServiceProvider;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
+use Facades\Statamic\Console\Processes\Composer;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\View\CascadeComposer;
-use Facades\Statamic\Console\Processes\Composer;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\View;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Git;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\GraphQL\Types\EntryInterface;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -50,7 +51,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $policies = [
-        SeoVariables::class => Policies\SeoVariablesPolicy::class,
+        SeoDefaultSet::class => Policies\SeoConfigurationPolicy::class,
     ];
 
     protected $vite = [
@@ -63,6 +64,11 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootAddon(): void
     {
+        Route::bind('test', function ($value) {
+            dd($value);
+            return User::where('name', $value)->firstOrFail();
+        });
+
         $this
             ->bootStacheStore()
             ->bootNav()
@@ -90,9 +96,9 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function registerEloquentDriver(): void
     {
-        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Eloquent\SeoDefaultsRepository::class);
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, Eloquent\SeoDefaultsRepository::class);
 
-        $this->app->bind('advanced_seo.model', \Aerni\AdvancedSeo\Eloquent\SeoDefaultModel::class);
+        $this->app->bind('advanced_seo.model', Eloquent\SeoDefaultModel::class);
     }
 
     protected function registerFileDriver(): void
@@ -113,7 +119,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         Nav::extend(function ($nav) {
             $defaults = Defaults::enabled()
-                ->filter(fn ($default) => User::current()->can('edit', [SeoVariables::class, $default['set']]))
+                ->filter(fn ($default) => User::current()->can('view', [SeoDefaultSet::class, $default['set'], Site::selected()]))
                 ->keyBy('type')
                 ->keys();
 
@@ -122,13 +128,13 @@ class ServiceProvider extends AddonServiceProvider
             }
 
             $nav->tools('SEO')
-                ->route("advanced-seo.index")
+                ->route('advanced-seo.index')
                 ->icon('ai-search-spark')
                 ->children(function () use ($nav, $defaults) {
                     return $defaults
                         ->map(fn ($type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"))
                         ->all();
-            });
+                });
         });
 
         return $this;
@@ -147,7 +153,7 @@ class ServiceProvider extends AddonServiceProvider
                 Permission::register('edit seo defaults', function ($permission) {
                     $permission
                         ->label('Edit Defaults')
-                        ->description("Grants access to edit collection and taxonomy defaults");
+                        ->description('Grants access to edit collection and taxonomy defaults');
                 });
             });
         });
