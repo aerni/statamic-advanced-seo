@@ -18,8 +18,7 @@ const props = defineProps({
     initialLocalizations: Array,
     initialLocalizedFields: Array,
     initialSite: String,
-    action: String,
-    configUrl: String,
+    initialConfigUrl: String,
     readOnly: Boolean,
     // docs: Array,
 });
@@ -33,6 +32,7 @@ const localizing = ref(false);
 const localizations = ref(props.initialLocalizations);
 const localizedFields = ref(props.initialLocalizedFields);
 const site = ref(props.initialSite);
+const configUrl = ref(props.initialConfigUrl);
 const pendingLocalization = ref(null);
 const saving = ref(false);
 
@@ -41,7 +41,7 @@ function save() {
 		.provide({ container, errors, saving })
 		.through([
 			new BeforeSaveHooks('seo-defaults-config'),
-			new Request(props.action, 'patch', {
+			new Request(configUrl.value, 'patch', {
 				site: site.value,
 				_localized: localizedFields.value,
 			}),
@@ -92,6 +92,7 @@ const updateDataFromResponse = (data) => {
 	meta.value = data.initialMeta;
 	localizations.value = data.initialLocalizations;
 	localizedFields.value = data.initialLocalizedFields;
+	configUrl.value = data.initialConfigUrl;
 };
 
 const switchToLocalization = (localization) => {

@@ -21,8 +21,8 @@ const props = defineProps({
 	initialOriginValues: Object,
 	initialOriginMeta: Object,
     initialSite: String,
+    initialEditUrl: String,
     initialConfigUrl: String,
-    action: String,
     readOnly: Boolean,
     configurable: Boolean,
     // docs: Array,
@@ -40,6 +40,7 @@ const hasOrigin = ref(props.initialHasOrigin);
 const originValues = ref(props.initialOriginValues);
 const originMeta = ref(props.initialOriginMeta);
 const site = ref(props.initialSite);
+const editUrl = ref(props.initialEditUrl);
 const configUrl = ref(props.initialConfigUrl);
 const syncFieldConfirmationText = ref(__('messages.sync_entry_field_confirmation_text'));
 const pendingLocalization = ref(null);
@@ -50,7 +51,7 @@ function save() {
 		.provide({ container, errors, saving })
 		.through([
 			new BeforeSaveHooks('seo-defaults'),
-			new Request(props.action, 'patch', {
+			new Request(editUrl.value, 'patch', {
 				site: site.value,
 				_localized: localizedFields.value,
 			}),
@@ -104,6 +105,7 @@ const updateDataFromResponse = (data) => {
 	localizations.value = data.initialLocalizations;
 	localizedFields.value = data.initialLocalizedFields;
 	hasOrigin.value = data.initialHasOrigin;
+	editUrl.value = data.initialEditUrl;
 	configUrl.value = data.initialConfigUrl;
 };
 

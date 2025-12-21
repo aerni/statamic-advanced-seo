@@ -99,10 +99,11 @@ abstract class BaseDefaultsController extends CpController
                 ];
             })->filter()->values()->all(),
             'initialLocalizedFields' => $localization->data()->keys()->all(),
+            'initialEditUrl' => $localization->editUrl(),
             'initialConfigUrl' => $localization->configUrl(),
+            // TODO: Probably should make readOnly and configurable also reactive.
             'readOnly' => User::current()->cant('edit', [SeoDefaultSet::class, $set, $site]),
             'configurable' => $this->isConfigurable($set, $site),
-            'action' => $localization->editUrl(),
         ];
 
         if ($request->wantsJson()) {

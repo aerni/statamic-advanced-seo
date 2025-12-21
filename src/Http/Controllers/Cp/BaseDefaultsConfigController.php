@@ -56,8 +56,9 @@ abstract class BaseDefaultsConfigController extends CpController
                     'url' => $set->in($site->handle())->configUrl(),
                 ])->values(),
             'initialLocalizedFields' => $localization->config()->data()->keys()->all(),
+            'initialConfigUrl' => $localization->configUrl(),
+            // TODO: Probably should make readOnly also reactive.
             'readOnly' => User::current()->cant('configure', [SeoDefaultSet::class, $set, $site]),
-            'action' => $localization->configUrl(),
         ];
 
         if ($request->wantsJson()) {
