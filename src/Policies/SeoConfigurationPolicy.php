@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
-use Statamic\Sites\Site;
-use Statamic\Contracts\Auth\User;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\User as UserFacade;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
+use Statamic\Sites\Site;
 
 class SeoConfigurationPolicy
 {
@@ -34,15 +34,11 @@ class SeoConfigurationPolicy
             });
     }
 
-    public function view(User $user, SeoDefaultSet $set, Site $site): bool
+    public function edit(User $user, SeoDefaultSet $set, Site $site): bool
     {
         $user = UserFacade::fromUser($user);
 
         if (! $this->userCanAccessSite($user, $site)) {
-            return false;
-        }
-
-        if (! $set->availableInSite($site->handle())) {
             return false;
         }
 
@@ -54,15 +50,6 @@ class SeoConfigurationPolicy
         };
     }
 
-    public function edit(User $user, SeoDefaultSet $set, Site $site): bool
-    {
-        if (! $this->view($user, $set, $site)) {
-            return false;
-        }
-
-        return $set->in($site->handle())->enabled();
-    }
-
     public function configure(User $user, SeoDefaultSet $set, Site $site): bool
     {
         $user = UserFacade::fromUser($user);
@@ -71,11 +58,12 @@ class SeoConfigurationPolicy
             return false;
         }
 
-        if (! $set->availableInSite($site->handle())) {
-            return false;
-        }
-
-        return $user->hasPermission('configure seo');
+        return match ($set->type()) {
+            'site' => $user->hasPermission('configure seo'),
+            'collections' => $this->canConfigureContentSeoDefaults($user, 'collections', $set->handle()),
+            'taxonomies' => $this->canConfigureContentSeoDefaults($user, 'taxonomies', $set->handle()),
+            default => false,
+        };
     }
 
     protected function canEditContentSeoDefaults(User $user, string $type, string $handle): bool
@@ -86,6 +74,24 @@ class SeoConfigurationPolicy
             || $user->hasPermission('edit seo defaults');
 
         if (! $hasBaseSeoPermission) {
+            return false;
+        }
+
+        $itemType = match ($type) {
+            'collections' => 'entries',
+            'taxonomies' => 'terms',
+        };
+
+        // Grant edit permission if they have permission to edit the collection/taxonomy.
+        return $user->hasPermission("configure {$type}")
+            || $user->hasPermission("edit {$handle} {$itemType}");
+    }
+
+    protected function canConfigureContentSeoDefaults(User $user, string $type, string $handle): bool
+    {
+        $user = UserFacade::fromUser($user);
+
+        if (! $user->hasPermission('configure seo')) {
             return false;
         }
 

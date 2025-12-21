@@ -51,6 +51,9 @@ abstract class BaseDefaultsController extends CpController
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
+        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
+        throw_unless($set->in($site->handle())->enabled(), new NotFoundHttpException);
+
         // Create a localization for each of the provided sites. This triggers a save on the set.
         // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
         // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
@@ -115,6 +118,9 @@ abstract class BaseDefaultsController extends CpController
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
+        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
+        throw_unless($set->in($site->handle())->enabled(), new NotFoundHttpException);
+
         $localization = $set->in($site->handle());
 
         $blueprint = $localization->blueprint();
@@ -160,8 +166,9 @@ abstract class BaseDefaultsController extends CpController
         $site = SiteFacade::selected();
 
         return Defaults::enabledInType($this->type())
-            ->filter(fn ($default) => User::current()->can('view', [SeoDefaultSet::class, $default['set'], $site]))
-            ->each(fn ($default) => $default['set']->ensureLocalizations())
+            ->filter(fn ($default) => User::current()->can('edit', [SeoDefaultSet::class, $default['set'], $site]))
+            ->each(fn ($default) => $default['set']->ensureLocalizations()) // TODO: Should we ensure somewhere else? Maybe in the Defaults model class?
+            ->filter(fn ($default) => $default['set']->availableInSite($site))
             ->map(fn ($default) => [
                 ...$default,
                 'enabled' => $default['set']->in($site->handle())->enabled(),

@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo;
 
 use Statamic\Statamic;
 use Statamic\Facades\Git;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Illuminate\Support\Arr;
 use Statamic\Stache\Stache;
@@ -118,23 +117,19 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
-            $defaults = Defaults::enabled()
-                ->filter(fn ($default) => User::current()->can('view', [SeoDefaultSet::class, $default['set'], Site::selected()]))
-                ->keyBy('type')
-                ->keys();
+            $navItems = Defaults::enabled()
+                ->groupBy('type')
+                ->filter(fn ($defaults, $type) => User::current()->can('viewAny', [SeoDefaultSet::class, $type]))
+                ->map(fn ($default, $type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"));
 
-            if ($defaults->isEmpty()) {
+            if ($navItems->isEmpty()) {
                 return;
             }
 
             $nav->tools('SEO')
                 ->route('advanced-seo.index')
                 ->icon('ai-search-spark')
-                ->children(function () use ($nav, $defaults) {
-                    return $defaults
-                        ->map(fn ($type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"))
-                        ->all();
-                });
+                ->children($navItems->all());
         });
 
         return $this;

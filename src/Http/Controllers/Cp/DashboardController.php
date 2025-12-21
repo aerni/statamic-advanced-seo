@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Inertia\Inertia;
 use Inertia\Response;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Models\Defaults;

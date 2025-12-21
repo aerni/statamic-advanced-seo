@@ -26,6 +26,8 @@ abstract class BaseDefaultsConfigController extends CpController
 
         $set = $defaults['set'];
 
+        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
+
         $this->authorize('configure', [SeoDefaultSet::class, $set, $site]);
 
         $set = $set->createLocalizations();
@@ -54,7 +56,7 @@ abstract class BaseDefaultsConfigController extends CpController
                     'url' => $set->in($site->handle())->configUrl(),
                 ])->values(),
             'initialLocalizedFields' => $localization->config()->data()->keys()->all(),
-            'readOnly' => User::current()->cant('edit', [SeoDefaultSet::class, $set, $site]),
+            'readOnly' => User::current()->cant('configure', [SeoDefaultSet::class, $set, $site]),
             'action' => $localization->configUrl(),
         ];
 
@@ -70,6 +72,8 @@ abstract class BaseDefaultsConfigController extends CpController
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
         $set = $defaults['set'];
+
+        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
 
         $this->authorize('configure', [SeoDefaultSet::class, $set, $site]);
 
