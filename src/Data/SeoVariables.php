@@ -39,7 +39,7 @@ class SeoVariables implements Augmentable, Localization
     public function __construct()
     {
         $this->data = collect();
-        $this->config = new SeoConfig();
+        $this->config = new SeoConfig;
     }
 
     public function config(?callable $callback = null): SeoConfig|self

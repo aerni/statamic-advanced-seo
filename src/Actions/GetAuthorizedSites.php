@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 
 class GetAuthorizedSites

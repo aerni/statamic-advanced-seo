@@ -25,7 +25,7 @@ class SeoConfig
 
     public function set($key, $value): self
     {
-        $this->data->put($key,$value);
+        $this->data->put($key, $value);
 
         return $this;
     }

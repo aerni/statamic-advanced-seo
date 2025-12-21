@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\DashboardController;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\TaxonomiesController;
-use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionsController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionsConfigController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\CollectionsController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\DashboardController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SiteConfigController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SiteController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\TaxonomiesConfigController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\TaxonomiesController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('index');

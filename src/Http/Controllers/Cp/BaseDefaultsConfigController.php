@@ -203,6 +203,6 @@ abstract class BaseDefaultsConfigController extends CpController
                     ],
                 ],
             ])
-            ->all());
+                ->all());
     }
 }

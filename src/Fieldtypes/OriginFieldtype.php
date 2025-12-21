@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Closure;
-use Statamic\Fields\Fieldtype;
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Fields\Fieldtype;
 
 class OriginFieldtype extends Fieldtype
 {
@@ -23,6 +23,7 @@ class OriginFieldtype extends Fieldtype
             ->filter(fn ($localization) => $localization->origin()?->locale() !== $currentLocalization->locale())
             ->map(function ($localization) {
                 $site = $localization->site();
+
                 return ['value' => $site->handle(), 'label' => $site->name()];
             })
             ->values()
@@ -68,6 +69,7 @@ class OriginFieldtype extends Fieldtype
                 while ($current !== null) {
                     if ($visited->contains($current)) {
                         $fail('This origin creates a circular dependency. Please choose a different site or clear the origin.');
+
                         return;
                     }
 
