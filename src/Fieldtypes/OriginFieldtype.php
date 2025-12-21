@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Closure;
-use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class OriginFieldtype extends Fieldtype
@@ -13,13 +13,16 @@ class OriginFieldtype extends Fieldtype
 
     public function preload(): array
     {
-        $localization = $this->field->parent();
+        $currentLocalization = $this->field->parent();
+        $set = $currentLocalization->seoSet();
 
-        return $localization->sites()
-            ->intersect(Site::authorized())
-            ->filter(fn ($site) => $site !== $localization->locale())
-            ->map(function ($site) {
-                $site = Site::get($site);
+        return $set->localizations()
+            ->intersectByKeys(GetAuthorizedSites::handle($set))
+            ->filter(fn ($localization) => $localization->locale() !== $currentLocalization->locale())
+            ->filter(fn ($localization) => $localization->enabled())
+            ->filter(fn ($localization) => $localization->origin()?->locale() !== $currentLocalization->locale())
+            ->map(function ($localization) {
+                $site = $localization->site();
                 return ['value' => $site->handle(), 'label' => $site->name()];
             })
             ->values()

@@ -3,16 +3,16 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
-use Inertia\Inertia;
-use Statamic\Sites\Site;
-use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\Fields\Blueprint;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Sites\Site;
 
 abstract class BaseDefaultsConfigController extends CpController
 {
@@ -20,17 +20,17 @@ abstract class BaseDefaultsConfigController extends CpController
 
     public function edit(Request $request, string $handle, Site $site)
     {
-        throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
-
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
-        $set = $defaults['set'];
+        // The global feature enabled state. e.g. used by site defaults like favicons.
+        // TODO: Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
+        throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
 
-        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
+        $set = $defaults['set']->ensureLocalizations();
 
         $this->authorize('configure', [SeoDefaultSet::class, $set, $site]);
 
-        $set = $set->createLocalizations();
+        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
 
         $localization = $set->in($site->handle());
 
@@ -72,11 +72,11 @@ abstract class BaseDefaultsConfigController extends CpController
     {
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
-        $set = $defaults['set'];
-
-        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
+        $set = $defaults['set']->ensureLocalization($site);
 
         $this->authorize('configure', [SeoDefaultSet::class, $set, $site]);
+
+        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
 
         $localization = $set->in($site->handle());
 
@@ -124,22 +124,24 @@ abstract class BaseDefaultsConfigController extends CpController
             ];
         }
 
-        if (GetAuthorizedSites::handle($localization->seoSet())->count() > 1) {
-            $fields['origin'] = [
-                'display' => __('Origin'),
-                'fields' => [
-                    'origin' => [
-                        'display' => __('Origin'),
-                        'instructions' => __('Values will be inherited from the selected site.'),
-                        'type' => 'origin',
-                        // There is no 'enabled' field for site defaults. This ensures we don't break the blueprint.
-                        'if' => array_filter([
-                            'enabled' => 'true',
-                        ], fn () => $localization->type() !== 'site'),
-                    ],
+        /**
+         * TODO: Add a custom condition to hide the field if there are no origins to select
+         * https://v6.statamic.dev/control-panel/conditional-fields#custom-logic
+         */
+        $fields['origin'] = [
+            'display' => __('Origin'),
+            'fields' => [
+                'origin' => [
+                    'display' => __('Origin'),
+                    'instructions' => __('Values will be inherited from the selected site.'),
+                    'type' => 'origin',
+                    // There is no 'enabled' field for site defaults. This ensures we don't break the blueprint.
+                    'if' => array_filter([
+                        'enabled' => 'true',
+                    ], fn () => $localization->type() !== 'site'),
                 ],
-            ];
-        }
+            ],
+        ];
 
         // TODO: Bring these fields back later.
         // $fields['indexing'] = [

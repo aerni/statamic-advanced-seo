@@ -106,11 +106,6 @@ class SeoDefaultSet implements Contract
             ->locale($site);
     }
 
-    public function createLocalizations(): self
-    {
-        return $this->ensureLocalizations()->save();
-    }
-
     public function createOrDeleteLocalizations(Collection $sites): self
     {
         return $this
@@ -119,10 +114,15 @@ class SeoDefaultSet implements Contract
             ->save();
     }
 
-    /**
-     * TODO: We can probably refactor this to not accept a sites array but get the sites from the parent() instead.
-     * But this might only work for collection and taxonomy defaults. What to do with site defaults that don't have a parent?
-     */
+    public function ensureLocalization(string $site): self
+    {
+        if ($this->in($site)) {
+            return $this;
+        }
+
+        return $this->addLocalization($this->makeLocalization($site)->withDefaultData());
+    }
+
     public function ensureLocalizations(?Collection $sites = null): self
     {
         // Get sites from the instance if not provided, or ensure custom sites are valid
@@ -234,6 +234,8 @@ class SeoDefaultSet implements Contract
 
     public function save(): self
     {
+        // TODO: Maybe we can take inspiration from the GlobalSet saveOrDeleteLocalizations() method.
+        // This method evaluates if a localization should be saved or deleted.
         \Aerni\AdvancedSeo\Facades\Seo::save($this);
 
         return $this;

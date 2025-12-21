@@ -2,23 +2,22 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
-use Statamic\Sites\Site;
-use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\Fields\Blueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Facades\Site as SiteFacade;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Statamic\Sites\Site;
 
 abstract class BaseDefaultsController extends CpController
 {
@@ -30,10 +29,25 @@ abstract class BaseDefaultsController extends CpController
     {
         $this->authorize('viewAny', [SeoDefaultSet::class, $this->type()]);
 
+        $site = SiteFacade::selected();
+
+        $items = Defaults::enabledInType($this->type())
+            ->filter(fn ($default) => User::current()->can('edit', [SeoDefaultSet::class, $default['set'], $site]))
+            ->each(fn ($default) => $default['set']->ensureLocalizations()) // TODO: Should we ensure somewhere else? Maybe in the Defaults model class?
+            ->filter(fn ($default) => $default['set']->availableInSite($site))
+            ->map(fn ($default) => [
+                ...$default,
+                'enabled' => $default['set']->in($site->handle())->enabled(),
+                'configurable' => $this->isConfigurable($default['set'], $site),
+                'edit_url' => $default['set']->editUrl(),
+                'config_url' => $default['set']->configUrl(),
+            ])
+            ->values();
+
         return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Index', [
             'title' => __("advanced-seo::messages.{$this->type()}"),
             'icon' => $this->icon(),
-            'items' => $this->items(),
+            'items' => $items,
             'columns' => [
                 Column::make('title')->label(__('Title')),
                 Column::make('status')->label(__('Status')),
@@ -43,24 +57,21 @@ abstract class BaseDefaultsController extends CpController
 
     public function edit(Request $request, string $handle, Site $site): mixed
     {
-        throw_unless(Defaults::isEnabled("{$this->type()}::{$handle}"), new NotFoundHttpException);
-
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
-        $set = $defaults['set'];
+        // The global feature enabled state. e.g. used by site defaults like favicons.
+        // TODO: Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
+        throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
+
+        $set = $defaults['set']->ensureLocalizations();
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
         throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
-        throw_unless($set->in($site->handle())->enabled(), new NotFoundHttpException);
-
-        // Create a localization for each of the provided sites. This triggers a save on the set.
-        // TODO: Do we really need to create the localizations or can we simply ensure them with ensureLocalizations()?
-        // Ensuring wouldn't save them to file. But maybe we don't even have to do that?
-        // TODO: Probably don't need to pass the sites anymore as we are getting those in the seoDefaultsSet now.
-        $set = $set->createLocalizations();
 
         $localization = $set->in($site->handle());
+
+        throw_unless($localization->enabled(), new NotFoundHttpException);
 
         $blueprint = $localization->blueprint();
 
@@ -115,14 +126,15 @@ abstract class BaseDefaultsController extends CpController
 
     public function update(Request $request, string $handle, Site $site): void
     {
-        $set = Seo::findOrMake($this->type(), $handle);
+        $set = Seo::findOrMake($this->type(), $handle)->ensureLocalization($site);
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
         throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
-        throw_unless($set->in($site->handle())->enabled(), new NotFoundHttpException);
 
         $localization = $set->in($site->handle());
+
+        throw_unless($localization->enabled(), new NotFoundHttpException);
 
         $blueprint = $localization->blueprint();
 
@@ -159,24 +171,6 @@ abstract class BaseDefaultsController extends CpController
         }
 
         return BaseDefaultsConfigController::editFormBlueprint($set->in($site->handle()))
-            ->fields()->items()->count() > 0;
-    }
-
-    protected function items(): Collection
-    {
-        $site = SiteFacade::selected();
-
-        return Defaults::enabledInType($this->type())
-            ->filter(fn ($default) => User::current()->can('edit', [SeoDefaultSet::class, $default['set'], $site]))
-            ->each(fn ($default) => $default['set']->ensureLocalizations()) // TODO: Should we ensure somewhere else? Maybe in the Defaults model class?
-            ->filter(fn ($default) => $default['set']->availableInSite($site))
-            ->map(fn ($default) => [
-                ...$default,
-                'enabled' => $default['set']->in($site->handle())->enabled(),
-                'configurable' => $this->isConfigurable($default['set'], $site),
-                'edit_url' => $default['set']->in($site->handle())->editUrl(),
-                'config_url' => $default['set']->configUrl(),
-            ])
-            ->values();
+            ->fields()->items()->isNotEmpty();
     }
 }
