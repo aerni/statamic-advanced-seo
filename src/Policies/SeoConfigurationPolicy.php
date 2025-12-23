@@ -50,11 +50,11 @@ class SeoConfigurationPolicy
         };
     }
 
-    public function configure(User $user, SeoDefaultSet $set, Site $site): bool
+    public function configure(User $user, SeoDefaultSet $set): bool
     {
         $user = UserFacade::fromUser($user);
 
-        if (! $this->userCanAccessSite($user, $site)) {
+        if (! $this->userCanAccessSite($user, Sites::selected())) {
             return false;
         }
 

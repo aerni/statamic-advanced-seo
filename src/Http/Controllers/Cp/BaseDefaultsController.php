@@ -2,22 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
-use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Site as SiteFacade;
-use Statamic\Facades\User;
-use Statamic\Fields\Blueprint;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Sites\Site;
+use Statamic\Facades\User;
+use Illuminate\Http\Request;
+use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Facades\Site as Sites;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Statamic\Facades\Site as SiteFacade;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Http\Controllers\CP\CpController;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
 
 abstract class BaseDefaultsController extends CpController
 {
@@ -35,11 +36,12 @@ abstract class BaseDefaultsController extends CpController
             ->filter(fn ($default) => User::current()->can('edit', [SeoDefaultSet::class, $default['set'], $site]))
             ->each(fn ($default) => $default['set']->ensureLocalizations()) // TODO: Should we ensure somewhere else? Maybe in the Defaults model class?
             ->filter(fn ($default) => $default['set']->availableInSite($site))
+            ->filter(fn ($default) => $this->canConfigure($default['set']) || $default['set']->enabled())
             ->map(fn ($default) => [
                 ...$default,
-                'enabled' => $default['set']->in($site->handle())->enabled(),
-                'configurable' => $this->isConfigurable($default['set'], $site),
-                'edit_url' => $default['set']->editUrl(),
+                'enabled' => $default['set']->enabled(),
+                'configurable' => $this->canConfigure($default['set']),
+                'edit_url' => $default['set']->in(Sites::selected())->editUrl(),
                 'config_url' => $default['set']->configUrl(),
             ])
             ->values();
@@ -59,19 +61,19 @@ abstract class BaseDefaultsController extends CpController
     {
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
-        // The global feature enabled state. e.g. used by site defaults like favicons.
-        // TODO: Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
+        // TODO: The global feature enabled state. e.g. used by site defaults like favicons.
+        // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
         throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
 
         $set = $defaults['set']->ensureLocalizations();
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
+        throw_unless($set->enabled(), new NotFoundHttpException);
         throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
 
-        $localization = $set->in($site->handle());
-
-        throw_unless($localization->enabled(), new NotFoundHttpException);
+        $localization = $set->in($site->handle())
+            ->origin(data_get($set->get('sites'),$site->handle()));
 
         $blueprint = $localization->blueprint();
 
@@ -81,8 +83,18 @@ abstract class BaseDefaultsController extends CpController
             [$originValues, $originMeta] = $this->extractFromFields($localization->origin(), $blueprint);
         }
 
-        // This variable solely exists to prevent variable conflict in $viewData['localizations'].
-        $requestLocalization = $localization;
+        // If there is an origin, we need to ensure that initialLocalizedFields in $viewData
+        // only consists of keys of items that are different to the originValues.
+        $localizedFields = $localization->data()->keys()->all();
+
+        if ($hasOrigin) {
+            $localizedFields = collect($localizedFields)
+                ->filter(fn ($key) => ($originValues[$key] ?? null) !== ($values[$key] ?? null))
+                ->values()
+                ->all();
+        }
+
+        dd($localizedFields);
 
         $viewData = [
             'title' => $defaults['title'],
@@ -95,26 +107,17 @@ abstract class BaseDefaultsController extends CpController
             'initialHasOrigin' => $hasOrigin,
             'initialOriginValues' => $originValues ?? null,
             'initialOriginMeta' => $originMeta ?? null,
-            'initialLocalizations' => GetAuthorizedSites::handle($set)->map(function ($site) use ($localization, $set, $requestLocalization) {
-                $localization = $set->in($site->handle());
-
-                if (! $localization->enabled()) {
-                    return;
-                }
-
-                return [
+            'initialLocalizations' => GetAuthorizedSites::handle($set)
+                ->map(fn ($site) =>[
                     'handle' => $site->handle(),
                     'name' => $site->name(),
-                    'active' => $site->handle() === $requestLocalization->locale(),
-                    'url' => $localization->editUrl(),
-                ];
-            })->filter()->values()->all(),
-            'initialLocalizedFields' => $localization->data()->keys()->all(),
+                    'active' => $site->handle() === $localization->locale(),
+                    'url' => $set->in($site->handle())->editUrl(),
+                ])->filter()->values()->all(),
+            'initialLocalizedFields' => $localizedFields,
             'initialEditUrl' => $localization->editUrl(),
-            'initialConfigUrl' => $localization->configUrl(),
-            // TODO: Probably should make readOnly and configurable also reactive.
-            'readOnly' => User::current()->cant('edit', [SeoDefaultSet::class, $set, $site]),
-            'configurable' => $this->isConfigurable($set, $site),
+            'configUrl' => $set->configUrl(),
+            'configurable' => $this->canConfigure($set),
         ];
 
         if ($request->wantsJson()) {
@@ -132,7 +135,8 @@ abstract class BaseDefaultsController extends CpController
 
         throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
 
-        $localization = $set->in($site->handle());
+        $localization = $set->in($site->handle())
+            ->origin(data_get($set->get('sites'),$site->handle()));;
 
         throw_unless($localization->enabled(), new NotFoundHttpException);
 
@@ -164,13 +168,8 @@ abstract class BaseDefaultsController extends CpController
         return [$fields->values()->all(), $fields->meta()->all()];
     }
 
-    protected function isConfigurable(SeoDefaultSet $set, Site $site): bool
+    protected function canConfigure(SeoDefaultSet $set): bool
     {
-        if (User::current()->cant('configure', [SeoDefaultSet::class, $set, $site])) {
-            return false;
-        }
-
-        return BaseDefaultsConfigController::editFormBlueprint($set->in($site->handle()))
-            ->fields()->items()->isNotEmpty();
+        return User::current()->can('configure', [SeoDefaultSet::class, $set]);
     }
 }

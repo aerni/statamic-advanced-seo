@@ -19,19 +19,32 @@ class SeoDefaultSet extends StacheSeoDefaultSet
             ->handle($model->handle)
             ->model($model);
 
-        if (! Site::multiEnabled()) {
-            $localization = $seoDefaultSet
-                ->makeLocalization(Site::default()->handle())
-                ->merge($model->data);
+        $modelData = $model->data->all();
 
-            return $seoDefaultSet->addLocalization($localization);
+        // Load config data from the model (new format: config key at root)
+        if (isset($modelData['config'])) {
+            $seoDefaultSet->merge($modelData['config']);
         }
 
-        $model->data->each(function ($data, $site) use ($seoDefaultSet) {
+        // Get site-keyed localizations data (everything except config)
+        $sitesData = Arr::except($modelData, 'config');
+
+        // Iterate over site-keyed data (works for both single-site and multi-site)
+        collect($sitesData)->each(function ($data, $site) use ($seoDefaultSet) {
+            // Handle legacy format where each site had config/data structure (backward compatibility)
+            if (isset($data['config']) && isset($data['data'])) {
+                $localizationData = $data['data'];
+                $origin = Arr::get($data['config'], 'origin');
+            } else {
+                // New format: flat data with optional origin key
+                $localizationData = Arr::except($data, 'origin');
+                $origin = Arr::get($data, 'origin');
+            }
+
             $localization = $seoDefaultSet
                 ->makeLocalization($site)
-                ->merge(Arr::except($data, 'origin'))
-                ->origin(Arr::get($data, 'origin'));
+                ->merge($localizationData)
+                ->origin($origin);
 
             $seoDefaultSet->addLocalization($localization);
         });
@@ -48,10 +61,16 @@ class SeoDefaultSet extends StacheSeoDefaultSet
     {
         $class = app('advanced_seo.model');
 
-        $data = $source->localizations()
+        $localizationsData = $source->localizations()
             ->intersectByKeys($source->sites()->flip()) /* Only keep data of configured sites. */
             ->map->fileData()
-            ->when(! Site::multiEnabled(), fn ($data) => $data->first()); /* Don't key data by site when not using multi-site. */
+            ->all();
+
+        // Always use multi-site structure: config key + site-keyed data
+        $data = array_merge(
+            ['config' => $source->data()->all()], /* Config data from SeoDefaultSet */
+            $localizationsData /* Site-keyed localization data */
+        );
 
         return $class::firstOrNew([
             'type' => $source->type(),

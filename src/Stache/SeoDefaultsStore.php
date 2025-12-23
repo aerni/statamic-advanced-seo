@@ -29,9 +29,12 @@ class SeoDefaultsStore extends ChildStore
     {
         [$type, $handle] = $this->extractAttributesFromPath($path);
 
+        $data = YAML::file($path)->parse();
+
         $set = Seo::make()
             ->handle($handle)
             ->type($type)
+            ->data(Arr::except($data, 'title'))
             ->initialPath($path);
 
         $set->sites()
@@ -42,6 +45,7 @@ class SeoDefaultsStore extends ChildStore
         return $set;
     }
 
+    // TODO: Maybe we can ensure the localizations here instead of the controllers?
     protected function makeVariables(SeoDefaultSet $set, string $site): ?SeoVariables
     {
         $variables = $set->makeLocalization($site);
@@ -52,22 +56,25 @@ class SeoDefaultsStore extends ChildStore
 
         $parsed = YAML::file($path)->parse();
 
-        // New format with config and data sections
+        // TODO: Can we remove this stuff?
+        // TODO: We shouldn't store the origin in the SeoVariables file anymore.
+        // It now comes from the SeoDefaultsSet file. Should we adapt the origin() method?
+
+        // New format with config and data sections (for backward compatibility during migration)
         if (isset($parsed['config']) && isset($parsed['data'])) {
-            $parsedConfig = $parsed['config'];
             $parsedData = $parsed['data'];
+            $origin = Arr::get($parsed['config'], 'origin');
         }
-        // Legacy flat format (for backward compatibility during migration)
+        // New flat format
         else {
-            $parsedConfig = Arr::only($parsed, 'origin');
             $parsedData = Arr::except($parsed, 'origin');
+            $origin = Arr::get($parsed, 'origin');
         }
 
         return $variables
             ->initialPath($path)
-            ->config(fn ($config) => $config->merge($parsedConfig))
             ->merge($parsedData)
-            ->origin(Arr::get($parsedConfig, 'origin'));
+            ->origin($set->get('sites')[$site] ?? null);
     }
 
     public function save($set): void

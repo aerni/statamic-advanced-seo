@@ -34,28 +34,14 @@ class SeoVariables implements Augmentable, Localization
 
     protected string $locale;
 
-    protected SeoConfig $config;
-
     public function __construct()
     {
         $this->data = collect();
-        $this->config = new SeoConfig;
-    }
-
-    public function config(?callable $callback = null): SeoConfig|self
-    {
-        if ($callback === null) {
-            return $this->config;
-        }
-
-        $this->config = $callback($this->config);
-
-        return $this;
     }
 
     public function enabled(): bool
     {
-        return $this->config()->get('enabled', true);
+        return $this->seoSet()->enabled();
     }
 
     public function seoSet($set = null)
@@ -103,15 +89,6 @@ class SeoVariables implements Augmentable, Localization
             'site' => cp_route('advanced-seo.site.defaults', [$this->handle(), $this->locale()]),
             'collections' => cp_route('advanced-seo.collections.defaults', [$this->handle(), $this->locale()]),
             'taxonomies' => cp_route('advanced-seo.taxonomies.defaults', [$this->handle(), $this->locale()]),
-        };
-    }
-
-    public function configUrl(): string
-    {
-        return match ($this->type()) {
-            'site' => cp_route('advanced-seo.site.config', [$this->handle(), $this->locale()]),
-            'collections' => cp_route('advanced-seo.collections.config', [$this->handle(), $this->locale()]),
-            'taxonomies' => cp_route('advanced-seo.taxonomies.config', [$this->handle(), $this->locale()]),
         };
     }
 
@@ -175,13 +152,10 @@ class SeoVariables implements Augmentable, Localization
         }
 
         if (Site::multiEnabled()) {
-            $this->config()->set('origin', $this->hasOrigin() ? $this->origin()->locale() : null);
+            $data['origin'] = $this->hasOrigin() ? $this->origin()->locale() : null;
         }
 
-        return [
-            'config' => Arr::removeNullValues($this->config()->data()->all()),
-            'data' => $data,
-        ];
+        return $data;
     }
 
     protected function shouldRemoveNullsFromFileData()

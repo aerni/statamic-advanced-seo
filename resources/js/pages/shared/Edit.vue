@@ -22,8 +22,7 @@ const props = defineProps({
 	initialOriginMeta: Object,
     initialSite: String,
     initialEditUrl: String,
-    initialConfigUrl: String,
-    readOnly: Boolean,
+    configUrl: String,
     configurable: Boolean,
     // docs: Array,
 });
@@ -41,7 +40,6 @@ const originValues = ref(props.initialOriginValues);
 const originMeta = ref(props.initialOriginMeta);
 const site = ref(props.initialSite);
 const editUrl = ref(props.initialEditUrl);
-const configUrl = ref(props.initialConfigUrl);
 const syncFieldConfirmationText = ref(__('messages.sync_entry_field_confirmation_text'));
 const pendingLocalization = ref(null);
 const saving = ref(false);
@@ -67,7 +65,6 @@ let saveKeyBinding;
 onMounted(() => {
 	saveKeyBinding = Statamic.$keys.bindGlobal(['mod+s'], (e) => {
 		e.preventDefault();
-        if (!canSave.value) return;
 		save();
 	});
 });
@@ -75,7 +72,6 @@ onMounted(() => {
 onUnmounted(() => saveKeyBinding.destroy());
 
 const isDirty = computed(() => Statamic.$dirty.has('seo-defaults'));
-const canSave = computed(() => !props.readOnly && isDirty.value && !saving.value);
 const showLocalizationSelector = computed(() => localizations.value.length > 1);
 
 const localizationSelected = (localizationHandle) => {
@@ -106,7 +102,6 @@ const updateDataFromResponse = (data) => {
 	localizedFields.value = data.initialLocalizedFields;
 	hasOrigin.value = data.initialHasOrigin;
 	editUrl.value = data.initialEditUrl;
-	configUrl.value = data.initialConfigUrl;
 };
 
 const switchToLocalization = (localization) => {
@@ -154,7 +149,7 @@ const refreshLocalization = () => {
 				@update:modelValue="localizationSelected"
 			/>
 
-            <Button v-if="!readOnly" variant="primary" :text="__('Save')" @click="save" :disabled="!canSave" />
+            <Button variant="primary" :text="__('Save')" @click="save" :disabled="!saving" />
         </Header>
 
         <PublishContainer
@@ -171,7 +166,6 @@ const refreshLocalization = () => {
             v-model:modified-fields="localizedFields"
             :sync-field-confirmation-text
             :track-dirty-state="true"
-            :read-only
         />
 
         <confirmation-modal

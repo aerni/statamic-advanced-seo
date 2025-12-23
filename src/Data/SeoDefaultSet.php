@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
+use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
@@ -17,6 +18,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoDefaultSet implements Contract
 {
+    use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
     use HasDefaultsData;
@@ -27,9 +29,19 @@ class SeoDefaultSet implements Contract
 
     protected array $localizations;
 
+    public function __construct()
+    {
+        $this->data = collect();
+    }
+
     public function id(): string
     {
         return "{$this->type()}::{$this->handle()}";
+    }
+
+    public function reference(): string
+    {
+        return "seo::{$this->id()}";
     }
 
     public function handle($handle = null)
@@ -93,9 +105,18 @@ class SeoDefaultSet implements Contract
 
     public function fileData(): array
     {
-        return [
+        return array_merge([
             'title' => $this->title(),
-        ];
+        ], $this->data()->all());
+    }
+
+    public function enabled(?bool $enabled = null): bool|self
+    {
+        if (func_num_args() === 0) {
+            return $this->get('enabled', true);
+        }
+
+        return $this->set('enabled', $enabled);
     }
 
     public function makeLocalization(string $site): SeoVariables
@@ -119,6 +140,7 @@ class SeoDefaultSet implements Contract
             return $this;
         }
 
+        // TODO: Default data should only be added to items without an origin. Need to do this in the controller.
         return $this->addLocalization($this->makeLocalization($site)->withDefaultData());
     }
 
@@ -132,7 +154,7 @@ class SeoDefaultSet implements Contract
             $this->in($site) ?? $this->addLocalization($this->makeLocalization($site));
         });
 
-        // TODO: Need to ensure that we still get the correct default data. Do we even need this method anymore?
+        // TODO: Default data should only be added to items without an origin. Need to do this in the controller.
         $this->localizations()->each(fn ($item) => $item->withDefaultData());
 
         return $this;
@@ -190,21 +212,12 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
-    public function editUrl(): string
-    {
-        return match ($this->type()) {
-            'site' => cp_route('advanced-seo.site.defaults', [$this->handle(), Site::selected()]),
-            'collections' => cp_route('advanced-seo.collections.defaults', [$this->handle(), Site::selected()]),
-            'taxonomies' => cp_route('advanced-seo.taxonomies.defaults', [$this->handle(), Site::selected()]),
-        };
-    }
-
     public function configUrl(): string
     {
         return match ($this->type()) {
-            'site' => cp_route('advanced-seo.site.config', [$this->handle(), Site::selected()]),
-            'collections' => cp_route('advanced-seo.collections.config', [$this->handle(), Site::selected()]),
-            'taxonomies' => cp_route('advanced-seo.taxonomies.config', [$this->handle(), Site::selected()]),
+            'site' => cp_route('advanced-seo.site.config', $this->handle()),
+            'collections' => cp_route('advanced-seo.collections.config', $this->handle()),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.config', $this->handle()),
         };
     }
 
@@ -226,6 +239,8 @@ class SeoDefaultSet implements Contract
         };
     }
 
+    // TODO: This is just a feature toggle for things like favicons.
+    // The enabled state for collections/taxonomies is saved in $this->data.
     public function isEnabled(): bool
     {
         return Defaults::isEnabled("{$this->type()}::{$this->handle()}");
