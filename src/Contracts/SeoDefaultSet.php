@@ -6,7 +6,7 @@ use Statamic\Contracts\Data\Localizable;
 
 interface SeoDefaultSet extends Localizable
 {
-    public function in($locale);
+    public function in(string $locale);
 
     public function inSelectedSite();
 

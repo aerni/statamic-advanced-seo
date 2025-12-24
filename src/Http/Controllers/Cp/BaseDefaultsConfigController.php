@@ -2,13 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Statamic\CP\PublishForm;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
 abstract class BaseDefaultsConfigController extends CpController
@@ -27,12 +28,18 @@ abstract class BaseDefaultsConfigController extends CpController
 
         $this->authorize('configure', [SeoDefaultSet::class, $set]);
 
+        $values = [
+            'enabled' => $set->enabled(),
+            'origins' => $set->origins(),
+        ];
+        // dd($values, $set->fileData());
+
         return PublishForm::make(static::editFormBlueprint($set))
             ->parent($defaults['set'])
             ->asConfig()
             ->icon('cog')
             ->title("Configure {$defaults['title']}")
-            ->values($set->data()->all())
+            ->values($values) // TODO: Don't use data. What does Collection do here?
             ->submittingTo($set->editUrl());
     }
 
@@ -51,11 +58,17 @@ abstract class BaseDefaultsConfigController extends CpController
         $values = PublishForm::make(static::editFormBlueprint($set))
             ->submit($request->all());
 
-        $set->merge($values)->save();
+        $set
+            ->enabled(Arr::get($values, 'enabled'))
+            ->origins(Arr::get($values, 'origins'))
+            ->ensureLocalizations(); // We need to ensure localizations after merging values so that the origins are determined correctly.
 
         if (! $set->enabled()) {
+            $set->localizations()->each(fn ($localization) => $set->removeLocalization($localization));
             RemoveSeoValues::handle($set->parent());
         }
+
+        $set->save();
     }
 
     // TODO: Make this an actual blueprint class.
@@ -77,17 +90,23 @@ abstract class BaseDefaultsConfigController extends CpController
             ];
         }
 
-        $fields['sites'] = [
-            'display' => __('Sites'),
+        // TODO: If there is only one site, we should hide the field. But make sure we always save.
+        // Else, a user with only access to one site will override the configuration of a user with access to more sites.
+        $fields['origins'] = [
+            'display' => __('Origins'),
             'fields' => [
-                'sites' => [
-                    'display' => __('Sites'),
+                'origins' => [
+                    'display' => __('Origins'),
                     'instructions' => __('Choose to inherit values from the selected origin.'),
                     'type' => 'default_set_sites',
+                    // 'visibility' => GetAuthorizedSites::handle($set)->count() > 1 ? 'visible' : 'hidden',
                     // There is no 'enabled' field for site defaults. This ensures we don't break the blueprint.
                     'if' => array_filter([
                         'enabled' => 'true',
                     ], fn () => $set->type() !== 'site'),
+                    // 'if' => array_filter([
+                    //     'enabled' => 'true',
+                    // ], fn () => $set->type() !== 'site'),
                 ],
             ],
         ];

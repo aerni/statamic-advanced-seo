@@ -11,11 +11,11 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\ResolvesValues;
-use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoVariables implements Augmentable, Localization
@@ -32,6 +32,7 @@ class SeoVariables implements Augmentable, Localization
 
     protected SeoDefaultSet $set;
 
+    // TODO: Should the locale be changeable? Isn't this derrived from the SeoDefaultSet
     protected string $locale;
 
     public function __construct()
@@ -144,23 +145,18 @@ class SeoVariables implements Augmentable, Localization
 
     public function fileData(): array
     {
-        // We only want to keep values of fields that exist in the blueprint.
-        $data = $this->data()->only($this->blueprintFields())->all();
+        $data = $this->data()->only($this->blueprintFields());
 
-        if ($this->isRoot()) {
-            $data = Arr::removeNullValues($data);
-        }
+        // if ($origin = $this->origin()) {
+        //     $data = $data->dot()->diff($origin->data()->dot())->undot();
+        // }
 
-        if (Site::multiEnabled()) {
-            $data['origin'] = $this->hasOrigin() ? $this->origin()->locale() : null;
-        }
-
-        return $data;
+        return $data->all();
     }
 
     protected function shouldRemoveNullsFromFileData()
     {
-        return false;
+        return ! $this->hasOrigin();
     }
 
     public function sites(): Collection
@@ -183,6 +179,39 @@ class SeoVariables implements Augmentable, Localization
         return $this->seoSet()
             ->defaultsData($this->defaultsData())
             ->blueprint();
+    }
+
+    public function origin($origin = null)
+    {
+        if (func_num_args() === 0) {
+            if ($found = Blink::get($this->getOriginBlinkKey())) {
+                return $found;
+            }
+
+            $origin = $this->seoSet()->origins()->get($this->locale());
+
+            return tap($this->getOriginByString($origin), function ($found) {
+                Blink::put($this->getOriginBlinkKey(), $found);
+            });
+        }
+
+        // Ensure we don't make a localization its own origin
+        if ($origin === $this->locale()) {
+            return $this;
+        }
+
+        // Verify that the origin is valid.
+        if (! $this->seoSet()->sites()->has($origin)) {
+            return $this;
+        }
+
+        Blink::forget($this->getOriginBlinkKey());
+
+        $origins = $this->seoSet()->origins()->put($this->locale(), $origin)->all();
+
+        $this->seoSet()->origins($origins);
+
+        return $this;
     }
 
     protected function getOriginByString($origin)

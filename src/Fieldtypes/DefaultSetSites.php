@@ -16,7 +16,6 @@ class DefaultSetSites extends Fieldtype
         $set = $this->field->parent();
 
         return GetAuthorizedSites::handle($set)
-            ->intersect($set->sites())
             ->map(fn ($site) => [
                 'handle' => $site->handle(),
                 'label' => $site->name(),

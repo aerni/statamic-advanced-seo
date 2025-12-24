@@ -61,6 +61,7 @@ class SeoDefaultSet extends StacheSeoDefaultSet
     {
         $class = app('advanced_seo.model');
 
+        // TODO: Probably need to fix this as ->sites() returns full Site objects now.
         $localizationsData = $source->localizations()
             ->intersectByKeys($source->sites()->flip()) /* Only keep data of configured sites. */
             ->map->fileData()

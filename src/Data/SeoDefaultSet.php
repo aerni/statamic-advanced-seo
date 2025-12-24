@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
-use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
@@ -18,21 +17,19 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoDefaultSet implements Contract
 {
-    use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
     use HasDefaultsData;
 
-    protected string $handle;
-
     protected string $type;
 
-    protected array $localizations;
+    protected string $handle;
 
-    public function __construct()
-    {
-        $this->data = collect();
-    }
+    protected array $localizations = [];
+
+    protected bool $enabled = true;
+
+    protected ?array $origins = [];
 
     public function id(): string
     {
@@ -44,14 +41,42 @@ class SeoDefaultSet implements Contract
         return "seo::{$this->id()}";
     }
 
+    public function type($type = null)
+    {
+        return $this->fluentlyGetOrSet('type')->args(func_get_args());
+    }
+
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
-    public function type($type = null)
+    public function enabled(?bool $enabled = null): bool|self
     {
-        return $this->fluentlyGetOrSet('type')->args(func_get_args());
+        return $this->fluentlyGetOrSet('enabled')->args(func_get_args());
+    }
+
+    public function origins($origins = null): Collection|self
+    {
+        return $this
+            ->fluentlyGetOrSet('origins')
+            ->getter(function ($origins) {
+                if (empty($origins) && $this->sites()->count() > 1) {
+                    return $this->sites()->map(fn ($site) => null);
+                }
+
+                return collect($origins);
+
+            })
+            ->setter(function ($origins) {
+                // TODO: Should we not set anything if there is only one origin?
+                return collect($origins)
+                    ->filter(function ($value, $key) {
+                        $validValues = $this->sites()->keys();
+                        return $validValues->contains($key) && $validValues->contains($value);
+                    })->all();
+            })
+            ->args(func_get_args());
     }
 
     public function localizations(): Collection
@@ -61,14 +86,12 @@ class SeoDefaultSet implements Contract
 
     public function sites(): Collection
     {
-        $allSites = Site::all()->keys();
-
+        // Only get sites configured on the parent (collection/taxonomy)
         if ($parent = $this->parent()) {
-            // Only return sites from the parent that are configured in Statamic's sites config
-            return $allSites->filter(fn ($site) => $parent->sites()->contains($site));
+            return $parent->sites()->mapWithKeys(fn ($site) => [$site => Site::get($site)]);
         }
 
-        return $allSites;
+        return Site::all();
     }
 
     public function availableInSite(string $site): bool
@@ -105,18 +128,10 @@ class SeoDefaultSet implements Contract
 
     public function fileData(): array
     {
-        return array_merge([
-            'title' => $this->title(),
-        ], $this->data()->all());
-    }
-
-    public function enabled(?bool $enabled = null): bool|self
-    {
-        if (func_num_args() === 0) {
-            return $this->get('enabled', true);
-        }
-
-        return $this->set('enabled', $enabled);
+        return [
+            'enabled' => $this->enabled,
+            'origins' => $this->origins,
+        ];
     }
 
     public function makeLocalization(string $site): SeoVariables
@@ -140,10 +155,14 @@ class SeoDefaultSet implements Contract
             return $this;
         }
 
-        // TODO: Default data should only be added to items without an origin. Need to do this in the controller.
-        return $this->addLocalization($this->makeLocalization($site)->withDefaultData());
+        return $this->addLocalization($this->makeLocalization($site));
+
+        // TODO: TODO: Should we really add the default data to the file? Don't they get derrived from the default value in the blueprint?
+        // return $this->addLocalization($this->makeLocalization($site)->withDefaultData());
     }
 
+    // TODO: The GlobalSet solves this by making a localization in the ->in() method
+    // if the requested localization doesn't exist.
     public function ensureLocalizations(?Collection $sites = null): self
     {
         // Get sites from the instance if not provided, or ensure custom sites are valid
@@ -154,8 +173,8 @@ class SeoDefaultSet implements Contract
             $this->in($site) ?? $this->addLocalization($this->makeLocalization($site));
         });
 
-        // TODO: Default data should only be added to items without an origin. Need to do this in the controller.
-        $this->localizations()->each(fn ($item) => $item->withDefaultData());
+        // TODO: TODO: Should we really add the default data to the file? Don't they get derrived from the default value in the blueprint?
+        // $this->localizations()->each(fn ($item) => $item->withDefaultData());
 
         return $this;
     }
@@ -187,9 +206,31 @@ class SeoDefaultSet implements Contract
         return $this;
     }
 
-    public function in($locale): ?SeoVariables
+    // TODO: Get rid of the $localizations property and just always get them fresh.
+    // Like Statamic does with Globals. But then we'd need a repository for variables too ...
+    // public function in(?string $locale): ?SeoVariables
+    // {
+    //     return $this->localizations[$locale] ?? null;
+    // }
+
+    // TODO: This likely allows us to get rid of ensureLocalizations()
+    // as we now always create one if requested.
+    public function in(?string $site): ?SeoVariables
     {
-        return $this->localizations[$locale] ?? null;
+        if (! $this->sites()->contains($site)) {
+            return null;
+        }
+
+        if ($localizations = $this->localizations()->get($site)) {
+            return $localizations;
+        };
+
+        $localization = $this->makeLocalization($site);
+
+        // TODO: Should we really add the localization to the set or no?
+        $this->addLocalization($localization);
+
+        return $localization;
     }
 
     public function inSelectedSite(): ?SeoVariables

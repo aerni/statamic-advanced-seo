@@ -2,23 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
-use Statamic\Sites\Site;
-use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\Fields\Blueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Statamic\Facades\Site as Sites;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Data\SeoVariables;
-use Statamic\Facades\Site as SiteFacade;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Facades\Site as Sites;
+use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Statamic\Sites\Site;
 
 abstract class BaseDefaultsController extends CpController
 {
@@ -72,8 +72,7 @@ abstract class BaseDefaultsController extends CpController
         throw_unless($set->enabled(), new NotFoundHttpException);
         throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
 
-        $localization = $set->in($site->handle())
-            ->origin(data_get($set->get('sites'),$site->handle()));
+        $localization = $set->in($site->handle());
 
         $blueprint = $localization->blueprint();
 
@@ -82,19 +81,6 @@ abstract class BaseDefaultsController extends CpController
         if ($hasOrigin = $localization->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($localization->origin(), $blueprint);
         }
-
-        // If there is an origin, we need to ensure that initialLocalizedFields in $viewData
-        // only consists of keys of items that are different to the originValues.
-        $localizedFields = $localization->data()->keys()->all();
-
-        if ($hasOrigin) {
-            $localizedFields = collect($localizedFields)
-                ->filter(fn ($key) => ($originValues[$key] ?? null) !== ($values[$key] ?? null))
-                ->values()
-                ->all();
-        }
-
-        dd($localizedFields);
 
         $viewData = [
             'title' => $defaults['title'],
@@ -114,7 +100,7 @@ abstract class BaseDefaultsController extends CpController
                     'active' => $site->handle() === $localization->locale(),
                     'url' => $set->in($site->handle())->editUrl(),
                 ])->filter()->values()->all(),
-            'initialLocalizedFields' => $localizedFields,
+            'initialLocalizedFields' => $localization->data()->keys()->all(),
             'initialEditUrl' => $localization->editUrl(),
             'configUrl' => $set->editUrl(),
             'configurable' => $this->canConfigure($set),
@@ -135,8 +121,7 @@ abstract class BaseDefaultsController extends CpController
 
         throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
 
-        $localization = $set->in($site->handle())
-            ->origin(data_get($set->get('sites'),$site->handle()));;
+        $localization = $set->in($site->handle());
 
         throw_unless($localization->enabled(), new NotFoundHttpException);
 
@@ -148,10 +133,13 @@ abstract class BaseDefaultsController extends CpController
 
         $values = $fields->process()->values();
 
+        // TODO: I want to be able to purposely unlink a field even if its value is the same as the origin. We should save it to file.
+        // dd($values->only($request->input('_localized')));
         $localization->hasOrigin()
             ? $localization->data($values->only($request->input('_localized')))
             : $localization->merge($values);
 
+            // dd($localization->data());
         $localization = $localization->save();
 
         // TODO: We should probably dispatch this event in the save method of the SeoDefaultSet class or the repository.

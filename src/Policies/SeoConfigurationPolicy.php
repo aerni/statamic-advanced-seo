@@ -10,6 +10,7 @@ use Statamic\Facades\User as UserFacade;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
 use Statamic\Sites\Site;
 
+// TODO: Should this be two policies. One for the SeoVariables and one for the SeoDefaultSet?
 class SeoConfigurationPolicy
 {
     use HasMultisitePolicy;
@@ -29,8 +30,9 @@ class SeoConfigurationPolicy
 
         return Defaults::enabledInType($type)
             ->contains(function (array $default) use ($user) {
-                return $default['set']->sites()
-                    ->contains(fn ($site) => $this->edit($user, $default['set'], Sites::get($site)));
+                return $default['set']
+                    ->sites()
+                    ->contains(fn ($site) => $this->edit($user, $default['set'], $site));
             });
     }
 
