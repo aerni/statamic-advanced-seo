@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Closure;
-use Statamic\Fields\Fieldtype;
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Fields\Fieldtype;
 
 class DefaultSetSites extends Fieldtype
 {
@@ -74,6 +74,7 @@ class DefaultSetSites extends Fieldtype
                     while ($current !== null) {
                         if (in_array($current, $visited)) {
                             $fail(__('Circular site origin dependencies are not allowed.'));
+
                             return;
                         }
 

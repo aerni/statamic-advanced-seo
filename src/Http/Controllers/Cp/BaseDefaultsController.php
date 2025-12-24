@@ -94,7 +94,7 @@ abstract class BaseDefaultsController extends CpController
             'initialOriginValues' => $originValues ?? null,
             'initialOriginMeta' => $originMeta ?? null,
             'initialLocalizations' => GetAuthorizedSites::handle($set)
-                ->map(fn ($site) =>[
+                ->map(fn ($site) => [
                     'handle' => $site->handle(),
                     'name' => $site->name(),
                     'active' => $site->handle() === $localization->locale(),
@@ -139,7 +139,7 @@ abstract class BaseDefaultsController extends CpController
             ? $localization->data($values->only($request->input('_localized')))
             : $localization->merge($values);
 
-            // dd($localization->data());
+        // dd($localization->data());
         $localization = $localization->save();
 
         // TODO: We should probably dispatch this event in the save method of the SeoDefaultSet class or the repository.

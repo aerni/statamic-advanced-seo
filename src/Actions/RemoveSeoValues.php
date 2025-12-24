@@ -21,7 +21,7 @@ class RemoveSeoValues
         return false;
     }
 
-    static protected function removeValuesFromEntries(Collection $collection): void
+    protected static function removeValuesFromEntries(Collection $collection): void
     {
         $collection->queryEntries()->get()
             ->filter(fn (Entry $entry) => $entry->data()->contains(fn ($value, $key) => str($key)->startsWith('seo_')))
@@ -31,7 +31,7 @@ class RemoveSeoValues
             });
     }
 
-    static protected function removeValuesFromTerms(Taxonomy $taxonomy): void
+    protected static function removeValuesFromTerms(Taxonomy $taxonomy): void
     {
         $taxonomy->queryTerms()->get()
             ->filter(fn (LocalizedTerm $localization) => $localization->data()->contains(fn ($value, $key) => str($key)->startsWith('seo_')))

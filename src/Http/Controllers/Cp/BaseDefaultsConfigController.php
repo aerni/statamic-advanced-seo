@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
-use Statamic\CP\PublishForm;
-use Statamic\Fields\Blueprint;
-use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Statamic\CP\PublishForm;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 abstract class BaseDefaultsConfigController extends CpController
@@ -189,6 +189,6 @@ abstract class BaseDefaultsConfigController extends CpController
                     ],
                 ],
             ])
-            ->all());
+                ->all());
     }
 }

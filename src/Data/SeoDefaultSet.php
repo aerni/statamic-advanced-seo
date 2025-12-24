@@ -73,6 +73,7 @@ class SeoDefaultSet implements Contract
                 return collect($origins)
                     ->filter(function ($value, $key) {
                         $validValues = $this->sites()->keys();
+
                         return $validValues->contains($key) && $validValues->contains($value);
                     })->all();
             })
@@ -223,7 +224,7 @@ class SeoDefaultSet implements Contract
 
         if ($localizations = $this->localizations()->get($site)) {
             return $localizations;
-        };
+        }
 
         $localization = $this->makeLocalization($site);
 
