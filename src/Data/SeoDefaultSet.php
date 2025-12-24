@@ -212,12 +212,12 @@ class SeoDefaultSet implements Contract
         return $this->in($locale) !== null;
     }
 
-    public function configUrl(): string
+    public function editUrl(): string
     {
         return match ($this->type()) {
-            'site' => cp_route('advanced-seo.site.config', $this->handle()),
-            'collections' => cp_route('advanced-seo.collections.config', $this->handle()),
-            'taxonomies' => cp_route('advanced-seo.taxonomies.config', $this->handle()),
+            'site' => cp_route('advanced-seo.site.edit', $this->handle()),
+            'collections' => cp_route('advanced-seo.collections.edit', $this->handle()),
+            'taxonomies' => cp_route('advanced-seo.taxonomies.edit', $this->handle()),
         };
     }
 

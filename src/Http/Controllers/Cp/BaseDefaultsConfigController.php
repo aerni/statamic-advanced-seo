@@ -33,7 +33,7 @@ abstract class BaseDefaultsConfigController extends CpController
             ->icon('cog')
             ->title("Configure {$defaults['title']}")
             ->values($set->data()->all())
-            ->submittingTo($set->configUrl());
+            ->submittingTo($set->editUrl());
     }
 
     public function update(Request $request, string $handle): void

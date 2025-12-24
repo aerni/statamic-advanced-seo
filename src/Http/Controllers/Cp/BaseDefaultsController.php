@@ -42,7 +42,7 @@ abstract class BaseDefaultsController extends CpController
                 'enabled' => $default['set']->enabled(),
                 'configurable' => $this->canConfigure($default['set']),
                 'edit_url' => $default['set']->in(Sites::selected())->editUrl(),
-                'config_url' => $default['set']->configUrl(),
+                'config_url' => $default['set']->editUrl(),
             ])
             ->values();
 
@@ -116,7 +116,7 @@ abstract class BaseDefaultsController extends CpController
                 ])->filter()->values()->all(),
             'initialLocalizedFields' => $localizedFields,
             'initialEditUrl' => $localization->editUrl(),
-            'configUrl' => $set->configUrl(),
+            'configUrl' => $set->editUrl(),
             'configurable' => $this->canConfigure($set),
         ];
 
