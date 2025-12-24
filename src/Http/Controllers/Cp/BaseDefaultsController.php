@@ -41,7 +41,7 @@ abstract class BaseDefaultsController extends CpController
                 ...$default,
                 'enabled' => $default['set']->enabled(),
                 'configurable' => $this->canConfigure($default['set']),
-                'edit_url' => $default['set']->in(Sites::selected())->editUrl(),
+                'edit_url' => $default['set']->in(Sites::selected()->handle())->editUrl(),
                 'config_url' => $default['set']->editUrl(),
             ])
             ->values();
