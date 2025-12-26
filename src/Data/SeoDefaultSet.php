@@ -100,6 +100,7 @@ class SeoDefaultSet implements Contract
     {
         return app(SeoVariablesRepository::class)
             ->whereSet($this->type(), $this->handle())
+            ->each(fn ($localization) => $localization->seoSet($this))
             ->keyBy->locale();
     }
 
