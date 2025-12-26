@@ -140,9 +140,6 @@ abstract class BaseDefaultsController extends CpController
 
         // dd($localization->data());
         $localization = $localization->save();
-
-        // TODO: We should probably dispatch this event in the save method of the SeoDefaultSet class or the repository.
-        SeoDefaultSetSaved::dispatch($localization->seoSet());
     }
 
     protected function extractFromFields(SeoVariables $localization, Blueprint $blueprint): array

@@ -2,20 +2,21 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
-use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Illuminate\Support\Collection;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Support\Str;
 use Statamic\Facades\Site;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
-use Statamic\Support\Str;
+use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Facades\Collection as CollectionFacade;
+use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
 
 class SeoDefaultSet implements Contract
 {
@@ -236,6 +237,8 @@ class SeoDefaultSet implements Contract
     public function save(): self
     {
         \Aerni\AdvancedSeo\Facades\Seo::save($this);
+
+        SeoDefaultSetSaved::dispatch($this);
 
         $this->saveOrDeleteLocalizations();
 
