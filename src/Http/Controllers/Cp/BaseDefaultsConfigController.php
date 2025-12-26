@@ -20,11 +20,11 @@ abstract class BaseDefaultsConfigController extends CpController
     {
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
+        $set = $defaults['set'];
+
         // The global feature enabled state. e.g. used by site defaults like favicons.
         // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
         throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
-
-        $set = $defaults['set'];
 
         $this->authorize('configure', [SeoDefaultSet::class, $set]);
 
@@ -34,7 +34,7 @@ abstract class BaseDefaultsConfigController extends CpController
         ];
 
         return PublishForm::make(static::editFormBlueprint($set))
-            ->parent($defaults['set'])
+            ->parent($set)
             ->asConfig()
             ->icon('cog')
             ->title("Configure {$defaults['title']}")
@@ -45,10 +45,6 @@ abstract class BaseDefaultsConfigController extends CpController
     public function update(Request $request, string $handle): void
     {
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
-
-        // The global feature enabled state. e.g. used by site defaults like favicons.
-        // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
-        throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
 
         $set = $defaults['set'];
 
@@ -61,13 +57,9 @@ abstract class BaseDefaultsConfigController extends CpController
             $set->enabled(Arr::get($values, 'enabled'));
         }
 
-        $set->origins(Arr::get($values, 'origins'));
-
-        if (! $set->enabled()) {
-            RemoveSeoValues::handle($set->parent());
-        }
-
-        $set->save();
+        $set
+            ->origins(Arr::get($values, 'origins'))
+            ->save();
     }
 
     // TODO: Make this an actual blueprint class.

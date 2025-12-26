@@ -11,6 +11,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Data\ExistsAsFile;
 use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -252,6 +253,7 @@ class SeoDefaultSet implements Contract
         // Delete all localizations if the set is disabled.
         if (! $this->enabled()) {
             $localizations->each->delete();
+            RemoveSeoValues::handle($this->parent());
             return;
         }
 

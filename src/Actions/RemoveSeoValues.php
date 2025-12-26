@@ -10,15 +10,13 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class RemoveSeoValues
 {
-    public static function handle(mixed $model): bool
+    public static function handle(mixed $model): void
     {
         match (true) {
             $model instanceof Collection => self::removeValuesFromEntries($model),
             $model instanceof Taxonomy => self::removeValuesFromTerms($model),
             default => null,
         };
-
-        return false;
     }
 
     protected static function removeValuesFromEntries(Collection $collection): void

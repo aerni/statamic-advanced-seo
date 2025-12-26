@@ -128,6 +128,7 @@ class SeoVariables implements Contract, Augmentable, Localization
         return $defaultData->filter(fn ($value) => $value !== null && $value !== []);
     }
 
+    // TODO: We are not using this anywhere anymore. Need to add it again?
     public function withDefaultData(): self
     {
         if ($this->isRoot()) {

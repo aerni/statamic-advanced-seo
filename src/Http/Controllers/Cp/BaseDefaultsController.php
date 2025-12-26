@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoVariables;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Http\Request;
@@ -60,18 +59,17 @@ abstract class BaseDefaultsController extends CpController
     {
         $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
 
+        $set = $defaults['set'];
+
         // TODO: The global feature enabled state. e.g. used by site defaults like favicons.
         // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
         throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
-
-        $set = $defaults['set'];
+        throw_unless($set->enabled(), new NotFoundHttpException);
+        throw_unless($set->availableInSite($site), new NotFoundHttpException);
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
-        throw_unless($set->enabled(), new NotFoundHttpException);
-        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
-
-        $localization = $set->in($site->handle());
+        $localization = $set->in($site);
 
         $blueprint = $localization->blueprint();
 
@@ -97,7 +95,7 @@ abstract class BaseDefaultsController extends CpController
                     'handle' => $site->handle(),
                     'name' => $site->name(),
                     'active' => $site->handle() === $localization->locale(),
-                    'url' => $set->in($site->handle())->editUrl(),
+                    'url' => $set->in($site)->editUrl(),
                 ])->filter()->values()->all(),
             'initialLocalizedFields' => $localization->data()->keys()->all(),
             'initialEditUrl' => $localization->editUrl(),
@@ -116,13 +114,12 @@ abstract class BaseDefaultsController extends CpController
     {
         $set = Seo::findOrMake($this->type(), $handle);
 
+        throw_unless($set->enabled(), new NotFoundHttpException);
+        throw_unless($set->availableInSite($site), new NotFoundHttpException);
+
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
-        throw_unless($set->availableInSite($site->handle()), new NotFoundHttpException);
-
-        $localization = $set->in($site->handle());
-
-        throw_unless($localization->enabled(), new NotFoundHttpException);
+        $localization = $set->in($site);
 
         $blueprint = $localization->blueprint();
 
@@ -132,13 +129,10 @@ abstract class BaseDefaultsController extends CpController
 
         $values = $fields->process()->values();
 
-        // TODO: I want to be able to purposely unlink a field even if its value is the same as the origin. We should save it to file.
-        // dd($values->only($request->input('_localized')));
         $localization->hasOrigin()
             ? $localization->data($values->only($request->input('_localized')))
             : $localization->merge($values);
 
-        // dd($localization->data());
         $localization = $localization->save();
     }
 
