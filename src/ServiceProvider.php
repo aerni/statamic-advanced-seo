@@ -2,46 +2,46 @@
 
 namespace Aerni\AdvancedSeo;
 
+use Statamic\Statamic;
+use Statamic\Facades\Git;
+use Statamic\Facades\User;
+use Illuminate\Support\Arr;
+use Statamic\Stache\Stache;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Stache\Stores\SeoStore;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\View\CascadeComposer;
+use Statamic\Providers\AddonServiceProvider;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
+use Facades\Statamic\Console\Processes\Composer;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\Stache\Stores\SeoVariablesStore;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Stache\SeoStore;
-use Aerni\AdvancedSeo\View\CascadeComposer;
-use Facades\Statamic\Console\Processes\Composer;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Git;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Statamic\Facades\User;
-use Statamic\GraphQL\Types\EntryInterface;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\Providers\AddonServiceProvider;
-use Statamic\Stache\Stache;
-use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -63,12 +63,6 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootAddon(): void
     {
-        Route::bind('test', function ($value) {
-            dd($value);
-
-            return User::where('name', $value)->firstOrFail();
-        });
-
         $this
             ->bootStacheStore()
             ->bootNav()
@@ -103,14 +97,17 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function registerFileDriver(): void
     {
-        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\SeoDefaultsRepository::class);
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoDefaultsRepository::class);
+        Statamic::repository(Contracts\SeoVariablesRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoVariablesRepository::class);
     }
 
     protected function bootStacheStore(): self
     {
         $seoStore = app(SeoStore::class)->directory(config('advanced-seo.directory'));
+        $seoVariablesStore = app(SeoVariablesStore::class)->directory(config('advanced-seo.directory'));
 
         app(Stache::class)->registerStore($seoStore);
+        app(Stache::class)->registerStore($seoVariablesStore);
 
         return $this;
     }

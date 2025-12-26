@@ -4,9 +4,11 @@ namespace Aerni\AdvancedSeo\Data;
 
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
+use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -24,8 +26,6 @@ class SeoDefaultSet implements Contract
     protected string $type;
 
     protected string $handle;
-
-    protected array $localizations = [];
 
     protected bool $enabled = true;
 
@@ -53,7 +53,16 @@ class SeoDefaultSet implements Contract
 
     public function enabled(?bool $enabled = null): bool|self
     {
-        return $this->fluentlyGetOrSet('enabled')->args(func_get_args());
+        return $this->fluentlyGetOrSet('enabled')
+            ->setter(function ($enabled) {
+                // Prevent setting enabled on site defaults
+                if ($this->type === 'site') {
+                    throw new \LogicException('Site defaults cannot be disabled. They are always enabled.');
+                }
+
+                return $enabled;
+            })
+            ->args(func_get_args());
     }
 
     public function origins($origins = null): Collection|self
@@ -82,7 +91,16 @@ class SeoDefaultSet implements Contract
 
     public function localizations(): Collection
     {
-        return collect($this->localizations);
+        return Blink::once('seo-defaults-localizations-'.$this->id(), function () {
+            return $this->freshLocalizations();
+        });
+    }
+
+    protected function freshLocalizations(): Collection
+    {
+        return app(SeoVariablesRepository::class)
+            ->whereSet($this->type(), $this->handle())
+            ->keyBy->locale();
     }
 
     public function sites(): Collection
@@ -129,10 +147,14 @@ class SeoDefaultSet implements Contract
 
     public function fileData(): array
     {
-        return [
-            'enabled' => $this->enabled,
-            'origins' => $this->origins,
-        ];
+        $data = ['origins' => $this->origins];
+
+        // Only save 'enabled' for collections and taxonomies, not for site
+        if ($this->type !== 'site') {
+            $data['enabled'] = $this->enabled;
+        }
+
+        return $data;
     }
 
     public function makeLocalization(string $site): SeoVariables
@@ -142,96 +164,18 @@ class SeoDefaultSet implements Contract
             ->locale($site);
     }
 
-    public function createOrDeleteLocalizations(Collection $sites): self
+
+    public function in(string $site): ?SeoVariables
     {
-        return $this
-            ->ensureLocalizations($sites)
-            ->removeLocalizations($sites)
-            ->save();
-    }
-
-    public function ensureLocalization(string $site): self
-    {
-        if ($this->in($site)) {
-            return $this;
-        }
-
-        return $this->addLocalization($this->makeLocalization($site));
-
-        // TODO: TODO: Should we really add the default data to the file? Don't they get derrived from the default value in the blueprint?
-        // return $this->addLocalization($this->makeLocalization($site)->withDefaultData());
-    }
-
-    // TODO: The GlobalSet solves this by making a localization in the ->in() method
-    // if the requested localization doesn't exist.
-    public function ensureLocalizations(?Collection $sites = null): self
-    {
-        // Get sites from the instance if not provided, or ensure custom sites are valid
-        $sites = $sites?->intersect(Site::all()->keys()) ?? $this->sites();
-
-        // Make a localization for each site if it doesn't already exist.
-        $sites->each(function ($site) {
-            $this->in($site) ?? $this->addLocalization($this->makeLocalization($site));
-        });
-
-        // TODO: TODO: Should we really add the default data to the file? Don't they get derrived from the default value in the blueprint?
-        // $this->localizations()->each(fn ($item) => $item->withDefaultData());
-
-        return $this;
-    }
-
-    public function removeLocalizations(Collection $sites): self
-    {
-        $localizationsToDelete = $this->localizations()->map->locale()->diff($sites);
-
-        $localizationsToDelete->each(function ($localization) {
-            $this->removeLocalization($this->localizations()->get($localization));
-        });
-
-        return $this;
-    }
-
-    public function addLocalization(SeoVariables $localization): self
-    {
-        $localization->seoSet($this);
-
-        $this->localizations[$localization->locale()] = $localization;
-
-        return $this;
-    }
-
-    public function removeLocalization(SeoVariables $localization): self
-    {
-        unset($this->localizations[$localization->locale()]);
-
-        return $this;
-    }
-
-    // TODO: Get rid of the $localizations property and just always get them fresh.
-    // Like Statamic does with Globals. But then we'd need a repository for variables too ...
-    // public function in(?string $locale): ?SeoVariables
-    // {
-    //     return $this->localizations[$locale] ?? null;
-    // }
-
-    // TODO: This likely allows us to get rid of ensureLocalizations()
-    // as we now always create one if requested.
-    public function in(?string $site): ?SeoVariables
-    {
-        if (! $this->sites()->contains($site)) {
+        if (! $this->availableInSite($site)) {
             return null;
         }
 
-        if ($localizations = $this->localizations()->get($site)) {
-            return $localizations;
+        if (! $variables = $this->localizations()->get($site)) {
+            $variables = $this->makeLocalization($site);
         }
 
-        $localization = $this->makeLocalization($site);
-
-        // TODO: Should we really add the localization to the set or no?
-        $this->addLocalization($localization);
-
-        return $localization;
+        return $variables;
     }
 
     public function inSelectedSite(): ?SeoVariables
@@ -290,16 +234,39 @@ class SeoDefaultSet implements Contract
 
     public function save(): self
     {
-        // TODO: Maybe we can take inspiration from the GlobalSet saveOrDeleteLocalizations() method.
-        // This method evaluates if a localization should be saved or deleted.
         \Aerni\AdvancedSeo\Facades\Seo::save($this);
 
+        $this->saveOrDeleteLocalizations();
+
         return $this;
+    }
+
+    protected function saveOrDeleteLocalizations(): void
+    {
+        $localizations = $this->freshLocalizations();
+
+        // Delete all localizations if the set is disabled.
+        if (! $this->enabled()) {
+            $localizations->each->delete();
+            return;
+        }
+
+        // Save localizations that don't exist on file yet.
+        $this->sites()
+            ->reject(fn ($site, $handle) => $localizations->has($handle))
+            ->each(fn ($site) => $this->makeLocalization($site)->save());
+
+        // Delete all localizations that shouldn't exist based on the configured sites.
+        $localizations
+            ->filter(fn ($localization) => ! $this->sites()->contains($localization->locale()))
+            ->each->delete();
     }
 
     public function delete(): bool
     {
         \Aerni\AdvancedSeo\Facades\Seo::delete($this);
+
+        $this->localizations()->each->delete();
 
         return true;
     }

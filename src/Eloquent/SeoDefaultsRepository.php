@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository as StacheRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoDefaultsRepository as StacheRepository;
 use Illuminate\Support\Collection;
 use Statamic\Data\DataCollection;
 use Statamic\Facades\Blink;

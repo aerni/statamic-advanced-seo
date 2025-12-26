@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Stache;
+namespace Aerni\AdvancedSeo\Stache\Stores;
 
 use Statamic\Stache\Stores\AggregateStore;
 
@@ -16,9 +16,9 @@ class SeoStore extends AggregateStore
     public function discoverStores()
     {
         return collect([
+            'site' => $this->store('site'),
             'collections' => $this->store('collections'),
             'taxonomies' => $this->store('taxonomies'),
-            'site' => $this->store('site'),
         ]);
     }
 }

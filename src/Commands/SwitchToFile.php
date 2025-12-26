@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Commands;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as SeoDefaultsRepositoryContract;
 use Aerni\AdvancedSeo\Eloquent\SeoDefaultModel;
 use Aerni\AdvancedSeo\Eloquent\SeoDefaultSet as EloquentSeoDefaultSet;
-use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository as StacheSeoDefaultsRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoDefaultsRepository as StacheSeoDefaultsRepository;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Facade;

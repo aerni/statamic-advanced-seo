@@ -2,23 +2,27 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Data\Localization;
-use Statamic\Data\ContainsData;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
+use Statamic\Facades\Blink;
+use Statamic\Data\HasOrigin;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Blueprint;
+use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
 use Statamic\GraphQL\ResolvesValues;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
+use Aerni\AdvancedSeo\Contracts\SeoVariables as Contract;
 
-class SeoVariables implements Augmentable, Localization
+class SeoVariables implements Contract, Augmentable, Localization
 {
     use ContainsData;
     use ExistsAsFile;
@@ -32,7 +36,6 @@ class SeoVariables implements Augmentable, Localization
 
     protected SeoDefaultSet $set;
 
-    // TODO: Should the locale be changeable? Isn't this derrived from the SeoDefaultSet
     protected string $locale;
 
     public function __construct()
@@ -47,7 +50,16 @@ class SeoVariables implements Augmentable, Localization
 
     public function seoSet($set = null)
     {
-        return $this->fluentlyGetOrSet('set')->args(func_get_args());
+        return $this->fluentlyGetOrSet('set')
+            ->setter(function ($set) {
+                if ($set instanceof SeoDefaultSet) {
+                    return $set;
+                }
+
+                [$type, $handle] = explode('::', $set);
+                return Seo::find($type, $handle);
+            })
+            ->args(func_get_args());
     }
 
     public function locale($locale = null)
@@ -95,22 +107,16 @@ class SeoVariables implements Augmentable, Localization
 
     public function save(): self
     {
-        $this
-            ->seoSet()
-            ->addLocalization($this)
-            ->save();
+        app(SeoVariablesRepository::class)->save($this);
 
         return $this;
     }
 
-    public function delete(): self
+    public function delete(): bool
     {
-        $this
-            ->seoSet()
-            ->removeLocalization($this)
-            ->save();
+        app(SeoVariablesRepository::class)->delete($this);
 
-        return $this;
+        return true;
     }
 
     public function defaultData(): Collection
@@ -145,13 +151,9 @@ class SeoVariables implements Augmentable, Localization
 
     public function fileData(): array
     {
-        $data = $this->data()->only($this->blueprintFields());
-
-        // if ($origin = $this->origin()) {
-        //     $data = $data->dot()->diff($origin->data()->dot())->undot();
-        // }
-
-        return $data->all();
+        return $this->data()
+            ->only($this->blueprintFields())
+            ->all();
     }
 
     protected function shouldRemoveNullsFromFileData()
@@ -216,7 +218,7 @@ class SeoVariables implements Augmentable, Localization
 
     protected function getOriginByString($origin)
     {
-        return $this->seoSet()->in($origin);
+        return is_null($origin) ? null : $this->seoSet()->in($origin);
     }
 
     public function resolveGqlValue(string $field)

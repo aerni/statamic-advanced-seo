@@ -29,7 +29,7 @@ class SeoDefaultSet extends StacheSeoDefaultSet
         // Get site-keyed localizations data (everything except config)
         $sitesData = Arr::except($modelData, 'config');
 
-        // Iterate over site-keyed data (works for both single-site and multi-site)
+        // Iterate over site-keyed data and save localizations (works for both single-site and multi-site)
         collect($sitesData)->each(function ($data, $site) use ($seoDefaultSet) {
             // Handle legacy format where each site had config/data structure (backward compatibility)
             if (isset($data['config']) && isset($data['data'])) {
@@ -46,7 +46,8 @@ class SeoDefaultSet extends StacheSeoDefaultSet
                 ->merge($localizationData)
                 ->origin($origin);
 
-            $seoDefaultSet->addLocalization($localization);
+            // Save the localization to disk/repository
+            $localization->save();
         });
 
         return $seoDefaultSet;

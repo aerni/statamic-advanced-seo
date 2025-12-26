@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Stache;
+namespace Aerni\AdvancedSeo\Stache\Repositories;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as Contract;
@@ -11,13 +11,10 @@ use Statamic\Stache\Stores\Store;
 
 class SeoDefaultsRepository implements Contract
 {
-    protected Stache $stache;
-
     protected Store $store;
 
-    public function __construct(Stache $stache)
+    public function __construct(protected Stache $stache)
     {
-        $this->stache = $stache;
         $this->store = $stache->store('seo');
     }
 
@@ -38,9 +35,8 @@ class SeoDefaultsRepository implements Contract
 
     public function all(): Collection
     {
-        return $this->store->discoverStores()->map(function ($store, $type) {
-            return $this->allOfType($type);
-        });
+        return $this->store->discoverStores()
+            ->map(fn ($store, $type) => $this->allOfType($type));
     }
 
     public function allOfType(string $type): DataCollection

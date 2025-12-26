@@ -29,8 +29,7 @@ class MigrateSiteNamePosition extends UpdateScript
 
         // Get all localizations and make sure they exist.
         $siteDefaults = Seo::find('site', 'general')
-            ?->ensureLocalizations(Site::all())
-            ->localizations();
+            ?->localizations();
 
         // Get the title positions from each localization.
         $titlePositions = $siteDefaults
@@ -41,11 +40,6 @@ class MigrateSiteNamePosition extends UpdateScript
         // Set the site name position for all collection defaults.
         Defaults::enabledInType('collections')
             ->map(fn ($default) => Seo::findOrMake($default['type'], $default['handle']))
-            ->map(function ($default) {
-                $sites = Collection::find($default->handle())->sites();
-
-                return $default->ensureLocalizations($sites);
-            })
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {
                     $default->in($site)?->set('seo_site_name_position', $value)->save();
@@ -55,11 +49,6 @@ class MigrateSiteNamePosition extends UpdateScript
         // Set the site name position for all taxonomy defaults.
         Defaults::enabledInType('taxonomies')
             ->map(fn ($default) => Seo::findOrMake($default['type'], $default['handle']))
-            ->map(function ($default) {
-                $sites = Taxonomy::find($default->handle())->sites();
-
-                return $default->ensureLocalizations($sites);
-            })
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {
                     $default->in($site)?->set('seo_site_name_position', $value)->save();

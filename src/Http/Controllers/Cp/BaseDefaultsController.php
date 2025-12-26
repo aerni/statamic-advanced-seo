@@ -34,7 +34,6 @@ abstract class BaseDefaultsController extends CpController
 
         $items = Defaults::enabledInType($this->type())
             ->filter(fn ($default) => User::current()->can('edit', [SeoDefaultSet::class, $default['set'], $site]))
-            ->each(fn ($default) => $default['set']->ensureLocalizations()) // TODO: Should we ensure somewhere else? Maybe in the Defaults model class?
             ->filter(fn ($default) => $default['set']->availableInSite($site))
             ->filter(fn ($default) => $this->canConfigure($default['set']) || $default['set']->enabled())
             ->map(fn ($default) => [
@@ -65,7 +64,7 @@ abstract class BaseDefaultsController extends CpController
         // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
         throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
 
-        $set = $defaults['set']->ensureLocalizations();
+        $set = $defaults['set'];
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 
@@ -115,7 +114,7 @@ abstract class BaseDefaultsController extends CpController
 
     public function update(Request $request, string $handle, Site $site): void
     {
-        $set = Seo::findOrMake($this->type(), $handle)->ensureLocalization($site);
+        $set = Seo::findOrMake($this->type(), $handle);
 
         $this->authorize('edit', [SeoDefaultSet::class, $set, $site]);
 

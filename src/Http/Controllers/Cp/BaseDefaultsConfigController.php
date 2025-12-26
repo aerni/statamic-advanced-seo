@@ -32,7 +32,6 @@ abstract class BaseDefaultsConfigController extends CpController
             'enabled' => $set->enabled(),
             'origins' => $set->origins(),
         ];
-        // dd($values, $set->fileData());
 
         return PublishForm::make(static::editFormBlueprint($set))
             ->parent($defaults['set'])
@@ -58,13 +57,13 @@ abstract class BaseDefaultsConfigController extends CpController
         $values = PublishForm::make(static::editFormBlueprint($set))
             ->submit($request->all());
 
-        $set
-            ->enabled(Arr::get($values, 'enabled'))
-            ->origins(Arr::get($values, 'origins'))
-            ->ensureLocalizations(); // We need to ensure localizations after merging values so that the origins are determined correctly.
+        if ($set->type() !== 'site') {
+            $set->enabled(Arr::get($values, 'enabled'));
+        }
+
+        $set->origins(Arr::get($values, 'origins'));
 
         if (! $set->enabled()) {
-            $set->localizations()->each(fn ($localization) => $set->removeLocalization($localization));
             RemoveSeoValues::handle($set->parent());
         }
 
