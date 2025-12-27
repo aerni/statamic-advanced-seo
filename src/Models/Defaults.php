@@ -2,6 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Models;
 
+use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
+use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -13,102 +19,111 @@ use Statamic\Facades\YAML;
 
 class Defaults extends Model
 {
+    protected static array $siteDefaultsConfig = [
+        'general' => [
+            'title' => 'General',
+            'blueprint' => GeneralBlueprint::class,
+            'data' => 'general.yaml',
+            'icon' => 'utilities',
+        ],
+        'indexing' => [
+            'title' => 'Indexing',
+            'blueprint' => IndexingBlueprint::class,
+            'data' => 'indexing.yaml',
+            'icon' => 'hierarchy',
+        ],
+        'social_media' => [
+            'title' => 'Social Media',
+            'blueprint' => SocialMediaBlueprint::class,
+            'data' => 'social_media.yaml',
+            'icon' => 'assets',
+        ],
+        'analytics' => [
+            'title' => 'Analytics',
+            'blueprint' => AnalyticsBlueprint::class,
+            'data' => 'analytics.yaml',
+            'icon' => 'money-graph-bar-increase',
+            'enabled' => fn () => collect(config('advanced-seo.analytics'))
+                ->reject(fn ($value, $key) => $key === 'environments')
+                ->filter()
+                ->isNotEmpty(),
+        ],
+        'favicons' => [
+            'title' => 'Favicons',
+            'blueprint' => FaviconsBlueprint::class,
+            'data' => 'favicons.yaml',
+            'icon' => 'edit-paint-palette',
+            'enabled' => fn () => config('advanced-seo.favicons.enabled', false),
+        ],
+    ];
+
     protected static function getRows(): array
     {
-        $site = [
-            [
-                'id' => 'site::general',
-                'type' => 'site',
-                'handle' => 'general',
-                'title' => 'General',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::class,
-                'data' => __DIR__.'/../../content/general.yaml',
-                'enabled' => true,
-                'icon' => 'utilities',
-                'type_icon' => 'web',
-                'set' => Seo::findOrMake('site', 'general'),
-            ],
-            [
-                'id' => 'site::indexing',
-                'type' => 'site',
-                'handle' => 'indexing',
-                'title' => 'Indexing',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::class,
-                'data' => __DIR__.'/../../content/indexing.yaml',
-                'enabled' => true,
-                'icon' => 'hierarchy',
-                'type_icon' => 'web',
-                'set' => Seo::findOrMake('site', 'indexing'),
-            ],
-            [
-                'id' => 'site::social_media',
-                'type' => 'site',
-                'handle' => 'social_media',
-                'title' => 'Social Media',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint::class,
-                'data' => __DIR__.'/../../content/social_media.yaml',
-                'enabled' => true,
-                'icon' => 'assets',
-                'type_icon' => 'web',
-                'set' => Seo::findOrMake('site', 'social_media'),
-            ],
-            [
-                'id' => 'site::analytics',
-                'type' => 'site',
-                'handle' => 'analytics',
-                'title' => 'Analytics',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
-                'data' => __DIR__.'/../../content/analytics.yaml',
-                'enabled' => collect(config('advanced-seo.analytics'))->reject(fn ($value, $key) => $key === 'environments')->filter()->isNotEmpty(),
-                'icon' => 'money-graph-bar-increase',
-                'type_icon' => 'web',
-                'set' => Seo::findOrMake('site', 'analytics'),
-            ],
-            [
-                'id' => 'site::favicons',
-                'type' => 'site',
-                'handle' => 'favicons',
-                'title' => 'Favicons',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::class,
-                'data' => __DIR__.'/../../content/favicons.yaml',
-                'enabled' => config('advanced-seo.favicons.enabled', false),
-                'icon' => 'edit-paint-palette',
-                'type_icon' => 'web',
-                'set' => Seo::findOrMake('site', 'favicons'),
-            ],
-        ];
+        return Blink::once('advanced-seo::defaults::rows', function () {
+            return collect(static::siteDefaults())
+                ->merge(static::collectionDefaults())
+                ->merge(static::taxonomyDefaults())
+                ->toArray();
+        });
+    }
 
-        $collections = CollectionFacade::all()->map(function ($collection) {
+    protected static function siteDefaults(): Collection
+    {
+        return collect(static::$siteDefaultsConfig)->map(function ($config, $handle) {
             return [
-                'id' => 'collections::'.$collection->handle(),
+                'id' => "site::{$handle}",
+                'type' => 'site',
+                'handle' => $handle,
+                'title' => $config['title'],
+                'blueprint' => $config['blueprint'],
+                'data' => static::contentPath($config['data']),
+                'enabled' => value($config['enabled'] ?? true),
+                'icon' => $config['icon'],
+                'type_icon' => 'web',
+                'set' => Seo::findOrMake('site', $handle),
+            ];
+        });
+    }
+
+    protected static function collectionDefaults(): Collection
+    {
+        return CollectionFacade::all()->map(function ($collection) {
+            return [
+                'id' => "collections::{$collection->handle()}",
                 'type' => 'collections',
                 'handle' => $collection->handle(),
                 'title' => $collection->title(),
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
-                'data' => __DIR__.'/../../content/content.yaml',
+                'blueprint' => ContentDefaultsBlueprint::class,
+                'data' => static::contentPath('content.yaml'),
                 'enabled' => true,
                 'icon' => $collection->icon(),
                 'type_icon' => 'collections',
                 'set' => Seo::findOrMake('collections', $collection->handle()),
             ];
         })->sortBy('handle');
+    }
 
-        $taxonomies = Taxonomy::all()->map(function ($taxonomy) {
+    protected static function taxonomyDefaults(): Collection
+    {
+        return Taxonomy::all()->map(function ($taxonomy) {
             return [
-                'id' => 'taxonomies::'.$taxonomy->handle(),
+                'id' => "taxonomies::{$taxonomy->handle()}",
                 'type' => 'taxonomies',
                 'handle' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
-                'data' => __DIR__.'/../../content/content.yaml',
+                'blueprint' => ContentDefaultsBlueprint::class,
+                'data' => static::contentPath('content.yaml'),
                 'enabled' => true,
                 'icon' => 'taxonomies',
                 'type_icon' => 'taxonomies',
                 'set' => Seo::findOrMake('taxonomies', $taxonomy->handle()),
             ];
         })->sortBy('handle');
+    }
 
-        return collect($site)->merge($collections)->merge($taxonomies)->toArray();
+    protected static function contentPath(string $file): string
+    {
+        return __DIR__."/../../content/{$file}";
     }
 
     protected static function all(): Collection
