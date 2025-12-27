@@ -51,9 +51,9 @@ class SeoVariables implements Contract, Augmentable, Localization
     {
         return $this->fluentlyGetOrSet('set')
             ->getter(function ($set) {
-                [$type, $handle] = explode('::', $set);
-
-                return Seo::find($type, $handle);
+                return Blink::once("seo-defaults-set-{$set}", function () use ($set) {
+                    return Seo::findOrMake(...explode('::', $set));
+                });
             })
             ->args(func_get_args());
     }
