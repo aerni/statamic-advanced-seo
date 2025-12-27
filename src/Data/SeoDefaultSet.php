@@ -94,15 +94,10 @@ class SeoDefaultSet implements Contract
     public function localizations(): Collection
     {
         return Blink::once('seo-defaults-localizations-'.$this->id(), function () {
-            return $this->freshLocalizations();
+            return app(SeoVariablesRepository::class)
+                ->whereSet($this->type(), $this->handle())
+                ->keyBy->locale();
         });
-    }
-
-    protected function freshLocalizations(): Collection
-    {
-        return app(SeoVariablesRepository::class)
-            ->whereSet($this->type(), $this->handle())
-            ->keyBy->locale();
     }
 
     public function sites(): Collection
@@ -247,12 +242,13 @@ class SeoDefaultSet implements Contract
 
     protected function saveOrDeleteLocalizations(): void
     {
-        $localizations = $this->freshLocalizations();
+        $localizations = $this->localizations();
 
         // Delete all localizations if the set is disabled.
         if (! $this->enabled()) {
             $localizations->each->delete();
             RemoveSeoValues::handle($this->parent());
+
             return;
         }
 
