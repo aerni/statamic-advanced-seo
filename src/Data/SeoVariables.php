@@ -155,7 +155,7 @@ class SeoVariables implements Contract, Augmentable, Localization
 
     protected function shouldRemoveNullsFromFileData()
     {
-        return ! $this->hasOrigin();
+        return $this->isRoot();
     }
 
     public function sites(): Collection
