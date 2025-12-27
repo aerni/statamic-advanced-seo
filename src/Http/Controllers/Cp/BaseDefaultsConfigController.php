@@ -18,13 +18,13 @@ abstract class BaseDefaultsConfigController extends CpController
 
     public function edit(string $handle)
     {
-        $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
+        $defaults = Defaults::first(fn ($row) => $row->id() === "{$this->type()}::{$handle}");
 
-        $set = $defaults['set'];
+        $set = $defaults->set();
 
         // The global feature enabled state. e.g. used by site defaults like favicons.
         // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
-        throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
+        throw_unless($defaults->enabled(), new NotFoundHttpException);
 
         $this->authorize('configure', [SeoDefaultSet::class, $set]);
 
@@ -37,16 +37,16 @@ abstract class BaseDefaultsConfigController extends CpController
             ->parent($set)
             ->asConfig()
             ->icon('cog')
-            ->title("Configure {$defaults['title']}")
+            ->title("Configure {$defaults->title}")
             ->values($values) // TODO: Don't use data. What does Collection do here?
             ->submittingTo($set->editUrl());
     }
 
     public function update(Request $request, string $handle): void
     {
-        $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
+        $defaults = Defaults::first(fn ($row) => $row->id() === "{$this->type()}::{$handle}");
 
-        $set = $defaults['set'];
+        $set = $defaults->set();
 
         $this->authorize('configure', [SeoDefaultSet::class, $set]);
 

@@ -33,7 +33,7 @@ class DashboardController extends CpController
                 'type' => $type,
                 'title' => ucfirst($type),
                 'route' => cp_route("advanced-seo.{$type}.index"),
-                'icon' => $type === 'site' ? 'web' : $defaults->first()['icon'],
+                'icon' => $type === 'site' ? 'web' : $defaults->first()->icon,
             ])
             ->values();
     }

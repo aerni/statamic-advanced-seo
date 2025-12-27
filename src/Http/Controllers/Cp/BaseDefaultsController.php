@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoDefault;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
@@ -32,15 +33,15 @@ abstract class BaseDefaultsController extends CpController
         $site = SiteFacade::selected();
 
         $items = Defaults::enabledInType($this->type())
-            ->filter(fn ($default) => User::current()->can('edit', [SeoDefaultSet::class, $default['set'], $site]))
-            ->filter(fn ($default) => $default['set']->availableInSite($site))
-            ->filter(fn ($default) => $this->canConfigure($default['set']) || $default['set']->enabled())
-            ->map(fn ($default) => [
-                ...$default,
-                'enabled' => $default['set']->enabled(),
-                'configurable' => $this->canConfigure($default['set']),
-                'edit_url' => $default['set']->in(Sites::selected()->handle())->editUrl(),
-                'config_url' => $default['set']->editUrl(),
+            ->filter(fn (SeoDefault $default) => User::current()->can('edit', [SeoDefaultSet::class, $default->set(), $site]))
+            ->filter(fn (SeoDefault $default) => $default->set()->availableInSite($site))
+            ->filter(fn (SeoDefault $default) => $this->canConfigure($default->set()) || $default->set()->enabled())
+            ->map(fn (SeoDefault $default) => [
+                ...$default->toArray(),
+                'enabled' => $default->set()->enabled(),
+                'configurable' => $this->canConfigure($default->set()),
+                'edit_url' => $default->set()->in(Sites::selected()->handle())->editUrl(),
+                'config_url' => $default->set()->editUrl(),
             ])
             ->values();
 
@@ -57,13 +58,13 @@ abstract class BaseDefaultsController extends CpController
 
     public function edit(Request $request, string $handle, Site $site): mixed
     {
-        $defaults = Defaults::firstWhere('id', "{$this->type()}::{$handle}");
+        $defaults = Defaults::first(fn ($row) => $row->id() === "{$this->type()}::{$handle}");
 
-        $set = $defaults['set'];
+        $set = $defaults->set();
 
         // TODO: The global feature enabled state. e.g. used by site defaults like favicons.
         // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
-        throw_unless($defaults['enabled'] ?? false, new NotFoundHttpException);
+        throw_unless($defaults->enabled(), new NotFoundHttpException);
         throw_unless($set->enabled(), new NotFoundHttpException);
         throw_unless($set->availableInSite($site), new NotFoundHttpException);
 
@@ -80,8 +81,8 @@ abstract class BaseDefaultsController extends CpController
         }
 
         $viewData = [
-            'title' => $defaults['title'],
-            'icon' => $defaults['icon'],
+            'title' => $defaults->title,
+            'icon' => $defaults->icon,
             'blueprint' => $blueprint->toPublishArray(),
             'initialReference' => $localization->reference(),
             'initialValues' => $values,

@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Policies;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Data\SeoDefault;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Site as Sites;
@@ -29,10 +30,10 @@ class SeoConfigurationPolicy
         $user = UserFacade::fromUser($user);
 
         return Defaults::enabledInType($type)
-            ->contains(function (array $default) use ($user) {
-                return $default['set']
+            ->contains(function (SeoDefault $default) use ($user) {
+                return $default->set()
                     ->sites()
-                    ->contains(fn ($site) => $this->edit($user, $default['set'], $site));
+                    ->contains(fn ($site) => $this->edit($user, $default->set(), $site));
             });
     }
 

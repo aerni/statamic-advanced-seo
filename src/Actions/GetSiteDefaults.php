@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Data\SeoDefault;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
@@ -20,10 +21,10 @@ class GetSiteDefaults
 
         return Blink::once("advanced-seo::site::{$locale}", function () use ($locale, $data) {
             $siteDefaults = Defaults::enabledInType('site')
-                ->flatMap(fn ($model) => GetAugmentedDefaults::handle(
+                ->flatMap(fn (SeoDefault $default) => GetAugmentedDefaults::handle(
                     new DefaultsData(
-                        type: 'site',
-                        handle: $model['handle'],
+                        type: $default->type,
+                        handle: $default->handle,
                         locale: $locale,
                         sites: Site::all()->map->handle(),
                     )
