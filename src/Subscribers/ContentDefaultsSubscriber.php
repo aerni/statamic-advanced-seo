@@ -30,6 +30,7 @@ class ContentDefaultsSubscriber
         $handle = $property->handle();
 
         // Abort if Collection or Taxnomy was disabled in the config.
+        // TODO: Refactor this to use $set->enabled().
         if (in_array($handle, config("advanced-seo.disabled.{$type}", []))) {
             return;
         }

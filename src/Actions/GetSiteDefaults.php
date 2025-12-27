@@ -20,7 +20,7 @@ class GetSiteDefaults
         }
 
         return Blink::once("advanced-seo::site::{$locale}", function () use ($locale, $data) {
-            $siteDefaults = Defaults::enabledInType('site')
+            $siteDefaults = Defaults::whereType('site')
                 ->flatMap(fn (SeoDefault $default) => GetAugmentedDefaults::handle(
                     new DefaultsData(
                         type: $default->type,

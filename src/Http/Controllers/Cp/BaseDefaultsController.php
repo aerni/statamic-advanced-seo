@@ -32,7 +32,7 @@ abstract class BaseDefaultsController extends CpController
 
         $site = SiteFacade::selected();
 
-        $items = Defaults::enabledInType($this->type())
+        $items = Defaults::whereType($this->type())
             ->filter(fn (SeoDefault $default) => User::current()->can('edit', [SeoDefaultSet::class, $default->set(), $site]))
             ->filter(fn (SeoDefault $default) => $default->set()->availableInSite($site))
             ->filter(fn (SeoDefault $default) => $this->canConfigure($default->set()) || $default->set()->enabled())
@@ -58,13 +58,12 @@ abstract class BaseDefaultsController extends CpController
 
     public function edit(Request $request, string $handle, Site $site): mixed
     {
-        $defaults = Defaults::first(fn ($row) => $row->id() === "{$this->type()}::{$handle}");
+        $defaults = Defaults::find("{$this->type()}::{$handle}");
+
+        throw_unless($defaults, new NotFoundHttpException);
 
         $set = $defaults->set();
 
-        // TODO: The global feature enabled state. e.g. used by site defaults like favicons.
-        // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
-        throw_unless($defaults->enabled(), new NotFoundHttpException);
         throw_unless($set->enabled(), new NotFoundHttpException);
         throw_unless($set->availableInSite($site), new NotFoundHttpException);
 
@@ -113,6 +112,10 @@ abstract class BaseDefaultsController extends CpController
 
     public function update(Request $request, string $handle, Site $site): void
     {
+        // TODO: Should we use Defaults:: instead?
+        // $defaults = Defaults::find("{$this->type()}::{$handle}");
+        // throw_unless($defaults, new NotFoundHttpException);
+
         $set = Seo::findOrMake($this->type(), $handle);
 
         throw_unless($set->enabled(), new NotFoundHttpException);

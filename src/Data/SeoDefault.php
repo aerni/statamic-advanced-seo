@@ -15,7 +15,6 @@ class SeoDefault
         public readonly string $blueprint,
         public readonly string $data,
         public readonly string $icon,
-        public readonly ?bool $enabled = null,
     ) {}
 
     public function set(): SeoDefaultSet
@@ -32,7 +31,7 @@ class SeoDefault
 
     public function enabled(): bool
     {
-        return $this->enabled ?? $this->set()->enabled();
+        return $this->set()->enabled();
     }
 
     public function toArray(): array

@@ -38,7 +38,7 @@ class MigrateSiteNamePosition extends UpdateScript
             ->map(fn ($value) => Arr::get($mapping, $value));
 
         // Set the site name position for all collection defaults.
-        Defaults::enabledInType('collections')
+        Defaults::whereType('collections')
             ->map(fn ($default) => Seo::findOrMake($default->type, $default->handle))
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {
@@ -47,7 +47,7 @@ class MigrateSiteNamePosition extends UpdateScript
             });
 
         // Set the site name position for all taxonomy defaults.
-        Defaults::enabledInType('taxonomies')
+        Defaults::whereType('taxonomies')
             ->map(fn ($default) => Seo::findOrMake($default->type, $default->handle))
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {

@@ -26,7 +26,7 @@ class DashboardController extends CpController
 
     protected function defaults(): Collection
     {
-        return Defaults::enabled()
+        return Defaults::all()
             ->groupBy('type')
             ->filter(fn ($defaults, $type) => User::current()->can('viewAny', [SeoDefaultSet::class, $type]))
             ->map(fn ($defaults, $type) => [

@@ -115,7 +115,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
-            $navItems = Defaults::enabled()
+            $navItems = Defaults::all()
                 ->groupBy('type')
                 ->filter(fn ($defaults, $type) => User::current()->can('viewAny', [SeoDefaultSet::class, $type]))
                 ->map(fn ($default, $type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"));

@@ -18,13 +18,11 @@ abstract class BaseDefaultsConfigController extends CpController
 
     public function edit(string $handle)
     {
-        $defaults = Defaults::first(fn ($row) => $row->id() === "{$this->type()}::{$handle}");
+        $defaults = Defaults::find("{$this->type()}::{$handle}");
+
+        throw_unless($defaults, new NotFoundHttpException);
 
         $set = $defaults->set();
-
-        // The global feature enabled state. e.g. used by site defaults like favicons.
-        // Might be able to get rid of it at some point. We already determine enabled state per locale for collections/taxonomies now.
-        throw_unless($defaults->enabled(), new NotFoundHttpException);
 
         $this->authorize('configure', [SeoDefaultSet::class, $set]);
 
@@ -44,7 +42,9 @@ abstract class BaseDefaultsConfigController extends CpController
 
     public function update(Request $request, string $handle): void
     {
-        $defaults = Defaults::first(fn ($row) => $row->id() === "{$this->type()}::{$handle}");
+        $defaults = Defaults::find("{$this->type()}::{$handle}");
+
+        throw_unless($defaults, new NotFoundHttpException);
 
         $set = $defaults->set();
 

@@ -71,17 +71,18 @@ class Defaults extends Registry
 
     protected static function siteDefaults(): Collection
     {
-        return collect(static::siteDefaultsConfig())->map(function ($config, $handle) {
-            return new SeoDefault(
-                type: 'site',
-                handle: $handle,
-                title: $config['title'],
-                blueprint: $config['blueprint'],
-                data: static::contentPath($config['data']),
-                icon: $config['icon'],
-                enabled: $config['enabled'],
-            );
-        });
+        return collect(static::siteDefaultsConfig())
+            ->filter(fn ($config) => $config['enabled'])
+            ->map(function ($config, $handle) {
+                return new SeoDefault(
+                    type: 'site',
+                    handle: $handle,
+                    title: $config['title'],
+                    blueprint: $config['blueprint'],
+                    data: static::contentPath($config['data']),
+                    icon: $config['icon'],
+                );
+            });
     }
 
     protected static function collectionDefaults(): Collection
@@ -133,21 +134,16 @@ class Defaults extends Registry
 
     protected static function blueprint(string $id): ?string
     {
-        return static::all()->first(fn ($row) => $row->id() === $id)?->blueprint;
+        return static::find($id)?->blueprint;
     }
 
-    protected static function enabled(): Collection
+    protected static function find(string $id): ?SeoDefault
     {
-        return static::all()->filter(fn ($row) => $row->enabled());
+        return static::all()->first(fn ($row) => $row->id() === $id);
     }
 
-    protected static function enabledInType(string $type): Collection
+    protected static function whereType(string $type): Collection
     {
-        return static::all()->filter(fn ($row) => $row->type === $type && $row->enabled());
-    }
-
-    protected static function isEnabled(string $id): bool
-    {
-        return static::all()->contains(fn ($row) => $row->id() === $id && $row->enabled());
+        return static::all()->filter(fn ($row) => $row->type === $type);
     }
 }

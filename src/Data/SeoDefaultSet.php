@@ -217,13 +217,6 @@ class SeoDefaultSet implements Contract
         };
     }
 
-    // TODO: This is just a feature toggle for things like favicons.
-    // The enabled state for collections/taxonomies is saved in $this->data.
-    public function isEnabled(): bool
-    {
-        return Defaults::isEnabled("{$this->type()}::{$this->handle()}");
-    }
-
     public function save(): self
     {
         \Aerni\AdvancedSeo\Facades\Seo::save($this);

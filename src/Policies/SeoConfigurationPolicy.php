@@ -29,7 +29,7 @@ class SeoConfigurationPolicy
     {
         $user = UserFacade::fromUser($user);
 
-        return Defaults::enabledInType($type)
+        return Defaults::whereType($type)
             ->contains(function (SeoDefault $default) use ($user) {
                 return $default->set()
                     ->sites()

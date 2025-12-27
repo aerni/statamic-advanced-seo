@@ -13,11 +13,11 @@ class IsEnabledModel
         $parent = EvaluateModelParent::handle($model);
 
         if ($parent instanceof Collection) {
-            return Defaults::isEnabled("collections::{$parent->handle()}");
+            return Defaults::find("collections::{$parent->handle()}")?->enabled() ?? false;
         }
 
         if ($parent instanceof Taxonomy) {
-            return Defaults::isEnabled("taxonomies::{$parent->handle()}");
+            return Defaults::find("taxonomies::{$parent->handle()}")?->enabled() ?? false;
         }
 
         return false;
