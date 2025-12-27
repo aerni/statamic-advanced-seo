@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Policies;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoDefault;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\User as UserFacade;

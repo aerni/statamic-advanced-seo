@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 

@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;

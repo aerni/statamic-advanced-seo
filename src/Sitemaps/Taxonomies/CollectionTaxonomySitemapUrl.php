@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;

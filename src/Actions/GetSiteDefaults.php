@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Data\SeoDefault;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;

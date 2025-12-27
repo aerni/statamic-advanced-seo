@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Models;
+namespace Aerni\AdvancedSeo\Registries;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;

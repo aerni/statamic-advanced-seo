@@ -7,7 +7,7 @@ use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
 use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
 use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Blink;

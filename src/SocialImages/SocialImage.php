@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\SocialImages;
 
 use Aerni\AdvancedSeo\Facades\SocialImage as SocialImageApi;
-use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Aerni\AdvancedSeo\Registries\SocialImageTheme;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;

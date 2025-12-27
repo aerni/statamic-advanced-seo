@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Aerni\AdvancedSeo\Models\SocialImageTheme;
+use Aerni\AdvancedSeo\Registries\SocialImageTheme;
 use Illuminate\Support\Str;
 
 class OnPageSeoFields extends BaseFields

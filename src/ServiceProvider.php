@@ -12,7 +12,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Blade;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Aerni\AdvancedSeo\Stache\Stores\SeoStore;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\EntryInterface;

@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\UpdateScripts;
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Illuminate\Support\Arr;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;

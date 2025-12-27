@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 
 class GeneralFields extends BaseFields
 {

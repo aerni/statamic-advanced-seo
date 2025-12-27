@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Site;

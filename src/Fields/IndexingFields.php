@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SiteVerification;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 
 class IndexingFields extends BaseFields
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Models;
+namespace Aerni\AdvancedSeo\Registries;
 
 use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
 use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;

@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Statamic\CP\PublishForm;

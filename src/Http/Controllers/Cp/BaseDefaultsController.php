@@ -7,7 +7,7 @@ use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\Data\SeoDefault;
 use Aerni\AdvancedSeo\Data\SeoVariables;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Registries\Defaults;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
