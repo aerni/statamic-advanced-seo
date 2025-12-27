@@ -103,9 +103,20 @@ class SeoVariables implements Contract, Augmentable, Localization
 
     public function save(): self
     {
+        $this->ensureSeoSetExists();
+
         app(SeoVariablesRepository::class)->save($this);
 
         return $this;
+    }
+
+    protected function ensureSeoSetExists(): void
+    {
+        $set = $this->seoSet();
+
+        if (! $set->initialPath()) {
+            $set->save();
+        }
     }
 
     public function delete(): bool
