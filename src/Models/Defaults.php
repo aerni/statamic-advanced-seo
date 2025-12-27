@@ -16,7 +16,7 @@ use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\YAML;
 
-class Defaults extends Model
+class Defaults extends Registry
 {
     protected static function siteDefaultsConfig(): array
     {
@@ -62,14 +62,11 @@ class Defaults extends Model
         ];
     }
 
-    protected static function getRows(): array
+    protected static function make(): Collection
     {
-        return Blink::once('advanced-seo::defaults::rows', function () {
-            return collect(static::siteDefaults())
-                ->merge(static::collectionDefaults())
-                ->merge(static::taxonomyDefaults())
-                ->all();
-        });
+        return collect(static::siteDefaults())
+            ->merge(static::collectionDefaults())
+            ->merge(static::taxonomyDefaults());
     }
 
     protected static function siteDefaults(): Collection
@@ -120,15 +117,10 @@ class Defaults extends Model
         return __DIR__."/../../content/{$file}";
     }
 
-    protected static function all(): Collection
-    {
-        return static::$rows;
-    }
-
     protected static function data(string $id): Collection
     {
         return Blink::once("advanced-seo::defaults::data::$id", function () use ($id) {
-            $model = static::$rows->filter(fn ($row) => Str::contains($row->id(), $id))->first();
+            $model = static::all()->filter(fn ($row) => Str::contains($row->id(), $id))->first();
             $path = $model?->data;
 
             if (is_null($path)) {
@@ -141,21 +133,21 @@ class Defaults extends Model
 
     protected static function blueprint(string $id): ?string
     {
-        return static::$rows->first(fn ($row) => $row->id() === $id)?->blueprint;
+        return static::all()->first(fn ($row) => $row->id() === $id)?->blueprint;
     }
 
     protected static function enabled(): Collection
     {
-        return static::$rows->filter(fn ($row) => $row->enabled());
+        return static::all()->filter(fn ($row) => $row->enabled());
     }
 
     protected static function enabledInType(string $type): Collection
     {
-        return static::$rows->filter(fn ($row) => $row->type === $type && $row->enabled());
+        return static::all()->filter(fn ($row) => $row->type === $type && $row->enabled());
     }
 
     protected static function isEnabled(string $id): bool
     {
-        return static::$rows->contains(fn ($row) => $row->id() === $id && $row->enabled());
+        return static::all()->contains(fn ($row) => $row->id() === $id && $row->enabled());
     }
 }

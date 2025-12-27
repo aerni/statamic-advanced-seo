@@ -4,11 +4,11 @@ namespace Aerni\AdvancedSeo\Models;
 
 use Illuminate\Support\Collection;
 
-class SocialImage extends Model
+class SocialImage extends Registry
 {
     public static $types = ['open_graph', 'twitter_summary', 'twitter_summary_large_image'];
 
-    protected static function getRows(): array
+    protected static function make(): array
     {
         return [
             'open_graph' => [
@@ -43,13 +43,8 @@ class SocialImage extends Model
         ];
     }
 
-    protected static function all(): Collection
-    {
-        return static::$rows;
-    }
-
     protected static function groups(): Collection
     {
-        return collect(static::$rows)->groupBy('group');
+        return static::all()->groupBy('group');
     }
 }

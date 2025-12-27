@@ -6,16 +6,16 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Facades\Folder;
 
-class SocialImageTheme extends Model
+class SocialImageTheme extends Registry
 {
-    protected static function getRows(): array
+    protected static function make(): Collection
     {
         if (config('advanced-seo.social_images.generator.enabled', false) && ! Folder::disk('resources')->exists('views/social_images')) {
             throw new \Exception('You need to create at least one theme for your social images.');
         }
 
         if (! Folder::disk('resources')->exists('views/social_images')) {
-            return [];
+            return collect();
         }
 
         $themes = Folder::disk('resources')
@@ -49,29 +49,24 @@ class SocialImageTheme extends Model
             throw new \Exception('You need to create at least one theme for your social images.');
         }
 
-        return $themes->toArray();
-    }
-
-    protected static function all(): Collection
-    {
-        return static::$rows;
+        return $themes;
     }
 
     protected static function templatesOfType(string $id): Collection
     {
-        return static::$rows->mapWithKeys(function ($theme) use ($id) {
+        return static::all()->mapWithKeys(function ($theme) use ($id) {
             return [$theme['handle'] => collect($theme['templates'])->first(fn ($view, $key) => $key === $id)];
         })->filter();
     }
 
     protected static function fieldtypeOptions(): array
     {
-        return static::$rows->flatMap(fn ($theme) => [$theme['handle'] => $theme['title']])->toArray();
+        return static::all()->flatMap(fn ($theme) => [$theme['handle'] => $theme['title']])->toArray();
     }
 
     protected static function fieldtypeDefault(): ?string
     {
-        $theme = static::$rows->firstWhere('handle', 'default') ?? static::$rows->first();
+        $theme = static::all()->firstWhere('handle', 'default') ?? static::all()->first();
 
         return $theme['handle'] ?? null;
     }
