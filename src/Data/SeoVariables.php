@@ -42,11 +42,6 @@ class SeoVariables implements Contract, Augmentable, Localization
         $this->data = collect();
     }
 
-    public function enabled(): bool
-    {
-        return $this->seoSet()->enabled();
-    }
-
     public function seoSet(?string $set = null)
     {
         return $this->fluentlyGetOrSet('set')
