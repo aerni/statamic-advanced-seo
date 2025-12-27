@@ -154,11 +154,15 @@ class SourceFieldtype extends Fieldtype
         $parent = $this->field->parent();
         $field = $this->config('auto');
 
-        return match (true) {
-            ($parent instanceof Entry) => $parent->$field,
-            ($parent instanceof Term) => $parent->in(EvaluateModelLocale::handle($parent))->$field,
-            default => null
-        };
+        if (! $parent || ! $field) {
+            return null;
+        }
+
+        if ($parent instanceof Term) {
+            return $parent->in(EvaluateModelLocale::handle($parent))->$field;
+        }
+
+        return $parent->$field;
     }
 
     protected function parseFieldValues($data): mixed
