@@ -2,22 +2,22 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
+use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
+use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Aerni\AdvancedSeo\Models\Defaults;
+use Illuminate\Support\Collection;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
-use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Models\Defaults;
-use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Aerni\AdvancedSeo\Events\SeoDefaultSetSaved;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Facades\Collection as CollectionFacade;
-use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
 
 class SeoDefaultSet implements Contract
 {
@@ -77,7 +77,6 @@ class SeoDefaultSet implements Contract
                 }
 
                 return collect($origins);
-
             })
             ->setter(function ($origins) {
                 // TODO: Should we not set anything if there is only one origin?
@@ -161,18 +160,14 @@ class SeoDefaultSet implements Contract
             ->locale($site);
     }
 
-
     public function in(string $site): ?SeoVariables
     {
         if (! $this->availableInSite($site)) {
             return null;
         }
 
-        if (! $variables = $this->localizations()->get($site)) {
-            $variables = $this->makeLocalization($site);
-        }
-
-        return $variables;
+        return $this->localizations()->get($site)
+            ?? $this->makeLocalization($site);
     }
 
     public function inSelectedSite(): ?SeoVariables
