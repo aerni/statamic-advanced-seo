@@ -2,25 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Blink;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Stache;
-use Statamic\Fields\Blueprint;
-use Statamic\Data\ContainsData;
-use Statamic\Data\ExistsAsFile;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Contracts\SeoVariables as Contract;
+use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
-use Statamic\GraphQL\ResolvesValues;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Data\HasAugmentedInstance;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Fields\Blueprint;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
-use Aerni\AdvancedSeo\Contracts\SeoVariables as Contract;
 
 class SeoVariables implements Contract, Augmentable, Localization
 {
@@ -53,6 +52,7 @@ class SeoVariables implements Contract, Augmentable, Localization
         return $this->fluentlyGetOrSet('set')
             ->getter(function ($set) {
                 [$type, $handle] = explode('::', $set);
+
                 return Seo::find($type, $handle);
             })
             ->args(func_get_args());
@@ -113,31 +113,6 @@ class SeoVariables implements Contract, Augmentable, Localization
         app(SeoVariablesRepository::class)->delete($this);
 
         return true;
-    }
-
-    public function defaultData(): Collection
-    {
-        // Get the default value of each field from the blueprint.
-        $defaultData = $this->blueprint()->fields()->all()->map->defaultValue();
-
-        // Only keep default fields with values that should be saved to file.
-        return $defaultData->filter(fn ($value) => $value !== null && $value !== []);
-    }
-
-    // TODO: We are not using this anywhere anymore. Need to add it again?
-    public function withDefaultData(): self
-    {
-        if ($this->isRoot()) {
-            $this->data = $this->defaultData()->merge($this->data());
-        }
-
-        if ($this->hasOrigin()) {
-            $this->data = $this->defaultData()
-                ->diffAssoc($this->origin()->defaultData())
-                ->merge($this->data());
-        }
-
-        return $this;
     }
 
     public function blueprintFields(): array
