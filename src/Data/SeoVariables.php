@@ -34,7 +34,7 @@ class SeoVariables implements Contract, Augmentable, Localization
         resolveGqlValue as traitResolveGqlValue;
     }
 
-    protected SeoDefaultSet $set;
+    protected string $set;
 
     protected string $locale;
 
@@ -48,14 +48,10 @@ class SeoVariables implements Contract, Augmentable, Localization
         return $this->seoSet()->enabled();
     }
 
-    public function seoSet($set = null)
+    public function seoSet(?string $set = null)
     {
         return $this->fluentlyGetOrSet('set')
-            ->setter(function ($set) {
-                if ($set instanceof SeoDefaultSet) {
-                    return $set;
-                }
-
+            ->getter(function ($set) {
                 [$type, $handle] = explode('::', $set);
                 return Seo::find($type, $handle);
             })
