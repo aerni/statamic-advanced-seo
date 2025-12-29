@@ -3,16 +3,16 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Stache\Repositories\SeoDefaultsRepository as StacheRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoSetsRepository as StacheRepository;
 use Illuminate\Support\Collection;
 use Statamic\Data\DataCollection;
 use Statamic\Facades\Blink;
 
-class SeoDefaultsRepository extends StacheRepository
+class SeoSetsRepository extends StacheRepository
 {
     public function find(string $type, string $handle): ?SeoDefaultSet
     {
-        return Blink::once("eloquent-advanced-seo-defaults-{$type}-{$handle}", function () use ($type, $handle) {
+        return Blink::once("eloquent-advanced-seo-sets-{$type}-{$handle}", function () use ($type, $handle) {
             $model = app('advanced_seo.model')::query()
                 ->whereType($type)
                 ->whereHandle($handle)
@@ -26,7 +26,7 @@ class SeoDefaultsRepository extends StacheRepository
 
     public function all(): Collection
     {
-        return Blink::once('eloquent-advanced-seo-defaults', function () {
+        return Blink::once('eloquent-advanced-seo-sets', function () {
             return app('advanced_seo.model')::all()
                 ->map(fn ($model) => app(SeoDefaultSet::class)::fromModel($model));
         });
@@ -34,7 +34,7 @@ class SeoDefaultsRepository extends StacheRepository
 
     public function allOfType(string $type): DataCollection
     {
-        return Blink::once("eloquent-advanced-seo-defaults-{$type}", function () use ($type) {
+        return Blink::once("eloquent-advanced-seo-sets-{$type}", function () use ($type) {
             $models = app('advanced_seo.model')::query()
                 ->whereType($type)
                 ->get()
@@ -52,9 +52,9 @@ class SeoDefaultsRepository extends StacheRepository
 
         $set->model($model->fresh());
 
-        Blink::forget('eloquent-advanced-seo-defaults');
-        Blink::forget("eloquent-advanced-seo-defaults-{$set->type()}");
-        Blink::forget("eloquent-advanced-seo-defaults-{$set->type()}-{$set->handle()}");
+        Blink::forget('eloquent-advanced-seo-sets');
+        Blink::forget("eloquent-advanced-seo-sets-{$set->type()}");
+        Blink::forget("eloquent-advanced-seo-sets-{$set->type()}-{$set->handle()}");
 
         return $this;
     }
@@ -63,9 +63,9 @@ class SeoDefaultsRepository extends StacheRepository
     {
         $set->model()->delete();
 
-        Blink::forget('eloquent-advanced-seo-defaults');
-        Blink::forget("eloquent-advanced-seo-defaults-{$set->type()}");
-        Blink::forget("eloquent-advanced-seo-defaults-{$set->type()}-{$set->handle()}");
+        Blink::forget('eloquent-advanced-seo-sets');
+        Blink::forget("eloquent-advanced-seo-sets-{$set->type()}");
+        Blink::forget("eloquent-advanced-seo-sets-{$set->type()}-{$set->handle()}");
 
         return true;
     }

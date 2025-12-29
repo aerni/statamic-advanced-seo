@@ -3,25 +3,27 @@
 namespace Aerni\AdvancedSeo\Data;
 
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Aerni\AdvancedSeo\Contracts\SeoVariables as Contract;
-use Aerni\AdvancedSeo\Contracts\SeoVariablesRepository;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Data\Localization;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Blueprint;
 use Statamic\GraphQL\ResolvesValues;
+use Statamic\Sites\Site as SiteObject;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class SeoVariables implements Augmentable, Contract, Localization
+class SeoSetLocalization implements Augmentable, Contract
 {
     use ContainsData;
     use ExistsAsFile;
@@ -33,29 +35,21 @@ class SeoVariables implements Augmentable, Contract, Localization
         resolveGqlValue as traitResolveGqlValue;
     }
 
-    protected string $set;
-
-    protected string $locale;
-
-    public function __construct()
-    {
+    public function __construct(
+        protected readonly string $seoSet,
+        protected readonly string $locale,
+    ) {
         $this->data = collect();
     }
 
-    public function seoSet(?string $set = null)
+    public function seoSet(): SeoSet
     {
-        return $this->fluentlyGetOrSet('set')
-            ->getter(function ($set) {
-                return Blink::once("seo-sets-set-{$set}", function () use ($set) {
-                    return Seo::findOrMake(...explode('::', $set));
-                });
-            })
-            ->args(func_get_args());
+        return Blink::once("seo::{$this->seoSet}", fn () => Seo::find($this->seoSet));
     }
 
-    public function locale($locale = null)
+    public function locale(): string
     {
-        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
+        return $this->locale;
     }
 
     public function id(): string
@@ -65,58 +59,50 @@ class SeoVariables implements Augmentable, Contract, Localization
 
     public function handle(): string
     {
-        return $this->seoSet()->handle();
+        return $this->seoSet()->handle;
     }
 
     public function title(): string
     {
-        return $this->seoSet()->title();
+        return $this->seoSet()->title;
     }
 
     public function type(): string
     {
-        return $this->seoSet()->type();
+        return $this->seoSet()->type;
     }
 
     public function path(): string
     {
-        return vsprintf('%s/%s/%s.yaml', [
-            Stache::store('seo')->store($this->type())->directory(),
+        return Path::assemble(
+            Stache::store('seo-set-configs')->directory(),
+            $this->type(),
             $this->locale(),
-            $this->handle(),
-        ]);
+            "{$this->handle()}.yaml"
+        );
     }
 
     public function editUrl(): string
     {
-        return match ($this->type()) {
-            'site' => cp_route('advanced-seo.site.defaults', [$this->handle(), $this->locale()]),
-            'collections' => cp_route('advanced-seo.collections.defaults', [$this->handle(), $this->locale()]),
-            'taxonomies' => cp_route('advanced-seo.taxonomies.defaults', [$this->handle(), $this->locale()]),
-        };
+        return cp_route("advanced-seo.{$this->type()}.localization", [$this->handle(), $this->locale()]);
     }
 
     public function save(): self
     {
-        $this->ensureSeoSetExists();
+        $config = $this->seoSet()->config();
 
-        app(SeoVariablesRepository::class)->save($this);
+        if (! $config->initialPath()) {
+            $config->save();
+        }
+
+        SeoLocalization::save($this);
 
         return $this;
     }
 
-    protected function ensureSeoSetExists(): void
-    {
-        $set = $this->seoSet();
-
-        if (! $set->initialPath()) {
-            $set->save();
-        }
-    }
-
     public function delete(): bool
     {
-        app(SeoVariablesRepository::class)->delete($this);
+        SeoLocalization::delete($this);
 
         return true;
     }
@@ -144,14 +130,9 @@ class SeoVariables implements Augmentable, Contract, Localization
         return $this->seoSet()->sites();
     }
 
-    public function site()
+    public function site(): SiteObject
     {
         return Site::get($this->locale());
-    }
-
-    public function reference(): string
-    {
-        return "seo::{$this->id()}";
     }
 
     public function blueprint(): Blueprint
@@ -161,7 +142,7 @@ class SeoVariables implements Augmentable, Contract, Localization
             ->blueprint();
     }
 
-    public function origin($origin = null)
+    public function origin(?string $origin = null): Contract|self|null
     {
         if (func_num_args() === 0) {
             if ($found = Blink::get($this->getOriginBlinkKey())) {
@@ -189,7 +170,7 @@ class SeoVariables implements Augmentable, Contract, Localization
 
         $origins = $this->seoSet()->origins()->put($this->locale(), $origin)->all();
 
-        $this->seoSet()->origins($origins);
+        $this->seoSet()->config()->origins($origins);
 
         return $this;
     }
@@ -210,6 +191,6 @@ class SeoVariables implements Augmentable, Contract, Localization
 
     public function newAugmentedInstance(): Augmented
     {
-        return new AugmentedVariables($this);
+        return new AugmentedLocalization($this);
     }
 }

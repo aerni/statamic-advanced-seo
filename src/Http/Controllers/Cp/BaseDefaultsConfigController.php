@@ -2,13 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Registries\Defaults;
+use Aerni\AdvancedSeo\Contracts\SeoSet as SeoSetContract;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Statamic\CP\PublishForm;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -16,58 +15,53 @@ abstract class BaseDefaultsConfigController extends CpController
 {
     abstract protected function type(): string;
 
-    public function edit(string $handle)
+    public function edit(SeoSet $seoSet): PublishForm
     {
-        $defaults = Defaults::find("{$this->type()}::{$handle}");
+        $this->authorize('configure', [SeoSetContract::class, $seoSet]);
 
-        throw_unless($defaults, new NotFoundHttpException);
+        $config = $seoSet->config();
 
-        $set = $defaults->set();
-
-        $this->authorize('configure', [SeoDefaultSet::class, $set]);
-
-        $values = [
-            'enabled' => $set->enabled(),
-            'origins' => $set->origins(),
-        ];
-
-        return PublishForm::make(static::editFormBlueprint($set))
-            ->parent($set)
+        return PublishForm::make(static::editFormBlueprint($config))
+            ->parent($seoSet)
             ->asConfig()
             ->icon('cog')
-            ->title("Configure {$defaults->title}")
-            ->values($values) // TODO: Don't use data. What does Collection do here?
-            ->submittingTo($set->editUrl());
+            ->title("Configure {$seoSet->title}")
+            ->values([
+                'enabled' => $config->enabled(),
+                'origins' => $config->origins(),
+            ])
+            ->submittingTo($config->editUrl());
     }
 
-    public function update(Request $request, string $handle): void
+    public function update(Request $request, SeoSet $seoSet): void
     {
-        $defaults = Defaults::find("{$this->type()}::{$handle}");
+        $this->authorize('configure', [SeoSetContract::class, $seoSet]);
 
-        throw_unless($defaults, new NotFoundHttpException);
+        $config = $seoSet->config();
 
-        $set = $defaults->set();
-
-        $this->authorize('configure', [SeoDefaultSet::class, $set]);
-
-        $values = PublishForm::make(static::editFormBlueprint($set))
+        $values = PublishForm::make(static::editFormBlueprint($config))
             ->submit($request->all());
 
-        if ($set->type() !== 'site') {
-            $set->enabled(Arr::get($values, 'enabled'));
+        if ($seoSet->type() !== 'site') {
+            $config->enabled(Arr::get($values, 'enabled'));
         }
 
-        $set
+        /**
+         * We save the seoSet instead of the config directly as the set also manages localizations.
+         * E.g. if the seoSet was disabled the localizations get deleted.
+         */
+        $config
             ->origins(Arr::get($values, 'origins'))
+            ->seoSet()
             ->save();
     }
 
     // TODO: Make this an actual blueprint class.
-    public static function editFormBlueprint(SeoDefaultSet $set): Blueprint
+    public static function editFormBlueprint(SeoSetConfig $config): Blueprint
     {
         $fields = [];
 
-        if ($set->type() !== 'site') {
+        if ($config->type() !== 'site') {
             $fields['enabled'] = [
                 'display' => __('Enabled'),
                 'fields' => [
@@ -90,14 +84,10 @@ abstract class BaseDefaultsConfigController extends CpController
                     'display' => __('Origins'),
                     'instructions' => __('Choose to inherit values from the selected origin.'),
                     'type' => 'default_set_sites',
-                    // 'visibility' => GetAuthorizedSites::handle($set)->count() > 1 ? 'visible' : 'hidden',
                     // There is no 'enabled' field for site defaults. This ensures we don't break the blueprint.
                     'if' => array_filter([
                         'enabled' => 'true',
-                    ], fn () => $set->type() !== 'site'),
-                    // 'if' => array_filter([
-                    //     'enabled' => 'true',
-                    // ], fn () => $set->type() !== 'site'),
+                    ], fn () => $config->type() !== 'site'),
                 ],
             ],
         ];

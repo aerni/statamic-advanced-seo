@@ -26,7 +26,7 @@ class SocialImagesGenerator
             return false;
         }
 
-        $enabledCollections = Seo::find('site', 'social_media')
+        $enabledCollections = Seo::find('site::social_media')
             ?->in($data->locale)
             ?->value('social_images_generator_collections') ?? [];
 

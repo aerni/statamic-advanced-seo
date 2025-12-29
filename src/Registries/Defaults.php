@@ -8,7 +8,7 @@ use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
 use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
 use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
 use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
-use Aerni\AdvancedSeo\Data\SeoDefault;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Facades\Blink;
@@ -16,7 +16,7 @@ use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\YAML;
 
-class Defaults extends Registry
+class Defaults extends StaticRegistry
 {
     protected static function siteDefaultsConfig(): array
     {
@@ -74,7 +74,7 @@ class Defaults extends Registry
         return collect(static::siteDefaultsConfig())
             ->filter(fn ($config) => $config['enabled'])
             ->map(function ($config, $handle) {
-                return new SeoDefault(
+                return new SeoSet(
                     type: 'site',
                     handle: $handle,
                     title: $config['title'],
@@ -88,7 +88,7 @@ class Defaults extends Registry
     protected static function collectionDefaults(): Collection
     {
         return CollectionFacade::all()->map(function ($collection) {
-            return new SeoDefault(
+            return new SeoSet(
                 type: 'collections',
                 handle: $collection->handle(),
                 title: $collection->title(),
@@ -102,7 +102,7 @@ class Defaults extends Registry
     protected static function taxonomyDefaults(): Collection
     {
         return Taxonomy::all()->map(function ($taxonomy) {
-            return new SeoDefault(
+            return new SeoSet(
                 type: 'taxonomies',
                 handle: $taxonomy->handle(),
                 title: $taxonomy->title(),
@@ -137,7 +137,7 @@ class Defaults extends Registry
         return static::find($id)?->blueprint;
     }
 
-    protected static function find(string $id): ?SeoDefault
+    protected static function find(string $id): ?SeoSet
     {
         return static::all()->first(fn ($row) => $row->id() === $id);
     }

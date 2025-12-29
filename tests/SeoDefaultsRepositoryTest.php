@@ -5,7 +5,7 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 
 it('can find seo defaults', function () {
-    expect(Seo::find('site', 'general'))->toBeInstanceOf(SeoDefaultSet::class);
+    expect(Seo::find('site::general'))->toBeInstanceOf(SeoDefaultSet::class);
 });
 
 it('can get all seo defaults', function () {

@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Data\SeoDefault;
-use Aerni\AdvancedSeo\Registries\Defaults;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
@@ -20,11 +20,11 @@ class GetSiteDefaults
         }
 
         return Blink::once("advanced-seo::site::{$locale}", function () use ($locale, $data) {
-            $siteDefaults = Defaults::whereType('site')
-                ->flatMap(fn (SeoDefault $default) => GetAugmentedDefaults::handle(
+            $siteDefaults = Seo::whereType('site')
+                ->flatMap(fn (SeoSet $default) => GetAugmentedDefaults::handle(
                     new DefaultsData(
-                        type: $default->type,
-                        handle: $default->handle,
+                        type: $default->type(),
+                        handle: $default->handle(),
                         locale: $locale,
                         sites: Site::all()->map->handle(),
                     )

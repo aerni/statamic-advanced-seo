@@ -39,7 +39,7 @@ class ContentDefaultsField extends Field
 
     protected function resolve($root, $args, $context, ResolveInfo $info): ?SeoVariables
     {
-        $set = Seo::find(Str::plural($info->fieldName), $args['handle']);
+        $set = Seo::find(Str::plural($info->fieldName).'::'.$args['handle']);
 
         if (! $set) {
             return null;

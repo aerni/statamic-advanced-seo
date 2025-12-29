@@ -20,7 +20,7 @@ class Sitemap
             return false;
         }
 
-        $config = Seo::find('site', 'indexing')?->in($data->locale);
+        $config = Seo::find('site::indexing')?->in($data->locale);
 
         // If there is no config, the sitemap should be indexable.
         if (is_null($config)) {

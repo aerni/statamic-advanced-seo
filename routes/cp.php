@@ -13,20 +13,21 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('index');
 
     Route::get('/site', [SiteController::class, 'index'])->name('site.index');
-    Route::get('/site/{default}/edit', [SiteConfigController::class, 'edit'])->name('site.edit');
-    Route::patch('/site/{default}/edit', [SiteConfigController::class, 'update'])->name('site.edit');
-    Route::get('/site/{default}/{site}', [SiteController::class, 'edit'])->name('site.defaults');
-    Route::patch('/site/{default}/{site}', [SiteController::class, 'update'])->name('site.defaults');
+    Route::get('/site/{seoSet}/edit', [SiteConfigController::class, 'edit'])->name('site.edit');
+    Route::patch('/site/{seoSet}/edit', [SiteConfigController::class, 'update'])->name('site.edit');
+    Route::get('/site/{seoSetLocalization}/{site}', [SiteController::class, 'edit'])->name('site.localization');
+    Route::patch('/site/{seoSetLocalization}/{site}', [SiteController::class, 'update'])->name('site.localization');
 
     Route::get('/collections', [CollectionsController::class, 'index'])->name('collections.index');
-    Route::get('/collections/{collection}/edit', [CollectionsConfigController::class, 'edit'])->name('collections.edit');
-    Route::patch('/collections/{collection}/edit', [CollectionsConfigController::class, 'update'])->name('collections.edit');
-    Route::get('/collections/{collection}/{site}', [CollectionsController::class, 'edit'])->name('collections.defaults');
-    Route::patch('/collections/{collection}/{site}', [CollectionsController::class, 'update'])->name('collections.defaults');
+    Route::get('/collections/{seoSet}/edit', [CollectionsConfigController::class, 'edit'])->name('collections.edit');
+    Route::patch('/collections/{seoSet}/edit', [CollectionsConfigController::class, 'update'])->name('collections.edit');
+    Route::get('/collections/{seoSetLocalization}/{site}', [CollectionsController::class, 'edit'])->name('collections.localization');
+    Route::patch('/collections/{seoSetLocalization}/{site}', [CollectionsController::class, 'update'])->name('collections.localization');
+
 
     Route::get('/taxonomies', [TaxonomiesController::class, 'index'])->name('taxonomies.index');
-    Route::get('/taxonomies/{taxonomy}/edit', [TaxonomiesConfigController::class, 'edit'])->name('taxonomies.edit');
-    Route::patch('/taxonomies/{taxonomy}/edit', [TaxonomiesConfigController::class, 'update'])->name('taxonomies.edit');
-    Route::get('/taxonomies/{taxonomy}/{site}', [TaxonomiesController::class, 'edit'])->name('taxonomies.defaults');
-    Route::patch('/taxonomies/{taxonomy}/{site}', [TaxonomiesController::class, 'update'])->name('taxonomies.defaults');
+    Route::get('/taxonomies/{seoSet}/edit', [TaxonomiesConfigController::class, 'edit'])->name('taxonomies.edit');
+    Route::patch('/taxonomies/{seoSet}/edit', [TaxonomiesConfigController::class, 'update'])->name('taxonomies.edit');
+    Route::get('/taxonomies/{seoSetLocalization}/{site}', [TaxonomiesController::class, 'edit'])->name('taxonomies.localization');
+    Route::patch('/taxonomies/{seoSetLocalization}/{site}', [TaxonomiesController::class, 'update'])->name('taxonomies.localization');
 });

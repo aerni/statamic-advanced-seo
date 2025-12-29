@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Registries\Defaults;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 
@@ -13,11 +13,11 @@ class IsEnabledModel
         $parent = EvaluateModelParent::handle($model);
 
         if ($parent instanceof Collection) {
-            return Defaults::find("collections::{$parent->handle()}")?->enabled() ?? false;
+            return Seo::find("collections::{$parent->handle()}")?->enabled() ?? false;
         }
 
         if ($parent instanceof Taxonomy) {
-            return Defaults::find("taxonomies::{$parent->handle()}")?->enabled() ?? false;
+            return Seo::find("taxonomies::{$parent->handle()}")?->enabled() ?? false;
         }
 
         return false;

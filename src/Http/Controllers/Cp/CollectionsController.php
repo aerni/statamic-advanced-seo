@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-class CollectionsController extends BaseDefaultsController
+class CollectionsController extends BaseSeoSetLocalizationController
 {
     protected function type(): string
     {

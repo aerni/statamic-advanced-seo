@@ -31,7 +31,7 @@ const showLink = (item) => {
             @refreshing="() => router.reload()"
         >
             <template #cell-title="{ row: item }">
-                <Link v-if="showLink(item)" :href="item.enabled ? item.edit_url : item.config_url" class="flex items-center gap-2 select-none">
+                <Link v-if="showLink(item)" :href="item.enabled ? item.localization_url : item.config_url" class="flex items-center gap-2 select-none">
                     <Icon :name="item.icon" />
                     {{ __(item.title) }}
                 </Link>
@@ -55,7 +55,7 @@ const showLink = (item) => {
                 />
             </template>
             <template #prepended-row-actions="{ row: item }">
-                <DropdownItem v-if="item.enabled" :text="__('Edit')" icon="edit" :href="item.edit_url" />
+                <DropdownItem v-if="item.enabled" :text="__('Edit')" icon="edit" :href="item.localization_url" />
                 <DropdownItem v-if="item.configurable" :text="__('Configure')" icon="cog" :href="item.config_url" />
             </template>
         </Listing>

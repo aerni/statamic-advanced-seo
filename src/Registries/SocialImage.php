@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Registries;
 
 use Illuminate\Support\Collection;
 
-class SocialImage extends Registry
+class SocialImage extends StaticRegistry
 {
     public static $types = ['open_graph', 'twitter_summary', 'twitter_summary_large_image'];
 

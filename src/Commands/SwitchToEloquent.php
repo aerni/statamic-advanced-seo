@@ -3,11 +3,11 @@
 namespace Aerni\AdvancedSeo\Commands;
 
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as SeoDefaultSetContract;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as SeoDefaultsRepositoryContract;
+use Aerni\AdvancedSeo\Contracts\SeoSetsRepository as SeoSetsRepositoryContract;
 use Aerni\AdvancedSeo\Eloquent\SeoDefaultModel;
 use Aerni\AdvancedSeo\Eloquent\SeoDefaultSet as EloquentSeoDefaultSet;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Stache\Repositories\SeoDefaultsRepository as StacheSeoDefaultsRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoSetsRepository as StacheSeoSetsRepository;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Facade;
@@ -102,9 +102,9 @@ class SwitchToEloquent extends Command
             return $this;
         }
 
-        Facade::clearResolvedInstance(SeoDefaultsRepositoryContract::class);
+        Facade::clearResolvedInstance(SeoSetsRepositoryContract::class);
 
-        Statamic::repository(SeoDefaultsRepositoryContract::class, StacheSeoDefaultsRepository::class);
+        Statamic::repository(SeoSetsRepositoryContract::class, StacheSeoSetsRepository::class);
 
         app()->bind(SeoDefaultSetContract::class, EloquentSeoDefaultSet::class);
 

@@ -92,7 +92,7 @@ class SeoDefaultSet implements Contract
 
     public function localizations(): Collection
     {
-        return Blink::once('seo-defaults-localizations-'.$this->id(), function () {
+        return Blink::once('seo-sets-localizations-'.$this->id(), function () {
             return app(SeoVariablesRepository::class)
                 ->whereSet($this->type(), $this->handle())
                 ->keyBy->locale();

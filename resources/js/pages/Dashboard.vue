@@ -3,7 +3,7 @@ import { Head, useArchitecturalBackground } from '@statamic/cms/inertia';
 import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@statamic/cms/ui';
 
 const props = defineProps({
-    defaults: Array,
+    groups: Array,
 });
 
 useArchitecturalBackground();
@@ -21,7 +21,7 @@ useArchitecturalBackground();
 
     <EmptyStateMenu>
         <EmptyStateItem
-            v-for="item in defaults" :key="item.type"
+            v-for="item in groups" :key="item.type"
             :href="item.route"
             :icon="item.icon"
             :heading="__(item.title)"

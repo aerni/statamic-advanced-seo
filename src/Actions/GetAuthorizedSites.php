@@ -2,14 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 
 class GetAuthorizedSites
 {
-    public static function handle(SeoDefaultSet $set): Collection
+    public static function handle(SeoSet $default): Collection
     {
-        return Site::authorized()->intersect($set->sites());
+        return Site::authorized()->intersect($default->sites());
     }
 }

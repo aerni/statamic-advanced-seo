@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Facades\Folder;
 
-class SocialImageTheme extends Registry
+class SocialImageTheme extends StaticRegistry
 {
     protected static function make(): Collection
     {

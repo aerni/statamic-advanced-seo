@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -16,7 +16,7 @@ class EvaluateModelType
     public static function handle(mixed $model): ?string
     {
         return match (true) {
-            ($model instanceof SeoDefaultSet) => $model->type(),
+            ($model instanceof SeoSet) => $model->type(),
             ($model instanceof Collection) => 'collections',
             ($model instanceof Entry) => 'collections',
             ($model instanceof EntryBlueprintFound) => 'collections',

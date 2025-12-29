@@ -42,7 +42,7 @@ trait EvaluatesIndexability
     protected function isIndexableSite(string $site): bool
     {
         return $this->crawlingIsEnabled()
-            && ! Seo::find('site', 'indexing')?->in($site)?->noindex;
+            && ! Seo::find('site::indexing')?->in($site)?->noindex;
     }
 
     protected function crawlingIsEnabled(): bool

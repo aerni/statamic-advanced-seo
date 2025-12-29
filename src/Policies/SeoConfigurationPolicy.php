@@ -2,16 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
-use Aerni\AdvancedSeo\Data\SeoDefault;
-use Aerni\AdvancedSeo\Registries\Defaults;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\User as UserFacade;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
 use Statamic\Sites\Site;
 
-// TODO: Should this be two policies. One for the SeoVariables and one for the SeoDefaultSet?
 class SeoConfigurationPolicy
 {
     use HasMultisitePolicy;
@@ -29,15 +27,14 @@ class SeoConfigurationPolicy
     {
         $user = UserFacade::fromUser($user);
 
-        return Defaults::whereType($type)
-            ->contains(function (SeoDefault $default) use ($user) {
-                return $default->set()
-                    ->sites()
-                    ->contains(fn ($site) => $this->edit($user, $default->set(), $site));
+        return Seo::whereType($type)
+            ->contains(function (SeoSet $default) use ($user) {
+                return $default->sites()
+                    ->contains(fn ($site) => $this->edit($user, $default, $site));
             });
     }
 
-    public function edit(User $user, SeoDefaultSet $set, Site $site): bool
+    public function edit(User $user, SeoSet $default, Site $site): bool
     {
         $user = UserFacade::fromUser($user);
 
@@ -45,15 +42,15 @@ class SeoConfigurationPolicy
             return false;
         }
 
-        return match ($set->type()) {
+        return match ($default->type()) {
             'site' => $user->hasPermission('configure seo'),
-            'collections' => $this->canEditContentSeoDefaults($user, 'collections', $set->handle()),
-            'taxonomies' => $this->canEditContentSeoDefaults($user, 'taxonomies', $set->handle()),
+            'collections' => $this->canEditContentSeoSets($user, 'collections', $default->handle()),
+            'taxonomies' => $this->canEditContentSeoSets($user, 'taxonomies', $default->handle()),
             default => false,
         };
     }
 
-    public function configure(User $user, SeoDefaultSet $set): bool
+    public function configure(User $user, SeoSet $default): bool
     {
         $user = UserFacade::fromUser($user);
 
@@ -61,15 +58,15 @@ class SeoConfigurationPolicy
             return false;
         }
 
-        return match ($set->type()) {
+        return match ($default->type()) {
             'site' => $user->hasPermission('configure seo'),
-            'collections' => $this->canConfigureContentSeoDefaults($user, 'collections', $set->handle()),
-            'taxonomies' => $this->canConfigureContentSeoDefaults($user, 'taxonomies', $set->handle()),
+            'collections' => $this->canConfigureContentSeoSets($user, 'collections', $default->handle()),
+            'taxonomies' => $this->canConfigureContentSeoSets($user, 'taxonomies', $default->handle()),
             default => false,
         };
     }
 
-    protected function canEditContentSeoDefaults(User $user, string $type, string $handle): bool
+    protected function canEditContentSeoSets(User $user, string $type, string $handle): bool
     {
         $user = UserFacade::fromUser($user);
 
@@ -90,7 +87,7 @@ class SeoConfigurationPolicy
             || $user->hasPermission("edit {$handle} {$itemType}");
     }
 
-    protected function canConfigureContentSeoDefaults(User $user, string $type, string $handle): bool
+    protected function canConfigureContentSeoSets(User $user, string $type, string $handle): bool
     {
         $user = UserFacade::fromUser($user);
 

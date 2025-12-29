@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SiteVerification;
-use Aerni\AdvancedSeo\Registries\Defaults;
 
 class IndexingFields extends BaseFields
 {
@@ -30,7 +30,7 @@ class IndexingFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('noindex.display'),
                         'instructions' => $this->trans('noindex.instructions'),
-                        'default' => Defaults::data('site::indexing')->get('noindex'),
+                        'default' => Seo::defaultValues('site::indexing')->get('noindex'),
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
@@ -42,7 +42,7 @@ class IndexingFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('nofollow.display'),
                         'instructions' => $this->trans('nofollow.instructions'),
-                        'default' => Defaults::data('site::indexing')->get('nofollow'),
+                        'default' => Seo::defaultValues('site::indexing')->get('nofollow'),
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,

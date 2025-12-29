@@ -6,33 +6,33 @@ use Statamic\Statamic;
 use Statamic\Facades\Git;
 use Statamic\Facades\User;
 use Illuminate\Support\Arr;
-use Statamic\Stache\Stache;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Stache;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Permission;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Blade;
-use Aerni\AdvancedSeo\Registries\Defaults;
-use Aerni\AdvancedSeo\Stache\Stores\SeoStore;
+use Illuminate\Support\Facades\Route;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\EntryInterface;
 use Aerni\AdvancedSeo\View\CascadeComposer;
 use Statamic\Providers\AddonServiceProvider;
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSetsType;
 use Facades\Statamic\Console\Processes\Composer;
 use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoSetsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
 use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\Stache\Stores\SeoVariablesStore;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
+use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
@@ -42,6 +42,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -50,7 +51,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $policies = [
-        SeoDefaultSet::class => Policies\SeoConfigurationPolicy::class,
+        SeoSet::class => Policies\SeoConfigurationPolicy::class,
     ];
 
     protected $vite = [
@@ -64,6 +65,7 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
+            ->bootRouteBindings()
             ->bootStacheStore()
             ->bootNav()
             ->bootPermissions()
@@ -90,24 +92,55 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function registerEloquentDriver(): void
     {
-        Statamic::repository(Contracts\SeoDefaultsRepository::class, Eloquent\SeoDefaultsRepository::class);
+        // TODO: Update Eloquent driver for new architecture
+        Statamic::repository(Contracts\SeoSetConfigRepository::class, \Aerni\AdvancedSeo\Eloquent\SeoSetConfigRepository::class);
 
         $this->app->bind('advanced_seo.model', Eloquent\SeoDefaultModel::class);
     }
 
     protected function registerFileDriver(): void
     {
-        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoDefaultsRepository::class);
-        Statamic::repository(Contracts\SeoVariablesRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoVariablesRepository::class);
+        Statamic::repository(Contracts\SeoSetConfigRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository::class);
+        Statamic::repository(Contracts\SeoSetLocalizationRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository::class);
+    }
+
+    protected function bootRouteBindings(): self
+    {
+        Route::bind('seoSet', function (string $handle, \Illuminate\Routing\Route $route) {
+            $type = str($route->uri())
+                ->after($route->action['prefix'].'/')
+                ->before('/{seoSet}');
+
+            throw_unless(
+                $seoSet = Seo::find("{$type}::{$handle}"),
+                new \Statamic\Exceptions\NotFoundHttpException("SEO Set [{$type}::{$handle}] not found.")
+            );
+
+            return $seoSet;
+        });
+
+        Route::bind('seoSetLocalization', function (string $handle, \Illuminate\Routing\Route $route) {
+            $type = str($route->uri())
+                ->after($route->action['prefix'].'/')
+                ->before('/{seoSetLocalization}');
+
+            throw_unless(
+                $localization = Seo::find("{$type}::{$handle}")?->in($route->site),
+                new \Statamic\Exceptions\NotFoundHttpException("SEO Set Localization [{$type}::{$handle}::{$route->site}] not found.")
+            );
+
+            return $localization;
+        });
+
+        return $this;
     }
 
     protected function bootStacheStore(): self
     {
-        $seoStore = app(SeoStore::class)->directory(config('advanced-seo.directory'));
-        $seoVariablesStore = app(SeoVariablesStore::class)->directory(config('advanced-seo.directory'));
-
-        app(Stache::class)->registerStore($seoStore);
-        app(Stache::class)->registerStore($seoVariablesStore);
+        Stache::registerStores([
+            app(SeoSetConfigsStore::class)->directory(config('advanced-seo.directory')),
+            app(SeoSetLocalizationsStore::class)->directory(config('advanced-seo.directory')),
+        ]);
 
         return $this;
     }
@@ -115,10 +148,10 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
-            $navItems = Defaults::all()
-                ->groupBy('type')
-                ->filter(fn ($defaults, $type) => User::current()->can('viewAny', [SeoDefaultSet::class, $type]))
-                ->map(fn ($default, $type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"));
+            $navItems = Seo::all()
+                ->groupBy(fn (SeoSet $default) => $default->type())
+                ->filter(fn ($defaults, $type) => User::current()->can('viewAny', [SeoSet::class, $type]))
+                ->map(fn ($defaults, $type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"));
 
             if ($navItems->isEmpty()) {
                 return;
@@ -157,7 +190,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGit(): self
     {
         if (config('statamic.git.enabled')) {
-            Git::listen(Events\SeoDefaultSetSaved::class);
+            Git::listen(Events\SeoSetSaved::class);
         }
 
         return $this;
@@ -187,7 +220,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGraphQL(): self
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
-            GraphQL::addQuery(SeoDefaultsQuery::class);
+            GraphQL::addQuery(SeoSetsQuery::class);
             GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoSitemapsQuery::class);
 
@@ -200,7 +233,7 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(IndexingDefaultsType::class);
             GraphQL::addType(RawMetaDataType::class);
             GraphQL::addType(RenderedViewsType::class);
-            GraphQL::addType(SeoDefaultsType::class);
+            GraphQL::addType(SeoSetsType::class);
             GraphQL::addType(SeoMetaType::class);
             GraphQL::addType(SeoSitemapsType::class);
             GraphQL::addType(SeoSitemapType::class);

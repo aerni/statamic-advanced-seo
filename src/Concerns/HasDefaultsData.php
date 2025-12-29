@@ -3,9 +3,12 @@
 namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 trait HasDefaultsData
 {
+    use FluentlyGetsAndSets;
+
     protected $defaultsData;
 
     public function defaultsData(?DefaultsData $data = null): DefaultsData|self

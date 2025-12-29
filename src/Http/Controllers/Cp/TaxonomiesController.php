@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-class TaxonomiesController extends BaseDefaultsController
+class TaxonomiesController extends BaseSeoSetLocalizationController
 {
     protected function type(): string
     {

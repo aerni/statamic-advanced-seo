@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
-use Aerni\AdvancedSeo\Registries\Defaults;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
@@ -53,12 +53,12 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
     public function changefreq(): string
     {
-        return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
+        return Seo::data('taxonomies')->get('seo_sitemap_change_frequency');
     }
 
     public function priority(): string
     {
-        return Defaults::data('taxonomies')->get('seo_sitemap_priority');
+        return Seo::data('taxonomies')->get('seo_sitemap_priority');
     }
 
     public function site(): string

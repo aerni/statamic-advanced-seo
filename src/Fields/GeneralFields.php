@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Registries\Defaults;
+use Aerni\AdvancedSeo\Facades\Seo;
 
 class GeneralFields extends BaseFields
 {
@@ -52,7 +52,7 @@ class GeneralFields extends BaseFields
                             ' > ' => '>',
                             ' ~ ' => '~',
                         ],
-                        'default' => Defaults::data('site::general')->get('title_separator'),
+                        'default' => Seo::defaultValues('site::general')->get('title_separator'),
                         'clearable' => false,
                         'multiple' => false,
                         'searchable' => true,
@@ -87,7 +87,7 @@ class GeneralFields extends BaseFields
                             'person' => $this->trans('site_json_ld_type.person'),
                             'custom' => $this->trans('site_json_ld_type.custom'),
                         ],
-                        'default' => Defaults::data('site::general')->get('site_json_ld_type'),
+                        'default' => Seo::defaultValues('site::general')->get('site_json_ld_type'),
                         'localizable' => true,
                         'listable' => false,
                     ],
@@ -184,7 +184,7 @@ class GeneralFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('use_breadcrumbs.display'),
                         'instructions' => $this->trans('use_breadcrumbs.instructions'),
-                        'default' => Defaults::data('site::general')->get('use_breadcrumbs'),
+                        'default' => Seo::defaultValues('site::general')->get('use_breadcrumbs'),
                         'localizable' => true,
                         'listable' => false,
                     ],

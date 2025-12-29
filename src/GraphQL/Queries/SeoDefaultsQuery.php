@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Queries;
 
-use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSetsType;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\Query;
 
-class SeoDefaultsQuery extends Query
+class SeoSetsQuery extends Query
 {
     protected $attributes = [
         'name' => 'seoDefaults',
@@ -16,7 +16,7 @@ class SeoDefaultsQuery extends Query
 
     public function type(): Type
     {
-        return GraphQL::type(SeoDefaultsType::NAME);
+        return GraphQL::type(SeoSetsType::NAME);
     }
 
     public function resolve($root, $args)

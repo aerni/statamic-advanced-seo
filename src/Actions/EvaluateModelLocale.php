@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultSet;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Collection;
@@ -21,7 +21,7 @@ class EvaluateModelLocale
     public static function handle(mixed $model): ?string
     {
         return match (true) {
-            ($model instanceof SeoDefaultSet) => self::seoDefaultSet($model),
+            ($model instanceof SeoSet) => self::seoSet($model),
             ($model instanceof Collection) => self::collection(),
             ($model instanceof Entry) => $model->locale(),
             ($model instanceof EntryBlueprintFound) => self::entryBlueprintFound(),
@@ -34,7 +34,7 @@ class EvaluateModelLocale
         };
     }
 
-    protected static function seoDefaultSet(SeoDefaultSet $model): string
+    protected static function seoSet(SeoSet $model): string
     {
         return request()->get('site') ?? $model->selectedSite();
     }

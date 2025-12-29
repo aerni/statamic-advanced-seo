@@ -48,7 +48,7 @@ class SiteDefaultsType extends Type
     private function resolver(): callable
     {
         return function ($root, $args, $context, ResolveInfo $info): ?SeoVariables {
-            $set = Seo::find('site', Str::snake($info->fieldName));
+            $set = Seo::find('site::'.Str::snake($info->fieldName));
 
             if (! $set) {
                 return null;

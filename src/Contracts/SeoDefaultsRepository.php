@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Contracts;
 use Illuminate\Support\Collection;
 use Statamic\Data\DataCollection;
 
-interface SeoDefaultsRepository
+interface SeoSetsRepository
 {
     public function make(): SeoDefaultSet;
 

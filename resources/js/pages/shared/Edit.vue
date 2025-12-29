@@ -48,12 +48,12 @@ function save() {
 	new Pipeline()
 		.provide({ container, errors, saving })
 		.through([
-			new BeforeSaveHooks('seo-defaults'),
+			new BeforeSaveHooks('seo-set-localizations'),
 			new Request(editUrl.value, 'patch', {
 				site: site.value,
 				_localized: localizedFields.value,
 			}),
-			new AfterSaveHooks('seo-defaults'),
+			new AfterSaveHooks('seo-set-localizations'),
 		])
 		.then((response) => {
 			Statamic.$toast.success(__('Saved'));
@@ -71,7 +71,7 @@ onMounted(() => {
 
 onUnmounted(() => saveKeyBinding.destroy());
 
-const isDirty = computed(() => Statamic.$dirty.has('seo-defaults'));
+const isDirty = computed(() => Statamic.$dirty.has('seo-set-localizations'));
 const showLocalizationSelector = computed(() => localizations.value.length > 1);
 
 const localizationSelected = (localizationHandle) => {
@@ -154,7 +154,7 @@ const refreshLocalization = () => {
 
         <PublishContainer
             ref="container"
-            name="seo-defaults"
+            name="seo-set-localizations"
             :reference
             :blueprint
             v-model="values"

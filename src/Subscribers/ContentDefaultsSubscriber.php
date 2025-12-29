@@ -15,35 +15,27 @@ class ContentDefaultsSubscriber
     public function subscribe(Dispatcher $events): array
     {
         return [
-            Events\CollectionSaved::class => 'createDefaults',
-            Events\TaxonomySaved::class => 'createDefaults',
-            Events\CollectionDeleted::class => 'deleteDefaults',
-            Events\TaxonomyDeleted::class => 'deleteDefaults',
+            Events\CollectionSaved::class => 'saveSeoSet',
+            Events\TaxonomySaved::class => 'saveSeoSet',
+            Events\CollectionDeleted::class => 'deleteSeoSet',
+            Events\TaxonomyDeleted::class => 'deleteSeoSet',
         ];
     }
 
-    public function createDefaults(Event $event): void
+    public function saveSeoSet(Event $event): void
     {
         $property = $this->getProperty($event);
         $type = $this->getRepositoryType($event);
 
-        $handle = $property->handle();
-
-        // Abort if Collection or Taxnomy was disabled in the config.
-        // TODO: Refactor this to use $set->enabled().
-        if (in_array($handle, config("advanced-seo.disabled.{$type}", []))) {
-            return;
-        }
-
-        Seo::findOrMake($type, $handle)->save();
+        Seo::find("{$type}::{$property->handle()}")?->save();
     }
 
-    public function deleteDefaults(Event $event): void
+    public function deleteSeoSet(Event $event): void
     {
         $property = $this->getProperty($event);
         $type = $this->getRepositoryType($event);
 
-        Seo::find($type, $property->handle())?->delete();
+        Seo::find("{$type}::{$property->handle()}")?->delete();
     }
 
     protected function getRepositoryType(Event $event): string

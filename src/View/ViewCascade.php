@@ -5,8 +5,8 @@ namespace Aerni\AdvancedSeo\View;
 use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Data\HasComputedData;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Registries\Defaults;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
@@ -136,7 +136,7 @@ class ViewCascade extends BaseCascade
             // The following three cases handle pages like taxonomy and 404.
             ($this->has('twitter_summary_large_image')) => SocialImage::findModel('twitter_summary_large_image')['card'],
             ($this->has('twitter_summary_image')) => SocialImage::findModel('twitter_summary')['card'],
-            default => Defaults::data('collections')->get('seo_twitter_card'),
+            default => Seo::defaultValues('collections')->get('seo_twitter_card'),
         };
     }
 

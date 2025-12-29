@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\UpdateScripts;
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Registries\Defaults;
 use Illuminate\Support\Arr;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -28,7 +27,7 @@ class MigrateSiteNamePosition extends UpdateScript
         ];
 
         // Get all localizations and make sure they exist.
-        $siteDefaults = Seo::find('site', 'general')
+        $siteDefaults = Seo::find('site::general')
             ?->localizations();
 
         // Get the title positions from each localization.
@@ -38,7 +37,7 @@ class MigrateSiteNamePosition extends UpdateScript
             ->map(fn ($value) => Arr::get($mapping, $value));
 
         // Set the site name position for all collection defaults.
-        Defaults::whereType('collections')
+        Seo::whereType('collections')
             ->map(fn ($default) => Seo::findOrMake($default->type, $default->handle))
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {
@@ -47,7 +46,7 @@ class MigrateSiteNamePosition extends UpdateScript
             });
 
         // Set the site name position for all taxonomy defaults.
-        Defaults::whereType('taxonomies')
+        Seo::whereType('taxonomies')
             ->map(fn ($default) => Seo::findOrMake($default->type, $default->handle))
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {
