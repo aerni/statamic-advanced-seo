@@ -172,7 +172,7 @@ class ServiceProvider extends AddonServiceProvider
                         ->description('Grants access to all permissions and allows editing settings and defaults');
                 });
 
-                Permission::register('edit seo defaults', function ($permission) {
+                Permission::register('edit seo', function ($permission) {
                     $permission
                         ->label('Edit Defaults')
                         ->description('Grants access to edit collection and taxonomy defaults');
