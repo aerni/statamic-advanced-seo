@@ -29,7 +29,7 @@ class SeoSetConfig implements Contract
 
     public function seoSet(): SeoSet
     {
-        return Blink::once("seo::{$this->seoSet}", fn () => Seo::find($this->seoSet));
+        return Blink::once("advanced-seo::{$this->seoSet}", fn () => Seo::find($this->seoSet));
     }
 
     public function id(): string

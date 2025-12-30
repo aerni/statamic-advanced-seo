@@ -74,7 +74,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
 
     public function defaultValues(): Collection
     {
-        return Blink::once("seo::{$this->id()}::defaultValues", function () {
+        return Blink::once("advanced-seo::{$this->id()}::defaultValues", function () {
             $path = __DIR__."/../../content/{$this->contentFile}";
 
             return file_exists($path)
@@ -90,7 +90,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
 
     public function config(): SeoSetConfig
     {
-        return Blink::once("seo::{$this->id()}::config", function () {
+        return Blink::once("advanced-seo::{$this->id()}::config", function () {
             return SeoConfig::findOrMake($this->id());
         });
     }
@@ -121,7 +121,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
 
     public function localizations(): Collection
     {
-        return Blink::once("seo::{$this->id()}::localizations", function () {
+        return Blink::once("advanced-seo::{$this->id()}::localizations", function () {
             $persisted = SeoLocalization::whereSeoSet($this->id())->keyBy->locale();
 
             return $this->sites()
