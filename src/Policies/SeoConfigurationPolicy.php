@@ -3,13 +3,14 @@
 namespace Aerni\AdvancedSeo\Policies;
 
 use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\User as UserFacade;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
-use Statamic\Sites\Site;
 
+// TODO: Rename the class to SeoSetPolicy.
 class SeoConfigurationPolicy
 {
     use HasMultisitePolicy;
@@ -23,53 +24,56 @@ class SeoConfigurationPolicy
         }
     }
 
+    // TODO: This could accept the SeoSetType so we don't have to look it up again.
     public function viewAny(User $user, string $type): bool
     {
         $user = UserFacade::fromUser($user);
 
         return Seo::whereType($type)
-            ->contains(function (SeoSet $default) use ($user) {
-                return $default->sites()
-                    ->contains(fn ($site) => $this->edit($user, $default, $site));
+            ->contains(function (SeoSet $seoSet) use ($user) {
+                return $seoSet->localizations()
+                    ->contains(fn ($localization) => $this->edit($user, $localization));
             });
     }
 
-    public function edit(User $user, SeoSet $default, Site $site): bool
+    public function edit(User $user, SeoSetLocalization $localization): bool
     {
+        // TODO: Should this just return $this->configure() first and then go on with the other edit checks?
+        // Only drawback would be that we are calling methods like canEditStatamicContent() multiple times.
         $user = UserFacade::fromUser($user);
 
-        if (! $this->userCanAccessSite($user, $site)) {
+        if (! $this->userCanAccessSite($user, $localization->site())) {
             return false;
         }
 
-        return match ($default->type()) {
+        return match ($localization->type()) {
             'site' => $user->hasPermission('configure seo'),
-            'collections' => $this->canEditContentSeoSets($user, 'collections', $default->handle()),
-            'taxonomies' => $this->canEditContentSeoSets($user, 'taxonomies', $default->handle()),
+            'collections' => $this->canEditContentLocalization($user, $localization),
+            'taxonomies' => $this->canEditContentLocalization($user, $localization),
             default => false,
         };
     }
 
-    public function configure(User $user, SeoSet $default): bool
+    // TODO: Should this accept an SeoSetConfig instead?
+    public function configure(User $user, SeoSet $seoSet): bool
     {
         $user = UserFacade::fromUser($user);
 
+        // TODO: Do we even need this permission check here? Sets have no localizations.
         if (! $this->userCanAccessSite($user, Sites::selected())) {
             return false;
         }
 
-        return match ($default->type()) {
+        return match ($seoSet->type()) {
             'site' => $user->hasPermission('configure seo'),
-            'collections' => $this->canConfigureContentSeoSets($user, 'collections', $default->handle()),
-            'taxonomies' => $this->canConfigureContentSeoSets($user, 'taxonomies', $default->handle()),
+            'collections' => $this->canConfigureContentSeoSets($user, $seoSet),
+            'taxonomies' => $this->canConfigureContentSeoSets($user, $seoSet),
             default => false,
         };
     }
 
-    protected function canEditContentSeoSets(User $user, string $type, string $handle): bool
+    protected function canEditContentLocalization(User $user, SeoSetLocalization $localization): bool
     {
-        $user = UserFacade::fromUser($user);
-
         $hasBaseSeoPermission = $user->hasPermission('configure seo')
             || $user->hasPermission('edit seo defaults');
 
@@ -77,30 +81,25 @@ class SeoConfigurationPolicy
             return false;
         }
 
-        $itemType = match ($type) {
-            'collections' => 'entries',
-            'taxonomies' => 'terms',
-        };
-
-        // Grant edit permission if they have permission to edit the collection/taxonomy.
-        return $user->hasPermission("configure {$type}")
-            || $user->hasPermission("edit {$handle} {$itemType}");
+        return $this->canEditStatamicContent($user, $localization->type(), $localization->handle());
     }
 
-    protected function canConfigureContentSeoSets(User $user, string $type, string $handle): bool
+    protected function canConfigureContentSeoSets(User $user, SeoSet $seoSet): bool
     {
-        $user = UserFacade::fromUser($user);
-
         if (! $user->hasPermission('configure seo')) {
             return false;
         }
 
+        return $this->canEditStatamicContent($user, $seoSet->type(), $seoSet->handle());
+    }
+
+    protected function canEditStatamicContent(User $user, string $type, string $handle): bool
+    {
         $itemType = match ($type) {
             'collections' => 'entries',
             'taxonomies' => 'terms',
         };
 
-        // Grant edit permission if they have permission to edit the collection/taxonomy.
         return $user->hasPermission("configure {$type}")
             || $user->hasPermission("edit {$handle} {$itemType}");
     }

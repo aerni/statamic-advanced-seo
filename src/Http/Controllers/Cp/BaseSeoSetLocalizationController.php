@@ -2,20 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
-use Aerni\AdvancedSeo\Contracts\SeoSet as SeoSetContract;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
-use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Site as SiteFacade;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Sites\Site;
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 
 abstract class BaseSeoSetLocalizationController extends CpController
 {
@@ -23,16 +22,26 @@ abstract class BaseSeoSetLocalizationController extends CpController
 
     abstract protected function icon(): string;
 
+    // TODO: Maybe we can accept the SeoSetType group as argument. Also bind in in the route. Then we don't need $this->type().
     public function index(): Response
     {
-        $this->authorize('viewAny', [SeoSetContract::class, $this->type()]);
-
-        $site = SiteFacade::selected();
+        $this->authorize('viewAny', [SeoSet::class, $this->type()]);
 
         $items = Seo::whereType($this->type())
-            ->filter(fn (SeoSetContract $seoSet) => User::current()->can('edit', [SeoSetContract::class, $seoSet, $site]))
-            ->filter(fn (SeoSetContract $seoSet) => $seoSet->availableInSite($site))
-            ->filter(fn (SeoSetContract $seoSet) => $this->canConfigure($seoSet) || $seoSet->enabled());
+            ->filter(function (SeoSet $seoSet) {
+                $localization = $seoSet->in(Site::selected());
+
+                if (! $localization) {
+                    return false;
+                }
+
+                if (! User::current()->can('edit', [SeoSet::class, $localization])) {
+                    return false;
+                }
+
+                // Include if user can configure, or if the seoSet is enabled
+                return User::current()->can('configure', [SeoSet::class, $seoSet]) || $seoSet->enabled();
+            })->values();
 
         return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Index', [
             'title' => __("advanced-seo::messages.{$this->type()}"),
@@ -45,13 +54,11 @@ abstract class BaseSeoSetLocalizationController extends CpController
         ]);
     }
 
-    public function edit(Request $request, SeoSetLocalization $localization, Site $site): mixed
+    public function edit(Request $request, SeoSet $seoSet, SeoSetLocalization $localization): mixed
     {
-        $seoSet = $localization->seoSet();
-
         throw_unless($seoSet->enabled(), new NotFoundHttpException);
 
-        $this->authorize('edit', [SeoSetContract::class, $seoSet, $site]);
+        $this->authorize('edit', [SeoSet::class, $localization]);
 
         $blueprint = $localization->blueprint();
 
@@ -68,7 +75,7 @@ abstract class BaseSeoSetLocalizationController extends CpController
             'initialReference' => $localization->id(),
             'initialValues' => $values,
             'initialMeta' => $meta,
-            'initialSite' => $site->handle(),
+            'initialSite' => $localization->locale(),
             'initialHasOrigin' => $hasOrigin,
             'initialOriginValues' => $originValues ?? null,
             'initialOriginMeta' => $originMeta ?? null,
@@ -82,7 +89,7 @@ abstract class BaseSeoSetLocalizationController extends CpController
             'initialLocalizedFields' => $localization->data()->keys()->all(),
             'initialEditUrl' => $localization->editUrl(),
             'configUrl' => $seoSet->config()->editUrl(),
-            'configurable' => $this->canConfigure($seoSet),
+            'configurable' => User::current()->can('configure', [SeoSet::class, $seoSet]),
         ];
 
         if ($request->wantsJson()) {
@@ -92,13 +99,11 @@ abstract class BaseSeoSetLocalizationController extends CpController
         return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Edit', $viewData);
     }
 
-    public function update(Request $request, SeoSetLocalization $localization, Site $site): void
+    public function update(Request $request, SeoSet $seoSet, SeoSetLocalization $localization): void
     {
-        $seoSet = $localization->seoSet();
-
         throw_unless($seoSet->enabled(), new NotFoundHttpException);
 
-        $this->authorize('edit', [SeoSetContract::class, $seoSet, $site]);
+        $this->authorize('edit', [SeoSet::class, $localization]);
 
         $blueprint = $localization->blueprint();
 
@@ -123,10 +128,5 @@ abstract class BaseSeoSetLocalizationController extends CpController
             ->preProcess();
 
         return [$fields->values()->all(), $fields->meta()->all()];
-    }
-
-    protected function canConfigure(SeoSetContract $seoSet): bool
-    {
-        return User::current()->can('configure', [SeoSetContract::class, $seoSet]);
     }
 }

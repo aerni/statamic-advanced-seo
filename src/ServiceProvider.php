@@ -17,9 +17,11 @@ use Illuminate\Support\Facades\Route;
 use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\EntryInterface;
+use Aerni\AdvancedSeo\Contracts\SeoSetType;
 use Aerni\AdvancedSeo\View\CascadeComposer;
 use Statamic\Providers\AddonServiceProvider;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
+use Statamic\Exceptions\NotFoundHttpException;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSetsType;
 use Facades\Statamic\Console\Processes\Composer;
@@ -93,7 +95,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function registerEloquentDriver(): void
     {
         // TODO: Update Eloquent driver for new architecture
-        Statamic::repository(Contracts\SeoSetConfigRepository::class, \Aerni\AdvancedSeo\Eloquent\SeoSetConfigRepository::class);
+        Statamic::repository(Contracts\SeoSetConfigRepository::class, Eloquent\SeoSetConfigRepository::class);
 
         $this->app->bind('advanced_seo.model', Eloquent\SeoDefaultModel::class);
     }
@@ -113,20 +115,16 @@ class ServiceProvider extends AddonServiceProvider
 
             throw_unless(
                 $seoSet = Seo::find("{$type}::{$handle}"),
-                new \Statamic\Exceptions\NotFoundHttpException("SEO Set [{$type}::{$handle}] not found.")
+                new NotFoundHttpException
             );
 
             return $seoSet;
         });
 
-        Route::bind('seoSetLocalization', function (string $handle, \Illuminate\Routing\Route $route) {
-            $type = str($route->uri())
-                ->after($route->action['prefix'].'/')
-                ->before('/{seoSetLocalization}');
-
+        Route::bind('seoSetLocalization', function (string $site, \Illuminate\Routing\Route $route) {
             throw_unless(
-                $localization = Seo::find("{$type}::{$handle}")?->in($route->site),
-                new \Statamic\Exceptions\NotFoundHttpException("SEO Set Localization [{$type}::{$handle}::{$route->site}] not found.")
+                $localization = $route->seoSet->in($site),
+                new NotFoundHttpException
             );
 
             return $localization;
@@ -148,10 +146,9 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
-            $navItems = Seo::all()
-                ->groupBy(fn (SeoSet $default) => $default->type())
-                ->filter(fn ($defaults, $type) => User::current()->can('viewAny', [SeoSet::class, $type]))
-                ->map(fn ($defaults, $type) => $nav->item(ucfirst($type))->route("advanced-seo.{$type}.index"));
+            $navItems = Seo::groups()
+                ->filter(fn (SeoSetType $type) => User::current()->can('viewAny', [SeoSet::class, $type->type()]))
+                ->map(fn (SeoSetType $type) => $nav->item($type->title())->route($type->route()));
 
             if ($navItems->isEmpty()) {
                 return;

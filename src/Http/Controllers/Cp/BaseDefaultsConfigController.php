@@ -2,9 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Contracts\SeoSet as SeoSetContract;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
-use Aerni\AdvancedSeo\Data\SeoSet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Statamic\CP\PublishForm;
@@ -17,7 +16,7 @@ abstract class BaseDefaultsConfigController extends CpController
 
     public function edit(SeoSet $seoSet): PublishForm
     {
-        $this->authorize('configure', [SeoSetContract::class, $seoSet]);
+        $this->authorize('configure', [SeoSet::class, $seoSet]);
 
         $config = $seoSet->config();
 
@@ -35,7 +34,7 @@ abstract class BaseDefaultsConfigController extends CpController
 
     public function update(Request $request, SeoSet $seoSet): void
     {
-        $this->authorize('configure', [SeoSetContract::class, $seoSet]);
+        $this->authorize('configure', [SeoSet::class, $seoSet]);
 
         $config = $seoSet->config();
 

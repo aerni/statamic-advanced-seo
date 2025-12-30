@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\SeoSetType as Contract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 
+// TODO: Maybe call this SeoSetTypeGroup
 class SeoSetType implements Arrayable, Contract
 {
     public function __construct(public readonly Collection $sets)
@@ -13,6 +14,7 @@ class SeoSetType implements Arrayable, Contract
         //
     }
 
+    // TODO: Maybe call this "handle" to be persistent?
     public function type(): string
     {
         return $this->sets->first()->type();
@@ -25,7 +27,12 @@ class SeoSetType implements Arrayable, Contract
 
     public function route(): string
     {
-        return cp_route("advanced-seo.{$this->type()}.index");
+        return "advanced-seo.{$this->type()}.index";
+    }
+
+    public function indexUrl(): string
+    {
+        return cp_route($this->route());
     }
 
     public function icon(): string
@@ -44,6 +51,7 @@ class SeoSetType implements Arrayable, Contract
             'type' => $this->type(),
             'title' => $this->title(),
             'route' => $this->route(),
+            'indexUrl' => $this->indexUrl(),
             'icon' => $this->icon(),
         ];
     }

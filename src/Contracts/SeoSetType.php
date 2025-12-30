@@ -10,5 +10,7 @@ interface SeoSetType
 
     public function route(): string;
 
+    public function indexUrl(): string;
+
     public function icon(): string;
 }
