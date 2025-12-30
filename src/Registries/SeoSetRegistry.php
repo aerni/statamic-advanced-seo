@@ -2,18 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Illuminate\Support\Str;
-use Statamic\Facades\Taxonomy;
-use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
+use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
 use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetGroup;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Statamic\Facades\Collection as Collections;
-use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
-use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
-use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
+use Statamic\Facades\Taxonomy;
 
 class SeoSetRegistry extends Registry
 {
