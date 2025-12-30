@@ -2,49 +2,49 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Statamic;
-use Statamic\Facades\Git;
-use Statamic\Facades\User;
-use Illuminate\Support\Arr;
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Stache;
-use Statamic\Facades\GraphQL;
-use Statamic\Facades\Permission;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
 use Aerni\AdvancedSeo\Contracts\SeoSet;
-use Statamic\GraphQL\Types\TermInterface;
-use Statamic\GraphQL\Types\EntryInterface;
-use Aerni\AdvancedSeo\Contracts\SeoSetType;
-use Aerni\AdvancedSeo\View\CascadeComposer;
-use Statamic\Providers\AddonServiceProvider;
+use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
-use Statamic\Exceptions\NotFoundHttpException;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSetsType;
-use Facades\Statamic\Console\Processes\Composer;
-use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSetsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
-use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
-use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
-use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\FaviconsDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\GeneralDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
+use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSetsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
+use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SitemapAlternatesType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
+use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
+use Aerni\AdvancedSeo\View\CascadeComposer;
+use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Git;
+use Statamic\Facades\GraphQL;
+use Statamic\Facades\Permission;
+use Statamic\Facades\Stache;
+use Statamic\Facades\User;
+use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\TermInterface;
+use Statamic\Providers\AddonServiceProvider;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -53,7 +53,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $policies = [
-        SeoSet::class => Policies\SeoConfigurationPolicy::class,
+        SeoSet::class => Policies\SeoSetPolicy::class,
     ];
 
     protected $vite = [
@@ -67,8 +67,8 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this
-            ->bootRouteBindings()
             ->bootStacheStore()
+            ->bootRouteBindings()
             ->bootNav()
             ->bootPermissions()
             ->bootGit()
@@ -106,33 +106,6 @@ class ServiceProvider extends AddonServiceProvider
         Statamic::repository(Contracts\SeoSetLocalizationRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository::class);
     }
 
-    protected function bootRouteBindings(): self
-    {
-        Route::bind('seoSet', function (string $handle, \Illuminate\Routing\Route $route) {
-            $type = str($route->uri())
-                ->after($route->action['prefix'].'/')
-                ->before('/{seoSet}');
-
-            throw_unless(
-                $seoSet = Seo::find("{$type}::{$handle}"),
-                new NotFoundHttpException
-            );
-
-            return $seoSet;
-        });
-
-        Route::bind('seoSetLocalization', function (string $site, \Illuminate\Routing\Route $route) {
-            throw_unless(
-                $localization = $route->seoSet->in($site),
-                new NotFoundHttpException
-            );
-
-            return $localization;
-        });
-
-        return $this;
-    }
-
     protected function bootStacheStore(): self
     {
         Stache::registerStores([
@@ -143,19 +116,45 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
+    protected function bootRouteBindings(): self
+    {
+        Route::bind('seoSetGroup', function (string $type) {
+            return throw_unless(
+                Seo::groups()->first(fn (SeoSetGroup $group) => $group->type() === $type),
+                new NotFoundHttpException
+            );
+        });
+
+        Route::bind('seoSet', function (string $handle, \Illuminate\Routing\Route $route) {
+            return throw_unless(
+                $route->seoSetGroup->seoSets()->where('handle', $handle)->first(),
+                new NotFoundHttpException
+            );
+        });
+
+        Route::bind('seoSetLocalization', function (string $site, \Illuminate\Routing\Route $route) {
+            return throw_unless(
+                $route->seoSet->in($site),
+                new NotFoundHttpException
+            );
+        });
+
+        return $this;
+    }
+
     protected function bootNav(): self
     {
         Nav::extend(function ($nav) {
             $navItems = Seo::groups()
-                ->filter(fn (SeoSetType $type) => User::current()->can('viewAny', [SeoSet::class, $type->type()]))
-                ->map(fn (SeoSetType $type) => $nav->item($type->title())->route($type->route()));
+                ->filter(fn (SeoSetGroup $group) => User::current()->can('viewAny', [SeoSet::class, $group]))
+                ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->indexUrl()));
 
             if ($navItems->isEmpty()) {
                 return;
             }
 
             $nav->tools('SEO')
-                ->route('advanced-seo.index')
+                ->route('advanced-seo.dashboard')
                 ->icon('ai-search-spark')
                 ->children($navItems->all());
         });

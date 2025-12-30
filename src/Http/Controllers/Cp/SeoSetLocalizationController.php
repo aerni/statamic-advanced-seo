@@ -2,59 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Inertia\Inertia;
-use Inertia\Response;
-use Statamic\CP\Column;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\Fields\Blueprint;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Contracts\SeoSet;
-use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Http\Controllers\CP\CpController;
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
+use Statamic\Http\Controllers\CP\CpController;
 
-abstract class BaseSeoSetLocalizationController extends CpController
+class SeoSetLocalizationController extends CpController
 {
-    abstract protected function type(): string;
-
-    abstract protected function icon(): string;
-
-    // TODO: Maybe we can accept the SeoSetType group as argument. Also bind in in the route. Then we don't need $this->type().
-    public function index(): Response
-    {
-        $this->authorize('viewAny', [SeoSet::class, $this->type()]);
-
-        $items = Seo::whereType($this->type())
-            ->filter(function (SeoSet $seoSet) {
-                $localization = $seoSet->in(Site::selected());
-
-                if (! $localization) {
-                    return false;
-                }
-
-                if (! User::current()->can('edit', [SeoSet::class, $localization])) {
-                    return false;
-                }
-
-                // Include if user can configure, or if the seoSet is enabled
-                return User::current()->can('configure', [SeoSet::class, $seoSet]) || $seoSet->enabled();
-            })->values();
-
-        return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Index', [
-            'title' => __("advanced-seo::messages.{$this->type()}"),
-            'icon' => $this->icon(),
-            'items' => $items,
-            'columns' => [
-                Column::make('title')->label(__('Title')),
-                Column::make('status')->label(__('Status')),
-            ],
-        ]);
-    }
-
-    public function edit(Request $request, SeoSet $seoSet, SeoSetLocalization $localization): mixed
+    public function edit(Request $request, SeoSetGroup $seoSetGroup, SeoSet $seoSet, SeoSetLocalization $localization): mixed
     {
         throw_unless($seoSet->enabled(), new NotFoundHttpException);
 
@@ -96,10 +57,10 @@ abstract class BaseSeoSetLocalizationController extends CpController
             return $viewData;
         }
 
-        return Inertia::render('advanced-seo::'.ucfirst($this->type()).'/Edit', $viewData);
+        return Inertia::render("advanced-seo::{$seoSetGroup->title()}/Edit", $viewData);
     }
 
-    public function update(Request $request, SeoSet $seoSet, SeoSetLocalization $localization): void
+    public function update(Request $request, SeoSetGroup $seoSetGroup, SeoSet $seoSet, SeoSetLocalization $localization): void
     {
         throw_unless($seoSet->enabled(), new NotFoundHttpException);
 

@@ -9,7 +9,7 @@ use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
 use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
 use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
 use Aerni\AdvancedSeo\Contracts\SeoSet;
-use Aerni\AdvancedSeo\Data\SeoSetType;
+use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Collection as Collections;
 use Statamic\Facades\Taxonomy;
@@ -32,7 +32,7 @@ class SeoSetRegistry extends Registry
     {
         return $this->all()
             ->groupBy(fn (SeoSet $set) => $set->type())
-            ->mapInto(SeoSetType::class)
+            ->mapInto(SeoSetGroup::class)
             ->values();
     }
 

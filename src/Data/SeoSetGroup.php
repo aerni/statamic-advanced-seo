@@ -2,22 +2,25 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Contracts\SeoSetType as Contract;
+use Aerni\AdvancedSeo\Contracts\SeoSetGroup as Contract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 
-// TODO: Maybe call this SeoSetTypeGroup
-class SeoSetType implements Arrayable, Contract
+class SeoSetGroup implements Arrayable, Contract
 {
-    public function __construct(public readonly Collection $sets)
+    public function __construct(protected readonly Collection $seoSets)
     {
         //
     }
 
-    // TODO: Maybe call this "handle" to be persistent?
+    public function seoSets(): Collection
+    {
+        return $this->seoSets;
+    }
+
     public function type(): string
     {
-        return $this->sets->first()->type();
+        return $this->seoSets()->first()->type();
     }
 
     public function title(): string
@@ -25,14 +28,9 @@ class SeoSetType implements Arrayable, Contract
         return ucfirst($this->type());
     }
 
-    public function route(): string
-    {
-        return "advanced-seo.{$this->type()}.index";
-    }
-
     public function indexUrl(): string
     {
-        return cp_route($this->route());
+        return cp_route('advanced-seo.sets.index', ['seoSetGroup' => $this->type()]);
     }
 
     public function icon(): string
@@ -50,7 +48,6 @@ class SeoSetType implements Arrayable, Contract
         return [
             'type' => $this->type(),
             'title' => $this->title(),
-            'route' => $this->route(),
             'indexUrl' => $this->indexUrl(),
             'icon' => $this->icon(),
         ];

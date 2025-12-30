@@ -113,7 +113,10 @@ class SeoSetConfig implements Contract
 
     public function editUrl(): string
     {
-        return cp_route("advanced-seo.{$this->type()}.edit", $this->handle());
+        return cp_route('advanced-seo.sets.config', [
+            'seoSetGroup' => $this->type(),
+            'seoSet' => $this->handle(),
+        ]);
     }
 
     public function save(): self

@@ -4,14 +4,13 @@ namespace Aerni\AdvancedSeo\Policies;
 
 use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\User as UserFacade;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
 
-// TODO: Rename the class to SeoSetPolicy.
-class SeoConfigurationPolicy
+class SeoSetPolicy
 {
     use HasMultisitePolicy;
 
@@ -24,16 +23,13 @@ class SeoConfigurationPolicy
         }
     }
 
-    // TODO: This could accept the SeoSetType so we don't have to look it up again.
-    public function viewAny(User $user, string $type): bool
+    public function viewAny(User $user, SeoSetGroup $group): bool
     {
         $user = UserFacade::fromUser($user);
 
-        return Seo::whereType($type)
-            ->contains(function (SeoSet $seoSet) use ($user) {
-                return $seoSet->localizations()
-                    ->contains(fn ($localization) => $this->edit($user, $localization));
-            });
+        return $group->seoSets()->contains(function (SeoSet $seoSet) use ($user) {
+            return $seoSet->localizations()->contains(fn (SeoSetLocalization $localization) => $this->edit($user, $localization));
+        });
     }
 
     public function edit(User $user, SeoSetLocalization $localization): bool

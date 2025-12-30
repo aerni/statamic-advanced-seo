@@ -2,13 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-interface SeoSetType
+use Illuminate\Support\Collection;
+
+interface SeoSetGroup
 {
+    public function seoSets(): Collection;
+
     public function type(): string;
 
     public function title(): string;
-
-    public function route(): string;
 
     public function indexUrl(): string;
 

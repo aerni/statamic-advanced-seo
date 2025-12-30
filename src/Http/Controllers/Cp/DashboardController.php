@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Contracts\SeoSet;
-use Aerni\AdvancedSeo\Contracts\SeoSetType;
+use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,8 +15,7 @@ class DashboardController extends CpController
 {
     public function __invoke(): Response
     {
-        $groups = Seo::groups()
-            ->filter(fn (SeoSetType $group) => User::current()->can('viewAny', [SeoSet::class, $group->type()]));
+        $groups = Seo::groups()->filter(fn (SeoSetGroup $group) => User::current()->can('viewAny', [SeoSet::class, $group]));
 
         throw_unless($groups->isNotEmpty(), new NotFoundHttpException);
 
