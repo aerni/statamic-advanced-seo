@@ -136,7 +136,7 @@ class ViewCascade extends BaseCascade
             // The following three cases handle pages like taxonomy and 404.
             ($this->has('twitter_summary_large_image')) => SocialImage::findModel('twitter_summary_large_image')['card'],
             ($this->has('twitter_summary_image')) => SocialImage::findModel('twitter_summary')['card'],
-            default => Seo::defaultValues('collections')->get('seo_twitter_card'),
+            default => Seo::defaultValue('collections.seo_twitter_card'),
         };
     }
 

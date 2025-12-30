@@ -2,17 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
-use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
+use Illuminate\Support\Str;
+use Statamic\Facades\Taxonomy;
+use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetGroup;
-use Illuminate\Support\Collection;
 use Statamic\Facades\Collection as Collections;
-use Statamic\Facades\Taxonomy;
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
+use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
+use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
+use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
 
 class SeoSetRegistry extends Registry
 {
@@ -36,13 +37,16 @@ class SeoSetRegistry extends Registry
             ->values();
     }
 
-    public function defaultValues(string $id): Collection
+    public function defaultValue(string $key, mixed $default = null): mixed
     {
+        $id = Str::before($key, '.');
+        $field = Str::after($key, '.');
+
         $set = str_contains($id, '::')
             ? $this->find($id)
             : $this->whereType($id)->first();
 
-        return $set?->defaultValues() ?? collect();
+        return data_get($set?->defaultValues(), $field, $default);
     }
 
     protected function items(): array
