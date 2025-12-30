@@ -2,6 +2,4 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-interface SeoVariables
-{
-}
+interface SeoVariables {}
