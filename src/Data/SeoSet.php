@@ -109,11 +109,6 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         return $this->parent->sites()->mapWithKeys(fn ($site) => [$site => Site::get($site)]);
     }
 
-    protected function defaultSite(): string
-    {
-        return $this->sites()->keys()->first();
-    }
-
     public function localizations(): Collection
     {
         return Blink::once("advanced-seo::{$this->id()}::localizations", function () {
@@ -127,6 +122,11 @@ class SeoSet implements Arrayable, Contract, QueryableValue
     public function selectedSite(): string
     {
         return $this->sites()->get(Site::selected()->handle()) ?? $this->defaultSite();
+    }
+
+    protected function defaultSite(): string
+    {
+        return $this->sites()->keys()->first();
     }
 
     public function in(string $locale): ?SeoSetLocalization
