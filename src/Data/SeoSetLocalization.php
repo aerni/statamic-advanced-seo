@@ -111,12 +111,6 @@ class SeoSetLocalization implements Augmentable, Contract
         return true;
     }
 
-    public function blueprintFields(): array
-    {
-        // Get the field keys of the processed blueprint. This excludes any fields of disabled features.
-        return $this->blueprint()->fields()->all()->keys()->all();
-    }
-
     public function fileData(): array
     {
         return $this->data()
@@ -146,6 +140,14 @@ class SeoSetLocalization implements Augmentable, Contract
             ->blueprint();
     }
 
+    public function blueprintFields(): array
+    {
+        // Get the field keys of the processed blueprint. This excludes any fields of disabled features.
+        return $this->blueprint()->fields()->all()->keys()->all();
+    }
+
+    // TODO: Do we really need the ability to change the origin here?
+    // Origins are always defined and derived in the SeoSet config.
     public function origin(?string $origin = null): Contract|self|null
     {
         if (func_num_args() === 0) {
