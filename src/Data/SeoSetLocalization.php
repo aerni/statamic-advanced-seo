@@ -57,19 +57,19 @@ class SeoSetLocalization implements Augmentable, Contract
         return "{$this->seoSet()->id()}::{$this->locale()}";
     }
 
+    public function type(): string
+    {
+        return $this->seoSet()->type();
+    }
+
     public function handle(): string
     {
-        return $this->seoSet()->handle;
+        return $this->seoSet()->handle();
     }
 
     public function title(): string
     {
-        return $this->seoSet()->title;
-    }
-
-    public function type(): string
-    {
-        return $this->seoSet()->type;
+        return $this->seoSet()->title();
     }
 
     public function path(): string
