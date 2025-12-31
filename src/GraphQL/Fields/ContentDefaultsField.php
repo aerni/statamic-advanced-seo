@@ -45,8 +45,7 @@ class ContentDefaultsField extends Field
             return null;
         }
 
-        // TODO: Probably use the new ->enabled() method?
-        if (! $set->isEnabled()) {
+        if (! $set->enabled()) {
             return null;
         }
 

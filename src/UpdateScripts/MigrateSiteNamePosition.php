@@ -38,7 +38,6 @@ class MigrateSiteNamePosition extends UpdateScript
 
         // Set the site name position for all collection defaults.
         Seo::whereType('collections')
-            ->map(fn ($default) => Seo::findOrMake($default->type, $default->handle))
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {
                     $default->in($site)?->set('seo_site_name_position', $value)->save();
@@ -47,7 +46,6 @@ class MigrateSiteNamePosition extends UpdateScript
 
         // Set the site name position for all taxonomy defaults.
         Seo::whereType('taxonomies')
-            ->map(fn ($default) => Seo::findOrMake($default->type, $default->handle))
             ->each(function ($default) use ($titlePositions) {
                 $titlePositions->each(function ($value, $site) use ($default) {
                     $default->in($site)?->set('seo_site_name_position', $value)->save();

@@ -127,7 +127,7 @@ class ServiceProvider extends AddonServiceProvider
 
         Route::bind('seoSet', function (string $handle, \Illuminate\Routing\Route $route) {
             return throw_unless(
-                $route->seoSetGroup->seoSets()->where('handle', $handle)->first(),
+                $route->seoSetGroup->seoSets()->filter(fn (SeoSet $set) => $set->handle() === $handle)->first(),
                 new NotFoundHttpException
             );
         });

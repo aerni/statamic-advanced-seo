@@ -54,7 +54,7 @@ class SiteDefaultsType extends Type
                 return null;
             }
 
-            if (! $set->isEnabled()) {
+            if (! $set->enabled()) {
                 return null;
             }
 

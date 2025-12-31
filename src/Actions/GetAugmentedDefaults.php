@@ -10,8 +10,9 @@ class GetAugmentedDefaults
 {
     public static function handle(DefaultsData $data): Collection
     {
-        return Seo::findOrMake($data->type, $data->handle)
-            ->in($data->locale)
-            ->toAugmentedCollection();
+        return Seo::find("{$data->type}::{$data->handle}")
+            ?->in($data->locale)
+            ?->toAugmentedCollection()
+            ?? collect();
     }
 }

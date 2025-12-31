@@ -110,7 +110,7 @@ class SwitchToEloquent extends Command
 
         app()->bind('advanced_seo.model', SeoDefaultModel::class);
 
-        $this->withProgressBar(Seo::all()->flatten(), function ($set) {
+        $this->withProgressBar(Seo::all(), function ($set) {
             EloquentSeoDefaultSet::makeModelFromContract($set)->save();
         });
 
