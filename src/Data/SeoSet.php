@@ -109,11 +109,6 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         return $this->parent->sites()->mapWithKeys(fn ($site) => [$site => Site::get($site)]);
     }
 
-    public function availableInSite(string $site): bool
-    {
-        return $this->sites()->has($site);
-    }
-
     public function defaultSite(): string
     {
         return $this->sites()->keys()->first();
@@ -133,7 +128,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
     {
         $selectedSite = Site::selected()->handle();
 
-        return $this->availableInSite($selectedSite)
+        return $this->sites()->has($selectedSite)
             ? $selectedSite
             : $this->defaultSite();
     }
