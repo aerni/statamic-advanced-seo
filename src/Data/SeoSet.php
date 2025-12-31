@@ -143,11 +143,6 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         return $this->in(Site::selected()->handle());
     }
 
-    public function inCurrentSite(): ?SeoSetLocalization
-    {
-        return $this->in(Site::current()->handle());
-    }
-
     public function inDefaultSite(): ?SeoSetLocalization
     {
         return $this->in($this->defaultSite());
