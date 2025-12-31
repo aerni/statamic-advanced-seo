@@ -26,13 +26,13 @@ class SeoSet implements Arrayable, Contract, QueryableValue
     use HasDefaultsData;
 
     public function __construct(
-        public readonly string $type,
-        public readonly string $handle,
-        public readonly string $title,
-        public readonly string $icon,
-        public readonly string $blueprint,
-        public readonly string $contentFile,
-        public readonly null|StatamicCollection|StatamicTaxonomy $parent = null
+        protected readonly string $type,
+        protected readonly string $handle,
+        protected readonly string $title,
+        protected readonly string $icon,
+        protected readonly string $blueprint,
+        protected readonly string $contentFile,
+        protected readonly null|StatamicCollection|StatamicTaxonomy $parent = null
     ) {
         //
     }

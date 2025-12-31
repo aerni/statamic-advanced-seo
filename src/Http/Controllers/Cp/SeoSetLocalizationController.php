@@ -30,8 +30,8 @@ class SeoSetLocalizationController extends CpController
         }
 
         $viewData = [
-            'title' => $seoSet->title,
-            'icon' => $seoSet->icon,
+            'title' => $seoSet->title(),
+            'icon' => $seoSet->icon(),
             'blueprint' => $blueprint->toPublishArray(),
             'initialReference' => $localization->id(),
             'initialValues' => $values,
