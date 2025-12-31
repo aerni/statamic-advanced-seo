@@ -223,25 +223,4 @@ class SeoSet implements Arrayable, Contract, QueryableValue
             'configurable' => User::current()->can('configure', [SeoSet::class, $this]),
         ];
     }
-
-    public function getRouteKey(): string
-    {
-        return $this->handle;
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'seoSet';
-    }
-
-    public function resolveRouteBinding($value, $field = null): ?self
-    {
-        // Route binding is handled by Route::bind() in ServiceProvider
-        return null;
-    }
-
-    public function resolveChildRouteBinding($childType, $value, $field): ?self
-    {
-        return null;
-    }
 }

@@ -2,9 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Illuminate\Contracts\Routing\UrlRoutable;
-
-interface SeoSet extends UrlRoutable
+interface SeoSet
 {
     public function id(): string;
 
