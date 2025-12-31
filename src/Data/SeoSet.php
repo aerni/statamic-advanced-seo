@@ -126,11 +126,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
 
     public function selectedSite(): string
     {
-        $selectedSite = Site::selected()->handle();
-
-        return $this->sites()->has($selectedSite)
-            ? $selectedSite
-            : $this->defaultSite();
+        return $this->sites()->get(Site::selected()->handle()) ?? $this->defaultSite();
     }
 
     public function in(string $locale): ?SeoSetLocalization
