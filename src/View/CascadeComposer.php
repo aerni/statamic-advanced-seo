@@ -7,6 +7,7 @@ use Statamic\Facades\Cascade;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Contracts\View\View;
 use Aerni\AdvancedSeo\Support\Helpers;
+use Statamic\Statamic;
 
 class CascadeComposer
 {
@@ -49,6 +50,10 @@ class CascadeComposer
 
     protected function shouldProcessCascade(Context $context): bool
     {
+        if (Statamic::isCpRoute()) {
+            return false;
+        }
+
         // Don't process the cascade if it has been processed before.
         if ($context->has('seo')) {
             return false;
