@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;

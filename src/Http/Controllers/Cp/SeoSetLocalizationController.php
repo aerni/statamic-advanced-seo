@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
-use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Illuminate\Http\Request;

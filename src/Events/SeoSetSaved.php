@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Events;
 
-use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events\Event;
 

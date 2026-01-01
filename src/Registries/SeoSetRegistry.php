@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Contracts\SeoSet;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

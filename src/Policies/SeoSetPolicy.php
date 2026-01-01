@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
-use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\User as UserFacade;
 use Statamic\Policies\Concerns\HasMultisitePolicy;

@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Data;
 
 use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Aerni\AdvancedSeo\Contracts\SeoSet as Contract;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Events\SeoSetSaved;
@@ -21,7 +20,7 @@ use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Support\Str;
 
-class SeoSet implements Arrayable, Contract, QueryableValue
+class SeoSet implements Arrayable, QueryableValue
 {
     use HasDefaultsData;
 
