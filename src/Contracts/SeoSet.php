@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Contracts;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Illuminate\Support\Collection;
-use Statamic\Fields\Blueprint;
 
 interface SeoSet
 {
@@ -18,7 +17,7 @@ interface SeoSet
 
     public function icon(): string;
 
-    public function blueprint(): Blueprint;
+    public function blueprint(string $blueprint): ?string;
 
     public function defaultValues(): Collection;
 

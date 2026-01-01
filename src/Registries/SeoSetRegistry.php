@@ -67,7 +67,9 @@ class SeoSetRegistry extends Registry
                 handle: $site['handle'],
                 title: $site['title'],
                 icon: $site['icon'],
-                blueprint: $site['blueprint'],
+                blueprints: [
+                    'localization' => $site['blueprint'],
+                ],
                 contentFile: $site['contentFile'],
             ))
             ->sortBy('handle');
@@ -81,7 +83,9 @@ class SeoSetRegistry extends Registry
                 handle: $collection->handle(),
                 title: $collection->title(),
                 icon: $collection->icon(),
-                blueprint: ContentDefaultsBlueprint::class,
+                blueprints: [
+                    'localization' => ContentDefaultsBlueprint::class,
+                ],
                 contentFile: 'localization.yaml',
                 parent: $collection,
             ))
@@ -96,7 +100,9 @@ class SeoSetRegistry extends Registry
                 handle: $taxonomy->handle(),
                 title: $taxonomy->title(),
                 icon: 'tags',
-                blueprint: ContentDefaultsBlueprint::class,
+                blueprints: [
+                    'localization' => ContentDefaultsBlueprint::class,
+                ],
                 contentFile: 'localization.yaml',
                 parent: $taxonomy,
             ))

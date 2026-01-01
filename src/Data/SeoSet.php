@@ -19,7 +19,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
-use Statamic\Fields\Blueprint;
 
 class SeoSet implements Arrayable, Contract, QueryableValue
 {
@@ -30,7 +29,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         protected readonly string $handle,
         protected readonly string $title,
         protected readonly string $icon,
-        protected readonly string $blueprint,
+        protected readonly array $blueprints,
         protected readonly string $contentFile,
         protected readonly null|StatamicCollection|StatamicTaxonomy $parent = null
     ) {
@@ -62,14 +61,9 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         return $this->icon;
     }
 
-    // TODO: Should the blueprint live in the config
-    // Because the SeoSet doesn't really have a blueprint.
-    public function blueprint(): Blueprint
+    public function blueprint(string $blueprint): ?string
     {
-        return resolve($this->blueprint)
-            ->make()
-            ->data($this->defaultsData())
-            ->get();
+        return $this->blueprints[$blueprint] ?? null;
     }
 
     public function defaultValues(): Collection
@@ -206,7 +200,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
             'enabled' => $this->enabled(),
             'localization_url' => $this->inSelectedSite()->editUrl(),
             'config_url' => $this->config()->editUrl(),
-            'configurable' => User::current()->can('configure', [SeoSet::class, $this]),
+            'configurable' => User::current()->can('configure', [self::class, $this]),
         ];
     }
 }

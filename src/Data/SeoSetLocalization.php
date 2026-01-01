@@ -135,9 +135,10 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function blueprint(): Blueprint
     {
-        return $this->seoSet()
-            ->defaultsData($this->defaultsData())
-            ->blueprint();
+        return resolve($this->seoSet()->blueprint('localization'))
+            ->make()
+            ->data($this->defaultsData())
+            ->get();
     }
 
     public function blueprintFields(): array
