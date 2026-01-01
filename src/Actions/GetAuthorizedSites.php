@@ -8,8 +8,8 @@ use Statamic\Facades\Site;
 
 class GetAuthorizedSites
 {
-    public static function handle(SeoSet $default): Collection
+    public static function handle(SeoSet $set): Collection
     {
-        return Site::authorized()->intersect($default->sites());
+        return Site::authorized()->intersect($set->sites());
     }
 }

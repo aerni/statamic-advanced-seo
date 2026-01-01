@@ -38,17 +38,17 @@ class MigrateSiteNamePosition extends UpdateScript
 
         // Set the site name position for all collection defaults.
         Seo::whereType('collections')
-            ->each(function ($default) use ($titlePositions) {
-                $titlePositions->each(function ($value, $site) use ($default) {
-                    $default->in($site)?->set('seo_site_name_position', $value)->save();
+            ->each(function ($set) use ($titlePositions) {
+                $titlePositions->each(function ($value, $site) use ($set) {
+                    $set->in($site)?->set('seo_site_name_position', $value)->save();
                 });
             });
 
         // Set the site name position for all taxonomy defaults.
         Seo::whereType('taxonomies')
-            ->each(function ($default) use ($titlePositions) {
-                $titlePositions->each(function ($value, $site) use ($default) {
-                    $default->in($site)?->set('seo_site_name_position', $value)->save();
+            ->each(function ($set) use ($titlePositions) {
+                $titlePositions->each(function ($value, $site) use ($set) {
+                    $set->in($site)?->set('seo_site_name_position', $value)->save();
                 });
             });
 
@@ -67,8 +67,8 @@ class MigrateSiteNamePosition extends UpdateScript
 
         // Remove the old title position from the site defaults.
         $siteDefaults
-            ->filter(fn ($default) => $default->has('title_position')) // Prevent saving of defaults with no title position
-            ->each(fn ($default) => $default->remove('title_position')->save());
+            ->filter(fn ($set) => $set->has('title_position')) // Prevent saving of defaults with no title position
+            ->each(fn ($set) => $set->remove('title_position')->save());
 
         $this->console()->info("Successfully migrated 'title_position' to 'site_name_position'.");
     }

@@ -8,7 +8,7 @@ use Statamic\Events\Event;
 
 class SeoSetSaved extends Event implements ProvidesCommitMessage
 {
-    public function __construct(public SeoSet $default)
+    public function __construct(public SeoSet $set)
     {
         //
     }
