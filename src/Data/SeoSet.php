@@ -30,7 +30,6 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         protected readonly string $title,
         protected readonly string $icon,
         protected readonly array $blueprints,
-        protected readonly null|StatamicCollection|StatamicTaxonomy $parent = null
     ) {
         //
     }
@@ -63,6 +62,17 @@ class SeoSet implements Arrayable, Contract, QueryableValue
     public function blueprint(string $blueprint): ?string
     {
         return $this->blueprints[$blueprint] ?? null;
+    }
+
+    public function parent(): null|StatamicCollection|StatamicTaxonomy
+    {
+        return Blink::once("advanced-seo::{$this->id()}::parent", function () {
+            return match ($this->type) {
+                'collections' => \Statamic\Facades\Collection::find($this->handle),
+                'taxonomies' => \Statamic\Facades\Taxonomy::find($this->handle),
+                'site' => null,
+            };
+        });
     }
 
     public function defaultValues(): Collection
@@ -100,11 +110,11 @@ class SeoSet implements Arrayable, Contract, QueryableValue
 
     public function sites(): Collection
     {
-        if (! $this->parent) {
+        if (! $parent = $this->parent()) {
             return Site::all();
         }
 
-        return $this->parent->sites()->mapWithKeys(fn ($site) => [$site => Site::get($site)]);
+        return $parent->sites()->mapWithKeys(fn ($site) => [$site => Site::get($site)]);
     }
 
     public function localizations(): Collection
@@ -158,7 +168,7 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         if (! $this->enabled()) {
             $this->localizations()->each->delete();
 
-            RemoveSeoValues::handle($this->parent);
+            RemoveSeoValues::handle($this->parent());
 
             return;
         }

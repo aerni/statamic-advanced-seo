@@ -85,7 +85,6 @@ class SeoSetRegistry extends Registry
                 blueprints: [
                     'localization' => ContentDefaultsBlueprint::class,
                 ],
-                parent: $collection,
             ))
             ->sortBy('handle');
     }
@@ -101,7 +100,6 @@ class SeoSetRegistry extends Registry
                 blueprints: [
                     'localization' => ContentDefaultsBlueprint::class,
                 ],
-                parent: $taxonomy,
             ))
             ->sortBy('handle');
     }
