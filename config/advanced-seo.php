@@ -37,22 +37,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Disabled Collections & Taxonomies
-    |--------------------------------------------------------------------------
-    |
-    | Disable Advanced SEO for any collection and taxonomy by adding
-    | its handle to the appropriate array below. This will remove the SEO tab,
-    | stop the output of meta data on the frontend, and remove the sitemap.
-    |
-    */
-
-    'disabled' => [
-        'collections' => [],
-        'taxonomies' => [],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | View Composer
     |--------------------------------------------------------------------------
     |
