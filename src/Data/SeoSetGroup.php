@@ -2,11 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Contracts\SeoSetGroup as Contract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 
-class SeoSetGroup implements Arrayable, Contract
+class SeoSetGroup implements Arrayable
 {
     public function __construct(protected readonly Collection $seoSets)
     {

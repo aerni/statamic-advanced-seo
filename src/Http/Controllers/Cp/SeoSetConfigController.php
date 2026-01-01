@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
-use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
+use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Statamic\CP\PublishForm;

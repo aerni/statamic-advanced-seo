@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
+use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;

@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
-use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
+use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Statamic\Contracts\Auth\User;

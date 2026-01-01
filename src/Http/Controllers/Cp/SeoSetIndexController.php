@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Contracts\SeoSetGroup;
+use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\CP\Column;
