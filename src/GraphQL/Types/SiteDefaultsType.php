@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Data\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Seo;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Arr;
@@ -47,7 +47,7 @@ class SiteDefaultsType extends Type
 
     private function resolver(): callable
     {
-        return function ($root, $args, $context, ResolveInfo $info): ?SeoVariables {
+        return function ($root, $args, $context, ResolveInfo $info): ?SeoSetLocalization {
             $set = Seo::find('site::'.Str::snake($info->fieldName));
 
             if (! $set) {

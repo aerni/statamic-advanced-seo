@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
-use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Data\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -37,7 +37,7 @@ class ContentDefaultsField extends Field
         return GraphQL::type(ContentDefaultsType::NAME);
     }
 
-    protected function resolve($root, $args, $context, ResolveInfo $info): ?SeoVariables
+    protected function resolve($root, $args, $context, ResolveInfo $info): ?SeoSetLocalization
     {
         $set = Seo::find(Str::plural($info->fieldName).'::'.$args['handle']);
 

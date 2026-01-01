@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
 use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
-use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Data\SeoSetLocalization;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Support\Str;
@@ -30,7 +30,7 @@ class ContentDefaultsType extends Type
 
     private function resolver(): callable
     {
-        return function (SeoVariables $variables, $args, $context, ResolveInfo $info) {
+        return function (SeoSetLocalization $variables, $args, $context, ResolveInfo $info) {
             return $variables->resolveGqlValue("seo_{$info->fieldName}");
         };
     }
