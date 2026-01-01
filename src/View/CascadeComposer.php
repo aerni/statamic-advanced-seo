@@ -2,10 +2,11 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Contracts\View\View;
-use Statamic\Facades\Cascade;
 use Statamic\Tags\Context;
+use Statamic\Facades\Cascade;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Contracts\View\View;
+use Aerni\AdvancedSeo\Support\Helpers;
 
 class CascadeComposer
 {
@@ -54,17 +55,17 @@ class CascadeComposer
         }
 
         // Don't process the cascade for collections that are excluded in the config.
-        if ($context->has('is_entry') && in_array($context->get('collection')->raw()->handle(), config('advanced-seo.disabled.collections', []))) {
+        if ($context->has('is_entry') && ! Seo::find("collections::{$context->get('collection')}")?->enabled()) {
             return false;
         }
 
         // Don't process the cascade for taxonomy terms that are excluded in the config.
-        if ($context->has('is_term') && in_array($context->get('taxonomy')->raw()->handle(), config('advanced-seo.disabled.taxonomies', []))) {
+        if ($context->has('is_term') && ! Seo::find("taxonomies::{$context->get('taxonomy')}")?->enabled()) {
             return false;
         }
 
         // Don't process the cascade for taxonomies that are excluded in the config.
-        if ($context->has('terms') && in_array($context->get('handle')->raw(), config('advanced-seo.disabled.taxonomies', []))) {
+        if ($context->has('terms') && ! Seo::find("taxonomies::{$context->get('handle')}")?->enabled()) {
             return false;
         }
 
