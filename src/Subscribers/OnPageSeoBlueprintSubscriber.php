@@ -2,17 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Statamic\Events;
+use Statamic\Statamic;
 use Statamic\Events\Event;
 use Statamic\Facades\Site;
-use Statamic\Statamic;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -50,7 +51,7 @@ class OnPageSeoBlueprintSubscriber
     protected function shouldExtendBlueprint(Event $event): bool
     {
         // Don't add fields if the collection/taxonomy is excluded in the config.
-        if ($this->isDisabledType()) {
+        if (! $this->data->set()->enabled()) {
             return false;
         }
 
@@ -70,11 +71,6 @@ class OnPageSeoBlueprintSubscriber
         }
 
         return true;
-    }
-
-    protected function isDisabledType(): bool
-    {
-        return in_array($this->data->handle, config("advanced-seo.disabled.{$this->data->type}", []));
     }
 
     protected function isModelCpRoute(Event $event): bool

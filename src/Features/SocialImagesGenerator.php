@@ -14,10 +14,7 @@ class SocialImagesGenerator
             return false;
         }
 
-        $disabled = config("advanced-seo.disabled.{$data->type}", []);
-
-        // Check if the collection/taxonomy is set to be disabled globally.
-        if (in_array($data->handle, $disabled)) {
+        if (! $data->set()->enabled()) {
             return false;
         }
 
@@ -26,8 +23,9 @@ class SocialImagesGenerator
             return false;
         }
 
+        // TODO: This needs to be changed when we move the social image generator settings to the seo set
         $enabledCollections = Seo::find('site::social_media')
-            ?->in($data->locale)
+            ->in($data->locale)
             ?->value('social_images_generator_collections') ?? [];
 
         // Don't show the generator section if the collection is not configured.
