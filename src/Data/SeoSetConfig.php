@@ -4,6 +4,8 @@ namespace Aerni\AdvancedSeo\Data;
 
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
+use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
+use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Illuminate\Support\Collection;
@@ -123,12 +125,16 @@ class SeoSetConfig implements Contract
     {
         SeoConfig::save($this);
 
+        SeoSetConfigSaved::dispatch($this);
+
         return $this;
     }
 
     public function delete(): bool
     {
         SeoConfig::delete($this);
+
+        SeoSetConfigDeleted::dispatch($this);
 
         return true;
     }

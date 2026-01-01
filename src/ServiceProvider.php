@@ -186,7 +186,10 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGit(): self
     {
         if (config('statamic.git.enabled')) {
-            Git::listen(Events\SeoSetSaved::class);
+            Git::listen(Events\SeoSetConfigSaved::class);
+            Git::listen(Events\SeoSetConfigDeleted::class);
+            Git::listen(Events\SeoSetLocalizationSaved::class);
+            Git::listen(Events\SeoSetLocalizationDeleted::class);
         }
 
         return $this;

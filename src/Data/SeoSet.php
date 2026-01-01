@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Events\SeoSetSaved;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Illuminate\Contracts\Support\Arrayable;
@@ -160,8 +159,6 @@ class SeoSet implements Arrayable, QueryableValue
         $this->config()->save();
 
         $this->saveOrDeleteLocalizations();
-
-        SeoSetSaved::dispatch($this);
 
         return $this;
     }

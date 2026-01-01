@@ -5,6 +5,8 @@ namespace Aerni\AdvancedSeo\Data;
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Illuminate\Support\Collection;
@@ -101,12 +103,16 @@ class SeoSetLocalization implements Augmentable, Contract
 
         SeoLocalization::save($this);
 
+        SeoSetLocalizationSaved::dispatch($this);
+
         return $this;
     }
 
     public function delete(): bool
     {
         SeoLocalization::delete($this);
+
+        SeoSetLocalizationDeleted::dispatch($this);
 
         return true;
     }
