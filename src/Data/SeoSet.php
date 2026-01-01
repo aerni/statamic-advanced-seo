@@ -30,7 +30,6 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         protected readonly string $title,
         protected readonly string $icon,
         protected readonly array $blueprints,
-        protected readonly string $contentFile,
         protected readonly null|StatamicCollection|StatamicTaxonomy $parent = null
     ) {
         //
@@ -69,7 +68,12 @@ class SeoSet implements Arrayable, Contract, QueryableValue
     public function defaultValues(): Collection
     {
         return Blink::once("advanced-seo::{$this->id()}::defaultValues", function () {
-            $path = __DIR__."/../../content/{$this->contentFile}";
+            $filename = match ($this->type) {
+                'site' => "{$this->handle}.yaml",
+                'collections', 'taxonomies' => 'content_defaults.yaml',
+            };
+
+            $path = __DIR__."/../../content/{$filename}";
 
             return file_exists($path)
                 ? collect(YAML::file($path)->parse())

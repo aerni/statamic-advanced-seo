@@ -70,7 +70,6 @@ class SeoSetRegistry extends Registry
                 blueprints: [
                     'localization' => $site['blueprint'],
                 ],
-                contentFile: $site['contentFile'],
             ))
             ->sortBy('handle');
     }
@@ -86,7 +85,6 @@ class SeoSetRegistry extends Registry
                 blueprints: [
                     'localization' => ContentDefaultsBlueprint::class,
                 ],
-                contentFile: 'localization.yaml',
                 parent: $collection,
             ))
             ->sortBy('handle');
@@ -103,7 +101,6 @@ class SeoSetRegistry extends Registry
                 blueprints: [
                     'localization' => ContentDefaultsBlueprint::class,
                 ],
-                contentFile: 'localization.yaml',
                 parent: $taxonomy,
             ))
             ->sortBy('handle');
@@ -117,7 +114,6 @@ class SeoSetRegistry extends Registry
                 'title' => 'General',
                 'blueprint' => GeneralBlueprint::class,
                 'icon' => 'utilities',
-                'contentFile' => 'general.yaml',
                 'enabled' => true,
             ],
             [
@@ -125,7 +121,6 @@ class SeoSetRegistry extends Registry
                 'title' => 'Indexing',
                 'blueprint' => IndexingBlueprint::class,
                 'icon' => 'hierarchy',
-                'contentFile' => 'indexing.yaml',
                 'enabled' => true,
             ],
             [
@@ -133,7 +128,6 @@ class SeoSetRegistry extends Registry
                 'title' => 'Social Media',
                 'blueprint' => SocialMediaBlueprint::class,
                 'icon' => 'assets',
-                'contentFile' => 'social_media.yaml',
                 'enabled' => true,
             ],
             [
@@ -141,7 +135,6 @@ class SeoSetRegistry extends Registry
                 'title' => 'Analytics',
                 'blueprint' => AnalyticsBlueprint::class,
                 'icon' => 'money-graph-bar-increase',
-                'contentFile' => 'analytics.yaml',
                 'enabled' => collect(config('advanced-seo.analytics'))
                     ->only('fathom', 'cloudflare_analytics', 'google_tag_manager')
                     ->filter()
@@ -152,7 +145,6 @@ class SeoSetRegistry extends Registry
                 'title' => 'Favicons',
                 'blueprint' => FaviconsBlueprint::class,
                 'icon' => 'edit-paint-palette',
-                'contentFile' => 'favicons.yaml',
                 'enabled' => config('advanced-seo.favicons.enabled', true),
             ],
         ];
