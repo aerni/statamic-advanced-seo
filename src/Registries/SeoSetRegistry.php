@@ -2,12 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
-use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
 use Aerni\AdvancedSeo\Contracts\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Illuminate\Support\Collection;
@@ -67,9 +61,6 @@ class SeoSetRegistry extends Registry
                 handle: $site['handle'],
                 title: $site['title'],
                 icon: $site['icon'],
-                blueprints: [
-                    'localization' => $site['blueprint'],
-                ],
             ))
             ->sortBy('handle');
     }
@@ -82,9 +73,6 @@ class SeoSetRegistry extends Registry
                 handle: $collection->handle(),
                 title: $collection->title(),
                 icon: $collection->icon(),
-                blueprints: [
-                    'localization' => ContentDefaultsBlueprint::class,
-                ],
             ))
             ->sortBy('handle');
     }
@@ -97,9 +85,6 @@ class SeoSetRegistry extends Registry
                 handle: $taxonomy->handle(),
                 title: $taxonomy->title(),
                 icon: 'tags',
-                blueprints: [
-                    'localization' => ContentDefaultsBlueprint::class,
-                ],
             ))
             ->sortBy('handle');
     }
@@ -110,28 +95,24 @@ class SeoSetRegistry extends Registry
             [
                 'handle' => 'general',
                 'title' => 'General',
-                'blueprint' => GeneralBlueprint::class,
                 'icon' => 'utilities',
                 'enabled' => true,
             ],
             [
                 'handle' => 'indexing',
                 'title' => 'Indexing',
-                'blueprint' => IndexingBlueprint::class,
                 'icon' => 'hierarchy',
                 'enabled' => true,
             ],
             [
                 'handle' => 'social_media',
                 'title' => 'Social Media',
-                'blueprint' => SocialMediaBlueprint::class,
                 'icon' => 'assets',
                 'enabled' => true,
             ],
             [
                 'handle' => 'analytics',
                 'title' => 'Analytics',
-                'blueprint' => AnalyticsBlueprint::class,
                 'icon' => 'money-graph-bar-increase',
                 'enabled' => collect(config('advanced-seo.analytics'))
                     ->only('fathom', 'cloudflare_analytics', 'google_tag_manager')
@@ -141,7 +122,6 @@ class SeoSetRegistry extends Registry
             [
                 'handle' => 'favicons',
                 'title' => 'Favicons',
-                'blueprint' => FaviconsBlueprint::class,
                 'icon' => 'edit-paint-palette',
                 'enabled' => config('advanced-seo.favicons.enabled', true),
             ],

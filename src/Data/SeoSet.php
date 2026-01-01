@@ -19,6 +19,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
+use Statamic\Support\Str;
 
 class SeoSet implements Arrayable, Contract, QueryableValue
 {
@@ -29,7 +30,6 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         protected readonly string $handle,
         protected readonly string $title,
         protected readonly string $icon,
-        protected readonly array $blueprints,
     ) {
         //
     }
@@ -59,9 +59,13 @@ class SeoSet implements Arrayable, Contract, QueryableValue
         return $this->icon;
     }
 
-    public function blueprint(string $blueprint): ?string
+    public function blueprint(string $type): string
     {
-        return $this->blueprints[$blueprint] ?? null;
+        return match ([$this->type, $type]) {
+            ['site', 'localization'] => 'Aerni\\AdvancedSeo\\Blueprints\\'.Str::studly($this->handle).'Blueprint',
+            ['collections', 'localization'], ['taxonomies', 'localization'] => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
+            default => throw new \Exception("No blueprint defined for SEO set type '{$this->type}' with blueprint type '{$type}'"),
+        };
     }
 
     public function parent(): null|StatamicCollection|StatamicTaxonomy
