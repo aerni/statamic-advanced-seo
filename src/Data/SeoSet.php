@@ -163,6 +163,7 @@ class SeoSet implements Arrayable, QueryableValue
         return $this;
     }
 
+    // TODO: Should we move this into a listener for SeoSetConfigSaved event?
     protected function saveOrDeleteLocalizations(): void
     {
         if (! $this->enabled()) {
