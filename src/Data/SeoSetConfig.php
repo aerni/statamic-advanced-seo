@@ -2,21 +2,23 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
-use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
-use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Facades\SeoConfig;
-use Illuminate\Support\Collection;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Stache;
+use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
+use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Facades\SeoConfig;
+use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
 
 class SeoSetConfig implements Contract
 {
+    use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
 
@@ -26,7 +28,7 @@ class SeoSetConfig implements Contract
 
     public function __construct(protected readonly string $seoSet)
     {
-        //
+        $this->data = collect();
     }
 
     public function seoSet(): SeoSet
@@ -100,17 +102,17 @@ class SeoSetConfig implements Contract
 
     public function fileData(): array
     {
-        $data = [];
+        $data = $this->data();
 
         if ($this->origins()->filter()->isNotEmpty()) {
-            $data['origins'] = $this->origins()->all();
+            $data->put('origins', $this->origins()->all());
         }
 
         if ($this->type() !== 'site') {
-            $data['enabled'] = $this->enabled();
+            $data->put('enabled', $this->enabled());
         }
 
-        return $data;
+        return $data->all();
     }
 
     public function editUrl(): string

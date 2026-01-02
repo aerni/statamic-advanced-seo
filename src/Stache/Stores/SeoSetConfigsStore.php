@@ -36,6 +36,7 @@ class SeoSetConfigsStore extends BasicStore
 
         $config = SeoConfig::make("{$type}::{$handle}")
             ->initialPath($path)
+            ->data(Arr::except($data, ['enabled', 'origins']))
             ->origins(Arr::get($data, 'origins', []));
 
         // Defaults of type 'site' are always enabled.

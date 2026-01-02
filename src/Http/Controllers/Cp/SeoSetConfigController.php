@@ -25,6 +25,7 @@ class SeoSetConfigController extends CpController
             ->icon('cog')
             ->title("Configure {$seoSet->title()}")
             ->values([
+                ...$config->data(),
                 'enabled' => $config->enabled(),
                 'origins' => $config->origins(),
             ])
@@ -46,6 +47,7 @@ class SeoSetConfigController extends CpController
 
         $config
             ->origins(Arr::get($values, 'origins'))
+            ->data(Arr::except($values, ['enabled', 'origins']))
             ->seoSet()
             ->save();
     }
