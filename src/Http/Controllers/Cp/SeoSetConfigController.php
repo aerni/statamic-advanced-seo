@@ -62,7 +62,7 @@ class SeoSetConfigController extends CpController
                 'fields' => [
                     'enabled' => [
                         'display' => __('Enabled'),
-                        'instructions' => __('Choose to enable/disable SEO processing for this item.'),
+                        'instructions' => __("Enables SEO for {$config->seoSet()->title()}."),
                         'type' => 'toggle',
                         'default' => true,
                     ],
@@ -75,7 +75,7 @@ class SeoSetConfigController extends CpController
             'fields' => [
                 'origins' => [
                     'display' => __('Origins'),
-                    'instructions' => __('Choose to inherit values from the selected origin.'),
+                    'instructions' => __('Choose to inherit values from selected origins.'),
                     'type' => 'default_set_sites',
                     'if' => array_filter([
                         'enabled' => 'true',
