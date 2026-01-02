@@ -64,24 +64,35 @@ class SeoSetConfig implements Contract
             ->args(func_get_args());
     }
 
+    // TODO: Maybe we should implement the circular origins check from the DefaultSetSites fieldtype as well.
     public function origins(?array $origins = null): Collection|self
     {
         return $this
             ->fluentlyGetOrSet('origins')
             ->getter(function ($origins) {
-                if (empty($origins) && $this->sites()->count() > 1) {
-                    return $this->sites()->map(fn ($site) => null);
+                if ($this->sites()->count() === 1) {
+                    return collect($origins);
                 }
 
-                return collect($origins);
+                return $this->sites()->map(fn ($site, $key) => $origins[$key] ?? null);
             })
             ->setter(function ($origins) {
-                return collect($origins)
-                    ->filter(function ($value, $key) {
-                        $validValues = $this->sites()->keys();
+                $validSites = $this->sites()->keys();
 
-                        return $validValues->contains($key) && $validValues->contains($value);
-                    })->all();
+                return collect($origins)->filter(function ($value, $key) use ($validSites) {
+                    // Only keep entries where the key is a valid site handle
+                    if (! $validSites->contains($key)) {
+                        return false;
+                    }
+
+                    // Keep null values (sites without origins)
+                    if ($value === null) {
+                        return true;
+                    }
+
+                    // Keep valid origin site handles
+                    return $validSites->contains($value);
+                })->all();
             })
             ->args(func_get_args());
     }
