@@ -173,11 +173,7 @@ class SeoSet implements Arrayable, QueryableValue
             return;
         }
 
-        // Save localizations that aren't persisted yet
-        // TODO: Do we even need this? As localizations are loaded in memory and don't have to be persisted per se.
-        $this->localizations()
-            ->reject(fn ($localization) => $localization->initialPath())
-            ->each->save();
+        $this->localizations()->each->save();
 
         // Delete orphaned localizations (persisted but no longer valid for available sites)
         // TODO: What's the best way to delete orphaned localizations? Maybe not here essentially?
