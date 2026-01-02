@@ -19,7 +19,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\IndexingDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoSetsType;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteDefaultsType;
@@ -232,7 +232,7 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(IndexingDefaultsType::class);
             GraphQL::addType(RawMetaDataType::class);
             GraphQL::addType(RenderedViewsType::class);
-            GraphQL::addType(SeoSetsType::class);
+            GraphQL::addType(SeoDefaultsType::class);
             GraphQL::addType(SeoMetaType::class);
             GraphQL::addType(SeoSitemapsType::class);
             GraphQL::addType(SeoSitemapType::class);

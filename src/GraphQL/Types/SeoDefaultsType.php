@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\GraphQL\Fields\ContentDefaultsField;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 
-class SeoSetsType extends Type
+class SeoDefaultsType extends Type
 {
     const NAME = 'seoDefaults';
 
