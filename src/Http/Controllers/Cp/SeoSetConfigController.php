@@ -84,6 +84,23 @@ class SeoSetConfigController extends CpController
             ],
         ];
 
+        if ($config->type() !== 'site' && config('advanced-seo.sitemap.enabled', true)) {
+            $fields['features'] = [
+                'display' => __('Features'),
+                'fields' => [
+                    'sitemap' => [
+                        'display' => __('Sitemap'),
+                        'instructions' => __("Enables the sitemap for {$config->seoSet()->title()}."),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'if' => [
+                            'enabled' => 'true',
+                        ],
+                    ],
+                ],
+            ];
+        }
+
         return \Statamic\Facades\Blueprint::make()
             ->setContents(collect([
                 'tabs' => [

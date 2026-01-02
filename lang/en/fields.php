@@ -344,16 +344,6 @@ return [
         'instructions' => 'Configure the sitemap settings of your site.',
     ],
 
-    'excluded_collections' => [
-        'display' => 'Collections',
-        'instructions' => 'Collections you want to exclude from the sitemap.',
-    ],
-
-    'excluded_taxonomies' => [
-        'display' => 'Taxonomies',
-        'instructions' => 'Taxonomies you want to exclude from the sitemap.',
-    ],
-
     'section_verification' => [
         'display' => 'Site verification',
         'instructions' => 'Verify your ownership of this site.',

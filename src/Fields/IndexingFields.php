@@ -12,7 +12,6 @@ class IndexingFields extends BaseFields
     {
         return [
             $this->crawling(),
-            $this->sitemap(),
             $this->siteVerification(),
         ];
     }
@@ -46,43 +45,6 @@ class IndexingFields extends BaseFields
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function sitemap(): array
-    {
-        return [
-            'display' => $this->trans('section_sitemap.display'),
-            'instructions' => $this->trans('section_sitemap.instructions'),
-            'collapsible' => true,
-            'fields' => [
-                [
-                    'handle' => 'excluded_collections',
-                    'field' => [
-                        'type' => 'collections',
-                        'display' => $this->trans('excluded_collections.display'),
-                        'instructions' => $this->trans('excluded_collections.instructions'),
-                        'mode' => 'stack',
-                        'listable' => 'hidden',
-                        'localizable' => true,
-                        'width' => 50,
-                        'feature' => Sitemap::class,
-                    ],
-                ],
-                [
-                    'handle' => 'excluded_taxonomies',
-                    'field' => [
-                        'type' => 'taxonomies',
-                        'display' => $this->trans('excluded_taxonomies.display'),
-                        'instructions' => $this->trans('excluded_taxonomies.instructions'),
-                        'mode' => 'stack',
-                        'listable' => 'hidden',
-                        'localizable' => true,
-                        'width' => 50,
-                        'feature' => Sitemap::class,
                     ],
                 ],
             ],
