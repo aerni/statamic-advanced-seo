@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
@@ -157,6 +156,7 @@ class SeoSet implements Arrayable, QueryableValue
     /**
      * Saves the config and triggers cascading side effects.
      * Side effects are handled by the HandleSeoSetConfigSaved event listener.
+     *
      * @see \Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigSaved
      */
     public function save(): self
@@ -169,6 +169,7 @@ class SeoSet implements Arrayable, QueryableValue
     /**
      * Deletes the config and triggers cascading cleanup.
      * Side effects are handled by the HandleSeoSetConfigDeleted event listener.
+     *
      * @see \Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigDeleted
      */
     public function delete(): bool

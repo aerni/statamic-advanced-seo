@@ -45,9 +45,9 @@ class MigrateSitemapsConfig extends UpdateScript
     {
         return $set
             ->localizations()
-            ->map(fn($localization, $site) => $localization->value($field))
+            ->map(fn ($localization, $site) => $localization->value($field))
             ->filter()
-            ->map(fn($handles, $site) => ['handles' => $handles])
+            ->map(fn ($handles, $site) => ['handles' => $handles])
             ->groupBy('handles', true)
             ->map(fn ($sites) => $sites->keys());
     }
@@ -64,6 +64,7 @@ class MigrateSitemapsConfig extends UpdateScript
 
                 if ($localizationsWithEnabledSitemap->isEmpty()) {
                     $set->config()->set('sitemap', false)->save();
+
                     return;
                 }
 
@@ -72,6 +73,6 @@ class MigrateSitemapsConfig extends UpdateScript
                 $localizationsWithDisabledSitemap->each(fn ($site) => $set->in($site)->set('seo_sitemap_enabled', false));
 
                 $set->save();
-        });
+            });
     }
 }

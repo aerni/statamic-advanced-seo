@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 

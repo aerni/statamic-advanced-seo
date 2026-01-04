@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;

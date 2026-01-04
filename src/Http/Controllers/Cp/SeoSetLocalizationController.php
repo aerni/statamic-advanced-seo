@@ -3,9 +3,9 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetGroup;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;

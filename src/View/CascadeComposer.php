@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Tags\Context;
-use Statamic\Facades\Cascade;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Contracts\View\View;
 use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Contracts\View\View;
+use Statamic\Facades\Cascade;
 use Statamic\Statamic;
+use Statamic\Tags\Context;
 
 class CascadeComposer
 {

@@ -10,7 +10,6 @@ use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Illuminate\Support\Collection;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
