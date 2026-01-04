@@ -148,44 +148,16 @@ class SeoSetLocalization implements Augmentable, Contract
         return $this->blueprint()->fields()->all()->keys()->all();
     }
 
-    // TODO: Do we really need the ability to change the origin here?
-    // Origins are always defined and derived in the SeoSet config.
-    public function origin(?string $origin = null): Contract|self|null
+    public function origin(): ?Contract
     {
-        if (func_num_args() === 0) {
-            if ($found = Blink::get($this->getOriginBlinkKey())) {
-                return $found;
-            }
-
-            $origin = $this->seoSet()->origins()->get($this->locale());
-
-            return tap($this->getOriginByString($origin), function ($found) {
-                Blink::put($this->getOriginBlinkKey(), $found);
-            });
-        }
-
-        // Ensure we don't make a localization its own origin
-        if ($origin === $this->locale()) {
-            return $this;
-        }
-
-        // Verify that the origin is valid.
-        if (! $this->seoSet()->sites()->has($origin)) {
-            return $this;
-        }
-
-        Blink::forget($this->getOriginBlinkKey());
-
-        $origins = $this->seoSet()->origins()->put($this->locale(), $origin)->all();
-
-        $this->seoSet()->config()->origins($origins);
-
-        return $this;
+        return ($origin = $this->seoSet()->origins()->get($this->locale()))
+            ? $this->getOriginByString($origin)
+            : null;
     }
 
-    protected function getOriginByString($origin)
+    protected function getOriginByString($origin): ?Contract
     {
-        return is_null($origin) ? null : $this->seoSet()->in($origin);
+        return $this->seoSet()->in($origin);
     }
 
     public function resolveGqlValue(string $field)
