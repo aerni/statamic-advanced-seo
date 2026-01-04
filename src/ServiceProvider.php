@@ -56,6 +56,20 @@ class ServiceProvider extends AddonServiceProvider
         SeoSet::class => Policies\SeoSetPolicy::class,
     ];
 
+    /**
+     * Explicitly define update scripts to control execution order.
+     * MigrateOriginsConfig must run before MigrateSitemapsConfig since
+     * the sitemap migration depends on origins being properly configured.
+     */
+    protected $updateScripts = [
+        UpdateScripts\MigrateUserPermissions::class,
+        UpdateScripts\MigrateDisabledConfig::class,
+        UpdateScripts\MigrateOriginsConfig::class,
+        UpdateScripts\MigrateSitemapsConfig::class,
+        UpdateScripts\MigrateSiteNamePosition::class,
+        UpdateScripts\CreateSocialImagesTheme::class,
+    ];
+
     protected $vite = [
         'input' => [
             'resources/js/cp.js',
