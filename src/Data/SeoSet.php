@@ -154,43 +154,26 @@ class SeoSet implements Arrayable, QueryableValue
         return $this->in($this->defaultSite());
     }
 
+    /**
+     * Saves the config and triggers cascading side effects.
+     * Side effects are handled by the HandleSeoSetConfigSaved event listener.
+     * @see \Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigSaved
+     */
     public function save(): self
     {
         $this->config()->save();
 
-        $this->saveOrDeleteLocalizations();
-
         return $this;
     }
 
-    // TODO: Should we move this into a listener for SeoSetConfigSaved event?
-    protected function saveOrDeleteLocalizations(): void
-    {
-        if (! $this->enabled()) {
-            $this->localizations()->each->delete();
-
-            RemoveSeoValues::handle($this->parent());
-
-            return;
-        }
-
-        $this->localizations()->each->save();
-
-        // Delete orphaned localizations (persisted but no longer valid for available sites)
-        // TODO: What's the best way to delete orphaned localizations? Maybe not here essentially?
-        // Maybe have a cleanup method that gets called when the registry is loaded?
-        // Something similar to how Livewire cleans up old uploaded assets.
-        SeoLocalization::whereSeoSet($this->id())
-            ->keyBy->locale()
-            ->diffKeys($this->sites())
-            ->each->delete();
-    }
-
+    /**
+     * Deletes the config and triggers cascading cleanup.
+     * Side effects are handled by the HandleSeoSetConfigDeleted event listener.
+     * @see \Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigDeleted
+     */
     public function delete(): bool
     {
         $this->config()->delete();
-
-        $this->localizations()->each->delete();
 
         return true;
     }

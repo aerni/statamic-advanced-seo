@@ -129,8 +129,6 @@ class SeoSetConfig implements Contract
         ]);
     }
 
-    // TODO: When the config is saved and there are disabled features like sitemap: false
-    // Should we then resave the localizations? And even remove seo_sitemap_enabled from the entries?
     public function save(): self
     {
         SeoConfig::save($this);

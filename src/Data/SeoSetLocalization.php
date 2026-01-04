@@ -90,12 +90,6 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function save(): self
     {
-        $config = $this->seoSet()->config();
-
-        if (! $config->initialPath()) {
-            $config->save();
-        }
-
         SeoLocalization::save($this);
 
         SeoSetLocalizationSaved::dispatch($this);
