@@ -13,6 +13,20 @@ class MigrateOriginsConfig extends UpdateScript
         return $this->isUpdatingTo('3.0.0');
     }
 
+    /**
+     * Migrate origin configuration from localizations to config
+     *
+     * In previous versions, origin information was stored in individual localizations.
+     * In v3.0.0, origins are now managed centrally in the SeoSet config.
+     *
+     * This migration:
+     * - Collects all 'origin' values from each SeoSet's localizations
+     * - Stores them in the SeoSet's config using the origins() method
+     * - Removes the 'origin' key from all localizations to prevent duplication
+     *
+     * This centralizes origin management and makes it easier to configure which
+     * localizations should inherit SEO data from other localizations.
+     */
     public function update(): void
     {
         Seo::all()->each(function (SeoSet $set) {

@@ -12,6 +12,24 @@ class MigrateDisabledConfig extends UpdateScript
         return $this->isUpdatingTo('3.0.0');
     }
 
+    /**
+     * Migrate disabled collections and taxonomies from config to SeoSet config
+     *
+     * Old configuration:
+     * - advanced-seo.disabled.collections (array of collection handles)
+     * - advanced-seo.disabled.taxonomies (array of taxonomy handles)
+     *
+     * New configuration:
+     * - Each SeoSet has its own enabled/disabled state in its config
+     *
+     * This migration:
+     * - Reads the old config arrays for disabled collections and taxonomies
+     * - Finds each corresponding SeoSet
+     * - Sets enabled(false) on the SeoSet's config
+     *
+     * This allows per-collection/taxonomy control of SEO functionality
+     * and removes the need for centralized disabled lists.
+     */
     public function update(): void
     {
         collect(config('advanced-seo.disabled.collections'))

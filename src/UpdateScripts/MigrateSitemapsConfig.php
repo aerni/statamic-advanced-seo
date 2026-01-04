@@ -14,6 +14,28 @@ class MigrateSitemapsConfig extends UpdateScript
         return $this->isUpdatingTo('3.0.0');
     }
 
+    /**
+     * Migrate sitemap exclusions from site indexing defaults to individual collection/taxonomy configs
+     *
+     * Old configuration:
+     * - Sitemap exclusions were managed centrally in the site indexing defaults
+     * - excluded_collections and excluded_taxonomies fields stored which handles to exclude per localization
+     *
+     * New configuration:
+     * - Each collection/taxonomy SeoSet manages its own sitemap inclusion via config
+     * - Per-localization control using the 'seo_sitemap_enabled' field in individual localizations
+     *
+     * This migration:
+     * 1. Builds exclusion maps from the indexing set's excluded_collections and excluded_taxonomies
+     *    - Maps which localizations have each collection/taxonomy excluded from sitemaps
+     * 2. For each collection/taxonomy:
+     *    - If excluded in all localizations: sets sitemap config to false
+     *    - If excluded in some localizations: sets sitemap config to true, then disables per-localization
+     * 3. Removes the old excluded_collections and excluded_taxonomies fields from indexing localizations
+     *
+     * This provides more granular control over sitemap inclusion at both the config and localization level,
+     * and moves sitemap configuration closer to the content it describes.
+     */
     public function update(): void
     {
         $indexingSet = Seo::find('site::indexing');
