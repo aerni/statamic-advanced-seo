@@ -29,6 +29,6 @@ class MigrateOriginsConfig extends UpdateScript
             $set->save();
         });
 
-        $this->console()->info('Migrated origins collections and taxonomies to set configs.');
+        $this->console()->info('Migrated origins to defaults configs.');
     }
 }

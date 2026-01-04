@@ -24,6 +24,6 @@ class MigrateDisabledConfig extends UpdateScript
                 Seo::find("taxonomies::{$handle}")?->config()->enabled(false)->save();
             });
 
-        $this->console()->info('Migrated disabled collections and taxonomies to set configs.');
+        $this->console()->info('Migrated disabled collections and taxonomies to defaults configs.');
     }
 }

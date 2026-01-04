@@ -31,7 +31,7 @@ class MigrateSitemapsConfig extends UpdateScript
 
         $indexingSet->save();
 
-        $this->console()->info('Migrated sitemap configuration from site::indexing to individual collection and taxonomy configs.');
+        $this->console()->info('Migrated sitemap configuration from indexing site defaults to individual collection and taxonomy defaults configs.');
     }
 
     /**
