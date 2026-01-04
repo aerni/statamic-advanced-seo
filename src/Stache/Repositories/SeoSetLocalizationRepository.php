@@ -17,12 +17,9 @@ class SeoSetLocalizationRepository implements Contract
         $this->store = $stache->store('seo-set-localizations');
     }
 
-    public function make(string $seoSet, string $locale): SeoSetLocalization
+    public function make(): SeoSetLocalization
     {
-        return app(
-            SeoSetLocalization::class,
-            ['seoSet' => $seoSet, 'locale' => $locale]
-        );
+        return app(SeoSetLocalization::class);
     }
 
     public function find(string $id): ?SeoSetLocalization

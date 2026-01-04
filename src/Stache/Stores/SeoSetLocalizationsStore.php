@@ -31,7 +31,9 @@ class SeoSetLocalizationsStore extends BasicStore
         [$type, $locale] = explode('/', $relative);
         $handle = pathinfo($path, PATHINFO_FILENAME);
 
-        return SeoLocalization::make("{$type}::{$handle}", $locale)
+        return SeoLocalization::make()
+            ->seoSet("{$type}::{$handle}")
+            ->locale($locale)
             ->initialPath($path)
             ->data(YAML::file($path)->parse());
     }

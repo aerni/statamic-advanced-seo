@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 interface SeoSetLocalizationRepository
 {
-    public function make(string $seoSet, string $locale): SeoSetLocalization;
+    public function make(): SeoSetLocalization;
 
     public function find(string $id): ?SeoSetLocalization;
 

@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 interface SeoSetConfigRepository
 {
-    public function make(string $id): SeoSetConfig;
+    public function make(): SeoSetConfig;
 
     public function find(string $id): ?SeoSetConfig;
 

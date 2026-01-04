@@ -101,7 +101,7 @@ class SeoSet implements Arrayable, QueryableValue
     public function config(): SeoSetConfig
     {
         return Blink::once("advanced-seo::{$this->id()}::config", function () {
-            return SeoConfig::findOrMake($this->id());
+            return SeoConfig::findOrMake($this->id())->seoSet($this);
         });
     }
 
@@ -125,7 +125,7 @@ class SeoSet implements Arrayable, QueryableValue
             $persisted = SeoLocalization::whereSeoSet($this->id())->keyBy->locale();
 
             return $this->sites()
-                ->map(fn ($site, $handle) => $persisted->get($handle) ?? SeoLocalization::make($this->id(), $handle));
+                ->map(fn ($site, $handle) => ($persisted->get($handle) ?? SeoLocalization::make())->seoSet($this)->locale($handle));
         });
     }
 

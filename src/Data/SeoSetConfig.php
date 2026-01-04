@@ -2,38 +2,33 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Facades\Path;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Stache;
+use Aerni\AdvancedSeo\Concerns\HasSeoSet;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
+use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
+use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
+use Aerni\AdvancedSeo\Facades\SeoConfig;
+use Illuminate\Support\Collection;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Facades\SeoConfig;
-use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
 
 class SeoSetConfig implements Contract
 {
     use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
+    use HasSeoSet;
 
     protected bool $enabled = true;
 
     protected array $origins = [];
 
-    public function __construct(protected readonly string $seoSet)
+    public function __construct()
     {
         $this->data = collect();
-    }
-
-    public function seoSet(): SeoSet
-    {
-        return Blink::once("advanced-seo::{$this->seoSet}", fn () => Seo::find($this->seoSet));
     }
 
     public function id(): string

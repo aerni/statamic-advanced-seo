@@ -17,9 +17,9 @@ class SeoSetConfigRepository implements Contract
         $this->store = $stache->store('seo-set-configs');
     }
 
-    public function make(string $id): SeoSetConfig
+    public function make(): SeoSetConfig
     {
-        return app(SeoSetConfig::class, ['seoSet' => $id]);
+        return app(SeoSetConfig::class);
     }
 
     public function find(string $id): ?SeoSetConfig
@@ -29,7 +29,7 @@ class SeoSetConfigRepository implements Contract
 
     public function findOrMake(string $id): SeoSetConfig
     {
-        return $this->find($id) ?? $this->make($id);
+        return $this->find($id) ?? $this->make();
     }
 
     public function all(): Collection

@@ -2,28 +2,27 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Facades\SeoLocalization;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Data\ContainsData;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\Blink;
+use Statamic\Data\HasOrigin;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Blueprint;
+use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
 use Statamic\GraphQL\ResolvesValues;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Sites\Site as SiteObject;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Contracts\Data\Augmentable;
+use Aerni\AdvancedSeo\Concerns\HasSeoSet;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
 
 class SeoSetLocalization implements Augmentable, Contract
 {
@@ -33,25 +32,21 @@ class SeoSetLocalization implements Augmentable, Contract
     use HasAugmentedInstance;
     use HasDefaultsData;
     use HasOrigin;
+    use HasSeoSet;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
 
-    public function __construct(
-        protected readonly string $seoSet,
-        protected readonly string $locale,
-    ) {
+    protected string $locale;
+
+    public function __construct()
+    {
         $this->data = collect();
     }
 
-    public function seoSet(): SeoSet
+    public function locale(?string $locale = null): string|self
     {
-        return Blink::once("advanced-seo::{$this->seoSet}", fn () => Seo::find($this->seoSet));
-    }
-
-    public function locale(): string
-    {
-        return $this->locale;
+        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
     }
 
     public function id(): string
