@@ -15,7 +15,7 @@ class MigrateUserPermissions extends UpdateScript
     /**
      * Migrate old permissions to new ones
      *
-     * Old permissios.
+     * Old permissions.
      * view seo {group} defaults
      * edit seo {group} defaults
      *
@@ -26,38 +26,49 @@ class MigrateUserPermissions extends UpdateScript
      * The "edit seo {group} defaults" was renamed to "edit seo".
      * "edit seo" means users can view and edit SEO defaults (SeoSetLocalization) for all Statamic collection/taxonomies they have access to.
      *
-     * The old "view seo {group} defaults" permission was removed in favor of the new "edit seo" permission.
-     * There's no "view only" access anymore. If users can see the defaults, they can also edit them.
+     * The old "view seo {group} defaults" permission is removed without replacement.
+     * Users who only had "view" permissions will not receive any new SEO permissions.
      *
      * A new "configure seo" permission was introduced.
      * This permission allows users to configure SEO settings (SeoSetConfig) for all Statamic collections/taxonomies they have access to.
      * Additionally, they get access to edit and configure site defaults (any SeoSet of type "site").
      *
-     * If a user had any "view seo {group} defaults" permissions, they should get the "edit seo" permissions.
-     * If a user had any "edit seo {group} defaults" permissions, they should get the "edit seo" permission.
-     * If a user had the "edit seo site defaults" permission, they should get the "configure seo" permission.
+     * If a user had any "edit seo {group} defaults" permissions (except site-level permissions), they should get the "edit seo" permission.
+     * If a user had any of the site-level "edit seo" permissions (general, indexing, social_media, analytics, favicons), they should get the "configure seo" permission.
      */
     public function update(): void
     {
         Role::all()->each(function ($role) {
             $permissions = $role->permissions();
 
-            // Check if role has any old "view seo {group} defaults" or "edit seo {group} defaults" permissions
-            $hasViewOrEditSeoDefaults = $permissions->contains(function ($permission) {
-                return preg_match('/^(view|edit) seo .+ defaults$/', $permission);
+            // Site-level permissions that should grant "configure seo"
+            $siteLevelPermissions = [
+                'edit seo general defaults',
+                'edit seo indexing defaults',
+                'edit seo social_media defaults',
+                'edit seo analytics defaults',
+                'edit seo favicons defaults',
+            ];
+
+            // Check if role has any site-level permissions
+            $hasSiteLevelPermissions = $permissions->contains(function ($permission) use ($siteLevelPermissions) {
+                return in_array($permission, $siteLevelPermissions);
             });
 
-            // Check if role has "edit seo site defaults" permission
-            $hasEditSeoSiteDefaults = $permissions->contains('edit seo site defaults');
-
-            // Add "edit seo" permission if user had any view/edit permissions
-            if ($hasViewOrEditSeoDefaults) {
-                $role->addPermission('edit seo');
+            // Add "configure seo" permission if user had any site-level permissions
+            if ($hasSiteLevelPermissions) {
+                $role->addPermission('configure seo');
             }
 
-            // Add "configure seo" permission if user had "edit seo site defaults"
-            if ($hasEditSeoSiteDefaults) {
-                $role->addPermission('configure seo');
+            // Check if role has any other "edit seo {group} defaults" permissions (excluding site-level)
+            $hasEditSeoDefaults = $permissions->contains(function ($permission) use ($siteLevelPermissions) {
+                return preg_match('/^edit seo .+ defaults$/', $permission)
+                    && ! in_array($permission, $siteLevelPermissions);
+            });
+
+            // Add "edit seo" permission only if user had edit permissions for non-site groups
+            if ($hasEditSeoDefaults) {
+                $role->addPermission('edit seo');
             }
 
             // Remove all old permissions that match the pattern
