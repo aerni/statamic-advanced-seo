@@ -1,5 +1,7 @@
 <?php
 
+use Statamic\Facades\Blink;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -39,7 +41,7 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function flushBlink()
 {
-    // ..
+    Blink::flush();
 }

@@ -2,7 +2,6 @@
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\UpdateScripts\MigrateConfigChanges;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Site;
@@ -17,7 +16,7 @@ uses(PreventsSavingStacheItemsToDisk::class);
 function runConfigMigrationScript(): void
 {
     (new MigrateConfigChanges('aerni/advanced-seo'))->update();
-    Blink::flush();
+    flushBlink();
 }
 
 beforeEach(function () {
