@@ -107,17 +107,17 @@ class SeoSetConfig implements Contract
 
     public function fileData(): array
     {
-        $data = $this->data();
-
-        if ($this->origins()->filter()->isNotEmpty()) {
-            $data->put('origins', $this->origins()->all());
-        }
+        $data = collect();
 
         if ($this->type() !== 'site') {
             $data->put('enabled', $this->enabled());
         }
 
-        return $data->all();
+        if ($this->origins()->filter()->isNotEmpty()) {
+            $data->put('origins', $this->origins()->all());
+        }
+
+        return $data->merge($this->data())->all();
     }
 
     public function editUrl(): string
