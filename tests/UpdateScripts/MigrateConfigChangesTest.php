@@ -30,12 +30,12 @@ beforeEach(function () {
         'french' => ['name' => 'French', 'url' => '/fr', 'locale' => 'fr'],
     ]);
 
-    Collection::make('pages')->sites(['english'])->save();
-    Collection::make('blog')->sites(['english', 'german'])->save();
-    Collection::make('products')->sites(['english', 'german', 'french'])->save();
+    Collection::make('pages')->sites(['english'])->saveQuietly();
+    Collection::make('blog')->sites(['english', 'german'])->saveQuietly();
+    Collection::make('products')->sites(['english', 'german', 'french'])->saveQuietly();
 
-    Taxonomy::make('tags')->sites(['english'])->save();
-    Taxonomy::make('categories')->sites(['english', 'german'])->save();
+    Taxonomy::make('tags')->sites(['english'])->saveQuietly();
+    Taxonomy::make('categories')->sites(['english', 'german'])->saveQuietly();
 });
 
 it('migrates disabled collections/taxonomies from config to set configs', function () {
