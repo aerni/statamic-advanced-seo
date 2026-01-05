@@ -8,7 +8,7 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\UpdateScripts\UpdateScript;
 
-class MigrateV3ConfigChanges extends UpdateScript
+class MigrateConfigChanges extends UpdateScript
 {
     protected Collection $seoSets;
 
@@ -175,8 +175,7 @@ class MigrateV3ConfigChanges extends UpdateScript
 
                 $set->config()->set('sitemap', true);
 
-                $localizationsWithDisabledSitemap->each(fn ($site) =>
-                    $set->in($site)->set('seo_sitemap_enabled', false)
+                $localizationsWithDisabledSitemap->each(fn ($site) => $set->in($site)->set('seo_sitemap_enabled', false)
                 );
             });
     }
