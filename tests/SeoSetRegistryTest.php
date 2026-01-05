@@ -1,11 +1,11 @@
 <?php
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Taxonomy;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Collection as StatamicCollection;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
