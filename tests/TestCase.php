@@ -15,7 +15,7 @@ abstract class TestCase extends AddonTestCase
         parent::resolveApplicationConfiguration($app);
 
         $app['config']->set('statamic.editions.pro', true);
-        
+
         $app['config']->set('statamic.system.multisite', true);
 
         $app['config']->set('advanced-seo', require (__DIR__.'/../config/advanced-seo.php'));
