@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Listeners;
 
+use Aerni\AdvancedSeo\Concerns\ManagesSeoSetLocalizations;
 use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
-use Aerni\AdvancedSeo\Listeners\Concerns\ManagesSeoSetLocalizations;
 
 class HandleSeoSetConfigDeleted
 {

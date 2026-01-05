@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Listeners;
 
+use Aerni\AdvancedSeo\Concerns\ManagesSeoSetLocalizations;
 use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
-use Aerni\AdvancedSeo\Listeners\Concerns\ManagesSeoSetLocalizations;
 
 class HandleSeoSetConfigSaved
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Listeners\Concerns;
+namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Data\SeoSet;
