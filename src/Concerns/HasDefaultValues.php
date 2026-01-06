@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Statamic\Facades\Blink;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
 
 trait HasDefaultValues
 {

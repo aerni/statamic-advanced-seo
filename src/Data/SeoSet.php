@@ -15,7 +15,6 @@ use Statamic\Contracts\Taxonomies\Taxonomy as StatamicTaxonomy;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Facades\YAML;
 use Statamic\Support\Str;
 
 class SeoSet implements Arrayable, QueryableValue
@@ -111,6 +110,7 @@ class SeoSet implements Arrayable, QueryableValue
 
             return $this->sites()->map(function ($site, $handle) use ($persisted) {
                 $localization = $persisted->get($handle) ?? SeoLocalization::make();
+
                 return $localization->seoSet($this)->locale($handle);
             });
         });

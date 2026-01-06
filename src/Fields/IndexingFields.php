@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\SiteVerification;
 
 class IndexingFields extends BaseFields

@@ -47,5 +47,4 @@ class SeoSetConfigController extends CpController
             ->data(Arr::except($values, ['enabled', 'origins']))
             ->save();
     }
-
 }

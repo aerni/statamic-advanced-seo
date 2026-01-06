@@ -182,6 +182,7 @@ class MigrateConfigChanges extends UpdateScript
 
                 if ($localizationsWithEnabledSitemap->isEmpty()) {
                     $set->config()->set('sitemap', false);
+
                     return;
                 }
 
