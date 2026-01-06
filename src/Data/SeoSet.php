@@ -123,8 +123,13 @@ class SeoSet implements Arrayable, QueryableValue
         return Blink::once("advanced-seo::{$this->id()}::localizations", function () {
             $persisted = SeoLocalization::whereSeoSet($this->id())->keyBy->locale();
 
-            return $this->sites()
-                ->map(fn ($site, $handle) => ($persisted->get($handle) ?? SeoLocalization::make())->seoSet($this)->locale($handle));
+            return $this->sites()->map(function ($site, $handle) use ($persisted) {
+                $localization = $persisted->get($handle) ?? SeoLocalization::make();
+
+                $mergedData = $this->defaultValues()->merge($localization->data());
+
+                return $localization->seoSet($this)->locale($handle)->data($mergedData);
+            });
         });
     }
 
