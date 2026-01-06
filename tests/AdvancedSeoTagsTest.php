@@ -4,7 +4,7 @@ use Aerni\AdvancedSeo\Tags\AdvancedSeoTags;
 use Illuminate\Contracts\View\View;
 
 beforeEach(function () {
-    $this->tag = new AdvancedSeoTags()->setContext([
+    $this->tag = (new AdvancedSeoTags())->setContext([
         'seo' => [
             'title' => 'Title',
         ],
