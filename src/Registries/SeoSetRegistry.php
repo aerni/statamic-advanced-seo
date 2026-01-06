@@ -62,7 +62,7 @@ class SeoSetRegistry extends Registry
                 title: $site['title'],
                 icon: $site['icon'],
             ))
-            ->sortBy('handle');
+            ->sortBy(fn (SeoSet $set) => $set->handle());
     }
 
     protected function collectionSeoSets(): Collection
@@ -74,7 +74,7 @@ class SeoSetRegistry extends Registry
                 title: $collection->title(),
                 icon: $collection->icon(),
             ))
-            ->sortBy('handle');
+            ->sortBy(fn (SeoSet $set) => $set->handle());
     }
 
     protected function taxonomySeoSets(): Collection
@@ -86,7 +86,7 @@ class SeoSetRegistry extends Registry
                 title: $taxonomy->title(),
                 icon: 'tags',
             ))
-            ->sortBy('handle');
+            ->sortBy(fn (SeoSet $set) => $set->handle());
     }
 
     protected function siteSeoSetsDefinition(): array
