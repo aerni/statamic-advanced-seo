@@ -3,14 +3,13 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Registries\SocialImageTheme;
 use Illuminate\Support\Str;
 
-class ContentDefaultsFields extends BaseFields
+class ContentSeoSetLocalizationFields extends BaseFields
 {
     use HasAssetField;
 
@@ -70,7 +69,7 @@ class ContentDefaultsFields extends BaseFields
                             'start' => $this->trans('seo_site_name_position.start'),
                             'disabled' => $this->trans('seo_site_name_position.disabled'),
                         ],
-                        'default' => Seo::defaultValue('collections.seo_site_name_position'),
+                        'default' => 'end',
                         'icon' => 'button_group',
                         'localizable' => true,
                         'listable' => false,
@@ -93,7 +92,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('seo_generate_social_images.display'),
                         'instructions' => $this->trans('seo_generate_social_images.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_generate_social_images'),
+                        'default' => false,
                         'icon' => 'toggle',
                         'localizable' => true,
                         'listable' => 'hidden',
@@ -148,7 +147,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'seo_source',
                         'display' => $this->trans('seo_og_title.display'),
                         'instructions' => $this->trans('seo_og_title.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_og_title'),
+                        'default' => '@auto',
                         'auto' => 'seo_title',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
@@ -166,7 +165,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'seo_source',
                         'display' => $this->trans('seo_og_description.display'),
                         'instructions' => $this->trans('seo_og_description.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_og_description'),
+                        'default' => '@auto',
                         'auto' => 'seo_description',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
@@ -198,7 +197,7 @@ class ContentDefaultsFields extends BaseFields
                             'summary' => $this->trans('seo_twitter_card.summary'),
                             'summary_large_image' => $this->trans('seo_twitter_card.summary_large_image'),
                         ],
-                        'default' => Seo::defaultValue('collections.seo_twitter_card'),
+                        'default' => 'summary',
                         'icon' => 'button_group',
                         'listable' => 'hidden',
                         'localizable' => true,
@@ -236,7 +235,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'seo_source',
                         'display' => $this->trans('seo_twitter_title.display'),
                         'instructions' => $this->trans('seo_twitter_title.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_twitter_title'),
+                        'default' => '@auto',
                         'auto' => 'seo_title',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
@@ -254,7 +253,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'seo_source',
                         'display' => $this->trans('seo_twitter_description.display'),
                         'instructions' => $this->trans('seo_twitter_description.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_twitter_description'),
+                        'default' => '@auto',
                         'auto' => 'seo_description',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
@@ -282,7 +281,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('seo_noindex.display'),
                         'instructions' => $this->trans('seo_noindex.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_noindex'),
+                        'default' => false,
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
@@ -294,7 +293,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('seo_nofollow.display'),
                         'instructions' => $this->trans('seo_nofollow.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_nofollow'),
+                        'default' => false,
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
@@ -322,7 +321,7 @@ class ContentDefaultsFields extends BaseFields
                             'other' => $this->trans('seo_canonical_type.other'),
                             'custom' => $this->trans('seo_canonical_type.custom'),
                         ],
-                        'default' => Seo::defaultValue('collections.seo_canonical_type'),
+                        'default' => 'current',
                         'icon' => 'button_group',
                         'listable' => 'hidden',
                         'localizable' => true,
@@ -378,7 +377,7 @@ class ContentDefaultsFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('seo_sitemap_enabled.display'),
                         'instructions' => $this->trans('seo_sitemap_enabled.default_instructions'),
-                        'default' => Seo::defaultValue('collections.seo_sitemap_enabled'),
+                        'default' => true,
                         'listable' => 'hidden',
                         'localizable' => true,
                         'feature' => Sitemap::class,
@@ -403,7 +402,7 @@ class ContentDefaultsFields extends BaseFields
                             '0.9' => '0.9',
                             '1.0' => '1.0',
                         ],
-                        'default' => Seo::defaultValue('collections.seo_sitemap_priority'),
+                        'default' => '0.5',
                         'clearable' => false,
                         'multiple' => false,
                         'searchable' => false,
@@ -431,7 +430,7 @@ class ContentDefaultsFields extends BaseFields
                             'yearly' => $this->trans('seo_sitemap_change_frequency.yearly'),
                             'never' => $this->trans('seo_sitemap_change_frequency.never'),
                         ],
-                        'default' => Seo::defaultValue('collections.seo_sitemap_change_frequency'),
+                        'default' => 'daily',
                         'clearable' => false,
                         'multiple' => false,
                         'searchable' => false,

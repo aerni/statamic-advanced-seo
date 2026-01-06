@@ -60,7 +60,9 @@ class SeoSet implements Arrayable, QueryableValue
     {
         return match ([$this->type, $type]) {
             ['site', 'localization'] => 'Aerni\\AdvancedSeo\\Blueprints\\'.Str::studly($this->handle).'Blueprint',
-            ['collections', 'localization'], ['taxonomies', 'localization'] => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
+            ['collections', 'localization'], ['taxonomies', 'localization'] => \Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint::class,
+            ['site', 'config'] => \Aerni\AdvancedSeo\Blueprints\SiteSeoSetConfigBlueprint::class,
+            ['collections', 'config'], ['taxonomies', 'config'] => \Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint::class,
             default => throw new \Exception("No blueprint defined for SEO set type '{$this->type}' with blueprint type '{$type}'"),
         };
     }
@@ -73,22 +75,6 @@ class SeoSet implements Arrayable, QueryableValue
                 'taxonomies' => \Statamic\Facades\Taxonomy::find($this->handle),
                 'site' => null,
             };
-        });
-    }
-
-    public function defaultValues(): Collection
-    {
-        return Blink::once("advanced-seo::{$this->id()}::defaultValues", function () {
-            $filename = match ($this->type) {
-                'site' => "{$this->handle}.yaml",
-                'collections', 'taxonomies' => 'content_defaults.yaml',
-            };
-
-            $path = __DIR__."/../../content/{$filename}";
-
-            return file_exists($path)
-                ? collect(YAML::file($path)->parse())
-                : collect();
         });
     }
 
@@ -125,10 +111,7 @@ class SeoSet implements Arrayable, QueryableValue
 
             return $this->sites()->map(function ($site, $handle) use ($persisted) {
                 $localization = $persisted->get($handle) ?? SeoLocalization::make();
-
-                $mergedData = $this->defaultValues()->merge($localization->data());
-
-                return $localization->seoSet($this)->locale($handle)->data($mergedData);
+                return $localization->seoSet($this)->locale($handle);
             });
         });
     }
@@ -153,7 +136,7 @@ class SeoSet implements Arrayable, QueryableValue
         return $this->in(Site::selected()->handle());
     }
 
-    public function inDefaultSite(): ?SeoSetLocalization
+    public function inDefaultSite(): SeoSetLocalization
     {
         return $this->in($this->defaultSite());
     }

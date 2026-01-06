@@ -124,6 +124,19 @@ class MigrateConfigChanges extends UpdateScript
     {
         $set = $this->seoSets->first(fn ($set) => $set->id() === 'site::indexing');
 
+        if (! config('advanced-seo.sitemap.enabled', true)) {
+            $set->localizations()->each(function ($localization) {
+                $localization->remove('excluded_collections')->remove('excluded_taxonomies');
+            });
+
+            return;
+        }
+
+        // Explicitly enable sitemap and disable later if excluded.
+        $this->seoSets
+            ->filter(fn (SeoSet $set) => in_array($set->type(), ['collections', 'taxonomies']))
+            ->each(fn (SeoSet $set) => $set->config()->set('sitemap', true));
+
         $excludedCollections = $this->buildSitemapExclusionMap($set, 'excluded_collections');
         $excludedTaxonomies = $this->buildSitemapExclusionMap($set, 'excluded_taxonomies');
 
@@ -169,14 +182,10 @@ class MigrateConfigChanges extends UpdateScript
 
                 if ($localizationsWithEnabledSitemap->isEmpty()) {
                     $set->config()->set('sitemap', false);
-
                     return;
                 }
 
-                $set->config()->set('sitemap', true);
-
-                $localizationsWithDisabledSitemap->each(fn ($site) => $set->in($site)->set('seo_sitemap_enabled', false)
-                );
+                $localizationsWithDisabledSitemap->each(fn ($site) => $set->in($site)->set('seo_sitemap_enabled', false));
             });
     }
 

@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Data;
 
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
@@ -30,6 +31,7 @@ class SeoSetLocalization implements Augmentable, Contract
     use FluentlyGetsAndSets;
     use HasAugmentedInstance;
     use HasDefaultsData;
+    use HasDefaultValues;
     use HasOrigin;
     use HasSeoSet;
     use ResolvesValues {

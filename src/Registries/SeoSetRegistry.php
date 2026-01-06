@@ -40,7 +40,7 @@ class SeoSetRegistry extends Registry
             ? $this->find($id)
             : $this->whereType($id)->first();
 
-        return data_get($set?->defaultValues(), $field, $default);
+        return data_get($set?->inDefaultSite()->defaultValues(), $field, $default);
     }
 
     protected function items(): array

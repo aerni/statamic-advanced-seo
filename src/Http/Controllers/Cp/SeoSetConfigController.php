@@ -2,13 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Statamic\CP\PublishForm;
-use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 class SeoSetConfigController extends CpController
@@ -19,16 +17,15 @@ class SeoSetConfigController extends CpController
 
         $config = $seoSet->config();
 
-        return PublishForm::make(static::editFormBlueprint($config))
+        return PublishForm::make($config->blueprint())
             ->parent($seoSet)
             ->asConfig()
             ->icon('cog')
             ->title("Configure {$seoSet->title()}")
-            ->values([
-                ...$config->data(),
+            ->values(array_merge($config->values()->all(), [
                 'enabled' => $config->enabled(),
                 'origins' => $config->origins(),
-            ])
+            ]))
             ->submittingTo($config->editUrl());
     }
 
@@ -38,7 +35,7 @@ class SeoSetConfigController extends CpController
 
         $config = $seoSet->config();
 
-        $values = PublishForm::make(static::editFormBlueprint($config))
+        $values = PublishForm::make($config->blueprint())
             ->submit($request->all());
 
         if ($seoSet->type() !== 'site') {
@@ -51,70 +48,4 @@ class SeoSetConfigController extends CpController
             ->save();
     }
 
-    public static function editFormBlueprint(SeoSetConfig $config): Blueprint
-    {
-        $fields = [];
-
-        if ($config->type() !== 'site') {
-            $fields['enabled'] = [
-                'display' => __('Enabled'),
-                'fields' => [
-                    'enabled' => [
-                        'display' => __('Enabled'),
-                        'instructions' => __("Enables SEO for {$config->seoSet()->title()}."),
-                        'type' => 'toggle',
-                        'default' => true,
-                    ],
-                ],
-            ];
-        }
-
-        $fields['origins'] = [
-            'display' => __('Origins'),
-            'fields' => [
-                'origins' => [
-                    'display' => __('Origins'),
-                    'instructions' => __('Choose to inherit values from selected origins.'),
-                    'type' => 'default_set_sites',
-                    'if' => array_filter([
-                        'enabled' => 'true',
-                    ], fn () => $config->type() !== 'site'),
-                ],
-            ],
-        ];
-
-        if ($config->type() !== 'site' && config('advanced-seo.sitemap.enabled', true)) {
-            $fields['features'] = [
-                'display' => __('Features'),
-                'fields' => [
-                    'sitemap' => [
-                        'display' => __('Sitemap'),
-                        'instructions' => __("Enables the sitemap for {$config->seoSet()->title()}."),
-                        'type' => 'toggle',
-                        'default' => true,
-                        'if' => [
-                            'enabled' => 'true',
-                        ],
-                    ],
-                ],
-            ];
-        }
-
-        return \Statamic\Facades\Blueprint::make()
-            ->setContents(collect([
-                'tabs' => [
-                    'main' => [
-                        'sections' => collect($fields)->map(fn ($section) => [
-                            'display' => $section['display'],
-                            'instructions' => $section['instructions'] ?? null,
-                            'fields' => collect($section['fields'])->map(fn ($field, $handle) => [
-                                'handle' => $handle,
-                                'field' => $field,
-                            ])->values()->all(),
-                        ])->values()->all(),
-                    ],
-                ],
-            ])
-                ->all());
-    }
 }

@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\ContentDefaultsFields;
+use Aerni\AdvancedSeo\Fields\ContentSeoSetLocalizationFields;
 
-class ContentDefaultsBlueprint extends BaseBlueprint
+class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
 {
     protected function handle(): string
     {
@@ -14,7 +14,7 @@ class ContentDefaultsBlueprint extends BaseBlueprint
     protected function tabs(): array
     {
         return [
-            'main' => ContentDefaultsFields::class,
+            'main' => ContentSeoSetLocalizationFields::class,
         ];
     }
 }

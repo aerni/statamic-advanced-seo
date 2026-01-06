@@ -93,8 +93,8 @@ it('migrates sitemap config from indexing set to individual collections/taxonomi
     // Assert collections: blog excluded in all its sites (english, german)
     $blogSet = Seo::find('collections::blog');
     expect($blogSet->config()->get('sitemap'))->toBeFalse(); // Excluded in all its sites
-    expect($blogSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
-    expect($blogSet->in('german')->get('seo_sitemap_enabled'))->toBeNull();
+    expect($blogSet->in('english')->get('seo_sitemap_enabled'))->toBeNull(); // Sitemap disabled, field should not exist
+    expect($blogSet->in('german')->get('seo_sitemap_enabled'))->toBeNull(); // Sitemap disabled, field should not exist
 
     // Assert collections: products excluded in all its sites (english, german, french)
     $productsSet = Seo::find('collections::products');
@@ -105,8 +105,8 @@ it('migrates sitemap config from indexing set to individual collections/taxonomi
 
     // Assert collections: pages has no sitemap config changes (not excluded anywhere)
     $pagesSet = Seo::find('collections::pages');
-    expect($pagesSet->config()->get('sitemap'))->toBeNull();
-    expect($pagesSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
+    expect($pagesSet->config()->get('sitemap'))->toBeTrue(); // Explicitly set and saved by migration
+    expect($pagesSet->in('english')->value('seo_sitemap_enabled'))->toBeTrue(); // Sitemap enabled, should have default value
 
     // Assert taxonomies: tags excluded in all its sites (english only)
     $tagsSet = Seo::find('taxonomies::tags');

@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
 use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
@@ -10,8 +12,10 @@ use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Illuminate\Support\Collection;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasOrigin;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Blueprint;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class SeoSetConfig implements Contract
@@ -19,6 +23,9 @@ class SeoSetConfig implements Contract
     use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
+    use HasDefaultsData;
+    use HasDefaultValues;
+    use HasOrigin;
     use HasSeoSet;
 
     protected bool $enabled = true;
@@ -94,6 +101,19 @@ class SeoSetConfig implements Contract
     public function sites(): Collection
     {
         return $this->seoSet()->sites();
+    }
+
+    public function blueprint(): Blueprint
+    {
+        return resolve($this->seoSet()->blueprint('config'))
+            ->make()
+            ->data($this->defaultsData())
+            ->get();
+    }
+
+    protected function getOriginByString($origin): null
+    {
+        return null;
     }
 
     public function path(): string
