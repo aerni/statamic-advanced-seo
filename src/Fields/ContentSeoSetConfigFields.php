@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Fields;
 
-use Aerni\AdvancedSeo\Actions\EvaluateFeature;
 use Aerni\AdvancedSeo\Features\Sitemap;
 
 class ContentSeoSetConfigFields extends BaseFields
@@ -55,35 +54,27 @@ class ContentSeoSetConfigFields extends BaseFields
 
     protected function features(): array
     {
-        $fields = [];
-
-        if (EvaluateFeature::handle(Sitemap::class, $this->data)) {
-            $fields[] = [
-                'handle' => 'sitemap',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => __('Sitemap'),
-                    'instructions' => __("Enables the sitemap for this {$this->typePlaceholder()}."),
-                    'default' => true,
-                    'if' => ['enabled' => 'true'],
-                    'feature' => Sitemap::class,
-                ],
-            ];
-        }
-
-        if (empty($fields)) {
-            return [];
-        }
-
         return [
             'display' => __('Features'),
-            'fields' => $fields,
+            'fields' => [
+                [
+                    'handle' => 'sitemap',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => __('Sitemap'),
+                        'instructions' => __("Enables the sitemap for this {$this->typePlaceholder()}."),
+                        'default' => true,
+                        'if' => ['enabled' => 'true'],
+                        'feature' => Sitemap::class,
+                    ],
+                ],
+            ],
         ];
     }
 
     protected function typePlaceholder(): string
     {
-        return $this->data->type === 'collections' 
+        return $this->data->type === 'collections'
             ? __('collection')
             : __('taxonomy');
     }
