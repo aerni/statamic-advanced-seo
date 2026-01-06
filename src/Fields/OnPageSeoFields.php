@@ -412,9 +412,6 @@ class OnPageSeoFields extends BaseFields
             'display' => $this->trans('seo_section_canonical_url.display'),
             'instructions' => $this->trans('seo_section_canonical_url.instructions'),
             'collapsible' => true,
-            'if' => [
-                'seo_noindex.value' => 'false',
-            ],
             'fields' => [
                 [
                     'handle' => 'seo_canonical_type',
@@ -496,10 +493,6 @@ class OnPageSeoFields extends BaseFields
             'display' => $this->trans('seo_section_sitemap.display'),
             'instructions' => $this->trans('seo_section_sitemap.instructions'),
             'collapsible' => true,
-            'if' => [
-                'seo_noindex.value' => 'false',
-                'seo_canonical_type.value' => 'equals current',
-            ],
             'fields' => [
                 [
                     'handle' => 'seo_sitemap_enabled',
