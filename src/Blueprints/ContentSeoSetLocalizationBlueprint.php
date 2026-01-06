@@ -8,7 +8,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
 {
     protected function handle(): string
     {
-        return 'content';
+        return 'content_localization';
     }
 
     protected function tabs(): array
