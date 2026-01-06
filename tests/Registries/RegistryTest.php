@@ -20,7 +20,7 @@ class TestRegistryTwo extends Registry
 }
 
 it('gets all items as collection', function () {
-    $result = (new TestRegistryOne())->all();
+    $result = (new TestRegistryOne)->all();
 
     expect($result)->toBeInstanceOf(Collection::class)
         ->and($result->all())->toBe(['item1', 'item2', 'item3']);
@@ -53,8 +53,8 @@ it('shares cached results across multiple instances of same registry', function 
 });
 
 it('uses separate cache keys for different registries', function () {
-    $result1 = (new TestRegistryOne())->all();
-    $result2 = (new TestRegistryTwo())->all();
+    $result1 = (new TestRegistryOne)->all();
+    $result2 = (new TestRegistryTwo)->all();
 
     expect($result1)->not->toBe($result2)
         ->and($result1->count())->toBe(3)
