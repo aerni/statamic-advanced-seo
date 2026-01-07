@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Enums\Context;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 trait HasDefaultsData
@@ -10,6 +11,8 @@ trait HasDefaultsData
     use FluentlyGetsAndSets;
 
     protected $defaultsData;
+
+    abstract protected function context(): Context;
 
     public function defaultsData(?DefaultsData $data = null): DefaultsData|self
     {
@@ -20,6 +23,7 @@ trait HasDefaultsData
                     handle: $this->handle(),
                     locale: method_exists($this, 'locale') ? $this->locale() : null,
                     sites: $this->sites(),
+                    context: $this->context(),
                 );
             })->args(func_get_args());
     }

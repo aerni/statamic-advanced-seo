@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
+use Aerni\AdvancedSeo\Enums\Context;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
@@ -153,6 +154,11 @@ class SeoSetLocalization implements Augmentable, Contract
     protected function getOriginByString($origin): ?Contract
     {
         return $this->seoSet()->in($origin);
+    }
+
+    protected function context(): Context
+    {
+        return Context::LOCALIZATION;
     }
 
     public function resolveGqlValue(string $field)

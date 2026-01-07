@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
+use Aerni\AdvancedSeo\Enums\Context;
 use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
@@ -114,6 +115,11 @@ class SeoSetConfig implements Contract
     protected function getOriginByString($origin): null
     {
         return null;
+    }
+
+    protected function context(): Context
+    {
+        return Context::CONFIG;
     }
 
     public function path(): string

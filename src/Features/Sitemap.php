@@ -12,6 +12,15 @@ class Sitemap
             return false;
         }
 
-        return $data->set()->config()->get('sitemap', true);
+        /* Always show toggle in the config */
+        if ($data->isConfigContext()) {
+            return true;
+        }
+
+        if (! $data->set()->enabled()) {
+            return false;
+        }
+
+        return $data->set()->config()->value('sitemap');
     }
 }

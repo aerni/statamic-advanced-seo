@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Enums\Context;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 
@@ -12,6 +13,7 @@ class DefaultsData
         public string $handle,
         public ?string $locale = null,
         public ?Collection $sites = null,
+        public Context $context,
     ) {}
 
     public function id(): string
@@ -22,5 +24,20 @@ class DefaultsData
     public function set(): ?SeoSet
     {
         return Seo::find("{$this->type}::{$this->handle}");
+    }
+
+    public function isConfigContext(): bool
+    {
+        return $this->context === Context::CONFIG;
+    }
+
+    public function isLocalizationContext(): bool
+    {
+        return $this->context === Context::LOCALIZATION;
+    }
+
+    public function isContentContext(): bool
+    {
+        return $this->context === Context::CONTENT;
     }
 }

@@ -3,14 +3,21 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Facades\Seo;
 
 class SocialImagesGenerator
 {
     public static function enabled(DefaultsData $data): bool
     {
-        // Don't show the generator section if the generator is disabled.
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
+        /* Always show toggle in the config */
+        if ($data->isConfigContext()) {
+            return true;
+        }
+
+        if ($data->type === 'taxonomies') {
             return false;
         }
 
@@ -18,21 +25,6 @@ class SocialImagesGenerator
             return false;
         }
 
-        // Terms are not yet supported.
-        if ($data->type === 'taxonomies') {
-            return false;
-        }
-
-        // TODO: This needs to be changed when we move the social image generator settings to the seo set
-        $enabledCollections = Seo::find('site::social_media')
-            ->in($data->locale)
-            ?->value('social_images_generator_collections') ?? [];
-
-        // Don't show the generator section if the collection is not configured.
-        if ($data->type === 'collections' && ! in_array($data->handle, $enabledCollections)) {
-            return false;
-        }
-
-        return true;
+        return $data->set()->config()->get('social_images_generator', false);
     }
 }

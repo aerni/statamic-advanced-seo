@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\Enums\Context as SeoContext;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
@@ -27,6 +28,7 @@ class GetSiteDefaults
                         handle: $set->handle(),
                         locale: $locale,
                         sites: Site::all()->map->handle(),
+                        context: SeoContext::LOCALIZATION,
                     )
                 ));
 

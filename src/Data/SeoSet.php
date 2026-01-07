@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
@@ -19,8 +18,6 @@ use Statamic\Support\Str;
 
 class SeoSet implements Arrayable, QueryableValue
 {
-    use HasDefaultsData;
-
     public function __construct(
         protected readonly string $type,
         protected readonly string $handle,

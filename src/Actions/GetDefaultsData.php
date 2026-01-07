@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Enums\Context;
 
 class GetDefaultsData
 {
@@ -21,6 +22,7 @@ class GetDefaultsData
             handle: EvaluateModelHandle::handle($parent),
             locale: EvaluateModelLocale::handle($data),
             sites: EvaluateModelSites::handle($parent),
+            context: Context::CONTENT,
         );
     }
 }
