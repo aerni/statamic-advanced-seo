@@ -93,9 +93,9 @@ describe('Social Images Generator Feature', function () {
         $data = new DefaultsData(
             type: 'collections',
             handle: 'pages',
+            context: Context::CONFIG,
             locale: 'english',
             sites: collect(['english']),
-            context: Context::CONFIG,
         );
 
         expect(SocialImagesGenerator::enabled($data))->toBeTrue();
@@ -110,9 +110,9 @@ describe('Social Images Generator Feature', function () {
         $data = new DefaultsData(
             type: 'collections',
             handle: 'pages',
+            context: Context::LOCALIZATION,
             locale: 'english',
             sites: collect(['english']),
-            context: Context::LOCALIZATION,
         );
 
         expect(SocialImagesGenerator::enabled($data))->toBeFalse();
@@ -127,9 +127,9 @@ describe('Social Images Generator Feature', function () {
         $data = new DefaultsData(
             type: 'collections',
             handle: 'pages',
+            context: Context::CONTENT,
             locale: 'english',
             sites: collect(['english']),
-            context: Context::CONTENT,
         );
 
         expect(SocialImagesGenerator::enabled($data))->toBeFalse();
@@ -145,9 +145,9 @@ describe('Social Images Generator Feature', function () {
             $data = new DefaultsData(
                 type: 'collections',
                 handle: 'pages',
+                context: $context,
                 locale: 'english',
                 sites: collect(['english']),
-                context: $context,
             );
 
             expect(SocialImagesGenerator::enabled($data))->toBeTrue("Failed for context: {$context->value}");
@@ -157,21 +157,21 @@ describe('Social Images Generator Feature', function () {
 
 describe('DefaultsData Context Helpers', function () {
     it('identifies config context', function () {
-        $data = new DefaultsData('collections', 'pages', 'en', collect(), Context::CONFIG);
+        $data = new DefaultsData('collections', 'pages', Context::CONFIG, 'en', collect());
         expect($data->isConfigContext())->toBeTrue();
         expect($data->isLocalizationContext())->toBeFalse();
         expect($data->isContentContext())->toBeFalse();
     });
 
     it('identifies localization context', function () {
-        $data = new DefaultsData('collections', 'pages', 'en', collect(), Context::LOCALIZATION);
+        $data = new DefaultsData('collections', 'pages', Context::LOCALIZATION, 'en', collect());
         expect($data->isConfigContext())->toBeFalse();
         expect($data->isLocalizationContext())->toBeTrue();
         expect($data->isContentContext())->toBeFalse();
     });
 
     it('identifies content context', function () {
-        $data = new DefaultsData('collections', 'pages', 'en', collect(), Context::CONTENT);
+        $data = new DefaultsData('collections', 'pages', Context::CONTENT, 'en', collect());
         expect($data->isConfigContext())->toBeFalse();
         expect($data->isLocalizationContext())->toBeFalse();
         expect($data->isContentContext())->toBeTrue();
