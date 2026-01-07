@@ -171,13 +171,17 @@ class SeoSet implements Arrayable, QueryableValue
 
     public function toArray(): array
     {
+        $enabled = $this->enabled();
+
         return [
             'id' => $this->id(),
             'type' => $this->type,
             'handle' => $this->handle,
             'title' => $this->title,
             'icon' => $this->icon,
-            'enabled' => $this->enabled(),
+            'enabled' => $enabled,
+            'sitemap' => $enabled ? $this->config()->value('sitemap') : false,
+            'social_images_generator' => $enabled ? $this->config()->value('social_images_generator') : false,
             'localization_url' => $this->inSelectedSite()->editUrl(),
             'config_url' => $this->config()->editUrl(),
             'configurable' => User::current()->can('configure', [self::class, $this]),

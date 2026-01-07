@@ -36,10 +36,29 @@ class SeoSetIndexController extends CpController
             'title' => __("advanced-seo::messages.{$seoSetGroup->type()}"),
             'icon' => $seoSetGroup->icon(),
             'items' => $items,
-            'columns' => [
+            'columns' => $this->columns($seoSetGroup->type()),
+        ]);
+    }
+
+    protected function columns(string $type): array
+    {
+        if ($type === 'collections') {
+            return [
                 Column::make('title')->label(__('Title')),
                 Column::make('status')->label(__('Status')),
-            ],
-        ]);
+                Column::make('sitemap')->label(__('Sitemap'))->fieldtype('toggle'),
+                Column::make('social_images_generator')->label(__('Social Images Generator'))->fieldtype('toggle'),
+            ];
+        }
+
+        if ($type === 'taxonomies') {
+            return [
+                Column::make('title')->label(__('Title')),
+                Column::make('status')->label(__('Status')),
+                Column::make('sitemap')->label(__('Sitemap'))->fieldtype('toggle'),
+            ];
+        }
+
+        return [];
     }
 }
