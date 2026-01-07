@@ -11,9 +11,9 @@ class DefaultsData
     public function __construct(
         public string $type,
         public string $handle,
+        public Context $context,
         public ?string $locale = null,
         public ?Collection $sites = null,
-        public Context $context,
     ) {}
 
     public function id(): string
