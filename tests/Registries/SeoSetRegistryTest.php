@@ -67,7 +67,7 @@ it('sorts sets by handle', function () {
 
 it('creates all statically defined site sets', function () {
     expect(Seo::whereType('site')->map->handle()->all())
-        ->toBe(['analytics', 'favicons', 'general', 'indexing', 'social_media']);
+        ->toBe(['general', 'indexing', 'social_media', 'analytics', 'favicons']);
 });
 
 it('includes analytics set when enabled', function () {

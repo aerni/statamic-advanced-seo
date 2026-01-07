@@ -61,8 +61,7 @@ class SeoSetRegistry extends Registry
                 handle: $site['handle'],
                 title: $site['title'],
                 icon: $site['icon'],
-            ))
-            ->sortBy(fn (SeoSet $set) => $set->handle());
+            ));
     }
 
     protected function collectionSeoSets(): Collection
