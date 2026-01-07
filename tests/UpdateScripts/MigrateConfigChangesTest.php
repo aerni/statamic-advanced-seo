@@ -37,6 +37,14 @@ beforeEach(function () {
     Taxonomy::make('categories')->sites(['english', 'german'])->saveQuietly();
 });
 
+it('deletes title from config set', function () {
+    Seo::find('collections::pages')->config()->set('title', 'Pages')->save();
+
+    runConfigMigrationScript();
+
+    expect(Seo::find('collections::pages')->config()->get('title'))->toBeNull();
+});
+
 it('migrates disabled collections/taxonomies from config to set configs', function () {
     config(['advanced-seo.disabled.collections' => ['blog', 'products', 'non-existing-collection']]);
     config(['advanced-seo.disabled.taxonomies' => ['tags', 'non-existing-collection']]);

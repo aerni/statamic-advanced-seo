@@ -21,11 +21,26 @@ class MigrateConfigChanges extends UpdateScript
     {
         $this->seoSets = Seo::all();
 
+        $this->removeTitleFromConfigSet();
         $this->migrateDisabledConfig();
         $this->migrateOriginsConfig();
         $this->migrateSitemapsConfig();
         $this->migrateSocialImagesGeneratorConfig();
         $this->saveSetsAndLocalizations();
+    }
+
+    /**
+     * Remove deprecated 'title' field from all SeoSet configs.
+     *
+     * The title field is no longer used in v3.0.0 and should be removed from all set configs.
+     */
+    protected function removeTitleFromConfigSet(): void
+    {
+        $this->seoSets->each(function (SeoSet $set) {
+            $set->config()->remove('title');
+        });
+
+        $this->console()->info('Removed deprecated title field from all set configs.');
     }
 
     /**
