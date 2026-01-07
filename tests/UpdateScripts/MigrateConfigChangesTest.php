@@ -129,6 +129,42 @@ it('migrates sitemap config from indexing set to individual collections/taxonomi
     expect($indexingSet->in('french')->get('excluded_taxonomies'))->toBeNull();
 });
 
+it('skips sitemap migration and cleans up fields when sitemap is disabled', function () {
+    config(['advanced-seo.sitemap.enabled' => false]);
+
+    $indexingSet = Seo::find('site::indexing');
+
+    $indexingSet->in('english')
+        ->set('excluded_collections', ['blog', 'products'])
+        ->set('excluded_taxonomies', ['tags'])
+        ->save();
+
+    $indexingSet->in('german')
+        ->set('origin', 'english')
+        ->set('excluded_collections', ['blog'])
+        ->set('excluded_taxonomies', [])
+        ->save();
+
+    runConfigMigrationScript();
+
+    // Assert: Collections and taxonomies should not have sitemap config changes
+    $blogSet = Seo::find('collections::blog');
+    expect($blogSet->config()->get('sitemap'))->toBeNull();
+
+    $productsSet = Seo::find('collections::products');
+    expect($productsSet->config()->get('sitemap'))->toBeNull();
+
+    $tagsSet = Seo::find('taxonomies::tags');
+    expect($tagsSet->config()->get('sitemap'))->toBeNull();
+
+    // Assert: Old fields are still removed from indexing set
+    $indexingSet = Seo::find('site::indexing');
+    expect($indexingSet->in('english')->get('excluded_collections'))->toBeNull();
+    expect($indexingSet->in('english')->get('excluded_taxonomies'))->toBeNull();
+    expect($indexingSet->in('german')->get('excluded_collections'))->toBeNull();
+    expect($indexingSet->in('german')->get('excluded_taxonomies'))->toBeNull();
+});
+
 it('migrates social images generator config based on localization coverage', function () {
     $socialMediaSet = Seo::find('site::social_media');
 
@@ -212,4 +248,31 @@ it('migrates social images generator: cleans up old field and origins from socia
     expect($socialMediaSet->in('english')->get('social_images_generator_collections'))->toBeNull();
     expect($socialMediaSet->in('german')->get('social_images_generator_collections'))->toBeNull();
     expect($socialMediaSet->in('french')->get('social_images_generator_collections'))->toBeNull();
+});
+
+it('skips social images generator migration and cleans up fields when generator is disabled', function () {
+    config(['advanced-seo.social_images_generator.enabled' => false]);
+
+    $socialMediaSet = Seo::find('site::social_media');
+
+    $socialMediaSet->in('english')
+        ->set('social_images_generator_collections', ['products', 'blog'])
+        ->save();
+
+    $socialMediaSet->in('german')
+        ->set('origin', 'english')
+        ->set('social_images_generator_collections', ['products'])
+        ->save();
+
+    runConfigMigrationScript();
+
+    // Assert: Collections should not have social_images_generator config changes
+    expect(Seo::find('collections::products')->config()->get('social_images_generator'))->toBeNull();
+    expect(Seo::find('collections::blog')->config()->get('social_images_generator'))->toBeNull();
+    expect(Seo::find('collections::pages')->config()->get('social_images_generator'))->toBeNull();
+
+    // Assert: Old field is still removed from social_media set
+    $socialMediaSet = Seo::find('site::social_media');
+    expect($socialMediaSet->in('english')->get('social_images_generator_collections'))->toBeNull();
+    expect($socialMediaSet->in('german')->get('social_images_generator_collections'))->toBeNull();
 });
