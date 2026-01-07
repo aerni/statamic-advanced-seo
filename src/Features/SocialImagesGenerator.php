@@ -12,19 +12,19 @@ class SocialImagesGenerator
             return false;
         }
 
+        if ($data->type === 'taxonomies') {
+            return false;
+        }
+
         /* Always show toggle in the config */
         if ($data->isConfigContext()) {
             return true;
-        }
-
-        if ($data->type === 'taxonomies') {
-            return false;
         }
 
         if (! $data->set()->enabled()) {
             return false;
         }
 
-        return $data->set()->config()->get('social_images_generator', false);
+        return $data->set()->config()->value('social_images_generator');
     }
 }

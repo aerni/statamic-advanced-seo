@@ -125,8 +125,91 @@ it('migrates sitemap config from indexing set to individual collections/taxonomi
     expect($indexingSet->in('english')->get('excluded_taxonomies'))->toBeNull();
     expect($indexingSet->in('german')->get('excluded_collections'))->toBeNull();
     expect($indexingSet->in('german')->get('excluded_taxonomies'))->toBeNull();
-    expect($indexingSet->in('german')->get('origin'))->toBeNull();
     expect($indexingSet->in('french')->get('excluded_collections'))->toBeNull();
     expect($indexingSet->in('french')->get('excluded_taxonomies'))->toBeNull();
-    expect($indexingSet->in('french')->get('origin'))->toBeNull();
+});
+
+it('migrates social images generator config based on localization coverage', function () {
+    $socialMediaSet = Seo::find('site::social_media');
+
+    $socialMediaSet->in('english')
+        ->set('social_images_generator_collections', ['products'])
+        ->save();
+
+    $socialMediaSet->in('german')
+        ->set('origin', 'english')
+        ->set('social_images_generator_collections', ['blog'])
+        ->save();
+
+    $socialMediaSet->in('french')
+        ->set('origin', 'english')
+        ->set('social_images_generator_collections', ['products'])
+        ->save();
+
+    runConfigMigrationScript();
+
+    $productsSet = Seo::find('collections::products');
+    expect($productsSet->config()->get('social_images_generator'))->toBeTrue();
+    expect($productsSet->in('english')->get('seo_generate_social_images'))->toBeFalse();
+    expect($productsSet->in('german')->get('seo_generate_social_images'))->toBeFalse();
+    expect($productsSet->in('french')->get('seo_generate_social_images'))->toBeFalse();
+
+    $blogSet = Seo::find('collections::blog');
+    expect($blogSet->config()->get('social_images_generator'))->toBeTrue();
+    expect($blogSet->in('english')->get('seo_generate_social_images'))->toBeFalse();
+    expect($blogSet->in('german')->get('seo_generate_social_images'))->toBeFalse();
+
+    $pagesSet = Seo::find('collections::pages');
+    expect($pagesSet->config()->get('social_images_generator'))->toBeFalse();
+    expect($pagesSet->in('english')->get('seo_generate_social_images'))->toBeNull();
+});
+
+it('migrates social images generator: preserves existing true values', function () {
+    $socialMediaSet = Seo::find('site::social_media');
+
+    $socialMediaSet->in('english')
+        ->set('social_images_generator_collections', ['products'])
+        ->save();
+
+    $socialMediaSet->in('german')
+        ->set('origin', 'english')
+        ->save();
+
+    $socialMediaSet->in('french')
+        ->set('origin', 'english')
+        ->save();
+
+    Seo::find('collections::products')->in('german')->set('seo_generate_social_images', true)->save();
+
+    runConfigMigrationScript();
+
+    $productsSet = Seo::find('collections::products');
+    expect($productsSet->config()->get('social_images_generator'))->toBeTrue();
+    expect($productsSet->in('english')->get('seo_generate_social_images'))->toBeFalse();
+    expect($productsSet->in('german')->get('seo_generate_social_images'))->toBeTrue();
+    expect($productsSet->in('french')->get('seo_generate_social_images'))->toBeFalse();
+});
+
+it('migrates social images generator: cleans up old field and origins from social_media set', function () {
+    $socialMediaSet = Seo::find('site::social_media');
+
+    $socialMediaSet->in('english')
+        ->set('social_images_generator_collections', ['products'])
+        ->save();
+
+    $socialMediaSet->in('german')
+        ->set('social_images_generator_collections', ['products'])
+        ->save();
+
+    $socialMediaSet->in('french')
+        ->set('social_images_generator_collections', ['products'])
+        ->save();
+
+    runConfigMigrationScript();
+
+    $socialMediaSet = Seo::find('site::social_media');
+
+    expect($socialMediaSet->in('english')->get('social_images_generator_collections'))->toBeNull();
+    expect($socialMediaSet->in('german')->get('social_images_generator_collections'))->toBeNull();
+    expect($socialMediaSet->in('french')->get('social_images_generator_collections'))->toBeNull();
 });

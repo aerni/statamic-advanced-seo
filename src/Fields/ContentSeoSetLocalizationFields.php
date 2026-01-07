@@ -92,7 +92,7 @@ class ContentSeoSetLocalizationFields extends BaseFields
                         'type' => 'toggle',
                         'display' => $this->trans('seo_generate_social_images.display'),
                         'instructions' => $this->trans('seo_generate_social_images.default_instructions'),
-                        'default' => false,
+                        'default' => true,
                         'icon' => 'toggle',
                         'localizable' => true,
                         'listable' => 'hidden',

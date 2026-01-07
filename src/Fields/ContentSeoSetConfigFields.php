@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Features\Sitemap;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
 class ContentSeoSetConfigFields extends BaseFields
 {
@@ -66,6 +67,17 @@ class ContentSeoSetConfigFields extends BaseFields
                         'default' => true,
                         'if' => ['enabled' => 'true'],
                         'feature' => Sitemap::class,
+                    ],
+                ],
+                [
+                    'handle' => 'social_images_generator',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => __('Social Images Generator'),
+                        'instructions' => __("Enables the social images generator for this {$this->typePlaceholder()}."),
+                        'default' => true,
+                        'if' => ['enabled' => 'true'],
+                        'feature' => SocialImagesGenerator::class,
                     ],
                 ],
             ],

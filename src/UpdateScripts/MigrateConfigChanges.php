@@ -24,6 +24,7 @@ class MigrateConfigChanges extends UpdateScript
         $this->migrateDisabledConfig();
         $this->migrateOriginsConfig();
         $this->migrateSitemapsConfig();
+        $this->migrateSocialImagesGeneratorConfig();
         $this->saveSetsAndLocalizations();
     }
 
@@ -188,6 +189,133 @@ class MigrateConfigChanges extends UpdateScript
 
                 $localizationsWithDisabledSitemap->each(fn ($site) => $set->in($site)->set('seo_sitemap_enabled', false));
             });
+    }
+
+    /**
+     * Migrate social images generator from site::social_media to individual collection configs
+     *
+     * Old configuration:
+     * - Social images generator was managed centrally in site::social_media set
+     * - social_images_generator_collections field stored which collection handles to enable per localization
+     *
+     * New configuration:
+     * - Each collection SeoSet manages its own social images generator via config toggle
+     * - Per-localization control using the 'seo_generate_social_images' field in individual localizations
+     *
+     * This migration:
+     * 1. Builds a map of which localizations have each collection in their social_images_generator_collections
+     * 2. For each collection:
+     *    - If enabled in all localizations: sets social_images_generator config to true
+     *    - If enabled in no localizations: sets social_images_generator config to false
+     *    - If enabled in some localizations: sets social_images_generator config to true, then disables per-localization
+     * 3. Sets seo_generate_social_images to false on all localizations unless already explicitly true
+     *    (ensures backwards compatibility when default changes from false to true)
+     * 4. Removes the social_images_generator_collections field from all site::social_media localizations
+     *
+     * This provides granular control over social images generation at both the config and localization level,
+     * and eliminates cross-set dependencies during blueprint generation (which caused infinite recursion).
+     */
+    protected function migrateSocialImagesGeneratorConfig(): void
+    {
+        $socialMediaSet = $this->seoSets->first(fn ($set) => $set->id() === 'site::social_media');
+
+        if (! $socialMediaSet) {
+            $this->console()->info('No site::social_media set found. Skipping social images generator migration.');
+
+            return;
+        }
+
+        // Build a map of which localizations have each collection enabled
+        $enabledCollectionsMap = $this->buildSocialImagesGeneratorMap($socialMediaSet);
+
+        if ($enabledCollectionsMap->isEmpty()) {
+            $this->console()->info('No social images generator collections configured.');
+
+            // Still need to set all collections to false for backward compatibility
+            $this->seoSets
+                ->filter(fn (SeoSet $set) => $set->type() === 'collections')
+                ->each(fn (SeoSet $set) => $set->config()->set('social_images_generator', false));
+        } else {
+            $this->migrateSocialImagesGeneratorType($enabledCollectionsMap);
+        }
+
+        // Remove the field from all social_media localizations
+        $socialMediaSet->localizations()->each(fn ($loc) => $loc->remove('social_images_generator_collections'));
+    }
+
+    /**
+     * Creates a map of localizations that have social images generator enabled, keyed by collection handle.
+     *
+     * Example return format:
+     * [
+     *     'pages' => ['default', 'german'],
+     *     'articles' => ['default'],
+     * ]
+     */
+    protected function buildSocialImagesGeneratorMap(SeoSet $set): Collection
+    {
+        return $set
+            ->localizations()
+            ->map(fn (SeoSetLocalization $localization, $site) => $localization->value('social_images_generator_collections'))
+            ->filter()
+            ->map(fn ($handles, $site) => ['handles' => $handles])
+            ->groupBy('handles', true)
+            ->map(fn ($sites) => $sites->keys());
+    }
+
+    /**
+     * Migrates social images generator configuration for collections based on localization coverage.
+     *
+     * For each collection:
+     * - Enabled in ALL localizations: config = true, explicitly set seo_generate_social_images = false on all
+     * - Enabled in NO localizations: config = false, don't touch localization fields
+     * - Enabled in SOME localizations: config = true, explicitly set seo_generate_social_images = false on all
+     *
+     * The explicit false on localizations ensures backward compatibility when the field default changes to true.
+     */
+    protected function migrateSocialImagesGeneratorType(Collection $handles): void
+    {
+        // Get all collection sets
+        $collectionSets = $this->seoSets->filter(fn ($set) => $set->type() === 'collections');
+
+        $collectionSets->each(function ($set) use ($handles) {
+            $handle = str_replace('collections::', '', $set->id());
+            $localizationsWithEnabledGenerator = $handles->get($handle, collect());
+            $setSites = $set->sites()->keys();
+            $localizationsWithDisabledGenerator = $setSites->diff($localizationsWithEnabledGenerator);
+
+            // Scenario A: Enabled in ALL localizations
+            if ($localizationsWithDisabledGenerator->isEmpty() && $localizationsWithEnabledGenerator->isNotEmpty()) {
+                $set->config()->set('social_images_generator', true);
+
+                // Explicitly set false on all localizations unless already true
+                $set->localizations()->each(function ($localization) {
+                    if ($localization->get('seo_generate_social_images') !== true) {
+                        $localization->set('seo_generate_social_images', false);
+                    }
+                });
+
+                return;
+            }
+
+            // Scenario B: Enabled in NO localizations
+            if ($localizationsWithEnabledGenerator->isEmpty()) {
+                $set->config()->set('social_images_generator', false);
+
+                // Don't touch localization fields - config-level false will hide the field
+                return;
+            }
+
+            // Scenario C: Enabled in SOME localizations
+            $set->config()->set('social_images_generator', true);
+
+            // Explicitly set false on all localizations unless already true
+            $set->localizations()->each(function ($localization) {
+                if ($localization->get('seo_generate_social_images') !== true) {
+                    $localization->set('seo_generate_social_images', false);
+                }
+            });
+        });
     }
 
     /**

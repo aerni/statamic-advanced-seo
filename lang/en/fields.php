@@ -364,11 +364,6 @@ return [
         'instructions' => 'Configurate the settings of the social images generator.',
     ],
 
-    'social_images_generator_collections' => [
-        'display' => 'Collections',
-        'instructions' => 'Enable the generator for the selected collections.',
-    ],
-
     'section_og' => [
         'display' => 'Open Graph',
         'instructions' => 'Configure the site-wide Open Graph settings.',
