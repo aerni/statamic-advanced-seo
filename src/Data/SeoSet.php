@@ -187,4 +187,9 @@ class SeoSet implements Arrayable, QueryableValue
             'configurable' => User::current()->can('configure', [self::class, $this]),
         ];
     }
+
+    public function flushBlink(): void
+    {
+        Blink::flushStartingWith("advanced-seo::{$this->id()}::");
+    }
 }

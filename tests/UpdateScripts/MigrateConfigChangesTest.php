@@ -10,13 +10,9 @@ use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
 
-/**
- * Run the update script and clear Blink cache to force fresh data retrieval from the registry
- */
 function runConfigMigrationScript(): void
 {
     (new MigrateConfigChanges('aerni/advanced-seo'))->update();
-    flushBlink();
 }
 
 beforeEach(function () {
@@ -174,6 +170,8 @@ it('skips sitemap migration and cleans up fields when sitemap is disabled', func
 });
 
 it('migrates social images generator config based on localization coverage', function () {
+    config()->set('advanced-seo.social_images.generator.enabled', true);
+
     $socialMediaSet = Seo::find('site::social_media');
 
     $socialMediaSet->in('english')
@@ -209,6 +207,8 @@ it('migrates social images generator config based on localization coverage', fun
 });
 
 it('migrates social images generator: preserves existing true values', function () {
+    config()->set('advanced-seo.social_images.generator.enabled', true);
+
     $socialMediaSet = Seo::find('site::social_media');
 
     $socialMediaSet->in('english')
@@ -223,7 +223,10 @@ it('migrates social images generator: preserves existing true values', function 
         ->set('origin', 'english')
         ->save();
 
-    Seo::find('collections::products')->in('german')->set('seo_generate_social_images', true)->save();
+    Seo::find('collections::products')
+        ->in('german')
+        ->set('seo_generate_social_images', true)
+        ->save();
 
     runConfigMigrationScript();
 

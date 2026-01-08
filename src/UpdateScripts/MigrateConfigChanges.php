@@ -278,12 +278,17 @@ class MigrateConfigChanges extends UpdateScript
     protected function saveSetsAndLocalizations(): void
     {
         $this->seoSets->each(function (SeoSet $set) {
+            // Get references to config and localizations before saving
+            // This ensures we work with the same modified objects after caches are cleared on $config->save().
+            $config = $set->config();
+            $localizations = $set->localizations();
+
             // Save config first (triggers HandleSeoSetConfigSaved event)
-            $set->config()->save();
+            $config->save();
 
             // Explicitly save ALL localizations for this set
             // This ensures both previously persisted and newly modified localizations are saved
-            $set->localizations()->each->save();
+            $localizations->each->save();
         });
     }
 }

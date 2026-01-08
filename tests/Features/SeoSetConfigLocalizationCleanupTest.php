@@ -22,9 +22,6 @@ it('removes localization field values of disabled features when saving the set c
         ->set('seo_sitemap_enabled', true)
         ->save();
 
-    /* Ensure we can evaluate the sitemap feature as we need fresh localizations and fresh EvaluateFeature */
-    flushBlink();
-
     $seoSet->config()
         ->set('sitemap', false)
         ->save();
