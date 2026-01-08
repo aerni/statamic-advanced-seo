@@ -1,10 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Facades\SeoLocalization;
-use Illuminate\Filesystem\Filesystem;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 

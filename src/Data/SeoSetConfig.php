@@ -2,23 +2,22 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Facades\Path;
-use Statamic\Facades\Blink;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Stache;
-use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
+use Aerni\AdvancedSeo\Concerns\HasSeoSet;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
+use Aerni\AdvancedSeo\Enums\Context;
+use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
+use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
+use Aerni\AdvancedSeo\Facades\SeoConfig;
+use Illuminate\Support\Collection;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Enums\Context;
-use Aerni\AdvancedSeo\Facades\SeoConfig;
-use Aerni\AdvancedSeo\Concerns\HasSeoSet;
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
-use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
-use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
+use Statamic\Fields\Blueprint;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
 
 class SeoSetConfig implements Contract
 {
