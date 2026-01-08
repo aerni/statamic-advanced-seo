@@ -215,7 +215,7 @@ class MigrateConfigChanges extends UpdateScript
     {
         $socialMediaSet = $this->seoSets->first(fn ($set) => $set->id() === 'site::social_media');
 
-        if (! config('advanced-seo.social_images_generator.enabled', true)) {
+        if (! config('advanced-seo.social_images.generator.enabled', true)) {
             $socialMediaSet->localizations()->each(function ($localization) {
                 $localization->remove('social_images_generator_collections');
             });
