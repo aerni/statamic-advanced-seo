@@ -12,30 +12,30 @@ class MigrateUserPermissions extends UpdateScript
         return $this->isUpdatingTo('3.0.0');
     }
 
-     /**
-      * Migrate old permissions to new ones
-      *
-      * Old permissions:
-      * - view seo {group} defaults
-      * - edit seo {group} defaults
-      *
-      * New permissions:
-      * - configure seo
-      * - edit seo defaults
-      * - edit seo content
-      *
-      * Migration rules:
-      * - "edit seo {group} defaults" (content-level) → "edit seo defaults"
-      * - "edit seo {group} defaults" (site-level) → "configure seo"
-      * - "view seo {group} defaults" → removed (no replacement)
-      * - ALL roles get "edit seo content" to maintain backward compatibility
-      *   since users could previously edit SEO on entries/terms without explicit permission control.
-      *
-      * Permission meanings:
-      * - "configure seo": Master permission granting all SEO permissions plus settings access
-      * - "edit seo defaults": Allows editing SEO defaults (SeoSetLocalization) for collections/taxonomies
-      * - "edit seo content": Allows editing the SEO tab on individual entries/terms
-      */
+    /**
+     * Migrate old permissions to new ones
+     *
+     * Old permissions:
+     * - view seo {group} defaults
+     * - edit seo {group} defaults
+     *
+     * New permissions:
+     * - configure seo
+     * - edit seo defaults
+     * - edit seo content
+     *
+     * Migration rules:
+     * - "edit seo {group} defaults" (content-level) → "edit seo defaults"
+     * - "edit seo {group} defaults" (site-level) → "configure seo"
+     * - "view seo {group} defaults" → removed (no replacement)
+     * - ALL roles get "edit seo content" to maintain backward compatibility
+     *   since users could previously edit SEO on entries/terms without explicit permission control.
+     *
+     * Permission meanings:
+     * - "configure seo": Master permission granting all SEO permissions plus settings access
+     * - "edit seo defaults": Allows editing SEO defaults (SeoSetLocalization) for collections/taxonomies
+     * - "edit seo content": Allows editing the SEO tab on individual entries/terms
+     */
     public function update(): void
     {
         Role::all()->each(function ($role) {
