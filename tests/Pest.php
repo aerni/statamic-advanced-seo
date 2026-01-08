@@ -1,6 +1,7 @@
 <?php
 
 use Statamic\Facades\Blink;
+use Statamic\Facades\Stache;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,4 +45,9 @@ expect()->extend('toBeOne', function () {
 function flushBlink()
 {
     Blink::flush();
+}
+
+function clearStache()
+{
+    Stache::clear();
 }
