@@ -2,17 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Subscribers;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Statamic\Events;
+use Statamic\Statamic;
 use Statamic\Events\Event;
 use Statamic\Facades\Site;
-use Statamic\Statamic;
+use Statamic\Facades\User;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Gate;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Concerns\GetsEventData;
+use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 
 class OnPageSeoBlueprintSubscriber
 {
@@ -64,8 +66,13 @@ class OnPageSeoBlueprintSubscriber
             return false;
         }
 
-        // Don't add fields to any other CP route other than the entry/term view and when performing an action on the listing view (necesarry for the social images generator action to work).
+        // Don't add fields to any other CP route other than the entry/term view and when performing an action on the listing view (necessary for the social images generator action to work).
         if (Statamic::isCpRoute() && ! $this->isModelCpRoute($event) && ! $this->isActionCpRoute()) {
+            return false;
+        }
+
+        // Check if user has permission to edit SEO content
+        if (Statamic::isCpRoute() && Gate::denies('seo.edit-content')) {
             return false;
         }
 

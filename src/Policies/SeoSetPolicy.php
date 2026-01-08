@@ -44,7 +44,7 @@ class SeoSetPolicy
         }
 
         $canEditLocalization = $user->hasPermission('configure seo')
-            || $user->hasPermission('edit seo');
+            || $user->hasPermission('edit seo defaults');
 
         return $canEditLocalization && $this->canEditStatamicContent($user, $localization->type(), $localization->handle());
     }

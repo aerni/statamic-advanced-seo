@@ -28,10 +28,12 @@ use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaDefaultsType;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
+use Aerni\AdvancedSeo\Gates\SeoGate;
 use Aerni\AdvancedSeo\View\CascadeComposer;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -164,18 +166,26 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootPermissions(): self
     {
+        Gate::define('seo.edit-content', [SeoGate::class, 'editContent']);
+
         Permission::extend(function () {
             Permission::group('advanced-seo', 'Advanced SEO', function () {
                 Permission::register('configure seo', function ($permission) {
                     $permission
-                        ->label('Configure Settings & Defaults')
-                        ->description('Grants access to all permissions and allows editing settings and defaults');
+                        ->label('Configure SEO (Full Access)')
+                        ->description('Grants all permissions including the ability to edit settings, defaults, and content');
                 });
 
-                Permission::register('edit seo', function ($permission) {
+                Permission::register('edit seo defaults', function ($permission) {
                     $permission
                         ->label('Edit Defaults')
-                        ->description('Grants access to edit collection and taxonomy defaults');
+                        ->description('Grants ability to edit collection and taxonomy defaults, and access the SEO tab on entries and terms');
+                });
+
+                Permission::register('edit seo content', function ($permission) {
+                    $permission
+                        ->label('Edit Content')
+                        ->description('Grants access to the SEO tab on entries and terms');
                 });
             });
         });
