@@ -10,10 +10,13 @@ class SocialImageTheme extends StaticRegistry
 {
     protected static function make(): Collection
     {
-        // TODO: This caused an exception when running the social images generator tests. Because we don't have any theme. Is this overkill anyways?
-        // if (config('advanced-seo.social_images.generator.enabled', false) && ! Folder::disk('resources')->exists('views/social_images')) {
-        //     throw new \Exception('You need to create at least one theme for your social images.');
-        // }
+        if (app()->runningInConsole()) {
+            return collect();
+        }
+
+        if (config('advanced-seo.social_images.generator.enabled', false) && ! Folder::disk('resources')->exists('views/social_images')) {
+            throw new \Exception('You need to create at least one theme for your social images.');
+        }
 
         if (! Folder::disk('resources')->exists('views/social_images')) {
             return collect();
