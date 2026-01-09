@@ -15,8 +15,8 @@ class GetContentDefaults
         }
 
         return Blink::once(
-            "advanced-seo::{$context->type}::{$context->handle}::{$context->site}",
-            fn () => GetAugmentedDefaults::handle($context)
+            "advanced-seo::{$context->id()}",
+            fn () => $context->seoSetLocalization()?->toAugmentedCollection() ?? collect()
         );
     }
 }

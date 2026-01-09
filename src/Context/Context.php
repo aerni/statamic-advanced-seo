@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Context;
 
 use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\Data\SeoSetLocalization;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
 
@@ -37,6 +38,18 @@ class Context
     public function seoSet(): ?SeoSet
     {
         return Seo::find("{$this->type}::{$this->handle}");
+    }
+
+    /**
+     * Get the associated SeoSetLocalization.
+     */
+    public function seoSetLocalization(): ?SeoSetLocalization
+    {
+        if (! $this->site) {
+            return null;
+        }
+
+        return $this->seoSet()?->in($this->site);
     }
 
     /**
