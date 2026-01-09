@@ -1,5 +1,6 @@
 <?php
 
+use Statamic\Facades\Path;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Stache;
 
@@ -42,12 +43,21 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function flushBlink()
+function flushBlink(): void
 {
     Blink::flush();
 }
 
-function clearStache()
+function clearStache(): void
 {
     Stache::clear();
+}
+
+function tempPath(?string $path = null): string
+{
+    $tempDir = __DIR__.'/tmp';
+
+    return $path === null
+        ? Path::tidy($tempDir)
+        : Path::tidy($tempDir.'/'.ltrim($path, '/'));
 }
