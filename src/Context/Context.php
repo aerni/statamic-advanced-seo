@@ -21,7 +21,7 @@ class Context
      */
     public static function from(mixed $model): ?self
     {
-        return new ContextResolver($model)->resolve();
+        return (new ContextResolver($model))->resolve();
     }
 
     /**
