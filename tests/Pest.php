@@ -1,7 +1,7 @@
 <?php
 
-use Statamic\Facades\Path;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 
 /*
