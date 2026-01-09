@@ -1,18 +1,18 @@
 <?php
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Blink;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Illuminate\Support\Collection;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Statamic\Facades\Collection as CollectionFacade;
-use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
 
@@ -250,7 +250,6 @@ it('returns the ID as queryable value', function () {
  * Returns an array with keys: id, type, handle, title, icon, enabled,
  * sitemap, social_images_generator, localization_url, config_url, configurable
  */
-
 it('flushes the blink cache', function () {
     $set = new SeoSet(
         type: 'collections',
