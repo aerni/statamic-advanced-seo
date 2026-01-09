@@ -56,13 +56,7 @@ class SeoSetConfig implements Contract
     public function enabled(?bool $enabled = null): bool|self
     {
         return $this->fluentlyGetOrSet('enabled')
-            ->setter(function ($enabled) {
-                if ($this->type() === 'site') {
-                    throw new \LogicException('Site defaults cannot be disabled. They are always enabled.');
-                }
-
-                return $enabled;
-            })
+            ->getter(fn ($enabled) => $this->type() === 'site' ? true : $enabled)
             ->args(func_get_args());
     }
 

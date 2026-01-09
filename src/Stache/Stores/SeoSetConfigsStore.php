@@ -34,17 +34,11 @@ class SeoSetConfigsStore extends BasicStore
 
         $data = YAML::file($path)->parse();
 
-        $config = SeoConfig::make()
-            ->seoSet("{$type}::{$handle}")
+        return SeoConfig::make()
             ->initialPath($path)
-            ->data(Arr::except($data, ['enabled', 'origins']))
-            ->origins(Arr::get($data, 'origins', []));
-
-        // Defaults of type 'site' are always enabled.
-        if ($type !== 'site') {
-            $config->enabled(Arr::get($data, 'enabled', true));
-        }
-
-        return $config;
+            ->seoSet("{$type}::{$handle}")
+            ->enabled(Arr::get($data, 'enabled', true))
+            ->origins(Arr::get($data, 'origins', []))
+            ->data(Arr::except($data, ['enabled', 'origins']));
     }
 }
