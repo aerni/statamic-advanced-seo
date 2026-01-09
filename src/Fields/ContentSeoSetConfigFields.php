@@ -86,7 +86,7 @@ class ContentSeoSetConfigFields extends BaseFields
 
     protected function typePlaceholder(): string
     {
-        return $this->data->type === 'collections'
+        return $this->context->type === 'collections'
             ? __('collection')
             : __('taxonomy');
     }
