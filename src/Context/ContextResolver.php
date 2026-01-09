@@ -54,17 +54,14 @@ class ContextResolver
             $model instanceof EntryBlueprintFound => CollectionFacade::find(
                 Str::after($model->blueprint->namespace(), '.')
             ),
-            $model instanceof TagsContext && $model->get('collection') instanceof Value
-                => $model->get('collection')->value(),
+            $model instanceof TagsContext && $model->get('collection') instanceof Value => $model->get('collection')->value(),
             $model instanceof Taxonomy => $model,
             $model instanceof Term => $model->taxonomy(),
             $model instanceof TermBlueprintFound => TaxonomyFacade::find(
                 Str::after($model->blueprint->namespace(), '.')
             ),
-            $model instanceof TagsContext && $model->get('taxonomy') instanceof Value
-                => $model->get('taxonomy')->value(),
-            $model instanceof TagsContext && $model->get('terms') instanceof TermQueryBuilder
-                => TaxonomyFacade::find($model->get('handle')->value()),
+            $model instanceof TagsContext && $model->get('taxonomy') instanceof Value => $model->get('taxonomy')->value(),
+            $model instanceof TagsContext && $model->get('terms') instanceof TermQueryBuilder => TaxonomyFacade::find($model->get('handle')->value()),
             default => null,
         };
     }
