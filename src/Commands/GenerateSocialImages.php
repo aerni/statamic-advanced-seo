@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Console\Command;
@@ -19,7 +19,7 @@ class GenerateSocialImages extends Command
 
     public function handle(): void
     {
-        $entries = Entry::all()->filter(fn ($entry) => SocialImagesGenerator::enabled(GetDefaultsData::handle($entry)));
+        $entries = Entry::all()->filter(fn ($entry) => SocialImagesGenerator::enabled(Context::from($entry)));
 
         if ($entries->isEmpty()) {
             $this->info('There are no images to generate');

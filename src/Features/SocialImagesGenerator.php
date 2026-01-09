@@ -2,29 +2,29 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 
 class SocialImagesGenerator
 {
-    public static function enabled(DefaultsData $data): bool
+    public static function enabled(Context $context): bool
     {
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
             return false;
         }
 
-        if ($data->type === 'taxonomies') {
+        if ($context->type === 'taxonomies') {
             return false;
         }
 
         /* Always show toggle in the config */
-        if ($data->isConfigContext()) {
+        if ($context->isConfig()) {
             return true;
         }
 
-        if (! $data->set()->enabled()) {
+        if (! $context->seoSet()->enabled()) {
             return false;
         }
 
-        return $data->set()->config()->value('social_images_generator');
+        return $context->seoSet()->config()->value('social_images_generator');
     }
 }

@@ -3,22 +3,22 @@
 namespace Aerni\AdvancedSeo\Fields;
 
 use Aerni\AdvancedSeo\Actions\EvaluateFeature;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Contracts\Fields;
-use Aerni\AdvancedSeo\Data\DefaultsData;
 use Aerni\AdvancedSeo\Support\Helpers;
 
 abstract class BaseFields implements Fields
 {
-    protected DefaultsData $data;
+    protected Context $context;
 
     public static function make(): self
     {
         return new static;
     }
 
-    public function data(DefaultsData $data): self
+    public function context(Context $context): self
     {
-        $this->data = $data;
+        $this->context = $context;
 
         return $this;
     }
@@ -27,7 +27,7 @@ abstract class BaseFields implements Fields
     {
         $sections = $this->sections();
 
-        if (! isset($this->data)) {
+        if (! isset($this->context)) {
             return $sections;
         }
 
@@ -40,7 +40,7 @@ abstract class BaseFields implements Fields
                             return true;
                         }
 
-                        return EvaluateFeature::handle($feature, $this->data);
+                        return EvaluateFeature::handle($feature, $this->context);
                     })
                     ->all(),
             ])
@@ -59,7 +59,7 @@ abstract class BaseFields implements Fields
 
     protected function trans(string $key, array $placeholders = []): ?string
     {
-        if (! isset($this->data)) {
+        if (! isset($this->context)) {
             return null;
         }
 
@@ -70,11 +70,11 @@ abstract class BaseFields implements Fields
 
     protected function typePlaceholder(): string
     {
-        if (! isset($this->data)) {
+        if (! isset($this->context)) {
             return '';
         }
 
-        return match ($this->data->type) {
+        return match ($this->context->type) {
             'collections' => Helpers::isAddonCpRoute()
                 ? lcfirst(__('advanced-seo::messages.entries'))
                 : lcfirst(__('advanced-seo::messages.entry')),

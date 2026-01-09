@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Concerns\HasContext;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
-use Aerni\AdvancedSeo\Enums\Context;
+use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
@@ -31,7 +31,7 @@ class SeoSetLocalization implements Augmentable, Contract
     use ExistsAsFile;
     use FluentlyGetsAndSets;
     use HasAugmentedInstance;
-    use HasDefaultsData;
+    use HasContext;
     use HasDefaultValues;
     use HasOrigin;
     use HasSeoSet;
@@ -138,7 +138,7 @@ class SeoSetLocalization implements Augmentable, Contract
     {
         return resolve($this->seoSet()->blueprint('localization'))
             ->make()
-            ->data($this->defaultsData())
+            ->context($this->context())
             ->get();
     }
 
@@ -160,9 +160,9 @@ class SeoSetLocalization implements Augmentable, Contract
         return $this->seoSet()->in($origin);
     }
 
-    protected function context(): Context
+    protected function scope(): Scope
     {
-        return Context::LOCALIZATION;
+        return Scope::LOCALIZATION;
     }
 
     public function resolveGqlValue(string $field)

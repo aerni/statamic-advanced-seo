@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
@@ -12,7 +13,7 @@ class ShouldGenerateSocialImages
     public static function handle(Entry $entry): bool
     {
         // Don't generate if the social images generator feature is disabled.
-        if (! SocialImagesGenerator::enabled(GetDefaultsData::handle($entry))) {
+        if (! SocialImagesGenerator::enabled(Context::from($entry))) {
             return false;
         }
 

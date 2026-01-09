@@ -2,33 +2,31 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Enums\Context as SeoContext;
+use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Site;
 use Statamic\Fields\Value;
-use Statamic\Tags\Context;
+use Statamic\Tags\Context as TagsContext;
 
 class GetSiteDefaults
 {
-    public static function handle(mixed $data): Collection
+    public static function handle(mixed $model): Collection
     {
-        if (! $locale = EvaluateModelLocale::handle($data)) {
+        if (! $site = Context::from($model)?->site) {
             return collect();
         }
 
-        return Blink::once("advanced-seo::site::{$locale}", function () use ($locale, $data) {
+        return Blink::once("advanced-seo::site::{$site}", function () use ($site, $model) {
             $siteDefaults = Seo::whereType('site')
                 ->flatMap(fn (SeoSet $set) => GetAugmentedDefaults::handle(
-                    new DefaultsData(
+                    new Context(
                         type: $set->type(),
                         handle: $set->handle(),
-                        locale: $locale,
-                        sites: Site::all()->map->handle(),
-                        context: SeoContext::LOCALIZATION,
+                        scope: Scope::LOCALIZATION,
+                        site: $site,
                     )
                 ));
 
@@ -36,8 +34,8 @@ class GetSiteDefaults
              * TODO: Instead of merging the overrides, we might be able to refactor this to something similar to the GetPageData action.
              * Instead of augmenting all the default values upfront, we could get the blueprint of each site default and then add the values to each blueprint field.
              */
-            if ($data instanceof Context) {
-                return self::mergeViewOverrides($siteDefaults, $data);
+            if ($model instanceof TagsContext) {
+                return self::mergeViewOverrides($siteDefaults, $model);
             }
 
             return $siteDefaults;

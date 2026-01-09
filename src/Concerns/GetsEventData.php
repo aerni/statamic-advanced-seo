@@ -2,8 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Statamic\Events\Event;
 
 trait GetsEventData
@@ -16,9 +15,9 @@ trait GetsEventData
         return $event->$property;
     }
 
-    protected function getDataFromEvent(Event $event): DefaultsData
+    protected function resolveEventContext(Event $event): Context
     {
         // Fall back to event if no data exists, e.g. when creating an entry/term.
-        return GetDefaultsData::handle($this->getProperty($event) ?? $event);
+        return Context::from($this->getProperty($event) ?? $event);
     }
 }

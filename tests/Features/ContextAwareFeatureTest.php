@@ -1,7 +1,7 @@
 <?php
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Enums\Context;
+use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
@@ -24,12 +24,11 @@ describe('Sitemap Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('sitemap', false)->save();
 
-        $data = new DefaultsData(
+        $data = new Context(
             type: 'collections',
             handle: 'pages',
-            locale: 'english',
-            sites: collect(['english']),
-            context: Context::CONFIG,
+            scope: Scope::CONFIG,
+            site: 'english',
         );
 
         expect(Sitemap::enabled($data))->toBeTrue();
@@ -39,12 +38,11 @@ describe('Sitemap Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('sitemap', false)->save();
 
-        $data = new DefaultsData(
+        $data = new Context(
             type: 'collections',
             handle: 'pages',
-            locale: 'english',
-            sites: collect(['english']),
-            context: Context::LOCALIZATION,
+            scope: Scope::LOCALIZATION,
+            site: 'english',
         );
 
         expect(Sitemap::enabled($data))->toBeFalse();
@@ -54,12 +52,11 @@ describe('Sitemap Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('sitemap', false)->save();
 
-        $data = new DefaultsData(
+        $data = new Context(
             type: 'collections',
             handle: 'pages',
-            locale: 'english',
-            sites: collect(['english']),
-            context: Context::CONTENT,
+            scope: Scope::CONTENT,
+            site: 'english',
         );
 
         expect(Sitemap::enabled($data))->toBeFalse();
@@ -69,16 +66,15 @@ describe('Sitemap Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('sitemap', true)->save();
 
-        foreach ([Context::CONFIG, Context::LOCALIZATION, Context::CONTENT] as $context) {
-            $data = new DefaultsData(
+        foreach ([Scope::CONFIG, Scope::LOCALIZATION, Scope::CONTENT] as $scope) {
+            $context = new Context(
                 type: 'collections',
                 handle: 'pages',
-                locale: 'english',
-                sites: collect(['english']),
-                context: $context,
+                scope: $scope,
+                site: 'english',
             );
 
-            expect(Sitemap::enabled($data))->toBeTrue("Failed for context: {$context->value}");
+            expect(Sitemap::enabled($context))->toBeTrue("Failed for scope: {$scope->value}");
         }
     });
 });
@@ -90,12 +86,11 @@ describe('Social Images Generator Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('social_images_generator', false)->save();
 
-        $data = new DefaultsData(
+        $data = new Context(
             type: 'collections',
             handle: 'pages',
-            context: Context::CONFIG,
-            locale: 'english',
-            sites: collect(['english']),
+            scope: Scope::CONFIG,
+            site: 'english',
         );
 
         expect(SocialImagesGenerator::enabled($data))->toBeTrue();
@@ -107,12 +102,11 @@ describe('Social Images Generator Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('social_images_generator', false)->save();
 
-        $data = new DefaultsData(
+        $data = new Context(
             type: 'collections',
             handle: 'pages',
-            context: Context::LOCALIZATION,
-            locale: 'english',
-            sites: collect(['english']),
+            scope: Scope::LOCALIZATION,
+            site: 'english',
         );
 
         expect(SocialImagesGenerator::enabled($data))->toBeFalse();
@@ -124,12 +118,11 @@ describe('Social Images Generator Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('social_images_generator', false)->save();
 
-        $data = new DefaultsData(
+        $data = new Context(
             type: 'collections',
             handle: 'pages',
-            context: Context::CONTENT,
-            locale: 'english',
-            sites: collect(['english']),
+            scope: Scope::CONTENT,
+            site: 'english',
         );
 
         expect(SocialImagesGenerator::enabled($data))->toBeFalse();
@@ -141,39 +134,38 @@ describe('Social Images Generator Feature', function () {
         $set = Seo::find('collections::pages');
         $set->config()->set('social_images_generator', true)->save();
 
-        foreach ([Context::CONFIG, Context::LOCALIZATION, Context::CONTENT] as $context) {
-            $data = new DefaultsData(
+        foreach ([Scope::CONFIG, Scope::LOCALIZATION, Scope::CONTENT] as $scope) {
+            $context = new Context(
                 type: 'collections',
                 handle: 'pages',
-                context: $context,
-                locale: 'english',
-                sites: collect(['english']),
+                scope: $scope,
+                site: 'english',
             );
 
-            expect(SocialImagesGenerator::enabled($data))->toBeTrue("Failed for context: {$context->value}");
+            expect(SocialImagesGenerator::enabled($context))->toBeTrue("Failed for scope: {$scope->value}");
         }
     });
 });
 
-describe('DefaultsData Context Helpers', function () {
-    it('identifies config context', function () {
-        $data = new DefaultsData('collections', 'pages', Context::CONFIG, 'en', collect());
-        expect($data->isConfigContext())->toBeTrue();
-        expect($data->isLocalizationContext())->toBeFalse();
-        expect($data->isContentContext())->toBeFalse();
+describe('Context Scope Helpers', function () {
+    it('identifies config scope', function () {
+        $context = new Context('collections', 'pages', Scope::CONFIG, 'en');
+        expect($context->isConfig())->toBeTrue();
+        expect($context->isLocalization())->toBeFalse();
+        expect($context->isContent())->toBeFalse();
     });
 
-    it('identifies localization context', function () {
-        $data = new DefaultsData('collections', 'pages', Context::LOCALIZATION, 'en', collect());
-        expect($data->isConfigContext())->toBeFalse();
-        expect($data->isLocalizationContext())->toBeTrue();
-        expect($data->isContentContext())->toBeFalse();
+    it('identifies localization scope', function () {
+        $context = new Context('collections', 'pages', Scope::LOCALIZATION, 'en');
+        expect($context->isConfig())->toBeFalse();
+        expect($context->isLocalization())->toBeTrue();
+        expect($context->isContent())->toBeFalse();
     });
 
-    it('identifies content context', function () {
-        $data = new DefaultsData('collections', 'pages', Context::CONTENT, 'en', collect());
-        expect($data->isConfigContext())->toBeFalse();
-        expect($data->isLocalizationContext())->toBeFalse();
-        expect($data->isContentContext())->toBeTrue();
+    it('identifies content scope', function () {
+        $context = new Context('collections', 'pages', Scope::CONTENT, 'en');
+        expect($context->isConfig())->toBeFalse();
+        expect($context->isLocalization())->toBeFalse();
+        expect($context->isContent())->toBeTrue();
     });
 });

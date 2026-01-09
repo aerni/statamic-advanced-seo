@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 
 interface Fields
 {
     public static function make(): self;
 
-    public function data(DefaultsData $data): self;
+    public function context(Context $context): self;
 
     public function get(): array;
 

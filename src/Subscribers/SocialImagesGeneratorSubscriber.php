@@ -72,6 +72,6 @@ class SocialImagesGeneratorSubscriber
         }
 
         // Only add preview targets when the generator is enabled.
-        return SocialImagesGenerator::enabled($this->getDataFromEvent($event));
+        return SocialImagesGenerator::enabled($this->resolveEventContext($event));
     }
 }

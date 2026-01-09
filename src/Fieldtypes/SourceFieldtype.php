@@ -2,8 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Aerni\AdvancedSeo\Actions\EvaluateModelLocale;
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\View\SourceFieldtypeCascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
@@ -154,7 +153,7 @@ class SourceFieldtype extends Fieldtype
         }
 
         if ($parent instanceof Term) {
-            return $parent->in(EvaluateModelLocale::handle($parent))->$field;
+            $parent = $parent->in(Context::from($parent)->site);
         }
 
         return $parent->$field;
@@ -165,7 +164,7 @@ class SourceFieldtype extends Fieldtype
         $parent = $this->field->parent();
 
         if ($parent instanceof Term) {
-            $parent = $parent->in(EvaluateModelLocale::handle($parent));
+            $parent = $parent->in(Context::from($parent)->site);
         }
 
         $parent = $parent->toAugmentedArray();
@@ -196,14 +195,14 @@ class SourceFieldtype extends Fieldtype
 
     protected function defaultValueFromCascade(): mixed
     {
-        $data = GetDefaultsData::handle($this->field->parent());
+        $context = Context::from($this->field->parent());
 
-        // We can't get any data on default views like '/cp/advanced-seo/collections/pages'.
-        if (! $data) {
+        // We can't get any context on default views like '/cp/advanced-seo/collections/pages'.
+        if (! $context) {
             return null;
         }
 
-        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$data->id()}", fn () => SourceFieldtypeCascade::from($data));
+        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$context->id()}", fn () => SourceFieldtypeCascade::from($context));
 
         $value = $cascade->value(Str::remove('seo_', $this->field->handle()));
 

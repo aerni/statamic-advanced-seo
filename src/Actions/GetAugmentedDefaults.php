@@ -2,16 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 
 class GetAugmentedDefaults
 {
-    public static function handle(DefaultsData $data): Collection
+    public static function handle(Context $context): Collection
     {
-        return Seo::find("{$data->type}::{$data->handle}")
-            ?->in($data->locale)
+        return Seo::find("{$context->type}::{$context->handle}")
+            ?->in($context->site)
             ?->toAugmentedCollection()
             ?? collect();
     }

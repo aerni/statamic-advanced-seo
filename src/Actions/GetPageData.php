@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Context\Context;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
@@ -19,8 +20,8 @@ class GetPageData
          * This ensures that we don't return any values of conditionally hidden fields.
          * This would typically happen when a feature like the social images generator has been disabled.
          */
-        if ($data = GetDefaultsData::handle($model)) {
-            $blueprint->data($data);
+        if ($context = Context::from($model)) {
+            $blueprint->context($context);
         }
 
         $fields = $blueprint->get()->fields()->all();

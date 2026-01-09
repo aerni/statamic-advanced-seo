@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 
 class SourceFieldtypeCascade extends BaseCascade
 {
-    public function __construct(DefaultsData $model)
+    public function __construct(Context $model)
     {
         parent::__construct($model);
     }

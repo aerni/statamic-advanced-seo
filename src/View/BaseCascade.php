@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\View;
 use Aerni\AdvancedSeo\Actions\GetContentDefaults;
 use Aerni\AdvancedSeo\Actions\GetPageData;
 use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context as SeoContext;
 use Facades\Statamic\Modifiers\CoreModifiers;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
@@ -22,7 +22,7 @@ abstract class BaseCascade implements Augmentable
     use ContainsData;
     use HasAugmentedInstance;
 
-    public function __construct(protected Context|DefaultsData|Entry|Term $model)
+    public function __construct(protected Context|SeoContext|Entry|Term $model)
     {
         $this->data = collect();
     }

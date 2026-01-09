@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
+use Aerni\AdvancedSeo\Concerns\HasContext;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
-use Aerni\AdvancedSeo\Enums\Context;
+use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
@@ -24,7 +24,7 @@ class SeoSetConfig implements Contract
     use ContainsData;
     use ExistsAsFile;
     use FluentlyGetsAndSets;
-    use HasDefaultsData;
+    use HasContext;
     use HasDefaultValues;
     use HasOrigin;
     use HasSeoSet;
@@ -102,7 +102,7 @@ class SeoSetConfig implements Contract
     {
         return resolve($this->seoSet()->blueprint('config'))
             ->make()
-            ->data($this->defaultsData())
+            ->context($this->context())
             ->get();
     }
 
@@ -111,9 +111,9 @@ class SeoSetConfig implements Contract
         return null;
     }
 
-    protected function context(): Context
+    protected function scope(): Scope
     {
-        return Context::CONFIG;
+        return Scope::CONFIG;
     }
 
     public function path(): string

@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Subscribers;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
-use Aerni\AdvancedSeo\Data\DefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -20,7 +20,7 @@ class OnPageSeoBlueprintSubscriber
 {
     use GetsEventData;
 
-    protected DefaultsData $data;
+    protected Context $context;
 
     public function subscribe(Dispatcher $events): array
     {
@@ -32,7 +32,7 @@ class OnPageSeoBlueprintSubscriber
 
     public function extendBlueprint(Event $event): void
     {
-        $this->data = $this->getDataFromEvent($event);
+        $this->context = $this->resolveEventContext($event);
 
         if (! $this->shouldExtendBlueprint($event)) {
             return;
@@ -40,7 +40,7 @@ class OnPageSeoBlueprintSubscriber
 
         $contents = array_replace_recursive(
             $event->blueprint->contents(),
-            OnPageSeoBlueprint::make()->data($this->data)->get()->contents()
+            OnPageSeoBlueprint::make()->context($this->context)->get()->contents()
         );
 
         // Quick and dirty solution to ensure we capitalize the tab title
@@ -52,7 +52,7 @@ class OnPageSeoBlueprintSubscriber
     protected function shouldExtendBlueprint(Event $event): bool
     {
         // Don't add fields if the collection/taxonomy is excluded in the config.
-        if (! $this->data->set()->enabled()) {
+        if (! $this->context->seoSet()->enabled()) {
             return false;
         }
 
@@ -82,7 +82,7 @@ class OnPageSeoBlueprintSubscriber
     protected function isModelCpRoute(Event $event): bool
     {
         // Has a value if editing or localizing an existing entry/term.
-        $id = $this->data->type === 'collections' ? $event->entry?->id() : $event->term?->slug();
+        $id = $this->context->type === 'collections' ? $event->entry?->id() : $event->term?->slug();
 
         // The locale a new entry is being created in.
         $createLocale = Arr::get(Site::all()->map->handle(), basename(request()->path()));
@@ -92,11 +92,11 @@ class OnPageSeoBlueprintSubscriber
          * But we only want to extend the blueprint for the current localization.
          * Otherwise we will have issue evaluating conditional fields, e.g. the sitemap fields.
          */
-        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->data->type, $id ?? $createLocale]);
+        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->context->type, $id ?? $createLocale]);
     }
 
     protected function isActionCpRoute(): bool
     {
-        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->data->type, $this->data->handle, 'actions']);
+        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->context->type, $this->context->handle, 'actions']);
     }
 }

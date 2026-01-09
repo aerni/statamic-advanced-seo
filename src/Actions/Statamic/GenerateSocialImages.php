@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions\Statamic;
 
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Statamic\Actions\Action;
@@ -17,7 +17,7 @@ class GenerateSocialImages extends Action
      */
     public function visibleTo($item)
     {
-        return $item instanceof Entry && SocialImagesGenerator::enabled(GetDefaultsData::handle($item));
+        return $item instanceof Entry && SocialImagesGenerator::enabled(Context::from($item));
     }
 
     /**

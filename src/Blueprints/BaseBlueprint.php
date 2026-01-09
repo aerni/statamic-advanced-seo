@@ -2,24 +2,24 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
-use Aerni\AdvancedSeo\Data\DefaultsData;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Blueprint as BlueprintFields;
 use Statamic\Support\Str;
 
 abstract class BaseBlueprint implements Contract
 {
-    protected DefaultsData $data;
+    protected Context $context;
 
     public static function make(): self
     {
         return new static;
     }
 
-    public function data(DefaultsData $data): self
+    public function context(Context $context): self
     {
-        $this->data = $data;
+        $this->context = $context;
 
         return $this;
     }
@@ -43,7 +43,7 @@ abstract class BaseBlueprint implements Contract
         return collect($this->tabs())
             ->map(fn ($tab, $handle) => [
                 'display' => Str::slugToTitle($handle),
-                'sections' => isset($this->data) ? $tab::make()->data($this->data)->get() : $tab::make()->get(),
+                'sections' => isset($this->context) ? $tab::make()->context($this->context)->get() : $tab::make()->get(),
             ])
             ->filter(fn ($tab) => ! empty($tab['sections']))
             ->all();
