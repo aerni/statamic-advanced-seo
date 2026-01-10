@@ -2,28 +2,27 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Concerns\HasContext;
-use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
-use Aerni\AdvancedSeo\Concerns\HasSeoSet;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
-use Aerni\AdvancedSeo\Enums\Scope;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
-use Aerni\AdvancedSeo\Facades\SeoLocalization;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Data\ContainsData;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasOrigin;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Data\HasOrigin;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Blueprint;
+use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Collection;
 use Statamic\GraphQL\ResolvesValues;
+use Aerni\AdvancedSeo\Context\Context;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Sites\Site as SiteObject;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Contracts\Data\Augmentable;
+use Aerni\AdvancedSeo\Concerns\HasSeoSet;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
 
 class SeoSetLocalization implements Augmentable, Contract
 {
@@ -31,7 +30,6 @@ class SeoSetLocalization implements Augmentable, Contract
     use ExistsAsFile;
     use FluentlyGetsAndSets;
     use HasAugmentedInstance;
-    use HasContext;
     use HasDefaultValues;
     use HasOrigin;
     use HasSeoSet;
@@ -138,7 +136,7 @@ class SeoSetLocalization implements Augmentable, Contract
     {
         return resolve($this->seoSet()->blueprint('localization'))
             ->make()
-            ->context($this->context())
+            ->context(Context::from($this))
             ->get();
     }
 
@@ -158,11 +156,6 @@ class SeoSetLocalization implements Augmentable, Contract
     protected function getOriginByString($origin): ?Contract
     {
         return $this->seoSet()->in($origin);
-    }
-
-    protected function scope(): Scope
-    {
-        return Scope::LOCALIZATION;
     }
 
     public function resolveGqlValue(string $field)

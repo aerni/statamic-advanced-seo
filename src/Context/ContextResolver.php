@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Context;
 
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Illuminate\Support\Str;
@@ -40,7 +42,7 @@ class ContextResolver
         return new Context(
             type: $this->type($parent),
             handle: $this->handle($parent),
-            scope: $this->scope(),
+            scope: $this->scope($parent),
             site: $this->site($this->model),
         );
     }
@@ -49,6 +51,8 @@ class ContextResolver
     {
         return match (true) {
             $model instanceof SeoSet => $model,
+            $model instanceof SeoSetConfig => $model,
+            $model instanceof SeoSetLocalization => $model,
             $model instanceof Collection => $model,
             $model instanceof Entry => $model->collection(),
             $model instanceof EntryBlueprintFound => CollectionFacade::find(
@@ -70,6 +74,8 @@ class ContextResolver
     {
         return match (true) {
             $parent instanceof SeoSet => $parent->type(),
+            $parent instanceof SeoSetConfig => $parent->type(),
+            $parent instanceof SeoSetLocalization => $parent->type(),
             $parent instanceof Collection => 'collections',
             $parent instanceof Taxonomy => 'taxonomies',
             default => throw new \InvalidArgumentException('Cannot extract type from parent'),
@@ -80,15 +86,21 @@ class ContextResolver
     {
         return match (true) {
             $parent instanceof SeoSet => $parent->handle(),
+            $parent instanceof SeoSetConfig => $parent->handle(),
+            $parent instanceof SeoSetLocalization => $parent->handle(),
             $parent instanceof Collection => $parent->handle(),
             $parent instanceof Taxonomy => $parent->handle(),
             default => throw new \InvalidArgumentException('Cannot extract handle from parent'),
         };
     }
 
-    protected function scope(): Scope
+    protected function scope(mixed $model): Scope
     {
-        return Scope::CONTENT;
+        return match (true) {
+            $model instanceof SeoSetConfig => Scope::CONFIG,
+            $model instanceof SeoSetLocalization => Scope::LOCALIZATION,
+            default => Scope::CONTENT,
+        };
     }
 
     protected function site(mixed $model): ?string
@@ -99,6 +111,8 @@ class ContextResolver
             $model instanceof TagsContext => $model->get('site')?->handle() ?? Site::current()->handle(),
             $model instanceof Context => $model->site,
             $model instanceof SeoSet => $this->seoSetSite($model),
+            $model instanceof SeoSetConfig => $model->seoSet()->selectedSite(),
+            $model instanceof SeoSetLocalization => $model->locale(),
             $model instanceof Collection => $this->collectionSite(),
             $model instanceof EntryBlueprintFound => $this->CpSite(),
             $model instanceof Taxonomy => $this->CpSite(),
