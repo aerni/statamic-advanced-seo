@@ -17,7 +17,7 @@ class IndexingDefaultsType extends Type
 
     public function fields(): array
     {
-        return IndexingBlueprint::make()->get()->fields()->toGql()
+        return IndexingBlueprint::resolve()->fields()->toGql()
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 
