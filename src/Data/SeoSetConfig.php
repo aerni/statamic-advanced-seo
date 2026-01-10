@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SiteSeoSetConfigBlueprint;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
@@ -97,7 +99,12 @@ class SeoSetConfig implements Contract
 
     public function blueprint(): Blueprint
     {
-        return resolve($this->seoSet()->blueprint('config'))::resolve($this);
+        $class = match ($this->type()) {
+            'site' => SiteSeoSetConfigBlueprint::class,
+            'collections', 'taxonomies' => ContentSeoSetConfigBlueprint::class,
+        };
+
+        return $class::resolve($this);
     }
 
     protected function getOriginByString($origin): null

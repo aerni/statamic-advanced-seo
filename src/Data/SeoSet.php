@@ -2,23 +2,18 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint;
-use Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint;
-use Aerni\AdvancedSeo\Blueprints\SiteSeoSetConfigBlueprint;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Contracts\Taxonomies\Taxonomy as StatamicTaxonomy;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Support\Str;
 
 class SeoSet implements Arrayable, QueryableValue
 {
@@ -52,23 +47,6 @@ class SeoSet implements Arrayable, QueryableValue
     public function icon(): string
     {
         return $this->icon;
-    }
-
-    // TODO: Actually instantiate the blueprint class but lazily? Then pass the model along in the config and localization
-    // So we don't have ugly thing like this: return resolve($this->seoSet()->blueprint('localization'))::resolve($this);
-    public function blueprint(string $type): string
-    {
-        return match ([$this->type, $type]) {
-            ['site', 'localization'] => 'Aerni\\AdvancedSeo\\Blueprints\\'.Str::studly($this->handle).'Blueprint',
-            ['collections', 'localization'],
-            ['taxonomies', 'localization'] => ContentSeoSetLocalizationBlueprint::class,
-            ['site', 'config'] => SiteSeoSetConfigBlueprint::class,
-            ['collections', 'config'],
-            ['taxonomies', 'config'] => ContentSeoSetConfigBlueprint::class,
-            default => throw new InvalidArgumentException(
-                "No blueprint defined for SEO set type '{$this->type}' with blueprint type '{$type}'"
-            ),
-        };
     }
 
     public function parent(): null|StatamicCollection|StatamicTaxonomy

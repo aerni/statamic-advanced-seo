@@ -2,6 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint;
+use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
+use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
@@ -133,7 +139,18 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function blueprint(): Blueprint
     {
-        return resolve($this->seoSet()->blueprint('localization'))::resolve($this);
+        $class = match ($this->type()) {
+            'site' => match ($this->handle()) {
+                'general' => GeneralBlueprint::class,
+                'indexing' => IndexingBlueprint::class,
+                'social_media' => SocialMediaBlueprint::class,
+                'analytics' => AnalyticsBlueprint::class,
+                'favicons' => FaviconsBlueprint::class,
+            },
+            'collections', 'taxonomies' => ContentSeoSetLocalizationBlueprint::class,
+        };
+
+        return $class::resolve($this);
     }
 
     public function blueprintFields(): array

@@ -64,35 +64,6 @@ it('can get the icon', function () {
     expect($set->icon())->toBe('foo');
 });
 
-it('can get the blueprint', function () {
-    $collectionSet = Seo::find('collections::articles');
-
-    expect($collectionSet->blueprint('localization'))
-        ->toBe(\Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint::class);
-    expect($collectionSet->blueprint('config'))
-        ->toBe(\Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint::class);
-
-    $taxonomySet = Seo::find('taxonomies::tags');
-
-    expect($taxonomySet->blueprint('localization'))
-        ->toBe(\Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint::class);
-    expect($taxonomySet->blueprint('config'))
-        ->toBe(\Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint::class);
-
-    $siteSet = Seo::find('site::general');
-
-    expect($siteSet->blueprint('localization'))
-        ->toBe('Aerni\\AdvancedSeo\\Blueprints\\GeneralBlueprint');
-    expect($siteSet->blueprint('config'))
-        ->toBe(\Aerni\AdvancedSeo\Blueprints\SiteSeoSetConfigBlueprint::class);
-});
-
-it('throws exception for invalid blueprint type', function () {
-    $set = Seo::find('collections::articles');
-
-    $set->blueprint('invalid');
-})->throws(\Exception::class, "No blueprint defined for SEO set type 'collections' with blueprint type 'invalid'");
-
 it('can get the parent', function () {
     $collectionSet = Seo::find('collections::articles');
 
