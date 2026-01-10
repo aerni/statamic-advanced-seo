@@ -2,12 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint;
+use Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SiteSeoSetConfigBlueprint;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Contracts\Taxonomies\Taxonomy as StatamicTaxonomy;
@@ -24,7 +28,6 @@ class SeoSet implements Arrayable, QueryableValue
         protected readonly string $title,
         protected readonly string $icon,
     ) {
-        //
     }
 
     public function id(): string
@@ -56,16 +59,20 @@ class SeoSet implements Arrayable, QueryableValue
     {
         return match ([$this->type, $type]) {
             ['site', 'localization'] => 'Aerni\\AdvancedSeo\\Blueprints\\'.Str::studly($this->handle).'Blueprint',
-            ['collections', 'localization'], ['taxonomies', 'localization'] => \Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint::class,
-            ['site', 'config'] => \Aerni\AdvancedSeo\Blueprints\SiteSeoSetConfigBlueprint::class,
-            ['collections', 'config'], ['taxonomies', 'config'] => \Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint::class,
-            default => throw new \Exception("No blueprint defined for SEO set type '{$this->type}' with blueprint type '{$type}'"),
+            ['collections', 'localization'],
+            ['taxonomies', 'localization'] => ContentSeoSetLocalizationBlueprint::class,
+            ['site', 'config'] => SiteSeoSetConfigBlueprint::class,
+            ['collections', 'config'],
+            ['taxonomies', 'config'] => ContentSeoSetConfigBlueprint::class,
+            default => throw new InvalidArgumentException(
+                "No blueprint defined for SEO set type '{$this->type}' with blueprint type '{$type}'"
+            ),
         };
     }
 
     public function parent(): null|StatamicCollection|StatamicTaxonomy
     {
-        return Blink::once("advanced-seo::{$this->id()}::parent", function () {
+        return Blink::once($this->blinkKey('parent'), function () {
             return match ($this->type) {
                 'collections' => \Statamic\Facades\Collection::find($this->handle),
                 'taxonomies' => \Statamic\Facades\Taxonomy::find($this->handle),
@@ -81,7 +88,7 @@ class SeoSet implements Arrayable, QueryableValue
 
     public function config(): SeoSetConfig
     {
-        return Blink::once("advanced-seo::{$this->id()}::config", function () {
+        return Blink::once($this->blinkKey('config'), function () {
             return SeoConfig::findOrMake($this->id())->seoSet($this);
         });
     }
@@ -91,6 +98,11 @@ class SeoSet implements Arrayable, QueryableValue
         return $this->config()->origins();
     }
 
+    /**
+     * Get all sites associated with this SEO set.
+     *
+     * @return Collection<string, \Statamic\Sites\Site>
+     */
     public function sites(): Collection
     {
         if (! $parent = $this->parent()) {
@@ -100,9 +112,14 @@ class SeoSet implements Arrayable, QueryableValue
         return $parent->sites()->mapWithKeys(fn ($site) => [$site => Site::get($site)]);
     }
 
+    /**
+     * Get all localizations for this SEO set, keyed by locale.
+     *
+     * @return Collection<string, SeoSetLocalization>
+     */
     public function localizations(): Collection
     {
-        return Blink::once("advanced-seo::{$this->id()}::localizations", function () {
+        return Blink::once($this->blinkKey('localizations'), function () {
             $persisted = SeoLocalization::whereSeoSet($this->id())->keyBy->locale();
 
             return $this->sites()->map(function ($site, $handle) use ($persisted) {
@@ -182,7 +199,7 @@ class SeoSet implements Arrayable, QueryableValue
             'enabled' => $enabled,
             'sitemap' => $enabled ? $this->config()->value('sitemap') : false,
             'social_images_generator' => $enabled ? $this->config()->value('social_images_generator') : false,
-            'localization_url' => $this->inSelectedSite()->editUrl(),
+            'localization_url' => $this->inSelectedSite()?->editUrl(),
             'config_url' => $this->config()->editUrl(),
             'configurable' => User::current()->can('configure', [self::class, $this]),
         ];
@@ -190,6 +207,11 @@ class SeoSet implements Arrayable, QueryableValue
 
     public function flushBlink(): void
     {
-        Blink::flushStartingWith("advanced-seo::{$this->id()}::");
+        Blink::flushStartingWith($this->blinkKey());
+    }
+
+    protected function blinkKey(?string $suffix = null): string
+    {
+        return "advanced-seo::{$this->id()}::{$suffix}";
     }
 }
