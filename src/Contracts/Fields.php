@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Aerni\AdvancedSeo\Context\Context;
-
 interface Fields
 {
     public static function make(): self;
 
-    public function context(Context $context): self;
+    public static function resolve(mixed $model = null): array;
+
+    public function for(mixed $model): self;
 
     public function get(): array;
 

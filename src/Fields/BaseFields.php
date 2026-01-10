@@ -9,16 +9,21 @@ use Aerni\AdvancedSeo\Support\Helpers;
 
 abstract class BaseFields implements Fields
 {
-    protected Context $context;
+    protected ?Context $context = null;
 
-    public static function make(): self
+    public static function make(): static
     {
         return new static;
     }
 
-    public function context(Context $context): self
+    public static function resolve(mixed $model = null): array
     {
-        $this->context = $context;
+        return static::make()->for($model)->get();
+    }
+
+    public function for(mixed $model): static
+    {
+        $this->context = Context::from($model);
 
         return $this;
     }
@@ -27,7 +32,7 @@ abstract class BaseFields implements Fields
     {
         $sections = $this->sections();
 
-        if (! isset($this->context)) {
+        if (! $this->context) {
             return $sections;
         }
 
@@ -59,7 +64,7 @@ abstract class BaseFields implements Fields
 
     protected function trans(string $key, array $placeholders = []): ?string
     {
-        if (! isset($this->context)) {
+        if (! $this->context) {
             return null;
         }
 
@@ -70,7 +75,7 @@ abstract class BaseFields implements Fields
 
     protected function typePlaceholder(): string
     {
-        if (! isset($this->context)) {
+        if (! $this->context) {
             return '';
         }
 

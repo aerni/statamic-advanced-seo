@@ -27,8 +27,7 @@ class SeoSet implements Arrayable, QueryableValue
         protected readonly string $handle,
         protected readonly string $title,
         protected readonly string $icon,
-    ) {
-    }
+    ) {}
 
     public function id(): string
     {
@@ -55,6 +54,8 @@ class SeoSet implements Arrayable, QueryableValue
         return $this->icon;
     }
 
+    // TODO: Actually instantiate the blueprint class but lazily? Then pass the model along in the config and localization
+    // So we don't have ugly thing like this: return resolve($this->seoSet()->blueprint('localization'))::resolve($this);
     public function blueprint(string $type): string
     {
         return match ([$this->type, $type]) {

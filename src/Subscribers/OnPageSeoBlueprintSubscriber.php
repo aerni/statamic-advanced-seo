@@ -32,6 +32,7 @@ class OnPageSeoBlueprintSubscriber
 
     public function extendBlueprint(Event $event): void
     {
+        $model = $this->getProperty($event) ?? $event;
         $this->context = $this->resolveEventContext($event);
 
         if (! $this->shouldExtendBlueprint($event)) {
@@ -40,7 +41,7 @@ class OnPageSeoBlueprintSubscriber
 
         $contents = array_replace_recursive(
             $event->blueprint->contents(),
-            OnPageSeoBlueprint::make()->context($this->context)->get()->contents()
+            OnPageSeoBlueprint::resolve($model)->contents()
         );
 
         // Quick and dirty solution to ensure we capitalize the tab title

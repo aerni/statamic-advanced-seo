@@ -2,27 +2,26 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Data\HasOrigin;
-use Statamic\Facades\Stache;
-use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
+use Aerni\AdvancedSeo\Concerns\HasSeoSet;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Collection;
-use Statamic\GraphQL\ResolvesValues;
-use Aerni\AdvancedSeo\Context\Context;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Sites\Site as SiteObject;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Contracts\Data\Augmentable;
-use Aerni\AdvancedSeo\Concerns\HasSeoSet;
-use Aerni\AdvancedSeo\Facades\SeoLocalization;
-use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Fields\Blueprint;
+use Statamic\GraphQL\ResolvesValues;
+use Statamic\Sites\Site as SiteObject;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
 
 class SeoSetLocalization implements Augmentable, Contract
 {
@@ -134,10 +133,7 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function blueprint(): Blueprint
     {
-        return resolve($this->seoSet()->blueprint('localization'))
-            ->make()
-            ->context(Context::from($this))
-            ->get();
+        return resolve($this->seoSet()->blueprint('localization'))::resolve($this);
     }
 
     public function blueprintFields(): array

@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Blueprint as BlueprintFields;
@@ -10,16 +9,21 @@ use Statamic\Support\Str;
 
 abstract class BaseBlueprint implements Contract
 {
-    protected Context $context;
+    protected mixed $model = null;
 
-    public static function make(): self
+    public static function make(): static
     {
         return new static;
     }
 
-    public function context(Context $context): self
+    public static function resolve(mixed $model = null): BlueprintFields
     {
-        $this->context = $context;
+        return static::make()->for($model)->get();
+    }
+
+    public function for(mixed $model): static
+    {
+        $this->model = $model;
 
         return $this;
     }
@@ -43,7 +47,7 @@ abstract class BaseBlueprint implements Contract
         return collect($this->tabs())
             ->map(fn ($tab, $handle) => [
                 'display' => Str::slugToTitle($handle),
-                'sections' => isset($this->context) ? $tab::make()->context($this->context)->get() : $tab::make()->get(),
+                'sections' => $tab::resolve($this->model),
             ])
             ->filter(fn ($tab) => ! empty($tab['sections']))
             ->all();
