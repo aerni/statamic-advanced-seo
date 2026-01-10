@@ -24,26 +24,19 @@ use Statamic\Tags\Context as TagsContext;
 
 class ContextResolver
 {
-    public function __construct(protected mixed $model)
+    public static function resolve(mixed $model): ?Context
     {
-        //
-    }
+        $resolver = new self;
 
-    public function resolve(): ?Context
-    {
-        if ($this->model instanceof Context) {
-            return $this->model;
-        }
-
-        if (! $parent = $this->parent($this->model)) {
+        if (! $parent = $resolver->parent($model)) {
             return null;
         }
 
         return new Context(
-            type: $this->type($parent),
-            handle: $this->handle($parent),
-            scope: $this->scope($parent),
-            site: $this->site($this->model),
+            type: $resolver->type($parent),
+            handle: $resolver->handle($parent),
+            scope: $resolver->scope($model),
+            site: $resolver->site($model),
         );
     }
 
@@ -109,14 +102,13 @@ class ContextResolver
             $model instanceof Entry => $model->locale(),
             $model instanceof Term => $this->termSite($model),
             $model instanceof TagsContext => $model->get('site')?->handle() ?? Site::current()->handle(),
-            $model instanceof Context => $model->site,
             $model instanceof SeoSet => $this->seoSetSite($model),
             $model instanceof SeoSetConfig => $model->seoSet()->selectedSite(),
             $model instanceof SeoSetLocalization => $model->locale(),
             $model instanceof Collection => $this->collectionSite(),
-            $model instanceof EntryBlueprintFound => $this->CpSite(),
-            $model instanceof Taxonomy => $this->CpSite(),
-            $model instanceof TermBlueprintFound => $this->CpSite(),
+            $model instanceof EntryBlueprintFound => $this->cpSite(),
+            $model instanceof Taxonomy => $this->cpSite(),
+            $model instanceof TermBlueprintFound => $this->cpSite(),
             default => null,
         };
     }
@@ -154,7 +146,7 @@ class ContextResolver
             : $term->locale();
     }
 
-    protected function CpSite(): string
+    protected function cpSite(): string
     {
         return Statamic::isCpRoute()
             ? basename(request()->path())
