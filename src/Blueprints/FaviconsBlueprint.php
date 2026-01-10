@@ -2,10 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\FaviconsFields;
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Features\Favicons;
 
 class FaviconsBlueprint extends BaseBlueprint
 {
+    use HasAssetField;
+
     protected function handle(): string
     {
         return 'favicons';
@@ -14,7 +17,167 @@ class FaviconsBlueprint extends BaseBlueprint
     protected function tabs(): array
     {
         return [
-            'favicons' => FaviconsFields::class,
+            'favicons' => [
+                $this->favicons(),
+                // ...$this->faviconsGenerator(),
+            ],
+        ];
+    }
+
+    protected function favicons(): array
+    {
+        return [
+            'display' => $this->trans('section_favicon.display'),
+            'instructions' => $this->trans('section_favicon.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'favicon_svg',
+                    'field' => $this->getAssetFieldConfig([
+                        'display' => $this->trans('favicon_svg.display'),
+                        'instructions' => $this->trans('favicon_svg.instructions'),
+                        'container' => config('advanced-seo.favicons.container', 'assets'),
+                        'folder' => 'favicons',
+                        'localizable' => true,
+                        'feature' => Favicons::class,
+                        'validate' => [
+                            'image',
+                            'mimes:svg',
+                        ],
+                    ]),
+                ],
+            ],
+        ];
+    }
+
+    protected function faviconsGenerator(): array
+    {
+        if (! config('advanced-seo.favicons.enabled', true) || ! config('advanced-seo.favicons.generator.enabled', false)) {
+            return [];
+        }
+
+        return [
+            [
+                'display' => 'Favicon Colors',
+                'instructions' => 'Configure your favicon colors.',
+                'collapsible' => true,
+                'fields' => [
+                    [
+                        'handle' => 'favicon_safari_color',
+                        'field' => [
+                            'theme' => 'nano',
+                            'lock_opacity' => true,
+                            'default_color_mode' => 'HEXA',
+                            'color_modes' => [
+                                'hex',
+                            ],
+                            'display' => 'Safari (mask-icon)',
+                            'type' => 'color',
+                            'icon' => 'color',
+                            'listable' => 'hidden',
+                            'instructions' => 'The color of your favicon in Safari.',
+                            'width' => 50,
+                            'validate' => [
+                                'required',
+                            ],
+                        ],
+                    ],
+                    [
+                        'handle' => 'favicon_ios_color',
+                        'field' => [
+                            'theme' => 'nano',
+                            'lock_opacity' => true,
+                            'default_color_mode' => 'HEXA',
+                            'color_modes' => [
+                                'hex',
+                            ],
+                            'display' => 'iOS (apple-touch-icon)',
+                            'type' => 'color',
+                            'icon' => 'color',
+                            'listable' => 'hidden',
+                            'instructions' => 'The background color of your favicon on iOS.',
+                            'width' => 50,
+                            'validate' => [
+                                'required',
+                            ],
+                        ],
+                    ],
+                    [
+                        'handle' => 'favicon_android_chrome_color',
+                        'field' => [
+                            'theme' => 'nano',
+                            'lock_opacity' => true,
+                            'default_color_mode' => 'HEXA',
+                            'color_modes' => [
+                                'hex',
+                            ],
+                            'display' => 'Android Chrome',
+                            'type' => 'color',
+                            'icon' => 'color',
+                            'listable' => 'hidden',
+                            'instructions' => 'The background color of your favicon on Android Chrome.',
+                            'width' => 50,
+                            'validate' => [
+                                'required',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => 'Favicon Overrides',
+                'instructions' => 'You may override the automatically generated favicons with your own.',
+                'collapsible' => true,
+                'fields' => [
+                    [
+                        'handle' => 'favicon_safari_override',
+                        'field' => $this->getAssetFieldConfig([
+                            'display' => 'Safari (mask-icon)',
+                            'instructions' => 'A single color and as flattened as possible SVG. This will use the `Safari` color defined above.',
+                            'container' => config('advanced-seo.favicons.container', 'assets'),
+                            'width' => 50,
+                            'folder' => 'favicons',
+                            'localizable' => false,
+                            'validate' => [
+                                'image',
+                                'mimes:svg',
+                            ],
+                        ]),
+                    ],
+                    [
+                        'handle' => 'favicon_ios_override',
+                        'field' => $this->getAssetFieldConfig([
+                            'display' => 'iOS (apple-touch-icon)',
+                            'instructions' => 'A `180x180px` PNG for iOS devices.',
+                            'container' => config('advanced-seo.favicons.container', 'assets'),
+                            'width' => 50,
+                            'folder' => 'favicons',
+                            'localizable' => false,
+                            'validate' => [
+                                'image',
+                                'mimes:png',
+                                'dimensions:width=180,height=180',
+                            ],
+                        ]),
+                    ],
+                    [
+                        'handle' => 'favicon_android_chrome_override',
+                        'field' => $this->getAssetFieldConfig([
+                            'display' => 'Android Chrome',
+                            'instructions' => 'A `512x512px` PNG for Android devices.',
+                            'container' => config('advanced-seo.favicons.container', 'assets'),
+                            'width' => 50,
+                            'folder' => 'favicons',
+                            'localizable' => false,
+                            'validate' => [
+                                'image',
+                                'mimes:png',
+                                'dimensions:width=512,height=512',
+                            ],
+                        ]),
+                    ],
+                ],
+            ],
         ];
     }
 }

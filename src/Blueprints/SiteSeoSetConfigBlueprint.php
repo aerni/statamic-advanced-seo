@@ -2,8 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Fields\SiteSeoSetConfigFields;
-
 class SiteSeoSetConfigBlueprint extends BaseBlueprint
 {
     protected function handle(): string
@@ -14,7 +12,27 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
     protected function tabs(): array
     {
         return [
-            'main' => SiteSeoSetConfigFields::class,
+            'main' => [
+                $this->origins(),
+            ],
+        ];
+    }
+
+    protected function origins(): array
+    {
+        return [
+            'display' => __('Origins'),
+            'fields' => [
+                [
+                    'handle' => 'origins',
+                    'field' => [
+                        'type' => 'default_set_sites',
+                        'display' => __('Origins'),
+                        'instructions' => __('Choose to inherit values from selected origins.'),
+                        'default' => [],
+                    ],
+                ],
+            ],
         ];
     }
 }
