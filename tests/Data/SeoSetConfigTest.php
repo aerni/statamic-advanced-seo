@@ -1,10 +1,10 @@
 <?php
 
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
-use Statamic\Facades\Collection;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
