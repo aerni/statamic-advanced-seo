@@ -69,11 +69,6 @@ class SeoSetLocalization implements Augmentable, Contract
         return $this->seoSet()->handle();
     }
 
-    public function title(): string
-    {
-        return $this->seoSet()->title();
-    }
-
     public function path(): string
     {
         return Path::assemble(
