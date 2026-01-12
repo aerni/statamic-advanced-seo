@@ -8,17 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create($this->prefix('advanced_seo_defaults'), function (Blueprint $table) {
+        Schema::create($this->prefix('seo_set_localizations'), function (Blueprint $table) {
             $table->id();
             $table->string('type');
             $table->string('handle');
+            $table->string('locale');
             $table->jsonb('data');
             $table->timestamps();
+
+            $table->unique(['type', 'handle', 'locale']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists($this->prefix('advanced_seo_defaults'));
+        Schema::dropIfExists($this->prefix('seo_set_localizations'));
     }
 };

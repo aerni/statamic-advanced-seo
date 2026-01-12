@@ -1,12 +1,14 @@
 <?php
 
+use Statamic\Facades\Site;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
-use Aerni\AdvancedSeo\Data\SeoSetConfig as StacheSeoSetConfig;
-use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
+use Aerni\AdvancedSeo\Eloquent\SeoSetConfig as EloquentSeoSetConfig;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(UseEloquentDriver::class);
 
 beforeEach(function () {
     Collection::make('pages')->saveQuietly();
@@ -15,7 +17,7 @@ beforeEach(function () {
 
 it('can make a config', function () {
     expect(SeoConfig::make())->toBeInstanceOf(SeoSetConfig::class);
-    expect(SeoConfig::make())->toBeInstanceOf(StacheSeoSetConfig::class);
+    expect(SeoConfig::make())->toBeInstanceOf(EloquentSeoSetConfig::class);
 });
 
 it('can find a config', function () {
@@ -27,12 +29,12 @@ it('can find or make a config', function () {
     $existing = SeoConfig::findOrMake('collections::pages');
 
     expect($existing)->toBeInstanceOf(SeoSetConfig::class)
-        ->and($existing->initialPath())->not->toBeNull();
+        ->and($existing->model())->not->toBeNull();
 
     $new = SeoConfig::findOrMake('collections::nonexistent');
 
     expect($new)->toBeInstanceOf(SeoSetConfig::class)
-        ->and($new->initialPath())->toBeNull();
+        ->and($new->model())->toBeNull();
 });
 
 it('can get all configs', function () {
@@ -44,14 +46,17 @@ it('can get all configs', function () {
 });
 
 it('can save a config', function () {
-    $config = SeoConfig::find('collections::pages');
+    $config = SeoConfig::find('collections::pages')
+        ->set('key', 'value');
 
-    $config->set('key', 'value');
+    $modelBeforeSave = $config->model();
+
+    expect(Blink::has("advanced-seo.eloquent.set.config.{$config->id()}"))->toBeTrue();
 
     SeoConfig::save($config);
 
-    /* Ensure we're reading from the persisted file, not from memory */
-    clearStache();
+    expect($modelBeforeSave)->not->toBe($config->model());
+    expect(Blink::has("advanced-seo.eloquent.set.config.{$config->id()}"))->toBeFalse();
 
     $fresh = SeoConfig::find('collections::pages');
 
@@ -62,7 +67,11 @@ it('can save a config', function () {
 it('can delete a config', function () {
     $config = SeoConfig::find('collections::pages');
 
+    expect(Blink::has("advanced-seo.eloquent.set.config.{$config->id()}"))->toBeTrue();
+
     SeoConfig::delete($config);
+
+    expect(Blink::has("advanced-seo.eloquent.set.config.{$config->id()}"))->toBeFalse();
 
     expect(SeoConfig::find('collections::pages'))->toBeNull()
         ->and(SeoConfig::all())->toHaveCount(0);

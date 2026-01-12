@@ -83,9 +83,7 @@ class ServiceProvider extends AddonServiceProvider
 
     public function register(): void
     {
-        $this->usesEloquentDriver()
-            ? $this->registerEloquentDriver()
-            : $this->registerFileDriver();
+        $this->usesEloquentDriver() ? $this->registerEloquentDriver() : $this->registerFileDriver();
     }
 
     protected function usesEloquentDriver(): bool
@@ -96,10 +94,11 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function registerEloquentDriver(): void
     {
-        // TODO: Update Eloquent driver for new architecture
         Statamic::repository(Contracts\SeoSetConfigRepository::class, Eloquent\SeoSetConfigRepository::class);
+        Statamic::repository(Contracts\SeoSetLocalizationRepository::class, Eloquent\SeoSetLocalizationRepository::class);
 
-        $this->app->bind('advanced_seo.model', Eloquent\SeoDefaultModel::class);
+        $this->app->bind('statamic.eloquent.seo_set_config.model', Eloquent\SeoSetConfigModel::class);
+        $this->app->bind('statamic.eloquent.seo_set_localization.model', Eloquent\SeoSetLocalizationModel::class);
     }
 
     protected function registerFileDriver(): void
@@ -261,7 +260,9 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootMigrations(): self
     {
         $this->publishes([
-            __DIR__.'/../database/migrations/2025_02_05_100000_create_advanced_seo_defaults_table.php' => database_path('migrations/2025_02_05_100000_create_advanced_seo_defaults_table.php'),
+            __DIR__.'/../database/migrations/2026_01_13_100000_create_seo_set_configs_table.php' => database_path('migrations/2026_01_13_100000_create_seo_set_configs_table.php'),
+            __DIR__.'/../database/migrations/2026_01_13_100001_create_seo_set_localizations_table.php' => database_path('migrations/2026_01_13_100001_create_seo_set_localizations_table.php'),
+            __DIR__.'/../database/migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php' => database_path('migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php'),
         ], 'advanced-seo-migrations');
 
         return $this;

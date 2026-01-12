@@ -5,7 +5,9 @@ namespace Aerni\AdvancedSeo\UpdateScripts;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Statamic\UpdateScripts\UpdateScript;
 
 class MigrateConfigChanges extends UpdateScript
@@ -19,6 +21,12 @@ class MigrateConfigChanges extends UpdateScript
 
     public function update(): void
     {
+        // For Eloquent users, we need to run migrations first to create the new tables
+        // and migrate data from the old table before we can work with the new architecture.
+        if ($this->usesEloquentDriver()) {
+            $this->migrateEloquentTables();
+        }
+
         $this->seoSets = Seo::all();
 
         $this->removeTitleFromConfigSet();
@@ -29,13 +37,45 @@ class MigrateConfigChanges extends UpdateScript
         $this->saveSetsAndLocalizations();
     }
 
+    protected function usesEloquentDriver(): bool
+    {
+        return Composer::isInstalled('statamic/eloquent-driver')
+            && config('advanced-seo.driver') === 'eloquent';
+    }
+
+    /**
+     * Publish and run the Eloquent migrations.
+     *
+     * This ensures the new tables are created and data is migrated from the old
+     * advanced_seo_defaults table before the update script tries to work with
+     * the new SeoSetConfig and SeoSetLocalization repositories.
+     */
+    protected function migrateEloquentTables(): void
+    {
+        Artisan::call('vendor:publish', [
+            '--tag' => 'advanced-seo-migrations',
+            '--force' => true,
+        ]);
+
+        Artisan::call('migrate');
+
+        $this->console()->info('Published and migrated Advanced SEO database tables.');
+    }
+
     /**
      * Remove deprecated 'title' field from all SeoSet configs.
      *
      * The title field is no longer used in v3.0.0 and should be removed from all set configs.
+     *
+     * Note: For Eloquent users, this is already handled by the database migration
+     * (2026_01_13_100002_migrate_advanced_seo_defaults_to_new_tables.php)
      */
     protected function removeTitleFromConfigSet(): void
     {
+        if ($this->usesEloquentDriver()) {
+            return;
+        }
+
         $this->seoSets->each(function (SeoSet $set) {
             $set->config()->remove('title');
         });
@@ -98,9 +138,16 @@ class MigrateConfigChanges extends UpdateScript
      *
      * This centralizes origin management and makes it easier to configure which
      * localizations should inherit SEO data from other localizations.
+     *
+     * Note: For Eloquent users, this is already handled by the database migration
+     * (2026_01_13_100002_migrate_advanced_seo_defaults_to_new_tables.php)
      */
     protected function migrateOriginsConfig(): void
     {
+        if ($this->usesEloquentDriver()) {
+            return;
+        }
+
         $this->seoSets->each(function (SeoSet $set) {
             $localizations = $set->localizations();
 

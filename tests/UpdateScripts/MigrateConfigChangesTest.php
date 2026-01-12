@@ -287,3 +287,24 @@ it('skips social images generator migration and cleans up fields when generator 
     expect($socialMediaSet->in('english')->get('social_images_generator_collections'))->toBeNull();
     expect($socialMediaSet->in('german')->get('social_images_generator_collections'))->toBeNull();
 });
+
+it('calls migrateEloquentTables and skips file-based migrations for Eloquent users', function () {
+    // Set title and origin BEFORE running the migration
+    Seo::find('collections::pages')->config()->set('title', 'Pages')->save();
+    Seo::find('collections::products')->in('german')->set('origin', 'english')->save();
+
+    $mock = Mockery::mock(MigrateConfigChanges::class, ['aerni/advanced-seo'])
+        ->makePartial()
+        ->shouldAllowMockingProtectedMethods();
+
+    $mock->shouldReceive('usesEloquentDriver')->andReturn(true);
+    $mock->shouldReceive('migrateEloquentTables')->once();
+
+    $mock->update();
+
+    // Title should NOT be removed (handled by database migration)
+    expect(Seo::find('collections::pages')->config()->get('title'))->toBe('Pages');
+
+    // Origins should NOT be migrated (handled by database migration)
+    expect(Seo::find('collections::products')->in('german')->get('origin'))->toBe('english');
+});
