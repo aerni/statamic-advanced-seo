@@ -92,7 +92,6 @@ it('can get the site', function () {
     expect($localization->site()->handle())->toBe('german');
 });
 
-// TODO: Mock the sites.
 it('can get the sites', function () {
     $localization = Seo::find('collections::articles')->inDefaultSite();
 

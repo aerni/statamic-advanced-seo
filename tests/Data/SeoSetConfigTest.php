@@ -133,17 +133,15 @@ it('can get the blueprint', function () {
     expect($blueprint->handle())->toBe('site_config');
 });
 
-it('can get sites from the seoSet', function () {
-    $expectedSites = collect(['english' => Site::get('english'), 'german' => Site::get('german')]);
+it('can get the sites', function () {
+    $config = Seo::find('collections::articles')->config();
 
-    $seoSet = Mockery::mock(SeoSet::class);
-    $seoSet->shouldReceive('sites')->once()->andReturn($expectedSites);
+    expect($config->sites())->toBeInstanceOf(Collection::class);
+    expect($config->sites()->keys()->all())->toBe(['english', 'german']);
 
-    $config = SeoConfig::make()->seoSet($seoSet);
+    $siteConfig = Seo::find('site::general')->config();
 
-    $result = $config->sites();
-
-    expect($result)->toBe($expectedSites);
+    expect($siteConfig->sites()->keys()->all())->toBe(Site::all()->keys()->all());
 });
 
 it('can get and set data values', function () {
@@ -168,7 +166,7 @@ it('can merge data', function () {
     expect($config->get('social_images_generator'))->toBeFalse();
 });
 
-it('returns correct file data', function () {
+it('can get file data', function () {
     $config = Seo::find('collections::articles')->config();
 
     $config->enabled(true);
@@ -197,13 +195,13 @@ it('excludes empty origins from file data', function () {
     expect($config->fileData())->not->toHaveKey('origins');
 });
 
-it('returns correct path', function () {
+it('can get the path', function () {
     $config = Seo::find('collections::articles')->config();
 
     expect($config->path())->toContain('collections/articles.yaml');
 });
 
-it('returns correct edit url', function () {
+it('can get the edit url', function () {
     $config = Seo::find('collections::articles')->config();
 
     expect($config->editUrl())->toContain('advanced-seo/collections/articles/config');

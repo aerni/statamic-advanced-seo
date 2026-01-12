@@ -19,7 +19,7 @@ class TestRegistryTwo extends Registry
     }
 }
 
-it('gets all items as collection', function () {
+it('can get all items as a collection', function () {
     $result = (new TestRegistryOne)->all();
 
     expect($result)->toBeInstanceOf(Collection::class)
