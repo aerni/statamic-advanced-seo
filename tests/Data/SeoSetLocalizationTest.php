@@ -1,23 +1,22 @@
 <?php
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Blink;
-use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
+use Aerni\AdvancedSeo\Data\AugmentedLocalization;
 use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\Data\SeoSetLocalization;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
+use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Statamic\Sites\Site as SiteObject;
 use Statamic\Contracts\Data\Augmentable;
-use Aerni\AdvancedSeo\Data\SeoSetLocalization;
-use Aerni\AdvancedSeo\Facades\SeoLocalization;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Aerni\AdvancedSeo\Data\AugmentedLocalization;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
-use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Statamic\Sites\Site as SiteObject;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
 
 uses(PreventsSavingStacheItemsToDisk::class);
 

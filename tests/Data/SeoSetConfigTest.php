@@ -1,20 +1,20 @@
 <?php
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Stache;
-use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
 use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\Data\SeoSetConfig;
+use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
+use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Aerni\AdvancedSeo\Data\SeoSetConfig;
-use Aerni\AdvancedSeo\Facades\SeoConfig;
-use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
-use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Taxonomy as TaxonomyFacade;
+use Statamic\Fields\Blueprint;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
