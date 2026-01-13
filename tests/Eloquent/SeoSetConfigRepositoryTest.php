@@ -1,12 +1,11 @@
 <?php
 
-use Statamic\Facades\Site;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\Eloquent\SeoSetConfig as EloquentSeoSetConfig;
+use Aerni\AdvancedSeo\Facades\SeoConfig;
+use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Aerni\AdvancedSeo\Facades\SeoConfig;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
-use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
-use Aerni\AdvancedSeo\Eloquent\SeoSetConfig as EloquentSeoSetConfig;
 
 uses(UseEloquentDriver::class);
 

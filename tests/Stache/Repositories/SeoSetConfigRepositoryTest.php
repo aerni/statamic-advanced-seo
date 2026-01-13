@@ -1,9 +1,9 @@
 <?php
 
-use Statamic\Facades\Collection;
-use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Data\SeoSetConfig as StacheSeoSetConfig;
+use Aerni\AdvancedSeo\Facades\SeoConfig;
+use Statamic\Facades\Collection;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);

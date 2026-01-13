@@ -1,11 +1,11 @@
 <?php
 
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
+use Aerni\AdvancedSeo\Eloquent\SeoSetLocalization as EloquentSeoSetLocalization;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Aerni\AdvancedSeo\Facades\SeoLocalization;
-use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
-use Aerni\AdvancedSeo\Eloquent\SeoSetLocalization as EloquentSeoSetLocalization;
 
 uses(UseEloquentDriver::class);
 

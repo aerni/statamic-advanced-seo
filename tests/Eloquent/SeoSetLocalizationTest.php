@@ -41,7 +41,6 @@ it('can make a model from a contract', function () {
         ->seoSet('collections::pages')
         ->locale('english');
 
-
     $model = SeoSetLocalization::makeModelFromContract($localization);
 
     expect($model)->toBeInstanceOf(Model::class)

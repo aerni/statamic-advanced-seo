@@ -1,10 +1,10 @@
 <?php
 
-use Statamic\Facades\Collection;
-use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 use Aerni\AdvancedSeo\Data\SeoSetLocalization as StacheSeoSetLocalization;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Statamic\Facades\Collection;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
 

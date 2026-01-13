@@ -5,9 +5,7 @@ use Aerni\AdvancedSeo\Eloquent\SeoSetConfig;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
-use Illuminate\Database\Eloquent\Model;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 
 uses(UseEloquentDriver::class);
 
