@@ -31,30 +31,37 @@ class SwitchToFile extends Command
     public function handle()
     {
         if (! Composer::isInstalled('statamic/eloquent-driver')) {
-            return error('You need to install the Eloquent Driver before running this command. Run `composer require statamic/eloquent-driver`.');
+            return error('You need to install the Eloquent driver before running this command. Run `composer require statamic/eloquent-driver`.');
+        }
+
+        if ($this->isUsingFileDriver()) {
+            return info('Already using the file driver.');
         }
 
         $this->switchToFileDriver();
         $this->migrateContent();
     }
 
+    protected function isUsingFileDriver(): bool
+    {
+        $configPath = config_path('advanced-seo.php');
+
+        if (! file_exists($configPath)) {
+            return true;
+        }
+
+        return ! preg_match("/('driver'\s*=>\s*)'eloquent'/", file_get_contents($configPath));
+    }
+
     protected function switchToFileDriver(): void
     {
         $configPath = config_path('advanced-seo.php');
 
-        if (file_exists($configPath) && preg_match("/('driver'\\s*=>\\s*)'file'/", file_get_contents($configPath))) {
-            return;
-        }
-
-        $this->call('vendor:publish', [
-            '--tag' => 'advanced-seo-config',
-        ]);
-
-        $config = preg_replace("/('driver'\s*=>\s*)'[^']*'/", "\${1}'file'", file_get_contents($configPath), 1);
+        $config = preg_replace("/('driver'\s*=>\s*)'eloquent'/", "\${1}'file'", file_get_contents($configPath), 1);
 
         file_put_contents($configPath, $config);
 
-        info('Updated config to use the File driver.');
+        info('Updated config to use the file driver.');
     }
 
     protected function migrateContent(): void

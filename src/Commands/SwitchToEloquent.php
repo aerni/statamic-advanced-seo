@@ -35,7 +35,11 @@ class SwitchToEloquent extends Command
     public function handle()
     {
         if (! Composer::isInstalled('statamic/eloquent-driver')) {
-            return error('You need to install the Eloquent Driver before running this command. Run `composer require statamic/eloquent-driver`.');
+            return error('You need to install the Eloquent driver before running this command. Run `composer require statamic/eloquent-driver`.');
+        }
+
+        if ($this->isUsingEloquentDriver()) {
+            return info('Already using the Eloquent driver.');
         }
 
         $this->switchToEloquentDriver();
@@ -43,19 +47,39 @@ class SwitchToEloquent extends Command
         $this->migrateContent();
     }
 
+    protected function isUsingEloquentDriver(): bool
+    {
+        $configPath = config_path('advanced-seo.php');
+
+        if (! file_exists($configPath)) {
+            return false;
+        }
+
+        return preg_match("/('driver'\s*=>\s*)'eloquent'/", file_get_contents($configPath));
+    }
+
     protected function switchToEloquentDriver(): void
     {
         $configPath = config_path('advanced-seo.php');
 
-        if (file_exists($configPath) && preg_match("/('driver'\\s*=>\\s*)'eloquent'/", file_get_contents($configPath))) {
-            return;
+        if (! file_exists($configPath)) {
+            $this->call('vendor:publish', [
+                '--tag' => 'advanced-seo-config',
+            ]);
         }
 
-        $this->call('vendor:publish', [
-            '--tag' => 'advanced-seo-config',
-        ]);
+        $config = file_get_contents($configPath);
 
-        $config = preg_replace("/('driver'\s*=>\s*)'[^']*'/", "\${1}'eloquent'", file_get_contents($configPath), 1);
+        if (preg_match("/('driver'\s*=>\s*)'[^']*'/", $config)) {
+            $config = preg_replace("/('driver'\s*=>\s*)'[^']*'/", "\${1}'eloquent'", $config, 1);
+        } else {
+            preg_match(
+                '/(\s*\/\*[\s\S]*?\*\/\s*\'driver\'\s*=>\s*)[\'"][^\'"]*[\'"],?/',
+                file_get_contents(__DIR__.'/../../config/advanced-seo.php'),
+                $matches
+            );
+            $config = preg_replace("/return\s*\[\s*/", "return [".$matches[1]."'eloquent',\n\n    ", $config, 1);
+        }
 
         file_put_contents($configPath, $config);
 
