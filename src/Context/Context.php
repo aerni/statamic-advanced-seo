@@ -25,11 +25,11 @@ class Context
     }
 
     /**
-     * Get the unique identifier for this context including the site.
+     * Get the unique identifier for this context including scope and site.
      */
     public function id(): string
     {
-        return "{$this->type}::{$this->handle}::{$this->site}";
+        return "{$this->type}::{$this->handle}::{$this->scope->value}::{$this->site}";
     }
 
     /**

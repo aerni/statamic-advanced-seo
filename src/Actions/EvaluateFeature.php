@@ -13,9 +13,6 @@ class EvaluateFeature
             return Blink::once("advanced-seo::features::{$feature}", fn () => $feature::enabled());
         }
 
-        // Structure cache key with set ID first for efficient bulk clearing
-        $cacheKey = "advanced-seo::{$context->type}::{$context->handle}::features::{$feature}::{$context->site}";
-
-        return Blink::once($cacheKey, fn () => $feature::enabled($context));
+        return Blink::once("advanced-seo::features::{$feature}::{$context->id()}", fn () => $feature::enabled($context));
     }
 }
