@@ -5,6 +5,7 @@ use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -80,6 +81,29 @@ describe('Sitemap Feature', function () {
 });
 
 describe('Social Images Generator Feature', function () {
+    beforeEach(function () {
+        File::ensureDirectoryExists(resource_path('views/social_images/default'));
+    });
+
+    afterEach(function () {
+        File::deleteDirectory(resource_path('views/social_images'));
+    });
+
+    it('is disabled when no themes exist', function () {
+        File::deleteDirectory(resource_path('views/social_images'));
+
+        config(['advanced-seo.social_images.generator.enabled' => true]);
+
+        $context = new Context(
+            type: 'collections',
+            handle: 'pages',
+            scope: Scope::CONFIG,
+            site: 'english',
+        );
+
+        expect(SocialImagesGenerator::enabled($context))->toBeFalse();
+    });
+
     it('always shows in config context even when disabled', function () {
         config(['advanced-seo.social_images.generator.enabled' => true]);
 

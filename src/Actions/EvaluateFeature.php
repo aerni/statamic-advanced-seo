@@ -13,6 +13,7 @@ class EvaluateFeature
             return Blink::once("advanced-seo::features::{$feature}", fn () => $feature::enabled());
         }
 
-        return Blink::once("advanced-seo::features::{$feature}::{$context->id()}", fn () => $feature::enabled($context));
+        // Key must start with "advanced-seo::{type}::{handle}::" to be flushed by SeoSet::flushBlink()
+        return Blink::once("advanced-seo::{$context->type}::{$context->handle}::features::{$feature}::{$context->scope->value}::{$context->site}", fn () => $feature::enabled($context));
     }
 }
