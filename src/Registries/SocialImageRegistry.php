@@ -47,22 +47,16 @@ class SocialImageRegistry extends Registry
      */
     public function previewTargets(Entry $entry): array
     {
+        $theme = $entry->seo_social_images_theme;
+
         return [
             [
                 'label' => 'Open Graph Image',
-                'format' => route('advanced-seo.social-images', [
-                    'theme' => $entry->seo_social_images_theme,
-                    'template' => $this->openGraph()->type,
-                    'id' => '{id}',
-                ]),
+                'format' => $this->openGraph()->url($theme, '{id}'),
             ],
             [
                 'label' => 'Twitter Image',
-                'format' => route('advanced-seo.social-images', [
-                    'theme' => $entry->seo_social_images_theme,
-                    'template' => $this->find("twitter_{$entry->seo_twitter_card}")->type,
-                    'id' => '{id}',
-                ]),
+                'format' => $this->find("twitter_{$entry->seo_twitter_card}")->url($theme, '{id}'),
             ],
         ];
     }

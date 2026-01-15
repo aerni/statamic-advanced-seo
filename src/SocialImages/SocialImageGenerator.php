@@ -64,11 +64,7 @@ class SocialImageGenerator
 
     protected function templateUrl(): string
     {
-        return route('advanced-seo.social-images', [
-            'theme' => $this->entry->seo_social_images_theme,
-            'template' => $this->socialImage->type,
-            'id' => $this->entry->id,
-        ]);
+        return $this->socialImage->url($this->entry->seo_social_images_theme, $this->entry->id);
     }
 
     protected function ensureDirectoryExists(): void

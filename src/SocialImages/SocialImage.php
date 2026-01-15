@@ -30,4 +30,9 @@ class SocialImage
     {
         return "{$this->width()} x {$this->height()} pixels";
     }
+
+    public function url(string $theme, string $id): string
+    {
+        return url("/!/advanced-seo/social-images/{$theme}/{$this->type}/{$id}");
+    }
 }
