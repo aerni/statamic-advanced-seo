@@ -36,29 +36,33 @@ class SeoSetIndexController extends CpController
             'title' => __("advanced-seo::messages.{$seoSetGroup->type()}"),
             'icon' => $seoSetGroup->icon(),
             'items' => $items,
-            'columns' => $this->columns($seoSetGroup->type()),
+            'columns' => $this->columns($seoSetGroup),
         ]);
     }
 
-    protected function columns(string $type): array
+    protected function columns(SeoSetGroup $seoSetGroup): ?array
     {
-        if ($type === 'collections') {
-            return [
-                Column::make('title')->label(__('Title')),
-                Column::make('status')->label(__('Status')),
-                Column::make('sitemap')->label(__('Sitemap'))->fieldtype('toggle'),
-                Column::make('social_images_generator')->label(__('Social Images Generator'))->fieldtype('toggle'),
-            ];
+        $type = $seoSetGroup->type();
+
+        if ($type === 'site') {
+            return null;
         }
 
-        if ($type === 'taxonomies') {
-            return [
-                Column::make('title')->label(__('Title')),
-                Column::make('status')->label(__('Status')),
-                Column::make('sitemap')->label(__('Sitemap'))->fieldtype('toggle'),
-            ];
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('status')->label(__('Status')),
+        ];
+
+        $blueprint = $seoSetGroup->seoSets()->first()->config()->blueprint();
+
+        if ($blueprint->hasField('sitemap')) {
+            $columns[] = Column::make('sitemap')->label(__('Sitemap'))->fieldtype('toggle');
         }
 
-        return [];
+        if ($blueprint->hasField('social_images_generator')) {
+            $columns[] = Column::make('social_images_generator')->label(__('Social Images Generator'))->fieldtype('toggle');
+        }
+
+        return $columns;
     }
 }
