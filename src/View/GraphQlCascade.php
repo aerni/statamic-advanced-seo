@@ -103,9 +103,12 @@ class GraphQlCascade extends BaseCascade
 
     public function ogImagePreset(): array
     {
-        return collect(SocialImage::findModel('open_graph'))
-            ->only(['width', 'height'])
-            ->all();
+        $openGraph = SocialImage::openGraph();
+
+        return [
+            'width' => $openGraph->width(),
+            'height' => $openGraph->height(),
+        ];
     }
 
     public function twitterTitle(): string
@@ -115,20 +118,23 @@ class GraphQlCascade extends BaseCascade
 
     public function twitterImage(): ?Asset
     {
-        if (! $model = SocialImage::findModel("twitter_{$this->get('twitter_card')}")) {
+        if (! $socialImage = SocialImage::find("twitter_{$this->get('twitter_card')}")) {
             return null;
         }
 
         return $this->get('generate_social_images')
-            ? $this->get('generated_twitter_image') ?? $this->get($model['handle'])
-            : $this->get($model['handle']);
+            ? $this->get('generated_twitter_image') ?? $this->get($socialImage->handle)
+            : $this->get($socialImage->handle);
     }
 
     public function twitterImagePreset(): array
     {
-        return collect(SocialImage::findModel("twitter_{$this->get('twitter_card')}"))
-            ->only(['width', 'height'])
-            ->all();
+        $socialImage = SocialImage::find("twitter_{$this->get('twitter_card')}");
+
+        return [
+            'width' => $socialImage->width(),
+            'height' => $socialImage->height(),
+        ];
     }
 
     public function twitterHandle(): ?string

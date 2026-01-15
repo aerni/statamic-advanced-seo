@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Aerni\AdvancedSeo\Registries\SocialImageTheme;
 use Illuminate\Support\Str;
 
 class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
@@ -112,8 +111,8 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'type' => 'select',
                         'display' => $this->trans('seo_social_images_theme.display'),
                         'instructions' => $this->trans('seo_social_images_theme.default_instructions'),
-                        'default' => SocialImageTheme::fieldtypeDefault(),
-                        'options' => SocialImageTheme::fieldtypeOptions(),
+                        'default' => SocialImage::themes()->default()?->handle,
+                        'options' => SocialImage::themes()->options(),
                         'clearable' => false,
                         'multiple' => false,
                         'searchable' => false,
@@ -122,7 +121,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'cast_booleans' => false,
                         'localizable' => true,
                         'listable' => 'hidden',
-                        'classes' => SocialImageTheme::all()->count() == 1 ? 'hidden' : '', // Hide the field in the CP if there is only one theme
+                        'classes' => SocialImage::themes()->count() === 1 ? 'hidden' : '',
                         'feature' => SocialImagesGenerator::class,
                     ],
                 ],
@@ -141,7 +140,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                     'handle' => 'seo_og_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('seo_og_image.display'),
-                        'instructions' => $this->trans('seo_og_image.default_instructions', ['size' => SocialImage::sizeString('open_graph')]),
+                        'instructions' => $this->trans('seo_og_image.default_instructions', ['size' => SocialImage::openGraph()->sizeString()]),
                         'validate' => [
                             'image',
                             'mimes:jpg,png',
@@ -214,8 +213,8 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                     'handle' => 'seo_twitter_summary_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('seo_twitter_summary_image.display'),
-                        'instructions' => $this->trans('seo_twitter_summary_image.default_instructions', ['size' => SocialImage::sizeString('twitter_summary')]),
-                        'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
+                        'instructions' => $this->trans('seo_twitter_summary_image.default_instructions', ['size' => SocialImage::twitter()->sizeString()]),
+                        'twitter_card' => 'summary',
                         'width' => 50,
                         'validate' => [
                             'image',
@@ -227,8 +226,8 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                     'handle' => 'seo_twitter_summary_large_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('seo_twitter_summary_large_image.display'),
-                        'instructions' => $this->trans('seo_twitter_summary_large_image.default_instructions', ['size' => SocialImage::sizeString('twitter_summary_large_image')]),
-                        'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
+                        'instructions' => $this->trans('seo_twitter_summary_large_image.default_instructions', ['size' => SocialImage::twitterLarge()->sizeString()]),
+                        'twitter_card' => 'summary_large_image',
                         'width' => 50,
                         'validate' => [
                             'image',

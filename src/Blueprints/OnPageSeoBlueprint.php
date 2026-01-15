@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Aerni\AdvancedSeo\Registries\SocialImageTheme;
 use Illuminate\Support\Str;
 
 class OnPageSeoBlueprint extends BaseBlueprint
@@ -127,15 +126,15 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_social_images_theme.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => SocialImageTheme::all()->count() == 1 ? 'hidden' : 'select-fieldtype', // Hide the field in the CP if there is only one theme,
+                        'classes' => SocialImage::themes()->count() === 1 ? 'hidden' : 'select-fieldtype',
                         'feature' => SocialImagesGenerator::class,
                         'if' => [
                             'seo_generate_social_images.value' => 'true',
                         ],
                         'field' => [
                             'type' => 'select',
-                            'options' => SocialImageTheme::fieldtypeOptions(),
-                            'default' => SocialImageTheme::fieldtypeDefault(),
+                            'options' => SocialImage::themes()->options(),
+                            'default' => SocialImage::themes()->default()?->handle,
                             'clearable' => false,
                             'multiple' => false,
                             'searchable' => false,
@@ -191,7 +190,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                     'field' => [
                         'type' => 'seo_source',
                         'display' => $this->trans('seo_og_image.display'),
-                        'instructions' => $this->trans('seo_og_image.instructions', ['size' => SocialImage::sizeString('open_graph')]),
+                        'instructions' => $this->trans('seo_og_image.instructions', ['size' => SocialImage::openGraph()->sizeString()]),
                         'default' => '@default',
                         'localizable' => true,
                         'classes' => 'assets-fieldtype',
@@ -281,11 +280,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
                     'field' => [
                         'type' => 'seo_source',
                         'display' => $this->trans('seo_twitter_summary_image.display'),
-                        'instructions' => $this->trans('seo_twitter_summary_image.instructions', ['size' => SocialImage::sizeString('twitter_summary')]),
+                        'instructions' => $this->trans('seo_twitter_summary_image.instructions', ['size' => SocialImage::twitter()->sizeString()]),
                         'default' => '@default',
                         'localizable' => true,
                         'classes' => 'assets-fieldtype',
-                        'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
+                        'twitter_card' => 'summary',
                         'if' => [
                             'seo_generate_social_images.value' => 'isnt true',
                             'seo_twitter_card.value' => 'equals summary',
@@ -310,11 +309,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
                     'field' => [
                         'type' => 'seo_source',
                         'display' => $this->trans('seo_twitter_summary_large_image.display'),
-                        'instructions' => $this->trans('seo_twitter_summary_large_image.instructions', ['size' => SocialImage::sizeString('twitter_summary_large_image')]),
+                        'instructions' => $this->trans('seo_twitter_summary_large_image.instructions', ['size' => SocialImage::twitterLarge()->sizeString()]),
                         'default' => '@default',
                         'localizable' => true,
                         'classes' => 'assets-fieldtype',
-                        'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
+                        'twitter_card' => 'summary_large_image',
                         'if' => [
                             'seo_generate_social_images.value' => 'isnt true',
                             'seo_twitter_card.value' => 'equals summary_large_image',

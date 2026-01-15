@@ -119,9 +119,12 @@ class ViewCascade extends BaseCascade
 
     public function ogImagePreset(): array
     {
-        return collect(SocialImage::findModel('open_graph'))
-            ->only(['width', 'height'])
-            ->all();
+        $openGraph = SocialImage::openGraph();
+
+        return [
+            'width' => $openGraph->width(),
+            'height' => $openGraph->height(),
+        ];
     }
 
     public function twitterTitle(): string
@@ -134,28 +137,31 @@ class ViewCascade extends BaseCascade
         return match (true) {
             ($this->has('twitter_card')) => $this->get('twitter_card'),
             // The following three cases handle pages like taxonomy and 404.
-            ($this->has('twitter_summary_large_image')) => SocialImage::findModel('twitter_summary_large_image')['card'],
-            ($this->has('twitter_summary_image')) => SocialImage::findModel('twitter_summary')['card'],
+            ($this->has('twitter_summary_large_image')) => 'summary_large_image',
+            ($this->has('twitter_summary_image')) => 'summary',
             default => Seo::defaultValue('collections.seo_twitter_card'),
         };
     }
 
     public function twitterImage(): ?Asset
     {
-        if (! $model = SocialImage::findModel("twitter_{$this->twitterCard()}")) {
+        if (! $socialImage = SocialImage::find("twitter_{$this->twitterCard()}")) {
             return null;
         }
 
         return $this->get('generate_social_images')
-            ? $this->get('generated_twitter_image') ?? $this->get($model['handle'])
-            : $this->get($model['handle']);
+            ? $this->get('generated_twitter_image') ?? $this->get($socialImage->handle)
+            : $this->get($socialImage->handle);
     }
 
     public function twitterImagePreset(): array
     {
-        return collect(SocialImage::findModel("twitter_{$this->twitterCard()}"))
-            ->only(['width', 'height'])
-            ->all();
+        $socialImage = SocialImage::find("twitter_{$this->twitterCard()}");
+
+        return [
+            'width' => $socialImage->width(),
+            'height' => $socialImage->height(),
+        ];
     }
 
     public function twitterHandle(): ?string

@@ -35,7 +35,7 @@ class SocialMediaBlueprint extends BaseBlueprint
                     'handle' => 'og_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('og_image.display'),
-                        'instructions' => $this->trans('og_image.instructions', ['size' => SocialImage::sizeString('open_graph')]),
+                        'instructions' => $this->trans('og_image.instructions', ['size' => SocialImage::openGraph()->sizeString()]),
                         'validate' => [
                             'image',
                             'mimes:jpg,png',
@@ -57,8 +57,8 @@ class SocialMediaBlueprint extends BaseBlueprint
                     'handle' => 'twitter_summary_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('twitter_summary_image.display'),
-                        'instructions' => $this->trans('twitter_summary_image.instructions', ['size' => SocialImage::sizeString('twitter_summary')]),
-                        'twitter_card' => SocialImage::findModel('twitter_summary')['card'],
+                        'instructions' => $this->trans('twitter_summary_image.instructions', ['size' => SocialImage::twitter()->sizeString()]),
+                        'twitter_card' => 'summary',
                         'width' => 50,
                         'validate' => [
                             'image',
@@ -70,8 +70,8 @@ class SocialMediaBlueprint extends BaseBlueprint
                     'handle' => 'twitter_summary_large_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('twitter_summary_large_image.display'),
-                        'instructions' => $this->trans('twitter_summary_large_image.instructions', ['size' => SocialImage::sizeString('twitter_summary_large_image')]),
-                        'twitter_card' => SocialImage::findModel('twitter_summary_large_image')['card'],
+                        'instructions' => $this->trans('twitter_summary_large_image.instructions', ['size' => SocialImage::twitterLarge()->sizeString()]),
+                        'twitter_card' => 'summary_large_image',
                         'width' => 50,
                         'validate' => [
                             'image',

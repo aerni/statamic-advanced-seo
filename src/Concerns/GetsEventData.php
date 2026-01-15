@@ -9,6 +9,8 @@ trait GetsEventData
 {
     protected function getProperty(Event $event): mixed
     {
+        // TODO: Will this throw an error somewhere because "defaults" likely belongs
+        // to the deprecated SeoSetDefaults class?
         $property = collect(['collection', 'entry', 'taxonomy', 'term', 'defaults'])
             ->first(fn ($property) => property_exists($event, $property));
 

@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\GraphQL;
@@ -21,8 +22,7 @@ class SocialImageFieldtype extends Fieldtype
             return null;
         }
 
-        $type = $this->config()['image_type'];
-        $image = SocialImage::all($parent)->get($type);
+        $generator = $this->generator($parent);
 
         $generateOnSaveMessage = config('queue.default') === 'sync'
             ? trans('advanced-seo::messages.social_images_generator_save_sync')
@@ -34,7 +34,7 @@ class SocialImageFieldtype extends Fieldtype
 
         return [
             'message' => $message,
-            'image' => $image->asset()?->absoluteUrl(),
+            'image' => $generator->asset()?->absoluteUrl(),
         ];
     }
 
@@ -46,10 +46,17 @@ class SocialImageFieldtype extends Fieldtype
             return null;
         }
 
-        $type = $this->config()['image_type'];
-        $image = SocialImage::all($parent)->get($type);
+        $generator = $this->generator($parent);
 
-        return $image->asset() ?? $image->generate()->asset();
+        return $generator->asset() ?? $generator->generate()->asset();
+    }
+
+    protected function generator(Entry $entry): SocialImageGenerator
+    {
+        return match ($this->config()['image_type']) {
+            'open_graph' => SocialImage::openGraph()->for($entry),
+            'twitter' => SocialImage::find("twitter_{$entry->seo_twitter_card}")->for($entry),
+        };
     }
 
     public function toGqlType()
