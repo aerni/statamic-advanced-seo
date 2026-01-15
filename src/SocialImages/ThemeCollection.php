@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\SocialImages;
 
 use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\SocialImages\Theme;
 
 class ThemeCollection extends Collection
 {

@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Support\Str;
@@ -126,15 +127,15 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_social_images_theme.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => SocialImage::themes()->count() === 1 ? 'hidden' : 'select-fieldtype',
+                        'visibility' => SocialImageTheme::allowedFor($this->context->seoSet())->count() === 1 ? 'hidden' : 'visible',
                         'feature' => SocialImagesGenerator::class,
                         'if' => [
                             'seo_generate_social_images.value' => 'true',
                         ],
                         'field' => [
                             'type' => 'select',
-                            'options' => SocialImage::themes()->options(),
-                            'default' => SocialImage::themes()->default()?->handle,
+                            'options' => SocialImageTheme::allowedFor($this->context->seoSet())->options(),
+                            'default' => SocialImageTheme::allowedFor($this->context->seoSet())->default()?->handle,
                             'clearable' => false,
                             'multiple' => false,
                             'searchable' => false,

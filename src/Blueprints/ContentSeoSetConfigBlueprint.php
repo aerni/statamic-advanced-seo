@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
@@ -18,7 +19,8 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
             'main' => [
                 $this->enabled(),
                 $this->origins(),
-                $this->features(),
+                $this->sitemap(),
+                $this->socialImagesGenerator(),
             ],
         ];
     }
@@ -60,30 +62,59 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function features(): array
+    protected function sitemap(): array
     {
         return [
-            'display' => __('Features'),
+            'display' => __('Sitemap'),
             'fields' => [
                 [
                     'handle' => 'sitemap',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('Sitemap'),
+                        'display' => __('Enabled'),
                         'instructions' => __("Enables the sitemap for this {$this->contentTypeLabel()}."),
                         'default' => true,
                         'if' => ['enabled' => 'true'],
                         'feature' => Sitemap::class,
                     ],
                 ],
+            ],
+        ];
+    }
+
+    protected function socialImagesGenerator(): array
+    {
+        return [
+            'display' => __('Social Images Generator'),
+            'fields' => [
                 [
                     'handle' => 'social_images_generator',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('Social Images Generator'),
+                        'display' => __('Enabled'),
                         'instructions' => __("Enables the social images generator for this {$this->contentTypeLabel()}."),
-                        'default' => true,
+                        'default' => false,
                         'if' => ['enabled' => 'true'],
+                        'feature' => SocialImagesGenerator::class,
+                    ],
+                ],
+                [
+                    'handle' => 'social_images_themes',
+                    'field' => [
+                        'type' => 'select',
+                        'display' => __('Themes'),
+                        'instructions' => __('Select the social image themes available for this collection.'),
+                        'options' => SocialImageTheme::all()->options(),
+                        'default' => SocialImageTheme::all()->default()?->handle,
+                        'multiple' => true,
+                        'validate' => [
+                            'required',
+                            'sometimes',
+                        ],
+                        'if' => [
+                            'enabled' => 'true',
+                            'social_images_generator' => 'true',
+                        ],
                         'feature' => SocialImagesGenerator::class,
                     ],
                 ],

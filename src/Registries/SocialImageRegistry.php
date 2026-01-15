@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
+use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\SocialImages\SocialImage;
-use Aerni\AdvancedSeo\SocialImages\ThemeCollection;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 
@@ -47,7 +47,7 @@ class SocialImageRegistry extends Registry
      */
     public function previewTargets(Entry $entry): array
     {
-        $theme = $entry->seo_social_images_theme;
+        $theme = SocialImageTheme::resolveFor($entry)->handle;
 
         return [
             [
@@ -59,11 +59,6 @@ class SocialImageRegistry extends Registry
                 'format' => $this->find("twitter_{$entry->seo_twitter_card}")->url($theme, '{id}'),
             ],
         ];
-    }
-
-    public function themes(): ThemeCollection
-    {
-        return (new SocialImageThemeRegistry)->all();
     }
 
     protected function items(): array

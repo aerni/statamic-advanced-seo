@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\SocialImages;
 
+use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Illuminate\Support\Facades\File;
 use Spatie\Browsershot\Browsershot;
 use Statamic\Contracts\Assets\Asset;
@@ -64,7 +65,12 @@ class SocialImageGenerator
 
     protected function templateUrl(): string
     {
-        return $this->socialImage->url($this->entry->seo_social_images_theme, $this->entry->id);
+        // TODO: It would be nice if we could just do $this->entry->seo_social_images_theme
+        // and the theme field resolves itself. Maybe in the future with its own fieldtype.
+        return $this->socialImage->url(
+            SocialImageTheme::resolveFor($this->entry)->handle,
+            $this->entry->id
+        );
     }
 
     protected function ensureDirectoryExists(): void
