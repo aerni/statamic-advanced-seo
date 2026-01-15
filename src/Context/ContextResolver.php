@@ -26,6 +26,10 @@ class ContextResolver
 {
     public static function resolve(mixed $model): ?Context
     {
+        if ($model instanceof Context) {
+            return $model;
+        }
+
         $resolver = new self;
 
         if (! $parent = $resolver->parent($model)) {
