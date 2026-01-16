@@ -87,9 +87,24 @@ abstract class BaseBlueprint
 
     protected function resolveLazyValues(Collection $tabs): Collection
     {
-        return $tabs->dot()
-            ->map(fn ($value) => $value instanceof Closure ? $value($this->context) : $value)
-            ->undot();
+        return $tabs->map(fn ($value) => $this->resolveValue($value));
+    }
+
+    protected function resolveValue(mixed $value): mixed
+    {
+        if ($value instanceof Closure) {
+            return $value($this->context);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->map(fn ($item) => $this->resolveValue($item))->all();
+        }
+
+        if (is_array($value)) {
+            return collect($value)->map(fn ($item) => $this->resolveValue($item))->all();
+        }
+
+        return $value;
     }
 
     protected function trans(string $key, array $placeholders = []): ?string
