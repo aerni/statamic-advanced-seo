@@ -44,21 +44,23 @@ abstract class BaseBlueprint
     {
         return \Statamic\Facades\Blueprint::make()
             ->setHandle($this->handle())
-            ->setContents(['tabs' => $this->processedTabs()]);
+            ->setContents($this->contents());
     }
 
-    protected function processedTabs(): array
+    protected function contents(): array
     {
-        return collect($this->tabs())
+        $tabs = collect($this->tabs())
             ->map(fn (array $sections, string $handle) => [
                 'display' => Str::slugToTitle($handle),
-                'sections' => $this->filterSections($sections),
+                'sections' => $this->sections($sections),
             ])
             ->pipe($this->resolveLazyValues(...))
             ->all();
+
+        return ['tabs' => $tabs];
     }
 
-    protected function filterSections(array $sections): array
+    protected function sections(array $sections): array
     {
         if (! $this->context) {
             return $sections;
