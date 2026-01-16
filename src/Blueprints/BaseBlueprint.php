@@ -2,13 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Closure;
-use Statamic\Support\Str;
-use Statamic\Fields\Blueprint;
-use Aerni\AdvancedSeo\Enums\Scope;
-use Illuminate\Support\Collection;
-use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Actions\EvaluateFeature;
+use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Enums\Scope;
+use Closure;
+use Illuminate\Support\Collection;
+use Statamic\Fields\Blueprint;
+use Statamic\Support\Str;
 
 abstract class BaseBlueprint
 {
@@ -96,11 +96,7 @@ abstract class BaseBlueprint
             return $value($this->context);
         }
 
-        if ($value instanceof Collection) {
-            return $value->map(fn ($item) => $this->resolveValue($item))->all();
-        }
-
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Collection) {
             return collect($value)->map(fn ($item) => $this->resolveValue($item))->all();
         }
 
@@ -113,9 +109,7 @@ abstract class BaseBlueprint
             return null;
         }
 
-        $placeholders = array_merge(['type' => $this->contentTypeLabel()], $placeholders);
-
-        return __("advanced-seo::fields.$key", $placeholders);
+        return __("advanced-seo::fields.$key", ['type' => $this->contentTypeLabel(), ...$placeholders]);
     }
 
     protected function contentTypeLabel(): string
