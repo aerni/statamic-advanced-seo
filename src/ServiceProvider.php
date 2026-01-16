@@ -7,8 +7,8 @@ use Aerni\AdvancedSeo\Data\SeoSetGroup;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Gates\SeoGate;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
+use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
-use Aerni\AdvancedSeo\GraphQL\Queries\SeoSetsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsDefaultsType;
 use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
@@ -228,7 +228,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function bootGraphQL(): self
     {
         if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
-            GraphQL::addQuery(SeoSetsQuery::class);
+            GraphQL::addQuery(SeoDefaultsQuery::class);
             GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoSitemapsQuery::class);
 
