@@ -2,11 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Actions\EvaluateFeature;
-use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Enums\Scope;
-use Statamic\Fields\Blueprint;
+use Closure;
 use Statamic\Support\Str;
+use Statamic\Fields\Blueprint;
+use Aerni\AdvancedSeo\Enums\Scope;
+use Illuminate\Support\Collection;
+use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Actions\EvaluateFeature;
 
 abstract class BaseBlueprint
 {
@@ -21,9 +23,14 @@ abstract class BaseBlueprint
         return new static;
     }
 
-    public static function resolve(mixed $model = null): Blueprint
+    public static function resolve(mixed $model): Blueprint
     {
         return static::make()->for($model)->get();
+    }
+
+    public static function definition(): Blueprint
+    {
+        return static::make()->get();
     }
 
     public function for(mixed $model): static
@@ -47,6 +54,7 @@ abstract class BaseBlueprint
                 'display' => Str::slugToTitle($handle),
                 'sections' => $this->filterSections($sections),
             ])
+            ->pipe($this->resolveLazyValues(...))
             ->all();
     }
 
@@ -68,6 +76,18 @@ abstract class BaseBlueprint
             ->filter(fn (array $section) => $section['fields'])
             ->values()
             ->all();
+    }
+
+    protected function lazy(callable $callback, mixed $fallback = null): Closure
+    {
+        return fn (?Context $context) => $context ? $callback($context) : $fallback;
+    }
+
+    protected function resolveLazyValues(Collection $tabs): Collection
+    {
+        return $tabs->dot()
+            ->map(fn ($value) => $value instanceof Closure ? $value($this->context) : $value)
+            ->undot();
     }
 
     protected function trans(string $key, array $placeholders = []): ?string

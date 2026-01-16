@@ -17,7 +17,7 @@ class AnalyticsDefaultsType extends Type
 
     public function fields(): array
     {
-        return AnalyticsBlueprint::resolve()->fields()->toGql()
+        return AnalyticsBlueprint::definition()->fields()->toGql()
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 

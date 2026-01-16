@@ -17,7 +17,7 @@ class FaviconsDefaultsType extends Type
 
     public function fields(): array
     {
-        return FaviconsBlueprint::resolve()->fields()->toGql()
+        return FaviconsBlueprint::definition()->fields()->toGql()
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 

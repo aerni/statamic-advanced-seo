@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\Features\Sitemap;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Support\Str;
 
@@ -127,15 +128,15 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_social_images_theme.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'visibility' => SocialImageTheme::allowedFor($this->context->seoSet())->count() === 1 ? 'hidden' : 'visible',
+                        'visibility' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),
                         'feature' => SocialImagesGenerator::class,
                         'if' => [
                             'seo_generate_social_images.value' => 'true',
                         ],
                         'field' => [
                             'type' => 'select',
-                            'options' => SocialImageTheme::allowedFor($this->context->seoSet())->options(),
-                            'default' => SocialImageTheme::allowedFor($this->context->seoSet())->default()?->handle,
+                            'options' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->options(), []),
+                            'default' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->default()?->handle, null),
                             'clearable' => false,
                             'multiple' => false,
                             'searchable' => false,

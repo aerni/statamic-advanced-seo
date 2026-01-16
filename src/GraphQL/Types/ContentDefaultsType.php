@@ -19,7 +19,7 @@ class ContentDefaultsType extends Type
 
     public function fields(): array
     {
-        return ContentSeoSetLocalizationBlueprint::resolve()->fields()->toGql()
+        return ContentSeoSetLocalizationBlueprint::definition()->fields()->toGql()
             ->mapWithKeys(fn ($field, $handle) => [Str::remove('seo_', $handle) => $field]) // We want to remove `seo_` from all the field keys
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();

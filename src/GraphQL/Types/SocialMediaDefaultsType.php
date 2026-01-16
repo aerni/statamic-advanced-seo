@@ -17,7 +17,7 @@ class SocialMediaDefaultsType extends Type
 
     public function fields(): array
     {
-        return SocialMediaBlueprint::resolve()->fields()->toGql()
+        return SocialMediaBlueprint::definition()->fields()->toGql()
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 

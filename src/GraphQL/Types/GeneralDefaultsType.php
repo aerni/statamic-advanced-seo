@@ -17,7 +17,7 @@ class GeneralDefaultsType extends Type
 
     public function fields(): array
     {
-        return GeneralBlueprint::resolve()->fields()->toGql()
+        return GeneralBlueprint::definition()->fields()->toGql()
             ->map(function ($field, $handle) {
                 $field['resolve'] = $this->resolver();
 

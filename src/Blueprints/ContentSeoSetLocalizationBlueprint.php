@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
@@ -112,8 +113,8 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'type' => 'select',
                         'display' => $this->trans('seo_social_images_theme.display'),
                         'instructions' => $this->trans('seo_social_images_theme.default_instructions'),
-                        'options' => SocialImageTheme::allowedFor($this->context->seoSet())->options(),
-                        'default' => SocialImageTheme::allowedFor($this->context->seoSet())->default()?->handle,
+                        'options' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->options(), []),
+                        'default' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->default()?->handle, null),
                         'clearable' => false,
                         'multiple' => false,
                         'searchable' => false,
@@ -122,7 +123,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'cast_booleans' => false,
                         'localizable' => true,
                         'listable' => 'hidden',
-                        'visibility' => SocialImageTheme::allowedFor($this->context->seoSet())->count() === 1 ? 'hidden' : 'visible',
+                        'visibility' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),
                         'feature' => SocialImagesGenerator::class,
                     ],
                 ],
