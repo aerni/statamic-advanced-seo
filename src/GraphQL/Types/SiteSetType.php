@@ -3,43 +3,47 @@
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
 use Aerni\AdvancedSeo\Data\SeoSetLocalization;
-use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetResolver;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
 
-class SiteDefaultsType extends Type
+class SiteSetType extends Type
 {
-    const NAME = 'siteDefaults';
+    const NAME = 'siteSet';
 
     protected $attributes = [
         'name' => self::NAME,
-        'description' => 'The Advanced SEO site defaults',
+        'description' => 'The SEO set for the site',
     ];
 
     public function fields(): array
     {
         return [
             'analytics' => [
-                'type' => GraphQL::type(AnalyticsDefaultsType::NAME),
+                'type' => GraphQL::type(AnalyticsSiteSetType::NAME),
+                'description' => 'The analytics settings',
                 'resolve' => $this->resolver(),
             ],
             'favicons' => [
-                'type' => GraphQL::type(FaviconsDefaultsType::NAME),
+                'type' => GraphQL::type(FaviconsSiteSetType::NAME),
+                'description' => 'The favicons settings',
                 'resolve' => $this->resolver(),
             ],
             'general' => [
-                'type' => GraphQL::type(GeneralDefaultsType::NAME),
+                'type' => GraphQL::type(GeneralSiteSetType::NAME),
+                'description' => 'The general SEO settings',
                 'resolve' => $this->resolver(),
             ],
             'indexing' => [
-                'type' => GraphQL::type(IndexingDefaultsType::NAME),
+                'type' => GraphQL::type(IndexingSiteSetType::NAME),
+                'description' => 'The indexing settings',
                 'resolve' => $this->resolver(),
             ],
             'socialMedia' => [
-                'type' => GraphQL::type(SocialMediaDefaultsType::NAME),
+                'type' => GraphQL::type(SocialMediaSiteSetType::NAME),
+                'description' => 'The social media settings',
                 'resolve' => $this->resolver(),
             ],
         ];
@@ -48,19 +52,7 @@ class SiteDefaultsType extends Type
     private function resolver(): callable
     {
         return function ($root, $args, $context, ResolveInfo $info): ?SeoSetLocalization {
-            $set = Seo::find('site::'.Str::snake($info->fieldName));
-
-            if (! $set) {
-                return null;
-            }
-
-            if (! $set->enabled()) {
-                return null;
-            }
-
-            return Arr::has($root, 'site')
-                ? $set->in($root['site'])
-                : $set->inDefaultSite();
+            return SeoSetResolver::resolve('site::'.Str::snake($info->fieldName), $root['site'] ?? null);
         };
     }
 }

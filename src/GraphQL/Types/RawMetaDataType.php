@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Support\Str;
@@ -20,18 +19,13 @@ class RawMetaDataType extends Type
     public function fields(): array
     {
         return OnPageSeoBlueprint::definition()->fields()->toGql()
-            ->mapWithKeys(fn ($field, $handle) => [Str::remove('seo_', $handle) => $field]) // We want to remove `seo_` from all the field keys
-            ->map(function ($field, $handle) {
-                $field['resolve'] = $this->resolver();
-
-                return $field;
-            })->all();
+            ->map(fn ($field, $handle) => $field + ['resolve' => $this->resolver($handle)])
+            ->mapWithKeys(fn ($field, $handle) => [Str::remove('seo_', $handle) => $field])
+            ->all();
     }
 
-    private function resolver(): callable
+    private function resolver(string $field): callable
     {
-        return function (Collection $values, $args, $context, ResolveInfo $info) {
-            return $values->get("seo_{$info->fieldName}")?->value();
-        };
+        return fn (Collection $values) => $values->get($field)?->value();
     }
 }

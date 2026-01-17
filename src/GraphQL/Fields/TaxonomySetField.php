@@ -3,19 +3,17 @@
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
 use Aerni\AdvancedSeo\Data\SeoSetLocalization;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\GraphQL\Types\ContentDefaultsType;
+use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetResolver;
+use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Rebing\GraphQL\Support\Field;
 use Statamic\Facades\GraphQL;
 
-class ContentDefaultsField extends Field
+class TaxonomySetField extends Field
 {
     protected $attributes = [
-        'description' => 'The Advanced SEO collection or taxonomy defaults',
+        'description' => 'The SEO defaults for a taxonomy',
     ];
 
     public function args(): array
@@ -34,23 +32,11 @@ class ContentDefaultsField extends Field
 
     public function type(): Type
     {
-        return GraphQL::type(ContentDefaultsType::NAME);
+        return GraphQL::type(TaxonomySetType::NAME);
     }
 
     protected function resolve($root, $args, $context, ResolveInfo $info): ?SeoSetLocalization
     {
-        $set = Seo::find(Str::plural($info->fieldName).'::'.$args['handle']);
-
-        if (! $set) {
-            return null;
-        }
-
-        if (! $set->enabled()) {
-            return null;
-        }
-
-        return Arr::has($args, 'site')
-            ? $set->in($args['site'])
-            : $set->inDefaultSite();
+        return SeoSetResolver::resolve('taxonomies::'.$args['handle'], $args['site'] ?? null);
     }
 }

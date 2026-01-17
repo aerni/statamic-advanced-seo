@@ -168,6 +168,7 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function resolveGqlValue(string $field)
     {
+        // We want to return null for disabled feature fields like sitemap.
         if (! in_array($field, $this->blueprintFields())) {
             return null;
         }
