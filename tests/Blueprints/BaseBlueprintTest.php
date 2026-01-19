@@ -3,7 +3,6 @@
 use Aerni\AdvancedSeo\Blueprints\BaseBlueprint;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Enums\Scope;
-use Statamic\Fields\Blueprint;
 
 it('can get untouched field definitions for GraphQL', function () {
     $fields = TestBlueprint::definition()->fields()->all();
@@ -23,7 +22,8 @@ it('can resolve fields by context', function () {
     expect($fields->get('lazy')->get('instructions'))->toBe('collections');
 });
 
-class TestBlueprint extends BaseBlueprint {
+class TestBlueprint extends BaseBlueprint
+{
     protected function handle(): string
     {
         return 'handle';

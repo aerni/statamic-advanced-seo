@@ -78,7 +78,7 @@ class SwitchToEloquent extends Command
                 file_get_contents(__DIR__.'/../../config/advanced-seo.php'),
                 $matches
             );
-            $config = preg_replace("/return\s*\[\s*/", "return [".$matches[1]."'eloquent',\n\n    ", $config, 1);
+            $config = preg_replace("/return\s*\[\s*/", 'return ['.$matches[1]."'eloquent',\n\n    ", $config, 1);
         }
 
         file_put_contents($configPath, $config);
