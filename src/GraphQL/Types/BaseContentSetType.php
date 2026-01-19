@@ -12,7 +12,7 @@ abstract class BaseContentSetType extends Type
     public function fields(): array
     {
         return ContentSeoSetLocalizationBlueprint::definition()->fields()->toGql()
-            ->map(fn ($field, $handle) => $field + ['resolve' => SeoSetLocalizationResolver::resolve($handle)])
+            ->map(fn ($field, $handle) => [...$field, 'resolve' => SeoSetLocalizationResolver::resolve($field, $handle)])
             ->mapWithKeys(fn ($field, $handle) => [Str::remove('seo_', $handle) => $field])
             ->all();
     }

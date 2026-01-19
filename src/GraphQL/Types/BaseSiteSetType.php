@@ -12,7 +12,7 @@ abstract class BaseSiteSetType extends Type
     public function fields(): array
     {
         return $this->blueprint()::definition()->fields()->toGql()
-            ->map(fn ($field, $handle) => $field + ['resolve' => SeoSetLocalizationResolver::resolve($handle)])
+            ->map(fn ($field, $handle) => [...$field, 'resolve' => SeoSetLocalizationResolver::resolve($field, $handle)])
             ->all();
     }
 }
