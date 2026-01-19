@@ -38,9 +38,7 @@ class SeoSetLocalization implements Augmentable, Contract
     use HasDefaultValues;
     use HasOrigin;
     use HasSeoSet;
-    use ResolvesValues {
-        resolveGqlValue as traitResolveGqlValue;
-    }
+    use ResolvesValues;
 
     protected string $locale;
 
@@ -164,16 +162,6 @@ class SeoSetLocalization implements Augmentable, Contract
     protected function getOriginByString($origin): ?Contract
     {
         return $this->seoSet()->in($origin);
-    }
-
-    public function resolveGqlValue(string $field)
-    {
-        // We want to return null for disabled feature fields like sitemap.
-        if (! in_array($field, $this->blueprintFields())) {
-            return null;
-        }
-
-        return $this->traitResolveGqlValue($field);
     }
 
     public function newAugmentedInstance(): Augmented
