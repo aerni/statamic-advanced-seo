@@ -51,7 +51,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'default' => '@auto',
                         'auto' => 'title',
                         'localizable' => true,
-                        'classes' => 'text-fieldtype',
                         'antlers' => true,
                         'field' => [
                             'type' => 'text',
@@ -67,7 +66,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_description.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'textarea-fieldtype',
                         'antlers' => true,
                         'field' => [
                             'type' => 'textarea',
@@ -83,7 +81,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_site_name_position.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'button_group-fieldtype',
                         'field' => [
                             'type' => 'button_group',
                             'options' => [
@@ -113,7 +110,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_generate_social_images.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'toggle-fieldtype',
                         'feature' => SocialImagesGenerator::class,
                         'field' => [
                             'type' => 'toggle',
@@ -195,7 +191,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_og_image.instructions', ['size' => SocialImage::openGraph()->sizeString()]),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'assets-fieldtype',
                         'if' => [
                             'seo_generate_social_images.value' => 'isnt true',
                         ],
@@ -223,7 +218,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'default' => '@auto',
                         'auto' => 'seo_title',
                         'localizable' => true,
-                        'classes' => 'text-fieldtype',
                         'antlers' => true,
                         'field' => [
                             'type' => 'text',
@@ -240,7 +234,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'default' => '@auto',
                         'auto' => 'seo_description',
                         'localizable' => true,
-                        'classes' => 'textarea-fieldtype',
                         'antlers' => true,
                         'field' => [
                             'type' => 'textarea',
@@ -267,7 +260,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_twitter_card.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'button_group-fieldtype',
                         'field' => [
                             'type' => 'button_group',
                             'options' => [
@@ -285,7 +277,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_twitter_summary_image.instructions', ['size' => SocialImage::twitter()->sizeString()]),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'assets-fieldtype',
                         'twitter_card' => 'summary',
                         'if' => [
                             'seo_generate_social_images.value' => 'isnt true',
@@ -314,7 +305,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_twitter_summary_large_image.instructions', ['size' => SocialImage::twitterLarge()->sizeString()]),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'assets-fieldtype',
                         'twitter_card' => 'summary_large_image',
                         'if' => [
                             'seo_generate_social_images.value' => 'isnt true',
@@ -344,7 +334,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'default' => '@auto',
                         'auto' => 'seo_title',
                         'localizable' => true,
-                        'classes' => 'text-fieldtype',
                         'antlers' => true,
                         'field' => [
                             'type' => 'text',
@@ -361,7 +350,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'default' => '@auto',
                         'auto' => 'seo_description',
                         'localizable' => true,
-                        'classes' => 'textarea-fieldtype',
                         'antlers' => true,
                         'field' => [
                             'type' => 'textarea',
@@ -388,7 +376,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_noindex.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'toggle-fieldtype',
                         'width' => 50,
                         'field' => [
                             'type' => 'toggle',
@@ -403,7 +390,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_nofollow.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'toggle-fieldtype',
                         'width' => 50,
                         'field' => [
                             'type' => 'toggle',
@@ -429,7 +415,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_canonical_type.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'button_group-fieldtype',
                         'if' => [
                             'seo_noindex.value' => 'false',
                         ],
@@ -451,7 +436,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_canonical_entry.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'relationship-fieldtype',
                         'if' => [
                             'seo_noindex.value' => 'false',
                             'seo_canonical_type.value' => 'equals other',
@@ -475,7 +459,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_canonical_custom.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'text-fieldtype',
                         'antlers' => true,
                         'if' => [
                             'seo_noindex.value' => 'false',
@@ -510,7 +493,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_sitemap_enabled.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'toggle-fieldtype',
                         'feature' => Sitemap::class,
                         'if' => [
                             'seo_noindex.value' => 'false',
@@ -529,7 +511,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_sitemap_priority.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'select-fieldtype',
                         'width' => 50,
                         'feature' => Sitemap::class,
                         'if' => [
@@ -602,7 +583,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_sitemap_change_frequency.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'select-fieldtype',
                         'width' => 50,
                         'feature' => Sitemap::class,
                         'if' => [
@@ -649,7 +629,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_json_ld.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'classes' => 'code-fieldtype',
                         'antlers' => true,
                         'field' => [
                             'type' => 'code',

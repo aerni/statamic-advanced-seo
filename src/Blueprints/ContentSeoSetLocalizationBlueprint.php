@@ -159,7 +159,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'auto' => 'seo_title',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
-                        'classes' => 'text-fieldtype',
                         'field' => [
                             'type' => 'text',
                             'character_limit' => 70,
@@ -177,7 +176,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'auto' => 'seo_description',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
-                        'classes' => 'textarea-fieldtype',
                         'field' => [
                             'type' => 'textarea',
                             'character_limit' => 200,
@@ -247,7 +245,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'auto' => 'seo_title',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
-                        'classes' => 'text-fieldtype',
                         'field' => [
                             'type' => 'text',
                             'character_limit' => 70,
@@ -265,7 +262,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'auto' => 'seo_description',
                         'options' => ['auto', 'custom'],
                         'localizable' => true,
-                        'classes' => 'textarea-fieldtype',
                         'field' => [
                             'type' => 'textarea',
                             'character_limit' => 200,
