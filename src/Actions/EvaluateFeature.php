@@ -3,10 +3,14 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Features\Feature;
 use Statamic\Facades\Blink;
 
 class EvaluateFeature
 {
+    /**
+     * @param  class-string<Feature>  $feature
+     */
     public static function handle(string $feature, ?Context $context = null): bool
     {
         if (! $context) {

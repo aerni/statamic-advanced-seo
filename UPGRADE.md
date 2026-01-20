@@ -141,3 +141,21 @@ The following fields have been removed as they are now configured per collection
     }
   }
 ```
+
+### Disabled Features Remove Fields and Sets
+
+Fields and entire sets belonging to disabled features are now completely removed from the GraphQL schema. Previously, disabled feature fields were still present in the schema but returned `null` values. Now, if a feature is disabled in `config/advanced-seo.php`, its fields will not appear in the GraphQL schema at all.
+
+For example, if you disable the sitemap:
+
+```php
+'sitemap' => [
+    'enabled' => false,
+],
+```
+
+All sitemap related fields will be removed from the GraphQL schema.
+
+Similarly, entire site sets are removed when their feature is disabled. For example, disabling favicons removes the `favicons` field from `siteSet`, and disabling all analytics trackers removes the `analytics` field entirely.
+
+If your GraphQL queries reference fields or sets from disabled features, you'll need to either enable the feature or update your queries.

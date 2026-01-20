@@ -2,7 +2,9 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
+use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Data\SeoSetLocalization;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetResolver;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Str;
@@ -18,35 +20,25 @@ class SiteSetType extends Type
         'description' => 'The SEO set for the site',
     ];
 
+    protected array $types = [
+        'analytics' => AnalyticsSiteSetType::NAME,
+        'favicons' => FaviconsSiteSetType::NAME,
+        'general' => GeneralSiteSetType::NAME,
+        'indexing' => IndexingSiteSetType::NAME,
+        'social_media' => SocialMediaSiteSetType::NAME,
+    ];
+
     public function fields(): array
     {
-        return [
-            'analytics' => [
-                'type' => GraphQL::type(AnalyticsSiteSetType::NAME),
-                'description' => 'The analytics settings',
-                'resolve' => $this->resolver(),
-            ],
-            'favicons' => [
-                'type' => GraphQL::type(FaviconsSiteSetType::NAME),
-                'description' => 'The favicons settings',
-                'resolve' => $this->resolver(),
-            ],
-            'general' => [
-                'type' => GraphQL::type(GeneralSiteSetType::NAME),
-                'description' => 'The general SEO settings',
-                'resolve' => $this->resolver(),
-            ],
-            'indexing' => [
-                'type' => GraphQL::type(IndexingSiteSetType::NAME),
-                'description' => 'The indexing settings',
-                'resolve' => $this->resolver(),
-            ],
-            'socialMedia' => [
-                'type' => GraphQL::type(SocialMediaSiteSetType::NAME),
-                'description' => 'The social media settings',
-                'resolve' => $this->resolver(),
-            ],
-        ];
+        return Seo::whereType('site')
+            ->mapWithKeys(fn (SeoSet $set) => [
+                Str::camel($set->handle()) => [
+                    'type' => GraphQL::type($this->types[$set->handle()]),
+                    'description' => "The {$set->title()} settings",
+                    'resolve' => $this->resolver(),
+                ],
+            ])
+            ->all();
     }
 
     private function resolver(): callable

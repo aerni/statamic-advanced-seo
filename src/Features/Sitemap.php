@@ -4,12 +4,16 @@ namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Context\Context;
 
-class Sitemap
+class Sitemap extends Feature
 {
-    public static function enabled(Context $context): bool
+    public static function enabled(?Context $context = null): bool
     {
         if (! config('advanced-seo.sitemap.enabled', true)) {
             return false;
+        }
+
+        if (! $context) {
+            return true;
         }
 
         /* Always show toggle in the config */

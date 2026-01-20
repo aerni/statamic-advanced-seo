@@ -5,9 +5,9 @@ namespace Aerni\AdvancedSeo\Features;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 
-class SocialImagesGenerator
+class SocialImagesGenerator extends Feature
 {
-    public static function enabled(Context $context): bool
+    public static function enabled(?Context $context = null): bool
     {
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
             return false;
@@ -15,6 +15,10 @@ class SocialImagesGenerator
 
         if (SocialImageTheme::all()->isEmpty()) {
             return false;
+        }
+
+        if (! $context) {
+            return true;
         }
 
         if ($context->type === 'taxonomies') {

@@ -3,11 +3,12 @@
 use Aerni\AdvancedSeo\Blueprints\BaseBlueprint;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Enums\Scope;
+use Aerni\AdvancedSeo\Features\Feature;
 
-it('can get untouched field definitions for GraphQL', function () {
+it('can get field definitions filtered by global config for GraphQL', function () {
     $fields = TestBlueprint::definition()->fields()->all();
 
-    expect($fields)->toHaveCount(6);
+    expect($fields)->toHaveCount(3);
 
     expect($fields->get('lazy')->get('instructions'))->toBe('fallback');
 });
@@ -54,7 +55,7 @@ class TestBlueprint extends BaseBlueprint
     }
 }
 
-class EnabledFeature
+class EnabledFeature extends Feature
 {
     public static function enabled(?Context $context = null): bool
     {
@@ -62,7 +63,7 @@ class EnabledFeature
     }
 }
 
-class DisabledFeature
+class DisabledFeature extends Feature
 {
     public static function enabled(?Context $context = null): bool
     {

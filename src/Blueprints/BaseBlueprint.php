@@ -62,10 +62,6 @@ abstract class BaseBlueprint
 
     protected function sections(array $sections): array
     {
-        if (! $this->context) {
-            return $sections;
-        }
-
         return collect($sections)
             ->map(fn (array $section) => [
                 ...$section,
