@@ -3,8 +3,16 @@
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Statamic\Facades\Site;
 
 uses(UseEloquentDriver::class);
+
+beforeEach(function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => '/de', 'locale' => 'de'],
+    ]);
+});
 
 function runDataMigration(): void
 {
@@ -65,4 +73,40 @@ it('migrates data from old table to new tables', function () {
 
     $german = $localizations->firstWhere('locale', 'german');
     expect(json_decode($german->data, true))->toBe(['seo_title' => 'German Title']);
+});
+
+it('migrates single-site data from old table to new tables', function () {
+    Schema::create('advanced_seo_defaults', function ($table) {
+        $table->id();
+        $table->string('type');
+        $table->string('handle');
+        $table->json('data');
+        $table->timestamps();
+
+        $table->unique(['type', 'handle']);
+    });
+
+    // Single-site data is NOT keyed by site handle
+    DB::table('advanced_seo_defaults')->insert([
+        'type' => 'collections',
+        'handle' => 'pages',
+        'data' => json_encode([
+            'seo_title' => 'Default Title',
+            'seo_description' => 'A page description',
+        ]),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    runDataMigration();
+
+    // Single localization created for the default site with the data
+    $localization = DB::table('seo_set_localizations')->first();
+
+    expect($localization->locale)->toBe('default');
+
+    expect(json_decode($localization->data, true))->toBe([
+        'seo_title' => 'Default Title',
+        'seo_description' => 'A page description',
+    ]);
 });

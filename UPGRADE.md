@@ -8,7 +8,7 @@ v3 introduces a significant internal refactor that improves the architecture and
 - Laravel 12+
 - Statamic 6+
 
-## Permission Breaking Changes
+## Permissions
 
 The permission system has been simplified. Old granular permissions have been replaced with three new permissions:
 
@@ -19,6 +19,27 @@ The permission system has been simplified. Old granular permissions have been re
 **Important:** The `edit seo defaults` and `edit seo content` permissions work in conjunction with Statamic's native collection and taxonomy permissions. For example, to edit SEO defaults for the Pages collection, a user needs the `edit seo defaults` permission AND either Statamic's `configure collections` or `edit pages entries` permission.
 
 > **Automated Migration**: User role permissions are automatically migrated. All existing roles receive the `edit seo content` permission to maintain backward compatibility.
+
+## Single-Site Data Structure
+
+Single-site installations now use the same data structure as multi-site, with config and localization data stored separately.
+
+For file-based installations, SEO data that was previously stored inline in config files is now stored in separate localization files within a site-specific directory:
+
+**Before:**
+```
+content/seo/collections/pages.yaml  # contained both config and data
+```
+
+**After:**
+```
+content/seo/collections/pages.yaml           # config only
+content/seo/collections/{site}/pages.yaml    # localization data
+```
+
+If you use the Eloquent driver, this is handled by the database migration.
+
+> **Automated Migration**: Your existing data is automatically migrated to the new structure.
 
 ## Disabled Collections & Taxonomies Config
 
@@ -55,7 +76,7 @@ The `origin` field has been removed from localizations. Origin configuration is 
 
 > **Automated Migration**: Your existing origin configuration is automatically migrated from localizations to the set config.
 
-## Event Breaking Changes
+## Events
 
 The `SeoDefaultSetSaved` event has been renamed to `SeoSetLocalizationSaved`. Both events handle the same localization data. The public property has been renamed from `$defaults` to `$localization`.
 
@@ -64,7 +85,7 @@ Additionally, new events have been added for config and deletion operations:
 - `SeoSetConfigDeleted` - Fired when a set's configuration is deleted
 - `SeoSetLocalizationDeleted` - Fired when a localization is deleted
 
-## Eloquent Driver Breaking Changes
+## Eloquent Driver
 
 If you're using the Eloquent driver, the database schema has changed:
 
@@ -72,9 +93,7 @@ The `advanced_seo_defaults` table has been replaced by `seo_set_localizations`. 
 
 > **Automated Migration**: When updating to v3.0, new migrations will be published and run automatically. Data will be migrated from the old table to the new tables, and the old `advanced_seo_defaults` table will be dropped.
 
-If you have any custom code that directly queries the `advanced_seo_defaults` table, you'll need to update it to use the new table structure.
-
-## GraphQL Breaking Changes
+## GraphQL
 
 The GraphQL API has been simplified and renamed for consistency. If you're using the GraphQL API, you'll need to update your queries.
 

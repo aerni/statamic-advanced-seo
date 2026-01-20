@@ -308,3 +308,22 @@ it('calls migrateEloquentTables and skips file-based migrations for Eloquent use
     // Origins should NOT be migrated (handled by database migration)
     expect(Seo::find('collections::products')->in('german')->get('origin'))->toBe('english');
 });
+
+it('migrates single-site inlined data from config to localization', function () {
+    // Simulate old single-site format: data stored in config under 'data' key
+    Seo::find('collections::pages')
+        ->config()
+        ->set('data', [
+            'seo_title' => 'Default Page Title',
+            'seo_description' => 'A page description',
+        ])
+        ->save();
+
+    runConfigMigrationScript();
+
+    // Assert: Data was moved from config to localization
+    $pagesSet = Seo::find('collections::pages');
+    expect($pagesSet->config()->get('data'))->toBeNull();
+    expect($pagesSet->inDefaultSite()->get('seo_title'))->toBe('Default Page Title');
+    expect($pagesSet->inDefaultSite()->get('seo_description'))->toBe('A page description');
+});

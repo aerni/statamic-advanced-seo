@@ -21,14 +21,17 @@ class MigrateConfigChanges extends UpdateScript
 
     public function update(): void
     {
-        // For Eloquent users, we need to run migrations first to create the new tables
-        // and migrate data from the old table before we can work with the new architecture.
+        /**
+         * For Eloquent users, we need to run migrations first to create the new tables
+         * and migrate data from the old table before we can work with the new architecture.
+         */
         if ($this->usesEloquentDriver()) {
             $this->migrateEloquentTables();
         }
 
         $this->seoSets = Seo::all();
 
+        $this->migrateSingleSiteData();
         $this->removeTitleFromConfigSet();
         $this->migrateDisabledConfig();
         $this->migrateOriginsConfig();
@@ -60,6 +63,40 @@ class MigrateConfigChanges extends UpdateScript
         Artisan::call('migrate');
 
         $this->console()->info('Published and migrated Advanced SEO database tables.');
+    }
+
+    /**
+     * Migrate single-site data from config to localization.
+     *
+     * In v2, single-site installations stored SEO data directly in the config file
+     * under a 'data' key. The new architecture stores this in separate localization files.
+     *
+     * This migration extracts the 'data' from each config and merges it into the
+     * default site's localization. The data is saved when saveSetsAndLocalizations() runs.
+     *
+     * Note: For Eloquent users, this is already handled by the database migration.
+     */
+    protected function migrateSingleSiteData(): void
+    {
+        if ($this->usesEloquentDriver()) {
+            return;
+        }
+
+        $setsWithData = $this->seoSets->filter(fn (SeoSet $set) => $set->config()->get('data'));
+
+        if ($setsWithData->isEmpty()) {
+            return;
+        }
+
+        $setsWithData->each(function (SeoSet $set) {
+            $config = $set->config();
+            $data = $config->get('data');
+
+            $config->remove('data');
+            $set->inDefaultSite()->merge($data);
+        });
+
+        $this->console()->info('Migrated single-site SEO data to localizations.');
     }
 
     /**
