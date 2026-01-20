@@ -59,7 +59,7 @@ class SeoSetConfig implements Contract
             ->args(func_get_args());
     }
 
-    // TODO: Maybe we should implement the circular origins check from the DefaultSetSites fieldtype as well.
+    // TODO: Maybe we should implement the circular origins check from the SiteOrigins fieldtype as well.
     public function origins(?array $origins = null): Collection|self
     {
         return $this

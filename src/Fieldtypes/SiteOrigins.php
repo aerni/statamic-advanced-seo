@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Fields\Fieldtype;
 
-class DefaultSetSites extends Fieldtype
+class SiteOrigins extends Fieldtype
 {
     protected $selectable = false;
 

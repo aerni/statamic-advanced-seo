@@ -7,7 +7,7 @@ import TaxonomiesIndex from './pages/shared/Index.vue';
 import TaxonomiesEdit from './pages/shared/Edit.vue';
 import SourceFieldtype from './components/fieldtypes/SourceFieldtype.vue'
 import SocialImageFieldtype from './components/fieldtypes/SocialImageFieldtype.vue'
-import DefaultSetSitesFieldtype from './components/fieldtypes/DefaultSetSitesFieldtype.vue'
+import SiteOriginsFieldtype from './components/fieldtypes/SiteOriginsFieldtype.vue'
 
 
 Statamic.booting(() => {
@@ -20,5 +20,5 @@ Statamic.booting(() => {
     Statamic.$inertia.register('advanced-seo::Taxonomies/Edit', TaxonomiesEdit)
     Statamic.$components.register('seo_source-fieldtype', SourceFieldtype)
     Statamic.$components.register('social_image-fieldtype', SocialImageFieldtype)
-    Statamic.$components.register('default_set_sites-fieldtype', DefaultSetSitesFieldtype)
+    Statamic.$components.register('site_origins-fieldtype', SiteOriginsFieldtype)
 })

@@ -51,7 +51,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                 [
                     'handle' => 'origins',
                     'field' => [
-                        'type' => 'default_set_sites',
+                        'type' => 'site_origins',
                         'display' => __('Origins'),
                         'instructions' => __('Choose to inherit values from selected origins.'),
                         'default' => [],
