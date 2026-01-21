@@ -3,7 +3,9 @@
 namespace Aerni\AdvancedSeo\Tests;
 
 use Aerni\AdvancedSeo\ServiceProvider;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
+use Statamic\GraphQL\TypeRegistrar;
 use Statamic\Testing\AddonTestCase;
 
 abstract class TestCase extends AddonTestCase
@@ -25,6 +27,11 @@ abstract class TestCase extends AddonTestCase
         if ($this->usesEloquentDriver()) {
             $app['config']->set('advanced-seo.driver', 'eloquent');
         }
+
+        if ($this->usesGraphQL()) {
+            $app['config']->set('statamic.graphql.enabled', true);
+            $app['config']->set('advanced-seo.graphql', true);
+        }
     }
 
     protected function setUp(): void
@@ -35,6 +42,10 @@ abstract class TestCase extends AddonTestCase
             : copy(__DIR__.'/__fixtures__/composer.empty.lock', __DIR__.'/../vendor/orchestra/testbench-core/laravel/composer.lock');
 
         parent::setUp();
+
+        if ($this->usesGraphQL()) {
+            app(TypeRegistrar::class)->register();
+        }
     }
 
     protected function tearDown(): void
@@ -48,5 +59,10 @@ abstract class TestCase extends AddonTestCase
     protected function usesEloquentDriver(): bool
     {
         return isset(array_flip(class_uses_recursive(static::class))[UseEloquentDriver::class]);
+    }
+
+    protected function usesGraphQL(): bool
+    {
+        return isset(array_flip(class_uses_recursive(static::class))[EnablesGraphQL::class]);
     }
 }

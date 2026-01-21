@@ -16,6 +16,7 @@ use Statamic\Facades\Stache;
 */
 
 uses(Aerni\AdvancedSeo\Tests\TestCase::class)->in('.');
+uses(Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL::class)->in('GraphQL');
 
 /*
 |--------------------------------------------------------------------------
