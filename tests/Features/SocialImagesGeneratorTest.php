@@ -1,0 +1,113 @@
+<?php
+
+use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Enums\Scope;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
+use Illuminate\Support\Facades\File;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+
+uses(PreventsSavingStacheItemsToDisk::class);
+
+beforeEach(function () {
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => '/', 'locale' => 'en'],
+    ]);
+
+    Collection::make('pages')->sites(['english'])->saveQuietly();
+
+    config(['advanced-seo.social_images.generator.enabled' => true]);
+
+    File::ensureDirectoryExists(resource_path('views/social_images/default'));
+});
+
+afterEach(function () {
+    File::deleteDirectory(resource_path('views/social_images'));
+});
+
+it('is enabled when config is true', function () {
+    expect(SocialImagesGenerator::enabled())->toBeTrue();
+});
+
+it('is disabled when config is false', function () {
+    config(['advanced-seo.social_images.generator.enabled' => false]);
+
+    expect(SocialImagesGenerator::enabled())->toBeFalse();
+});
+
+it('is disabled when no themes exist', function () {
+    File::deleteDirectory(resource_path('views/social_images'));
+
+    expect(SocialImagesGenerator::enabled())->toBeFalse();
+});
+
+it('is enabled when no context is provided', function () {
+    expect(SocialImagesGenerator::enabled(null))->toBeTrue();
+});
+
+it('is enabled in config scope even when seoSet generator is disabled', function () {
+    $context = new Context(
+        parent: Collection::find('pages'),
+        type: 'collections',
+        handle: 'pages',
+        scope: Scope::CONFIG,
+        site: 'english',
+    );
+
+    expect(SocialImagesGenerator::enabled($context))->toBeTrue();
+});
+
+it('is disabled if the seoSet is disabled', function () {
+    Seo::find('collections::pages')
+        ->config()
+        ->enabled(false)
+        ->save();
+
+    $context = new Context(
+        parent: Collection::find('pages'),
+        type: 'collections',
+        handle: 'pages',
+        scope: Scope::LOCALIZATION,
+        site: 'english',
+    );
+
+    expect(SocialImagesGenerator::enabled($context))->toBeFalse();
+});
+
+it('is disabled if the generator is disabled in the config', function () {
+    Seo::find('collections::pages')
+        ->config()
+        ->set('social_images_generator', false)
+        ->save();
+
+    $context = new Context(
+        parent: Collection::find('pages'),
+        type: 'collections',
+        handle: 'pages',
+        scope: Scope::CONTENT,
+        site: 'english',
+    );
+
+    expect(SocialImagesGenerator::enabled($context))->toBeFalse();
+});
+
+it('shows in all contexts when enabled', function () {
+    Seo::find('collections::pages')
+        ->config()
+        ->set('social_images_generator', true)
+        ->save();
+
+    foreach ([Scope::CONFIG, Scope::LOCALIZATION, Scope::CONTENT] as $scope) {
+        $context = new Context(
+            parent: Collection::find('pages'),
+            type: 'collections',
+            handle: 'pages',
+            scope: $scope,
+            site: 'english',
+        );
+
+        expect(SocialImagesGenerator::enabled($context))->toBeTrue("Failed for scope: {$scope->value}");
+    }
+});
