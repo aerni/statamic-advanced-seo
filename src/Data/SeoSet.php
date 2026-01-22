@@ -165,6 +165,22 @@ class SeoSet implements Arrayable, QueryableValue
         return $this->id();
     }
 
+    public function enableUrl(): string
+    {
+        return cp_route('advanced-seo.sets.enable', [
+            'seoSetGroup' => $this->type,
+            'seoSet' => $this->handle,
+        ]);
+    }
+
+    public function disableUrl(): string
+    {
+        return cp_route('advanced-seo.sets.disable', [
+            'seoSetGroup' => $this->type,
+            'seoSet' => $this->handle,
+        ]);
+    }
+
     public function toArray(): array
     {
         $enabled = $this->enabled();
@@ -180,6 +196,8 @@ class SeoSet implements Arrayable, QueryableValue
             'social_images_generator' => $enabled ? $this->config()->value('social_images_generator') : false,
             'localization_url' => $this->inSelectedSite()?->editUrl(),
             'config_url' => $this->config()->editUrl(),
+            'enable_url' => $this->enableUrl(),
+            'disable_url' => $this->disableUrl(),
             'configurable' => User::current()->can('configure', [self::class, $this]),
         ];
     }

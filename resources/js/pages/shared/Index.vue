@@ -1,6 +1,7 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, Link, router } from '@statamic/cms/inertia';
-import { Header, DocsCallout, Icon, Listing, Badge, DropdownItem } from '@statamic/cms/ui';
+import { Header, DocsCallout, Icon, Listing, Badge, DropdownItem, DropdownSeparator, ConfirmationModal } from '@statamic/cms/ui';
 
 const props = defineProps({
     title: String,
@@ -13,6 +14,24 @@ const props = defineProps({
 const showLink = (item) => {
     if (item.configurable) return true
     return item.enabled;
+};
+
+const enable = (item) => router.post(item.enable_url);
+
+const disabling = ref(null);
+
+const disable = (item) => {
+    disabling.value = item;
+};
+
+const confirmDisable = () => {
+    router.post(disabling.value.disable_url, {}, {
+        onFinish: () => disabling.value = null,
+    });
+};
+
+const cancelDisable = () => {
+    disabling.value = null;
 };
 </script>
 
@@ -56,7 +75,10 @@ const showLink = (item) => {
             </template>
             <template #prepended-row-actions="{ row: item }">
                 <DropdownItem v-if="item.enabled" :text="__('Edit')" icon="edit" :href="item.localization_url" />
+                <DropdownSeparator v-if="item.enabled && item.configurable" />
                 <DropdownItem v-if="item.configurable" :text="__('Configure')" icon="cog" :href="item.config_url" />
+                <DropdownItem v-if="item.configurable && !item.enabled" :text="__('Enable')" icon="eye" @click="enable(item)" />
+                <DropdownItem v-if="item.configurable && item.enabled" :text="__('Disable')" icon="eye-slash" @click="disable(item)" />
             </template>
         </Listing>
 
@@ -67,5 +89,17 @@ const showLink = (item) => {
         />
 
         <!-- <DocsCallout :topic="__(docs.topic)" :url="docs.url" /> -->
+
+        <ConfirmationModal
+            v-if="disabling"
+            :open="true"
+            :title="__('Disable :title', { title: __(disabling.title) })"
+            :buttonText="__('Disable')"
+            :danger="true"
+            @confirm="confirmDisable"
+            @cancel="cancelDisable"
+        >
+            <p class="text-sm">{{ __('Are you sure you want to disable this item? All SEO data will be deleted.') }}</p>
+        </ConfirmationModal>
     </div>
 </template>
