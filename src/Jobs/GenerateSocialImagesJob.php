@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 
 class GenerateSocialImagesJob implements ShouldQueue
 {
@@ -15,13 +16,13 @@ class GenerateSocialImagesJob implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
 
-    public function __construct(protected Entry $entry)
+    public function __construct(protected Entry|Term $content)
     {
         $this->queue = config('advanced-seo.social_images.generator.queue', 'default');
     }
 
     public function handle(): void
     {
-        SocialImage::for($this->entry)->each->generate();
+        SocialImage::for($this->content)->each->generate();
     }
 }

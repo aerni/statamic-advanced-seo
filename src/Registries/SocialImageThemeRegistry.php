@@ -6,9 +6,11 @@ use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\SocialImages\Theme;
 use Aerni\AdvancedSeo\SocialImages\ThemeCollection;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 
 class SocialImageThemeRegistry extends Registry
 {
@@ -30,13 +32,13 @@ class SocialImageThemeRegistry extends Registry
     }
 
     /**
-     * Resolve the effective theme for an entry.
+     * Resolve the effective theme for content.
      */
-    public function resolveFor(Entry $entry): Theme
+    public function resolveFor(Entry|Term $content): Theme
     {
-        $allowedThemes = $this->allowedFor(Context::from($entry)->seoSet());
+        $allowedThemes = $this->allowedFor(Context::from($content)->seoSet());
 
-        return $allowedThemes->firstWhere('handle', $entry->seo_social_images_theme)
+        return $allowedThemes->firstWhere('handle', Helpers::localizedContent($content)->seo_social_images_theme)
             ?? $allowedThemes->default();
     }
 

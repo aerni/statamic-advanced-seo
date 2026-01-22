@@ -21,10 +21,6 @@ class SocialImagesGenerator extends Feature
             return true;
         }
 
-        if ($context->type === 'taxonomies') {
-            return false;
-        }
-
         /* Always show toggle in the config */
         if ($context->isConfig()) {
             return true;

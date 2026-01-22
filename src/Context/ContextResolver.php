@@ -147,14 +147,14 @@ class ContextResolver
     protected function termSite(Term $term): string
     {
         return Statamic::isCpRoute()
-            ? basename(request()->path())
+            ? request()->route('site')?->handle() ?? basename(request()->path())
             : $term->locale();
     }
 
     protected function cpSite(): string
     {
         return Statamic::isCpRoute()
-            ? basename(request()->path())
+            ? request()->route('site')?->handle() ?? basename(request()->path())
             : Site::current()->handle();
     }
 }

@@ -8,6 +8,7 @@ use Spatie\Browsershot\Browsershot;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as Container;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\AssetContainer;
 
 class SocialImageGenerator
@@ -16,7 +17,7 @@ class SocialImageGenerator
 
     public function __construct(
         protected SocialImage $socialImage,
-        protected Entry $entry,
+        protected Entry|Term $content,
     ) {
         $this->container = AssetContainer::find(config('advanced-seo.social_images.container', 'assets'));
     }
@@ -48,7 +49,11 @@ class SocialImageGenerator
 
     protected function path(): string
     {
-        return "social_images/{$this->entry->collection}/{$this->filename()}";
+        $handle = $this->content instanceof Entry
+            ? $this->content->collection()->handle()
+            : $this->content->taxonomy()->handle();
+
+        return "social_images/{$handle}/{$this->filename()}";
     }
 
     protected function absolutePath(?string $path = null): string
@@ -60,7 +65,13 @@ class SocialImageGenerator
     {
         $group = str_starts_with($this->socialImage->type, 'twitter_') ? 'twitter' : 'open-graph';
 
-        return "{$this->entry->id}_{$group}.png";
+        // Entries have unique IDs per localization, but terms share the same ID (taxonomy::slug)
+        // across localizations. Use slug + locale for terms to ensure unique filenames.
+        if ($this->content instanceof Term) {
+            return "{$this->content->slug()}_{$this->content->locale()}_{$group}.png";
+        }
+
+        return "{$this->content->id()}_{$group}.png";
     }
 
     protected function templateUrl(): string
@@ -68,8 +79,9 @@ class SocialImageGenerator
         // TODO: It would be nice if we could just do $this->entry->seo_social_images_theme
         // and the theme field resolves itself. Maybe in the future with its own fieldtype.
         return $this->socialImage->url(
-            SocialImageTheme::resolveFor($this->entry)->handle,
-            $this->entry->id
+            SocialImageTheme::resolveFor($this->content)->handle,
+            $this->content->id(),
+            $this->content->locale()
         );
     }
 

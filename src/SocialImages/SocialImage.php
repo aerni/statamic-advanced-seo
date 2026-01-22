@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\SocialImages;
 
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 
 class SocialImage
 {
@@ -11,9 +12,9 @@ class SocialImage
         public readonly string $handle,
     ) {}
 
-    public function for(Entry $entry): SocialImageGenerator
+    public function for(Entry|Term $content): SocialImageGenerator
     {
-        return new SocialImageGenerator($this, $entry);
+        return new SocialImageGenerator($this, $content);
     }
 
     public function width(): int
@@ -31,8 +32,8 @@ class SocialImage
         return "{$this->width()} x {$this->height()} pixels";
     }
 
-    public function url(string $theme, string $id): string
+    public function url(string $theme, string $id, string $site): string
     {
-        return url("/!/advanced-seo/social-images/{$theme}/{$this->type}/{$id}");
+        return url("/!/advanced-seo/social-images/{$theme}/{$this->type}/{$id}/{$site}");
     }
 }

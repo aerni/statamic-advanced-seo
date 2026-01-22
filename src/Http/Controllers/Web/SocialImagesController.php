@@ -17,7 +17,7 @@ use Statamic\View\View;
 
 class SocialImagesController extends Controller
 {
-    public function __invoke(string $theme, string $template, string $id): Response
+    public function __invoke(string $theme, string $template, string $id, string $site): Response
     {
         $theme = Str::replace('-', '_', $theme);
         $template = Str::replace('-', '_', $template);
@@ -26,7 +26,7 @@ class SocialImagesController extends Controller
         throw_unless(config('advanced-seo.social_images.generator.enabled', false), new NotFoundHttpException);
 
         // Throw if no data was found.
-        throw_unless($data = $this->data($id), new NotFoundHttpException);
+        throw_unless($data = $this->data($id, $site), new NotFoundHttpException);
 
         // Throw if the data is not an entry or term.
         throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException);
@@ -58,12 +58,12 @@ class SocialImagesController extends Controller
         return response($view)->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
-    protected function data(string $id): Entry|LocalizedTerm|null
+    protected function data(string $id, string $site): Entry|LocalizedTerm|null
     {
         if (request()->statamicToken()) {
             return LivePreview::item(request()->statamicToken());
         }
 
-        return Data::find($id);
+        return Data::find($id)?->in($site);
     }
 }

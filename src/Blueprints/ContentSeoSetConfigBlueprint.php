@@ -103,7 +103,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                     'field' => [
                         'type' => 'select',
                         'display' => __('Themes'),
-                        'instructions' => __('Select the social image themes available for this collection.'),
+                        'instructions' => __("Select the social image themes available for this {$this->contentTypeLabel()}."),
                         'options' => SocialImageTheme::all()->options(),
                         'default' => SocialImageTheme::all()->default()?->handle,
                         'multiple' => true,
