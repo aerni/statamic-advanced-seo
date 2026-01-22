@@ -26,6 +26,7 @@ describe('Sitemap Feature', function () {
         $set->config()->set('sitemap', false)->save();
 
         $data = new Context(
+            parent: Collection::find('pages'),
             type: 'collections',
             handle: 'pages',
             scope: Scope::CONFIG,
@@ -40,6 +41,7 @@ describe('Sitemap Feature', function () {
         $set->config()->set('sitemap', false)->save();
 
         $data = new Context(
+            parent: Collection::find('pages'),
             type: 'collections',
             handle: 'pages',
             scope: Scope::LOCALIZATION,
@@ -54,6 +56,7 @@ describe('Sitemap Feature', function () {
         $set->config()->set('sitemap', false)->save();
 
         $data = new Context(
+            parent: Collection::find('pages'),
             type: 'collections',
             handle: 'pages',
             scope: Scope::CONTENT,
@@ -69,6 +72,7 @@ describe('Sitemap Feature', function () {
 
         foreach ([Scope::CONFIG, Scope::LOCALIZATION, Scope::CONTENT] as $scope) {
             $context = new Context(
+                parent: Collection::find('pages'),
                 type: 'collections',
                 handle: 'pages',
                 scope: $scope,
@@ -95,6 +99,7 @@ describe('Social Images Generator Feature', function () {
         config(['advanced-seo.social_images.generator.enabled' => true]);
 
         $context = new Context(
+            parent: Collection::find('pages'),
             type: 'collections',
             handle: 'pages',
             scope: Scope::CONFIG,
@@ -111,6 +116,7 @@ describe('Social Images Generator Feature', function () {
         $set->config()->set('social_images_generator', false)->save();
 
         $data = new Context(
+            parent: Collection::find('pages'),
             type: 'collections',
             handle: 'pages',
             scope: Scope::CONFIG,
@@ -127,6 +133,7 @@ describe('Social Images Generator Feature', function () {
         $set->config()->set('social_images_generator', false)->save();
 
         $data = new Context(
+            parent: Collection::find('pages'),
             type: 'collections',
             handle: 'pages',
             scope: Scope::LOCALIZATION,
@@ -143,6 +150,7 @@ describe('Social Images Generator Feature', function () {
         $set->config()->set('social_images_generator', false)->save();
 
         $data = new Context(
+            parent: Collection::find('pages'),
             type: 'collections',
             handle: 'pages',
             scope: Scope::CONTENT,
@@ -160,6 +168,7 @@ describe('Social Images Generator Feature', function () {
 
         foreach ([Scope::CONFIG, Scope::LOCALIZATION, Scope::CONTENT] as $scope) {
             $context = new Context(
+                parent: Collection::find('pages'),
                 type: 'collections',
                 handle: 'pages',
                 scope: $scope,
@@ -173,21 +182,39 @@ describe('Social Images Generator Feature', function () {
 
 describe('Context Scope Helpers', function () {
     it('identifies config scope', function () {
-        $context = new Context('collections', 'pages', Scope::CONFIG, 'en');
+        $context = new Context(
+            parent: Collection::find('pages'),
+            type: 'collections',
+            handle: 'pages',
+            scope: Scope::CONFIG,
+            site: 'english',
+        );
         expect($context->isConfig())->toBeTrue();
         expect($context->isLocalization())->toBeFalse();
         expect($context->isContent())->toBeFalse();
     });
 
     it('identifies localization scope', function () {
-        $context = new Context('collections', 'pages', Scope::LOCALIZATION, 'en');
+        $context = new Context(
+            parent: Collection::find('pages'),
+            type: 'collections',
+            handle: 'pages',
+            scope: Scope::LOCALIZATION,
+            site: 'english',
+        );
         expect($context->isConfig())->toBeFalse();
         expect($context->isLocalization())->toBeTrue();
         expect($context->isContent())->toBeFalse();
     });
 
     it('identifies content scope', function () {
-        $context = new Context('collections', 'pages', Scope::CONTENT, 'en');
+        $context = new Context(
+            parent: Collection::find('pages'),
+            type: 'collections',
+            handle: 'pages',
+            scope: Scope::CONTENT,
+            site: 'english',
+        );
         expect($context->isConfig())->toBeFalse();
         expect($context->isLocalization())->toBeFalse();
         expect($context->isContent())->toBeTrue();

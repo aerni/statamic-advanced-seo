@@ -10,6 +10,7 @@ use Aerni\AdvancedSeo\Facades\Seo;
 class Context
 {
     public function __construct(
+        public mixed $parent,
         public string $type,
         public string $handle,
         public Scope $scope,

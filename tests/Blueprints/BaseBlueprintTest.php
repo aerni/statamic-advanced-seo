@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Blueprints\BaseBlueprint;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Features\Feature;
+use Statamic\Facades\Collection;
 
 it('can get field definitions filtered by global config for GraphQL', function () {
     $fields = TestBlueprint::definition()->fields()->all();
@@ -14,7 +15,13 @@ it('can get field definitions filtered by global config for GraphQL', function (
 });
 
 it('can resolve fields by context', function () {
-    $context = new Context('collections', 'articles', Scope::CONTENT, 'english');
+    $context = new Context(
+        parent: Collection::make('articles'),
+        type: 'collections',
+        handle: 'articles',
+        scope: Scope::CONTENT,
+        site: 'english',
+    );
 
     $fields = TestBlueprint::resolve($context)->fields()->all();
 

@@ -37,6 +37,7 @@ class ContextResolver
         }
 
         return new Context(
+            parent: $parent,
             type: $resolver->type($parent),
             handle: $resolver->handle($parent),
             scope: $resolver->scope($model),
