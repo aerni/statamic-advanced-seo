@@ -49,7 +49,7 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
     {
         return match (true) {
             $this->baseUrl() && is_string($model) => URL::assemble($this->baseUrl(), Str::after($model, parse_url($model, PHP_URL_HOST))),
-            $this->baseUrl() => URL::assemble($this->baseUrl(), $model->url()),
+            $this->baseUrl() !== null => URL::assemble($this->baseUrl(), $model->url()),
             is_string($model) => $model,
             default => $model->absoluteUrl(),
         };
