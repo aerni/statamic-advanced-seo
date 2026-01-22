@@ -5,7 +5,6 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetResolver;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
-use Statamic\Facades\Taxonomy;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);

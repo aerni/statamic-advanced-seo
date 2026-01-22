@@ -2,7 +2,6 @@
 
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSitemapsType;
-use Statamic\Facades\Site;
 
 it('has the correct name', function () {
     expect((new SeoSitemapsQuery)->name)->toBe('seoSitemaps');

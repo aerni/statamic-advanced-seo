@@ -2,7 +2,6 @@
 
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSetQuery;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoSetType;
-use Statamic\Facades\Site;
 
 it('has the correct name', function () {
     expect((new SeoSetQuery)->name)->toBe('seoSet');
@@ -13,7 +12,7 @@ it('returns the SeoSetType', function () {
 });
 
 it('resolves by passing through the args', function () {
-    $args =  ['site' => 'english'];
+    $args = ['site' => 'english'];
 
     $result = (new SeoSetQuery)->resolve(null, $args);
 

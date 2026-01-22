@@ -1,15 +1,15 @@
 <?php
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Collection;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
