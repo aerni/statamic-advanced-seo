@@ -48,15 +48,12 @@ class SeoMetaQuery extends Query
         }
 
         if ($site && $model instanceof Term) {
-            $locales = $model->term()->localizations()->keys();
-            $termExistsInLocale = $locales->contains($site);
-
             /**
              * We have to explicitly return 'null' because the 'in' method returns
-             * a new LocalizedTerm, even if this term doesn't exists in the requested locale.
-             * This is different to how the 'in' method works on an Entry.
+             * a new LocalizedTerm, even if the taxonomy isn't configured for the requested site.
+             * This is different to how the 'in' method works on an Entry, which returns null.
              */
-            $model = $termExistsInLocale ? $model->in($site) : null;
+            $model = $model->taxonomy()->sites()->contains($site) ? $model->in($site) : null;
         }
 
         // Only resolve the meta data if the collection or taxonomy wasn't disabled in the config
