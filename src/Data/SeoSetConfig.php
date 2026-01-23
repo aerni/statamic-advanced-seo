@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
+use Aerni\AdvancedSeo\Actions\HasCircularOrigins;
 use Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint;
 use Aerni\AdvancedSeo\Blueprints\SiteSeoSetConfigBlueprint;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
@@ -59,7 +60,6 @@ class SeoSetConfig implements Contract
             ->args(func_get_args());
     }
 
-    // TODO: Maybe we should implement the circular origins check from the SiteOrigins fieldtype as well.
     public function origins(?array $origins = null): Collection|self
     {
         return $this
@@ -74,7 +74,7 @@ class SeoSetConfig implements Contract
             ->setter(function ($origins) {
                 $validSites = $this->sites()->keys();
 
-                return collect($origins)->filter(function ($value, $key) use ($validSites) {
+                $filtered = collect($origins)->filter(function ($value, $key) use ($validSites) {
                     // Only keep entries where the key is a valid site handle
                     if (! $validSites->contains($key)) {
                         return false;
@@ -88,6 +88,12 @@ class SeoSetConfig implements Contract
                     // Keep valid origin site handles
                     return $validSites->contains($value);
                 })->all();
+
+                if (HasCircularOrigins::handle($filtered)) {
+                    throw new \InvalidArgumentException('Circular site origin dependencies are not allowed.');
+                }
+
+                return $filtered;
             })
             ->args(func_get_args());
     }

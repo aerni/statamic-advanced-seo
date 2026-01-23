@@ -24,8 +24,9 @@ function originOptions(site) {
     findDependents(site.handle);
 
     return props.value
-        .map((site) => ({ value: site.handle, label: __(site.label) }))
-        .filter((site) => !circularSites.has(site.value));
+        .filter((s) => !s.readonly || s.handle === site.origin)
+        .map((s) => ({ value: s.handle, label: __(s.label) }))
+        .filter((s) => !circularSites.has(s.value));
 }
 </script>
 
@@ -47,16 +48,15 @@ function originOptions(site) {
         </thead>
         <tbody>
             <tr v-for="site in props.value" :key="site.handle">
-                <td class="grid-cell">
-                    <div class="flex items-center gap-2">
-                        <Heading :text="__(site.label)" />
-                    </div>
+                <td class="grid-cell" :class="{ 'text-gray-500': site.readonly }">
+                    <Heading :text="__(site.label)" :icon="site.readonly ? 'padlock-locked' : null" />
                 </td>
                 <td class="grid-cell">
                     <Select
                         class="w-full"
                         :options="originOptions(site)"
-                        :clearable="true"
+                        :clearable="!site.readonly"
+                        :disabled="site.readonly"
                         :model-value="site.origin"
                         @update:model-value="(newOrigin) => {
                             const updatedValue = props.value.map(s =>
