@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Fields\Fieldtype;
 
-class SiteOrigins extends Fieldtype
+class SiteOriginsFieldtype extends Fieldtype
 {
     protected $selectable = false;
 
@@ -43,8 +43,7 @@ class SiteOrigins extends Fieldtype
 
     private function requireAtLeastOneRootSite(): ValidationRule
     {
-        return new class implements ValidationRule
-        {
+        return new class implements ValidationRule {
             public function validate(string $attribute, mixed $value, Closure $fail): void
             {
                 // At least one site must not have an origin
@@ -57,8 +56,7 @@ class SiteOrigins extends Fieldtype
 
     private function preventCircularOrigins(): ValidationRule
     {
-        return new class implements ValidationRule
-        {
+        return new class implements ValidationRule {
             public function validate(string $attribute, mixed $value, Closure $fail): void
             {
                 $sites = collect($value);
