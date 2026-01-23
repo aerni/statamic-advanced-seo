@@ -45,7 +45,8 @@ class SiteOriginsFieldtype extends Fieldtype
 
     private function requireAtLeastOneRootSite(): ValidationRule
     {
-        return new class implements ValidationRule {
+        return new class implements ValidationRule
+        {
             public function validate(string $attribute, mixed $value, Closure $fail): void
             {
                 if (collect($value)->every(fn ($site) => $site['origin'])) {
@@ -57,7 +58,8 @@ class SiteOriginsFieldtype extends Fieldtype
 
     private function preventCircularOrigins(): ValidationRule
     {
-        return new class implements ValidationRule {
+        return new class implements ValidationRule
+        {
             public function validate(string $attribute, mixed $value, Closure $fail): void
             {
                 $origins = collect($value)
