@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref, useTemplateRef, computed, nextTick, getCurrentInstance } from 'vue';
-import { DocsCallout, Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer } from '@statamic/cms/ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer } from '@statamic/cms/ui';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
 import { Head } from '@statamic/cms/inertia';
 import SiteSelector from '../../components/SiteSelector.vue';
@@ -177,7 +177,5 @@ const refreshLocalization = () => {
 			@confirm="confirmSwitchLocalization"
 			@cancel="pendingLocalization = null"
 		/>
-
-        <!-- <DocsCallout :topic="__(docs.topic)" :url="docs.url" /> -->
     </div>
 </template>

@@ -1,14 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import { Head, Link, router } from '@statamic/cms/inertia';
-import { Header, DocsCallout, Icon, Listing, Badge, DropdownItem, DropdownSeparator, ConfirmationModal } from '@statamic/cms/ui';
+import { Header, Icon, Listing, Badge, DropdownItem, DropdownSeparator, ConfirmationModal } from '@statamic/cms/ui';
 
 const props = defineProps({
     title: String,
     icon: String,
     items: Array,
     columns: Array,
-    // docs: Array,
 });
 
 const showLink = (item) => {
@@ -87,8 +86,6 @@ const cancelDisable = () => {
             class="p-6 text-center text-gray-500 border border-gray-300 border-dashed rounded-lg dark:border-gray-700"
             v-text="__(`No ${title} configured for the selected site`)"
         />
-
-        <!-- <DocsCallout :topic="__(docs.topic)" :url="docs.url" /> -->
 
         <ConfirmationModal
             v-if="disabling"

@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@statamic/cms/inertia';
-import { Header, CardPanel, Heading, Subheading, DocsCallout, Icon } from '@statamic/cms/ui';
+import { Header, CardPanel, Heading, Subheading, Icon } from '@statamic/cms/ui';
 
 defineProps({
     title: String,
@@ -32,7 +32,5 @@ defineProps({
                 </Link>
 			</div>
 		</CardPanel>
-
-        <DocsCallout :topic="__('Defaults')" url="https://advanced-seo.michaelaerni.ch/usage/settings-and-defaults" />
     </div>
 </template>
