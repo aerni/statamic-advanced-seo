@@ -47,6 +47,7 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
     protected function collectionSitemaps(): Collection
     {
         return CollectionFacade::all()
+            ->sortBy('handle')
             ->filter($this->shouldProcessSitemap(...))
             ->mapInto(CollectionSitemap::class)
             ->values();
@@ -55,6 +56,7 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
     protected function taxonomySitemaps(): Collection
     {
         return Taxonomy::all()
+            ->sortBy('handle')
             ->filter($this->shouldProcessSitemap(...))
             ->mapInto(TaxonomySitemap::class)
             ->values();
