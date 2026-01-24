@@ -110,8 +110,6 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
 
     protected function shouldProcessSitemap(CollectionContract|TaxonomyContract $model): bool
     {
-        return $model->sites()
-            ->map(fn ($site) => IncludeInSitemap::run($model, $site))
-            ->contains('true');
+        return $model->sites()->contains(fn ($site) => IncludeInSitemap::run($model, $site));
     }
 }
