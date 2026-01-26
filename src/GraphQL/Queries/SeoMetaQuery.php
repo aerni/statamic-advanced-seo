@@ -23,8 +23,7 @@ class SeoMetaQuery extends Query
         return [
             'id' => [
                 'name' => 'id',
-                'type' => GraphQL::string(),
-                'rules' => ['required'],
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'site' => [
                 'type' => GraphQL::string(),

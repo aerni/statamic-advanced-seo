@@ -21,8 +21,7 @@ class TaxonomySetField extends Field
         return [
             'handle' => [
                 'name' => 'handle',
-                'type' => GraphQL::string(),
-                'rules' => ['required'],
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'site' => [
                 'type' => GraphQL::string(),
