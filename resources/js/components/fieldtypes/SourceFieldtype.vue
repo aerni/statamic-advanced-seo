@@ -1,34 +1,38 @@
 <template>
     <div class="mt-4 space-y-2">
 
-        <ButtonGroup>
-            <Button
-                v-for="(source) in fieldSources"
-                :key="source.value"
-                :text="source.label"
-                size="xs"
-                :variant="fieldSource === source.value ? 'pressed' : 'default'"
-                :disabled="isReadOnly"
-                @click="updateFieldSource(source.value)"
+        <div>
+            <ButtonGroup>
+                <Button
+                    v-for="(source) in fieldSources"
+                    :key="source.value"
+                    :text="source.label"
+                    size="xs"
+                    :variant="fieldSource === source.value ? 'pressed' : 'default'"
+                    :disabled="isReadOnly"
+                    @click="updateFieldSource(source.value)"
+                />
+            </ButtonGroup>
+        </div>
+
+        <div>
+            <Component
+                :is="fieldComponent"
+                :name="name"
+                :config="fieldConfig"
+                :meta="fieldMeta"
+                :value="fieldValue"
+                :read-only="isReadOnly || !isCustomSource"
+                handle="source_value"
+                @update:meta="updateFieldMeta"
+                @update:value="updateFieldValue"
             />
-        </ButtonGroup>
+        </div>
 
-        <Component
-            :is="fieldComponent"
-            :name="name"
-            :config="fieldConfig"
-            :meta="fieldMeta"
-            :value="fieldValue"
-            :read-only="isReadOnly || !isCustomSource"
-            handle="source_value"
-            @update:meta="updateFieldMeta"
-            @update:value="updateFieldValue"
-        />
+        <div v-if="!isCustomSource">
+            <Description :text="sourceDescription" />
+        </div>
 
-        <Description
-            v-if="!isCustomSource"
-            :text="sourceDescription"
-        />
 
     </div>
 </template>
