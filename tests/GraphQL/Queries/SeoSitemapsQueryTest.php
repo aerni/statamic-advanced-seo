@@ -1,12 +1,12 @@
 <?php
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Collection;
-use GraphQL\Type\Definition\NonNull;
-use Aerni\AdvancedSeo\GraphQL\Types\SitemapType;
 use Aerni\AdvancedSeo\GraphQL\Enums\SitemapTypeEnum;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
+use Aerni\AdvancedSeo\GraphQL\Types\SitemapType;
+use GraphQL\Type\Definition\NonNull;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
