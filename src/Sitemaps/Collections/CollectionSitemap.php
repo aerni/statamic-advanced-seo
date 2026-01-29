@@ -12,12 +12,22 @@ class CollectionSitemap extends BaseSitemap
 {
     public function __construct(protected EntriesCollection $model) {}
 
+    public function type(): string
+    {
+        return 'collection';
+    }
+
+    public function handle(): string
+    {
+        return $this->model->handle();
+    }
+
     public function urls(): Collection
     {
-        return Blink::once($this->filename(), function () {
+        return Blink::once($this->cacheKey(), function () {
             return $this->entries()
-                ->map(fn ($entry) => new EntrySitemapUrl($entry))
-                ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
+                ->mapInto(EntrySitemapUrl::class)
+                ->each->sitemap($this);
         });
     }
 

@@ -13,7 +13,6 @@ use Statamic\Taxonomies\Taxonomy;
 trait HasHreflang
 {
     use EvaluatesIndexability;
-    use HasAbsoluteUrl;
 
     protected function entryAndTermHreflang(Entry|LocalizedTerm $model): ?array
     {
@@ -39,7 +38,7 @@ trait HasHreflang
         }
 
         $hreflang->transform(fn ($model) => [
-            'url' => $this->absoluteUrl($model),
+            'url' => $model->absoluteUrl(),
             'locale' => Helpers::parseLocale($model->site()->locale()),
         ]);
 
@@ -48,7 +47,7 @@ trait HasHreflang
         $xDefault = $this->shouldIncludeHreflang($origin) ? $origin : $model;
 
         return $hreflang->push([
-            'url' => $this->absoluteUrl($xDefault),
+            'url' => $xDefault->absoluteUrl(),
             'locale' => 'x-default',
         ])->values()->all();
     }

@@ -18,7 +18,7 @@ it('has handle and site arguments', function () {
     $args = (new TaxonomySetField)->args();
 
     expect($args)->toHaveKeys(['handle', 'site']);
-    expect($args['handle']['rules'])->toContain('required');
+    expect($args['handle']['type']->getWrappedType()->name)->toBe('String');
 });
 
 it('resolves via SeoSetResolver', function () {

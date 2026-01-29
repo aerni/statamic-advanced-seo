@@ -66,22 +66,18 @@ class ComputedMetaDataType extends Type
             ],
             'hreflang' => [
                 'type' => GraphQl::listOf(GraphQL::type(HreflangType::NAME)),
-                'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],
             'canonical' => [
                 'type' => GraphQl::string(),
-                'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],
             'site_schema' => [
                 'type' => GraphQl::string(),
-                'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],
             'breadcrumbs' => [
                 'type' => GraphQl::string(),
-                'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],
         ];
@@ -89,20 +85,6 @@ class ComputedMetaDataType extends Type
 
     private function resolver(): callable
     {
-        return function (GraphQlCascade $cascade, $args, $context, ResolveInfo $info) {
-            return $cascade->baseUrl($args['baseUrl'] ?? null)->{$info->fieldName};
-        };
-    }
-
-    private function args(): array
-    {
-        return [
-            'baseUrl' => [
-                'name' => 'baseUrl',
-                'description' => 'Change the base URL if your frontend is hosted on another domain than Statamic',
-                'type' => GraphQL::string(),
-                'rules' => ['url'],
-            ],
-        ];
+        return fn (GraphQlCascade $cascade, array $args, mixed $context, ResolveInfo $info) => $cascade->{$info->fieldName};
     }
 }

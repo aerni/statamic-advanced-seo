@@ -12,11 +12,11 @@ use Statamic\Facades\Site;
 
 class CollectionTermSitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Term $term, protected TaxonomySitemap $sitemap) {}
+    public function __construct(protected Term $term) {}
 
     public function loc(): string
     {
-        return $this->absoluteUrl($this->term);
+        return $this->term->absoluteUrl();
     }
 
     public function alternates(): ?array
@@ -32,7 +32,7 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
         }
 
         $hreflang = $terms->map(fn ($term) => [
-            'href' => $this->absoluteUrl($term),
+            'href' => $term->absoluteUrl(),
             'hreflang' => Helpers::parseLocale($term->site()->locale()),
         ]);
 
@@ -41,7 +41,7 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
         $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->term;
 
         return $hreflang->push([
-            'href' => $this->absoluteUrl($xDefault),
+            'href' => $xDefault->absoluteUrl(),
             'hreflang' => 'x-default',
         ])->values()->all();
     }
@@ -68,7 +68,7 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
 
     protected function terms(): Collection
     {
-        return $this->sitemap->collectionTerms()
+        return $this->sitemap()->collectionTerms()
             ->filter(function ($term) {
                 return $term->id() === $this->term->id()
                     && $term->term()->collection()->handle() === $this->term->term()->collection()->handle();

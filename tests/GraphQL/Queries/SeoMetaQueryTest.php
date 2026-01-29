@@ -41,7 +41,7 @@ it('has id and site arguments', function () {
     $args = (new SeoMetaQuery)->args();
 
     expect($args)->toHaveKeys(['id', 'site']);
-    expect($args['id']['rules'])->toContain('required');
+    expect($args['id']['type']->getWrappedType()->name)->toBe('String');
 });
 
 it('resolves an entry by id', function () {

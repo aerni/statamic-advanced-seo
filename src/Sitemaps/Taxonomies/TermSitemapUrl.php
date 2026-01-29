@@ -14,7 +14,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->absoluteUrl($this->term);
+        return $this->term->absoluteUrl();
     }
 
     public function alternates(): ?array
@@ -32,7 +32,7 @@ class TermSitemapUrl extends BaseSitemapUrl
         }
 
         $hreflang = $terms->map(fn ($term) => [
-            'href' => $this->absoluteUrl($term),
+            'href' => $term->absoluteUrl(),
             'hreflang' => Helpers::parseLocale($term->site()->locale()),
         ]);
 
@@ -41,7 +41,7 @@ class TermSitemapUrl extends BaseSitemapUrl
         $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->term;
 
         return $hreflang->push([
-            'href' => $this->absoluteUrl($xDefault),
+            'href' => $xDefault->absoluteUrl(),
             'hreflang' => 'x-default',
         ])->values()->all();
     }
@@ -65,10 +65,5 @@ class TermSitemapUrl extends BaseSitemapUrl
     public function site(): string
     {
         return $this->term->locale();
-    }
-
-    public function canonicalTypeIsCurrent(): bool
-    {
-        return $this->term->seo_canonical_type == 'current';
     }
 }

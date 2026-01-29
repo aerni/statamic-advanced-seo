@@ -3,11 +3,9 @@
 namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
-use Aerni\AdvancedSeo\Concerns\HasBaseUrl;
 use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\View\Concerns\HasAbsoluteUrl;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
@@ -22,8 +20,6 @@ use Statamic\Support\Str;
 class GraphQlCascade extends BaseCascade
 {
     use EvaluatesIndexability;
-    use HasAbsoluteUrl;
-    use HasBaseUrl;
     use HasComputedData;
     use HasHreflang;
 
@@ -182,14 +178,14 @@ class GraphQlCascade extends BaseCascade
         $type = $this->get('canonical_type');
 
         if ($type == 'other' && $this->has('canonical_entry')) {
-            return $this->absoluteUrl($this->get('canonical_entry'));
+            return $this->get('canonical_entry')->absoluteUrl();
         }
 
         if ($type == 'custom' && $this->has('canonical_custom')) {
             return $this->get('canonical_custom');
         }
 
-        return $this->absoluteUrl($this->model);
+        return $this->model->absoluteUrl();
     }
 
     public function siteSchema(): ?string
@@ -207,11 +203,11 @@ class GraphQlCascade extends BaseCascade
         if ($type == 'organization') {
             $schema = Schema::organization()
                 ->name($this->get('organization_name'))
-                ->url($this->absoluteUrl($this->model->site()));
+                ->url($this->model->site()->absoluteUrl());
 
             if ($logo = $this->get('organization_logo')) {
                 $logo = Schema::imageObject()
-                    ->url($this->absoluteUrl($logo))
+                    ->url($logo->absoluteUrl())
                     ->width($logo->width())
                     ->height($logo->height());
 
@@ -222,7 +218,7 @@ class GraphQlCascade extends BaseCascade
         if ($type == 'person') {
             $schema = Schema::person()
                 ->name($this->get('person_name'))
-                ->url($this->absoluteUrl($this->model->site()));
+                ->url($this->model->site()->absoluteUrl());
         }
 
         return json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE);
@@ -268,7 +264,7 @@ class GraphQlCascade extends BaseCascade
             ->map(fn ($model, $key) => [
                 'position' => $key + 1,
                 'title' => method_exists($model, 'title') ? $model->title() : $model->value('title'),
-                'url' => $this->absoluteUrl($model),
+                'url' => $model->absoluteUrl(),
             ]);
 
         return $crumbs;

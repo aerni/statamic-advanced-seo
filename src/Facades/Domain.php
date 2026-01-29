@@ -4,10 +4,10 @@ namespace Aerni\AdvancedSeo\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class Sitemap extends Facade
+class Domain extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Aerni\AdvancedSeo\Registries\SitemapRegistry::class;
+        return \Aerni\AdvancedSeo\Registries\DomainRegistry::class;
     }
 }

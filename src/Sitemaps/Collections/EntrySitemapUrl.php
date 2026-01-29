@@ -14,10 +14,9 @@ class EntrySitemapUrl extends BaseSitemapUrl
 
     public function loc(): string
     {
-        return $this->absoluteUrl($this->entry);
+        return $this->entry->absoluteUrl();
     }
 
-    // TODO: Can we use the entryAndTermHreflang method from the HasHreflang trait as the code is just a copy of it.
     public function alternates(): ?array
     {
         if (! Site::multiEnabled()) {
@@ -40,7 +39,7 @@ class EntrySitemapUrl extends BaseSitemapUrl
         }
 
         $hreflang->transform(fn ($model) => [
-            'href' => $this->absoluteUrl($model),
+            'href' => $model->absoluteUrl(),
             'hreflang' => Helpers::parseLocale($model->site()->locale()),
         ]);
 
@@ -49,7 +48,7 @@ class EntrySitemapUrl extends BaseSitemapUrl
         $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->entry;
 
         return $hreflang->push([
-            'href' => $this->absoluteUrl($xDefault),
+            'href' => $xDefault->absoluteUrl(),
             'hreflang' => 'x-default',
         ])->values()->all();
     }
@@ -73,10 +72,5 @@ class EntrySitemapUrl extends BaseSitemapUrl
     public function site(): string
     {
         return $this->entry->locale();
-    }
-
-    public function canonicalTypeIsCurrent(): bool
-    {
-        return $this->entry->seo_canonical_type == 'current';
     }
 }

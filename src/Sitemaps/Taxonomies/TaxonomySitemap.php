@@ -12,40 +12,48 @@ class TaxonomySitemap extends BaseSitemap
 {
     public function __construct(protected Taxonomy $model) {}
 
+    public function type(): string
+    {
+        return 'taxonomy';
+    }
+
+    public function handle(): string
+    {
+        return $this->model->handle();
+    }
+
     public function urls(): Collection
     {
-        return Blink::once($this->filename(), function () {
+        return Blink::once($this->cacheKey(), function () {
             return $this->taxonomyUrls()
                 ->merge($this->termUrls())
                 ->merge($this->collectionTaxonomyUrls())
                 ->merge($this->collectionTermUrls())
-                ->filter(fn ($url) => $url->canonicalTypeIsCurrent());
+                ->each->sitemap($this);
         });
     }
 
     protected function taxonomyUrls(): Collection
     {
         return $this->taxonomies()
-            ->map(fn ($taxonomy, $site) => new TaxonomySitemapUrl($taxonomy, $site, $this))
+            ->map(fn ($taxonomy, $site) => new TaxonomySitemapUrl($taxonomy, $site))
             ->values();
     }
 
     protected function termUrls(): Collection
     {
-        return $this->terms()
-            ->map(fn ($term) => new TermSitemapUrl($term));
+        return $this->terms()->mapInto(TermSitemapUrl::class);
     }
 
     protected function collectionTaxonomyUrls(): Collection
     {
         return $this->collectionTaxonomies()
-            ->map(fn ($item) => new CollectionTaxonomySitemapUrl($item['taxonomy'], $item['site'], $this));
+            ->map(fn ($item) => new CollectionTaxonomySitemapUrl($item['taxonomy'], $item['site']));
     }
 
     protected function collectionTermUrls(): Collection
     {
-        return $this->collectionTerms()
-            ->map(fn ($term) => new CollectionTermSitemapUrl($term, $this));
+        return $this->collectionTerms()->mapInto(CollectionTermSitemapUrl::class);
     }
 
     public function taxonomies(): Collection
@@ -55,6 +63,7 @@ class TaxonomySitemap extends BaseSitemap
         }
 
         return $this->model->sites()
+            ->intersect($this->sites())
             ->filter(fn ($site) => IncludeInSitemap::run($this->model, $site))
             ->mapWithKeys(fn ($site) => [$site => $this->model]);
     }
@@ -83,6 +92,7 @@ class TaxonomySitemap extends BaseSitemap
                 return $taxonomy->sites()
                     ->merge($taxonomy->collection()->sites())
                     ->duplicates()
+                    ->intersect($this->sites())
                     ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
             })
             ->filter(fn ($item) => IncludeInSitemap::run($item['taxonomy'], $item['site']));
@@ -97,6 +107,7 @@ class TaxonomySitemap extends BaseSitemap
                 return $terms->map(fn ($term) => $term->fresh()->collection($collection)); // Need to get a fresh instance of the Term, else we'll override the previously set collection.
             })
             ->filter(fn ($term) => view()->exists($term->template()))
+            ->filter(fn ($term) => $this->sites()->contains($term->locale()))
             ->filter(function ($term) {
                 // Only allow sites that have been set on both the taxonomy and the collection
                 return $term->taxonomy()->sites()

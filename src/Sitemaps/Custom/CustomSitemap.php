@@ -14,6 +14,16 @@ class CustomSitemap extends BaseSitemap
         $this->urls = collect();
     }
 
+    public function type(): string
+    {
+        return 'custom';
+    }
+
+    public function handle(): string
+    {
+        return $this->handle;
+    }
+
     public function add(CustomSitemapUrl $item): self
     {
         $this->urls = $this->urls->push($item)->unique();
@@ -23,6 +33,6 @@ class CustomSitemap extends BaseSitemap
 
     public function urls(): Collection
     {
-        return $this->urls;
+        return $this->urls->each->sitemap($this);
     }
 }

@@ -93,13 +93,43 @@ The `advanced_seo_defaults` table has been replaced by `seo_set_localizations`. 
 
 > **Automated Migration**: When updating to v3.0, new migrations will be published and run automatically. Data will be migrated from the old table to the new tables, and the old `advanced_seo_defaults` table will be dropped.
 
+## Sitemaps
+
+### Domain Scoping
+
+Each domain now gets its own sitemap index, and its sitemaps only contain URLs from sites on that domain. Previously, a single sitemap index included URLs from all sites regardless of domain.
+
+| Setup | Sitemap indexes |
+|-------|-----------------|
+| `example.com`, `example.com/de`, `example.com/fr` | One index on `example.com` (unchanged) |
+| `example.com`, `example.com/de`, `example.fr` | One index on `example.com`, one on `example.fr` |
+| `example.com`, `example.de`, `example.fr` | One index per domain |
+
+> **Note:** Hreflang tags are unaffected and continue to reference all localized versions across domains.
+
+### Custom Sitemap Registration
+
+Due to domain scoping, the API for registering custom sitemaps has changed. Instead of using `Sitemap::register()` which implicitly routed sitemaps based on their site, you now explicitly add sitemaps to a specific site's index:
+
+**Before:**
+```php
+Sitemap::register($sitemap);
+```
+
+**After:**
+```php
+Sitemap::index('english')->add($sitemap);
+```
+
 ## GraphQL
 
-The GraphQL API has been simplified and renamed for consistency. If you're using the GraphQL API, you'll need to update your queries.
+The GraphQL API has been simplified and restructured for consistency. If you're using the GraphQL API, you'll need to update your queries.
 
-### Query Renamed
+### `seoSet` Query
 
-The root query has been renamed from `seoDefaults` to `seoSet`:
+#### Renamed Query and Types
+
+The query has been renamed from `seoDefaults` to `seoSet`:
 
 ```diff
 - seoDefaults {
@@ -108,9 +138,7 @@ The root query has been renamed from `seoDefaults` to `seoSet`:
   }
 ```
 
-### Type Names Changed
-
-All GraphQL type names have been updated to use "Set" instead of "Defaults":
+All type names have been updated to use "Set" instead of "Defaults":
 
 | Old Type Name | New Type Name |
 |---------------|---------------|
@@ -122,7 +150,7 @@ All GraphQL type names have been updated to use "Set" instead of "Defaults":
 | `socialMediaDefaults` | `socialMediaSiteSet` |
 | `contentDefaults` | `collectionSet` / `taxonomySet` |
 
-### Removed Fields
+#### Removed Fields
 
 The following fields have been removed as they are now configured per collection/taxonomy:
 
@@ -142,20 +170,63 @@ The following fields have been removed as they are now configured per collection
   }
 ```
 
-### Disabled Features Remove Fields and Sets
+#### Disabled Features
 
-Fields and entire sets belonging to disabled features are now completely removed from the GraphQL schema. Previously, disabled feature fields were still present in the schema but returned `null` values. Now, if a feature is disabled in `config/advanced-seo.php`, its fields will not appear in the GraphQL schema at all.
+Fields and entire sets belonging to disabled features are now completely removed from the schema. Previously, disabled feature fields were still present but returned `null` values. Now, if a feature is disabled in `config/advanced-seo.php`, its fields will not appear in the schema at all.
 
-For example, if you disable the sitemap:
+For example, if you disable the sitemap, all sitemap related fields will be removed. Similarly, disabling favicons removes the `favicons` field from `siteSet`, and disabling all analytics trackers removes the `analytics` field entirely.
 
-```php
-'sitemap' => [
-    'enabled' => false,
-],
+### `seoSitemaps` Query
+
+The query has been completely restructured for a simpler, flatter API.
+
+**Before:**
+```graphql
+{
+  seoSitemaps {
+    collection(baseUrl: "https://frontend.example.com", site: "default", handle: "pages") {
+      loc
+      lastmod
+      alternates { hreflang, href }
+    }
+  }
+}
 ```
 
-All sitemap related fields will be removed from the GraphQL schema.
+**After:**
+```graphql
+{
+  seoSitemaps(site: "default", type: "collection", handle: "pages") {
+    id
+    type
+    handle
+    lastmod
+    urls {
+      loc
+      lastmod
+      changefreq
+      priority
+      alternates { hreflang, href }
+    }
+  }
+}
+```
 
-Similarly, entire site sets are removed when their feature is disabled. For example, disabling favicons removes the `favicons` field from `siteSet`, and disabling all analytics trackers removes the `analytics` field entirely.
+#### Key Changes
 
-If your GraphQL queries reference fields or sets from disabled features, you'll need to either enable the feature or update your queries.
+- `site` is now a required query argument (was optional on nested fields)
+- `type` argument (`collection`, `taxonomy`, `custom`) replaces the nested fields
+- `baseUrl` has been removed (see [Removed `baseUrl` Argument](#removed-baseurl-argument))
+- Returns a list of sitemaps with `id`, `type`, `handle`, `lastmod`, and nested `urls` array (previously returned a flat list of URLs)
+
+### Removed `baseUrl` Argument
+
+The `baseUrl` argument has been removed from all GraphQL queries and fields. Previously, it allowed rewriting absolute URLs for headless setups where the frontend was hosted on a different domain. To achieve the same behavior, configure your frontend domain in Statamic's sites configuration (`resources/sites.yaml`).
+
+The following fields no longer accept `baseUrl`:
+
+| Query | Fields |
+|-------|--------|
+| `seoMeta` | `computed.canonical`, `computed.hreflang`, `computed.site_schema`, `computed.breadcrumbs` |
+| `seoMeta` | `view.head` |
+| `seoSitemaps` | `collection`, `taxonomy`, `custom` |

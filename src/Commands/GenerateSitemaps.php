@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Jobs\GenerateSitemapsJob;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
@@ -39,14 +38,12 @@ class GenerateSitemaps extends Command
             $this->shouldQueue = false;
         }
 
-        $sitemaps = collect([Sitemap::index()])->merge(Sitemap::all());
-
         $this->shouldQueue
-            ? GenerateSitemapsJob::dispatch($sitemaps)
-            : spin(fn () => GenerateSitemapsJob::dispatchSync($sitemaps), 'Generating sitemaps ...');
+            ? GenerateSitemapsJob::dispatch()
+            : spin(fn () => GenerateSitemapsJob::dispatchSync(), 'Generating sitemaps ...');
 
         $this->shouldQueue
             ? info('All requests to generate the sitemaps have been added to the queue.')
-            : info('The sitemaps have been succesfully generated.');
+            : info('The sitemaps have been successfully generated.');
     }
 }
