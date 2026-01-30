@@ -14,13 +14,13 @@ class GenerateSitemapsJob implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
 
-    public function __construct()
+    public function __construct(public string $site)
     {
         $this->queue = config('advanced-seo.sitemap.queue', 'default');
     }
 
     public function handle(): void
     {
-        Sitemap::generate();
+        Sitemap::generate($this->site);
     }
 }
