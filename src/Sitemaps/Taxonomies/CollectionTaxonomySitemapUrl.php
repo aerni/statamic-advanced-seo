@@ -65,12 +65,12 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     public function changefreq(): string
     {
-        return Seo::data('taxonomies')->get('seo_sitemap_change_frequency');
+        return Seo::defaultValue('taxonomies.seo_sitemap_change_frequency');
     }
 
     public function priority(): string
     {
-        return Seo::data('taxonomies')->get('seo_sitemap_priority');
+        return Seo::defaultValue('taxonomies.seo_sitemap_priority');
     }
 
     public function site(): string
