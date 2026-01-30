@@ -176,6 +176,28 @@ Fields and entire sets belonging to disabled features are now completely removed
 
 For example, if you disable the sitemap, all sitemap related fields will be removed. Similarly, disabling favicons removes the `favicons` field from `siteSet`, and disabling all analytics trackers removes the `analytics` field entirely.
 
+### `seoMeta` Query
+
+#### Removed `baseUrl` Argument
+
+The `baseUrl` argument has been removed from the `seoMeta` query. Previously, it allowed rewriting absolute URLs for headless setups where the frontend was hosted on a different domain. To achieve the same behavior, configure your frontend domain in Statamic's sites configuration (`resources/sites.yaml`).
+
+The argument was defined on the query itself but affected the output of `computed.canonical`, `computed.hreflang`, `computed.site_schema`, and `computed.breadcrumbs` by rewriting their absolute URLs.
+
+```diff
+  {
+-   seoMeta(id: "e5f6a7b8-1234-5678-9abc-def012345678", baseUrl: "https://frontend.example.com") {
++   seoMeta(id: "e5f6a7b8-1234-5678-9abc-def012345678") {
+      computed {
+        canonical
+        hreflang
+        site_schema
+        breadcrumbs
+      }
+    }
+  }
+```
+
 ### `seoSitemaps` Query
 
 The query has been completely restructured for a simpler, flatter API.
@@ -216,17 +238,5 @@ The query has been completely restructured for a simpler, flatter API.
 
 - `site` is now a required query argument (was optional on nested fields)
 - `type` argument (`collection`, `taxonomy`, `custom`) replaces the nested fields
-- `baseUrl` has been removed (see [Removed `baseUrl` Argument](#removed-baseurl-argument))
+- `baseUrl` has been removed. Configure your frontend domain in Statamic's sites configuration (`resources/sites.yaml`) instead.
 - Returns a list of sitemaps with `id`, `type`, `handle`, `lastmod`, and nested `urls` array (previously returned a flat list of URLs)
-
-### Removed `baseUrl` Argument
-
-The `baseUrl` argument has been removed from all GraphQL queries and fields. Previously, it allowed rewriting absolute URLs for headless setups where the frontend was hosted on a different domain. To achieve the same behavior, configure your frontend domain in Statamic's sites configuration (`resources/sites.yaml`).
-
-The following fields no longer accept `baseUrl`:
-
-| Query | Fields |
-|-------|--------|
-| `seoMeta` | `computed.canonical`, `computed.hreflang`, `computed.site_schema`, `computed.breadcrumbs` |
-| `seoMeta` | `view.head` |
-| `seoSitemaps` | `collection`, `taxonomy`, `custom` |
