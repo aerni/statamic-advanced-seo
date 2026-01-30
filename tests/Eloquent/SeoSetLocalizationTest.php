@@ -7,8 +7,9 @@ use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Illuminate\Database\Eloquent\Model;
 use Statamic\Facades\Collection;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(UseEloquentDriver::class);
+uses(UseEloquentDriver::class, PreventsSavingStacheItemsToDisk::class);
 
 beforeEach(function () {
     Collection::make('pages')->saveQuietly();

@@ -6,8 +6,9 @@ use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(UseEloquentDriver::class);
+uses(UseEloquentDriver::class, PreventsSavingStacheItemsToDisk::class);
 
 beforeEach(function () {
     Collection::make('pages')->saveQuietly();
