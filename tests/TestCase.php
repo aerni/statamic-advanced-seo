@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Tests;
 
 use Aerni\AdvancedSeo\ServiceProvider;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\GraphQL\TypeRegistrar;
 use Statamic\Testing\AddonTestCase;
@@ -31,6 +32,11 @@ abstract class TestCase extends AddonTestCase
         if ($this->usesGraphQL()) {
             $app['config']->set('statamic.graphql.enabled', true);
             $app['config']->set('advanced-seo.graphql', true);
+        }
+
+        if ($this->usesSitemap()) {
+            $app['config']->set('advanced-seo.sitemap.enabled', true);
+            $app['config']->set('advanced-seo.crawling.environments', ['testing']);
         }
     }
 
@@ -64,5 +70,10 @@ abstract class TestCase extends AddonTestCase
     protected function usesGraphQL(): bool
     {
         return isset(array_flip(class_uses_recursive(static::class))[EnablesGraphQL::class]);
+    }
+
+    protected function usesSitemap(): bool
+    {
+        return isset(array_flip(class_uses_recursive(static::class))[EnablesSitemap::class]);
     }
 }
