@@ -6,12 +6,13 @@ use Aerni\AdvancedSeo\Facades\Domain;
 use Aerni\AdvancedSeo\Jobs\GenerateSitemapsJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Site;
+
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\spin;
 use function Laravel\Prompts\warning;
-use Statamic\Console\RunsInPlease;
-use Statamic\Facades\Site;
 
 class GenerateSitemaps extends Command
 {
