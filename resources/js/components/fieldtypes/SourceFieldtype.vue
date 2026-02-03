@@ -56,6 +56,30 @@ export default {
         Description,
     },
 
+    data() {
+        return {
+            customValue: null,
+        }
+    },
+
+    watch: {
+        'meta.customValue': {
+            handler(value) {
+                this.customValue = value
+            },
+            immediate: true,
+        },
+
+        value: {
+            handler(value) {
+                if (value.source === SOURCE_TYPES.CUSTOM) {
+                    this.customValue = value.value
+                }
+            },
+            deep: true,
+        },
+    },
+
     computed: {
 
         fieldSource() {
@@ -75,18 +99,8 @@ export default {
             return this.meta.default
         },
 
-        customFieldValue() {
-            return this.value.value
-        },
-
         fieldValue() {
-            const values = {
-                [SOURCE_TYPES.AUTO]: this.autoFieldValue,
-                [SOURCE_TYPES.DEFAULT]: this.defaultFieldValue,
-                [SOURCE_TYPES.CUSTOM]: this.customFieldValue,
-            }
-
-            return values[this.fieldSource]
+            return this.valueForSource(this.fieldSource)
         },
 
         fieldComponent() {
@@ -157,13 +171,22 @@ export default {
 
     methods: {
 
+        valueForSource(source) {
+            return {
+                [SOURCE_TYPES.AUTO]: this.autoFieldValue,
+                [SOURCE_TYPES.DEFAULT]: this.defaultFieldValue,
+                [SOURCE_TYPES.CUSTOM]: this.customValue,
+            }[source]
+        },
+
         updateFieldSource(source) {
             if (this.fieldSource === source) return
-            this.update({ source: source, value: this.customFieldValue })
+
+            this.update({ source, value: this.valueForSource(source) })
         },
 
         updateFieldValue(value) {
-            this.update({ source: this.fieldSource, value: value})
+            this.update({ source: this.fieldSource, value })
         },
 
         updateFieldMeta(meta) {

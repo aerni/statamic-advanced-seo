@@ -68,7 +68,15 @@ class SourceFieldtype extends Fieldtype
             'defaultMeta' => $this->sourceFieldDefaultMeta(),
             'meta' => $this->sourceFieldMeta(),
             'title' => $this->parentTitle(),
+            'customValue' => $this->customValue(),
         ];
+    }
+
+    protected function customValue(): mixed
+    {
+        $data = $this->field->value();
+
+        return $data['source'] === 'custom' ? $data['value'] : null;
     }
 
     public function augment(mixed $data): mixed
