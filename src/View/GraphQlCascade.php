@@ -66,7 +66,7 @@ class GraphQlCascade extends BaseCascade
 
     public function siteName(): string
     {
-        return $this->get('site_name') ?? $this->model->site()->name();
+        return $this->get('site_name');
     }
 
     public function title(): string

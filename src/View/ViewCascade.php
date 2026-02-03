@@ -86,7 +86,7 @@ class ViewCascade extends BaseCascade
 
     public function siteName(): string
     {
-        return $this->get('site_name') ?? Site::current()->name();
+        return $this->get('site_name');
     }
 
     public function title(): string
