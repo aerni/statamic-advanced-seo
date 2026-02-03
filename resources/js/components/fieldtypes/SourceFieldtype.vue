@@ -1,3 +1,118 @@
+<script setup>
+import { ref, computed, watch } from 'vue';
+import { Fieldtype } from '@statamic/cms';
+import { Button, ButtonGroup, Description, injectPublishContext } from '@statamic/cms/ui';
+import { useSeoValues } from '../../composables/useSeoValues.js';
+
+const SOURCE_TYPES = {
+    AUTO: 'auto',
+    DEFAULT: 'default',
+    CUSTOM: 'custom',
+};
+
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const fieldtype = Fieldtype.use(emit, props);
+defineExpose(fieldtype.expose);
+
+const publishContainer = injectPublishContext();
+
+const seo = useSeoValues();
+const customValue = ref(null);
+
+watch(() => props.meta.customValue, (newValue) => {
+    customValue.value = newValue;
+}, { immediate: true });
+
+watch(() => props.value, (newValue) => {
+    if (newValue.source === SOURCE_TYPES.CUSTOM) {
+        customValue.value = newValue.value;
+    }
+}, { deep: true });
+
+const fieldSource = computed(() => props.value.source);
+const isCustomSource = computed(() => fieldSource.value === SOURCE_TYPES.CUSTOM);
+
+const autoFieldHandle = computed(() => props.config.auto);
+const autoFieldValue = computed(() => autoFieldHandle.value ? seo.resolve(autoFieldHandle.value) : null);
+const defaultFieldValue = computed(() => props.meta.default);
+
+const fieldValue = computed(() => valueForSource(fieldSource.value));
+
+const fieldComponent = computed(() => {
+    const field = props.config.field.component || props.config.field.type;
+    return field.replace('.', '-') + '-fieldtype';
+});
+
+const fieldConfig = computed(() => props.config.field);
+const fieldMeta = computed(() => props.meta.meta);
+
+const autoFieldDisplay = computed(() => {
+    const sections = publishContainer.blueprint.value.tabs.flatMap(tab => tab.sections);
+    const fields = sections.flatMap(section => section.fields);
+    return fields.find(field => field.handle === autoFieldHandle.value)?.display;
+});
+
+const fieldSources = computed(() => {
+    const sources = [
+        {
+            value: SOURCE_TYPES.DEFAULT,
+            label: __('advanced-seo::messages.field_sources.default'),
+            description: __('advanced-seo::messages.field_source_description.defaults', {
+                title: props.meta.title,
+            }),
+        },
+        {
+            value: SOURCE_TYPES.CUSTOM,
+            label: __('advanced-seo::messages.field_sources.custom'),
+            description: '',
+        },
+    ];
+
+    if (autoFieldHandle.value) {
+        sources.unshift({
+            value: SOURCE_TYPES.AUTO,
+            label: __('advanced-seo::messages.field_sources.auto'),
+            description: __('advanced-seo::messages.field_source_description.auto', {
+                title: autoFieldDisplay.value,
+                handle: autoFieldHandle.value,
+            }),
+        });
+    }
+
+    if (props.config.options) {
+        return sources.filter(source => props.config.options.includes(source.value));
+    }
+
+    return sources;
+});
+
+const sourceDescription = computed(() => {
+    return fieldSources.value.find(source => source.value === fieldSource.value).description;
+});
+
+function valueForSource(source) {
+    return {
+        [SOURCE_TYPES.AUTO]: autoFieldValue.value,
+        [SOURCE_TYPES.DEFAULT]: defaultFieldValue.value,
+        [SOURCE_TYPES.CUSTOM]: customValue.value,
+    }[source];
+}
+
+function updateFieldSource(source) {
+    if (fieldSource.value === source) return;
+    fieldtype.update({ source, value: valueForSource(source) });
+}
+
+function updateFieldValue(newValue) {
+    fieldtype.update({ source: fieldSource.value, value: newValue });
+}
+
+function updateFieldMeta(newMeta) {
+    fieldtype.updateMeta({ ...props.meta, meta: newMeta || fieldMeta.value });
+}
+</script>
+
 <template>
     <div class="mt-4 space-y-2">
 
@@ -9,7 +124,7 @@
                     :text="source.label"
                     size="xs"
                     :variant="fieldSource === source.value ? 'pressed' : 'default'"
-                    :disabled="isReadOnly"
+                    :disabled="props.isReadOnly"
                     @click="updateFieldSource(source.value)"
                 />
             </ButtonGroup>
@@ -18,11 +133,11 @@
         <div>
             <Component
                 :is="fieldComponent"
-                :name="name"
+                :name="props.name"
                 :config="fieldConfig"
                 :meta="fieldMeta"
                 :value="fieldValue"
-                :read-only="isReadOnly || !isCustomSource"
+                :read-only="props.isReadOnly || !isCustomSource"
                 handle="source_value"
                 @update:meta="updateFieldMeta"
                 @update:value="updateFieldValue"
@@ -33,167 +148,5 @@
             <Description :text="sourceDescription" />
         </div>
 
-
     </div>
 </template>
-
-<script>
-import { FieldtypeMixin as Fieldtype } from '@statamic/cms';
-import { Button, ButtonGroup, Description } from '@statamic/cms/ui';
-
-const SOURCE_TYPES = {
-    AUTO: 'auto',
-    DEFAULT: 'default',
-    CUSTOM: 'custom',
-};
-
-export default {
-    mixins: [Fieldtype],
-
-    components: {
-        Button,
-        ButtonGroup,
-        Description,
-    },
-
-    data() {
-        return {
-            customValue: null,
-        }
-    },
-
-    watch: {
-        'meta.customValue': {
-            handler(value) {
-                this.customValue = value
-            },
-            immediate: true,
-        },
-
-        value: {
-            handler(value) {
-                if (value.source === SOURCE_TYPES.CUSTOM) {
-                    this.customValue = value.value
-                }
-            },
-            deep: true,
-        },
-    },
-
-    computed: {
-
-        fieldSource() {
-            return this.value.source
-        },
-
-        isCustomSource() {
-            return this.fieldSource === SOURCE_TYPES.CUSTOM
-        },
-
-        autoFieldValue() {
-            const value = this.publishContainer.values[this.autoFieldHandle]
-            return value && typeof value === 'object' ? value.value : value
-        },
-
-        defaultFieldValue() {
-            return this.meta.default
-        },
-
-        fieldValue() {
-            return this.valueForSource(this.fieldSource)
-        },
-
-        fieldComponent() {
-            const type = this.config.field.type
-            const component = this.config.field.component
-            const field = component || type // Use the component name if it's an entries fieldtype.
-
-            return field.replace('.', '-') + '-fieldtype'
-        },
-
-        fieldConfig() {
-            return this.config.field
-        },
-
-        fieldMeta() {
-            return this.meta.meta
-        },
-
-        autoFieldDisplay() {
-            const sections = this.publishContainer.blueprint.tabs.flatMap(tab => tab.sections)
-            const fields = sections.flatMap(section => section.fields)
-
-            return fields.find(field => field.handle === this.autoFieldHandle)?.display
-        },
-
-        autoFieldHandle() {
-            return this.config.auto
-        },
-
-        fieldSources() {
-            const sources = [
-                {
-                    value: SOURCE_TYPES.DEFAULT,
-                    label: __('advanced-seo::messages.field_sources.default'),
-                    description: __('advanced-seo::messages.field_source_description.defaults', {
-                        title: this.meta.title,
-                    }),
-                },
-                {
-                    value: SOURCE_TYPES.CUSTOM,
-                    label: __('advanced-seo::messages.field_sources.custom'),
-                    description: '',
-                },
-            ]
-
-            if (this.autoFieldHandle) {
-                sources.unshift({
-                    value: SOURCE_TYPES.AUTO,
-                    label: __('advanced-seo::messages.field_sources.auto'),
-                    description: __('advanced-seo::messages.field_source_description.auto', {
-                        title: this.autoFieldDisplay,
-                        handle: this.autoFieldHandle,
-                    }),
-                })
-            }
-
-            if (this.config.options) {
-                return sources.filter(source => this.config.options.includes(source.value))
-            }
-
-            return sources
-        },
-
-        sourceDescription() {
-            return this.fieldSources.find(source => source.value === this.fieldSource).description
-        },
-    },
-
-    methods: {
-
-        valueForSource(source) {
-            return {
-                [SOURCE_TYPES.AUTO]: this.autoFieldValue,
-                [SOURCE_TYPES.DEFAULT]: this.defaultFieldValue,
-                [SOURCE_TYPES.CUSTOM]: this.customValue,
-            }[source]
-        },
-
-        updateFieldSource(source) {
-            if (this.fieldSource === source) return
-
-            this.update({ source, value: this.valueForSource(source) })
-        },
-
-        updateFieldValue(value) {
-            this.update({ source: this.fieldSource, value })
-        },
-
-        updateFieldMeta(meta) {
-            this.updateMeta({ ...this.meta, meta: meta || this.fieldMeta })
-        },
-
-    },
-
-}
-</script>
