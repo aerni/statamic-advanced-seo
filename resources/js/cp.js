@@ -8,7 +8,7 @@ import TaxonomiesEdit from './pages/shared/Edit.vue';
 import SourceFieldtype from './components/fieldtypes/SourceFieldtype.vue'
 import SocialImageFieldtype from './components/fieldtypes/SocialImageFieldtype.vue'
 import SiteOriginsFieldtype from './components/fieldtypes/SiteOriginsFieldtype.vue'
-
+import SearchPreviewFieldtype from './components/fieldtypes/SearchPreviewFieldtype.vue'
 
 Statamic.booting(() => {
     Statamic.$inertia.register('advanced-seo::Dashboard', Dashboard)
@@ -21,4 +21,5 @@ Statamic.booting(() => {
     Statamic.$components.register('seo_source-fieldtype', SourceFieldtype)
     Statamic.$components.register('social_image-fieldtype', SocialImageFieldtype)
     Statamic.$components.register('site_origins-fieldtype', SiteOriginsFieldtype)
+    Statamic.$components.register('search_preview-fieldtype', SearchPreviewFieldtype)
 })

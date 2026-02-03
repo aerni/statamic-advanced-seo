@@ -91,6 +91,14 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         ],
                     ],
                 ],
+                [
+                    'handle' => 'seo_search_preview',
+                    'field' => [
+                        'type' => 'search_preview',
+                        'display' => $this->trans('seo_search_preview.display'),
+                        'listable' => 'hidden',
+                    ],
+                ],
             ],
         ];
     }

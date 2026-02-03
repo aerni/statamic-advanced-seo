@@ -334,39 +334,20 @@ class ViewCascade extends BaseCascade
             return null;
         }
 
-        $listItems = $this->breadcrumbsListItems()->map(function ($crumb) {
-            return Schema::listItem()
-                ->position($crumb['position'])
-                ->name($crumb['title'])
-                ->item($crumb['url']);
-        })->all();
+        // Ensure we add the homepage as the first breadcrumb.
+        $segments = array_merge(['/'], request()->segments());
 
-        $breadcrumbs = Schema::breadcrumbList()->itemListElement($listItems);
-
-        return json_encode($breadcrumbs->toArray(), JSON_UNESCAPED_UNICODE);
-    }
-
-    protected function breadcrumbsListItems(): Collection
-    {
-        $segments = collect(request()->segments())->prepend('/');
-
-        $crumbs = $segments->map(function () use (&$segments) {
-            $uri = URL::tidy($segments->join('/'));
-            $segments->pop();
-
-            return Data::findByUri(Str::ensureLeft($uri, '/'), Site::current()->handle());
-        })
-            ->filter()
-            ->reverse()
-            ->values()
-            ->map(function ($item, $key) {
-                return [
-                    'position' => $key + 1,
-                    'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
-                    'url' => $item->absoluteUrl(),
-                ];
+        $listItems = ResolveBreadcrumbs::handle($segments, Site::current()->handle())
+            ->map(function ($crumb) {
+                return Schema::listItem()
+                    ->position($crumb['position'])
+                    ->name($crumb['title'])
+                    ->item($crumb['url']);
             });
 
-        return $crumbs;
+        return json_encode(
+            Schema::breadcrumbList()->itemListElement($listItems),
+            JSON_UNESCAPED_UNICODE,
+        );
     }
 }

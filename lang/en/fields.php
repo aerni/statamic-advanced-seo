@@ -205,6 +205,10 @@ return [
         'default_instructions' => 'The default structured data of your :type. This will be wrapped in the appropriate script tag.',
     ],
 
+    'seo_search_preview' => [
+        'display' => 'Search Preview',
+    ],
+
     'section_fathom' => [
         'display' => 'Fathom',
         'instructions' => 'Use [Fathom](https://usefathom.com) as a privacy-friendly alternative to Google Analytics.',
