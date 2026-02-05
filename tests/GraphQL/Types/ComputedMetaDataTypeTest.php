@@ -15,7 +15,6 @@ it('exposes all expected fields', function () {
         'og_title',
         'twitter_image',
         'twitter_image_preset',
-        'twitter_title',
         'twitter_handle',
         'indexing',
         'locale',

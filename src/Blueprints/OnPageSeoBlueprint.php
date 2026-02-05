@@ -333,38 +333,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         ],
                     ],
                 ],
-                [
-                    'handle' => 'seo_twitter_title',
-                    'field' => [
-                        'type' => 'seo_source',
-                        'display' => $this->trans('seo_twitter_title.display'),
-                        'instructions' => $this->trans('seo_twitter_title.instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_title',
-                        'localizable' => true,
-                        'antlers' => true,
-                        'field' => [
-                            'type' => 'text',
-                            'character_limit' => 70,
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_twitter_description',
-                    'field' => [
-                        'type' => 'seo_source',
-                        'display' => $this->trans('seo_twitter_description.display'),
-                        'instructions' => $this->trans('seo_twitter_description.instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_description',
-                        'localizable' => true,
-                        'antlers' => true,
-                        'field' => [
-                            'type' => 'textarea',
-                            'character_limit' => 200,
-                        ],
-                    ],
-                ],
             ],
         ];
     }
@@ -375,6 +343,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_indexing.display'),
             'instructions' => $this->trans('seo_section_indexing.instructions'),
             'collapsible' => true,
+            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_noindex',
@@ -414,6 +383,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_canonical_url.display'),
             'instructions' => $this->trans('seo_section_canonical_url.instructions'),
             'collapsible' => true,
+            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_canonical_type',
@@ -492,6 +462,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_sitemap.display'),
             'instructions' => $this->trans('seo_section_sitemap.instructions'),
             'collapsible' => true,
+            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_sitemap_enabled',
@@ -628,6 +599,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_json_ld.display'),
             'instructions' => $this->trans('seo_section_json_ld.instructions'),
             'collapsible' => true,
+            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_json_ld',

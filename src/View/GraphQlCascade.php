@@ -48,7 +48,6 @@ class GraphQlCascade extends BaseCascade
             'og_title',
             'twitter_image',
             'twitter_image_preset',
-            'twitter_title',
             'twitter_handle',
             'indexing',
             'locale',
@@ -105,11 +104,6 @@ class GraphQlCascade extends BaseCascade
             'width' => $openGraph->width(),
             'height' => $openGraph->height(),
         ];
-    }
-
-    public function twitterTitle(): string
-    {
-        return $this->get('twitter_title') ?? $this->pageTitle() ?? $this->siteName();
     }
 
     public function twitterImage(): ?Asset

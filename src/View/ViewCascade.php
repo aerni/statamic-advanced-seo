@@ -13,9 +13,7 @@ use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Support\Str;
 use Statamic\Tags\Context;
@@ -54,7 +52,6 @@ class ViewCascade extends BaseCascade
             'twitter_card',
             'twitter_image',
             'twitter_image_preset',
-            'twitter_title',
             'twitter_handle',
             'indexing',
             'locale',
@@ -125,11 +122,6 @@ class ViewCascade extends BaseCascade
             'width' => $openGraph->width(),
             'height' => $openGraph->height(),
         ];
-    }
-
-    public function twitterTitle(): string
-    {
-        return $this->get('twitter_title') ?? $this->pageTitle() ?? $this->siteName();
     }
 
     public function twitterCard(): string

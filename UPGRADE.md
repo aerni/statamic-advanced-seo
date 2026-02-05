@@ -70,6 +70,22 @@ The `social_images_generator_collections` field has been removed from the `site:
 
 The `$group` variable has been removed from the data passed to social images generator templates. If your templates reference this variable, you'll need to update them.
 
+## Twitter Title and Description Fields
+
+The `seo_twitter_title` and `seo_twitter_description` fields have been removed. Twitter/X falls back to Open Graph values when Twitter-specific tags aren't present, making separate fields unnecessary.
+
+The `twitter:title` and `twitter:description` meta tags are still output, but now use the Open Graph title and description values.
+
+> **Automated Migration**: Existing Twitter title and description data is automatically removed from your content during the upgrade.
+
+### Custom Views
+
+If you've published or customized the `_twitter.antlers.html` snippet and reference `seo:twitter_title` or `seo:twitter_description`, update them to use `seo:og_title` and `seo:og_description` instead.
+
+### Social Images Generator Templates
+
+If you use custom social images generator templates for Twitter (`twitter_summary` or `twitter_summary_large_image` presets), no changes are required. The templates continue to work - only the title/description meta fields have been removed, not the image generation.
+
 ## Localization Origin Field
 
 The `origin` field has been removed from localizations. Origin configuration is now stored centrally in the set config using an `origins` array.
@@ -197,6 +213,16 @@ The argument was defined on the query itself but affected the output of `compute
     }
   }
 ```
+
+#### Removed Twitter Fields
+
+The following fields have been removed from the `computed` type as Twitter now uses Open Graph values:
+
+| Removed Field | Use Instead |
+|---------------|-------------|
+| `twitter_title` | `og_title` |
+
+Raw data fields `twitter_title` and `twitter_description` have also been removed from `collectionSet` and `taxonomySet` types.
 
 ### `seoSitemaps` Query
 

@@ -235,39 +235,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         ],
                     ]),
                 ],
-                [
-                    'handle' => 'seo_twitter_title',
-                    'field' => [
-                        'type' => 'seo_source',
-                        'display' => $this->trans('seo_twitter_title.display'),
-                        'instructions' => $this->trans('seo_twitter_title.default_instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_title',
-                        'options' => ['auto', 'custom'],
-                        'localizable' => true,
-                        'field' => [
-                            'type' => 'text',
-                            'character_limit' => 70,
-                            'antlers' => false,
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_twitter_description',
-                    'field' => [
-                        'type' => 'seo_source',
-                        'display' => $this->trans('seo_twitter_description.display'),
-                        'instructions' => $this->trans('seo_twitter_description.default_instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_description',
-                        'options' => ['auto', 'custom'],
-                        'localizable' => true,
-                        'field' => [
-                            'type' => 'textarea',
-                            'character_limit' => 200,
-                        ],
-                    ],
-                ],
             ],
         ];
     }

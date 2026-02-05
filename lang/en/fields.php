@@ -105,18 +105,6 @@ return [
         'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to :size.',
     ],
 
-    'seo_twitter_title' => [
-        'display' => 'Twitter Title',
-        'instructions' => 'Set the Twitter title of this :type.',
-        'default_instructions' => 'Set the default Twitter title of your :type.',
-    ],
-
-    'seo_twitter_description' => [
-        'display' => 'Twitter Description',
-        'instructions' => 'Set the Twitter description of this :type.',
-        'default_instructions' => 'Set the default Twitter description of your :type.',
-    ],
-
     'seo_section_canonical_url' => [
         'display' => 'Canonical URL',
         'instructions' => 'Configure the canonical URL settings of this :type.',

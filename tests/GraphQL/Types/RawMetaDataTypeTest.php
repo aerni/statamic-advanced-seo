@@ -26,8 +26,6 @@ it('exposes all expected fields', function () {
         'twitter_card',
         'twitter_summary_image',
         'twitter_summary_large_image',
-        'twitter_title',
-        'twitter_description',
         'noindex',
         'nofollow',
         'canonical_type',

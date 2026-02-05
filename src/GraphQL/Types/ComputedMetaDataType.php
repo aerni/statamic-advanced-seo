@@ -48,10 +48,6 @@ class ComputedMetaDataType extends Type
                 'type' => GraphQl::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
-            'twitter_title' => [
-                'type' => GraphQl::string(),
-                'resolve' => $this->resolver(),
-            ],
             'twitter_handle' => [
                 'type' => GraphQl::string(),
                 'resolve' => $this->resolver(),
