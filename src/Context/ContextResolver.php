@@ -17,10 +17,9 @@ use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Statamic\Fields\Value;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Statamic;
-use Statamic\Tags\Context as TagsContext;
+use Statamic\Tags\Context as ViewContext;
 
 class ContextResolver
 {
@@ -56,16 +55,32 @@ class ContextResolver
             $model instanceof EntryBlueprintFound => CollectionFacade::find(
                 Str::after($model->blueprint->namespace(), '.')
             ),
-            $model instanceof TagsContext && ($collection = $model->get('collection')) instanceof Value && $collection->value() => $collection->value(),
             $model instanceof Taxonomy => $model,
             $model instanceof Term => $model->taxonomy(),
             $model instanceof TermBlueprintFound => TaxonomyFacade::find(
                 Str::after($model->blueprint->namespace(), '.')
             ),
-            $model instanceof TagsContext && $model->get('taxonomy') instanceof Value => $model->get('taxonomy')->value(),
-            $model instanceof TagsContext && $model->get('terms') instanceof TermQueryBuilder => TaxonomyFacade::find($model->get('handle')->value()),
+            $model instanceof ViewContext => $this->parentFromViewContext($model),
             default => null,
         };
+    }
+
+    protected function parentFromViewContext(ViewContext $context): mixed
+    {
+        if ($context->value('is_entry')) {
+            return $context->value('collection');
+        }
+
+        if ($context->value('is_term')) {
+            return $context->value('taxonomy');
+        }
+
+        // Taxonomy index page (listing terms)
+        if ($context->get('terms') instanceof TermQueryBuilder) {
+            return $context->get('handle')->augmentable();
+        }
+
+        return null;
     }
 
     protected function type(mixed $parent): string
@@ -106,7 +121,7 @@ class ContextResolver
         return match (true) {
             $model instanceof Entry => $model->locale(),
             $model instanceof Term => $this->termSite($model),
-            $model instanceof TagsContext => $model->get('site')?->handle() ?? Site::current()->handle(),
+            $model instanceof ViewContext => $model->get('site')?->handle() ?? Site::current()->handle(),
             $model instanceof SeoSet => $this->seoSetSite($model),
             $model instanceof SeoSetConfig => $model->seoSet()->selectedSite(),
             $model instanceof SeoSetLocalization => $model->locale(),
