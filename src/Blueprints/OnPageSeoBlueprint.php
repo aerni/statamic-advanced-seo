@@ -220,6 +220,14 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         ],
                     ],
                 ],
+                [
+                    'handle' => 'seo_social_preview',
+                    'field' => [
+                        'type' => 'social_preview',
+                        'display' => $this->trans('seo_social_preview.display'),
+                        'listable' => 'hidden',
+                    ],
+                ],
             ],
         ];
     }

@@ -161,6 +161,10 @@ return [
         'display' => 'Search Preview',
     ],
 
+    'seo_social_preview' => [
+        'display' => 'Social Preview',
+    ],
+
     'section_fathom' => [
         'display' => 'Fathom',
         'instructions' => 'Use [Fathom](https://usefathom.com) as a privacy-friendly alternative to Google Analytics.',
