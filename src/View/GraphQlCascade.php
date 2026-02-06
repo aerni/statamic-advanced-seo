@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\View;
 
+use Aerni\AdvancedSeo\Actions\ResolveBreadcrumbs;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Data\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
@@ -12,9 +13,7 @@ use Spatie\SchemaOrg\Schema;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
 class GraphQlCascade extends BaseCascade
@@ -209,37 +208,17 @@ class GraphQlCascade extends BaseCascade
             return null;
         }
 
-        $listItems = $this->breadcrumbsListItems()->map(function ($crumb) {
-            return Schema::listItem()
+        $segments = array_merge(['/'], explode('/', trim($this->model->url(), '/')));
+
+        $listItems = ResolveBreadcrumbs::handle($segments, $this->model->site()->handle())
+            ->map(fn ($crumb) => Schema::listItem()
                 ->position($crumb['position'])
                 ->name($crumb['title'])
-                ->item($crumb['url']);
-        })->all();
+                ->item($crumb['url']));
 
-        $breadcrumbs = Schema::breadcrumbList()->itemListElement($listItems);
-
-        return json_encode($breadcrumbs->toArray(), JSON_UNESCAPED_UNICODE);
-    }
-
-    protected function breadcrumbsListItems(): Collection
-    {
-        $segments = collect(explode('/', $this->model->url()))->filter()->prepend('/');
-
-        $crumbs = $segments->map(function () use (&$segments) {
-            $uri = URL::tidy($segments->join('/'));
-            $segments->pop();
-
-            return Data::findByUri(Str::ensureLeft($uri, '/'), $this->model->site()->handle());
-        })
-            ->filter()
-            ->reverse()
-            ->values()
-            ->map(fn ($model, $key) => [
-                'position' => $key + 1,
-                'title' => method_exists($model, 'title') ? $model->title() : $model->value('title'),
-                'url' => $model->absoluteUrl(),
-            ]);
-
-        return $crumbs;
+        return json_encode(
+            Schema::breadcrumbList()->itemListElement($listItems),
+            JSON_UNESCAPED_UNICODE,
+        );
     }
 }
