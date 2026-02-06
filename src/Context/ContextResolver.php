@@ -56,7 +56,7 @@ class ContextResolver
             $model instanceof EntryBlueprintFound => CollectionFacade::find(
                 Str::after($model->blueprint->namespace(), '.')
             ),
-            $model instanceof TagsContext && $model->get('collection') instanceof Value => $model->get('collection')->value(),
+            $model instanceof TagsContext && ($collection = $model->get('collection')) instanceof Value && $collection->value() => $collection->value(),
             $model instanceof Taxonomy => $model,
             $model instanceof Term => $model->taxonomy(),
             $model instanceof TermBlueprintFound => TaxonomyFacade::find(
