@@ -181,9 +181,43 @@ export function useSeoAssets() {
     }
 
     /**
+     * Check if social image generation is enabled.
+     * Reads from reactive publishValues so this will update when toggle changes.
+     */
+    function isGenerationEnabled() {
+        const raw = getRawValue('seo_generate_social_images');
+
+        // seo_source wrapped: { source, value }
+        if (typeof raw === 'object' && raw !== null && 'value' in raw) {
+            return raw.value === true || raw.value === 'true';
+        }
+
+        return raw === true || raw === 'true';
+    }
+
+    /**
+     * Get the generated social image URL from the seo_generated_og_image field meta.
+     * Only returns URL if generation is enabled.
+     */
+    function getGeneratedImageUrl() {
+        if (!isGenerationEnabled()) {
+            return null;
+        }
+
+        return publishContainer?.meta?.value?.seo_generated_og_image?.image || null;
+    }
+
+    /**
      * Get the resolved OG image reactively.
+     * Prioritizes generated image (when enabled) over manually uploaded image.
      */
     function resolveOgImage() {
+        const generatedUrl = getGeneratedImageUrl();
+
+        if (generatedUrl) {
+            return { url: generatedUrl };
+        }
+
         return resolveImage('seo_og_image', getFallbackId('seo_og_image'));
     }
 
