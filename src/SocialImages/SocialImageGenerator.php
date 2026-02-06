@@ -63,15 +63,13 @@ class SocialImageGenerator
 
     protected function filename(): string
     {
-        $group = str_starts_with($this->socialImage->type, 'twitter_') ? 'twitter' : 'open-graph';
-
         // Entries have unique IDs per localization, but terms share the same ID (taxonomy::slug)
         // across localizations. Use slug + locale for terms to ensure unique filenames.
         if ($this->content instanceof Term) {
-            return "{$this->content->slug()}_{$this->content->locale()}_{$group}.png";
+            return "{$this->content->slug()}_{$this->content->locale()}_open-graph.png";
         }
 
-        return "{$this->content->id()}_{$group}.png";
+        return "{$this->content->id()}_open-graph.png";
     }
 
     protected function templateUrl(): string

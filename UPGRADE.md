@@ -54,52 +54,11 @@ The `disabled` configuration option has been removed from `config/advanced-seo.p
 
 > **Automated Migration**: Your existing disabled collections and taxonomies are automatically migrated. Collections and taxonomies can now be disabled individually through the Control Panel by clicking the "Configure" button on each set.
 
-## Sitemap Exclusion Settings
-
-The `excluded_collections` and `excluded_taxonomies` fields have been removed from the `site::indexing` defaults. The sitemap is now enabled per-collection/taxonomy using the `sitemap` toggle in the collection/taxonomy config.
-
-> **Automated Migration**: Your existing settings are automatically migrated to per-collection/taxonomy configuration.
-
-## Social Images Generator Settings
-
-The `social_images_generator_collections` field has been removed from the `site::social_media` defaults. The social images generator is now enabled per-collection using the `social_images_generator` toggle in the collection config.
-
-> **Automated Migration**: Your existing settings are automatically migrated to per-collection configuration.
-
-## Social Images Generator Templates
-
-The `$group` variable has been removed from the data passed to social images generator templates. If your templates reference this variable, you'll need to update them.
-
-## Twitter Title and Description Fields
-
-The `seo_twitter_title` and `seo_twitter_description` fields have been removed. Twitter/X falls back to Open Graph values when Twitter-specific tags aren't present, making separate fields unnecessary.
-
-The `twitter:title` and `twitter:description` meta tags are still output, but now use the Open Graph title and description values.
-
-> **Automated Migration**: Existing Twitter title and description data is automatically removed from your content during the upgrade.
-
-### Custom Views
-
-If you've published or customized the `_twitter.antlers.html` snippet and reference `seo:twitter_title` or `seo:twitter_description`, update them to use `seo:og_title` and `seo:og_description` instead.
-
-### Social Images Generator Templates
-
-If you use custom social images generator templates for Twitter (`twitter_summary` or `twitter_summary_large_image` presets), no changes are required. The templates continue to work - only the title/description meta fields have been removed, not the image generation.
-
 ## Localization Origin Field
 
 The `origin` field has been removed from localizations. Origin configuration is now stored centrally in the set config using an `origins` array.
 
 > **Automated Migration**: Your existing origin configuration is automatically migrated from localizations to the set config.
-
-## Events
-
-The `SeoDefaultSetSaved` event has been renamed to `SeoSetLocalizationSaved`. Both events handle the same localization data. The public property has been renamed from `$defaults` to `$localization`.
-
-Additionally, new events have been added for config and deletion operations:
-- `SeoSetConfigSaved` - Fired when a set's configuration is saved
-- `SeoSetConfigDeleted` - Fired when a set's configuration is deleted
-- `SeoSetLocalizationDeleted` - Fired when a localization is deleted
 
 ## Eloquent Driver
 
@@ -109,7 +68,89 @@ The `advanced_seo_defaults` table has been replaced by `seo_set_localizations`. 
 
 > **Automated Migration**: When updating to v3.0, new migrations will be published and run automatically. Data will be migrated from the old table to the new tables, and the old `advanced_seo_defaults` table will be dropped.
 
+## X (Twitter) Social Sharing
+
+The X (Twitter) social sharing has been significantly simplified. Instead of maintaining separate Twitter-specific fields, the addon now uses a unified social image shared between Open Graph and Twitter, with only the card size remaining as a Twitter-specific setting.
+
+### Removed Fields
+
+The following fields have been removed from entries, terms, and SEO set localizations:
+
+| Removed Field | Replacement |
+|---------------|-------------|
+| `seo_twitter_title` | Uses `seo_og_title` |
+| `seo_twitter_description` | Uses `seo_og_description` |
+| `seo_twitter_summary_image` | Uses `seo_og_image` |
+| `seo_twitter_summary_large_image` | Uses `seo_og_image` |
+
+The following fields have been removed from the site-wide social media defaults:
+
+| Removed Field | Replacement |
+|---------------|-------------|
+| `twitter_summary_image` | Uses `og_image` |
+| `twitter_summary_large_image` | Uses `og_image` |
+
+> **Automated Migration**: Existing Twitter field data is automatically removed from your content during the upgrade.
+
+### Twitter Card Setting
+
+The `seo_twitter_card` field has been moved from a per-localization setting to a per-collection/taxonomy configuration setting. It is now available in the "Social Appearance" section of the collection/taxonomy config, alongside other collection-level settings like the sitemap and social images generator toggles.
+
+> **Automated Migration**: The existing `seo_twitter_card` value from the default site's localization is automatically migrated to the collection/taxonomy config.
+
+### Custom Views
+
+If you've published or customized the `_twitter.antlers.html` snippet, update the following references:
+
+| Old Variable | New Variable |
+|--------------|--------------|
+| `seo:twitter_title` | `seo:og_title` |
+| `seo:twitter_description` | `seo:og_description` |
+| `seo:twitter_image` | `seo:og_image` |
+| `seo:twitter_image_preset` | `seo:og_image_preset` |
+| `seo:twitter_image:alt` | `seo:og_image:alt` |
+
+### Social Images Generator
+
+If you're using the social images generator, see the [Removed Twitter Presets](#removed-twitter-presets) section for related changes.
+
+### GraphQL
+
+If you're using the GraphQL API, see the [Twitter Field Changes](#twitter-field-changes) section under GraphQL for related schema updates.
+
+## Social Images Generator
+
+### Per-Collection Settings
+
+The `social_images_generator_collections` field has been removed from the `site::social_media` defaults. The social images generator is now enabled per-collection using the `social_images_generator` toggle in the collection config.
+
+> **Automated Migration**: Your existing settings are automatically migrated to per-collection configuration.
+
+### Removed Twitter Presets
+
+The social images generator no longer generates separate Twitter images. Only the Open Graph image is generated, and it is shared with Twitter. The `twitter_summary` and `twitter_summary_large_image` presets have been removed from the config:
+
+```diff
+  'presets' => [
+      'open_graph' => ['width' => 1200, 'height' => 630],
+-     'twitter_summary' => ['width' => 240, 'height' => 240],
+-     'twitter_summary_large_image' => ['width' => 1200, 'height' => 600],
+  ],
+```
+
+If you have custom social images generator themes, you can remove the `twitter_summary.antlers.html` and `twitter_summary_large_image.antlers.html` templates — only `open_graph.antlers.html` is used.
+
+### Template Changes
+
+The `$group` variable has been removed from the data passed to social images generator templates. If your templates reference this variable, you'll need to update them.
+
 ## Sitemaps
+
+### Per-Collection/Taxonomy Settings
+
+The `excluded_collections` and `excluded_taxonomies` fields have been removed from the `site::indexing` defaults. The sitemap is now enabled per-collection/taxonomy using the `sitemap` toggle in the collection/taxonomy config.
+
+> **Automated Migration**: Your existing settings are automatically migrated to per-collection/taxonomy configuration.
 
 ### Domain Scoping
 
@@ -136,6 +177,15 @@ Sitemap::register($sitemap);
 ```php
 Sitemap::index('english')->add($sitemap);
 ```
+
+## Events
+
+The `SeoDefaultSetSaved` event has been renamed to `SeoSetLocalizationSaved`. Both events handle the same localization data. The public property has been renamed from `$defaults` to `$localization`.
+
+Additionally, new events have been added for config and deletion operations:
+- `SeoSetConfigSaved` - Fired when a set's configuration is saved
+- `SeoSetConfigDeleted` - Fired when a set's configuration is deleted
+- `SeoSetLocalizationDeleted` - Fired when a localization is deleted
 
 ## GraphQL
 
@@ -214,15 +264,27 @@ The argument was defined on the query itself but affected the output of `compute
   }
 ```
 
-#### Removed Twitter Fields
+#### Twitter Field Changes
 
 The following fields have been removed from the `computed` type as Twitter now uses Open Graph values:
 
 | Removed Field | Use Instead |
 |---------------|-------------|
 | `twitter_title` | `og_title` |
+| `twitter_image` | `og_image` |
+| `twitter_image_preset` | `og_image_preset` |
 
-Raw data fields `twitter_title` and `twitter_description` have also been removed from `collectionSet` and `taxonomySet` types.
+A new `twitter_card` field has been added to the `computed` type, returning the card size (`summary` or `summary_large_image`).
+
+The following raw data fields have been removed from the `collectionSet`, `taxonomySet`, and `socialMediaSiteSet` types:
+
+| Removed Field | Use Instead |
+|---------------|-------------|
+| `twitter_card` | Use `seoMeta { computed { twitter_card } }` |
+| `twitter_title` | `og_title` |
+| `twitter_description` | `og_description` |
+| `twitter_summary_image` | `og_image` |
+| `twitter_summary_large_image` | `og_image` |
 
 ### `seoSitemaps` Query
 

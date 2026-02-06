@@ -53,8 +53,6 @@ class SeoProMigrator extends BaseMigrator
             'seo_nofollow' => in_array('nofollow', $robots) ? true : null,
             'seo_canonical_type' => $data->has('seo_canonical_custom') ? 'custom' : null,
             'seo_og_image' => $image ?? null,
-            'seo_twitter_summary_image' => $image ?? null,
-            'seo_twitter_summary_large_image' => $image ?? null,
         ])->filter();
 
         return $data

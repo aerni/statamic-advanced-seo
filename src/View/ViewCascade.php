@@ -5,7 +5,6 @@ namespace Aerni\AdvancedSeo\View;
 use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Data\HasComputedData;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
@@ -34,6 +33,7 @@ class ViewCascade extends BaseCascade
     {
         return $this
             ->withSiteDefaults()
+            ->withContentConfig()
             ->withPageData()
             ->removeSeoPrefix()
             ->ensureOverrides()
@@ -50,8 +50,6 @@ class ViewCascade extends BaseCascade
             'og_image_preset',
             'og_title',
             'twitter_card',
-            'twitter_image',
-            'twitter_image_preset',
             'twitter_handle',
             'indexing',
             'locale',
@@ -121,38 +119,6 @@ class ViewCascade extends BaseCascade
         return [
             'width' => $openGraph->width(),
             'height' => $openGraph->height(),
-        ];
-    }
-
-    public function twitterCard(): string
-    {
-        return match (true) {
-            ($this->has('twitter_card')) => $this->get('twitter_card'),
-            // The following three cases handle pages like taxonomy and 404.
-            ($this->has('twitter_summary_large_image')) => 'summary_large_image',
-            ($this->has('twitter_summary_image')) => 'summary',
-            default => Seo::defaultValue('collections.seo_twitter_card'),
-        };
-    }
-
-    public function twitterImage(): ?Asset
-    {
-        if (! $socialImage = SocialImage::find("twitter_{$this->twitterCard()}")) {
-            return null;
-        }
-
-        return $this->get('generate_social_images')
-            ? $this->get('generated_twitter_image') ?? $this->get($socialImage->handle)
-            : $this->get($socialImage->handle);
-    }
-
-    public function twitterImagePreset(): array
-    {
-        $socialImage = SocialImage::find("twitter_{$this->twitterCard()}");
-
-        return [
-            'width' => $socialImage->width(),
-            'height' => $socialImage->height(),
         ];
     }
 

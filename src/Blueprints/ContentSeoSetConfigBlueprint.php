@@ -19,8 +19,8 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
             'main' => [
                 $this->enabled(),
                 $this->origins(),
-                $this->sitemap(),
-                $this->socialImagesGenerator(),
+                $this->features(),
+                $this->socialAppearance(),
             ],
         ];
     }
@@ -62,36 +62,27 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function sitemap(): array
+    protected function features(): array
     {
         return [
-            'display' => __('Sitemap'),
+            'display' => __('Features'),
             'fields' => [
                 [
                     'handle' => 'sitemap',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('Enabled'),
+                        'display' => __('Sitemap'),
                         'instructions' => __("Enables the sitemap for this {$this->contentTypeLabel()}."),
                         'default' => true,
                         'if' => ['enabled' => 'true'],
                         'feature' => Sitemap::class,
                     ],
                 ],
-            ],
-        ];
-    }
-
-    protected function socialImagesGenerator(): array
-    {
-        return [
-            'display' => __('Social Images Generator'),
-            'fields' => [
                 [
                     'handle' => 'social_images_generator',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('Enabled'),
+                        'display' => __('Social Images Generator'),
                         'instructions' => __("Enables the social images generator for this {$this->contentTypeLabel()}."),
                         'default' => false,
                         'if' => ['enabled' => 'true'],
@@ -116,6 +107,29 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                             'social_images_generator' => 'true',
                         ],
                         'feature' => SocialImagesGenerator::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function socialAppearance(): array
+    {
+        return [
+            'display' => $this->trans('seo_section_social_appearance.display'),
+            'fields' => [
+                [
+                    'handle' => 'twitter_card',
+                    'field' => [
+                        'type' => 'button_group',
+                        'display' => $this->trans('twitter_card.display'),
+                        'instructions' => $this->trans('twitter_card.instructions'),
+                        'options' => [
+                            'summary_large_image' => $this->trans('twitter_card.summary_large_image'),
+                            'summary' => $this->trans('twitter_card.summary'),
+                        ],
+                        'default' => 'summary_large_image',
+                        'if' => ['enabled' => 'true'],
                     ],
                 ],
             ],

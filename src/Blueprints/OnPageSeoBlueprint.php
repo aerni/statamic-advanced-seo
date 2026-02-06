@@ -23,10 +23,8 @@ class OnPageSeoBlueprint extends BaseBlueprint
     {
         return [
             'seo' => [
-                $this->titleAndDescription(),
-                $this->socialImagesGenerator(),
-                $this->openGraphImage(),
-                $this->twitterImage(),
+                $this->searchAppearance(),
+                $this->socialAppearance(),
                 $this->indexing(),
                 $this->canonicalUrl(),
                 $this->sitemap(),
@@ -35,11 +33,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function titleAndDescription(): array
+    protected function searchAppearance(): array
     {
         return [
-            'display' => $this->trans('seo_section_title_description.display'),
-            'instructions' => $this->trans('seo_section_title_description.instructions'),
+            'display' => $this->trans('seo_section_search_appearance.display'),
+            'instructions' => $this->trans('seo_section_search_appearance.instructions'),
             'collapsible' => true,
             'fields' => [
                 [
@@ -103,11 +101,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function socialImagesGenerator(): array
+    protected function socialAppearance(): array
     {
         return [
-            'display' => $this->trans('seo_section_social_images_generator.display'),
-            'instructions' => $this->trans('seo_section_social_images_generator.instructions'),
+            'display' => $this->trans('seo_section_social_appearance.display'),
+            'instructions' => $this->trans('seo_section_social_appearance.instructions'),
             'collapsible' => true,
             'fields' => [
                 [
@@ -158,39 +156,12 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'image_type' => 'open_graph',
                         'read_only' => true,
                         'listable' => 'hidden',
-                        'width' => 50,
                         'feature' => SocialImagesGenerator::class,
                         'if' => [
                             'seo_generate_social_images.value' => 'true',
                         ],
                     ],
                 ],
-                [
-                    'handle' => 'seo_generated_twitter_image',
-                    'field' => [
-                        'type' => 'social_image',
-                        'display' => $this->trans('seo_generated_twitter_image.display'),
-                        'image_type' => 'twitter',
-                        'read_only' => true,
-                        'listable' => 'hidden',
-                        'width' => 50,
-                        'feature' => SocialImagesGenerator::class,
-                        'if' => [
-                            'seo_generate_social_images.value' => 'true',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function openGraphImage(): array
-    {
-        return [
-            'display' => $this->trans('seo_section_og.display'),
-            'instructions' => $this->trans('seo_section_og.instructions'),
-            'collapsible' => true,
-            'fields' => [
                 [
                     'handle' => 'seo_og_image',
                     'field' => [
@@ -246,90 +217,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'field' => [
                             'type' => 'textarea',
                             'character_limit' => 200,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function twitterImage(): array
-    {
-        return [
-            'display' => $this->trans('seo_section_twitter.display'),
-            'instructions' => $this->trans('seo_section_twitter.instructions'),
-            'collapsible' => true,
-            'fields' => [
-                [
-                    'handle' => 'seo_twitter_card',
-                    'field' => [
-                        'type' => 'seo_source',
-                        'display' => $this->trans('seo_twitter_card.display'),
-                        'instructions' => $this->trans('seo_twitter_card.instructions'),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'field' => [
-                            'type' => 'button_group',
-                            'options' => [
-                                'summary' => $this->trans('seo_twitter_card.summary'),
-                                'summary_large_image' => $this->trans('seo_twitter_card.summary_large_image'),
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_twitter_summary_image',
-                    'field' => [
-                        'type' => 'seo_source',
-                        'display' => $this->trans('seo_twitter_summary_image.display'),
-                        'instructions' => $this->trans('seo_twitter_summary_image.instructions', ['size' => SocialImage::twitter()->sizeString()]),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'twitter_card' => 'summary',
-                        'if' => [
-                            'seo_generate_social_images.value' => 'isnt true',
-                            'seo_twitter_card.value' => 'equals summary',
-                        ],
-                        'field' => [
-                            'type' => 'assets',
-                            'container' => config('advanced-seo.social_images.container', 'assets'),
-                            'folder' => 'social_images',
-                            'max_files' => 1,
-                            'mode' => 'list',
-                            'allow_uploads' => true,
-                            'restrict' => false,
-                            'validate' => [
-                                'image',
-                                'mimes:jpg,png',
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_twitter_summary_large_image',
-                    'field' => [
-                        'type' => 'seo_source',
-                        'display' => $this->trans('seo_twitter_summary_large_image.display'),
-                        'instructions' => $this->trans('seo_twitter_summary_large_image.instructions', ['size' => SocialImage::twitterLarge()->sizeString()]),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'twitter_card' => 'summary_large_image',
-                        'if' => [
-                            'seo_generate_social_images.value' => 'isnt true',
-                            'seo_twitter_card.value' => 'equals summary_large_image',
-                        ],
-                        'field' => [
-                            'type' => 'assets',
-                            'container' => config('advanced-seo.social_images.container', 'assets'),
-                            'folder' => 'social_images',
-                            'max_files' => 1,
-                            'mode' => 'list',
-                            'allow_uploads' => true,
-                            'restrict' => false,
-                            'validate' => [
-                                'image',
-                                'mimes:jpg,png',
-                            ],
                         ],
                     ],
                 ],

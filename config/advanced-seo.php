@@ -82,8 +82,6 @@ return [
 
         'presets' => [
             'open_graph' => ['width' => 1200, 'height' => 630],
-            'twitter_summary' => ['width' => 240, 'height' => 240],
-            'twitter_summary_large_image' => ['width' => 1260, 'height' => 630],
         ],
 
         /*

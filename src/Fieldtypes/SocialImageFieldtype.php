@@ -51,10 +51,7 @@ class SocialImageFieldtype extends Fieldtype
     {
         $content = Helpers::localizedContent($content);
 
-        return match ($this->config()['image_type']) {
-            'open_graph' => SocialImage::openGraph()->for($content),
-            'twitter' => SocialImage::find("twitter_{$content->seo_twitter_card}")->for($content),
-        };
+        return SocialImage::openGraph()->for($content);
     }
 
     public function toGqlType()

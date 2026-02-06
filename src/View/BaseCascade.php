@@ -50,6 +50,17 @@ abstract class BaseCascade implements Augmentable
         return $this->merge($contentDefaults);
     }
 
+    protected function withContentConfig(): self
+    {
+        $config = SeoContext::from($this->model)?->seoSet()?->config();
+
+        if ($config) {
+            $this->merge(['twitter_card' => $config->value('twitter_card')]);
+        }
+
+        return $this;
+    }
+
     protected function withPageData(): self
     {
         $pageData = GetPageData::handle($this->model)
@@ -86,7 +97,7 @@ abstract class BaseCascade implements Augmentable
     protected function ensureOverrides(): self
     {
         // The keys that should be considered for the overrides.
-        $overrides = ['noindex', 'nofollow', 'og_image', 'twitter_summary_image', 'twitter_summary_large_image'];
+        $overrides = ['noindex', 'nofollow', 'og_image'];
 
         // The values that should be used as overrides.
         $defaults = GetSiteDefaults::handle($this->model)

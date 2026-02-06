@@ -2,10 +2,10 @@
 
 return [
 
-    'seo_section_title_description' => [
-        'display' => 'Title & Description',
-        'instructions' => 'Configure the title and description of this :type.',
-        'default_instructions' => 'Configure the default title and description of your :type.',
+    'seo_section_search_appearance' => [
+        'display' => 'Search Appearance',
+        'instructions' => 'Configure how this :type appears in search results.',
+        'default_instructions' => 'Configure how your :type appear in search results by default.',
     ],
 
     'seo_title' => [
@@ -29,10 +29,10 @@ return [
         'disabled' => 'Disabled',
     ],
 
-    'seo_section_social_images_generator' => [
-        'display' => 'Social Images Generator',
-        'instructions' => 'Configure the generator settings of this :type.',
-        'default_instructions' => 'Configure the default generator settings of your :type.',
+    'seo_section_social_appearance' => [
+        'display' => 'Social Appearance',
+        'instructions' => 'Configure how this :type appears when shared on social media.',
+        'default_instructions' => 'Configure how your :type appear when shared on social media by default.',
     ],
 
     'seo_generate_social_images' => [
@@ -48,61 +48,25 @@ return [
     ],
 
     'seo_generated_og_image' => [
-        'display' => 'Open Graph',
-    ],
-
-    'seo_generated_twitter_image' => [
-        'display' => 'Twitter',
-    ],
-
-    'seo_section_og' => [
-        'display' => 'Open Graph',
-        'instructions' => 'Configure the Open Graph settings of this :type.',
-        'default_instructions' => 'Configure the default Open Graph settings of your :type.',
+        'display' => 'Generated Social Image',
     ],
 
     'seo_og_image' => [
-        'display' => 'Open Graph Image',
-        'instructions' => 'Add an Open Graph image for this :type. It will be cropped to :size.',
-        'default_instructions' => 'Add a default Open Graph image for your :type. It will be cropped to :size.',
+        'display' => 'Social Image',
+        'instructions' => 'Add a social image for this :type. It will be cropped to :size.',
+        'default_instructions' => 'Add a default social image for your :type. It will be cropped to :size.',
     ],
 
     'seo_og_title' => [
-        'display' => 'Open Graph Title',
-        'instructions' => 'Set the Open Graph title of this :type.',
-        'default_instructions' => 'Set the default Open Graph title of your :type.',
+        'display' => 'Social Title',
+        'instructions' => 'Set the social title of this :type.',
+        'default_instructions' => 'Set the default social title of your :type.',
     ],
 
     'seo_og_description' => [
-        'display' => 'Open Graph Description',
-        'instructions' => 'Set the Open Graph description of this :type.',
-        'default_instructions' => 'Set the default Open Graph description of your :type.',
-    ],
-
-    'seo_section_twitter' => [
-        'display' => 'Twitter',
-        'instructions' => 'Configure the Twitter settings of this :type.',
-        'default_instructions' => 'Configure the default Twitter settings of your :type.',
-    ],
-
-    'seo_twitter_card' => [
-        'display' => 'Twitter Card',
-        'instructions' => 'Choose the type of card to use when sharing this :type.',
-        'default_instructions' => 'Choose the default type of card to use when sharing your :type.',
-        'summary' => 'Regular',
-        'summary_large_image' => 'Large Image',
-    ],
-
-    'seo_twitter_summary_image' => [
-        'display' => 'Twitter Summary Image',
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to :size.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to :size.',
-    ],
-
-    'seo_twitter_summary_large_image' => [
-        'display' => 'Twitter Summary Large Image',
-        'instructions' => 'Add a Twitter image for this :type. It will be cropped to :size.',
-        'default_instructions' => 'Add a default Twitter image for your :type. It will be cropped to :size.',
+        'display' => 'Social Description',
+        'instructions' => 'Set the social description of this :type.',
+        'default_instructions' => 'Set the default social description of your :type.',
     ],
 
     'seo_section_canonical_url' => [
@@ -356,34 +320,26 @@ return [
         'instructions' => 'Configurate the settings of the social images generator.',
     ],
 
-    'section_og' => [
-        'display' => 'Open Graph',
-        'instructions' => 'Configure the site-wide Open Graph settings.',
+    'section_social_media' => [
+        'display' => 'Social Media',
+        'instructions' => 'Configure the site-wide social media settings.',
     ],
 
     'og_image' => [
-        'display' => 'Open Graph Image',
+        'display' => 'Social Image',
         'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
     ],
 
-    'section_twitter' => [
-        'display' => 'Twitter',
-        'instructions' => 'Configure the site-wide Twitter settings.',
-    ],
-
-    'twitter_summary_image' => [
-        'display' => 'Twitter Summary Image',
-        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
-    ],
-
-    'twitter_summary_large_image' => [
-        'display' => 'Twitter Summary Large Image',
-        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+    'twitter_card' => [
+        'display' => 'X (Twitter) Card',
+        'instructions' => 'Choose the card size to use when sharing content from this collection.',
+        'summary' => 'Small',
+        'summary_large_image' => 'Large',
     ],
 
     'twitter_handle' => [
-        'display' => 'Twitter Username',
-        'instructions' => 'Add your Twitter username.',
+        'display' => 'X (Twitter) Username',
+        'instructions' => 'Add your X (Twitter) username.',
     ],
 
 ];

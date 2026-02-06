@@ -14,8 +14,6 @@ it('has the correct name', function () {
 it('exposes all expected fields', function () {
     expect((new SocialMediaSiteSetType)->fields())->toHaveKeys([
         'og_image',
-        'twitter_summary_image',
-        'twitter_summary_large_image',
         'twitter_handle',
     ]);
 });

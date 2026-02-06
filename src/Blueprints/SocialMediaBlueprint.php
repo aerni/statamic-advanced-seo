@@ -18,17 +18,16 @@ class SocialMediaBlueprint extends BaseBlueprint
     {
         return [
             'social' => [
-                $this->openGraphImage(),
-                $this->twitterImage(),
+                $this->socialMedia(),
             ],
         ];
     }
 
-    protected function openGraphImage(): array
+    protected function socialMedia(): array
     {
         return [
-            'display' => $this->trans('section_og.display'),
-            'instructions' => $this->trans('section_og.instructions'),
+            'display' => $this->trans('section_social_media.display'),
+            'instructions' => $this->trans('section_social_media.instructions'),
             'collapsible' => true,
             'fields' => [
                 [
@@ -36,43 +35,6 @@ class SocialMediaBlueprint extends BaseBlueprint
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('og_image.display'),
                         'instructions' => $this->trans('og_image.instructions', ['size' => SocialImage::openGraph()->sizeString()]),
-                        'validate' => [
-                            'image',
-                            'mimes:jpg,png',
-                        ],
-                    ]),
-                ],
-            ],
-        ];
-    }
-
-    protected function twitterImage(): array
-    {
-        return [
-            'display' => $this->trans('section_twitter.display'),
-            'instructions' => $this->trans('section_twitter.instructions'),
-            'collapsible' => true,
-            'fields' => [
-                [
-                    'handle' => 'twitter_summary_image',
-                    'field' => $this->getAssetFieldConfig([
-                        'display' => $this->trans('twitter_summary_image.display'),
-                        'instructions' => $this->trans('twitter_summary_image.instructions', ['size' => SocialImage::twitter()->sizeString()]),
-                        'twitter_card' => 'summary',
-                        'width' => 50,
-                        'validate' => [
-                            'image',
-                            'mimes:jpg,png',
-                        ],
-                    ]),
-                ],
-                [
-                    'handle' => 'twitter_summary_large_image',
-                    'field' => $this->getAssetFieldConfig([
-                        'display' => $this->trans('twitter_summary_large_image.display'),
-                        'instructions' => $this->trans('twitter_summary_large_image.instructions', ['size' => SocialImage::twitterLarge()->sizeString()]),
-                        'twitter_card' => 'summary_large_image',
-                        'width' => 50,
                         'validate' => [
                             'image',
                             'mimes:jpg,png',
@@ -90,7 +52,6 @@ class SocialMediaBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'prepend' => '@',
                         'antlers' => false,
-                        'width' => 50,
                     ],
                 ],
             ],

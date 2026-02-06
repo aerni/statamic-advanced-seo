@@ -32,6 +32,7 @@ class GraphQlCascade extends BaseCascade
     {
         return $this
             ->withSiteDefaults()
+            ->withContentConfig()
             ->withPageData()
             ->removeSeoPrefix()
             ->ensureOverrides()
@@ -46,8 +47,7 @@ class GraphQlCascade extends BaseCascade
             'og_image',
             'og_image_preset',
             'og_title',
-            'twitter_image',
-            'twitter_image_preset',
+            'twitter_card',
             'twitter_handle',
             'indexing',
             'locale',
@@ -103,27 +103,6 @@ class GraphQlCascade extends BaseCascade
         return [
             'width' => $openGraph->width(),
             'height' => $openGraph->height(),
-        ];
-    }
-
-    public function twitterImage(): ?Asset
-    {
-        if (! $socialImage = SocialImage::find("twitter_{$this->get('twitter_card')}")) {
-            return null;
-        }
-
-        return $this->get('generate_social_images')
-            ? $this->get('generated_twitter_image') ?? $this->get($socialImage->handle)
-            : $this->get($socialImage->handle);
-    }
-
-    public function twitterImagePreset(): array
-    {
-        $socialImage = SocialImage::find("twitter_{$this->get('twitter_card')}");
-
-        return [
-            'width' => $socialImage->width(),
-            'height' => $socialImage->height(),
         ];
     }
 

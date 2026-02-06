@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\SocialImages\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -22,18 +21,8 @@ class SocialImageRegistry extends Registry
         return $this->find('open_graph');
     }
 
-    public function twitter(): SocialImage
-    {
-        return $this->find('twitter_summary');
-    }
-
-    public function twitterLarge(): SocialImage
-    {
-        return $this->find('twitter_summary_large_image');
-    }
-
     /**
-     * Get all generators for content, auto-resolving the correct Twitter type.
+     * Get all generators for content.
      *
      * @return Collection<int, \Aerni\AdvancedSeo\SocialImages\SocialImageGenerator>
      */
@@ -43,7 +32,6 @@ class SocialImageRegistry extends Registry
 
         return collect([
             $this->openGraph()->for($content),
-            $this->find("twitter_{$content->seo_twitter_card}")->for($content),
         ]);
     }
 
@@ -55,29 +43,10 @@ class SocialImageRegistry extends Registry
         $content = Helpers::localizedContent($content);
         $theme = SocialImageTheme::resolveFor($content)->handle;
 
-        /**
-         * Use preview data if available (during preview POST), otherwise use saved value.
-         * When source is 'default', get the actual default from the SEO set since
-         * the form's value field may still contain the old custom value.
-         */
-        $previewData = request()->input('preview.seo_twitter_card');
-
-        if ($previewData) {
-            $twitterCard = $previewData['source'] === 'default'
-                ? Context::from($content)->seoSetLocalization()->seo_twitter_card
-                : $previewData['value'];
-        } else {
-            $twitterCard = $content->seo_twitter_card;
-        }
-
         return [
             [
-                'label' => 'Open Graph Image',
+                'label' => 'Social Image',
                 'format' => $this->openGraph()->url($theme, '{id}', $content->locale()),
-            ],
-            [
-                'label' => 'Twitter Image',
-                'format' => $this->find("twitter_{$twitterCard}")->url($theme, '{id}', $content->locale()),
             ],
         ];
     }
@@ -86,8 +55,6 @@ class SocialImageRegistry extends Registry
     {
         return [
             new SocialImage(type: 'open_graph', handle: 'og_image'),
-            new SocialImage(type: 'twitter_summary', handle: 'twitter_summary_image'),
-            new SocialImage(type: 'twitter_summary_large_image', handle: 'twitter_summary_large_image'),
         ];
     }
 }

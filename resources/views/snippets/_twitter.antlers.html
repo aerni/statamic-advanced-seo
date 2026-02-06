@@ -14,10 +14,10 @@
     <meta name="twitter:site" content="{{ seo:twitter_handle }}">
 {{ /if }}
 
-{{ if seo:twitter_image }}
-    <meta name="twitter:image" content="{{ glide src="{seo:twitter_image}" width="{seo:twitter_image_preset:width}" height="{seo:twitter_image_preset:height}" fit="crop_focal" absolute="true" }}">
+{{ if seo:og_image }}
+    <meta name="twitter:image" content="{{ glide src="{seo:og_image}" width="{seo:og_image_preset:width}" height="{seo:og_image_preset:height}" fit="crop_focal" absolute="true" }}">
 
-    {{ if seo:twitter_image:alt }}
-        <meta name="twitter:image:alt" content="{{ seo:twitter_image:alt }}">
+    {{ if seo:og_image:alt }}
+        <meta name="twitter:image:alt" content="{{ seo:og_image:alt }}">
     {{ /if }}
 {{ /if }}
