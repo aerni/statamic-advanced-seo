@@ -7,16 +7,15 @@ use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
 use Statamic\Fields\Value;
-use Statamic\Tags\Context as TagsContext;
+use Statamic\Tags\Context as ViewContext;
 
 class GetSiteDefaults
 {
     public static function handle(mixed $model): Collection
     {
-        if (! $site = Context::from($model)?->site) {
-            return collect();
-        }
+        $site = Context::from($model)?->site ?? Site::current()->handle();
 
         return Blink::once("advanced-seo::site::{$site}", function () use ($site, $model) {
             $siteDefaults = Seo::whereType('site')
@@ -26,7 +25,7 @@ class GetSiteDefaults
              * TODO: Instead of merging the overrides, we might be able to refactor this to something similar to the GetPageData action.
              * Instead of augmenting all the default values upfront, we could get the blueprint of each site default and then add the values to each blueprint field.
              */
-            if ($model instanceof TagsContext) {
+            if ($model instanceof ViewContext) {
                 return self::mergeViewOverrides($siteDefaults, $model);
             }
 

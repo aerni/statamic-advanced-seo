@@ -2,21 +2,21 @@
 
 namespace Aerni\AdvancedSeo\View;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Site;
-use Statamic\Tags\Context;
-use Statamic\Facades\Blink;
-use Spatie\SchemaOrg\Schema;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Assets\Asset;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\Facades\SocialImage;
-use Aerni\AdvancedSeo\Data\HasComputedData;
-use Statamic\Stache\Query\TermQueryBuilder;
-use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Aerni\AdvancedSeo\Actions\ResolveBreadcrumbs;
 use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
+use Aerni\AdvancedSeo\Data\HasComputedData;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Support\Helpers;
+use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
+use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Schema;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
+use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Support\Str;
+use Statamic\Tags\Context;
 
 class ViewCascade extends BaseCascade
 {
@@ -94,9 +94,9 @@ class ViewCascade extends BaseCascade
 
         return match (true) {
             (! $pageTitle) => $siteName,
-            ($siteNamePosition == 'end') => "{$pageTitle} {$titleSeparator} {$siteName}",
-            ($siteNamePosition == 'start') => "{$siteName} {$titleSeparator} {$pageTitle}",
-            ($siteNamePosition == 'disabled') => $pageTitle,
+            ($siteNamePosition === 'end') => "{$pageTitle} {$titleSeparator} {$siteName}",
+            ($siteNamePosition === 'start') => "{$siteName} {$titleSeparator} {$pageTitle}",
+            ($siteNamePosition === 'disabled') => $pageTitle,
             default => "{$pageTitle} {$titleSeparator} {$siteName}",
         };
     }
