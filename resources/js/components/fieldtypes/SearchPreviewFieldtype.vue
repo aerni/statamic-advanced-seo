@@ -40,7 +40,7 @@ const breadcrumbs = computed(() => {
 <template>
     <div class="mt-4 max-w-[700px] p-5! bg-gray-50 border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-900">
         <div class="flex items-center gap-3 mb-1.5">
-            <div class="flex items-center justify-center rounded-full size-[26px] shrink-0 bg-gray-200 border border-gray-300 dark:bg-gray-800 dark:border-gray-600">
+            <div class="flex items-center justify-center rounded-full size-[26px] shrink-0 bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-600">
                 <img v-if="meta.favicon" :src="meta.favicon" class="size-[18px] rounded-sm" />
                 <svg v-else class="size-3.5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zM4 12c0-.93.16-1.823.454-2.652L7.96 12.85 7.96 13.9a1.053 1.053 0 001.052 1.052v2.063A8.01 8.01 0 014 12zm13.072 5.196A1.044 1.044 0 0016.2 16.5h-.496a1.053 1.053 0 01-1.052-1.052v-1.58a.526.526 0 00-.527-.526H10.06a.526.526 0 01-.527-.527v-1.052c0-.291.236-.527.527-.527h2.104c.291 0 .527-.236.527-.527V9.657c0-.291.236-.527.527-.527h.527c.581 0 1.052-.471 1.052-1.052V7.66A8.012 8.012 0 0120 12a7.97 7.97 0 01-2.928 5.196z" />
