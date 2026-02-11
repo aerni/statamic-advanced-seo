@@ -39,11 +39,6 @@ const defaultFieldValue = computed(() => props.meta.default);
 
 const fieldValue = computed(() => valueForSource(fieldSource.value));
 
-const fieldComponent = computed(() => {
-    const field = props.config.field.component || props.config.field.type;
-    return field.replace('.', '-') + '-fieldtype';
-});
-
 const fieldConfig = computed(() => props.config.field);
 const fieldMeta = computed(() => props.meta.meta);
 
@@ -132,7 +127,7 @@ function updateFieldMeta(newMeta) {
 
         <div>
             <Component
-                :is="fieldComponent"
+                :is="props.meta.component"
                 :name="props.name"
                 :config="fieldConfig"
                 :meta="fieldMeta"

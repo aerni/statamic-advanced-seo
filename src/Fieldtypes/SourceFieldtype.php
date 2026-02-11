@@ -64,6 +64,7 @@ class SourceFieldtype extends Fieldtype
     public function preload(): array
     {
         return [
+            'component' => $this->sourceFieldtype()->component().'-fieldtype',
             'default' => $this->sourceFieldDefaultValue(),
             'defaultMeta' => $this->sourceFieldDefaultMeta(),
             'meta' => $this->sourceFieldMeta(),
