@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Enums\Scope;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -164,9 +165,7 @@ class ContextResolver
 
     protected function termSite(Term $term): string
     {
-        return Statamic::isCpRoute()
-            ? request()->route('site')?->handle() ?? basename(request()->path())
-            : $term->locale();
+        return Helpers::localizedContent($term)->locale();
     }
 
     protected function cpSite(): string

@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\UpdateScripts\MigrateTwitterFields;
+use Aerni\AdvancedSeo\UpdateScripts\MigrateSeoFields;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -21,10 +21,240 @@ beforeEach(function () {
     Taxonomy::make('tags')->sites(['english', 'german'])->saveQuietly();
 });
 
-function runTwitterFieldsRemovalScript(): void
+function runMigrateSeoFieldsScript(): void
 {
-    (new MigrateTwitterFields('aerni/advanced-seo'))->update();
+    (new MigrateSeoFields('aerni/advanced-seo'))->update();
 }
+
+// --- Legacy value migration ---
+
+it('migrates @auto values to @default on entries', function () {
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_title' => '@auto',
+            'seo_description' => '@auto',
+            'seo_og_title' => '@auto',
+        ]);
+
+    $origin->saveQuietly();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::query()->where('locale', 'english')->first();
+
+    expect($entry->get('title'))->toBe('Test Page');
+    expect($entry->get('seo_title'))->toBe('@default');
+    expect($entry->get('seo_description'))->toBe('@default');
+    expect($entry->get('seo_og_title'))->toBe('@default');
+});
+
+it('migrates @null values to @default on entries', function () {
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_title' => '@null',
+            'seo_og_image' => '@null',
+        ]);
+
+    $origin->saveQuietly();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::query()->where('locale', 'english')->first();
+
+    expect($entry->get('title'))->toBe('Test Page');
+    expect($entry->get('seo_title'))->toBe('@default');
+    expect($entry->get('seo_og_image'))->toBe('@default');
+});
+
+it('preserves @default values on entries', function () {
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_title' => '@default',
+            'seo_description' => '@default',
+        ]);
+
+    $origin->saveQuietly();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::query()->where('locale', 'english')->first();
+
+    expect($entry->get('title'))->toBe('Test Page');
+    expect($entry->get('seo_title'))->toBe('@default');
+    expect($entry->get('seo_description'))->toBe('@default');
+});
+
+it('preserves custom values on entries', function () {
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_title' => 'My Custom Title',
+            'seo_description' => 'My custom description',
+            'seo_og_title' => '{{ seo_title }}',
+        ]);
+
+    $origin->saveQuietly();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::query()->where('locale', 'english')->first();
+
+    expect($entry->get('title'))->toBe('Test Page');
+    expect($entry->get('seo_title'))->toBe('My Custom Title');
+    expect($entry->get('seo_description'))->toBe('My custom description');
+    expect($entry->get('seo_og_title'))->toBe('{{ seo_title }}');
+});
+
+it('migrates @field references to Antlers syntax on entries', function () {
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_og_title' => '@field:seo_title',
+            'seo_og_description' => '@field:seo_description',
+        ]);
+
+    $origin->saveQuietly();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::query()->where('locale', 'english')->first();
+
+    expect($entry->get('seo_og_title'))->toBe('{{ seo_title }}');
+    expect($entry->get('seo_og_description'))->toBe('{{ seo_description }}');
+});
+
+it('migrates entries in all localizations', function () {
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_title' => '@auto',
+            'seo_og_title' => '@null',
+        ]);
+
+    $origin->saveQuietly();
+
+    $origin->makeLocalization('german')
+        ->data([
+            'title' => 'German Test Page',
+            'seo_title' => '@null',
+            'seo_og_title' => '@auto',
+        ])
+        ->saveQuietly();
+
+    runMigrateSeoFieldsScript();
+
+    $english = Entry::query()->where('locale', 'english')->first();
+    $german = Entry::query()->where('locale', 'german')->first();
+
+    expect($english->get('seo_title'))->toBe('@default');
+    expect($english->get('seo_og_title'))->toBe('@default');
+
+    expect($german->get('seo_title'))->toBe('@default');
+    expect($german->get('seo_og_title'))->toBe('@default');
+});
+
+it('migrates legacy values on terms', function () {
+    Term::make()
+        ->taxonomy('tags')
+        ->slug('test-tag')
+        ->dataForLocale('english', [
+            'title' => 'Test Tag',
+            'seo_title' => '@auto',
+            'seo_description' => '@null',
+            'seo_og_title' => '@field:seo_title',
+        ])
+        ->dataForLocale('german', [
+            'title' => 'German Test Tag',
+            'seo_title' => '@null',
+            'seo_og_title' => '@auto',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $english = Term::find('tags::test-tag')->in('english');
+    $german = Term::find('tags::test-tag')->in('german');
+
+    expect($english->get('title'))->toBe('Test Tag');
+    expect($english->get('seo_title'))->toBe('@default');
+    expect($english->get('seo_description'))->toBe('@default');
+    expect($english->get('seo_og_title'))->toBe('{{ seo_title }}');
+
+    expect($german->get('title'))->toBe('German Test Tag');
+    expect($german->get('seo_title'))->toBe('@default');
+    expect($german->get('seo_og_title'))->toBe('@default');
+});
+
+it('migrates legacy values on seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->in('english')
+        ->data([
+            'seo_title' => 'Custom Title',
+            'seo_description' => '@auto',
+            'seo_og_title' => '@null',
+        ])
+        ->save();
+
+    Seo::find('collections::pages')
+        ->in('german')
+        ->data([
+            'seo_title' => '@auto',
+            'seo_description' => '@null',
+            'seo_og_title' => '@field:seo_title',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $english = Seo::find('collections::pages')->in('english');
+    $german = Seo::find('collections::pages')->in('german');
+
+    expect($english->get('seo_title'))->toBe('Custom Title');
+    expect($english->get('seo_description'))->toBe('@default');
+    expect($english->get('seo_og_title'))->toBe('@default');
+
+    expect($german->get('seo_title'))->toBe('@default');
+    expect($german->get('seo_description'))->toBe('@default');
+    expect($german->get('seo_og_title'))->toBe('{{ seo_title }}');
+});
+
+it('does not modify non-seo fields', function () {
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'content' => 'Some content',
+            'seo_title' => '@auto',
+        ]);
+
+    $origin->saveQuietly();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::query()->where('locale', 'english')->first();
+
+    expect($entry->get('title'))->toBe('Test Page');
+    expect($entry->get('content'))->toBe('Some content');
+    expect($entry->get('seo_title'))->toBe('@default');
+});
+
+// --- Twitter field removal ---
 
 it('removes twitter fields from entries in all localizations', function () {
     $origin = Entry::make()
@@ -52,7 +282,7 @@ it('removes twitter fields from entries in all localizations', function () {
         ])
         ->saveQuietly();
 
-    runTwitterFieldsRemovalScript();
+    runMigrateSeoFieldsScript();
 
     $english = Entry::query()->where('locale', 'english')->first();
     $german = Entry::query()->where('locale', 'german')->first();
@@ -94,7 +324,7 @@ it('removes twitter fields from terms in all localizations', function () {
         ])
         ->save();
 
-    runTwitterFieldsRemovalScript();
+    runMigrateSeoFieldsScript();
 
     $english = Term::find('tags::test-tag')->in('english');
     $german = Term::find('tags::test-tag')->in('german');
@@ -139,7 +369,7 @@ it('removes twitter fields from seo set localizations in all sites', function ()
         ])
         ->save();
 
-    runTwitterFieldsRemovalScript();
+    runMigrateSeoFieldsScript();
 
     $english = Seo::find('collections::pages')->in('english');
     $german = Seo::find('collections::pages')->in('german');
@@ -165,7 +395,7 @@ it('migrates twitter card value from default site localization to config', funct
         ->data(['seo_twitter_card' => 'summary'])
         ->save();
 
-    runTwitterFieldsRemovalScript();
+    runMigrateSeoFieldsScript();
 
     $config = Seo::find('collections::pages')->config();
 
@@ -183,7 +413,7 @@ it('removes twitter image fields from site social media defaults', function () {
         ])
         ->save();
 
-    runTwitterFieldsRemovalScript();
+    runMigrateSeoFieldsScript();
 
     $localization = Seo::find('site::social_media')->inDefaultSite();
 

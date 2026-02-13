@@ -50,7 +50,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'listable' => 'hidden',
                         'character_limit' => 60,
-                        'antlers' => false,
+                        'default' => '{{ title }}'
                     ],
                 ],
                 [
@@ -139,34 +139,23 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_og_title',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'text',
                         'display' => $this->trans('seo_og_title.display'),
                         'instructions' => $this->trans('seo_og_title.default_instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_title',
-                        'options' => ['auto', 'custom'],
+                        'default' => '{{ seo_title }}',
                         'localizable' => true,
-                        'field' => [
-                            'type' => 'text',
-                            'character_limit' => 70,
-                            'antlers' => false,
-                        ],
+                        'character_limit' => 70,
                     ],
                 ],
                 [
                     'handle' => 'seo_og_description',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'textarea',
                         'display' => $this->trans('seo_og_description.display'),
                         'instructions' => $this->trans('seo_og_description.default_instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_description',
-                        'options' => ['auto', 'custom'],
+                        'default' => '{{ seo_description }}',
                         'localizable' => true,
-                        'field' => [
-                            'type' => 'textarea',
-                            'character_limit' => 200,
-                        ],
+                        'character_limit' => 200,
                     ],
                 ],
             ],
@@ -368,6 +357,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'icon' => 'code',
                         'theme' => 'material',
                         'mode' => 'javascript',
+                        'mode_selectable' => false,
                         'indent_type' => 'tabs',
                         'indent_size' => 4,
                         'key_map' => 'default',

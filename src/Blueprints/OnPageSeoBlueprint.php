@@ -43,13 +43,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_title',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_title.display'),
                         'instructions' => $this->trans('seo_title.instructions'),
-                        'default' => '@auto',
-                        'auto' => 'title',
                         'localizable' => true,
-                        'antlers' => true,
+
                         'field' => [
                             'type' => 'text',
                             'character_limit' => 60,
@@ -59,12 +57,12 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_description',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_description.display'),
                         'instructions' => $this->trans('seo_description.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'antlers' => true,
+
                         'field' => [
                             'type' => 'textarea',
                             'character_limit' => 160,
@@ -74,7 +72,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_site_name_position',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_site_name_position.display'),
                         'instructions' => $this->trans('seo_site_name_position.instructions'),
                         'default' => '@default',
@@ -111,7 +109,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_generate_social_images',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_generate_social_images.display'),
                         'instructions' => $this->trans('seo_generate_social_images.instructions'),
                         'default' => '@default',
@@ -125,7 +123,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_social_images_theme',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_social_images_theme.display'),
                         'instructions' => $this->trans('seo_social_images_theme.instructions'),
                         'default' => '@default',
@@ -165,7 +163,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_og_image',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_og_image.display'),
                         'instructions' => $this->trans('seo_og_image.instructions', ['size' => SocialImage::openGraph()->sizeString()]),
                         'default' => '@default',
@@ -191,13 +189,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_og_title',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_og_title.display'),
                         'instructions' => $this->trans('seo_og_title.instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_title',
                         'localizable' => true,
-                        'antlers' => true,
+
                         'field' => [
                             'type' => 'text',
                             'character_limit' => 70,
@@ -207,13 +203,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_og_description',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_og_description.display'),
                         'instructions' => $this->trans('seo_og_description.instructions'),
-                        'default' => '@auto',
-                        'auto' => 'seo_description',
                         'localizable' => true,
-                        'antlers' => true,
+
                         'field' => [
                             'type' => 'textarea',
                             'character_limit' => 200,
@@ -238,12 +232,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_indexing.display'),
             'instructions' => $this->trans('seo_section_indexing.instructions'),
             'collapsible' => true,
-            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_noindex',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_noindex.display'),
                         'instructions' => $this->trans('seo_noindex.instructions'),
                         'default' => '@default',
@@ -257,7 +250,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_nofollow',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_nofollow.display'),
                         'instructions' => $this->trans('seo_nofollow.instructions'),
                         'default' => '@default',
@@ -278,12 +271,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_canonical_url.display'),
             'instructions' => $this->trans('seo_section_canonical_url.instructions'),
             'collapsible' => true,
-            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_canonical_type',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_canonical_type.display'),
                         'instructions' => $this->trans('seo_canonical_type.instructions'),
                         'default' => '@default',
@@ -304,7 +296,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_canonical_entry',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_canonical_entry.display'),
                         'instructions' => $this->trans('seo_canonical_entry.instructions'),
                         'default' => '@default',
@@ -327,12 +319,12 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_canonical_custom',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_canonical_custom.display'),
                         'instructions' => $this->trans('seo_canonical_custom.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'antlers' => true,
+
                         'if' => [
                             'seo_noindex.value' => 'false',
                             'seo_canonical_type.value' => 'equals custom',
@@ -357,12 +349,11 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_sitemap.display'),
             'instructions' => $this->trans('seo_section_sitemap.instructions'),
             'collapsible' => true,
-            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_sitemap_enabled',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_sitemap_enabled.display'),
                         'instructions' => $this->trans('seo_sitemap_enabled.instructions'),
                         'default' => '@default',
@@ -380,7 +371,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_sitemap_priority',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_sitemap_priority.display'),
                         'instructions' => $this->trans('seo_sitemap_priority.instructions'),
                         'default' => '@default',
@@ -452,7 +443,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_sitemap_change_frequency',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_sitemap_change_frequency.display'),
                         'instructions' => $this->trans('seo_sitemap_change_frequency.instructions'),
                         'default' => '@default',
@@ -494,21 +485,21 @@ class OnPageSeoBlueprint extends BaseBlueprint
             'display' => $this->trans('seo_section_json_ld.display'),
             'instructions' => $this->trans('seo_section_json_ld.instructions'),
             'collapsible' => true,
-            'collapsed' => true,
             'fields' => [
                 [
                     'handle' => 'seo_json_ld',
                     'field' => [
-                        'type' => 'seo_source',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_json_ld.display'),
                         'instructions' => $this->trans('seo_json_ld.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'antlers' => true,
+
                         'field' => [
                             'type' => 'code',
                             'theme' => 'material',
                             'mode' => 'javascript',
+                            'mode_selectable' => false,
                             'indent_type' => 'tabs',
                             'indent_size' => 4,
                             'key_map' => 'default',

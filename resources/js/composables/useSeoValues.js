@@ -64,10 +64,10 @@ function toPlainText(value, fieldType) {
  * Composable for resolving SEO field values from the publish container.
  *
  * Provides reactive resolution of field values with support for:
- * - seo_source fields (auto, default, custom)
+ * - seo fields (default, custom)
  * - Field type conversion (markdown, bard) to plain text
- * - Template interpolation ({{ handle }} and @field:handle)
- * - Auto chain following for recursive resolution
+ * - Template parsing ({{ handle }})
+ * - Recursive resolution for seo field references
  *
  * @returns {{ resolve: Function, truncate: Function }}
  */
@@ -94,31 +94,53 @@ export function useSeoValues() {
     }
 
     /**
-     * Replace {{ handle }} and @field:handle references in a string
-     * with the corresponding publish field values.
+     * Resolve a field value to plain text. If the field is a seo field,
+     * resolve it through the full chain. Otherwise, convert to plain text.
      */
-    function interpolate(value) {
-        if (!value || typeof value !== 'string') return value;
+    function resolveFieldValue(handle) {
+        const field = getField(handle);
+        if (!field) return null;
 
-        return value
-            .replace(/\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g, (_, handle) => toPlainText(getFieldValue(handle), getField(handle).type))
-            .replace(/@field:([a-zA-Z0-9_\-]+)/g, (_, handle) => toPlainText(getFieldValue(handle), getField(handle).type));
+        if (field.type === 'seo') {
+            return resolve(handle) ?? '';
+        }
+
+        return toPlainText(getFieldValue(handle), field.type);
     }
 
     /**
-     * Resolve a seo_source text field value, following the field.auto chain.
+     * Replace {{ handle }} references in a string
+     * with the corresponding publish field values.
+     * Unresolvable references are kept as raw Antlers.
      */
+    function parse(value) {
+        if (!value || typeof value !== 'string') return value;
+
+        return value
+            .replace(/\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g, (match, handle) => {
+                const resolved = resolveFieldValue(handle);
+                return resolved !== null ? resolved : match;
+            });
+    }
+
+    /**
+     * Resolve a seo field value, using the cascade default
+     * for reactive resolution when the field is in inherited state.
+     */
+    function resolveDefault(handle) {
+        const def = getFieldMeta(handle)?.defaultValue;
+        return typeof def === 'string' && def !== '' ? parse(def) : '';
+    }
+
     function resolve(handle) {
         const value = getFieldValue(handle);
         const field = getField(handle);
 
         switch (value?.source) {
-            case 'auto':
-                return resolve(field.auto);
             case 'default':
-                return interpolate(getFieldMeta(handle).default);
+                return resolveDefault(handle);
             case 'custom':
-                return interpolate(value.value);
+                return parse(value.value)?.trim();
             default:
                 return toPlainText(value, field.type);
         }
@@ -126,6 +148,7 @@ export function useSeoValues() {
 
     return {
         resolve,
+        parse,
         truncate,
     };
 }

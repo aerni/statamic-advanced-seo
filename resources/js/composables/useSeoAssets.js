@@ -49,7 +49,7 @@ export function useSeoAssets() {
      * Extract an asset ID from a publish value.
      *
      * Statamic's assets fieldtype preProcess returns arrays of asset IDs
-     * in "container::path" format. For seo_source wrapped fields, the
+     * in "container::path" format. For seo wrapped fields, the
      * value is { source, value: ["container::path"] }.
      *
      * @param {*} raw - The raw publish value
@@ -58,7 +58,7 @@ export function useSeoAssets() {
     function extractAssetId(raw) {
         if (!raw) return null;
 
-        // seo_source wrapped: { source, value: ["container::path"] }
+        // seo wrapped: { source, value: ["container::path"] }
         if (typeof raw === 'object' && !Array.isArray(raw)) {
             const ids = raw.value;
 
@@ -162,7 +162,7 @@ export function useSeoAssets() {
     }
 
     /**
-     * Resolve an image from a seo_source wrapped asset field.
+     * Resolve an image from a seo wrapped asset field.
      *
      * @param {string} handle - The field handle
      * @param {string|null} fallbackId - Asset ID from the cascade fallback
@@ -187,7 +187,7 @@ export function useSeoAssets() {
     function isGenerationEnabled() {
         const raw = getRawValue('seo_generate_social_images');
 
-        // seo_source wrapped: { source, value }
+        // seo wrapped: { source, value }
         if (typeof raw === 'object' && raw !== null && 'value' in raw) {
             return raw.value === true || raw.value === 'true';
         }

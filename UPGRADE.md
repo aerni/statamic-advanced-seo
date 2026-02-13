@@ -68,6 +68,18 @@ The `advanced_seo_defaults` table has been replaced by `seo_set_localizations`. 
 
 > **Automated Migration**: When updating to v3.0, new migrations will be published and run automatically. Data will be migrated from the old table to the new tables, and the old `advanced_seo_defaults` table will be dropped.
 
+## SEO Field Values
+
+### Simplified Field UI
+
+The SEO source fields have been simplified from a three-state toggle (Auto/Default/Custom) to a two-state inheritance model. Fields are now either **inherited** (showing the default value) or **custom** (user-set value). The toggle has been removed — transitioning between states happens implicitly through editing and a Reset action.
+
+### `@field:handle` Syntax Replaced with Antlers
+
+The `@field:handle` syntax for referencing other fields has been replaced with standard Antlers `{{ handle }}` syntax. This means you can now use the full power of Antlers in your SEO fields, including modifiers like `{{ content | truncate(90, '...') }}`.
+
+> **Automated Migration**: All `@field:handle` references, as well as `@auto` and `@null` sentinel values, are automatically migrated during the upgrade.
+
 ## X (Twitter) Social Sharing
 
 The X (Twitter) social sharing has been significantly simplified. Instead of maintaining separate Twitter-specific fields, the addon now uses a unified social image shared between Open Graph and Twitter, with only the card size remaining as a Twitter-specific setting.

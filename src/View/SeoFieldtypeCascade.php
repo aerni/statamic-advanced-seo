@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Context\Context;
 
-class SourceFieldtypeCascade extends BaseCascade
+class SeoFieldtypeCascade extends BaseCascade
 {
     public function __construct(Context $model)
     {

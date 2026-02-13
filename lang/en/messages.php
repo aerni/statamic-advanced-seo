@@ -31,16 +31,7 @@ return [
     'social_images_generator_generated' => 'The social images have been successfully generated.',
     'social_images_generator_on_demand' => 'The image will be generated the first time you visit the URL of this entry.',
 
-    'field_sources' => [
-        'auto' => 'Auto',
-        'default' => 'Default',
-        'custom' => 'Custom',
-    ],
-
-    'field_source_description' => [
-        'auto' => 'The value is inherited from the <code>:title (:handle)</code> field.',
-        'defaults' => 'The value is inherited from the <code>:title</code> defaults.',
-    ],
+    'reset_to_default' => 'Reset to default',
 
     'entry' => 'Entry',
     'entries' => 'Entries',
