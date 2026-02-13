@@ -12,10 +12,10 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Antlers;
-use Statamic\Fieldtypes\Code;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Code;
 
 class SeoFieldtype extends Fieldtype
 {

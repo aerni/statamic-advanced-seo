@@ -4,9 +4,9 @@ namespace Aerni\AdvancedSeo\UpdateScripts;
 
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
-use Illuminate\Support\Collection;
 use Statamic\UpdateScripts\UpdateScript;
 
 class MigrateSeoFields extends UpdateScript

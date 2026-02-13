@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Statamic\Fields\Fieldtype;
-use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Actions\ResolveBreadcrumbs;
+use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Fields\Fieldtype;
 
 class SearchPreviewFieldtype extends Fieldtype
 {

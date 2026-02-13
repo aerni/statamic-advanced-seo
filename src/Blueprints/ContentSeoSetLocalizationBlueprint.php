@@ -50,7 +50,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'listable' => 'hidden',
                         'character_limit' => 60,
-                        'default' => '{{ title }}'
+                        'default' => '{{ title }}',
                     ],
                 ],
                 [
