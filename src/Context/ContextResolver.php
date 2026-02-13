@@ -14,7 +14,6 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\TermBlueprintFound;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
@@ -31,21 +30,19 @@ class ContextResolver
             return $model;
         }
 
-        return Blink::once('advanced-seo::context::'.spl_object_id($model), function () use ($model) {
-            $resolver = new self;
+        $resolver = new self;
 
-            if (! $parent = $resolver->parent($model)) {
-                return null;
-            }
+        if (! $parent = $resolver->parent($model)) {
+            return null;
+        }
 
-            return new Context(
-                parent: $parent,
-                type: $resolver->type($parent),
-                handle: $resolver->handle($parent),
-                scope: $resolver->scope($model),
-                site: $resolver->site($model),
-            );
-        });
+        return new Context(
+            parent: $parent,
+            type: $resolver->type($parent),
+            handle: $resolver->handle($parent),
+            scope: $resolver->scope($model),
+            site: $resolver->site($model),
+        );
     }
 
     protected function parent(mixed $model): mixed
