@@ -50,9 +50,9 @@ class SocialImageThemeRegistry extends Registry
             return [];
         }
 
-        return array_map(
-            fn ($path) => new Theme($path),
-            File::directories($path)
-        );
+        return collect(File::directories($path))
+            ->filter(fn (string $directory) => File::files($directory) !== [])
+            ->mapInto(Theme::class)
+            ->all();
     }
 }
