@@ -178,6 +178,10 @@ Generated social images are now stored in `social_images/collection-{handle}/` a
 
 Existing generated images in the old directory structure will not be migrated automatically. They will be regenerated in the new location on the next save or frontend request. You may delete the orphaned images in the old directories manually.
 
+### Removed Social Image Preview Targets
+
+The social images generator no longer registers live preview targets for entries. Social image previews are now shown directly in the publish form via the new inline preview fieldtype, which provides a better editing experience with real-time theme switching.
+
 ### Unified Social Image Field
 
 The `seo_generated_og_image` field has been removed. The `seo_og_image` field now handles both generated and user-defined images automatically based on the `seo_generate_social_images` toggle state.
