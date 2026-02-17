@@ -13,6 +13,6 @@ class ThemeCollection extends Collection
 
     public function default(): ?Theme
     {
-        return $this->firstWhere('handle', 'default') ?? $this->first();
+        return $this->first();
     }
 }

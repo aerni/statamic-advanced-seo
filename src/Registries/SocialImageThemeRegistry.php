@@ -2,15 +2,11 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\SocialImages\Theme;
 use Aerni\AdvancedSeo\SocialImages\ThemeCollection;
-use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 
 class SocialImageThemeRegistry extends Registry
 {
@@ -22,24 +18,19 @@ class SocialImageThemeRegistry extends Registry
     }
 
     /**
-     * Get allowed themes for a SeoSet.
+     * Get allowed themes for a SeoSet, preserving the user-defined order.
      */
     public function allowedFor(SeoSet $seoSet): ThemeCollection
     {
-        return $this->all()
-            ->whereIn('handle', Arr::wrap($seoSet->config()->value('social_images_themes')))
+        $handles = Arr::wrap($seoSet->config()->value('social_images_themes'));
+        $order = array_flip($handles);
+
+        $themes = $this->all()
+            ->whereIn('handle', $handles)
+            ->sortBy(fn (Theme $theme) => $order[$theme->handle])
             ->values();
-    }
 
-    /**
-     * Resolve the effective theme for content.
-     */
-    public function resolveFor(Entry|Term $content): Theme
-    {
-        $allowedThemes = $this->allowedFor(Context::from($content)->seoSet());
-
-        return $allowedThemes->firstWhere('handle', Helpers::localizedContent($content)->seo_social_images_theme)
-            ?? $allowedThemes->default();
+        return $themes->isNotEmpty() ? $themes : $this->all();
     }
 
     protected function items(): array

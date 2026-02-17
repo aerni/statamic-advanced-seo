@@ -85,6 +85,7 @@ class SeoSetLocalizationController extends CpController
     {
         $fields = $blueprint
             ->fields()
+            ->setParent($localization)
             ->addValues($localization->values()->all())
             ->preProcess();
 

@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\SocialImages;
 
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
@@ -143,7 +142,7 @@ class SocialImageGenerator
     protected function templateUrl(): string
     {
         return $this->socialImage->url(
-            SocialImageTheme::resolveFor($this->content)->handle,
+            $this->content->seo_social_images_theme,
             $this->content->id(),
             $this->content->locale()
         );
@@ -170,7 +169,7 @@ class SocialImageGenerator
                 'updated_at',
                 'updated_by',
             ])->all(),
-            'theme' => SocialImageTheme::resolveFor($this->content)->handle,
+            'theme' => (string) $this->content->seo_social_images_theme,
         ]));
     }
 

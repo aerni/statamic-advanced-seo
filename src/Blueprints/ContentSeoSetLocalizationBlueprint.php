@@ -109,17 +109,9 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_social_images_theme',
                     'field' => [
-                        'type' => 'select',
+                        'type' => 'social_images_theme',
                         'display' => $this->trans('seo_social_images_theme.display'),
                         'instructions' => $this->trans('seo_social_images_theme.default_instructions'),
-                        'options' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->options(), []),
-                        'default' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->default()?->handle, null),
-                        'clearable' => false,
-                        'multiple' => false,
-                        'searchable' => false,
-                        'taggable' => false,
-                        'push_tags' => false,
-                        'cast_booleans' => false,
                         'localizable' => true,
                         'listable' => 'hidden',
                         'visibility' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),

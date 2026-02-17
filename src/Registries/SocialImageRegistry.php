@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\SocialImages\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
@@ -41,12 +40,11 @@ class SocialImageRegistry extends Registry
     public function previewTargets(Entry|Term $content): array
     {
         $content = Helpers::localizedContent($content);
-        $theme = SocialImageTheme::resolveFor($content)->handle;
 
         return [
             [
                 'label' => 'Social Image',
-                'format' => $this->openGraph()->url($theme, '{id}', $content->locale()),
+                'format' => $this->openGraph()->url($content->seo_social_images_theme, '{id}', $content->locale()),
             ],
         ];
     }
