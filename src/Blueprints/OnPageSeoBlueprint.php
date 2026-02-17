@@ -47,7 +47,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'display' => $this->trans('seo_title.display'),
                         'instructions' => $this->trans('seo_title.instructions'),
                         'localizable' => true,
-
                         'field' => [
                             'type' => 'text',
                             'character_limit' => 60,
@@ -62,7 +61,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_description.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-
                         'field' => [
                             'type' => 'textarea',
                             'character_limit' => 160,
@@ -181,7 +179,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'display' => $this->trans('seo_og_title.display'),
                         'instructions' => $this->trans('seo_og_title.instructions'),
                         'localizable' => true,
-
                         'field' => [
                             'type' => 'text',
                             'character_limit' => 70,
@@ -195,7 +192,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'display' => $this->trans('seo_og_description.display'),
                         'instructions' => $this->trans('seo_og_description.instructions'),
                         'localizable' => true,
-
                         'field' => [
                             'type' => 'textarea',
                             'character_limit' => 200,
