@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelScreenshot\Facades\Screenshot;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as Container;
 use Statamic\Contracts\Entries\Entry;
@@ -30,10 +31,11 @@ class SocialImageGenerator
         $this->ensureDirectoryExists();
         $this->deletePreviousImages();
 
-        Browsershot::url($this->templateUrl())
-            ->windowSize($this->socialImage->width(), $this->socialImage->height())
-            ->preventUnsuccessfulResponse()
-            ->waitUntilNetworkIdle()
+        Screenshot::url($this->templateUrl())
+            ->width($this->socialImage->width())
+            ->height($this->socialImage->height())
+            ->deviceScaleFactor(1)
+            ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
             ->save($this->absolutePath());
 
         $asset = $this->container->makeAsset($this->path());

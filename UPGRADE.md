@@ -131,6 +131,14 @@ If you're using the GraphQL API, see the [Computed Field Changes](#computed-fiel
 
 ## Social Images Generator
 
+### Screenshot Package
+
+The social images generator now uses [spatie/laravel-screenshot](https://spatie.be/docs/laravel-screenshot/v1/introduction). Browsershot remains the default driver, so no changes are needed for existing setups. You now also have the option to use Cloudflare Browser Rendering as an alternative driver. To configure the driver or customize other screenshot settings, publish the config and refer to the [documentation](https://spatie.be/docs/laravel-screenshot/v1/introduction):
+
+```
+php artisan vendor:publish --tag=laravel-screenshot-config
+```
+
 ### Per-Collection Settings
 
 The `social_images_generator_collections` field has been removed from the `site::social_media` defaults. The social images generator is now enabled per-collection using the `social_images_generator` toggle in the collection config.

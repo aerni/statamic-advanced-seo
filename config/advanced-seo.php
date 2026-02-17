@@ -91,8 +91,9 @@ return [
         | Social Images Generator
         |--------------------------------------------------------------------------
         |
-        | To use the social images generator, you need to install Puppeteer:
-        | https://spatie.be/docs/browsershot/v2/requirements
+        | Uses spatie/laravel-screenshot under the hood. It supports Browsershot
+        | and Cloudflare as screenshot drivers. Read the documentation for setup
+        | and configuration: https://spatie.be/docs/laravel-screenshot
         |
         */
 
