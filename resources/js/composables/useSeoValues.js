@@ -5,7 +5,7 @@ import { usePublishFields } from './usePublishFields.js';
  */
 function truncate(value, max) {
     return value?.length > max
-        ? value.substring(0, max - 4) + ' ...'
+        ? value.substring(0, max) + ' ...'
         : value;
 }
 
