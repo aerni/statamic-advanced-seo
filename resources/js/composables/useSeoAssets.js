@@ -1,12 +1,9 @@
 import { computed, getCurrentInstance, onUnmounted, ref, watch } from 'vue';
-import { injectPublishContext } from '@statamic/cms/ui';
+import { usePublishFields } from './usePublishFields.js';
 
-/**
- * Field handles for image fields that may contain asset IDs.
- */
-const IMAGE_HANDLES = [
-    'seo_og_image',
-];
+const OG_IMAGE_HANDLE = 'seo_og_image';
+const GENERATE_SOCIAL_IMAGES_HANDLE = 'seo_generate_social_images';
+const SOCIAL_IMAGES_THEME_HANDLE = 'seo_social_images_theme';
 
 /**
  * Composable for resolving SEO image assets from the publish form context.
@@ -18,7 +15,12 @@ const IMAGE_HANDLES = [
  */
 export function useSeoAssets() {
     const { $axios } = getCurrentInstance().appContext.config.globalProperties;
-    const publishContainer = injectPublishContext();
+    const {
+        publishContainer,
+        getFieldRawValue,
+        getFieldValue,
+        getFieldMeta,
+    } = usePublishFields();
 
     /**
      * Cache of loaded asset data keyed by asset ID.
@@ -27,18 +29,15 @@ export function useSeoAssets() {
     const assetCache = ref({});
 
     /**
-     * Get the raw value object from publishValues for a given field handle.
+     * Incremented on each PATCH response to cache-bust the social image template iframe.
      */
-    function getRawValue(handle) {
-        if (!publishContainer?.values?.value) return undefined;
-        return publishContainer.values.value[handle];
-    }
+    const cacheBustKey = ref(0);
 
     /**
      * Get the cascade default asset ID for a field from its meta.
      */
-    function getFallbackId(handle) {
-        const fallback = publishContainer?.meta?.value?.[handle]?.default;
+    function getFallbackAssetId(handle) {
+        const fallback = getFieldMeta(handle)?.defaultValue;
 
         return (Array.isArray(fallback) && fallback.length > 0 && typeof fallback[0] === 'string')
             ? fallback[0]
@@ -46,54 +45,32 @@ export function useSeoAssets() {
     }
 
     /**
-     * Extract an asset ID from a publish value.
+     * Extract an asset ID from an unwrapped field value.
      *
      * Statamic's assets fieldtype preProcess returns arrays of asset IDs
-     * in "container::path" format. For seo wrapped fields, the
-     * value is { source, value: ["container::path"] }.
+     * in "container::path" format.
      *
-     * @param {*} raw - The raw publish value
      * @returns {string|null}
      */
-    function extractAssetId(raw) {
-        if (!raw) return null;
-
-        // seo wrapped: { source, value: ["container::path"] }
-        if (typeof raw === 'object' && !Array.isArray(raw)) {
-            const ids = raw.value;
-
-            if (Array.isArray(ids) && ids.length > 0 && typeof ids[0] === 'string') {
-                return ids[0];
-            }
-
-            return null;
-        }
-
-        // Direct asset array: ["container::path"]
-        if (Array.isArray(raw) && raw.length > 0 && typeof raw[0] === 'string') {
-            return raw[0];
+    function extractAssetIdFromValue(value) {
+        if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
+            return value[0];
         }
 
         return null;
     }
 
     /**
-     * All asset IDs that need to be loaded, from both publish values and fallbacks.
+     * OG image asset IDs that need to be loaded from both publish values and fallbacks.
      */
-    const allAssetIds = computed(() => {
-        const ids = new Set();
+    const ogAssetIds = computed(() => {
+        const ogImageValue = getFieldValue(OG_IMAGE_HANDLE);
+        const ids = [
+            extractAssetIdFromValue(ogImageValue),
+            getFallbackAssetId(OG_IMAGE_HANDLE),
+        ].filter(Boolean);
 
-        for (const handle of IMAGE_HANDLES) {
-            const id = extractAssetId(getRawValue(handle));
-            if (id) ids.add(id);
-        }
-
-        for (const handle of IMAGE_HANDLES) {
-            const fallback = getFallbackId(handle);
-            if (fallback) ids.add(fallback);
-        }
-
-        return [...ids];
+        return [...new Set(ids)];
     });
 
     /**
@@ -124,113 +101,123 @@ export function useSeoAssets() {
     }
 
     // Watch for changes in asset IDs and load any missing ones.
-    watch(allAssetIds, (ids) => loadAssets(ids), { immediate: true });
+    watch(ogAssetIds, (ids) => loadAssets(ids), { immediate: true });
 
-    // Re-fetch cached assets when any asset is saved (e.g. focal point edits).
-    // The asset editor PATCHes to /cp/assets/... which we detect here.
+    /**
+     * Check if social image generation is enabled for this content.
+     * For seo-wrapped fields, raw.value already contains the resolved default
+     * (from PHP's childDefaultValue), so no meta lookup is needed.
+     */
+    function isGeneratorEnabled() {
+        return getFieldValue(GENERATE_SOCIAL_IMAGES_HANDLE) === true;
+    }
+
+    function isPatchResponse(response) {
+        return response.config.method === 'patch';
+    }
+
+    function shouldRefreshAssetCache(response) {
+        return response.config.url?.includes('/assets/');
+    }
+
+    function refreshAssetCache() {
+        assetCache.value = {};
+        loadAssets(ogAssetIds.value);
+    }
+
+    function bumpPreviewCacheBustKey() {
+        cacheBustKey.value++;
+    }
+
+    // Intercept responses to detect saves and asset edits.
     const interceptorId = $axios.interceptors.response.use((response) => {
-        if (response.config.method === 'patch' && response.config.url?.includes('/assets/')) {
-            assetCache.value = {};
-            loadAssets(allAssetIds.value);
+        if (!isPatchResponse(response)) {
+            return response;
         }
+
+        // Re-fetch cached assets when any asset is saved (e.g. focal point edits).
+        if (shouldRefreshAssetCache(response)) {
+            refreshAssetCache();
+        }
+
+        // Cache-bust the social image template iframe after patches.
+        bumpPreviewCacheBustKey();
 
         return response;
     });
 
-    onUnmounted(() => $axios.interceptors.response.eject(interceptorId));
+    onUnmounted(() => {
+        $axios.interceptors.response.eject(interceptorId);
+    });
 
     /**
      * Get a cached asset by its ID.
      */
     function getAsset(assetId) {
-        if (!assetId) return null;
-
         return assetCache.value[assetId] || null;
     }
 
     /**
-     * Convert a Statamic focus value (e.g. "70-30") to a CSS object-position value.
+     * Parse a Statamic focus value (e.g. "70-30-2") into focal point coordinates and zoom.
+     *
+     * @returns {{ x: number, y: number, z: number } | undefined}
      */
-    function focusToObjectPosition(asset) {
+    function parseFocalPoint(asset) {
         const focus = asset?.values?.focus;
 
         if (!focus || typeof focus !== 'string') return undefined;
 
-        const [x, y] = focus.split('-');
+        const [x, y, z] = focus.split('-');
 
-        return (x && y) ? `${x}% ${y}%` : undefined;
+        if (!x || !y) return undefined;
+
+        return {
+            x: parseFloat(x),
+            y: parseFloat(y),
+            z: parseFloat(z) || 1,
+        };
     }
 
-    /**
-     * Resolve an image from a seo wrapped asset field.
-     *
-     * @param {string} handle - The field handle
-     * @param {string|null} fallbackId - Asset ID from the cascade fallback
-     * @returns {{ url: string, objectPosition?: string } | null}
-     */
-    function resolveImage(handle, fallbackId = null) {
-        const id = extractAssetId(getRawValue(handle));
-        const asset = getAsset(id) || getAsset(fallbackId);
+    function resolveOgImage() {
+        if (isGeneratorEnabled()) return null;
+
+        const raw = getFieldRawValue(OG_IMAGE_HANDLE);
+        const assetId = extractAssetIdFromValue(getFieldValue(OG_IMAGE_HANDLE));
+        const fallbackId = getFallbackAssetId(OG_IMAGE_HANDLE);
+
+        // Don't fall back to cascade default when the user explicitly cleared the value.
+        const isCustom = raw && typeof raw === 'object' && !Array.isArray(raw) && raw.source === 'custom';
+        const asset = getAsset(assetId) || (isCustom ? null : getAsset(fallbackId));
 
         if (!asset?.url) return null;
 
         return {
             url: asset.url,
-            objectPosition: focusToObjectPosition(asset),
+            width: asset.width ?? null,
+            height: asset.height ?? null,
+            ...parseFocalPoint(asset),
         };
     }
 
     /**
-     * Check if social image generation is enabled.
-     * Reads from reactive publishValues so this will update when toggle changes.
+     * Resolve the social image template URL with cache-busting.
+     * Returns null when generation is disabled or there's no URL (new entries without an ID).
+     * Reactively swaps the theme segment when the user changes the theme dropdown.
      */
-    function isGenerationEnabled() {
-        const raw = getRawValue('seo_generate_social_images');
+    function resolveImageTemplateUrl() {
+        if (!isGeneratorEnabled()) return null;
 
-        // seo wrapped: { source, value }
-        if (typeof raw === 'object' && raw !== null && 'value' in raw) {
-            return raw.value === true || raw.value === 'true';
-        }
+        const urlTemplate = publishContainer.meta.value?.seo_social_preview?.imageTemplateUrl;
+        const theme = getFieldValue(SOCIAL_IMAGES_THEME_HANDLE);
 
-        return raw === true || raw === 'true';
-    }
+        if (!urlTemplate || !theme) return null;
 
-    /**
-     * Get the generated social image URL from the seo_generated_og_image field meta.
-     * Only returns URL if generation is enabled.
-     */
-    function getGeneratedImageUrl() {
-        if (!isGenerationEnabled()) {
-            return null;
-        }
-
-        return publishContainer?.meta?.value?.seo_generated_og_image?.image || null;
-    }
-
-    /**
-     * Get the resolved OG image reactively.
-     * Prioritizes generated image (when enabled) over manually uploaded image.
-     */
-    function resolveOgImage() {
-        const generatedUrl = getGeneratedImageUrl();
-
-        if (generatedUrl) {
-            return { url: generatedUrl };
-        }
-
-        return resolveImage('seo_og_image', getFallbackId('seo_og_image'));
-    }
-
-    /**
-     * Get the resolved Twitter image reactively.
-     * Uses OG image since twitter-specific image fields have been removed.
-     */
-    function resolveTwitterImage() {
-        return resolveOgImage();
+        return `${urlTemplate.replace('{theme}', theme)}?v=${cacheBustKey.value}`;
     }
 
     return {
         resolveOgImage,
-        resolveTwitterImage,
+        resolveImageTemplateUrl,
+        isGeneratorEnabled,
     };
 }

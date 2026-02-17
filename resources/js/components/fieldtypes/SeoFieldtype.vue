@@ -76,8 +76,8 @@ const showsOriginDefault = computed(() => {
     return !isCustom.value
         && !isTextBasedField.value
         && originDefaultValue.value != null
-        && originDefaultValue.value !== localDefaultValue.value
-        && props.value.value !== localDefaultValue.value;
+        && JSON.stringify(originDefaultValue.value) !== JSON.stringify(localDefaultValue.value)
+        && JSON.stringify(props.value.value) !== JSON.stringify(localDefaultValue.value);
 });
 
 const childValue = computed(() => {
@@ -107,12 +107,22 @@ function reset() {
     fieldtype.updateMeta({ ...props.meta, meta: localDefaultMeta.value });
 }
 
+// Code and asset fields may re-emit their value when receiving new props
+// (e.g. after reset). Ignore emissions that match the current default.
+function matchesDefault(value) {
+    if (isCustom.value) return false;
+
+    // CodeMirror normalizes null to '' — compare code content directly.
+    if (isCodeField.value) return (value.code ?? '') === (localDefaultValue.value?.code ?? '');
+
+    // Assets, selects, toggles — deep compare.
+    if (!isTextBasedField.value) return JSON.stringify(value) === JSON.stringify(localDefaultValue.value);
+
+    return false;
+}
+
 function updateFieldValue(value) {
-    // Code fields re-emit when receiving new prop content (e.g. after reset or initialization).
-    // localDefaultValue.code is null (from PHP preProcess), but CodeMirror re-emits as ''.
-    if (isCodeField.value && (value.code ?? '') === (localDefaultValue.value.code ?? '')) {
-        return;
-    }
+    if (matchesDefault(value)) return;
 
     fieldtype.update({ source: 'custom', value });
 }

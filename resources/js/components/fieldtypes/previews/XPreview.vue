@@ -1,23 +1,33 @@
 <script setup>
 import { computed } from 'vue';
+import { useSocialPreview } from '../../../composables/useSocialPreview.js';
+import PreviewIframe from './PreviewIframe.vue';
 import PreviewImage from './PreviewImage.vue';
 
-const props = defineProps({
-    meta: { type: Object, required: true },
-    seo: { type: Object, required: true },
-});
+const { meta, seo, imageTemplateUrl, image } = useSocialPreview();
 
-const title = computed(() => props.seo.resolve('seo_og_title'));
-const description = computed(() => props.seo.resolve('seo_og_description'));
-const image = computed(() => props.seo.resolveTwitterImage());
+const preset = computed(() => meta.imagePresets[`twitter_${meta.twitterCard}`]);
+
+const title = computed(() => seo.resolve('seo_og_title'));
+const description = computed(() => seo.resolve('seo_og_description'));
 </script>
 
 <template>
     <div class="w-full max-w-[515px]">
 
         <!-- Summary card: horizontal layout with small square image -->
-        <div v-if="props.meta.twitterCard === 'summary'" class="flex overflow-hidden border border-gray-200 bg-gray-50 dark:border-gray-700 rounded-xl dark:bg-gray-900">
-            <PreviewImage :image :width="144" :height="144" class="w-[130px]! shrink-0" />
+        <div v-if="meta.twitterCard === 'summary'" class="flex overflow-hidden border border-gray-200 bg-gray-50 dark:border-gray-700 rounded-xl dark:bg-gray-900">
+            <PreviewIframe v-if="imageTemplateUrl"
+                :src="imageTemplateUrl"
+                :preset="meta.imagePresets.open_graph"
+                :crop="preset"
+                class="w-[130px]! shrink-0"
+            />
+            <PreviewImage v-else
+                :image
+                :preset
+                class="w-[130px]! shrink-0"
+            />
             <div class="border-l border-gray-200 dark:border-gray-700" />
             <div class="flex flex-col justify-center w-full min-w-0 gap-1 p-3">
                 <div class="text-[15px] leading-5 text-gray-500">{{ meta.domain }}</div>
@@ -34,7 +44,15 @@ const image = computed(() => props.seo.resolveTwitterImage());
         <!-- Summary large image: image with title overlay -->
         <template v-else>
             <div class="relative overflow-hidden border border-gray-200 dark:border-gray-700 rounded-2xl">
-                <PreviewImage :image :width="1200" :height="630" />
+                <PreviewIframe v-if="imageTemplateUrl"
+                    :src="imageTemplateUrl"
+                    :preset="meta.imagePresets.open_graph"
+                    :crop="preset"
+                />
+                <PreviewImage v-else
+                    :image
+                    :preset
+                />
                 <div class="absolute flex items-center h-5 px-2 rounded left-3 bottom-3 bg-black/77" :class="title ? 'max-w-[calc(100%-24px)]' : 'w-48'">
                     <span v-if="title" class="text-[13px] text-white truncate">{{ title }}</span>
                 </div>

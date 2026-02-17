@@ -1,4 +1,4 @@
-import { injectPublishContext } from '@statamic/cms/ui';
+import { usePublishFields } from './usePublishFields.js';
 
 /**
  * Truncate a string to a maximum length, appending ' ...' if needed.
@@ -72,26 +72,11 @@ function toPlainText(value, fieldType) {
  * @returns {{ resolve: Function, truncate: Function }}
  */
 export function useSeoValues() {
-    const publishContainer = injectPublishContext();
-
-    const fields = Object.fromEntries(
-        Object.values(publishContainer.blueprint.value.tabs)
-            .flatMap(tab => tab.sections)
-            .flatMap(section => section.fields)
-            .map(field => [field.handle, field])
-    );
-
-    function getField(handle) {
-        return fields[handle];
-    }
-
-    function getFieldValue(handle) {
-        return publishContainer.values.value[handle];
-    }
-
-    function getFieldMeta(handle) {
-        return publishContainer.meta.value[handle];
-    }
+    const {
+        getField,
+        getFieldRawValue,
+        getFieldMeta,
+    } = usePublishFields();
 
     /**
      * Resolve a field value to plain text. If the field is a seo field,
@@ -105,7 +90,7 @@ export function useSeoValues() {
             return resolve(handle) ?? '';
         }
 
-        return toPlainText(getFieldValue(handle), field.type);
+        return toPlainText(getFieldRawValue(handle), field.type);
     }
 
     /**
@@ -133,7 +118,7 @@ export function useSeoValues() {
     }
 
     function resolve(handle) {
-        const value = getFieldValue(handle);
+        const value = getFieldRawValue(handle);
         const field = getField(handle);
 
         switch (value?.source) {

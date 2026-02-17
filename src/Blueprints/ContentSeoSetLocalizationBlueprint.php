@@ -103,6 +103,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'listable' => 'hidden',
                         'feature' => SocialImagesGenerator::class,
+                        'width' => 50,
                     ],
                 ],
                 [
@@ -123,6 +124,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'listable' => 'hidden',
                         'visibility' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),
                         'feature' => SocialImagesGenerator::class,
+                        'width' => 50,
                     ],
                 ],
                 [

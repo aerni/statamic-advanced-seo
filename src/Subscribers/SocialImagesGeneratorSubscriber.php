@@ -6,15 +6,14 @@ use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Aerni\AdvancedSeo\Jobs\DeleteSocialImagesJob;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Events\Dispatcher;
+use function Illuminate\Support\defer;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events;
 use Statamic\Events\Event;
-use Statamic\Facades\CP\Toast;
 use Statamic\Statamic;
 
 class SocialImagesGeneratorSubscriber
@@ -40,19 +39,7 @@ class SocialImagesGeneratorSubscriber
             return;
         }
 
-        // Delete the images so we can create a new one on the next request.
-        if (! config('advanced-seo.social_images.generator.generate_on_save', true)) {
-            DeleteSocialImagesJob::dispatch($content);
-
-            return;
-        }
-
-        // Show a toast message if we are using the queue.
-        if (config('queue.default') !== 'sync') {
-            Toast::info(__('advanced-seo::messages.social_images_generator_generating_queue'));
-        }
-
-        GenerateSocialImagesJob::dispatch($content);
+        defer(fn () => GenerateSocialImagesJob::dispatch($content));
     }
 
     public function addPreviewTargets(Event $event): void
@@ -85,7 +72,12 @@ class SocialImagesGeneratorSubscriber
         }
 
         // Only generate if the social images generator is turned on for this content.
-        return $content->seo_generate_social_images;
+        if (! $content->seo_generate_social_images) {
+            return false;
+        }
+
+        // Don't generate if the content hasn't changed since the last generation.
+        return SocialImage::openGraph()->for($content)->isDirty();
     }
 
     protected function shouldAddPreviewTargets(Entry|Term|null $content, Context $context): bool

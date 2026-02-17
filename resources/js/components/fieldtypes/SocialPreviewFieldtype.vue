@@ -1,7 +1,9 @@
 <script setup>
+import { computed, watchEffect } from 'vue';
 import { Fieldtype } from '@statamic/cms';
 import { useSeoValues } from '../../composables/useSeoValues.js';
 import { useSeoAssets } from '../../composables/useSeoAssets.js';
+import { provideSocialPreview } from '../../composables/useSocialPreview.js';
 import FacebookPreview from './previews/FacebookPreview.vue';
 import XPreview from './previews/XPreview.vue';
 
@@ -10,12 +12,31 @@ const props = defineProps(Fieldtype.props);
 const { expose } = Fieldtype.use(emit, props);
 defineExpose(expose);
 
-const seo = { ...useSeoValues(), ...useSeoAssets() };
+const seo = useSeoValues();
+const assets = useSeoAssets();
+
+const imageTemplateUrl = computed(() => assets.resolveImageTemplateUrl());
+const image = computed(() => assets.resolveOgImage());
+const instructions = computed(() => {
+    if (!assets.isGeneratorEnabled()) {
+        return null;
+    }
+
+    return imageTemplateUrl.value
+        ? 'The image updates on save.'
+        : 'The image generates on first save.';
+});
+
+provideSocialPreview({ meta: props.meta, seo, imageTemplateUrl, image });
+
+watchEffect(() => {
+    props.config.instructions = instructions.value;
+});
 </script>
 
 <template>
     <div class="flex flex-wrap items-start mt-4 gap-4 sm:gap-5!">
-        <FacebookPreview :meta :seo />
-        <XPreview :meta :seo />
+        <FacebookPreview />
+        <XPreview />
     </div>
 </template>

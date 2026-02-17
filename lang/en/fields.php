@@ -47,10 +47,6 @@ return [
         'default_instructions' => 'Choose the default social images theme for your :type.',
     ],
 
-    'seo_generated_og_image' => [
-        'display' => 'Generated Social Image',
-    ],
-
     'seo_og_image' => [
         'display' => 'Social Image',
         'instructions' => 'Add a social image for this :type. It will be cropped to :size.',

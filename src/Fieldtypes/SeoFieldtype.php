@@ -81,9 +81,20 @@ class SeoFieldtype extends Fieldtype
 
     protected function isSyncedToOrigin(): bool
     {
-        $parent = Helpers::localizedContent($this->field->parent());
+        $parent = $this->localizedParent();
 
-        return $parent->hasOrigin() && ! $parent->data()->has($this->field->handle());
+        return $parent?->hasOrigin() && ! $parent->data()->has($this->field->handle());
+    }
+
+    protected function localizedParent(): mixed
+    {
+        $parent = $this->field->parent();
+
+        if (! ($parent instanceof Entry || $parent instanceof Term)) {
+            return null;
+        }
+
+        return Helpers::localizedContent($parent);
     }
 
     public function process(mixed $data): mixed
@@ -149,7 +160,8 @@ class SeoFieldtype extends Fieldtype
 
     protected function childField(): Field
     {
-        return new Field(null, $this->config('field'));
+        return new Field(null, $this->config('field'))
+            ->setParent($this->field->parent());
     }
 
     protected function childFieldtype(): Fieldtype
@@ -182,7 +194,13 @@ class SeoFieldtype extends Fieldtype
      */
     protected function originDefaultValue(): mixed
     {
-        return $this->childDefaultValue(Helpers::localizedContent($this->field->parent())->origin());
+        $parent = $this->localizedParent();
+
+        if (! $parent?->hasOrigin()) {
+            return null;
+        }
+
+        return $this->childDefaultValue($parent->origin());
     }
 
     protected function isTextBasedField(): bool

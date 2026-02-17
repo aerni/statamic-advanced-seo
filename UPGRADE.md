@@ -119,16 +119,15 @@ If you've published or customized the `_twitter.antlers.html` snippet, update th
 | `seo:twitter_title` | `seo:og_title` |
 | `seo:twitter_description` | `seo:og_description` |
 | `seo:twitter_image` | `seo:og_image` |
-| `seo:twitter_image_preset` | `seo:og_image_preset` |
 | `seo:twitter_image:alt` | `seo:og_image:alt` |
 
 ### Social Images Generator
 
-If you're using the social images generator, see the [Removed Twitter Presets](#removed-twitter-presets) section for related changes.
+If you're using the social images generator, see the [Removed Twitter Image Generation](#removed-twitter-image-generation) section for related changes.
 
 ### GraphQL
 
-If you're using the GraphQL API, see the [Twitter Field Changes](#twitter-field-changes) section under GraphQL for related schema updates.
+If you're using the GraphQL API, see the [Computed Field Changes](#computed-field-changes) section under GraphQL for related schema updates.
 
 ## Social Images Generator
 
@@ -138,23 +137,46 @@ The `social_images_generator_collections` field has been removed from the `site:
 
 > **Automated Migration**: Your existing settings are automatically migrated to per-collection configuration.
 
-### Removed Twitter Presets
+### Removed `generate_on_save` Config Option
 
-The social images generator no longer generates separate Twitter images. Only the Open Graph image is generated, and it is shared with Twitter. The `twitter_summary` and `twitter_summary_large_image` presets have been removed from the config:
+The `generate_on_save` config option has been removed from the generator config:
 
 ```diff
-  'presets' => [
-      'open_graph' => ['width' => 1200, 'height' => 630],
--     'twitter_summary' => ['width' => 240, 'height' => 240],
--     'twitter_summary_large_image' => ['width' => 1200, 'height' => 600],
+  'generator' => [
+-     'generate_on_save' => true,
   ],
 ```
+
+You can safely remove this option from your published config file.
+
+Social image generation now works as follows:
+
+- **After saving**: Images are generated using Laravel's `defer()`, which runs after the response is sent (sync driver) or dispatches a queued job. Content hashing ensures images are only regenerated when content actually changes.
+- **On demand**: If a generated image is missing (e.g. accidentally deleted), it will be regenerated on-the-fly on the next frontend request.
+
+### Removed Twitter Image Generation
+
+The social images generator no longer generates separate Twitter images. Only the Open Graph image is generated. The `twitter_summary` and `twitter_summary_large_image` config presets are still used to resize the shared image for the Twitter meta tags via Glide, but no separate images are generated for them.
 
 If you have custom social images generator themes, you can remove the `twitter_summary.antlers.html` and `twitter_summary_large_image.antlers.html` templates — only `open_graph.antlers.html` is used.
 
 ### Template Changes
 
 The `$group` variable has been removed from the data passed to social images generator templates. If your templates reference this variable, you'll need to update them.
+
+### Image Storage Directory
+
+Generated social images are now stored in `social_images/collection-{handle}/` and `social_images/taxonomy-{handle}/` subdirectories instead of `social_images/{handle}/`. This change adds support for taxonomy terms and avoids collisions between collections and taxonomies with the same handle.
+
+Existing generated images in the old directory structure will not be migrated automatically. They will be regenerated in the new location on the next save or frontend request. You may delete the orphaned images in the old directories manually.
+
+### Unified Social Image Field
+
+The `seo_generated_og_image` field has been removed. The `seo_og_image` field now handles both generated and user-defined images automatically based on the `seo_generate_social_images` toggle state.
+
+When the toggle is enabled, `seo_og_image` returns the generated image. When disabled, it returns the user-defined image. This change simplifies the data model and eliminates the need to check multiple fields.
+
+**Custom Views:** If you published or customized views that reference `seo:generated_og_image`, update them to use `seo:og_image`.
 
 ## Sitemaps
 
@@ -276,15 +298,16 @@ The argument was defined on the query itself but affected the output of `compute
   }
 ```
 
-#### Twitter Field Changes
+#### Computed Field Changes
 
-The following fields have been removed from the `computed` type as Twitter now uses Open Graph values:
+The following fields have been removed from the `computed` type:
 
 | Removed Field | Use Instead |
 |---------------|-------------|
 | `twitter_title` | `og_title` |
-| `twitter_image` | `og_image` |
-| `twitter_image_preset` | `og_image_preset` |
+| `twitter_image` | Use raw data `og_image` field |
+| `og_image` | Use raw data `og_image` field |
+| `generated_og_image` | Use raw data `og_image` field |
 
 A new `twitter_card` field has been added to the `computed` type, returning the card size (`summary` or `summary_large_image`).
 

@@ -5,57 +5,33 @@ namespace Aerni\AdvancedSeo\Fieldtypes;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\GraphQL;
-use Statamic\Fields\Fieldtype;
-use Statamic\GraphQL\Types\AssetInterface;
+use Statamic\Fieldtypes\Assets\Assets;
 
-class SocialImageFieldtype extends Fieldtype
+class SocialImageFieldtype extends Assets
 {
+    protected static $handle = 'social_image';
+
+    protected $component = 'assets';
+
     protected $selectable = false;
 
-    public function preload(): ?array
-    {
-        $generator = $this->generator($this->field->parent());
-
-        $generateOnSaveMessage = config('queue.default') === 'sync'
-            ? trans('advanced-seo::messages.social_images_generator_save_sync')
-            : trans('advanced-seo::messages.social_images_generator_save_queue');
-
-        $message = config('advanced-seo.social_images.generator.generate_on_save', true)
-            ? $generateOnSaveMessage
-            : trans('advanced-seo::messages.social_images_generator_on_demand');
-
-        return [
-            'message' => $message,
-            'image' => $generator->asset()?->absoluteUrl(),
-        ];
-    }
-
-    public function augment($value): ?Asset
+    public function augment($value)
     {
         $parent = $this->field->parent();
 
-        if (! $parent->seo_generate_social_images) {
-            return null;
+        if (! ($parent instanceof Entry || $parent instanceof Term) || ! $parent->seo_generate_social_images) {
+            return parent::augment($value);
         }
 
         $generator = $this->generator($parent);
 
-        return $generator->asset() ?? $generator->generate()->asset();
+        return $generator->asset() ?? $generator->generate();
     }
 
     protected function generator(Entry|Term $content): SocialImageGenerator
     {
-        $content = Helpers::localizedContent($content);
-
-        return SocialImage::openGraph()->for($content);
-    }
-
-    public function toGqlType()
-    {
-        return GraphQL::type(AssetInterface::NAME);
+        return SocialImage::openGraph()->for(Helpers::localizedContent($content));
     }
 }

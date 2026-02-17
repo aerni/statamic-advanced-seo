@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\View\GraphQlCascade;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
-use Statamic\GraphQL\Types\AssetInterface;
 
 class ComputedMetaDataType extends Type
 {
@@ -28,11 +27,11 @@ class ComputedMetaDataType extends Type
                 'type' => GraphQl::string(),
                 'resolve' => $this->resolver(),
             ],
-            'og_image' => [
-                'type' => GraphQl::type(AssetInterface::NAME),
+            'og_image_preset' => [
+                'type' => GraphQl::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
-            'og_image_preset' => [
+            'twitter_image_preset' => [
                 'type' => GraphQl::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],

@@ -115,6 +115,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'default' => '@default',
                         'localizable' => true,
                         'feature' => SocialImagesGenerator::class,
+                        'width' => 50,
                         'field' => [
                             'type' => 'toggle',
                         ],
@@ -130,6 +131,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'visibility' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),
                         'feature' => SocialImagesGenerator::class,
+                        'width' => 50,
                         'if' => [
                             'seo_generate_social_images.value' => 'true',
                         ],
@@ -147,20 +149,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                     ],
                 ],
                 [
-                    'handle' => 'seo_generated_og_image',
-                    'field' => [
-                        'type' => 'social_image',
-                        'display' => $this->trans('seo_generated_og_image.display'),
-                        'image_type' => 'open_graph',
-                        'read_only' => true,
-                        'listable' => 'hidden',
-                        'feature' => SocialImagesGenerator::class,
-                        'if' => [
-                            'seo_generate_social_images.value' => 'true',
-                        ],
-                    ],
-                ],
-                [
                     'handle' => 'seo_og_image',
                     'field' => [
                         'type' => 'seo',
@@ -172,7 +160,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                             'seo_generate_social_images.value' => 'isnt true',
                         ],
                         'field' => [
-                            'type' => 'assets',
+                            'type' => 'social_image',
                             'container' => config('advanced-seo.social_images.container', 'assets'),
                             'folder' => 'social_images',
                             'max_files' => 1,

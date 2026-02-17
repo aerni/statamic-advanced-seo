@@ -3,7 +3,10 @@
 namespace Aerni\AdvancedSeo\SocialImages;
 
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as Container;
@@ -22,9 +25,10 @@ class SocialImageGenerator
         $this->container = AssetContainer::find(config('advanced-seo.social_images.container', 'assets'));
     }
 
-    public function generate(): self
+    public function generate(): Asset
     {
         $this->ensureDirectoryExists();
+        $this->deletePreviousImages();
 
         Browsershot::url($this->templateUrl())
             ->windowSize($this->socialImage->width(), $this->socialImage->height())
@@ -32,28 +36,61 @@ class SocialImageGenerator
             ->waitUntilNetworkIdle()
             ->save($this->absolutePath());
 
-        $this->container->makeAsset($this->path())->save();
+        $asset = $this->container->makeAsset($this->path());
 
-        return $this;
+        $asset->save();
+
+        $this->cacheContentHash();
+
+        return $asset;
     }
 
+    /**
+     * Find an existing generated image for this content.
+     */
     public function asset(): ?Asset
     {
-        return $this->container->asset($this->path());
+        return $this->assets()->first();
     }
 
-    public function delete(): void
+    /**
+     * Check if the image needs to be (re)generated.
+     */
+    public function isDirty(): bool
     {
-        $this->asset()?->delete();
+        return Cache::get($this->contentHashCacheKey()) !== $this->contentHash()
+            || ! $this->asset();
     }
 
-    protected function path(): string
+    /**
+     * A unique identifier for this content's generated images.
+     * Terms share the same ID across localizations, so we append the locale.
+     */
+    protected function id(): string
     {
+        $id = Str::replace('::', '_', $this->content->id());
+
+        if ($this->content instanceof Term) {
+            return "{$id}_{$this->content->locale()}";
+        }
+
+        return $id;
+    }
+
+    protected function directory(): string
+    {
+        $type = $this->content instanceof Entry ? 'collection' : 'taxonomy';
+
         $handle = $this->content instanceof Entry
             ? $this->content->collection()->handle()
             : $this->content->taxonomy()->handle();
 
-        return "social_images/{$handle}/{$this->filename()}";
+        return "social_images/{$type}-{$handle}";
+    }
+
+    protected function path(): string
+    {
+        return "{$this->directory()}/{$this->filename()}";
     }
 
     protected function absolutePath(?string $path = null): string
@@ -61,26 +98,37 @@ class SocialImageGenerator
         return $this->container->disk()->path($path ?? $this->path());
     }
 
+    /**
+     * Each generation produces a unique filename with a timestamp.
+     * This ensures a new asset ID each time, preventing browser/Glide cache issues.
+     */
     protected function filename(): string
     {
-        // Entries have unique IDs per localization, but terms share the same ID (taxonomy::slug)
-        // across localizations. Use slug + locale for terms to ensure unique filenames.
-        if ($this->content instanceof Term) {
-            return "{$this->content->slug()}_{$this->content->locale()}_open-graph.png";
-        }
+        $timestamp = once(fn () => now()->timestamp);
 
-        return "{$this->content->id()}_open-graph.png";
+        return "{$this->id()}_{$timestamp}.png";
     }
 
-    protected function templateUrl(): string
+    /**
+     * Find all existing generated images for this content.
+     *
+     * @return Collection<int, Asset>
+     */
+    protected function assets(): Collection
     {
-        // TODO: It would be nice if we could just do $this->entry->seo_social_images_theme
-        // and the theme field resolves itself. Maybe in the future with its own fieldtype.
-        return $this->socialImage->url(
-            SocialImageTheme::resolveFor($this->content)->handle,
-            $this->content->id(),
-            $this->content->locale()
-        );
+        $directory = pathinfo($this->path(), PATHINFO_DIRNAME);
+
+        return $this->container->queryAssets()
+            ->where('path', 'like', "{$directory}/{$this->id()}_%")
+            ->get();
+    }
+
+    /**
+     * Delete all previously generated images for this content.
+     */
+    protected function deletePreviousImages(): void
+    {
+        $this->assets()->each->delete();
     }
 
     protected function ensureDirectoryExists(): void
@@ -88,5 +136,44 @@ class SocialImageGenerator
         $directory = $this->absolutePath(pathinfo($this->path(), PATHINFO_DIRNAME));
 
         File::ensureDirectoryExists($directory);
+    }
+
+    protected function templateUrl(): string
+    {
+        return $this->socialImage->url(
+            SocialImageTheme::resolveFor($this->content)->handle,
+            $this->content->id(),
+            $this->content->locale()
+        );
+    }
+
+    /**
+     * Cache the current content hash so isDirty() returns false until the content changes.
+     */
+    protected function cacheContentHash(): void
+    {
+        Cache::forever($this->contentHashCacheKey(), $this->contentHash());
+    }
+
+    /**
+     * Hash the content values and theme.
+     * Excludes fields that change on every save but don't affect template output.
+     */
+    protected function contentHash(): string
+    {
+        return md5(json_encode([
+            'values' => $this->content->values()->except([
+                'seo_generate_social_images',
+                'seo_og_image',
+                'updated_at',
+                'updated_by',
+            ])->all(),
+            'theme' => SocialImageTheme::resolveFor($this->content)->handle,
+        ]));
+    }
+
+    protected function contentHashCacheKey(): string
+    {
+        return "advanced-seo.social-image.{$this->id()}";
     }
 }

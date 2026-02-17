@@ -21,6 +21,7 @@ beforeEach(function () {
     config(['advanced-seo.social_images.generator.enabled' => true]);
 
     File::ensureDirectoryExists(resource_path('views/social_images/default'));
+    File::put(resource_path('views/social_images/default/open_graph.antlers.html'), '');
 });
 
 afterEach(function () {

@@ -10,7 +10,6 @@ use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
 use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
@@ -43,10 +42,10 @@ class GraphQlCascade extends BaseCascade
         return collect([
             'site_name',
             'title',
-            'og_image',
             'og_image_preset',
             'og_title',
             'twitter_card',
+            'twitter_image_preset',
             'twitter_handle',
             'indexing',
             'locale',
@@ -88,13 +87,6 @@ class GraphQlCascade extends BaseCascade
         return $this->get('og_title') ?? $this->pageTitle() ?? $this->siteName();
     }
 
-    public function ogImage(): ?Asset
-    {
-        return $this->get('generate_social_images')
-            ? $this->get('generated_og_image') ?? $this->get('og_image')
-            : $this->get('og_image');
-    }
-
     public function ogImagePreset(): array
     {
         $openGraph = SocialImage::openGraph();
@@ -103,6 +95,11 @@ class GraphQlCascade extends BaseCascade
             'width' => $openGraph->width(),
             'height' => $openGraph->height(),
         ];
+    }
+
+    public function twitterImagePreset(): array
+    {
+        return config("advanced-seo.social_images.presets.twitter_{$this->get('twitter_card')}");
     }
 
     public function twitterHandle(): ?string

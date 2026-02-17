@@ -82,6 +82,8 @@ return [
 
         'presets' => [
             'open_graph' => ['width' => 1200, 'height' => 630],
+            'twitter_summary' => ['width' => 240, 'height' => 240],
+            'twitter_summary_large_image' => ['width' => 1200, 'height' => 630],
         ],
 
         /*
@@ -106,19 +108,6 @@ return [
             */
 
             'enabled' => false,
-
-            /*
-            |--------------------------------------------------------------------------
-            | Generate on Save
-            |--------------------------------------------------------------------------
-            |
-            | Generate the social images every time an entry is saved.
-            | Disable this to generate the image the first time an entry is
-            | viewed on the frontend instead.
-            |
-            */
-
-            'generate_on_save' => true,
 
             /*
             |--------------------------------------------------------------------------
