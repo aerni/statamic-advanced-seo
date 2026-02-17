@@ -19,7 +19,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
             'main' => [
                 $this->enabled(),
                 $this->origins(),
-                $this->features(),
+                $this->sitemaps(),
                 $this->socialAppearance(),
             ],
         ];
@@ -62,10 +62,10 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function features(): array
+    protected function sitemaps(): array
     {
         return [
-            'display' => __('Features'),
+            'display' => __('Sitemaps'),
             'fields' => [
                 [
                     'handle' => 'sitemap',
@@ -76,6 +76,29 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                         'default' => true,
                         'if' => ['enabled' => 'true'],
                         'feature' => Sitemap::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function socialAppearance(): array
+    {
+        return [
+            'display' => $this->trans('seo_section_social_appearance.display'),
+            'fields' => [
+                [
+                    'handle' => 'twitter_card',
+                    'field' => [
+                        'type' => 'button_group',
+                        'display' => $this->trans('twitter_card.display'),
+                        'instructions' => $this->trans('twitter_card.instructions'),
+                        'options' => [
+                            'summary_large_image' => $this->trans('twitter_card.summary_large_image'),
+                            'summary' => $this->trans('twitter_card.summary'),
+                        ],
+                        'default' => 'summary_large_image',
+                        'if' => ['enabled' => 'true'],
                     ],
                 ],
                 [
@@ -107,29 +130,6 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                             'social_images_generator' => 'true',
                         ],
                         'feature' => SocialImagesGenerator::class,
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function socialAppearance(): array
-    {
-        return [
-            'display' => $this->trans('seo_section_social_appearance.display'),
-            'fields' => [
-                [
-                    'handle' => 'twitter_card',
-                    'field' => [
-                        'type' => 'button_group',
-                        'display' => $this->trans('twitter_card.display'),
-                        'instructions' => $this->trans('twitter_card.instructions'),
-                        'options' => [
-                            'summary_large_image' => $this->trans('twitter_card.summary_large_image'),
-                            'summary' => $this->trans('twitter_card.summary'),
-                        ],
-                        'default' => 'summary_large_image',
-                        'if' => ['enabled' => 'true'],
                     ],
                 ],
             ],
