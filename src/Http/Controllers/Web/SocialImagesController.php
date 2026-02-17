@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Registries\SocialImageThemeRegistry;
-use Facades\Statamic\CP\LivePreview;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
@@ -26,7 +25,7 @@ class SocialImagesController extends Controller
         throw_unless(config('advanced-seo.social_images.generator.enabled', false), new NotFoundHttpException);
 
         // Throw if no data was found.
-        throw_unless($data = $this->data($id, $site), new NotFoundHttpException);
+        throw_unless($data = Data::find($id)?->in($site), new NotFoundHttpException);
 
         // Throw if the data is not an entry or term.
         throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException);
@@ -56,14 +55,5 @@ class SocialImagesController extends Controller
             ]);
 
         return response($view)->header('X-Robots-Tag', 'noindex, nofollow');
-    }
-
-    protected function data(string $id, string $site): Entry|LocalizedTerm|null
-    {
-        if (request()->statamicToken()) {
-            return LivePreview::item(request()->statamicToken());
-        }
-
-        return Data::find($id)?->in($site);
     }
 }

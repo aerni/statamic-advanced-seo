@@ -8,13 +8,14 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Events\Dispatcher;
-use function Illuminate\Support\defer;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events;
 use Statamic\Events\Event;
 use Statamic\Statamic;
+
+use function Illuminate\Support\defer;
 
 class SocialImagesGeneratorSubscriber
 {
@@ -25,8 +26,6 @@ class SocialImagesGeneratorSubscriber
         return [
             Events\EntrySaved::class => 'generateSocialImages',
             Events\LocalizedTermSaved::class => 'generateSocialImages',
-            Events\EntryBlueprintFound::class => 'addPreviewTargets',
-            Events\TermBlueprintFound::class => 'addPreviewTargets',
         ];
     }
 
@@ -40,18 +39,6 @@ class SocialImagesGeneratorSubscriber
         }
 
         defer(fn () => GenerateSocialImagesJob::dispatch($content));
-    }
-
-    public function addPreviewTargets(Event $event): void
-    {
-        $content = $this->getProperty($event);
-        $context = $this->resolveEventContext($event);
-
-        if (! $this->shouldAddPreviewTargets($content, $context)) {
-            return;
-        }
-
-        $context->parent->addPreviewTargets(SocialImage::previewTargets($content));
     }
 
     protected function shouldGenerateSocialImages(Entry|Term $content, Context $context): bool
@@ -78,21 +65,5 @@ class SocialImagesGeneratorSubscriber
 
         // Don't generate if the content hasn't changed since the last generation.
         return SocialImage::openGraph()->for($content)->isDirty();
-    }
-
-    protected function shouldAddPreviewTargets(Entry|Term|null $content, Context $context): bool
-    {
-        // Only add preview targets in the CP.
-        if (! Statamic::isCpRoute()) {
-            return false;
-        }
-
-        // Only add preview targets when editing existing content.
-        if (! $content?->id()) {
-            return false;
-        }
-
-        // Only add preview targets when the generator is enabled.
-        return SocialImagesGenerator::enabled($context);
     }
 }

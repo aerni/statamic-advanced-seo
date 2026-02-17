@@ -34,21 +34,6 @@ class SocialImageRegistry extends Registry
         ]);
     }
 
-    /**
-     * Get preview targets for content.
-     */
-    public function previewTargets(Entry|Term $content): array
-    {
-        $content = Helpers::localizedContent($content);
-
-        return [
-            [
-                'label' => 'Social Image',
-                'format' => $this->openGraph()->url($content->seo_social_images_theme, '{id}', $content->locale()),
-            ],
-        ];
-    }
-
     protected function items(): array
     {
         return [
