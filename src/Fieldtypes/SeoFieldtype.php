@@ -155,7 +155,22 @@ class SeoFieldtype extends Fieldtype
 
     public function toGqlType(): mixed
     {
-        return $this->childFieldtype()->toGqlType();
+        $type = $this->childFieldtype()->toGqlType();
+
+        // Child fieldtype resolvers (e.g. select, dictionary) call $item->resolveGqlValue()
+        // expecting an Entry or similar parent. The SeoFieldtype wrapper is consumed by types
+        // like RawMetaDataType where the parent is an AugmentedCollection which doesn't have
+        // that method. Each consuming type provides its own resolver, so we strip the child's.
+        if (is_array($type)) {
+            unset($type['resolve']);
+        }
+
+        return $type;
+    }
+
+    public function addGqlTypes(): void
+    {
+        $this->childFieldtype()->addGqlTypes();
     }
 
     protected function childField(): Field
