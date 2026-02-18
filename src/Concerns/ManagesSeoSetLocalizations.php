@@ -48,6 +48,23 @@ trait ManagesSeoSetLocalizations
     }
 
     /**
+     * When the sitemap is disabled in the config,
+     * remove the per-entry/term sitemap values.
+     */
+    protected function cleanupSitemapValues(SeoSetConfig $config): void
+    {
+        if ($config->value('sitemap')) {
+            return;
+        }
+
+        RemoveSeoValues::handle($config->seoSet()->parent(), [
+            'seo_sitemap_enabled',
+            'seo_sitemap_priority',
+            'seo_sitemap_change_frequency',
+        ]);
+    }
+
+    /**
      * When the social images generator is disabled in the config,
      * remove the per-entry/term toggle and theme values.
      */

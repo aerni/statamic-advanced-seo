@@ -16,6 +16,7 @@ class HandleSeoSetConfigSaved
         if ($seoSet->enabled()) {
             $this->saveExistingLocalizations($seoSet);
             $this->cleanupOrphanedLocalizations($seoSet);
+            $this->cleanupSitemapValues($event->config);
             $this->cleanupSocialImageGeneratorValues($event->config);
         } else {
             $this->deleteLocalizations($seoSet);
