@@ -34,36 +34,41 @@ class SocialImagesGeneratorSubscriber
         $content = $this->getProperty($event);
         $context = $this->resolveEventContext($event);
 
-        if (! $this->shouldGenerateSocialImages($content, $context)) {
+        if (! $this->shouldHandleSocialImages($content, $context)) {
             return;
         }
 
-        defer(fn () => GenerateSocialImagesJob::dispatch($content));
+        $generator = SocialImage::openGraph()->for($content);
+
+        // Generate and persist the social image if it's dirty.
+        if ($generator->isDirty()) {
+            defer(fn () => GenerateSocialImagesJob::dispatch($content));
+            return;
+        }
+
+        // Ensure the existing asset is persisted.
+        $content->set('seo_og_image', $generator->asset()->path());
+        $content->saveQuietly();
     }
 
-    protected function shouldGenerateSocialImages(Entry|Term $content, Context $context): bool
+    protected function shouldHandleSocialImages(Entry|Term $content, Context $context): bool
     {
-        // Don't generate if the social images generator feature is disabled.
+        // Don't handle if the social images generator feature is disabled.
         if (! SocialImagesGenerator::enabled($context)) {
             return false;
         }
 
-        // Don't generate if the content is saved when first localizing.
+        // Don't handle if the content is saved when first localizing.
         if (Statamic::isCpRoute() && Str::contains(request()->path(), 'localize')) {
             return false;
         }
 
-        // Don't generate if the content is saved when an action is performed on the listing view.
+        // Don't handle if the content is saved when an action is performed on the listing view.
         if (Statamic::isCpRoute() && Str::contains(request()->path(), 'actions')) {
             return false;
         }
 
-        // Only generate if the social images generator is turned on for this content.
-        if (! $content->seo_generate_social_images) {
-            return false;
-        }
-
-        // Don't generate if the content hasn't changed since the last generation.
-        return SocialImage::openGraph()->for($content)->isDirty();
+        // Only handle if the social images generator is turned on for this content.
+        return $content->seo_generate_social_images;
     }
 }

@@ -23,8 +23,11 @@ class GenerateSocialImagesJob implements ShouldQueue
 
     public function handle(): void
     {
-        SocialImage::openGraph()
+        $asset = SocialImage::openGraph()
             ->for($this->content)
             ->generate();
+
+        $this->content->set('seo_og_image', $asset->path());
+        $this->content->saveQuietly();
     }
 }
