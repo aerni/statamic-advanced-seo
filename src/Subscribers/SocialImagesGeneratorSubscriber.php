@@ -48,6 +48,7 @@ class SocialImagesGeneratorSubscriber
         // Generate and persist the social image if it's dirty.
         if ($generator->isDirty()) {
             defer(fn () => GenerateSocialImagesJob::dispatch($content));
+
             return;
         }
 
