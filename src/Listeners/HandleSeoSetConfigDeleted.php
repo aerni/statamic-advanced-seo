@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Listeners;
 
+use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Concerns\ManagesSeoSetLocalizations;
 use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
 
@@ -14,6 +15,6 @@ class HandleSeoSetConfigDeleted
         $seoSet = $event->config->seoSet();
 
         $this->deleteLocalizations($seoSet);
-        $this->cleanupSeoValues($seoSet);
+        RemoveSeoValues::handle($seoSet->parent());
     }
 }
