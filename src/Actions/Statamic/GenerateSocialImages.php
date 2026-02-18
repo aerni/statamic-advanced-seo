@@ -10,6 +10,8 @@ use Statamic\Contracts\Entries\Entry;
 
 class GenerateSocialImages extends Action
 {
+    protected string $icon = 'assets';
+
     /**
      * Determine if the current thing is an entry and if it's opted in to the auto generation config (global).
      *
@@ -37,10 +39,6 @@ class GenerateSocialImages extends Action
      */
     public function run($items, $values)
     {
-        $items->each(fn ($item) => GenerateSocialImagesJob::dispatch($item));
-
-        return config('queue.default') === 'sync'
-            ? __('advanced-seo::messages.social_images_generator_generated')
-            : __('advanced-seo::messages.social_images_generator_generating_queue');
+        $items->each(fn ($item) => defer(fn () => GenerateSocialImagesJob::dispatch($item)));
     }
 }
