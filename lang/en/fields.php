@@ -49,8 +49,8 @@ return [
 
     'seo_og_image' => [
         'display' => 'Social Image',
-        'instructions' => 'Add a social image for this :type. It will be cropped to :size.',
-        'default_instructions' => 'Add a default social image for your :type. It will be cropped to :size.',
+        'instructions' => 'The recommended size is 1200x630px. The image is automatically resized as needed.',
+        'default_instructions' => 'Add a default social image for your :type. The image is automatically resized for each platform. Recommended size is 1200x630px.',
     ],
 
     'seo_og_title' => [
@@ -327,7 +327,7 @@ return [
 
     'og_image' => [
         'display' => 'Social Image',
-        'instructions' => 'This image will be used as a fallback if none was set on the content. It will be cropped to :size.',
+        'instructions' => 'This image will be used as a fallback if none was set on the content. The recommended size is 1200x630px. The image is automatically resized as needed.',
     ],
 
     'twitter_card' => [

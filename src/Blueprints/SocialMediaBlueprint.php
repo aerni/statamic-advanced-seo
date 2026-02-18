@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
-use Aerni\AdvancedSeo\Facades\SocialImage;
 
 class SocialMediaBlueprint extends BaseBlueprint
 {
@@ -34,7 +33,7 @@ class SocialMediaBlueprint extends BaseBlueprint
                     'handle' => 'og_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('og_image.display'),
-                        'instructions' => $this->trans('og_image.instructions', ['size' => SocialImage::openGraph()->sizeString()]),
+                        'instructions' => $this->trans('og_image.instructions'),
                         'validate' => [
                             'image',
                             'mimes:jpg,png',

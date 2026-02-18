@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
@@ -118,7 +117,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                     'handle' => 'seo_og_image',
                     'field' => $this->getAssetFieldConfig([
                         'display' => $this->trans('seo_og_image.display'),
-                        'instructions' => $this->trans('seo_og_image.default_instructions', ['size' => SocialImage::openGraph()->sizeString()]),
+                        'instructions' => $this->trans('seo_og_image.default_instructions'),
                         'validate' => [
                             'image',
                             'mimes:jpg,png',

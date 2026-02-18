@@ -27,11 +27,6 @@ class SocialImage
         return config("advanced-seo.social_images.presets.{$this->type}.height");
     }
 
-    public function sizeString(): string
-    {
-        return "{$this->width()} x {$this->height()} pixels";
-    }
-
     public function url(string $theme, string $id, string $site): string
     {
         return url("/!/advanced-seo/social-images/{$theme}/{$this->type}/{$id}/{$site}");

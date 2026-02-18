@@ -4,7 +4,6 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
@@ -135,7 +134,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                     'field' => [
                         'type' => 'seo',
                         'display' => $this->trans('seo_og_image.display'),
-                        'instructions' => $this->trans('seo_og_image.instructions', ['size' => SocialImage::openGraph()->sizeString()]),
+                        'instructions' => $this->trans('seo_og_image.instructions'),
                         'default' => '@default',
                         'localizable' => true,
                         'if' => [
