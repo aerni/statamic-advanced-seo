@@ -31,6 +31,11 @@ class SocialImagesGeneratorSubscriber
 
     public function generateSocialImages(Event $event): void
     {
+        // Only handle the initially saved localization, not cascaded descendants. Only for EntrySaved.
+        if (method_exists($event, 'isInitial') && ! $event->isInitial()) {
+            return;
+        }
+
         $content = $this->getProperty($event);
         $context = $this->resolveEventContext($event);
 
