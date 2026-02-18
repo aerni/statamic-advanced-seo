@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Actions\Statamic;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
+use Illuminate\Support\Facades\Gate;
 use Statamic\Actions\Action;
 use Statamic\Contracts\Entries\Entry;
 
@@ -29,7 +30,8 @@ class GenerateSocialImages extends Action
      */
     public function authorize($user, $item)
     {
-        return $user->can('edit', $item);
+        return Gate::allows('seo.edit-content')
+            && $user->can('edit', $item);
     }
 
     /**
