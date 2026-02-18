@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 
@@ -44,5 +45,21 @@ trait ManagesSeoSetLocalizations
     protected function cleanupSeoValues(SeoSet $seoSet): void
     {
         RemoveSeoValues::handle($seoSet->parent());
+    }
+
+    /**
+     * When the social images generator is disabled in the config,
+     * remove the per-entry/term toggle and theme values.
+     */
+    protected function cleanupSocialImageGeneratorValues(SeoSetConfig $config): void
+    {
+        if ($config->value('social_images_generator')) {
+            return;
+        }
+
+        RemoveSeoValues::handle($config->seoSet()->parent(), [
+            'seo_generate_social_images',
+            'seo_social_images_theme',
+        ]);
     }
 }
