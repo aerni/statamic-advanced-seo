@@ -25,7 +25,7 @@ class RemoveSeoValues
             ->filter(fn (Entry $entry) => $entry->data()->contains(fn ($value, $key) => str($key)->startsWith('seo_')))
             ->each(function (Entry $entry) {
                 $dataWithoutSeo = $entry->data()->filter(fn ($value, $key) => ! str($key)->startsWith('seo_'));
-                $entry->data($dataWithoutSeo)->save();
+                $entry->data($dataWithoutSeo)->saveQuietly();
             });
     }
 
@@ -41,7 +41,7 @@ class RemoveSeoValues
                     $localization->data($dataWithoutSeo);
                 });
 
-                $term->save();
+                $term->saveQuietly();
             });
     }
 }
