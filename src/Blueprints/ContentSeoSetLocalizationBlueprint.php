@@ -93,6 +93,39 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
             'collapsible' => true,
             'fields' => [
                 [
+                    'handle' => 'seo_og_title',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('seo_og_title.display'),
+                        'instructions' => $this->trans('seo_og_title.default_instructions'),
+                        'default' => '{{ seo_title }}',
+                        'localizable' => true,
+                        'character_limit' => 70,
+                    ],
+                ],
+                [
+                    'handle' => 'seo_og_description',
+                    'field' => [
+                        'type' => 'textarea',
+                        'display' => $this->trans('seo_og_description.display'),
+                        'instructions' => $this->trans('seo_og_description.default_instructions'),
+                        'default' => '{{ seo_description }}',
+                        'localizable' => true,
+                        'character_limit' => 200,
+                    ],
+                ],
+                [
+                    'handle' => 'seo_og_image',
+                    'field' => $this->getAssetFieldConfig([
+                        'display' => $this->trans('seo_og_image.display'),
+                        'instructions' => $this->trans('seo_og_image.default_instructions', ['size' => SocialImage::openGraph()->sizeString()]),
+                        'validate' => [
+                            'image',
+                            'mimes:jpg,png',
+                        ],
+                    ]),
+                ],
+                [
                     'handle' => 'seo_generate_social_images',
                     'field' => [
                         'type' => 'toggle',
@@ -117,39 +150,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'visibility' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),
                         'feature' => SocialImagesGenerator::class,
                         'width' => 50,
-                    ],
-                ],
-                [
-                    'handle' => 'seo_og_image',
-                    'field' => $this->getAssetFieldConfig([
-                        'display' => $this->trans('seo_og_image.display'),
-                        'instructions' => $this->trans('seo_og_image.default_instructions', ['size' => SocialImage::openGraph()->sizeString()]),
-                        'validate' => [
-                            'image',
-                            'mimes:jpg,png',
-                        ],
-                    ]),
-                ],
-                [
-                    'handle' => 'seo_og_title',
-                    'field' => [
-                        'type' => 'text',
-                        'display' => $this->trans('seo_og_title.display'),
-                        'instructions' => $this->trans('seo_og_title.default_instructions'),
-                        'default' => '{{ seo_title }}',
-                        'localizable' => true,
-                        'character_limit' => 70,
-                    ],
-                ],
-                [
-                    'handle' => 'seo_og_description',
-                    'field' => [
-                        'type' => 'textarea',
-                        'display' => $this->trans('seo_og_description.display'),
-                        'instructions' => $this->trans('seo_og_description.default_instructions'),
-                        'default' => '{{ seo_description }}',
-                        'localizable' => true,
-                        'character_limit' => 200,
                     ],
                 ],
             ],
