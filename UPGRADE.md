@@ -4,7 +4,7 @@ v3 introduces a significant internal refactor that improves the architecture and
 
 ## Requirements
 
-- PHP 8.3+
+- PHP 8.4+
 - Laravel 12+
 - Statamic 6+
 
