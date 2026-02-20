@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\UpdateScripts\MigrateSeoFields;
+use Aerni\AdvancedSeo\UpdateScripts\V3\MigrateSeoFields;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -23,7 +23,7 @@ beforeEach(function () {
 
 function runMigrateSeoFieldsScript(): void
 {
-    (new MigrateSeoFields('aerni/advanced-seo'))->update();
+    (new MigrateSeoFields)->run();
 }
 
 it('migrates @auto values to @default', function () {
@@ -204,8 +204,8 @@ it('migrates twitter card value from default site localization to config', funct
     expect($seo->config()->get('twitter_card'))->toBe('summary');
 });
 
-it('removes twitter image fields from site social media defaults', function () {
-    Seo::find('site::social_media')
+it('removes twitter image fields from site defaults', function () {
+    Seo::find('site::defaults')
         ->inDefaultSite()
         ->data([
             'twitter_summary_image' => 'social_images/twitter.jpg',
@@ -215,7 +215,7 @@ it('removes twitter image fields from site social media defaults', function () {
 
     runMigrateSeoFieldsScript();
 
-    $localization = Seo::find('site::social_media')->inDefaultSite();
+    $localization = Seo::find('site::defaults')->inDefaultSite();
 
     expect($localization->has('twitter_summary_image'))->toBeFalse();
     expect($localization->has('twitter_summary_large_image'))->toBeFalse();

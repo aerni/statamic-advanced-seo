@@ -20,10 +20,10 @@ class SocialPreviewFieldtype extends Fieldtype
     {
         $parent = $this->field()->parent();
         $context = Context::from($parent);
-        $general = Seo::find('site::general')->in($context->site);
+        $defaults = Seo::find('site::defaults')->in($context->site);
 
         return [
-            'domain' => parse_url($general->site()->absoluteUrl(), PHP_URL_HOST),
+            'domain' => parse_url($defaults->site()->absoluteUrl(), PHP_URL_HOST),
             'imagePresets' => config('advanced-seo.social_images.presets'),
             'twitterCard' => $context->seoSet()->config()->value('twitter_card'),
             'imageTemplateUrl' => $this->imageTemplateUrl($parent),

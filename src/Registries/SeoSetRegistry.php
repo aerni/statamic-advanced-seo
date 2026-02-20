@@ -54,20 +54,20 @@ class SeoSetRegistry extends Registry
 
     protected function siteSeoSets(): Collection
     {
-        return collect($this->siteSeoSetsDefinition())
-            ->filter(fn ($config) => $config['enabled'])
-            ->map(fn ($site) => new \Aerni\AdvancedSeo\Data\SeoSet(
+        return collect([
+            new SeoSet(
                 type: 'site',
-                handle: $site['handle'],
-                title: $site['title'],
-                icon: $site['icon'],
-            ));
+                handle: 'defaults',
+                title: __('advanced-seo::messages.site_defaults'),
+                icon: 'utilities',
+            ),
+        ]);
     }
 
     protected function collectionSeoSets(): Collection
     {
         return Collections::all()
-            ->map(fn ($collection) => new \Aerni\AdvancedSeo\Data\SeoSet(
+            ->map(fn ($collection) => new SeoSet(
                 type: 'collections',
                 handle: $collection->handle(),
                 title: $collection->title(),
@@ -79,51 +79,12 @@ class SeoSetRegistry extends Registry
     protected function taxonomySeoSets(): Collection
     {
         return Taxonomy::all()
-            ->map(fn ($taxonomy) => new \Aerni\AdvancedSeo\Data\SeoSet(
+            ->map(fn ($taxonomy) => new SeoSet(
                 type: 'taxonomies',
                 handle: $taxonomy->handle(),
                 title: $taxonomy->title(),
                 icon: 'tags',
             ))
             ->sortBy(fn (SeoSet $set) => $set->handle());
-    }
-
-    protected function siteSeoSetsDefinition(): array
-    {
-        return [
-            [
-                'handle' => 'general',
-                'title' => 'General',
-                'icon' => 'utilities',
-                'enabled' => true,
-            ],
-            [
-                'handle' => 'indexing',
-                'title' => 'Indexing',
-                'icon' => 'hierarchy',
-                'enabled' => true,
-            ],
-            [
-                'handle' => 'social_media',
-                'title' => 'Social Media',
-                'icon' => 'assets',
-                'enabled' => true,
-            ],
-            [
-                'handle' => 'analytics',
-                'title' => 'Analytics',
-                'icon' => 'money-graph-bar-increase',
-                'enabled' => collect(config('advanced-seo.analytics'))
-                    ->only('fathom', 'cloudflare_analytics', 'google_tag_manager')
-                    ->filter()
-                    ->isNotEmpty(),
-            ],
-            [
-                'handle' => 'favicons',
-                'title' => 'Favicons',
-                'icon' => 'edit-paint-palette',
-                'enabled' => config('advanced-seo.favicons.enabled', true),
-            ],
-        ];
     }
 }

@@ -22,24 +22,37 @@ The permission system has been simplified. Old granular permissions have been re
 
 ## Single-Site Data Structure
 
-Single-site installations now use the same data structure as multi-site, with config and localization data stored separately.
+Single-site installations now use the same data structure as multi-site. Config and localization data are stored separately:
 
-For file-based installations, SEO data that was previously stored inline in config files is now stored in separate localization files within a site-specific directory:
-
-**Before:**
-```
-content/seo/collections/pages.yaml  # contained both config and data
+```diff
+  content/seo/collections/pages.yaml
++ content/seo/collections/{site}/pages.yaml
 ```
 
-**After:**
-```
-content/seo/collections/pages.yaml           # config only
-content/seo/collections/{site}/pages.yaml    # localization data
+> **Automated Migration**: Your existing data is automatically migrated to the new structure, whether you use file-based storage or the Eloquent driver.
+
+## Site SEO Sets
+
+The five separate site SEO sets (`site::general`, `site::indexing`, `site::social_media`, `site::analytics`, `site::favicons`) have been consolidated into a single `site::defaults` set. The separation previously existed only for UI grouping — tabs now provide that organization within a single publish form.
+
+For file-based installations, the file structure has changed:
+
+```diff
+- content/seo/site/general.yaml
+- content/seo/site/indexing.yaml
+- content/seo/site/social_media.yaml
+- content/seo/site/analytics.yaml
+- content/seo/site/favicons.yaml
+- content/seo/site/{site}/general.yaml
+- content/seo/site/{site}/indexing.yaml
+- content/seo/site/{site}/social_media.yaml
+- content/seo/site/{site}/analytics.yaml
+- content/seo/site/{site}/favicons.yaml
++ content/seo/site/defaults.yaml
++ content/seo/site/{site}/defaults.yaml
 ```
 
-If you use the Eloquent driver, this is handled by the database migration.
-
-> **Automated Migration**: Your existing data is automatically migrated to the new structure.
+> **Automated Migration**: Your existing config and localization data is automatically merged into the single `site::defaults` set.
 
 ## Disabled Collections & Taxonomies Config
 
@@ -141,7 +154,7 @@ php artisan vendor:publish --tag=laravel-screenshot-config
 
 ### Per-Collection Settings
 
-The `social_images_generator_collections` field has been removed from the `site::social_media` defaults. The social images generator is now enabled per-collection using the `social_images_generator` toggle in the collection config.
+The `social_images_generator_collections` field has been removed from the site defaults. The social images generator is now enabled per-collection using the `social_images_generator` toggle in the collection config.
 
 > **Automated Migration**: Your existing settings are automatically migrated to per-collection configuration.
 
@@ -194,7 +207,7 @@ When the toggle is enabled, `seo_og_image` returns the generated image. When dis
 
 ### Per-Collection/Taxonomy Settings
 
-The `excluded_collections` and `excluded_taxonomies` fields have been removed from the `site::indexing` defaults. The sitemap is now enabled per-collection/taxonomy using the `sitemap` toggle in the collection/taxonomy config.
+The `excluded_collections` and `excluded_taxonomies` fields have been removed from the site defaults. The sitemap is now enabled per-collection/taxonomy using the `sitemap` toggle in the collection/taxonomy config.
 
 > **Automated Migration**: Your existing settings are automatically migrated to per-collection/taxonomy configuration.
 
@@ -214,14 +227,9 @@ Each domain now gets its own sitemap index, and its sitemaps only contain URLs f
 
 Due to domain scoping, the API for registering custom sitemaps has changed. Instead of using `Sitemap::register()` which implicitly routed sitemaps based on their site, you now explicitly add sitemaps to a specific site's index:
 
-**Before:**
-```php
-Sitemap::register($sitemap);
-```
-
-**After:**
-```php
-Sitemap::index('english')->add($sitemap);
+```diff
+- Sitemap::register($sitemap);
++ Sitemap::index('english')->add($sitemap);
 ```
 
 ## Events
@@ -255,38 +263,52 @@ All type names have been updated to use "Set" instead of "Defaults":
 | Old Type Name | New Type Name |
 |---------------|---------------|
 | `siteDefaults` | `siteSet` |
-| `analyticsDefaults` | `analyticsSiteSet` |
-| `faviconsDefaults` | `faviconsSiteSet` |
-| `generalDefaults` | `generalSiteSet` |
-| `indexingDefaults` | `indexingSiteSet` |
-| `socialMediaDefaults` | `socialMediaSiteSet` |
 | `contentDefaults` | `collectionSet` / `taxonomySet` |
 
-#### Removed Fields
+#### Flattened Site Set Structure
 
-The following fields have been removed as they are now configured per collection/taxonomy:
+The `siteDefaults` type previously contained nested sub-types (`general`, `indexing`, `socialMedia`, `analytics`, `favicons`). These have been consolidated into a single flat `siteSet` type with all fields at the top level:
 
 ```diff
   {
-    seoSet {
-      site {
-        indexing {
--         excluded_collections
--         excluded_taxonomies
-        }
-        socialMedia {
--         social_images_generator_collections
-        }
-      }
-    }
+-   seoDefaults {
+-     site {
+-       general { site_name, ... }
+-       indexing { noindex, ... }
+-       socialMedia { og_image, ... }
+-       analytics { fathom_id, ... }
+-       favicons { favicon_svg, ... }
+-     }
+-   }
++   seoSet {
++     site { site_name, noindex, og_image, fathom_id, favicon_svg, ... }
++   }
   }
 ```
 
+The following sub-types have been removed:
+
+| Removed Type | Replacement |
+|--------------|-------------|
+| `generalDefaults` | Fields moved directly onto `siteSet` |
+| `indexingDefaults` | Fields moved directly onto `siteSet` |
+| `socialMediaDefaults` | Fields moved directly onto `siteSet` |
+| `analyticsDefaults` | Fields moved directly onto `siteSet` |
+| `faviconsDefaults` | Fields moved directly onto `siteSet` |
+
+#### Removed Fields
+
+The following fields have been removed from the `siteSet` type as they are now configured per collection/taxonomy:
+
+- `excluded_collections`
+- `excluded_taxonomies`
+- `social_images_generator_collections`
+
 #### Disabled Features
 
-Fields and entire sets belonging to disabled features are now completely removed from the schema. Previously, disabled feature fields were still present but returned `null` values. Now, if a feature is disabled in `config/advanced-seo.php`, its fields will not appear in the schema at all.
+Fields belonging to disabled features are now completely removed from the schema. Previously, disabled feature fields were still present but returned `null` values. Now, if a feature is disabled in `config/advanced-seo.php`, its fields will not appear in the schema at all.
 
-For example, if you disable the sitemap, all sitemap related fields will be removed. Similarly, disabling favicons removes the `favicons` field from `siteSet`, and disabling all analytics trackers removes the `analytics` field entirely.
+For example, if you disable the sitemap, all sitemap related fields will be removed. Similarly, disabling favicons or all analytics trackers removes those fields entirely.
 
 ### `seoMeta` Query
 
@@ -323,7 +345,7 @@ The following fields have been removed from the `computed` type:
 
 A new `twitter_card` field has been added to the `computed` type, returning the card size (`summary` or `summary_large_image`).
 
-The following raw data fields have been removed from the `collectionSet`, `taxonomySet`, and `socialMediaSiteSet` types:
+The following raw data fields have been removed from the `collectionSet`, `taxonomySet`, and `siteSet` types:
 
 | Removed Field | Use Instead |
 |---------------|-------------|

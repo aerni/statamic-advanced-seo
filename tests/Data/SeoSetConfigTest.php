@@ -73,7 +73,7 @@ it('can get and set the enabled state', function () {
 });
 
 it('returns true for enabled on site type sets regardless of value', function () {
-    $config = Seo::find('site::general')->config();
+    $config = Seo::find('site::defaults')->config();
 
     /* Trying to disable a site config should still return true */
     $config->enabled(false);
@@ -129,7 +129,7 @@ it('can get the blueprint', function () {
     $blueprint = Seo::find('taxonomies::tags')->config()->blueprint();
     expect($blueprint->handle())->toBe('content_config');
 
-    $blueprint = Seo::find('site::general')->config()->blueprint();
+    $blueprint = Seo::find('site::defaults')->config()->blueprint();
     expect($blueprint->handle())->toBe('site_config');
 });
 
@@ -139,7 +139,7 @@ it('can get the sites', function () {
     expect($config->sites())->toBeInstanceOf(Collection::class);
     expect($config->sites()->keys()->all())->toBe(['english', 'german']);
 
-    $siteConfig = Seo::find('site::general')->config();
+    $siteConfig = Seo::find('site::defaults')->config();
 
     expect($siteConfig->sites()->keys()->all())->toBe(Site::all()->keys()->all());
 });
@@ -184,7 +184,7 @@ it('can get file data', function () {
 });
 
 it('excludes enabled from file data for site type', function () {
-    $config = Seo::find('site::general')->config();
+    $config = Seo::find('site::defaults')->config();
 
     expect($config->fileData())->not->toHaveKey('enabled');
 });

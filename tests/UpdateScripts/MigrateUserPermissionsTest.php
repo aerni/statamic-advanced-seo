@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\UpdateScripts\MigrateUserPermissions;
+use Aerni\AdvancedSeo\UpdateScripts\V3\MigrateUserPermissions;
 use Statamic\Facades\Role;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -8,7 +8,7 @@ uses(PreventsSavingStacheItemsToDisk::class);
 
 function runPermissionsMigrationScript(): void
 {
-    (new MigrateUserPermissions('aerni/advanced-seo'))->update();
+    (new MigrateUserPermissions)->run();
 }
 
 it('migrates site-level permissions to configure seo', function () {

@@ -11,13 +11,9 @@ use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSetQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoSitemapsQuery;
-use Aerni\AdvancedSeo\GraphQL\Types\AnalyticsSiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\CollectionSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\ComputedMetaDataType;
-use Aerni\AdvancedSeo\GraphQL\Types\FaviconsSiteSetType;
-use Aerni\AdvancedSeo\GraphQL\Types\GeneralSiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\HreflangType;
-use Aerni\AdvancedSeo\GraphQL\Types\IndexingSiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
 use Aerni\AdvancedSeo\GraphQL\Types\SeoMetaType;
@@ -27,7 +23,6 @@ use Aerni\AdvancedSeo\GraphQL\Types\SitemapType;
 use Aerni\AdvancedSeo\GraphQL\Types\SitemapUrlType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
-use Aerni\AdvancedSeo\GraphQL\Types\SocialMediaSiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
@@ -150,7 +145,7 @@ class ServiceProvider extends AddonServiceProvider
         Nav::extend(function ($nav) {
             $navItems = Seo::groups()
                 ->filter(fn (SeoSetGroup $group) => User::current()->can('viewAny', [SeoSet::class, $group]))
-                ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->indexUrl()));
+                ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->url()));
 
             if ($navItems->isEmpty()) {
                 return;
@@ -234,13 +229,9 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoSitemapsQuery::class);
 
-            GraphQL::addType(AnalyticsSiteSetType::class);
             GraphQL::addType(CollectionSetType::class);
             GraphQL::addType(ComputedMetaDataType::class);
-            GraphQL::addType(FaviconsSiteSetType::class);
-            GraphQL::addType(GeneralSiteSetType::class);
             GraphQL::addType(HreflangType::class);
-            GraphQL::addType(IndexingSiteSetType::class);
             GraphQL::addType(RawMetaDataType::class);
             GraphQL::addType(RenderedViewsType::class);
             GraphQL::addType(SeoMetaType::class);
@@ -251,7 +242,6 @@ class ServiceProvider extends AddonServiceProvider
             GraphQL::addType(SitemapUrlType::class);
             GraphQL::addType(SiteSetType::class);
             GraphQL::addType(SocialImagePresetType::class);
-            GraphQL::addType(SocialMediaSiteSetType::class);
             GraphQL::addType(TaxonomySetType::class);
 
             GraphQL::addField(EntryInterface::NAME, 'seo', fn () => (new SeoField)->toArray());

@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\UpdateScripts\MigrateConfigChanges;
+use Aerni\AdvancedSeo\UpdateScripts\V3\MigrateConfigChanges;
 use Statamic\Facades\Collection;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Site;
@@ -12,7 +12,7 @@ uses(PreventsSavingStacheItemsToDisk::class);
 
 function runConfigMigrationScript(): void
 {
-    (new MigrateConfigChanges('aerni/advanced-seo'))->update();
+    (new MigrateConfigChanges)->run();
 }
 
 beforeEach(function () {
@@ -74,19 +74,19 @@ it('migrates origins from localizations to set configs', function () {
     expect($set->in('french')->get('origin'))->toBeNull();
 });
 
-it('migrates sitemap config from indexing set to individual collections/taxonomies sets', function () {
-    $indexingSet = Seo::find('site::indexing');
+it('migrates sitemap config from site defaults to individual collections/taxonomies sets', function () {
+    $siteDefaults = Seo::find('site::defaults');
 
-    $indexingSet->in('english')
+    $siteDefaults->in('english')
         ->set('excluded_collections', ['blog', 'products'])
         ->set('excluded_taxonomies', ['tags', 'categories'])
         ->save();
 
-    $indexingSet->in('german')
+    $siteDefaults->in('german')
         ->set('origin', 'english')
         ->save();
 
-    $indexingSet->in('french')
+    $siteDefaults->in('french')
         ->set('origin', 'english')
         ->set('excluded_collections', ['products'])
         ->set('excluded_taxonomies', [])
@@ -96,94 +96,77 @@ it('migrates sitemap config from indexing set to individual collections/taxonomi
 
     // Assert collections: blog excluded in all its sites (english, german)
     $blogSet = Seo::find('collections::blog');
-    expect($blogSet->config()->get('sitemap'))->toBeFalse(); // Excluded in all its sites
-    expect($blogSet->in('english')->get('seo_sitemap_enabled'))->toBeNull(); // Sitemap disabled, field should not exist
-    expect($blogSet->in('german')->get('seo_sitemap_enabled'))->toBeNull(); // Sitemap disabled, field should not exist
+    expect($blogSet->config()->get('sitemap'))->toBeFalse();
+    expect($blogSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
+    expect($blogSet->in('german')->get('seo_sitemap_enabled'))->toBeNull();
 
     // Assert collections: products excluded in all its sites (english, german, french)
     $productsSet = Seo::find('collections::products');
-    expect($productsSet->config()->get('sitemap'))->toBeFalse(); // Excluded in all its sites
+    expect($productsSet->config()->get('sitemap'))->toBeFalse();
     expect($productsSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
     expect($productsSet->in('german')->get('seo_sitemap_enabled'))->toBeNull();
     expect($productsSet->in('french')->get('seo_sitemap_enabled'))->toBeNull();
 
     // Assert collections: pages has no sitemap config changes (not excluded anywhere)
     $pagesSet = Seo::find('collections::pages');
-    expect($pagesSet->config()->get('sitemap'))->toBeTrue(); // Explicitly set and saved by migration
-    expect($pagesSet->in('english')->value('seo_sitemap_enabled'))->toBeTrue(); // Sitemap enabled, should have default value
+    expect($pagesSet->config()->get('sitemap'))->toBeTrue();
+    expect($pagesSet->in('english')->value('seo_sitemap_enabled'))->toBeTrue();
 
     // Assert taxonomies: tags excluded in all its sites (english only)
     $tagsSet = Seo::find('taxonomies::tags');
-    expect($tagsSet->config()->get('sitemap'))->toBeFalse(); // Excluded in all its sites
+    expect($tagsSet->config()->get('sitemap'))->toBeFalse();
     expect($tagsSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
 
     // Assert taxonomies: categories excluded in all its sites (english, german)
     $categoriesSet = Seo::find('taxonomies::categories');
-    expect($categoriesSet->config()->get('sitemap'))->toBeFalse(); // Excluded in all its sites
-    expect($productsSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
-    expect($productsSet->in('german')->get('seo_sitemap_enabled'))->toBeNull();
+    expect($categoriesSet->config()->get('sitemap'))->toBeFalse();
 
-    // Assert old fields and origins are removed from indexing set
-    $indexingSet = Seo::find('site::indexing');
-    expect($indexingSet->in('english')->get('excluded_collections'))->toBeNull();
-    expect($indexingSet->in('english')->get('excluded_taxonomies'))->toBeNull();
-    expect($indexingSet->in('german')->get('excluded_collections'))->toBeNull();
-    expect($indexingSet->in('german')->get('excluded_taxonomies'))->toBeNull();
-    expect($indexingSet->in('french')->get('excluded_collections'))->toBeNull();
-    expect($indexingSet->in('french')->get('excluded_taxonomies'))->toBeNull();
+    // Assert old fields are removed from site defaults
+    $siteDefaults = Seo::find('site::defaults');
+    expect($siteDefaults->in('english')->get('excluded_collections'))->toBeNull();
+    expect($siteDefaults->in('english')->get('excluded_taxonomies'))->toBeNull();
+    expect($siteDefaults->in('german')->get('excluded_collections'))->toBeNull();
+    expect($siteDefaults->in('german')->get('excluded_taxonomies'))->toBeNull();
+    expect($siteDefaults->in('french')->get('excluded_collections'))->toBeNull();
+    expect($siteDefaults->in('french')->get('excluded_taxonomies'))->toBeNull();
 });
 
 it('skips sitemap migration and cleans up fields when sitemap is disabled', function () {
     config(['advanced-seo.sitemap.enabled' => false]);
 
-    $indexingSet = Seo::find('site::indexing');
-
-    $indexingSet->in('english')
+    Seo::find('site::defaults')->in('english')
         ->set('excluded_collections', ['blog', 'products'])
         ->set('excluded_taxonomies', ['tags'])
-        ->save();
-
-    $indexingSet->in('german')
-        ->set('origin', 'english')
-        ->set('excluded_collections', ['blog'])
-        ->set('excluded_taxonomies', [])
         ->save();
 
     runConfigMigrationScript();
 
     // Assert: Collections and taxonomies should not have sitemap config changes
-    $blogSet = Seo::find('collections::blog');
-    expect($blogSet->config()->get('sitemap'))->toBeNull();
+    expect(Seo::find('collections::blog')->config()->get('sitemap'))->toBeNull();
+    expect(Seo::find('collections::products')->config()->get('sitemap'))->toBeNull();
+    expect(Seo::find('taxonomies::tags')->config()->get('sitemap'))->toBeNull();
 
-    $productsSet = Seo::find('collections::products');
-    expect($productsSet->config()->get('sitemap'))->toBeNull();
-
-    $tagsSet = Seo::find('taxonomies::tags');
-    expect($tagsSet->config()->get('sitemap'))->toBeNull();
-
-    // Assert: Old fields are still removed from indexing set
-    $indexingSet = Seo::find('site::indexing');
-    expect($indexingSet->in('english')->get('excluded_collections'))->toBeNull();
-    expect($indexingSet->in('english')->get('excluded_taxonomies'))->toBeNull();
-    expect($indexingSet->in('german')->get('excluded_collections'))->toBeNull();
-    expect($indexingSet->in('german')->get('excluded_taxonomies'))->toBeNull();
+    // Assert: Old fields are still removed from site defaults
+    $siteDefaults = Seo::find('site::defaults');
+    expect($siteDefaults->in('english')->get('excluded_collections'))->toBeNull();
+    expect($siteDefaults->in('english')->get('excluded_taxonomies'))->toBeNull();
 });
 
 it('migrates social images generator config based on localization coverage', function () {
     config()->set('advanced-seo.social_images.generator.enabled', true);
 
-    $socialMediaSet = Seo::find('site::social_media');
+    $siteDefaults = Seo::find('site::defaults');
 
-    $socialMediaSet->in('english')
+    $siteDefaults->in('english')
         ->set('social_images_generator_collections', ['products'])
         ->save();
 
-    $socialMediaSet->in('german')
+    $siteDefaults->in('german')
         ->set('origin', 'english')
         ->set('social_images_generator_collections', ['blog'])
         ->save();
 
-    $socialMediaSet->in('french')
+    $siteDefaults->in('french')
         ->set('origin', 'english')
         ->set('social_images_generator_collections', ['products'])
         ->save();
@@ -209,18 +192,8 @@ it('migrates social images generator config based on localization coverage', fun
 it('migrates social images generator: preserves existing true values', function () {
     config()->set('advanced-seo.social_images.generator.enabled', true);
 
-    $socialMediaSet = Seo::find('site::social_media');
-
-    $socialMediaSet->in('english')
+    Seo::find('site::defaults')->in('english')
         ->set('social_images_generator_collections', ['products'])
-        ->save();
-
-    $socialMediaSet->in('german')
-        ->set('origin', 'english')
-        ->save();
-
-    $socialMediaSet->in('french')
-        ->set('origin', 'english')
         ->save();
 
     Seo::find('collections::products')
@@ -237,42 +210,27 @@ it('migrates social images generator: preserves existing true values', function 
     expect($productsSet->in('french')->get('seo_generate_social_images'))->toBeFalse();
 });
 
-it('migrates social images generator: cleans up old field and origins from social_media set', function () {
-    $socialMediaSet = Seo::find('site::social_media');
-
-    $socialMediaSet->in('english')
+it('migrates social images generator: cleans up old field from site defaults', function () {
+    Seo::find('site::defaults')->in('english')
         ->set('social_images_generator_collections', ['products'])
         ->save();
 
-    $socialMediaSet->in('german')
-        ->set('social_images_generator_collections', ['products'])
-        ->save();
-
-    $socialMediaSet->in('french')
+    Seo::find('site::defaults')->in('german')
         ->set('social_images_generator_collections', ['products'])
         ->save();
 
     runConfigMigrationScript();
 
-    $socialMediaSet = Seo::find('site::social_media');
-
-    expect($socialMediaSet->in('english')->get('social_images_generator_collections'))->toBeNull();
-    expect($socialMediaSet->in('german')->get('social_images_generator_collections'))->toBeNull();
-    expect($socialMediaSet->in('french')->get('social_images_generator_collections'))->toBeNull();
+    $siteDefaults = Seo::find('site::defaults');
+    expect($siteDefaults->in('english')->get('social_images_generator_collections'))->toBeNull();
+    expect($siteDefaults->in('german')->get('social_images_generator_collections'))->toBeNull();
 });
 
 it('skips social images generator migration and cleans up fields when generator is disabled', function () {
-    config(['advanced-seo.social_images_generator.enabled' => false]);
+    config(['advanced-seo.social_images.generator.enabled' => false]);
 
-    $socialMediaSet = Seo::find('site::social_media');
-
-    $socialMediaSet->in('english')
+    Seo::find('site::defaults')->in('english')
         ->set('social_images_generator_collections', ['products', 'blog'])
-        ->save();
-
-    $socialMediaSet->in('german')
-        ->set('origin', 'english')
-        ->set('social_images_generator_collections', ['products'])
         ->save();
 
     runConfigMigrationScript();
@@ -282,10 +240,8 @@ it('skips social images generator migration and cleans up fields when generator 
     expect(Seo::find('collections::blog')->config()->get('social_images_generator'))->toBeNull();
     expect(Seo::find('collections::pages')->config()->get('social_images_generator'))->toBeNull();
 
-    // Assert: Old field is still removed from social_media set
-    $socialMediaSet = Seo::find('site::social_media');
-    expect($socialMediaSet->in('english')->get('social_images_generator_collections'))->toBeNull();
-    expect($socialMediaSet->in('german')->get('social_images_generator_collections'))->toBeNull();
+    // Assert: Old field is still removed from site defaults
+    expect(Seo::find('site::defaults')->in('english')->get('social_images_generator_collections'))->toBeNull();
 });
 
 it('calls migrateEloquentTables and skips file-based migrations for Eloquent users', function () {
@@ -293,14 +249,15 @@ it('calls migrateEloquentTables and skips file-based migrations for Eloquent use
     Seo::find('collections::pages')->config()->set('title', 'Pages')->save();
     Seo::find('collections::products')->in('german')->set('origin', 'english')->save();
 
-    $mock = Mockery::mock(MigrateConfigChanges::class, ['aerni/advanced-seo'])
+    $mock = Mockery::mock(MigrateConfigChanges::class)
         ->makePartial()
         ->shouldAllowMockingProtectedMethods();
 
     $mock->shouldReceive('usesEloquentDriver')->andReturn(true);
     $mock->shouldReceive('migrateEloquentTables')->once();
+    $mock->shouldReceive('consolidateEloquentSiteSeoSets')->once();
 
-    $mock->update();
+    $mock->run();
 
     // Title should NOT be removed (handled by database migration)
     expect(Seo::find('collections::pages')->config()->get('title'))->toBe('Pages');

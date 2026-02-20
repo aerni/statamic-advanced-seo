@@ -347,7 +347,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'type' => 'code',
                         'display' => $this->trans('seo_json_ld.display'),
                         'instructions' => $this->trans('seo_json_ld.default_instructions'),
-                        'icon' => 'code',
                         'theme' => 'material',
                         'mode' => 'javascript',
                         'mode_selectable' => false,

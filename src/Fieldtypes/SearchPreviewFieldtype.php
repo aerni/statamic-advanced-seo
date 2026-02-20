@@ -17,13 +17,13 @@ class SearchPreviewFieldtype extends Fieldtype
     {
         $parent = $this->field()->parent();
         $context = Context::from($parent);
-        $general = Seo::find('site::general')->in($context->site);
+        $defaults = Seo::find('site::defaults')->in($context->site);
 
         return [
-            'siteName' => $general->site_name,
-            'domain' => parse_url($general->site()->absoluteUrl(), PHP_URL_HOST),
-            'titleSeparator' => $general->title_separator->value(),
-            'favicon' => Seo::find('site::favicons')->in($context->site)->favicon_svg?->url(),
+            'siteName' => $defaults->site_name,
+            'domain' => parse_url($defaults->site()->absoluteUrl(), PHP_URL_HOST),
+            'titleSeparator' => $defaults->title_separator->value(),
+            'favicon' => $defaults->favicon_svg?->url(),
             'uri' => $parent->uri(),
             'breadcrumbs' => ResolveBreadcrumbs::handle(
                 str($parent->uri())->explode('/')->filter()->values()->all(),

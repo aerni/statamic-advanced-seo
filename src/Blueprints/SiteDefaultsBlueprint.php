@@ -1,0 +1,489 @@
+<?php
+
+namespace Aerni\AdvancedSeo\Blueprints;
+
+use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Features\Cloudflare;
+use Aerni\AdvancedSeo\Features\Fathom;
+use Aerni\AdvancedSeo\Features\Favicons;
+use Aerni\AdvancedSeo\Features\GoogleTagManager;
+use Aerni\AdvancedSeo\Features\SiteVerification;
+
+class SiteDefaultsBlueprint extends BaseBlueprint
+{
+    use HasAssetField;
+
+    protected function handle(): string
+    {
+        return 'site_defaults';
+    }
+
+    protected function tabs(): array
+    {
+        return [
+            'general' => [
+                $this->titles(),
+                $this->knowledgeGraph(),
+                $this->favicons(),
+            ],
+            'social_media' => [
+                $this->socialMedia(),
+            ],
+            'indexing' => [
+                $this->crawling(),
+                $this->siteVerification(),
+            ],
+            'analytics' => [
+                $this->fathom(),
+                $this->cloudflare(),
+                $this->googleTagManager(),
+            ],
+        ];
+    }
+
+    protected function titles(): array
+    {
+        return [
+            'display' => $this->trans('section_titles.display'),
+            'instructions' => $this->trans('section_titles.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'site_name',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('site_name.display'),
+                        'instructions' => $this->trans('site_name.instructions'),
+                        'input_type' => 'text',
+                        'localizable' => true,
+                        'listable' => 'hidden',
+                        'width' => 50,
+                    ],
+                ],
+                [
+                    'handle' => 'title_separator',
+                    'field' => [
+                        'type' => 'select',
+                        'display' => $this->trans('title_separator.display'),
+                        'instructions' => $this->trans('title_separator.instructions'),
+                        'options' => [
+                            ' | ' => '|',
+                            ' / ' => '/',
+                            ' – ' => '–',
+                            ' - ' => '-',
+                            ' :: ' => '::',
+                            ' > ' => '>',
+                            ' ~ ' => '~',
+                        ],
+                        'default' => '|',
+                        'clearable' => false,
+                        'multiple' => false,
+                        'searchable' => true,
+                        'localizable' => true,
+                        'taggable' => true,
+                        'push_tags' => false,
+                        'cast_booleans' => false,
+                        'width' => 50,
+                        'listable' => 'hidden',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function knowledgeGraph(): array
+    {
+        return [
+            'display' => $this->trans('section_knowledge_graph.display'),
+            'instructions' => $this->trans('section_knowledge_graph.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'site_json_ld_type',
+                    'field' => [
+                        'type' => 'button_group',
+                        'display' => $this->trans('site_json_ld_type.display'),
+                        'instructions' => $this->trans('site_json_ld_type.instructions'),
+                        'options' => [
+                            'none' => $this->trans('site_json_ld_type.none'),
+                            'organization' => $this->trans('site_json_ld_type.organization'),
+                            'person' => $this->trans('site_json_ld_type.person'),
+                            'custom' => $this->trans('site_json_ld_type.custom'),
+                        ],
+                        'default' => 'none',
+                        'localizable' => true,
+                        'listable' => false,
+                        'width' => 50,
+                    ],
+                ],
+                [
+                    'handle' => 'use_breadcrumbs',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('use_breadcrumbs.display'),
+                        'instructions' => $this->trans('use_breadcrumbs.instructions'),
+                        'default' => true,
+                        'localizable' => true,
+                        'listable' => false,
+                        'width' => 50,
+                    ],
+                ],
+                [
+                    'handle' => 'organization_name',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('organization_name.display'),
+                        'instructions' => $this->trans('organization_name.instructions'),
+                        'input_type' => 'text',
+                        'localizable' => true,
+                        'listable' => 'hidden',
+                        'width' => 50,
+                        'if' => [
+                            'site_json_ld_type' => 'equals organization',
+                        ],
+                        'validate' => [
+                            'required_if:site_json_ld_type,organization',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'organization_logo',
+                    'field' => $this->getAssetFieldConfig([
+                        'display' => $this->trans('organization_logo.display'),
+                        'instructions' => $this->trans('organization_logo.instructions'),
+                        'width' => 50,
+                        'folder' => null,
+                        'validate' => [
+                            'image',
+                        ],
+                        'if' => [
+                            'site_json_ld_type' => 'equals organization',
+                        ],
+                    ]),
+                ],
+                [
+                    'handle' => 'person_name',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('person_name.display'),
+                        'instructions' => $this->trans('person_name.instructions'),
+                        'input_type' => 'text',
+                        'listable' => 'hidden',
+                        'width' => 50,
+                        'localizable' => true,
+                        'if' => [
+                            'site_json_ld_type' => 'equals person',
+                        ],
+                        'validate' => [
+                            'required_if:site_json_ld_type,person',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'site_json_ld',
+                    'field' => [
+                        'type' => 'code',
+                        'display' => $this->trans('site_json_ld.display'),
+                        'instructions' => $this->trans('site_json_ld.instructions'),
+                        'theme' => 'material',
+                        'mode' => 'javascript',
+                        'mode_selectable' => false,
+                        'indent_type' => 'tabs',
+                        'indent_size' => 4,
+                        'key_map' => 'default',
+                        'line_numbers' => true,
+                        'line_wrapping' => true,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'if' => [
+                            'site_json_ld_type' => 'equals custom',
+                        ],
+                        'validate' => [
+                            'required_if:site_json_ld_type,custom',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function favicons(): array
+    {
+        return [
+            'display' => $this->trans('section_favicon.display'),
+            'instructions' => $this->trans('section_favicon.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'favicon_svg',
+                    'field' => $this->getAssetFieldConfig([
+                        'display' => $this->trans('favicon_svg.display'),
+                        'instructions' => $this->trans('favicon_svg.instructions'),
+                        'container' => config('advanced-seo.favicons.container', 'assets'),
+                        'folder' => 'favicons',
+                        'localizable' => true,
+                        'feature' => Favicons::class,
+                        'validate' => [
+                            'image',
+                            'mimes:svg',
+                        ],
+                    ]),
+                ],
+            ],
+        ];
+    }
+
+    protected function socialMedia(): array
+    {
+        return [
+            'display' => $this->trans('section_social_media.display'),
+            'instructions' => $this->trans('section_social_media.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'og_image',
+                    'field' => $this->getAssetFieldConfig([
+                        'display' => $this->trans('og_image.display'),
+                        'instructions' => $this->trans('og_image.instructions'),
+                        'validate' => [
+                            'image',
+                            'mimes:jpg,png',
+                        ],
+                    ]),
+                ],
+                [
+                    'handle' => 'twitter_handle',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('twitter_handle.display'),
+                        'instructions' => $this->trans('twitter_handle.instructions'),
+                        'input_type' => 'text',
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'prepend' => '@',
+                        'antlers' => false,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function crawling(): array
+    {
+        return [
+            'display' => $this->trans('section_crawling.display'),
+            'instructions' => $this->trans('section_crawling.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'noindex',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('noindex.display'),
+                        'instructions' => $this->trans('noindex.instructions'),
+                        'default' => false,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
+                    ],
+                ],
+                [
+                    'handle' => 'nofollow',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('nofollow.display'),
+                        'instructions' => $this->trans('nofollow.instructions'),
+                        'default' => false,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function siteVerification(): array
+    {
+        return [
+            'display' => $this->trans('section_verification.display'),
+            'instructions' => $this->trans('section_verification.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'google_site_verification_code',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('google_site_verification_code.display'),
+                        'instructions' => $this->trans('google_site_verification_code.instructions'),
+                        'input_type' => 'text',
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
+                        'feature' => SiteVerification::class,
+                    ],
+                ],
+                [
+                    'handle' => 'bing_site_verification_code',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('bing_site_verification_code.display'),
+                        'instructions' => $this->trans('bing_site_verification_code.instructions'),
+                        'input_type' => 'text',
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
+                        'feature' => SiteVerification::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function fathom(): array
+    {
+        return [
+            'display' => $this->trans('section_fathom.display'),
+            'instructions' => $this->trans('section_fathom.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'use_fathom',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('use_fathom.display'),
+                        'instructions' => $this->trans('use_fathom.instructions'),
+                        'default' => false,
+                        'listable' => false,
+                        'localizable' => true,
+                        'feature' => Fathom::class,
+                    ],
+                ],
+                [
+                    'handle' => 'fathom_id',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('fathom_id.display'),
+                        'instructions' => $this->trans('fathom_id.instructions'),
+                        'input_type' => 'text',
+                        'width' => 50,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'antlers' => true,
+                        'feature' => Fathom::class,
+                        'validate' => [
+                            'required_if:use_fathom,true',
+                        ],
+                        'if' => [
+                            'use_fathom' => 'equals true',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'fathom_spa',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('fathom_spa.display'),
+                        'instructions' => $this->trans('fathom_spa.instructions'),
+                        'icon' => 'toggle',
+                        'listable' => 'hidden',
+                        'default' => false,
+                        'localizable' => true,
+                        'width' => 50,
+                        'feature' => Fathom::class,
+                        'validate' => [
+                            'required_if:use_fathom,true',
+                        ],
+                        'if' => [
+                            'use_fathom' => 'equals true',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function cloudflare(): array
+    {
+        return [
+            'display' => $this->trans('section_cloudflare_web_analytics.display'),
+            'instructions' => $this->trans('section_cloudflare_web_analytics.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'use_cloudflare_web_analytics',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('use_cloudflare_web_analytics.display'),
+                        'instructions' => $this->trans('use_cloudflare_web_analytics.instructions'),
+                        'default' => false,
+                        'listable' => false,
+                        'localizable' => true,
+                        'feature' => Cloudflare::class,
+                    ],
+                ],
+                [
+                    'handle' => 'cloudflare_web_analytics',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('cloudflare_web_analytics.display'),
+                        'instructions' => $this->trans('cloudflare_web_analytics.instructions'),
+                        'input_type' => 'text',
+                        'width' => 50,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'feature' => Cloudflare::class,
+                        'validate' => [
+                            'required_if:use_cloudflare_web_analytics,true',
+                        ],
+                        'if' => [
+                            'use_cloudflare_web_analytics' => 'equals true',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function googleTagManager(): array
+    {
+        return [
+            'display' => $this->trans('section_google_tag_manager.display'),
+            'instructions' => $this->trans('section_google_tag_manager.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'use_google_tag_manager',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('use_google_tag_manager.display'),
+                        'instructions' => $this->trans('use_google_tag_manager.instructions'),
+                        'default' => false,
+                        'listable' => false,
+                        'localizable' => true,
+                        'feature' => GoogleTagManager::class,
+                    ],
+                ],
+                [
+                    'handle' => 'google_tag_manager',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => $this->trans('google_tag_manager.display'),
+                        'instructions' => $this->trans('google_tag_manager.instructions'),
+                        'input_type' => 'text',
+                        'width' => 50,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'feature' => GoogleTagManager::class,
+                        'validate' => [
+                            'required_if:use_google_tag_manager,true',
+                        ],
+                        'if' => [
+                            'use_google_tag_manager' => 'equals true',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+}

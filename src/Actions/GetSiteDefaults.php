@@ -3,11 +3,9 @@
 namespace Aerni\AdvancedSeo\Actions;
 
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Data\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Site;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context as ViewContext;
 
@@ -15,11 +13,10 @@ class GetSiteDefaults
 {
     public static function handle(mixed $model): Collection
     {
-        $site = Context::from($model)?->site ?? Site::current()->handle();
+        $site = Context::from($model)->site;
 
         return Blink::once("advanced-seo::site::{$site}", function () use ($site, $model) {
-            $siteDefaults = Seo::whereType('site')
-                ->flatMap(fn (SeoSet $set) => $set->in($site)?->toAugmentedCollection() ?? collect());
+            $siteDefaults = Seo::find('site::defaults')->in($site)->toAugmentedCollection();
 
             /**
              * TODO: Instead of merging the overrides, we might be able to refactor this to something similar to the GetPageData action.

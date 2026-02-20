@@ -40,14 +40,8 @@ class SeoSetIndexController extends CpController
         ]);
     }
 
-    protected function columns(SeoSetGroup $seoSetGroup): ?array
+    protected function columns(SeoSetGroup $seoSetGroup): array
     {
-        $type = $seoSetGroup->type();
-
-        if ($type === 'site') {
-            return null;
-        }
-
         $columns = [
             Column::make('title')->label(__('Title')),
             Column::make('status')->label(__('Status')),

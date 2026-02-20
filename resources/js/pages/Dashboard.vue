@@ -22,7 +22,7 @@ useArchitecturalBackground();
     <EmptyStateMenu>
         <EmptyStateItem
             v-for="item in groups" :key="item.type"
-            :href="item.indexUrl"
+            :href="item.url"
             :icon="item.icon"
             :heading="__(item.title)"
             :description="__(`advanced-seo::messages.${item.type}_description`)"

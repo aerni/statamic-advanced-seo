@@ -20,11 +20,11 @@ beforeEach(function () {
 });
 
 it('can get all seo sets', function () {
-    expect(Seo::all())->toHaveCount(10);
+    expect(Seo::all())->toHaveCount(6);
 });
 
 it('can find an seo set', function () {
-    expect(Seo::find('site::general'))->toBeInstanceOf(SeoSet::class);
+    expect(Seo::find('site::defaults'))->toBeInstanceOf(SeoSet::class);
 });
 
 it('returns null for non-existent set', function () {
@@ -49,7 +49,7 @@ it('can get set groups', function () {
 });
 
 it('can get a default value from specific set', function () {
-    expect(Seo::defaultValue('site::general.title_separator'))->toBe('|');
+    expect(Seo::defaultValue('site::defaults.title_separator'))->toBe('|');
 });
 
 it('can get a default value by type', function () {
@@ -57,7 +57,7 @@ it('can get a default value by type', function () {
 });
 
 it("returns a fallback when field doesn't exist", function () {
-    expect(Seo::defaultValue('site::general.nonexistent', 'fallback_value'))->toBe('fallback_value');
+    expect(Seo::defaultValue('site::defaults.nonexistent', 'fallback_value'))->toBe('fallback_value');
 });
 
 it('sorts sets by handle', function () {
@@ -67,33 +67,5 @@ it('sorts sets by handle', function () {
 
 it('creates all statically defined site sets', function () {
     expect(Seo::whereType('site')->map->handle()->all())
-        ->toBe(['general', 'indexing', 'social_media', 'analytics', 'favicons']);
-});
-
-it('includes analytics set when enabled', function () {
-    config(['advanced-seo.analytics.fathom' => true]);
-    config(['advanced-seo.analytics.cloudflare_analytics' => false]);
-    config(['advanced-seo.analytics.google_tag_manager' => false]);
-
-    expect(Seo::find('site::analytics'))->toBeInstanceOf(SeoSet::class);
-});
-
-it('excludes analytics set when disabled', function () {
-    config(['advanced-seo.analytics.fathom' => false]);
-    config(['advanced-seo.analytics.cloudflare_analytics' => false]);
-    config(['advanced-seo.analytics.google_tag_manager' => false]);
-
-    expect(Seo::find('site::analytics'))->toBeNull();
-});
-
-it('includes favicons set when enabled', function () {
-    config(['advanced-seo.favicons.enabled' => true]);
-
-    expect(Seo::find('site::favicons'))->toBeInstanceOf(SeoSet::class);
-});
-
-it('excludes favicons set when disabled', function () {
-    config(['advanced-seo.favicons.enabled' => false]);
-
-    expect(Seo::find('site::favicons'))->toBeNull();
+        ->toBe(['defaults']);
 });

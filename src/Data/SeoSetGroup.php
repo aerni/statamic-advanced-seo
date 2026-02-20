@@ -27,15 +27,19 @@ class SeoSetGroup implements Arrayable
         return ucfirst($this->type());
     }
 
-    public function indexUrl(): string
+    public function url(): string
     {
+        if ($this->type() === 'site') {
+            return $this->seoSets()->first()->inSelectedSite()->editUrl();
+        }
+
         return cp_route('advanced-seo.sets.index', ['seoSetGroup' => $this->type()]);
     }
 
     public function icon(): string
     {
         return match ($this->type()) {
-            'site' => 'web',
+            'site' => 'utilities',
             'collections' => 'collections',
             'taxonomies' => 'taxonomies',
             default => 'folder-generic',
@@ -47,7 +51,7 @@ class SeoSetGroup implements Arrayable
         return [
             'type' => $this->type(),
             'title' => $this->title(),
-            'indexUrl' => $this->indexUrl(),
+            'url' => $this->url(),
             'icon' => $this->icon(),
         ];
     }

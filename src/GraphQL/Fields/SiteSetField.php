@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
+use Aerni\AdvancedSeo\Data\SeoSetLocalization;
+use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetResolver;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteSetType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
@@ -28,8 +30,8 @@ class SiteSetField extends Field
         return GraphQL::type(SiteSetType::NAME);
     }
 
-    protected function resolve($root, $args, $context, ResolveInfo $info): array
+    protected function resolve($root, $args, $context, ResolveInfo $info): ?SeoSetLocalization
     {
-        return $args;
+        return SeoSetResolver::resolve('site::defaults', $args['site'] ?? null);
     }
 }

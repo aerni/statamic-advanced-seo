@@ -73,7 +73,7 @@ it('can get the parent', function () {
 
     expect($taxonomySet->parent())->toBeInstanceOf(Taxonomy::class);
 
-    $siteSet = Seo::find('site::general');
+    $siteSet = Seo::find('site::defaults');
 
     expect($siteSet->parent())->toBeNull();
 });
@@ -105,7 +105,7 @@ it('can get the sites', function () {
 
     expect($collectionSet->sites()->keys()->all())->toBe(['english', 'german']);
 
-    $siteSet = Seo::find('site::general');
+    $siteSet = Seo::find('site::defaults');
 
     expect($siteSet->sites()->keys()->all())->toBe(Site::all()->keys()->all());
 });

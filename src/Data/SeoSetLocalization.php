@@ -2,12 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Data;
 
-use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
 use Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint;
-use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
-use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
-use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
-use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SiteDefaultsBlueprint;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
@@ -133,13 +129,7 @@ class SeoSetLocalization implements Augmentable, Contract
     public function blueprint(): Blueprint
     {
         $class = match ($this->type()) {
-            'site' => match ($this->handle()) {
-                'general' => GeneralBlueprint::class,
-                'indexing' => IndexingBlueprint::class,
-                'social_media' => SocialMediaBlueprint::class,
-                'analytics' => AnalyticsBlueprint::class,
-                'favicons' => FaviconsBlueprint::class,
-            },
+            'site' => SiteDefaultsBlueprint::class,
             'collections', 'taxonomies' => ContentSeoSetLocalizationBlueprint::class,
         };
 
@@ -166,8 +156,8 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function newAugmentedInstance(): Augmented
     {
-        return match ($this->handle()) {
-            'general' => new AugmentedGeneralLocalization($this),
+        return match ($this->type()) {
+            'site' => new AugmentedSiteDefaultsLocalization($this),
             default => new AugmentedLocalization($this),
         };
     }

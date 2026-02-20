@@ -1,17 +1,11 @@
 <?php
 
-namespace Aerni\AdvancedSeo\UpdateScripts;
+namespace Aerni\AdvancedSeo\UpdateScripts\V3;
 
 use Statamic\Facades\Role;
-use Statamic\UpdateScripts\UpdateScript;
 
-class MigrateUserPermissions extends UpdateScript
+class MigrateUserPermissions
 {
-    public function shouldUpdate($newVersion, $oldVersion): bool
-    {
-        return $this->isUpdatingTo('3.0.0');
-    }
-
     /**
      * Migrate old permissions to new ones
      *
@@ -36,7 +30,7 @@ class MigrateUserPermissions extends UpdateScript
      * - "edit seo defaults": Allows editing SEO defaults (SeoSetLocalization) for collections/taxonomies
      * - "edit seo content": Allows editing the SEO tab on individual entries/terms
      */
-    public function update(): void
+    public function run(): void
     {
         Role::all()->each(function ($role) {
             $permissions = $role->permissions();
@@ -82,7 +76,5 @@ class MigrateUserPermissions extends UpdateScript
 
             $role->save();
         });
-
-        $this->console()->info('Migrated user permissions.');
     }
 }

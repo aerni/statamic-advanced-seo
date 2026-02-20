@@ -73,7 +73,7 @@ it('can get the type', function () {
 
     expect($taxLocalization->type())->toBe('taxonomies');
 
-    $siteLocalization = Seo::find('site::general')->inDefaultSite();
+    $siteLocalization = Seo::find('site::defaults')->inDefaultSite();
 
     expect($siteLocalization->type())->toBe('site');
 });
@@ -111,20 +111,9 @@ it('can get the blueprint for taxonomies', function () {
 });
 
 it('can get the blueprint for site defaults', function () {
-    $generalBlueprint = Seo::find('site::general')->inDefaultSite()->blueprint();
-    expect($generalBlueprint->handle())->toBe('general');
+    $blueprint = Seo::find('site::defaults')->inDefaultSite()->blueprint();
 
-    $indexingBlueprint = Seo::find('site::indexing')->inDefaultSite()->blueprint();
-    expect($indexingBlueprint->handle())->toBe('indexing');
-
-    $socialMediaBlueprint = Seo::find('site::social_media')->inDefaultSite()->blueprint();
-    expect($socialMediaBlueprint->handle())->toBe('social');
-
-    $analyticsBlueprint = Seo::find('site::analytics')->inDefaultSite()->blueprint();
-    expect($analyticsBlueprint->handle())->toBe('analytics');
-
-    $faviconsBlueprint = Seo::find('site::favicons')->inDefaultSite()->blueprint();
-    expect($faviconsBlueprint->handle())->toBe('favicons');
+    expect($blueprint->handle())->toBe('site_defaults');
 });
 
 it('can get blueprint fields', function () {
