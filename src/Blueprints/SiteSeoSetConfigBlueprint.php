@@ -21,14 +21,14 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
     protected function origins(): array
     {
         return [
-            'display' => __('Origins'),
+            'display' => __('advanced-seo::messages.origins'),
             'fields' => [
                 [
                     'handle' => 'origins',
                     'field' => [
                         'type' => 'site_origins',
-                        'display' => __('Origins'),
-                        'instructions' => __('Choose to inherit values from selected origins.'),
+                        'display' => __('advanced-seo::messages.origins'),
+                        'instructions' => __('advanced-seo::messages.origins_instructions'),
                         'default' => [],
                     ],
                 ],

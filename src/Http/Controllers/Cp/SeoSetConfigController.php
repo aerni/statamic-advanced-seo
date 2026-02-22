@@ -21,7 +21,7 @@ class SeoSetConfigController extends CpController
             ->parent($seoSet)
             ->asConfig()
             ->icon('cog')
-            ->title("Configure {$seoSet->title()}")
+            ->title(__('advanced-seo::messages.configure_title', ['title' => $seoSet->title()]))
             ->values(array_merge($config->values()->all(), [
                 'enabled' => $config->enabled(),
                 'origins' => $config->origins(),

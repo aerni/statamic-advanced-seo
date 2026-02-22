@@ -28,14 +28,14 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
     protected function enabled(): array
     {
         return [
-            'display' => __('Enabled'),
+            'display' => $this->trans('config_enabled.display'),
             'fields' => [
                 [
                     'handle' => 'enabled',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('Enabled'),
-                        'instructions' => __("Enables SEO for this {$this->contentTypeLabel()}."),
+                        'display' => $this->trans('config_enabled.display'),
+                        'instructions' => $this->trans('config_enabled.instructions'),
                         'default' => true,
                     ],
                 ],
@@ -46,14 +46,14 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
     protected function origins(): array
     {
         return [
-            'display' => __('Origins'),
+            'display' => __('advanced-seo::messages.origins'),
             'fields' => [
                 [
                     'handle' => 'origins',
                     'field' => [
                         'type' => 'site_origins',
-                        'display' => __('Origins'),
-                        'instructions' => __('Choose to inherit values from selected origins.'),
+                        'display' => __('advanced-seo::messages.origins'),
+                        'instructions' => __('advanced-seo::messages.origins_instructions'),
                         'default' => [],
                         'if' => ['enabled' => 'true'],
                     ],
@@ -65,14 +65,14 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
     protected function sitemaps(): array
     {
         return [
-            'display' => __('Sitemaps'),
+            'display' => $this->trans('config_sitemaps.display'),
             'fields' => [
                 [
                     'handle' => 'sitemap',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('Sitemap'),
-                        'instructions' => __("Enables the sitemap for this {$this->contentTypeLabel()}."),
+                        'display' => $this->trans('config_sitemap.display'),
+                        'instructions' => $this->trans('config_sitemap.instructions'),
                         'default' => true,
                         'if' => ['enabled' => 'true'],
                         'feature' => Sitemap::class,
@@ -105,8 +105,8 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                     'handle' => 'social_images_generator',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('Social Images Generator'),
-                        'instructions' => __("Enables the social images generator for this {$this->contentTypeLabel()}."),
+                        'display' => $this->trans('config_social_images_generator.display'),
+                        'instructions' => $this->trans('config_social_images_generator.instructions'),
                         'default' => false,
                         'if' => ['enabled' => 'true'],
                         'feature' => SocialImagesGenerator::class,
@@ -116,8 +116,8 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                     'handle' => 'social_images_themes',
                     'field' => [
                         'type' => 'select',
-                        'display' => __('Themes'),
-                        'instructions' => __("Select the social image themes available for this {$this->contentTypeLabel()}."),
+                        'display' => $this->trans('config_social_images_themes.display'),
+                        'instructions' => $this->trans('config_social_images_themes.instructions'),
                         'options' => SocialImageTheme::all()->options(),
                         'default' => SocialImageTheme::all()->default()?->handle,
                         'multiple' => true,

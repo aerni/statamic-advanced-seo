@@ -20,5 +20,12 @@ return [
 
     'commit_message' => 'SEO defaults saved',
 
-    'configure_seo_defaults' => 'Configure SEO Defaults',
+    'origins' => 'Origins',
+    'origins_instructions' => 'Choose to inherit values from selected origins.',
+    'configure_title' => 'Configure :title',
+    'no_items_for_site' => 'No :title configured for the selected site.',
+    'disable_confirmation' => 'Are you sure you want to disable this item? All SEO data will be deleted.',
+    'social_image_updates_on_save' => 'The image updates on save.',
+    'social_image_generates_on_first_save' => 'The image generates on first save.',
+    'from_domain' => 'From :domain',
 ];

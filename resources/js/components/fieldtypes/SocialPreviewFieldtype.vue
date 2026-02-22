@@ -23,8 +23,8 @@ const instructions = computed(() => {
     }
 
     return imageTemplateUrl.value
-        ? 'The image updates on save.'
-        : 'The image generates on first save.';
+        ? __('advanced-seo::messages.social_image_updates_on_save')
+        : __('advanced-seo::messages.social_image_generates_on_first_save');
 });
 
 provideSocialPreview({ meta: props.meta, seo, imageTemplateUrl, image });

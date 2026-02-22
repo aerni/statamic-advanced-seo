@@ -4,26 +4,26 @@ return [
 
     'seo_section_search_appearance' => [
         'display' => 'Search Appearance',
-        'instructions' => 'Configure how this :type appears in search results.',
-        'default_instructions' => 'Configure how your :type appear in search results by default.',
+        'instructions' => 'Control how this :type appears in search results.',
+        'default_instructions' => 'Set defaults for how your :type appear in search results.',
     ],
 
     'seo_title' => [
         'display' => 'Meta Title',
-        'instructions' => 'Set the meta title of this :type.',
-        'default_instructions' => 'Set the default meta title of your :type.',
+        'instructions' => 'Shown as the title in search engine results.',
+        'default_instructions' => 'The default title for your :type in search results.',
     ],
 
     'seo_description' => [
         'display' => 'Meta Description',
-        'instructions' => 'Set the meta description of this :type.',
-        'default_instructions' => 'Set the default meta description of your :type.',
+        'instructions' => 'Shown as the description in search engine results.',
+        'default_instructions' => 'The default description for your :type in search results.',
     ],
 
     'seo_site_name_position' => [
         'display' => 'Site Name Position',
-        'instructions' => 'Set the site name position for the meta title of this :type.',
-        'default_instructions' => 'Set the default site name position for the meta title of your :type.',
+        'instructions' => 'Where to display the site name in the meta title.',
+        'default_instructions' => 'Default position of the site name in the meta title.',
         'end' => 'End',
         'start' => 'Start',
         'disabled' => 'Disabled',
@@ -31,50 +31,50 @@ return [
 
     'seo_section_social_appearance' => [
         'display' => 'Social Appearance',
-        'instructions' => 'Configure how this :type appears when shared on social media.',
-        'default_instructions' => 'Configure how your :type appear when shared on social media by default.',
+        'instructions' => 'Control how this :type looks when shared on social media.',
+        'default_instructions' => 'Set defaults for how your :type look when shared on social media.',
     ],
 
     'seo_generate_social_images' => [
         'display' => 'Generate Social Images',
-        'instructions' => 'Activate to use the social images generator for this :type.',
-        'default_instructions' => 'Activate to use the social images generator for your :type by default.',
+        'instructions' => 'Automatically generate social images for this :type.',
+        'default_instructions' => 'Automatically generate social images for your :type.',
     ],
 
     'seo_social_images_theme' => [
         'display' => 'Theme',
-        'instructions' => 'Choose the social images theme for this :type.',
-        'default_instructions' => 'Choose the default social images theme for your :type.',
+        'instructions' => 'The theme used for generated social images.',
+        'default_instructions' => 'The default theme for generated social images.',
     ],
 
     'seo_og_image' => [
         'display' => 'Social Image',
-        'instructions' => 'The recommended size is 1200x630px. The image is automatically resized as needed.',
-        'default_instructions' => 'Add a default social image for your :type. The image is automatically resized for each platform. Recommended size is 1200x630px.',
+        'instructions' => 'Recommended size: 1200x630px. Automatically resized as needed.',
+        'default_instructions' => 'The default social image for your :type. Recommended size: 1200x630px.',
     ],
 
     'seo_og_title' => [
         'display' => 'Social Title',
-        'instructions' => 'Set the social title of this :type.',
-        'default_instructions' => 'Set the default social title of your :type.',
+        'instructions' => 'Shown as the title when sharing on social media.',
+        'default_instructions' => 'The default social title for your :type.',
     ],
 
     'seo_og_description' => [
         'display' => 'Social Description',
-        'instructions' => 'Set the social description of this :type.',
-        'default_instructions' => 'Set the default social description of your :type.',
+        'instructions' => 'Shown as the description when sharing on social media.',
+        'default_instructions' => 'The default social description for your :type.',
     ],
 
     'seo_section_canonical_url' => [
         'display' => 'Canonical URL',
-        'instructions' => 'Configure the canonical URL settings of this :type.',
-        'default_instructions' => 'Configure the default canonical URL settings of your :type.',
+        'instructions' => 'Set the canonical URL for this :type.',
+        'default_instructions' => 'Set the default canonical URL for your :type.',
     ],
 
     'seo_canonical_type' => [
         'display' => 'Canonical URL',
-        'instructions' => 'Where should the canonical URL of this :type point to.',
-        'default_instructions' => 'Where should the default canonical URL of your :type point to.',
+        'instructions' => 'Where the canonical URL should point to.',
+        'default_instructions' => 'Where the default canonical URL should point to.',
         'current' => 'Current :type',
         'other' => 'Other Entry',
         'custom' => 'Custom URL',
@@ -82,56 +82,56 @@ return [
 
     'seo_canonical_entry' => [
         'display' => 'Entry',
-        'instructions' => 'Choose the entry with the original content.',
-        'default_instructions' => 'Choose the entry with the original content.',
+        'instructions' => 'The entry with the original content.',
+        'default_instructions' => 'The entry with the original content.',
     ],
 
     'seo_canonical_custom' => [
         'display' => 'URL',
-        'instructions' => 'A fully qualified and [active URL](https://laravel.com/docs/11.x/validation#rule-active-url).',
-        'default_instructions' => 'A fully qualified and [active URL](https://laravel.com/docs/11.x/validation#rule-active-url).',
+        'instructions' => 'A fully qualified [active URL](https://laravel.com/docs/master/validation#rule-active-url).',
+        'default_instructions' => 'A fully qualified [active URL](https://laravel.com/docs/master/validation#rule-active-url).',
     ],
 
     'seo_section_indexing' => [
         'display' => 'Indexing',
-        'instructions' => 'Configure the indexing settings of this :type.',
-        'default_instructions' => 'Configure the default indexing settings of your :type.',
+        'instructions' => 'Control search engine indexing for this :type.',
+        'default_instructions' => 'Set default indexing behavior for your :type.',
     ],
 
     'seo_noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Prevent this :type from being indexed by search engines.',
-        'default_instructions' => 'Prevent your :type from being indexed by search engines.',
+        'instructions' => 'Prevent search engines from indexing this :type.',
+        'default_instructions' => 'Prevent search engines from indexing your :type.',
     ],
 
     'seo_nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Prevent site crawlers from following links on this :type\'s page.',
-        'default_instructions' => 'Prevent site crawlers from following links on your :type\' pages.',
+        'instructions' => 'Prevent crawlers from following links on this :type.',
+        'default_instructions' => 'Prevent crawlers from following links on your :type.',
     ],
 
     'seo_section_sitemap' => [
         'display' => 'Sitemap',
-        'instructions' => 'Configure the sitemap settings of this :type.',
-        'default_instructions' => 'Configure the default sitemap settings of your :type.',
+        'instructions' => 'Configure sitemap settings for this :type.',
+        'default_instructions' => 'Set default sitemap settings for your :type.',
     ],
 
     'seo_sitemap_enabled' => [
         'display' => 'Enabled',
-        'instructions' => 'Choose to add or remove this :type from the sitemap.',
-        'default_instructions' => 'Choose to add or remove your :type from the sitemap.',
+        'instructions' => 'Include this :type in the sitemap.',
+        'default_instructions' => 'Include your :type in the sitemap.',
     ],
 
     'seo_sitemap_priority' => [
         'display' => 'Priority',
-        'instructions' => 'Choose the sitemap priority of this :type. 1.0 is the most important.',
-        'default_instructions' => 'Choose the default sitemap priority of your :type. 1.0 is the most important.',
+        'instructions' => 'Sitemap priority. 1.0 is the most important.',
+        'default_instructions' => 'Default sitemap priority. 1.0 is the most important.',
     ],
 
     'seo_sitemap_change_frequency' => [
         'display' => 'Change Frequency',
-        'instructions' => 'Choose the frequency in which search engines should crawl this :type.',
-        'default_instructions' => 'Choose the default frequency in which search engines should crawl your :type.',
+        'instructions' => 'How often search engines should crawl this :type.',
+        'default_instructions' => 'How often search engines should crawl your :type.',
         'always' => 'Always',
         'hourly' => 'Hourly',
         'daily' => 'Daily',
@@ -141,16 +141,16 @@ return [
         'never' => 'Never',
     ],
 
-    'seo_section_json_ld' => [
-        'display' => 'JSON-ld Schema',
-        'instructions' => 'Add custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for this :type.',
-        'default_instructions' => 'Add default custom [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) for your :type.',
+    'seo_section_structured_data' => [
+        'display' => 'Structured Data',
+        'instructions' => 'Add custom [structured data](https://developers.google.com/search/docs/guides/intro-structured-data) for this :type.',
+        'default_instructions' => 'Set default [structured data](https://developers.google.com/search/docs/guides/intro-structured-data) for your :type.',
     ],
 
     'seo_json_ld' => [
         'display' => 'JSON-LD Schema',
-        'instructions' => 'The structured data of this :type. This will be wrapped in the appropriate script tag.',
-        'default_instructions' => 'The default structured data of your :type. This will be wrapped in the appropriate script tag.',
+        'instructions' => 'Custom structured data. Automatically wrapped in a script tag.',
+        'default_instructions' => 'Default structured data for your :type. Automatically wrapped in a script tag.',
     ],
 
     'seo_search_preview' => [
@@ -163,87 +163,87 @@ return [
 
     'section_fathom' => [
         'display' => 'Fathom',
-        'instructions' => 'Use [Fathom](https://usefathom.com) as a privacy-friendly alternative to Google Analytics.',
+        'instructions' => 'A privacy-friendly alternative to Google Analytics. [Learn more](https://usefathom.com)',
     ],
 
     'use_fathom' => [
         'display' => 'Fathom',
-        'instructions' => 'Add the Fathom tracking script to your head.',
+        'instructions' => 'Add the Fathom tracking script.',
     ],
 
     'fathom_id' => [
         'display' => 'Site ID',
-        'instructions' => 'Add your site ID.',
+        'instructions' => 'Your Fathom site ID.',
     ],
 
     'fathom_spa' => [
         'display' => 'SPA Mode',
-        'instructions' => 'Activate if your site is a single page application.',
+        'instructions' => 'Enable for single page applications.',
     ],
 
     'section_cloudflare_web_analytics' => [
         'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'Use [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics) as a privacy-friendly alternative to Google Analytics.',
+        'instructions' => 'A privacy-friendly alternative to Google Analytics. [Learn more](https://www.cloudflare.com/web-analytics)',
     ],
 
     'use_cloudflare_web_analytics' => [
         'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'Add the Cloudflare tracking script to your head.',
+        'instructions' => 'Add the Cloudflare Web Analytics tracking script.',
     ],
 
     'cloudflare_web_analytics' => [
         'display' => 'Beacon Token',
-        'instructions' => 'Add your beacon token.',
+        'instructions' => 'Your Cloudflare beacon token.',
     ],
 
     'section_google_tag_manager' => [
         'display' => 'Google Tag Manager',
-        'instructions' => 'Use [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager) to track your users. You are `required by privacy law` to get your user\'s consent before loading any tracking scripts. You also need to inform them about what data you collect and what you intent to do with it.',
+        'instructions' => 'Manage tracking scripts via [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager).',
     ],
 
     'use_google_tag_manager' => [
         'display' => 'Google Tag Manager',
-        'instructions' => 'Add the Google Tag Manager tracking scripts.',
+        'instructions' => 'Add the Google Tag Manager scripts.',
     ],
 
     'google_tag_manager' => [
         'display' => 'Container ID',
-        'instructions' => 'Add your container ID.',
+        'instructions' => 'Your GTM container ID.',
     ],
 
     'section_favicon' => [
         'display' => 'Favicon',
-        'instructions' => 'Configure the favicon of your site.',
+        'instructions' => 'The icon displayed in browser tabs.',
     ],
 
     'favicon_svg' => [
         'display' => 'Favicon (SVG)',
-        'instructions' => 'Add your favicon as SVG file.',
+        'instructions' => 'Upload an SVG favicon.',
     ],
 
     'section_titles' => [
         'display' => 'Titles',
-        'instructions' => 'Configure the appearance of your page titles.',
+        'instructions' => 'Configure how page titles are displayed.',
     ],
 
     'site_name' => [
         'display' => 'Site Name',
-        'instructions' => 'The site name is added to your meta titles.',
+        'instructions' => 'Appended to your meta titles.',
     ],
 
     'title_separator' => [
         'display' => 'Title Separator',
-        'instructions' => 'This separates the site name and page title.',
+        'instructions' => 'The character between the page title and site name.',
     ],
 
-    'section_knowledge_graph' => [
-        'display' => 'Basic Information',
-        'instructions' => 'Add basic [JSON-LD](https://developers.google.com/search/docs/guides/intro-structured-data) information about this site.',
+    'section_structured_data' => [
+        'display' => 'Structured Data',
+        'instructions' => 'Help search engines understand your site with [structured data](https://developers.google.com/search/docs/guides/intro-structured-data).',
     ],
 
     'site_json_ld_type' => [
         'display' => 'Content Type',
-        'instructions' => 'The type of content this site represents.',
+        'instructions' => 'What this site represents.',
         'none' => 'None',
         'organization' => 'Organization',
         'person' => 'Person',
@@ -252,94 +252,103 @@ return [
 
     'organization_name' => [
         'display' => 'Organization Name',
-        'instructions' => "The name of this site's organization.",
+        'instructions' => 'The name of the organization.',
     ],
 
     'organization_logo' => [
         'display' => 'Organization Logo',
-        'instructions' => 'Add the logo with a minimum size of 112 x 112 pixels.',
+        'instructions' => 'Minimum size: 112x112px.',
     ],
 
     'person_name' => [
         'display' => 'Person Name',
-        'instructions' => "The name of this site's person.",
+        'instructions' => 'The name of the person.',
     ],
 
     'site_json_ld' => [
         'display' => 'JSON-LD Schema',
-        'instructions' => 'Structured data that will be added to every page. This will be wrapped in the appropriate script tag.',
-    ],
-
-    'section_breadcrumbs' => [
-        'display' => 'Breadcrumbs',
-        'instructions' => "Breadcrumbs help your users understand your site by indicating each page's position in the hierarchy.",
+        'instructions' => 'Structured data added to every page. Automatically wrapped in a script tag.',
     ],
 
     'use_breadcrumbs' => [
         'display' => 'Breadcrumbs',
-        'instructions' => 'Add [breadcrumbs](https://developers.google.com/search/docs/data-types/breadcrumb) to your pages.',
+        'instructions' => 'Add [breadcrumb](https://developers.google.com/search/docs/data-types/breadcrumb) structured data.',
     ],
 
-    'section_crawling' => [
-        'display' => 'Crawling',
-        'instructions' => 'Configure the crawling settings of your site. These settings will take precedence over their counterparts on entries and terms.',
+    'section_indexing' => [
+        'display' => 'Indexing',
+        'instructions' => 'Site-wide indexing settings. These override entry and term settings.',
     ],
 
     'noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Prevent your site from being indexed by search engines.',
+        'instructions' => 'Prevent search engines from indexing your entire site.',
     ],
 
     'nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Prevent site crawlers from following any links on your site.',
-    ],
-
-    'section_sitemap' => [
-        'display' => 'Sitemap',
-        'instructions' => 'Configure the sitemap settings of your site.',
+        'instructions' => 'Prevent crawlers from following any links on your site.',
     ],
 
     'section_verification' => [
-        'display' => 'Site verification',
-        'instructions' => 'Verify your ownership of this site.',
+        'display' => 'Site Verification',
+        'instructions' => 'Verify ownership of this site.',
     ],
 
     'google_site_verification_code' => [
         'display' => 'Google Verification Code',
-        'instructions' => 'Add your Google verification code. You can get it in [Google Search Console](https://search.google.com/search-console).',
+        'instructions' => 'From [Google Search Console](https://search.google.com/search-console).',
     ],
 
     'bing_site_verification_code' => [
         'display' => 'Bing Verification Code',
-        'instructions' => 'Add your Bing verification code. You can get it in [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
+        'instructions' => 'From [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
     ],
 
-    'section_social_images_generator' => [
-        'display' => 'Social Images Generator',
-        'instructions' => 'Configurate the settings of the social images generator.',
-    ],
-
-    'section_social_media' => [
-        'display' => 'Social Media',
-        'instructions' => 'Configure the site-wide social media settings.',
+    'section_social_appearance' => [
+        'display' => 'Social Appearance',
+        'instructions' => 'Site-wide social sharing settings.',
     ],
 
     'og_image' => [
         'display' => 'Social Image',
-        'instructions' => 'This image will be used as a fallback if none was set on the content. The recommended size is 1200x630px. The image is automatically resized as needed.',
+        'instructions' => 'Fallback image when none is set on the content. Recommended size: 1200x630px.',
     ],
 
     'twitter_card' => [
         'display' => 'X (Twitter) Card',
-        'instructions' => 'Choose the card size to use when sharing content from this collection.',
+        'instructions' => 'Card size when sharing content from this :type.',
         'summary' => 'Small',
         'summary_large_image' => 'Large',
     ],
 
     'twitter_handle' => [
         'display' => 'X (Twitter) Username',
-        'instructions' => 'Add your X (Twitter) username.',
+        'instructions' => 'Your X (Twitter) username.',
+    ],
+
+    'config_enabled' => [
+        'display' => 'Enabled',
+        'instructions' => 'Enables SEO for this :type.',
+    ],
+
+    'config_sitemaps' => [
+        'display' => 'Sitemaps',
+    ],
+
+    'config_sitemap' => [
+        'display' => 'Sitemap',
+        'instructions' => 'Enables the sitemap for this :type.',
+    ],
+
+    'config_social_images_generator' => [
+        'display' => 'Social Images Generator',
+        'instructions' => 'Enables the social images generator for this :type.',
+    ],
+
+    'config_social_images_themes' => [
+        'display' => 'Themes',
+        'instructions' => 'Select the social image themes available for this :type.',
     ],
 
 ];

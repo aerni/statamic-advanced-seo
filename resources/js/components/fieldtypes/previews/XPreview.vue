@@ -57,7 +57,7 @@ const description = computed(() => seo.resolve('seo_og_description'));
                     <span v-if="title" class="text-[13px] text-white truncate">{{ title }}</span>
                 </div>
             </div>
-            <div class="mt-1 text-[13px] leading-4 text-gray-500">From {{ meta.domain }}</div>
+            <div class="mt-1 text-[13px] leading-4 text-gray-500">{{ __('advanced-seo::messages.from_domain', { domain: meta.domain }) }}</div>
         </template>
 
     </div>

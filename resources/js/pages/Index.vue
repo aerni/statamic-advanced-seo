@@ -84,7 +84,7 @@ const cancelDisable = () => {
         <div
             v-else
             class="p-6 text-center text-gray-500 border border-gray-300 border-dashed rounded-lg dark:border-gray-700"
-            v-text="__(`No ${title} configured for the selected site`)"
+            v-text="__('advanced-seo::messages.no_items_for_site', { title })"
         />
 
         <ConfirmationModal
@@ -96,7 +96,7 @@ const cancelDisable = () => {
             @confirm="confirmDisable"
             @cancel="cancelDisable"
         >
-            <p class="text-sm">{{ __('Are you sure you want to disable this item? All SEO data will be deleted.') }}</p>
+            <p class="text-sm">{{ __('advanced-seo::messages.disable_confirmation') }}</p>
         </ConfirmationModal>
     </div>
 </template>

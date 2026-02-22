@@ -21,16 +21,16 @@ class SiteDefaultsBlueprint extends BaseBlueprint
     protected function tabs(): array
     {
         return [
-            'general' => [
+            'search_appearance' => [
                 $this->titles(),
-                $this->knowledgeGraph(),
+                $this->structuredData(),
                 $this->favicons(),
             ],
-            'social_media' => [
-                $this->socialMedia(),
+            'social_appearance' => [
+                $this->socialAppearance(),
             ],
             'indexing' => [
-                $this->crawling(),
+                $this->indexing(),
                 $this->siteVerification(),
             ],
             'analytics' => [
@@ -91,11 +91,11 @@ class SiteDefaultsBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function knowledgeGraph(): array
+    protected function structuredData(): array
     {
         return [
-            'display' => $this->trans('section_knowledge_graph.display'),
-            'instructions' => $this->trans('section_knowledge_graph.instructions'),
+            'display' => $this->trans('section_structured_data.display'),
+            'instructions' => $this->trans('section_structured_data.instructions'),
             'collapsible' => true,
             'fields' => [
                 [
@@ -233,11 +233,11 @@ class SiteDefaultsBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function socialMedia(): array
+    protected function socialAppearance(): array
     {
         return [
-            'display' => $this->trans('section_social_media.display'),
-            'instructions' => $this->trans('section_social_media.instructions'),
+            'display' => $this->trans('section_social_appearance.display'),
+            'instructions' => $this->trans('section_social_appearance.instructions'),
             'collapsible' => true,
             'fields' => [
                 [
@@ -268,11 +268,11 @@ class SiteDefaultsBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function crawling(): array
+    protected function indexing(): array
     {
         return [
-            'display' => $this->trans('section_crawling.display'),
-            'instructions' => $this->trans('section_crawling.instructions'),
+            'display' => $this->trans('section_indexing.display'),
+            'instructions' => $this->trans('section_indexing.instructions'),
             'collapsible' => true,
             'fields' => [
                 [

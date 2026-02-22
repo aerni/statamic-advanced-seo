@@ -457,8 +457,8 @@ class OnPageSeoBlueprint extends BaseBlueprint
     protected function jsonLd(): array
     {
         return [
-            'display' => $this->trans('seo_section_json_ld.display'),
-            'instructions' => $this->trans('seo_section_json_ld.instructions'),
+            'display' => $this->trans('seo_section_structured_data.display'),
+            'instructions' => $this->trans('seo_section_structured_data.instructions'),
             'collapsible' => true,
             'fields' => [
                 [

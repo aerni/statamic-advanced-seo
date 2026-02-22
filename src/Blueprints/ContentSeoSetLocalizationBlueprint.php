@@ -337,8 +337,8 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
     protected function jsonLd(): array
     {
         return [
-            'display' => $this->trans('seo_section_json_ld.display'),
-            'instructions' => $this->trans('seo_section_json_ld.default_instructions'),
+            'display' => $this->trans('seo_section_structured_data.display'),
+            'instructions' => $this->trans('seo_section_structured_data.default_instructions'),
             'collapsible' => true,
             'fields' => [
                 [
