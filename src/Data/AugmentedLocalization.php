@@ -14,4 +14,12 @@ class AugmentedLocalization extends AbstractAugmented
          */
         return $this->data->blueprintFields();
     }
+
+    /**
+     * Augment site_name with a fallback to the Statamic site name.
+     */
+    public function siteName(): string
+    {
+        return $this->data->value('site_name') ?? $this->data->site()->name();
+    }
 }

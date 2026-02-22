@@ -156,9 +156,6 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function newAugmentedInstance(): Augmented
     {
-        return match ($this->type()) {
-            'site' => new AugmentedSiteDefaultsLocalization($this),
-            default => new AugmentedLocalization($this),
-        };
+        return new AugmentedLocalization($this);
     }
 }
