@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { useSocialPreview } from '../../../composables/useSocialPreview.js';
+import { useSocialPreview } from '../../composables/useSocialPreview.js';
 import PreviewIframe from './PreviewIframe.vue';
 import PreviewImage from './PreviewImage.vue';
 

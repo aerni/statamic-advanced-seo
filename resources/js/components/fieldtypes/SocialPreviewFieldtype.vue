@@ -4,8 +4,8 @@ import { Fieldtype } from '@statamic/cms';
 import { useSeoValues } from '../../composables/useSeoValues.js';
 import { useSeoAssets } from '../../composables/useSeoAssets.js';
 import { provideSocialPreview } from '../../composables/useSocialPreview.js';
-import FacebookPreview from './previews/FacebookPreview.vue';
-import XPreview from './previews/XPreview.vue';
+import FacebookPreview from '../ui/FacebookPreview.vue';
+import XPreview from '../ui/XPreview.vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
