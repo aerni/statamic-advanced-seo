@@ -31,9 +31,9 @@ const description = computed(() => seo.resolve('seo_og_description'));
             <div class="border-l border-gray-200 dark:border-gray-700" />
             <div class="flex flex-col justify-center w-full min-w-0 gap-1 p-3">
                 <div class="text-[15px] leading-5 text-gray-500">{{ meta.domain }}</div>
-                <div v-if="title" class="text-[15px] leading-5 text-gray-925 dark:text-gray-300 line-clamp-1">{{ title }}</div>
+                <div v-if="title" class="text-[15px] leading-5 text-gray-925 dark:text-gray-300 line-clamp-1 whitespace-pre-wrap">{{ title }}</div>
                 <div v-else class="w-3/4 h-5 bg-gray-200 rounded dark:bg-gray-800" />
-                <div v-if="description" class="text-[15px] leading-5 text-gray-500 line-clamp-2">{{ description }}</div>
+                <div v-if="description" class="text-[15px] leading-5 text-gray-500 line-clamp-2 whitespace-pre-wrap">{{ description }}</div>
                 <div v-else class="flex flex-col w-full gap-1">
                     <div class="h-[18px] w-full bg-gray-200 dark:bg-gray-800 rounded" />
                     <div class="h-[18px] w-3/4 bg-gray-200 dark:bg-gray-800 rounded" />

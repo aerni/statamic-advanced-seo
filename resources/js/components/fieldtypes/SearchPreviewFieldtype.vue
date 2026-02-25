@@ -58,11 +58,11 @@ const breadcrumbs = computed(() => {
                 </div>
             </div>
         </div>
-        <div class="text-[20px] leading-[26px] text-[#1a0dab] dark:text-[#8ab4f8] mb-1 line-clamp-2">
+        <div class="text-[20px] leading-[26px] text-[#1a0dab] dark:text-[#8ab4f8] mb-1 line-clamp-2 whitespace-pre-wrap">
             <template v-if="title">{{ title }}</template>
             <template v-else>{{ titlePrefix }}<span class="inline-block w-32 h-5 align-middle bg-gray-200 rounded dark:bg-gray-800" />{{ titleSuffix }}</template>
         </div>
-        <div v-if="description" class="text-sm leading-[22px] text-gray-600 dark:text-gray-400 line-clamp-2">{{ description }}</div>
+        <div v-if="description" class="text-sm leading-[22px] text-gray-600 dark:text-gray-400 line-clamp-2 whitespace-pre-wrap">{{ description }}</div>
         <div v-else>
             <div class="flex items-center h-[22px]"><span class="w-full h-3 bg-gray-200 rounded dark:bg-gray-800" /></div>
             <div class="flex items-center h-[22px]"><span class="w-2/3 h-3 bg-gray-200 rounded dark:bg-gray-800" /></div>
