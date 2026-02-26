@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context as ViewContext;
 
@@ -13,7 +14,7 @@ class GetSiteDefaults
 {
     public static function handle(mixed $model): Collection
     {
-        $site = Context::from($model)->site;
+        $site = Context::from($model)?->site ?? Site::current()->handle();
 
         return Blink::once("advanced-seo::site::{$site}", function () use ($site, $model) {
             $siteDefaults = Seo::find('site::defaults')->in($site)->toAugmentedCollection();
