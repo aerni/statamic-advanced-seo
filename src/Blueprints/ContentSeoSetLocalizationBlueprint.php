@@ -42,10 +42,9 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_title',
                     'field' => [
-                        'type' => 'text',
+                        'type' => 'token_input',
                         'display' => $this->trans('seo_title.display'),
                         'instructions' => $this->trans('seo_title.default_instructions'),
-                        'input_type' => 'text',
                         'localizable' => true,
                         'listable' => 'hidden',
                         'character_limit' => 60,
@@ -55,7 +54,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_description',
                     'field' => [
-                        'type' => 'textarea',
+                        'type' => 'token_input',
                         'display' => $this->trans('seo_description.display'),
                         'instructions' => $this->trans('seo_description.default_instructions'),
                         'localizable' => true,
@@ -94,7 +93,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_og_title',
                     'field' => [
-                        'type' => 'text',
+                        'type' => 'token_input',
                         'display' => $this->trans('seo_og_title.display'),
                         'instructions' => $this->trans('seo_og_title.default_instructions'),
                         'default' => '{{ seo_title }}',
@@ -105,7 +104,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_og_description',
                     'field' => [
-                        'type' => 'textarea',
+                        'type' => 'token_input',
                         'display' => $this->trans('seo_og_description.display'),
                         'instructions' => $this->trans('seo_og_description.default_instructions'),
                         'default' => '{{ seo_description }}',

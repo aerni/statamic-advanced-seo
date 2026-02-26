@@ -6,6 +6,15 @@
     },
     "type": "module",
     "dependencies": {
+        "@tiptap/core": "^3.0.0",
+        "@tiptap/extension-document": "^3.0.0",
+        "@tiptap/extension-history": "^3.0.0",
+        "@tiptap/extension-paragraph": "^3.0.0",
+        "@tiptap/extension-placeholder": "^3.0.0",
+        "@tiptap/extension-text": "^3.0.0",
+        "@tiptap/pm": "^3.0.0",
+        "@tiptap/suggestion": "^3.0.0",
+        "@tiptap/vue-3": "^3.0.0",
         "vue": "^3.5.25"
     },
     "devDependencies": {

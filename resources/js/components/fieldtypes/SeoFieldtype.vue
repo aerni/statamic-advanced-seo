@@ -2,14 +2,11 @@
 import { computed, ref, watch } from 'vue';
 import { Fieldtype } from '@statamic/cms';
 import { Description, injectPublishContext } from '@statamic/cms/ui';
-import { useSeoValues } from '../../composables/useSeoValues.js';
-
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const fieldtype = Fieldtype.use(emit, props);
 defineExpose(fieldtype.expose);
 
-const { parse } = useSeoValues();
 const publishContext = injectPublishContext();
 
 // Snapshots of the local cascade defaults. During sync, Statamic swaps meta to the origin's
@@ -48,26 +45,6 @@ const isCustom = computed(() => props.value.source === 'custom');
 const isTextBasedField = computed(() => props.meta.isTextBasedField);
 const isCodeField = computed(() => props.meta.component === 'code-fieldtype');
 
-const childConfig = computed(() => {
-    const config = { ...props.config.field };
-
-    // For text/textarea fields in inherited state, show the resolved default as a placeholder.
-    // Code fields don't support placeholder — they show the default as muted content instead.
-    if (!isCustom.value && isTextBasedField.value && !isCodeField.value) {
-        config.placeholder = resolvedDefault.value;
-    }
-
-    return config;
-});
-
-const resolvedDefault = computed(() => {
-    const val = localDefaultValue.value;
-
-    if (val === null || val === undefined) return '';
-    if (typeof val === 'string') return parse(val) ?? val;
-    if (typeof val === 'boolean') return val ? 'true' : 'false';
-    return String(val);
-});
 
 // Non-text field synced to origin where the origin's cascade resolves differently.
 // After sync, props.value.value holds the origin's preprocessed default (e.g. false).
@@ -85,13 +62,8 @@ const childValue = computed(() => {
         return props.value.value;
     }
 
-    // Text/textarea: use null so the placeholder shows through.
-    if (isTextBasedField.value && !isCodeField.value) {
-        return null;
-    }
-
-    // Code fields: show the default value as actual content (with muted styling).
-    if (isCodeField.value) {
+    // Non-custom text/code fields: show the default value.
+    if (isTextBasedField.value || isCodeField.value) {
         return localDefaultValue.value;
     }
 
@@ -153,7 +125,7 @@ function handleBlur() {
             :is="props.meta.component"
             :handle="`${props.config.handle}_child`"
             :name="props.name"
-            :config="childConfig"
+            :config="props.config.field"
             :meta="childMeta"
             :value="childValue"
             :read-only="fieldtype.isReadOnly.value"

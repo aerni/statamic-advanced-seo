@@ -175,7 +175,7 @@ class SeoFieldtype extends Fieldtype
 
     protected function childField(): Field
     {
-        return new Field(null, $this->config('field'))
+        return new Field($this->field->handle(), $this->config('field'))
             ->setParent($this->field->parent());
     }
 

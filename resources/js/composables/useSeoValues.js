@@ -1,3 +1,4 @@
+import { ANTLERS_PATTERN } from '../utils/antlers.js';
 import { usePublishFields } from './usePublishFields.js';
 
 /**
@@ -66,7 +67,7 @@ function toPlainText(value, fieldType) {
  * Provides reactive resolution of field values with support for:
  * - seo fields (default, custom)
  * - Field type conversion (markdown, bard) to plain text
- * - Template parsing ({{ handle }})
+ * - Template resolution ({{ handle }})
  * - Recursive resolution for seo field references
  *
  * @returns {{ resolve: Function, truncate: Function }}
@@ -78,6 +79,8 @@ export function useSeoValues() {
         getFieldMeta,
     } = usePublishFields();
 
+    const resolving = new Set();
+
     /**
      * Resolve a field value to plain text. If the field is a seo field,
      * resolve it through the full chain. Otherwise, convert to plain text.
@@ -86,11 +89,19 @@ export function useSeoValues() {
         const field = getField(handle);
         if (!field) return null;
 
-        if (field.type === 'seo') {
-            return resolve(handle) ?? '';
-        }
+        if (resolving.has(handle)) return null;
 
-        return toPlainText(getFieldRawValue(handle), field.type);
+        resolving.add(handle);
+
+        try {
+            if (field.type === 'seo') {
+                return resolve(handle);
+            }
+
+            return toPlainText(getFieldRawValue(handle), field.type);
+        } finally {
+            resolving.delete(handle);
+        }
     }
 
     /**
@@ -98,14 +109,12 @@ export function useSeoValues() {
      * with the corresponding publish field values.
      * Unresolvable references are kept as raw Antlers.
      */
-    function parse(value) {
+    function resolveAntlers(value) {
         if (!value || typeof value !== 'string') return value;
 
-        return value
-            .replace(/\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g, (match, handle) => {
-                const resolved = resolveFieldValue(handle);
-                return resolved !== null ? resolved : match;
-            });
+        return value.replace(new RegExp(ANTLERS_PATTERN.source, 'g'), (match, handle) => {
+            return resolveFieldValue(handle) ?? match;
+        });
     }
 
     /**
@@ -114,7 +123,7 @@ export function useSeoValues() {
      */
     function resolveDefault(handle) {
         const def = getFieldMeta(handle)?.defaultValue;
-        return typeof def === 'string' && def !== '' ? parse(def) : '';
+        return typeof def === 'string' && def !== '' ? resolveAntlers(def) : '';
     }
 
     function resolve(handle) {
@@ -125,7 +134,7 @@ export function useSeoValues() {
             case 'default':
                 return resolveDefault(handle);
             case 'custom':
-                return parse(value.value)?.trim();
+                return resolveAntlers(value.value)?.trim();
             default:
                 return toPlainText(value, field.type);
         }
@@ -133,7 +142,7 @@ export function useSeoValues() {
 
     return {
         resolve,
-        parse,
+        resolveAntlers,
         truncate,
     };
 }

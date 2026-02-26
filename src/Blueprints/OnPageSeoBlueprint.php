@@ -47,7 +47,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_title.instructions'),
                         'localizable' => true,
                         'field' => [
-                            'type' => 'text',
+                            'type' => 'token_input',
                             'character_limit' => 60,
                         ],
                     ],
@@ -61,7 +61,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'default' => '@default',
                         'localizable' => true,
                         'field' => [
-                            'type' => 'textarea',
+                            'type' => 'token_input',
                             'character_limit' => 160,
                         ],
                     ],
@@ -111,7 +111,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_og_title.instructions'),
                         'localizable' => true,
                         'field' => [
-                            'type' => 'text',
+                            'type' => 'token_input',
                             'character_limit' => 70,
                         ],
                     ],
@@ -124,7 +124,7 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_og_description.instructions'),
                         'localizable' => true,
                         'field' => [
-                            'type' => 'textarea',
+                            'type' => 'token_input',
                             'character_limit' => 200,
                         ],
                     ],
