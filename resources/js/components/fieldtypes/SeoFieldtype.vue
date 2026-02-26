@@ -100,7 +100,7 @@ const childValue = computed(() => {
 
 const childMeta = computed(() => props.meta.meta);
 
-const showResetButton = computed(() => isCustom.value || showsOriginDefault.value);
+const showResetButton = computed(() => !fieldtype.isReadOnly.value && (isCustom.value || showsOriginDefault.value));
 
 function reset() {
     fieldtype.update({ source: 'default', value: localDefaultValue.value });
@@ -156,7 +156,7 @@ function handleBlur() {
             :config="childConfig"
             :meta="childMeta"
             :value="childValue"
-            :read-only="props.isReadOnly"
+            :read-only="fieldtype.isReadOnly.value"
             @update:meta="updateFieldMeta"
             @update:value="updateFieldValue"
         />
