@@ -40,10 +40,7 @@ class GraphQlCascade extends BaseCascade
     public function computedKeys(): Collection
     {
         return collect([
-            'site_name',
-            'title',
             'og_image_preset',
-            'og_title',
             'twitter_card',
             'twitter_image_preset',
             'twitter_handle',
@@ -54,21 +51,6 @@ class GraphQlCascade extends BaseCascade
             'site_schema',
             'breadcrumbs',
         ]);
-    }
-
-    public function siteName(): string
-    {
-        return $this->get('site_name');
-    }
-
-    public function title(): string
-    {
-        return $this->get('title') ?? $this->model->get('title') ?? $this->siteName();
-    }
-
-    public function ogTitle(): string
-    {
-        return $this->get('og_title') ?? $this->title();
     }
 
     public function ogImagePreset(): array

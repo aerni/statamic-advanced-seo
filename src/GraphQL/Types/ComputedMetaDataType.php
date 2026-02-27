@@ -19,24 +19,12 @@ class ComputedMetaDataType extends Type
     public function fields(): array
     {
         return [
-            'site_name' => [
-                'type' => GraphQl::string(),
-                'resolve' => $this->resolver(),
-            ],
-            'title' => [
-                'type' => GraphQl::string(),
-                'resolve' => $this->resolver(),
-            ],
             'og_image_preset' => [
                 'type' => GraphQl::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
             'twitter_image_preset' => [
                 'type' => GraphQl::type(SocialImagePresetType::NAME),
-                'resolve' => $this->resolver(),
-            ],
-            'og_title' => [
-                'type' => GraphQl::string(),
                 'resolve' => $this->resolver(),
             ],
             'twitter_card' => [

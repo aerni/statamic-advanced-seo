@@ -356,16 +356,18 @@ The following fields have been removed from the `computed` type:
 
 | Removed Field | Use Instead |
 |---------------|-------------|
-| `twitter_title` | `og_title` |
+| `title` | Use raw data `title` field |
+| `og_title` | Use raw data `og_title` field |
+| `twitter_title` | Use raw data `og_title` field |
 | `twitter_image` | Use raw data `og_image` field |
 | `og_image` | Use raw data `og_image` field |
 | `generated_og_image` | Use raw data `og_image` field |
 
+The `title` and `og_title` fields are now fully resolved through augmentation (see [Site Name Position](#site-name-position-composed-into-title)), making the computed methods redundant.
+
 A new `twitter_card` field has been added to the `computed` type, returning the card size (`summary` or `summary_large_image`).
 
-The `site_name_position` field has been removed from the `raw` type in the `seoMeta` query. Its value is now composed into the `title` field (see [Site Name Position](#site-name-position-composed-into-title)).
-
-The following raw data fields have been removed from the `collectionSet`, `taxonomySet`, and `siteSet` types:
+The following fields have been removed from the `seoMeta` raw type, `collectionSet`, and `taxonomySet` types:
 
 | Removed Field | Use Instead |
 |---------------|-------------|
@@ -373,6 +375,13 @@ The following raw data fields have been removed from the `collectionSet`, `taxon
 | `twitter_card` | Use `seoMeta { computed { twitter_card } }` |
 | `twitter_title` | `og_title` |
 | `twitter_description` | `og_description` |
+| `twitter_summary_image` | `og_image` |
+| `twitter_summary_large_image` | `og_image` |
+
+The following fields have been removed from the `siteSet` type:
+
+| Removed Field | Use Instead |
+|---------------|-------------|
 | `twitter_summary_image` | `og_image` |
 | `twitter_summary_large_image` | `og_image` |
 

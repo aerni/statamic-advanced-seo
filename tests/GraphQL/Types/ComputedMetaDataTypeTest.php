@@ -8,10 +8,7 @@ it('has the correct name', function () {
 
 it('exposes all expected fields', function () {
     expect((new ComputedMetaDataType)->fields())->toHaveKeys([
-        'site_name',
-        'title',
         'og_image_preset',
-        'og_title',
         'twitter_card',
         'twitter_handle',
         'twitter_image_preset',
