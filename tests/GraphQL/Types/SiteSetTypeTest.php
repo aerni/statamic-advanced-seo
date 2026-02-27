@@ -35,7 +35,7 @@ it('exposes all expected fields', function () {
     expect($fields)->toHaveKeys([
         // General: Titles
         'site_name',
-        'title_separator',
+        'separator',
         // General: Knowledge Graph
         'site_json_ld_type',
         'use_breadcrumbs',

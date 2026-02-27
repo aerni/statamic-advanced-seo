@@ -67,24 +67,6 @@ class OnPageSeoBlueprint extends BaseBlueprint
                     ],
                 ],
                 [
-                    'handle' => 'seo_site_name_position',
-                    'field' => [
-                        'type' => 'seo',
-                        'display' => $this->trans('seo_site_name_position.display'),
-                        'instructions' => $this->trans('seo_site_name_position.instructions'),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'field' => [
-                            'type' => 'button_group',
-                            'options' => [
-                                'end' => $this->trans('seo_site_name_position.end'),
-                                'start' => $this->trans('seo_site_name_position.start'),
-                                'disabled' => $this->trans('seo_site_name_position.disabled'),
-                            ],
-                        ],
-                    ],
-                ],
-                [
                     'handle' => 'seo_search_preview',
                     'field' => [
                         'type' => 'search_preview',

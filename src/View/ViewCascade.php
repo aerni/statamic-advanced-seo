@@ -63,22 +63,6 @@ class ViewCascade extends BaseCascade
         ]);
     }
 
-    protected function pageTitle(): ?string
-    {
-        // Handle taxonomy page.
-        if ($this->model->get('terms') instanceof TermQueryBuilder) {
-            return $this->model->get('title');
-        }
-
-        // Handle error page.
-        if ($this->model->get('response_code') === 404) {
-            return '404';
-        }
-
-        // Handle all other pages. Fall back to the model title if the SEO title is null.
-        return $this->get('title') ?? $this->model->get('title');
-    }
-
     public function siteName(): string
     {
         return $this->get('site_name');
@@ -86,23 +70,29 @@ class ViewCascade extends BaseCascade
 
     public function title(): string
     {
-        $siteNamePosition = $this->get('site_name_position');
-        $titleSeparator = $this->get('title_separator');
-        $siteName = $this->siteName();
-        $pageTitle = $this->pageTitle();
+        if ($this->model->get('terms') instanceof TermQueryBuilder) {
+            return $this->composeFallbackTitle($this->model->get('title'));
+        }
 
-        return match (true) {
-            (! $pageTitle) => $siteName,
-            ($siteNamePosition === 'end') => "{$pageTitle} {$titleSeparator} {$siteName}",
-            ($siteNamePosition === 'start') => "{$siteName} {$titleSeparator} {$pageTitle}",
-            ($siteNamePosition === 'disabled') => $pageTitle,
-            default => "{$pageTitle} {$titleSeparator} {$siteName}",
-        };
+        if ($this->model->get('response_code') === 404) {
+            return $this->composeFallbackTitle('404');
+        }
+
+        return $this->get('title') ?? $this->model->get('title') ?? $this->siteName();
+    }
+
+    protected function composeFallbackTitle(?string $pageTitle): string
+    {
+        if (! $pageTitle) {
+            return $this->siteName();
+        }
+
+        return "{$pageTitle} {$this->get('separator')} {$this->siteName()}";
     }
 
     public function ogTitle(): string
     {
-        return $this->get('og_title') ?? $this->pageTitle() ?? $this->siteName();
+        return $this->get('og_title') ?? $this->title();
     }
 
     public function ogImagePreset(): array

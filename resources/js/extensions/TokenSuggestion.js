@@ -1,12 +1,12 @@
 import { Extension } from '@tiptap/core';
 import Suggestion from '@tiptap/suggestion';
 
-export const FieldSuggestion = Extension.create({
-    name: 'fieldSuggestion',
+export const TokenSuggestion = Extension.create({
+    name: 'tokenSuggestion',
 
     addOptions() {
         return {
-            fields: [],
+            tokens: [],
             suggestion: {},
         };
     },
@@ -21,12 +21,12 @@ export const FieldSuggestion = Extension.create({
                 allowSpaces: false,
                 items: ({ query }) => {
                     if (!query) {
-                        return this.options.fields;
+                        return this.options.tokens;
                     }
 
                     const search = query.toLowerCase();
 
-                    return this.options.fields.filter(field => field.display.toLowerCase().includes(search) || field.handle.toLowerCase().includes(search));
+                    return this.options.tokens.filter(field => field.display.toLowerCase().includes(search) || field.handle.toLowerCase().includes(search));
                 },
                 command: ({ editor, range, props: field }) => {
                     editor.chain()

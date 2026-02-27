@@ -48,7 +48,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'listable' => 'hidden',
                         'character_limit' => 60,
-                        'default' => '{{ title }}',
+                        'default' => '{{ title }} {{ separator }} {{ site_name }}',
                     ],
                 ],
                 [
@@ -60,23 +60,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'listable' => 'hidden',
                         'character_limit' => 160,
-                    ],
-                ],
-                [
-                    'handle' => 'seo_site_name_position',
-                    'field' => [
-                        'type' => 'button_group',
-                        'display' => $this->trans('seo_site_name_position.display'),
-                        'instructions' => $this->trans('seo_site_name_position.default_instructions'),
-                        'options' => [
-                            'end' => $this->trans('seo_site_name_position.end'),
-                            'start' => $this->trans('seo_site_name_position.start'),
-                            'disabled' => $this->trans('seo_site_name_position.disabled'),
-                        ],
-                        'default' => 'end',
-                        'icon' => 'button_group',
-                        'localizable' => true,
-                        'listable' => false,
                     ],
                 ],
             ],

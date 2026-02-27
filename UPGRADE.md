@@ -93,6 +93,24 @@ The `@field:handle` syntax for referencing other fields has been replaced with s
 
 > **Automated Migration**: All `@field:handle` references, as well as `@auto` and `@null` sentinel values, are automatically migrated during the upgrade.
 
+### Site Name Position Composed into Title
+
+The `seo_site_name_position` field has been removed. Its value is now composed directly into the `seo_title` field using Antlers syntax, giving you full control over the title format.
+
+| Position | Resulting `seo_title` |
+|----------|-----------------------|
+| `start` | `{{ site_name }} {{ separator }} {{ title }}` |
+| `end` | `{{ title }} {{ separator }} {{ site_name }}` |
+| `disabled` | `{{ title }}` (no site name appended) |
+
+> **Automated Migration**: The position is automatically composed into the title during the upgrade.
+
+### Title Separator Renamed
+
+The `title_separator` field in site defaults has been renamed to `separator`.
+
+> **Automated Migration**: Existing `title_separator` values are automatically renamed to `separator` across all site localizations.
+
 ## X (Twitter) Social Sharing
 
 The X (Twitter) social sharing has been significantly simplified. Instead of maintaining separate Twitter-specific fields, the addon now uses a unified social image shared between Open Graph and Twitter, with only the card size remaining as a Twitter-specific setting.
@@ -345,15 +363,24 @@ The following fields have been removed from the `computed` type:
 
 A new `twitter_card` field has been added to the `computed` type, returning the card size (`summary` or `summary_large_image`).
 
+The `site_name_position` field has been removed from the `raw` type in the `seoMeta` query. Its value is now composed into the `title` field (see [Site Name Position](#site-name-position-composed-into-title)).
+
 The following raw data fields have been removed from the `collectionSet`, `taxonomySet`, and `siteSet` types:
 
 | Removed Field | Use Instead |
 |---------------|-------------|
+| `site_name_position` | Composed into `title` (see [Site Name Position](#site-name-position-composed-into-title)) |
 | `twitter_card` | Use `seoMeta { computed { twitter_card } }` |
 | `twitter_title` | `og_title` |
 | `twitter_description` | `og_description` |
 | `twitter_summary_image` | `og_image` |
 | `twitter_summary_large_image` | `og_image` |
+
+The following field has been renamed on the `siteSet` type:
+
+| Old Field | New Field |
+|-----------|-----------|
+| `title_separator` | `separator` |
 
 ### `seoSitemaps` Query
 

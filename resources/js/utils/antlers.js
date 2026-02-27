@@ -4,9 +4,12 @@ export const ANTLERS_PATTERN = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/;
  * Converts an Antlers template string into ProseMirror JSON
  * suitable for Tiptap's `setContent()`.
  *
+ * Only recognized token handles become token nodes.
+ * Unrecognized handles are kept as raw Antlers text.
+ *
  * "Hello {{ title }} world" → doc > paragraph > [text, token, text]
  */
-export function parse(value) {
+export function parse(value, tokens) {
     const doc = { type: 'doc', content: [{ type: 'paragraph' }] };
 
     if (value == null || value === '') {
@@ -22,7 +25,13 @@ export function parse(value) {
             content.push({ type: 'text', text: value.slice(lastIndex, match.index) });
         }
 
-        content.push({ type: 'token', attrs: { handle: match[1] } });
+        const handle = match[1];
+
+        content.push(tokens.some(token => token.handle === handle)
+            ? { type: 'token', attrs: { handle } }
+            : { type: 'text', text: match[0] },
+        );
+
         lastIndex = match.index + match[0].length;
     }
 

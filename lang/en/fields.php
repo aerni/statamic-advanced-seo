@@ -20,15 +20,6 @@ return [
         'default_instructions' => 'The default description for your :type in search results.',
     ],
 
-    'seo_site_name_position' => [
-        'display' => 'Site Name Position',
-        'instructions' => 'Where to display the site name in the meta title.',
-        'default_instructions' => 'Default position of the site name in the meta title.',
-        'end' => 'End',
-        'start' => 'Start',
-        'disabled' => 'Disabled',
-    ],
-
     'seo_section_social_appearance' => [
         'display' => 'Social Appearance',
         'instructions' => 'Control how this :type looks when shared on social media.',
@@ -231,8 +222,8 @@ return [
         'instructions' => 'Appended to your meta titles.',
     ],
 
-    'title_separator' => [
-        'display' => 'Title Separator',
+    'separator' => [
+        'display' => 'Separator',
         'instructions' => 'The character between the page title and site name.',
     ],
 

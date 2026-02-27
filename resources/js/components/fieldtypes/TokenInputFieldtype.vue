@@ -11,9 +11,9 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Dropcursor from '@tiptap/extension-dropcursor';
 import { Extension } from '@tiptap/core';
 import { TokenNode } from '../../extensions/TokenNode.js';
-import { FieldSuggestion } from '../../extensions/FieldSuggestion.js';
+import { TokenSuggestion } from '../../extensions/TokenSuggestion.js';
 import { parse, stringify } from '../../utils/antlers.js';
-import FieldSuggestionList from '../ui/FieldSuggestionList.vue';
+import TokenSuggestionList from '../ui/TokenSuggestionList.vue';
 import { useSeoValues } from '../../composables/useSeoValues.js';
 
 const emit = defineEmits(Fieldtype.emits);
@@ -35,7 +35,7 @@ const editor = shallowRef(null);
 
 // ─── Computed ────────────────────────────────────────────────────────────────
 
-const fields = computed(() => props.meta.fields);
+const tokens = computed(() => props.meta.tokens);
 
 const characterLimit = computed(() => {
     if (publishContext.name.value === 'seo-set-localizations') return null;
@@ -56,7 +56,7 @@ function withInternalUpdate(callback) {
 
 function collapseRemainingAntlers(instance) {
     const json = instance.getJSON();
-    const reparsed = parse(stringify(json));
+    const reparsed = parse(stringify(json), tokens.value);
 
     if (JSON.stringify(json) !== JSON.stringify(reparsed)) {
         withInternalUpdate(() => {
@@ -75,16 +75,16 @@ onMounted(() => {
             Text,
             History,
             Dropcursor.configure({ color: '#3b82f6', width: 2 }),
-            Placeholder.configure({ placeholder: __('advanced-seo::messages.field_picker_placeholder') }),
-            TokenNode.configure({ fields: fields.value }),
+            Placeholder.configure({ placeholder: __('advanced-seo::messages.token_picker_placeholder') }),
+            TokenNode.configure({ tokens: tokens.value }),
             Extension.create({
                 name: 'singleLine',
                 addKeyboardShortcuts() {
                     return { Enter: () => true };
                 },
             }),
-            FieldSuggestion.configure({
-                fields: fields.value,
+            TokenSuggestion.configure({
+                tokens: tokens.value,
                 suggestion: {
                     render: () => ({
                         onStart: (props) => { suggestionState.value = props; },
@@ -95,7 +95,7 @@ onMounted(() => {
                 },
             }),
         ],
-        content: parse(props.value),
+        content: parse(props.value, tokens.value),
         editable: !fieldtype.isReadOnly.value,
         editorProps: {
             attributes: {
@@ -135,7 +135,7 @@ watch(() => props.value, (value) => {
 
     if (value !== current) {
         withInternalUpdate(() => {
-            editor.value.commands.setContent(parse(value));
+            editor.value.commands.setContent(parse(value, tokens.value));
         });
     }
 }, { flush: 'post' });
@@ -146,7 +146,7 @@ watch(() => props.value, (value) => {
         class="relative bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-10"
         data-ui-input
         :data-suggestion-empty="suggestionEmpty || undefined"
-        :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.field_suggestion_placeholder')}'` }"
+        :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.token_suggestion_placeholder')}'` }"
         :class="{
             'pe-9': characterLimit && !fieldtype.isReadOnly.value,
             'border-dashed pointer-events-none': fieldtype.isReadOnly.value,
@@ -160,7 +160,7 @@ watch(() => props.value, (value) => {
             <CharacterCounter :text="resolveAntlers(props.value)" :limit="characterLimit" />
         </div>
 
-        <FieldSuggestionList
+        <TokenSuggestionList
             v-if="suggestionState && isEditorFocused"
             ref="suggestionListEl"
             :items="suggestionState.items"
@@ -181,12 +181,8 @@ watch(() => props.value, (value) => {
     margin: 0;
 }
 
-[data-antlers-input].ProseMirror-focused [data-token-valid].ProseMirror-selectednode {
+[data-antlers-input].ProseMirror-focused [data-token].ProseMirror-selectednode {
     background-color: var(--color-blue-100);
-}
-
-[data-antlers-input].ProseMirror-focused [data-token-invalid].ProseMirror-selectednode {
-    background-color: var(--color-red-100);
 }
 
 :is(.dark) [data-antlers-input].ProseMirror-focused [data-token].ProseMirror-selectednode {

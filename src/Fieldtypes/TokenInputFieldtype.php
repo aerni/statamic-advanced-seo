@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Data\SeoSetLocalization;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -21,21 +22,25 @@ class TokenInputFieldtype extends Fieldtype
     protected $selectable = false;
 
     protected const ALLOWED_FIELD_TYPES = [
-        'token_input', 'text', 'textarea', 'slug'
+        'token_input', 'text', 'textarea',
     ];
 
     protected const ALLOWED_SEO_FIELDS = [
         'seo_title', 'seo_description', 'seo_og_title', 'seo_og_description',
     ];
 
+    protected const SITE_TOKEN_FIELDS = [
+        'separator', 'site_name',
+    ];
+
     public function preload(): array
     {
         return [
-            'fields' => $this->resolveFields(),
+            'tokens' => $this->resolveFieldTokens()->merge($this->resolveSiteTokens())->values(),
         ];
     }
 
-    protected function resolveFields(): SupportCollection
+    protected function resolveFieldTokens(): SupportCollection
     {
         $parent = $this->field->parent();
 
@@ -52,6 +57,7 @@ class TokenInputFieldtype extends Fieldtype
                     'handle' => $field->handle(),
                     'display' => $field->display(),
                     'type' => $field->type(),
+                    'group' => 'fields',
                 ])
                 ->sortBy('display');
         });
@@ -59,6 +65,22 @@ class TokenInputFieldtype extends Fieldtype
         return $fields
             ->reject(fn (array $field) => $field['handle'] === $this->field->handle())
             ->values();
+    }
+
+    protected function resolveSiteTokens(): SupportCollection
+    {
+        $context = Context::from($this->field->parent());
+        $defaults = Seo::find('site::defaults')->in($context->site);
+
+        return $defaults->blueprint()->fields()->all()
+            ->only(self::SITE_TOKEN_FIELDS)
+            ->map(fn (Field $field) => [
+                'handle' => $field->handle(),
+                'display' => $field->display(),
+                'type' => 'token',
+                'group' => 'common',
+                'value' => $defaults->value($field->handle()),
+            ]);
     }
 
     protected function defaultsBlueprints(SeoSetLocalization $parent): SupportCollection

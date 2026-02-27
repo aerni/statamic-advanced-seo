@@ -61,11 +61,11 @@ class SiteDefaultsBlueprint extends BaseBlueprint
                     ],
                 ],
                 [
-                    'handle' => 'title_separator',
+                    'handle' => 'separator',
                     'field' => [
                         'type' => 'select',
-                        'display' => $this->trans('title_separator.display'),
-                        'instructions' => $this->trans('title_separator.instructions'),
+                        'display' => $this->trans('separator.display'),
+                        'instructions' => $this->trans('separator.instructions'),
                         'options' => [
                             ' | ' => '|',
                             ' / ' => '/',

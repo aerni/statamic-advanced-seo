@@ -7,6 +7,8 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class MigrateSeoFields
 {
@@ -37,6 +39,7 @@ class MigrateSeoFields
     {
         Entry::all()->each(function ($entry) {
             $this->migrateLegacyValues($entry);
+            $this->composeTitleWithPosition($entry);
             $this->removeTwitterFields($entry);
             $entry->saveQuietly();
         });
@@ -51,6 +54,7 @@ class MigrateSeoFields
                 ->each(function ($term) {
                     $term->localizations()->each(function ($localization) {
                         $this->migrateLegacyValues($localization);
+                        $this->composeTitleWithPosition($localization);
                         $this->removeTwitterFields($localization->data());
                     });
 
@@ -67,6 +71,7 @@ class MigrateSeoFields
                 $set->localizations()->each(function ($localization) {
                     $this->migrateLegacyValues($localization);
                     $this->removeTwitterFields($localization);
+                    $this->composeTitleWithPosition($localization);
                     $localization->save();
                 });
             });
@@ -78,11 +83,46 @@ class MigrateSeoFields
     protected function migrateSiteDefaults(): void
     {
         Seo::find('site::defaults')->localizations()->each(function ($localization) {
-            $localization
-                ->remove('twitter_summary_image')
-                ->remove('twitter_summary_large_image')
-                ->save();
+            $this->renameTitleSeparator($localization);
+            $this->removeTwitterFields($localization);
+            $localization->save();
         });
+    }
+
+    protected function renameTitleSeparator(mixed $item): void
+    {
+        if ($value = $item->get('title_separator')) {
+            $item->set('separator', $value);
+            $item->remove('title_separator');
+        }
+    }
+
+    protected function composeTitleWithPosition(mixed $item): void
+    {
+        $position = $item->get('seo_site_name_position');
+
+        if ($position === '@default') {
+            $position = match (true) {
+                $item instanceof EntryContract => Seo::find("collections::{$item->collection()->handle()}")?->in($item->locale())?->get('seo_site_name_position'),
+                $item instanceof LocalizedTerm => Seo::find("taxonomies::{$item->taxonomy()->handle()}")?->in($item->locale())?->get('seo_site_name_position'),
+                default => null,
+            };
+        }
+
+        if ($position) {
+            $title = $item->get('seo_title');
+            $titleTemplate = (! $title || $title === '@default') ? '{{ title }}' : $title;
+
+            $composedTitle = match ($position) {
+                'start' => "{{ site_name }} {{ separator }} {$titleTemplate}",
+                'end' => "{$titleTemplate} {{ separator }} {{ site_name }}",
+                default => $titleTemplate,
+            };
+
+            $item->set('seo_title', $composedTitle);
+        }
+
+        $this->remove($item, 'seo_site_name_position');
     }
 
     protected function migrateLegacyValues(mixed $item): void
@@ -100,14 +140,19 @@ class MigrateSeoFields
 
     protected function removeTwitterFields(mixed $item): void
     {
-        $fields = ['seo_twitter_card', 'seo_twitter_title', 'seo_twitter_description', 'seo_twitter_summary_image', 'seo_twitter_summary_large_image'];
+        $fields = ['seo_twitter_card', 'seo_twitter_title', 'seo_twitter_description', 'seo_twitter_summary_image', 'seo_twitter_summary_large_image', 'twitter_summary_image', 'twitter_summary_large_image'];
 
         foreach ($fields as $field) {
-            if ($item instanceof Collection) {
-                $item->forget($field);
-            } else {
-                $item->remove($field);
-            }
+            $this->remove($item, $field);
         }
+    }
+
+    protected function remove(mixed $item, string $key): void
+    {
+        match (true) {
+            $item instanceof Collection => $item->forget($key),
+            $item instanceof LocalizedTerm => $item->data($item->data()->forget($key)),
+            default => $item->remove($key),
+        };
     }
 }

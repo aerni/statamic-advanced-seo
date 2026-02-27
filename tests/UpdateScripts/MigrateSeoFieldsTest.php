@@ -220,3 +220,282 @@ it('removes twitter image fields from site defaults', function () {
     expect($localization->has('twitter_summary_image'))->toBeFalse();
     expect($localization->has('twitter_summary_large_image'))->toBeFalse();
 });
+
+it('renames title_separator to separator in site defaults', function () {
+    Seo::find('site::defaults')->in('english')->data(['title_separator' => '/'])->save();
+    Seo::find('site::defaults')->in('german')->data(['title_separator' => '–'])->save();
+
+    runMigrateSeoFieldsScript();
+
+    expect(Seo::find('site::defaults')->in('english')->get('separator'))->toBe('/');
+    expect(Seo::find('site::defaults')->in('english')->has('title_separator'))->toBeFalse();
+
+    expect(Seo::find('site::defaults')->in('german')->get('separator'))->toBe('–');
+    expect(Seo::find('site::defaults')->in('german')->has('title_separator'))->toBeFalse();
+});
+
+it('composes seo_title with site name position end on seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data([
+            'seo_title' => 'Custom Title',
+            'seo_site_name_position' => 'end',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->get('seo_title'))->toBe('Custom Title {{ separator }} {{ site_name }}');
+    expect($localization->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes seo_title with site name position start on seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data([
+            'seo_title' => 'Custom Title',
+            'seo_site_name_position' => 'start',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->get('seo_title'))->toBe('{{ site_name }} {{ separator }} Custom Title');
+    expect($localization->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes seo_title with site name position disabled on seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data([
+            'seo_title' => 'Custom Title',
+            'seo_site_name_position' => 'disabled',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->get('seo_title'))->toBe('Custom Title');
+    expect($localization->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes seo_title with default title and position on seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data(['seo_site_name_position' => 'start'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->get('seo_title'))->toBe('{{ site_name }} {{ separator }} {{ title }}');
+    expect($localization->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('does not modify seo_title when both title and position are absent on seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data(['seo_description' => 'A description'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->get('seo_title'))->toBeNull();
+    expect($localization->get('seo_description'))->toBe('A description');
+});
+
+it('cleans up position field when both title and position are default on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data(['seo_site_name_position' => '@default'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBeNull();
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('resolves @default position from cascade on entries', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data(['seo_site_name_position' => 'start'])
+        ->save();
+
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data(['seo_site_name_position' => '@default'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('{{ site_name }} {{ separator }} {{ title }}');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('resolves @default position from cascade on terms', function () {
+    Seo::find('taxonomies::tags')
+        ->inDefaultSite()
+        ->data(['seo_site_name_position' => 'end'])
+        ->save();
+
+    Term::make()
+        ->taxonomy('tags')
+        ->slug('test-tag')
+        ->dataForLocale('english', ['seo_site_name_position' => '@default'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $term = Term::find('tags::test-tag')->in('english');
+
+    expect($term->get('seo_title'))->toBe('{{ title }} {{ separator }} {{ site_name }}');
+    expect($term->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes title with custom position and default title on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data(['seo_site_name_position' => 'start'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('{{ site_name }} {{ separator }} {{ title }}');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('uses default title template when position is disabled on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data(['seo_site_name_position' => 'disabled'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('{{ title }}');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes title when position is end and title is default on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data(['seo_site_name_position' => 'end'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('{{ title }} {{ separator }} {{ site_name }}');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes title with custom title and position end on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'seo_title' => 'My Custom Title',
+            'seo_site_name_position' => 'end',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('My Custom Title {{ separator }} {{ site_name }}');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes title with custom title and position start on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'seo_title' => 'My Custom Title',
+            'seo_site_name_position' => 'start',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('{{ site_name }} {{ separator }} My Custom Title');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes title with custom title and position disabled on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'seo_title' => 'My Custom Title',
+            'seo_site_name_position' => 'disabled',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('My Custom Title');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('does not compose title when position is not set on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data(['seo_title' => 'My Custom Title'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_title'))->toBe('My Custom Title');
+    expect($entry->has('seo_site_name_position'))->toBeFalse();
+});
+
+it('composes title with position on terms', function () {
+    Term::make()
+        ->taxonomy('tags')
+        ->slug('test-tag')
+        ->dataForLocale('english', [
+            'seo_title' => 'Tag Title',
+            'seo_site_name_position' => 'start',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $term = Term::find('tags::test-tag')->in('english');
+
+    expect($term->get('seo_title'))->toBe('{{ site_name }} {{ separator }} Tag Title');
+    expect($term->has('seo_site_name_position'))->toBeFalse();
+});

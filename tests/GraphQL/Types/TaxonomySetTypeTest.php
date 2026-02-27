@@ -22,7 +22,6 @@ it('exposes all expected fields', function () {
     expect((new TaxonomySetType)->fields())->toHaveKeys([
         'title',
         'description',
-        'site_name_position',
         'generate_social_images',
         'social_images_theme',
         'og_image',

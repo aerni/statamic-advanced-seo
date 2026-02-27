@@ -49,7 +49,7 @@ it('can get set groups', function () {
 });
 
 it('can get a default value from specific set', function () {
-    expect(Seo::defaultValue('site::defaults.title_separator'))->toBe('|');
+    expect(Seo::defaultValue('site::defaults.separator'))->toBe('|');
 });
 
 it('can get a default value by type', function () {

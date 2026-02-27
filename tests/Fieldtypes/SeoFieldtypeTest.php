@@ -150,7 +150,7 @@ it('augments @default by resolving cascade', function () {
     $result = $field->fieldtype()->augment('@default');
 
     // The cascade resolves {{ title }} from the content defaults blueprint.
-    expect($result)->toBe('Test Page');
+    expect($result)->toBe('Test Page | English');
 });
 
 it('augments custom value directly', function () {
@@ -165,7 +165,7 @@ it('augments null by falling through to field default', function () {
     $result = $field->fieldtype()->augment(null);
 
     // null → field->defaultValue() → '@default' → cascade resolution → {{ title }}
-    expect($result)->toBe('Test Page');
+    expect($result)->toBe('Test Page | English');
 });
 
 // --- preload ---

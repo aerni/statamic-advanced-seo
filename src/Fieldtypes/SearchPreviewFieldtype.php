@@ -22,7 +22,6 @@ class SearchPreviewFieldtype extends Fieldtype
         return [
             'siteName' => $defaults->site_name,
             'domain' => parse_url($defaults->site()->absoluteUrl(), PHP_URL_HOST),
-            'titleSeparator' => $defaults->title_separator->value(),
             'favicon' => $defaults->favicon_svg?->url(),
             'uri' => $parent->uri(),
             'breadcrumbs' => ResolveBreadcrumbs::handle(

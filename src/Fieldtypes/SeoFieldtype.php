@@ -23,6 +23,8 @@ class SeoFieldtype extends Fieldtype
 
     protected $defaultValue = '@default';
 
+    protected static array $parsing = [];
+
     protected $selectable = false;
 
     public function preload(): array
@@ -130,7 +132,11 @@ class SeoFieldtype extends Fieldtype
             $data = $this->defaultValueFromCascade();
         }
 
-        return $this->childFieldtype()->augment($this->parseAntlers($data));
+        if ($this->isTextBasedField() && is_string($data)) {
+            $data = $this->parseAntlers($data);
+        }
+
+        return $this->childFieldtype()->augment($data);
     }
 
     public function preProcessValidatable(mixed $value): mixed
@@ -223,40 +229,60 @@ class SeoFieldtype extends Fieldtype
         return in_array('text', $this->childFieldtype()->categories());
     }
 
-    protected function parseAntlers(mixed $data): mixed
+    protected function parseAntlers(string $data): string
     {
-        if (! is_string($data)) {
-            return $data;
-        }
-
-        if (! Str::contains($data, '{{')) {
-            return $data;
-        }
-
         $parent = $this->field->parent();
 
         if ($parent instanceof Term) {
             $parent = $parent->in(Context::from($parent)->site);
         }
 
-        $parentData = $parent->toAugmentedArray();
+        $data = $this->stripCircularReferences($data);
 
-        // Prevent self-reference: remove the current field from context
-        // so {{ seo_title }} inside seo_title doesn't cause infinite recursion.
-        unset($parentData[$this->field->handle()]);
+        if (! Str::contains($data, '{{')) {
+            return $data;
+        }
 
-        return (string) Antlers::parse($data, $parentData);
+        static::$parsing[] = $this->field->handle();
+
+        try {
+            $variables = $this->cascade()->data()
+                ->merge($parent->toAugmentedArray())
+                ->all();
+
+            return Antlers::parse($data, $variables);
+        } finally {
+            array_pop(static::$parsing);
+        }
+    }
+
+    /**
+     * Strip references to the current field and any fields already being parsed
+     * up the call stack to prevent infinite recursion during Antlers augmentation.
+     */
+    protected function stripCircularReferences(string $data): string
+    {
+        $handles = array_unique([...static::$parsing, $this->field->handle()]);
+        $escaped = array_map(fn ($h) => preg_quote($h, '/'), $handles);
+
+        return preg_replace('/\{\{\s*(?:'.implode('|', $escaped).')\s*\}\}/', '', $data);
+    }
+
+    protected function cascade(mixed $parent = null): SeoFieldtypeCascade
+    {
+        $context = Context::from($parent ?? $this->field->parent());
+
+        return Blink::once(
+            "advanced-seo::cascade::fieldtype::{$context->id()}",
+            fn () => SeoFieldtypeCascade::from($context)
+        );
     }
 
     protected function defaultValueFromCascade(mixed $parent = null): mixed
     {
-        $context = Context::from($parent ?? $this->field->parent());
-
-        $cascade = Blink::once("advanced-seo::cascade::fieldtype::{$context->id()}", fn () => SeoFieldtypeCascade::from($context));
-
         $key = Str::remove('seo_', $this->field->handle());
 
-        $value = $cascade->value($key);
+        $value = $this->cascade($parent)->value($key);
 
         return match (true) {
             ($value instanceof Entry) => $value->id(),

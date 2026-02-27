@@ -74,6 +74,7 @@ function toPlainText(value, fieldType) {
  */
 export function useSeoValues() {
     const {
+        fields,
         getField,
         getFieldRawValue,
         getFieldMeta,
@@ -82,38 +83,39 @@ export function useSeoValues() {
     const resolving = new Set();
 
     /**
-     * Resolve a field value to plain text. If the field is a seo field,
-     * resolve it through the full chain. Otherwise, convert to plain text.
+     * Resolve a blueprint field value to plain text.
      */
     function resolveFieldValue(handle) {
         const field = getField(handle);
-        if (!field) return null;
 
-        if (resolving.has(handle)) return null;
+        if (!field) return;
 
-        resolving.add(handle);
-
-        try {
-            if (field.type === 'seo') {
-                return resolve(handle);
-            }
-
-            return toPlainText(getFieldRawValue(handle), field.type);
-        } finally {
-            resolving.delete(handle);
-        }
+        return field.type === 'seo'
+            ? resolve(handle)
+            : toPlainText(getFieldRawValue(handle), field.type);
     }
 
     /**
-     * Replace {{ handle }} references in a string
-     * with the corresponding publish field values.
+     * Find a token value from field meta.
+     * Checks meta.tokens (standalone) and meta.meta.tokens (seo-wrapped).
+     */
+    function resolveTokenValue(handle) {
+        return Object.values(fields.value)
+            .flatMap(field => getFieldMeta(field.handle))
+            .flatMap(meta => meta?.tokens ?? meta?.meta?.tokens ?? [])
+            .find(token => token.handle === handle)
+            ?.value;
+    }
+
+    /**
+     * Replace {{ handle }} references in a string with resolved values.
      * Unresolvable references are kept as raw Antlers.
      */
     function resolveAntlers(value) {
         if (!value || typeof value !== 'string') return value;
 
         return value.replace(new RegExp(ANTLERS_PATTERN.source, 'g'), (match, handle) => {
-            return resolveFieldValue(handle) ?? match;
+            return resolveFieldValue(handle) ?? resolveTokenValue(handle) ?? match;
         });
     }
 
@@ -126,17 +128,30 @@ export function useSeoValues() {
         return typeof def === 'string' && def !== '' ? resolveAntlers(def) : '';
     }
 
+    /**
+     * Resolve a seo field value with circular reference protection.
+     * Circular references return undefined so they fall through
+     * to raw Antlers in the preview, matching unknown-handle behavior.
+     */
     function resolve(handle) {
-        const value = getFieldRawValue(handle);
-        const field = getField(handle);
+        if (resolving.has(handle)) return;
 
-        switch (value?.source) {
-            case 'default':
-                return resolveDefault(handle);
-            case 'custom':
-                return resolveAntlers(value.value)?.trim();
-            default:
-                return toPlainText(value, field.type);
+        resolving.add(handle);
+
+        try {
+            const value = getFieldRawValue(handle);
+            const field = getField(handle);
+
+            switch (value?.source) {
+                case 'default':
+                    return resolveDefault(handle);
+                case 'custom':
+                    return resolveAntlers(value.value)?.trim();
+                default:
+                    return toPlainText(value, field.type);
+            }
+        } finally {
+            resolving.delete(handle);
         }
     }
 

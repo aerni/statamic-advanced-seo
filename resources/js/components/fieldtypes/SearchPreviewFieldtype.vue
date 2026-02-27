@@ -11,18 +11,8 @@ defineExpose(expose);
 const seo = useSeoValues();
 
 const siteName = computed(() => props.meta.siteName);
-const separator = computed(() => props.meta.titleSeparator);
-const position = computed(() => seo.resolve('seo_site_name_position'));
-const titlePrefix = computed(() => position.value === 'start' ? `${siteName.value} ${separator.value} ` : '');
-const titleSuffix = computed(() => position.value === 'end' ? ` ${separator.value} ${siteName.value}` : '');
 
-const title = computed(() => {
-    const pageTitle = seo.resolve('seo_title');
-
-    if (!pageTitle) return '';
-
-    return seo.truncate(`${titlePrefix.value}${pageTitle}${titleSuffix.value}`, 60);
-});
+const title = computed(() => seo.truncate(seo.resolve('seo_title'), 60));
 
 const description = computed(() => seo.truncate(seo.resolve('seo_description'), 160));
 
@@ -60,7 +50,7 @@ const breadcrumbs = computed(() => {
         </div>
         <div class="text-[20px] leading-[26px] text-[#1a0dab] dark:text-[#8ab4f8] mb-1 line-clamp-2 whitespace-pre-wrap">
             <template v-if="title">{{ title }}</template>
-            <template v-else>{{ titlePrefix }}<span class="inline-block w-32 h-5 align-middle bg-gray-200 rounded dark:bg-gray-800" />{{ titleSuffix }}</template>
+            <template v-else><span class="inline-block w-32 h-5 align-middle bg-gray-200 rounded dark:bg-gray-800" /></template>
         </div>
         <div v-if="description" class="text-sm leading-[22px] text-gray-600 dark:text-gray-400 line-clamp-2 whitespace-pre-wrap">{{ description }}</div>
         <div v-else>

@@ -4,7 +4,7 @@ import { injectPublishContext } from '@statamic/cms/ui';
 export function usePublishFields() {
     const publishContainer = injectPublishContext();
 
-    const fieldsByHandle = computed(() => Object.fromEntries(
+    const fields = computed(() => Object.fromEntries(
         Object.values(publishContainer.blueprint.value.tabs)
             .flatMap(tab => tab.sections)
             .flatMap(section => section.fields)
@@ -12,7 +12,7 @@ export function usePublishFields() {
     ));
 
     function getField(handle) {
-        return fieldsByHandle.value[handle];
+        return fields.value[handle];
     }
 
     function getFieldRawValue(handle) {
@@ -49,6 +49,7 @@ export function usePublishFields() {
     }
 
     return {
+        fields,
         getField,
         getFieldRawValue,
         getFieldValue,
