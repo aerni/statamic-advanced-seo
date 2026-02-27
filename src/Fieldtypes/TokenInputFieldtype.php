@@ -44,7 +44,7 @@ class TokenInputFieldtype extends Fieldtype
     {
         $parent = $this->field->parent();
 
-        $fields = Blink::once("advanced-seo.antlers-input-fields.{$parent->id()}", function () use ($parent) {
+        $fields = Blink::once("advanced-seo.token-input-fields.{$parent->id()}", function () use ($parent) {
             $blueprints = $parent instanceof SeoSetLocalization
                 ? $this->defaultsBlueprints($parent)
                 : collect([$this->contentBlueprint($parent)]);
@@ -69,18 +69,22 @@ class TokenInputFieldtype extends Fieldtype
 
     protected function resolveSiteTokens(): SupportCollection
     {
-        $context = Context::from($this->field->parent());
-        $defaults = Seo::find('site::defaults')->in($context->site);
+        $parent = $this->field->parent();
 
-        return $defaults->blueprint()->fields()->all()
-            ->only(self::SITE_TOKEN_FIELDS)
-            ->map(fn (Field $field) => [
-                'handle' => $field->handle(),
-                'display' => $field->display(),
-                'type' => 'token',
-                'group' => 'common',
-                'value' => $defaults->value($field->handle()),
-            ]);
+        return Blink::once("advanced-seo.token-input-site-tokens.{$parent->id()}", function () use ($parent) {
+            $context = Context::from($parent);
+            $defaults = Seo::find('site::defaults')->in($context->site);
+
+            return $defaults->blueprint()->fields()->all()
+                ->only(self::SITE_TOKEN_FIELDS)
+                ->map(fn (Field $field) => [
+                    'handle' => $field->handle(),
+                    'display' => $field->display(),
+                    'type' => 'token',
+                    'group' => 'common',
+                    'value' => $defaults->value($field->handle()),
+                ]);
+        });
     }
 
     protected function defaultsBlueprints(SeoSetLocalization $parent): SupportCollection
