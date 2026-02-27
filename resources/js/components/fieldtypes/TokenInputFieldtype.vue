@@ -9,12 +9,13 @@ import Text from '@tiptap/extension-text';
 import History from '@tiptap/extension-history';
 import Placeholder from '@tiptap/extension-placeholder';
 import Dropcursor from '@tiptap/extension-dropcursor';
-import { Extension } from '@tiptap/core';
+import { SingleLine } from '../../extensions/SingleLine.js';
 import { TokenNode } from '../../extensions/TokenNode.js';
+import { TokenSelectionHighlight } from '../../extensions/TokenSelectionHighlight.js';
 import { TokenSuggestion } from '../../extensions/TokenSuggestion.js';
 import { parse, stringify } from '../../utils/antlers.js';
-import TokenSuggestionList from '../ui/TokenSuggestionList.vue';
 import { useSeoValues } from '../../composables/useSeoValues.js';
+import TokenSuggestionList from '../ui/TokenSuggestionList.vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -73,16 +74,12 @@ onMounted(() => {
             SingleLineDoc,
             Paragraph,
             Text,
+            SingleLine,
             History,
-            Dropcursor.configure({ color: '#3b82f6', width: 2 }),
             Placeholder.configure({ placeholder: __('advanced-seo::messages.token_picker_placeholder') }),
+            Dropcursor.configure({ color: '#3b82f6', width: 2 }),
             TokenNode.configure({ tokens: tokens.value }),
-            Extension.create({
-                name: 'singleLine',
-                addKeyboardShortcuts() {
-                    return { Enter: () => true };
-                },
-            }),
+            TokenSelectionHighlight,
             TokenSuggestion.configure({
                 tokens: tokens.value,
                 suggestion: {
@@ -181,12 +178,12 @@ watch(() => props.value, (value) => {
     margin: 0;
 }
 
-[data-antlers-input].ProseMirror-focused [data-token].ProseMirror-selectednode {
     background-color: var(--color-blue-100);
+[data-antlers-input].ProseMirror-focused [data-token]:is(.ProseMirror-selectednode, .is-selected) {
 }
 
-:is(.dark) [data-antlers-input].ProseMirror-focused [data-token].ProseMirror-selectednode {
     background-color: var(--color-gray-700);
+:is(.dark) [data-antlers-input].ProseMirror-focused [data-token]:is(.ProseMirror-selectednode, .is-selected) {
 }
 
 [data-antlers-input] p.is-editor-empty:first-child::before {
