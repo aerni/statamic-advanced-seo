@@ -1,9 +1,36 @@
 import { InputRule, Node, PasteRule } from '@tiptap/core';
+import { NodeSelection } from '@tiptap/pm/state';
 import { ANTLERS_PATTERN } from '../utils/antlers.js';
 
-const TOKEN_BASE = 'inline-flex items-center justify-center ring-1 ring-inset font-normal antialiased whitespace-nowrap text-xs leading-[1.375rem] px-2 rounded-sm select-none cursor-default align-top';
+const TOKEN_BASE = 'inline-flex items-center justify-center ring-1 ring-inset font-normal antialiased whitespace-nowrap text-xs leading-[1.375rem] px-2 rounded-sm select-none cursor-grab align-top';
 const TOKEN_VALID = 'bg-blue-50 ring-blue-300 text-blue-700 dark:bg-gray-800 dark:ring-blue-700 dark:text-blue-300';
 const TOKEN_INVALID = 'bg-red-50 ring-red-400 text-red-700 dark:bg-gray-800 dark:ring-red-700 dark:text-red-300';
+
+function resolveToken(handle, fields) {
+    const field = fields.find(field => field.handle === handle);
+    const display = field?.display || handle;
+    const valid = Boolean(field);
+
+    const attrs = {
+        'data-token': handle,
+        'data-token-valid': valid ? '' : undefined,
+        'data-token-invalid': valid ? undefined : '',
+        'class': `${TOKEN_BASE} ${valid ? TOKEN_VALID : TOKEN_INVALID}`,
+    };
+
+    return { attrs, display };
+}
+
+// Select node on mousedown so ProseMirror handles drag instead of the browser.
+function selectNode(event, editor, getPos) {
+    if (event.button !== 0) return;
+
+    editor.view.focus();
+
+    const { state, dispatch } = editor.view;
+    const selection = NodeSelection.create(state.doc, getPos());
+    dispatch(state.tr.setSelection(selection));
+}
 
 export const TokenNode = Node.create({
     name: 'token',
@@ -11,6 +38,7 @@ export const TokenNode = Node.create({
     group: 'inline',
     atom: true,
     selectable: true,
+    draggable: true,
 
     addOptions() {
         return {
@@ -22,34 +50,38 @@ export const TokenNode = Node.create({
         return {
             handle: {
                 default: null,
-                parseHTML: (element) => element.getAttribute('data-token-valid'),
+                parseHTML: (element) => element.dataset.token,
             },
         };
     },
 
     parseHTML() {
         return [{
-            tag: 'span[data-token-valid]',
+            tag: 'span[data-token]',
         }];
     },
 
     renderHTML({ node }) {
-        const handle = node.attrs.handle;
-        const field = this.options.fields.find(field => field.handle === handle);
-        const variant = field ? TOKEN_VALID : TOKEN_INVALID;
-        const display = field?.display || handle;
-
-        const attrs = {
-            'data-token-valid': handle,
-            contenteditable: 'false',
-            class: `${TOKEN_BASE} ${variant}`,
-        };
-
-        if (!field) {
-            attrs['data-token-invalid'] = '';
-        }
+        const { attrs, display } = resolveToken(node.attrs.handle, this.options.fields);
 
         return ['span', attrs, display];
+    },
+
+    addNodeView() {
+        return ({ node, getPos, editor }) => {
+            const { attrs, display } = resolveToken(node.attrs.handle, this.options.fields);
+
+            const dom = document.createElement('span');
+            dom.textContent = display;
+
+            Object.entries(attrs)
+                .filter(([key, value]) => value !== undefined)
+                .forEach(([key, value]) => dom.setAttribute(key, value));
+
+            dom.addEventListener('mousedown', (event) => selectNode(event, editor, getPos));
+
+            return { dom };
+        };
     },
 
     addCommands() {

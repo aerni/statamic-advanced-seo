@@ -8,6 +8,7 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
 import History from '@tiptap/extension-history';
 import Placeholder from '@tiptap/extension-placeholder';
+import Dropcursor from '@tiptap/extension-dropcursor';
 import { Extension } from '@tiptap/core';
 import { TokenNode } from '../../extensions/TokenNode.js';
 import { FieldSuggestion } from '../../extensions/FieldSuggestion.js';
@@ -73,6 +74,7 @@ onMounted(() => {
             Paragraph,
             Text,
             History,
+            Dropcursor.configure({ color: '#3b82f6', width: 2 }),
             Placeholder.configure({ placeholder: __('advanced-seo::messages.field_picker_placeholder') }),
             TokenNode.configure({ fields: fields.value }),
             Extension.create({
@@ -99,10 +101,6 @@ onMounted(() => {
             attributes: {
                 'data-antlers-input': '',
                 class: 'min-w-full text-gray-925 dark:text-gray-300 antialiased text-base leading-[1.375rem] whitespace-nowrap outline-none',
-            },
-            handleDOMEvents: {
-                dragstart: (_, event) => { event.preventDefault(); },
-                drop: (_, event) => { event.preventDefault(); },
             },
         },
         onUpdate: ({ editor }) => {
@@ -187,15 +185,11 @@ watch(() => props.value, (value) => {
     background-color: var(--color-blue-100);
 }
 
-:is(.dark) [data-antlers-input].ProseMirror-focused [data-token-valid].ProseMirror-selectednode {
-    background-color: var(--color-gray-700);
-}
-
 [data-antlers-input].ProseMirror-focused [data-token-invalid].ProseMirror-selectednode {
     background-color: var(--color-red-100);
 }
 
-:is(.dark) [data-antlers-input].ProseMirror-focused [data-token-invalid].ProseMirror-selectednode {
+:is(.dark) [data-antlers-input].ProseMirror-focused [data-token].ProseMirror-selectednode {
     background-color: var(--color-gray-700);
 }
 
