@@ -1,7 +1,7 @@
 <script setup>
 import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 import { Fieldtype } from '@statamic/cms';
-import { CharacterCounter, injectPublishContext } from '@statamic/cms/ui';
+import { Button, injectPublishContext } from '@statamic/cms/ui';
 import { Editor } from '@tiptap/vue-3';
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
@@ -22,8 +22,8 @@ const props = defineProps(Fieldtype.props);
 const fieldtype = Fieldtype.use(emit, props);
 defineExpose(fieldtype.expose);
 
-const publishContext = injectPublishContext();
-const { resolveAntlers } = useSeoValues();
+// const publishContext = injectPublishContext();
+// const { resolveAntlers } = useSeoValues();
 
 // ─── Refs ────────────────────────────────────────────────────────────────────
 
@@ -38,12 +38,31 @@ const editor = shallowRef(null);
 
 const tokens = computed(() => props.meta.tokens);
 
-const characterLimit = computed(() => {
-    if (publishContext.name.value === 'seo-set-localizations') return null;
-    return props.config.character_limit;
-});
+// const characterLimit = computed(() => {
+//     if (publishContext.name.value === 'seo-set-localizations') return null;
+//     return props.config.character_limit;
+// });
 
 const suggestionEmpty = computed(() => suggestionState.value && !suggestionState.value.query);
+
+// ─── Actions ────────────────────────────────────────────────────────────────
+
+function openTokenSuggestion() {
+    if (!editor.value) return;
+
+    if (suggestionState.value) {
+        editor.value.chain().focus().deleteRange(suggestionState.value.range).run();
+        return;
+    }
+
+    const text = stringify(editor.value.getJSON());
+    const content = text.length > 0 && !text.endsWith(' ') ? ' /' : '/';
+
+    editor.value.chain().focus('end').command(({ tr }) => {
+        tr.insertText(content);
+        return true;
+    }).run();
+}
 
 // ─── Editor ─────────────────────────────────────────────────────────────────
 
@@ -99,6 +118,21 @@ onMounted(() => {
                 'data-antlers-input': '',
                 class: 'min-w-full text-gray-925 dark:text-gray-300 antialiased text-base leading-[1.375rem] whitespace-nowrap outline-none',
             },
+            handleKeyDown: (_view, event) => {
+                if (event.key === '/' && suggestionState.value) return true;
+
+                if (event.key === 'Escape' && suggestionState.value) {
+                    editor.value?.commands.deleteRange(suggestionState.value.range);
+                    return true;
+                }
+
+                if (event.key === 'Tab' && suggestionState.value) {
+                    editor.value?.commands.deleteRange(suggestionState.value.range);
+                    return false;
+                }
+
+                return false;
+            },
         },
         onUpdate: ({ editor }) => {
             if (isInternalUpdate.value) return;
@@ -113,6 +147,11 @@ onMounted(() => {
         },
         onBlur: ({ editor: instance }) => {
             isEditorFocused.value = false;
+
+            if (suggestionState.value) {
+                instance.commands.deleteRange(suggestionState.value.range);
+            }
+
             collapseRemainingAntlers(instance);
             emit('blur');
         },
@@ -139,30 +178,36 @@ watch(() => props.value, (value) => {
 </script>
 
 <template>
-    <div
-        class="relative bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-11"
-        data-ui-input
-        :data-suggestion-empty="suggestionEmpty || undefined"
-        :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.token_suggestion_placeholder')}'` }"
-        :class="{
-            'pe-9': characterLimit && !fieldtype.isReadOnly.value,
-            'border-dashed pointer-events-none': fieldtype.isReadOnly.value,
-        }"
-    >
-        <div class="px-3 py-2.5 overflow-x-auto [scrollbar-width:none]">
-            <div ref="editorEl" />
+    <div class="relative">
+        <div
+            class="bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-11"
+            data-ui-input
+            :data-suggestion-empty="suggestionEmpty || undefined"
+            :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.token_suggestion_placeholder')}'` }"
+            :class="{
+                'pe-9': !fieldtype.isReadOnly.value,
+                'border-dashed pointer-events-none': fieldtype.isReadOnly.value,
+            }"
+        >
+            <div class="px-3 py-2.5 overflow-x-auto [scrollbar-width:none]">
+                <div ref="editorEl" />
+            </div>
+
+            <!-- <div v-if="characterLimit && !fieldtype.isReadOnly.value" class="absolute inset-y-0 flex items-center right-2">
+                <CharacterCounter :text="resolveAntlers(props.value)" :limit="characterLimit" />
+            </div> -->
+
+            <TokenSuggestionList
+                v-if="suggestionState && isEditorFocused"
+                ref="suggestionListEl"
+                :items="suggestionState.items"
+                :command="suggestionState.command"
+            />
         </div>
 
-        <div v-if="characterLimit && !fieldtype.isReadOnly.value" class="absolute inset-y-0 flex items-center right-2">
-            <CharacterCounter :text="resolveAntlers(props.value)" :limit="characterLimit" />
+        <div v-if="!fieldtype.isReadOnly.value" class="absolute inset-y-0 right-1.5 flex items-center">
+            <Button v-tooltip="__('Add Token')" round icon="plus" size="xs" icon-only :aria-label="__('Add Token')" @mousedown.prevent @click="openTokenSuggestion" />
         </div>
-
-        <TokenSuggestionList
-            v-if="suggestionState && isEditorFocused"
-            ref="suggestionListEl"
-            :items="suggestionState.items"
-            :command="suggestionState.command"
-        />
     </div>
 </template>
 
