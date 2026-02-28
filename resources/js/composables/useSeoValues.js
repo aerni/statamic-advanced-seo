@@ -44,7 +44,7 @@ function extractBardText(value) {
         queue.unshift(...(item.content ?? []));
     }
 
-    return text.trim();
+    return text.replace(/\s+/g, ' ').trim();
 }
 
 /**
