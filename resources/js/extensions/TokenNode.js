@@ -71,9 +71,13 @@ export const TokenNode = Node.create({
                 .filter(([key, value]) => value !== undefined)
                 .forEach(([key, value]) => dom.setAttribute(key, value));
 
-            dom.addEventListener('mousedown', (event) => selectNode(event, editor, getPos));
+            const onMousedown = (event) => selectNode(event, editor, getPos);
+            dom.addEventListener('mousedown', onMousedown);
 
-            return { dom };
+            return {
+                dom,
+                destroy: () => dom.removeEventListener('mousedown', onMousedown),
+            };
         };
     },
 

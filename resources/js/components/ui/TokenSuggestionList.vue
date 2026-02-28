@@ -62,11 +62,14 @@ defineExpose({
                shadow-lg overflow-hidden"
         @mousedown.prevent
     >
-        <div ref="list" class="flex flex-col max-h-64 overflow-y-auto p-1.5" style="scroll-padding: 0.375rem">
+        <div ref="list" role="listbox" class="flex flex-col max-h-64 overflow-y-auto p-1.5" style="scroll-padding: 0.375rem">
             <template v-if="items.length">
                 <button
                     v-for="(field, index) in items"
+                    :id="`token-option-${field.handle}`"
                     :key="field.handle"
+                    role="option"
+                    :aria-selected="index === selectedIndex"
                     type="button"
                     class="flex items-center justify-between gap-4 cursor-pointer rounded-lg px-2.5 py-1.5 w-full text-left text-sm antialiased text-gray-900 dark:text-gray-300"
                     :class="index === selectedIndex

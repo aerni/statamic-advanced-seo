@@ -1,5 +1,5 @@
 <script setup>
-import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, markRaw, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 import { Fieldtype } from '@statamic/cms';
 import { Button, injectPublishContext } from '@statamic/cms/ui';
 import { Editor } from '@tiptap/vue-3';
@@ -72,8 +72,11 @@ const SingleLineDoc = Document.extend({ content: 'paragraph' });
 
 function withInternalUpdate(callback) {
     isInternalUpdate.value = true;
-    callback();
-    nextTick(() => { isInternalUpdate.value = false; });
+    try {
+        callback();
+    } finally {
+        isInternalUpdate.value = false;
+    }
 }
 
 function collapseRemainingAntlers(instance) {
@@ -165,9 +168,7 @@ onBeforeUnmount(() => editor.value?.destroy());
 // ─── Watchers ───────────────────────────────────────────────────────────────
 
 watch(() => props.value, (value) => {
-    if (isInternalUpdate.value || !editor.value) return;
-
-    if (suggestionState.value) return;
+    if (!editor.value || suggestionState.value) return;
 
     const current = stringify(editor.value.getJSON());
 
