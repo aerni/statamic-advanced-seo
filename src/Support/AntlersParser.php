@@ -66,7 +66,8 @@ class AntlersParser
     }
 
     /**
-     * Convert markup-producing field values to plain text.
+     * Convert markup-producing field values to plain text,
+     * capped at a generous limit to prevent large content dumps in meta tags.
      */
     protected static function toPlainText(mixed $value): mixed
     {
@@ -74,11 +75,17 @@ class AntlersParser
             return $value;
         }
 
-        return match ($value->fieldtype()?->handle()) {
+        $text = match ($value->fieldtype()?->handle()) {
             'markdown' => (new CoreModifiers)->stripTags($value->value(), [], []),
             'bard' => (new CoreModifiers)->bardText($value),
-            default => $value,
+            default => null,
         };
+
+        if ($text === null) {
+            return $value;
+        }
+
+        return (new CoreModifiers)->safeTruncate($text, [320, '…']);
     }
 
     protected static function cascade(mixed $parent): SeoFieldtypeCascade
