@@ -25,7 +25,7 @@ function makeSeoField(string $handle = 'seo_title', array $childField = [], arra
 {
     return new Field($handle, array_merge([
         'type' => 'seo',
-        'field' => array_merge(['type' => 'text'], $childField),
+        'field' => array_merge(['type' => 'token_input'], $childField),
         'default' => '@default',
     ], $extra));
 }
@@ -179,7 +179,7 @@ it('returns expected preload structure', function () {
     $result = $field->fieldtype()->preload();
 
     expect($result)->toHaveKeys(['component', 'defaultValue', 'defaultMeta', 'meta'])
-        ->and($result['component'])->toBe('text-fieldtype');
+        ->and($result['component'])->toBe('token_input-fieldtype');
 });
 
 it('returns the child component name for textarea', function () {
