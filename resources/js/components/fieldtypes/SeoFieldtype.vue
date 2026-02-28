@@ -137,7 +137,7 @@ function handleBlur() {
     <button
         v-if="showResetButton"
         type="button"
-        class="mt-2"
+        class="mt-2 select-none"
         @click.prevent="reset"
     >
         <Description class="underline text-2xs" :text="__('advanced-seo::messages.reset_to_default')" />
