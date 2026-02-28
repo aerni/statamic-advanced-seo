@@ -15,6 +15,7 @@ import { TokenSelectionHighlight } from '../../extensions/TokenSelectionHighligh
 import { TokenSuggestion } from '../../extensions/TokenSuggestion.js';
 import { parse, stringify } from '../../utils/antlers.js';
 import { useSeoValues } from '../../composables/useSeoValues.js';
+import CharacterCounter from '../ui/CharacterCounter.vue';
 import TokenSuggestionList from '../ui/TokenSuggestionList.vue';
 
 const emit = defineEmits(Fieldtype.emits);
@@ -22,8 +23,8 @@ const props = defineProps(Fieldtype.props);
 const fieldtype = Fieldtype.use(emit, props);
 defineExpose(fieldtype.expose);
 
-// const publishContext = injectPublishContext();
-// const { resolveAntlers } = useSeoValues();
+const publishContext = injectPublishContext();
+const { resolveAntlers } = useSeoValues();
 
 // ─── Refs ────────────────────────────────────────────────────────────────────
 
@@ -38,10 +39,12 @@ const editor = shallowRef(null);
 
 const tokens = computed(() => props.meta.tokens);
 
-// const characterLimit = computed(() => {
-//     if (publishContext.name.value === 'seo-set-localizations') return null;
-//     return props.config.character_limit;
-// });
+const characterLimit = computed(() => {
+    if (publishContext.name.value === 'seo-set-localizations') return null;
+    return props.config.character_limit;
+});
+
+const characterCount = computed(() => (resolveAntlers(props.value) ?? '').length);
 
 const suggestionEmpty = computed(() => suggestionState.value && !suggestionState.value.query);
 
@@ -179,35 +182,35 @@ watch(() => props.value, (value) => {
 
 <template>
     <div class="relative">
-        <div
-            class="bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-11"
-            data-ui-input
-            :data-suggestion-empty="suggestionEmpty || undefined"
-            :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.token_suggestion_placeholder')}'` }"
-            :class="{
-                'pe-9': !fieldtype.isReadOnly.value,
-                'border-dashed pointer-events-none': fieldtype.isReadOnly.value,
-            }"
-        >
-            <div class="px-3 py-2.5 overflow-x-auto [scrollbar-width:none]">
-                <div ref="editorEl" />
+        <div class="relative">
+            <div
+                class="bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-11"
+                data-ui-input
+                :data-suggestion-empty="suggestionEmpty || undefined"
+                :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.token_suggestion_placeholder')}'` }"
+                :class="{
+                    'pe-9': !fieldtype.isReadOnly.value,
+                    'border-dashed pointer-events-none': fieldtype.isReadOnly.value,
+                }"
+            >
+                <div class="px-3 py-2.5 overflow-x-auto [scrollbar-width:none]">
+                    <div ref="editorEl" />
+                </div>
+
+                <TokenSuggestionList
+                    v-if="suggestionState && isEditorFocused"
+                    ref="suggestionListEl"
+                    :items="suggestionState.items"
+                    :command="suggestionState.command"
+                />
             </div>
 
-            <!-- <div v-if="characterLimit && !fieldtype.isReadOnly.value" class="absolute inset-y-0 flex items-center right-2">
-                <CharacterCounter :text="resolveAntlers(props.value)" :limit="characterLimit" />
-            </div> -->
-
-            <TokenSuggestionList
-                v-if="suggestionState && isEditorFocused"
-                ref="suggestionListEl"
-                :items="suggestionState.items"
-                :command="suggestionState.command"
-            />
+            <div v-if="!fieldtype.isReadOnly.value" class="absolute inset-y-0 right-1.5 flex items-center">
+                <Button v-tooltip="__('Add Token')" round icon="plus" size="xs" icon-only :aria-label="__('Add Token')" @mousedown.prevent @click="openTokenSuggestion" />
+            </div>
         </div>
 
-        <div v-if="!fieldtype.isReadOnly.value" class="absolute inset-y-0 right-1.5 flex items-center">
-            <Button v-tooltip="__('Add Token')" round icon="plus" size="xs" icon-only :aria-label="__('Add Token')" @mousedown.prevent @click="openTokenSuggestion" />
-        </div>
+        <CharacterCounter v-if="characterLimit && !fieldtype.isReadOnly.value" :count="characterCount" :limit="characterLimit" />
     </div>
 </template>
 
