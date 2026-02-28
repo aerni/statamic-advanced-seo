@@ -18,7 +18,6 @@ export const TokenSuggestion = Extension.create({
                 char: '/',
                 decorationClass: 'suggestion-active',
                 allowedPrefixes: [' ', null],
-                allowSpaces: false,
                 items: ({ query }) => {
                     if (!query) {
                         return this.options.tokens;
