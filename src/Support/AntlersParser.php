@@ -10,6 +10,8 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
+use Statamic\Modifiers\CoreModifiers;
 
 class AntlersParser
 {
@@ -42,6 +44,7 @@ class AntlersParser
         try {
             $variables = static::cascade($field->parent())->data()
                 ->merge($parent->toAugmentedArray())
+                ->map(static::toPlainText(...))
                 ->all();
 
             return Antlers::parse($data, $variables);
@@ -60,6 +63,22 @@ class AntlersParser
         $escaped = array_map(fn ($h) => preg_quote($h, '/'), $handles);
 
         return preg_replace('/\{\{\s*(?:'.implode('|', $escaped).')\s*\}\}/', '', $data);
+    }
+
+    /**
+     * Convert markup-producing field values to plain text.
+     */
+    protected static function toPlainText(mixed $value): mixed
+    {
+        if (! $value instanceof Value) {
+            return $value;
+        }
+
+        return match ($value->fieldtype()?->handle()) {
+            'markdown' => (new CoreModifiers)->stripTags($value->value(), [], []),
+            'bard' => (new CoreModifiers)->bardText($value),
+            default => $value,
+        };
     }
 
     protected static function cascade(mixed $parent): SeoFieldtypeCascade

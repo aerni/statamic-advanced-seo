@@ -23,7 +23,7 @@ class TokenInputFieldtype extends Fieldtype
     protected $selectable = false;
 
     protected const ALLOWED_FIELD_TYPES = [
-        'token_input', 'text', 'textarea',
+        'token_input', 'text', 'textarea', 'markdown', 'bard',
     ];
 
     protected const ALLOWED_SEO_FIELDS = [
