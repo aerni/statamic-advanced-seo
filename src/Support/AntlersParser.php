@@ -44,7 +44,7 @@ class AntlersParser
         try {
             $variables = static::cascade($field->parent())->data()
                 ->merge($parent->toAugmentedArray())
-                ->map(static::toPlainText(...))
+                ->when($field->type() !== 'json_ld', fn ($data) => $data->map(static::toPlainText(...)))
                 ->all();
 
             return Antlers::parse($data, $variables);
