@@ -453,15 +453,10 @@ class OnPageSeoBlueprint extends BaseBlueprint
                         'localizable' => true,
 
                         'field' => [
-                            'type' => 'code',
+                            'type' => 'json_ld',
                             'theme' => 'material',
                             'mode' => 'javascript',
                             'mode_selectable' => false,
-                            'indent_type' => 'tabs',
-                            'indent_size' => 4,
-                            'key_map' => 'default',
-                            'line_numbers' => true,
-                            'line_wrapping' => true,
                         ],
                     ],
                 ],

@@ -326,17 +326,12 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_json_ld',
                     'field' => [
-                        'type' => 'code',
+                        'type' => 'json_ld',
                         'display' => $this->trans('seo_json_ld.display'),
                         'instructions' => $this->trans('seo_json_ld.default_instructions'),
                         'theme' => 'material',
                         'mode' => 'javascript',
                         'mode_selectable' => false,
-                        'indent_type' => 'tabs',
-                        'indent_size' => 4,
-                        'key_map' => 'default',
-                        'line_numbers' => true,
-                        'line_wrapping' => true,
                         'listable' => 'hidden',
                         'localizable' => true,
                     ],

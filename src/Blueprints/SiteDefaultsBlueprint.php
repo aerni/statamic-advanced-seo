@@ -182,17 +182,12 @@ class SiteDefaultsBlueprint extends BaseBlueprint
                 [
                     'handle' => 'site_json_ld',
                     'field' => [
-                        'type' => 'code',
+                        'type' => 'json_ld',
                         'display' => $this->trans('site_json_ld.display'),
                         'instructions' => $this->trans('site_json_ld.instructions'),
                         'theme' => 'material',
                         'mode' => 'javascript',
                         'mode_selectable' => false,
-                        'indent_type' => 'tabs',
-                        'indent_size' => 4,
-                        'key_map' => 'default',
-                        'line_numbers' => true,
-                        'line_wrapping' => true,
                         'listable' => 'hidden',
                         'localizable' => true,
                         'if' => [

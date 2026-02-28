@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -22,8 +21,6 @@ class SeoFieldtype extends Fieldtype
     protected static $handle = 'seo';
 
     protected $defaultValue = '@default';
-
-    protected static array $parsing = [];
 
     protected $selectable = false;
 
@@ -132,10 +129,6 @@ class SeoFieldtype extends Fieldtype
             $data = $this->defaultValueFromCascade();
         }
 
-        if ($this->isTextBasedField() && is_string($data)) {
-            $data = $this->parseAntlers($data);
-        }
-
         return $this->childFieldtype()->augment($data);
     }
 
@@ -227,45 +220,6 @@ class SeoFieldtype extends Fieldtype
     protected function isTextBasedField(): bool
     {
         return in_array('text', $this->childFieldtype()->categories());
-    }
-
-    protected function parseAntlers(string $data): string
-    {
-        $parent = $this->field->parent();
-
-        if ($parent instanceof Term) {
-            $parent = $parent->in(Context::from($parent)->site);
-        }
-
-        $data = $this->stripCircularReferences($data);
-
-        if (! Str::contains($data, '{{')) {
-            return $data;
-        }
-
-        static::$parsing[] = $this->field->handle();
-
-        try {
-            $variables = $this->cascade()->data()
-                ->merge($parent->toAugmentedArray())
-                ->all();
-
-            return Antlers::parse($data, $variables);
-        } finally {
-            array_pop(static::$parsing);
-        }
-    }
-
-    /**
-     * Strip references to the current field and any fields already being parsed
-     * up the call stack to prevent infinite recursion during Antlers augmentation.
-     */
-    protected function stripCircularReferences(string $data): string
-    {
-        $handles = array_unique([...static::$parsing, $this->field->handle()]);
-        $escaped = array_map(fn ($h) => preg_quote($h, '/'), $handles);
-
-        return preg_replace('/\{\{\s*(?:'.implode('|', $escaped).')\s*\}\}/', '', $data);
     }
 
     protected function cascade(mixed $parent = null): SeoFieldtypeCascade

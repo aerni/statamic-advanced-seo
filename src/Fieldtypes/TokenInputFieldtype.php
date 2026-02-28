@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Fieldtypes;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Data\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Support\AntlersParser;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -32,6 +33,11 @@ class TokenInputFieldtype extends Fieldtype
     protected const SITE_TOKEN_FIELDS = [
         'separator', 'site_name',
     ];
+
+    public function augment($value)
+    {
+        return AntlersParser::parse($value, $this->field);
+    }
 
     public function preload(): array
     {
