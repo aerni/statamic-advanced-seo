@@ -9,7 +9,7 @@ function resolveToken(handle, tokens) {
         display: token?.display || handle,
         attrs: {
             'data-token': handle,
-            'class': 'inline-flex items-center justify-center ring-1 ring-inset font-normal antialiased whitespace-nowrap text-xs leading-[1.375rem] px-2 rounded-sm select-none cursor-grab align-top bg-blue-50 ring-blue-300 text-blue-700 dark:bg-gray-800 dark:ring-blue-700 dark:text-blue-300'
+            'class': 'inline-flex items-center justify-center border dark:border-0 font-normal antialiased whitespace-nowrap text-xs leading-5 dark:leading-5.5 px-2 rounded-sm select-none cursor-grab align-top shadow-ui-sm bg-sky-50 border-sky-300 text-sky-700 dark:bg-gray-800 dark:text-sky-300'
         },
     };
 }

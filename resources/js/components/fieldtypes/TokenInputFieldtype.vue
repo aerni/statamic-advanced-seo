@@ -77,7 +77,7 @@ onMounted(() => {
             SingleLine,
             History,
             Placeholder.configure({ placeholder: __('advanced-seo::messages.token_picker_placeholder') }),
-            Dropcursor.configure({ color: '#3b82f6', width: 2 }),
+            Dropcursor,
             TokenNode.configure({ tokens: tokens.value }),
             TokenSelectionHighlight,
             TokenSuggestion.configure({
@@ -140,7 +140,7 @@ watch(() => props.value, (value) => {
 
 <template>
     <div
-        class="relative bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-10"
+        class="relative bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-11"
         data-ui-input
         :data-suggestion-empty="suggestionEmpty || undefined"
         :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.token_suggestion_placeholder')}'` }"
@@ -149,7 +149,7 @@ watch(() => props.value, (value) => {
             'border-dashed pointer-events-none': fieldtype.isReadOnly.value,
         }"
     >
-        <div class="px-3 py-2 overflow-x-auto [scrollbar-width:none]">
+        <div class="px-3 py-2.5 overflow-x-auto [scrollbar-width:none]">
             <div ref="editorEl" />
         </div>
 
@@ -178,12 +178,20 @@ watch(() => props.value, (value) => {
     margin: 0;
 }
 
-    background-color: var(--color-blue-100);
 [data-antlers-input].ProseMirror-focused [data-token]:is(.ProseMirror-selectednode, .is-selected) {
+    background-color: var(--color-sky-100);
 }
 
-    background-color: var(--color-gray-700);
 :is(.dark) [data-antlers-input].ProseMirror-focused [data-token]:is(.ProseMirror-selectednode, .is-selected) {
+    background-color: var(--color-gray-700);
+}
+
+[data-antlers-input] [data-token]:hover {
+    background-color: var(--color-sky-100);
+}
+
+:is(.dark) [data-antlers-input] [data-token]:hover {
+    background-color: var(--color-gray-700);
 }
 
 [data-antlers-input] p.is-editor-empty:first-child::before {
@@ -203,17 +211,19 @@ watch(() => props.value, (value) => {
     align-items: center;
     vertical-align: top;
     background-color: var(--color-gray-50);
-    box-shadow: inset 0 0 0 1px var(--color-gray-300);
+    border: 1px solid var(--color-gray-300);
     border-radius: var(--radius-sm);
+    box-shadow: var(--ui-shadow-sm);
     color: var(--color-gray-700);
     font-size: var(--text-xs);
-    line-height: 1.375rem;
+    line-height: 1.25rem;
     padding: 0 0.5rem;
 }
 
 :is(.dark) [data-antlers-input].ProseMirror-focused .suggestion-active {
     background-color: var(--color-gray-800);
-    box-shadow: none;
+    border: none;
+    line-height: 1.375rem;
     color: var(--color-gray-100);
 }
 
