@@ -61,10 +61,9 @@ function openTokenSuggestion() {
     const text = stringify(editor.value.getJSON());
     const content = text.length > 0 && !text.endsWith(' ') ? ' /' : '/';
 
-    editor.value.chain().focus('end').command(({ tr }) => {
-        tr.insertText(content);
-        return true;
-    }).run();
+    const end = editor.value.state.doc.content.size - 1;
+
+    editor.value.chain().focus().setTextSelection(end).insertContent(content).run();
 }
 
 // ─── Editor ─────────────────────────────────────────────────────────────────
