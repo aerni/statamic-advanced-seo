@@ -14,7 +14,7 @@ function truncate(value, max) {
  * Strip HTML tags from a string.
  */
 function stripTags(html) {
-    return html.replace(/<[^>]*>/g, '');
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 /**
