@@ -72,6 +72,11 @@ class OnPageSeoBlueprintSubscriber
             return false;
         }
 
+        // Don't add fields if content editing is disabled for this collection/taxonomy.
+        if (Statamic::isCpRoute() && ! $this->context->seoSet()->editable()) {
+            return false;
+        }
+
         // Check if user has permission to edit SEO content
         if (Statamic::isCpRoute() && Gate::denies('seo.edit-content')) {
             return false;

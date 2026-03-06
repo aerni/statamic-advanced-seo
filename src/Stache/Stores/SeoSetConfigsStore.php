@@ -38,7 +38,8 @@ class SeoSetConfigsStore extends BasicStore
             ->initialPath($path)
             ->seoSet("{$type}::{$handle}")
             ->enabled(Arr::get($data, 'enabled', true))
+            ->editable(Arr::get($data, 'editable', true))
             ->origins(Arr::get($data, 'origins', []))
-            ->data(Arr::except($data, ['enabled', 'origins']));
+            ->data(Arr::except($data, ['enabled', 'editable', 'origins']));
     }
 }

@@ -68,6 +68,7 @@ it('makes SeoSetConfig instances from file', function (): void {
 
     $this->files->put($path, <<<'YAML'
 enabled: false
+editable: false
 origins:
   english:
   german: english
@@ -80,6 +81,7 @@ YAML);
         ->and($item->initialPath())->toBe($path)
         ->and($item->id())->toBe('collections::articles')
         ->and($item->enabled())->toBeFalse()
+        ->and($item->editable())->toBeFalse()
         ->and($item->origins()->all())->toBe([
             'english' => null,
             'german' => 'english',

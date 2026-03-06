@@ -72,6 +72,21 @@ it('can get and set the enabled state', function () {
     expect($config->enabled())->toBeTrue();
 });
 
+it('can get and set the editable state', function () {
+    $config = Seo::find('collections::articles')->config();
+
+    /* Default state */
+    expect($config->editable())->toBeTrue();
+
+    /* Can disable */
+    $config->editable(false);
+    expect($config->editable())->toBeFalse();
+
+    /* Can enable */
+    $config->editable(true);
+    expect($config->editable())->toBeTrue();
+});
+
 it('returns true for enabled on site type sets regardless of value', function () {
     $config = Seo::find('site::defaults')->config();
 
@@ -175,6 +190,7 @@ it('can get file data', function () {
 
     expect($config->fileData())->toBe([
         'enabled' => true,
+        'editable' => true,
         'origins' => [
             'english' => null,
             'german' => 'english',
@@ -183,10 +199,11 @@ it('can get file data', function () {
     ]);
 });
 
-it('excludes enabled from file data for site type', function () {
+it('excludes enabled and editable from file data for site type', function () {
     $config = Seo::find('site::defaults')->config();
 
     expect($config->fileData())->not->toHaveKey('enabled');
+    expect($config->fileData())->not->toHaveKey('editable');
 });
 
 it('excludes empty origins from file data', function () {

@@ -319,8 +319,13 @@ return [
     ],
 
     'config_enabled' => [
-        'display' => 'Enabled',
-        'instructions' => 'Enables SEO for this :type.',
+        'display' => 'Enable SEO',
+        'instructions' => 'Process and output SEO data for this :type.',
+    ],
+
+    'config_editable' => [
+        'display' => 'Enable Editing',
+        'instructions' => 'Allow editing of SEO fields on individual :content.',
     ],
 
     'config_sitemaps' => [

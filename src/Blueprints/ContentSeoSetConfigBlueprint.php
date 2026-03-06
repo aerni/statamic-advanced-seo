@@ -28,7 +28,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
     protected function enabled(): array
     {
         return [
-            'display' => $this->trans('config_enabled.display'),
+            'display' => __('General'),
             'fields' => [
                 [
                     'handle' => 'enabled',
@@ -37,6 +37,16 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                         'display' => $this->trans('config_enabled.display'),
                         'instructions' => $this->trans('config_enabled.instructions'),
                         'default' => true,
+                    ],
+                ],
+                [
+                    'handle' => 'editable',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('config_editable.display'),
+                        'instructions' => $this->trans('config_editable.instructions'),
+                        'default' => true,
+                        'if' => ['enabled' => 'true'],
                     ],
                 ],
             ],

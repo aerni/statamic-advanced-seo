@@ -65,6 +65,11 @@ class SeoSet implements Arrayable, QueryableValue
         return $this->config()->enabled();
     }
 
+    public function editable(): bool
+    {
+        return $this->config()->editable();
+    }
+
     public function config(): SeoSetConfig
     {
         return Blink::once($this->blinkKey('config'), function () {

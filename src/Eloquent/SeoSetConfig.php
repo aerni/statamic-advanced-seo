@@ -16,8 +16,9 @@ class SeoSetConfig extends StacheSeoSetConfig
             ->model($model)
             ->seoSet("{$model->type}::{$model->handle}")
             ->enabled($model->data->get('enabled', true))
+            ->editable($model->data->get('editable', true))
             ->origins($model->data->get('origins', []))
-            ->data($model->data->except(['enabled', 'origins']));
+            ->data($model->data->except(['enabled', 'editable', 'origins']));
     }
 
     public function toModel(): Model

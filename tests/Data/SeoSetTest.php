@@ -84,6 +84,16 @@ it('can get the enabled state', function () {
     expect($set->enabled())->toBeTrue();
 });
 
+it('can get the editable state', function () {
+    $set = Seo::find('collections::articles');
+
+    expect($set->editable())->toBeTrue();
+
+    $set->config()->editable(false);
+
+    expect($set->editable())->toBeFalse();
+});
+
 it('can get the config', function () {
     $set = Seo::find('collections::articles');
     $config = $set->config();

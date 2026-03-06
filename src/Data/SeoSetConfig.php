@@ -31,6 +31,8 @@ class SeoSetConfig implements Contract
 
     protected bool $enabled = true;
 
+    protected bool $editable = true;
+
     protected array $origins = [];
 
     public function __construct()
@@ -58,6 +60,11 @@ class SeoSetConfig implements Contract
         return $this->fluentlyGetOrSet('enabled')
             ->getter(fn ($enabled) => $this->type() === 'site' ? true : $enabled)
             ->args(func_get_args());
+    }
+
+    public function editable(?bool $editable = null): bool|self
+    {
+        return $this->fluentlyGetOrSet('editable')->args(func_get_args());
     }
 
     public function origins(?array $origins = null): Collection|self
@@ -133,6 +140,7 @@ class SeoSetConfig implements Contract
 
         if ($this->type() !== 'site') {
             $data->put('enabled', $this->enabled());
+            $data->put('editable', $this->editable());
         }
 
         if ($this->origins()->filter()->isNotEmpty()) {

@@ -105,9 +105,16 @@ abstract class BaseBlueprint
             return null;
         }
 
-        return __("advanced-seo::fields.$key", ['type' => $this->contentTypeLabel(), ...$placeholders]);
+        return __("advanced-seo::fields.$key", [
+            'type' => $this->contentTypeLabel(),
+            'content' => $this->contentLabel(),
+            ...$placeholders,
+        ]);
     }
 
+    /**
+     * Scope-aware label: "collection"/"taxonomy" for config, "entries"/"terms" for localizations, "entry"/"term" for content.
+     */
     protected function contentTypeLabel(): string
     {
         return match ([$this->context?->scope, $this->context?->type]) {
@@ -117,6 +124,18 @@ abstract class BaseBlueprint
             [Scope::LOCALIZATION, 'taxonomies'] => lcfirst(__('advanced-seo::messages.terms')),
             [Scope::CONTENT, 'collections'] => lcfirst(__('advanced-seo::messages.entry')),
             [Scope::CONTENT, 'taxonomies'] => lcfirst(__('advanced-seo::messages.term')),
+            default => '',
+        };
+    }
+
+    /**
+     * The content items label: "entries" or "terms".
+     */
+    protected function contentLabel(): string
+    {
+        return match ($this->context?->type) {
+            'collections' => lcfirst(__('advanced-seo::messages.entries')),
+            'taxonomies' => lcfirst(__('advanced-seo::messages.terms')),
             default => '',
         };
     }
