@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Aerni\AdvancedSeo\Actions\HasCircularOrigins;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Fields\Fieldtype;
@@ -66,7 +67,7 @@ class SiteOriginsFieldtype extends Fieldtype
                     ->pluck('origin', 'handle')
                     ->all();
 
-                if (\Aerni\AdvancedSeo\Actions\HasCircularOrigins::handle($origins)) {
+                if (HasCircularOrigins::handle($origins)) {
                     $fail(__('Circular site origin dependencies are not allowed.'));
                 }
             }

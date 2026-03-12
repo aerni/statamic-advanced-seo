@@ -35,7 +35,7 @@ function makeField(string $handle = 'seo_title', string $type = 'token_input', m
     return $field;
 }
 
-function makeEntry(array $data = []): \Statamic\Entries\Entry
+function makeEntry(array $data = []): Statamic\Entries\Entry
 {
     $entry = Entry::make()
         ->collection('pages')
@@ -67,7 +67,7 @@ it('returns data unchanged when parent is not an entry or term', function () {
 });
 
 it('returns data unchanged when parent is a generic object', function () {
-    $field = makeField(parent: new \stdClass);
+    $field = makeField(parent: new stdClass);
 
     expect($this->parser->parse('{{ title }}', $field))->toBe('{{ title }}');
 });

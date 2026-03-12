@@ -5,8 +5,8 @@ use Aerni\AdvancedSeo\Tokens\Normalizers\BardTokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\Normalizers\MarkdownTokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\Normalizers\TextareaTokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\Normalizers\TextTokenNormalizer;
-use Aerni\AdvancedSeo\Tokens\TokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\Normalizers\UsersTokenNormalizer;
+use Aerni\AdvancedSeo\Tokens\TokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\ValueToken;
 use Aerni\AdvancedSeo\Tokens\ValueTokens\SeparatorToken;
 use Aerni\AdvancedSeo\Tokens\ValueTokens\SiteNameToken;
@@ -158,7 +158,7 @@ it('registers custom value tokens from config', function () {
 });
 
 it('filters out invalid classes from config', function () {
-    config(['advanced-seo.tokens' => ['NotARealClass', \stdClass::class, RegistryTestNormalizerOne::class]]);
+    config(['advanced-seo.tokens' => ['NotARealClass', stdClass::class, RegistryTestNormalizerOne::class]]);
 
     Blink::flush();
 

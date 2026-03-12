@@ -72,7 +72,7 @@ class SeoSetConfigRepository implements Contract
     public static function bindings(): array
     {
         return [
-            \Aerni\AdvancedSeo\Contracts\SeoSetConfig::class => \Aerni\AdvancedSeo\Eloquent\SeoSetConfig::class,
+            SeoSetConfig::class => \Aerni\AdvancedSeo\Eloquent\SeoSetConfig::class,
         ];
     }
 }

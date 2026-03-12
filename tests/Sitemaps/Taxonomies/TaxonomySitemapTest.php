@@ -41,7 +41,7 @@ it('returns a collection of urls', function () {
     $sitemap = Sitemap::index('english')->sitemaps()
         ->first(fn ($s) => $s instanceof TaxonomySitemap);
 
-    expect($sitemap->urls())->toBeInstanceOf(\Illuminate\Support\Collection::class);
+    expect($sitemap->urls())->toBeInstanceOf(Illuminate\Support\Collection::class);
 });
 
 it('creates sitemaps for all taxonomies', function () {

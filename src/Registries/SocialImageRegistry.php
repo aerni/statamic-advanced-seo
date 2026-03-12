@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Registries;
 
 use Aerni\AdvancedSeo\SocialImages\SocialImage;
+use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -23,7 +24,7 @@ class SocialImageRegistry extends Registry
     /**
      * Get all generators for content.
      *
-     * @return Collection<int, \Aerni\AdvancedSeo\SocialImages\SocialImageGenerator>
+     * @return Collection<int, SocialImageGenerator>
      */
     public function for(Entry|Term $content): Collection
     {

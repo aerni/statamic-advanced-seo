@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Facades;
 
+use Aerni\AdvancedSeo\Contracts\SeoSetConfigRepository;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -12,13 +13,13 @@ use Illuminate\Support\Facades\Facade;
  * @method static void save(\Aerni\AdvancedSeo\Contracts\SeoSetConfig $config)
  * @method static bool delete(\Aerni\AdvancedSeo\Contracts\SeoSetConfig $config)
  *
- * @see \Aerni\AdvancedSeo\Contracts\SeoSetConfigRepository
+ * @see SeoSetConfigRepository
  * @see \Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository
  */
 class SeoConfig extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Aerni\AdvancedSeo\Contracts\SeoSetConfigRepository::class;
+        return SeoSetConfigRepository::class;
     }
 }

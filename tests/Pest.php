@@ -1,5 +1,8 @@
 <?php
 
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
+use Aerni\AdvancedSeo\Tests\TestCase;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
@@ -15,9 +18,9 @@ use Statamic\Facades\Stache;
 |
 */
 
-uses(Aerni\AdvancedSeo\Tests\TestCase::class)->in('.');
-uses(Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL::class)->in('GraphQL');
-uses(Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap::class)->in('Sitemaps');
+uses(TestCase::class)->in('.');
+uses(EnablesGraphQL::class)->in('GraphQL');
+uses(EnablesSitemap::class)->in('Sitemaps');
 
 /*
 |--------------------------------------------------------------------------

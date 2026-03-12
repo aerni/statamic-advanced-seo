@@ -20,43 +20,43 @@ class ComputedMetaDataType extends Type
     {
         return [
             'og_image_preset' => [
-                'type' => GraphQl::type(SocialImagePresetType::NAME),
+                'type' => GraphQL::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
             'twitter_image_preset' => [
-                'type' => GraphQl::type(SocialImagePresetType::NAME),
+                'type' => GraphQL::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
             'twitter_card' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'twitter_handle' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'indexing' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'locale' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'hreflang' => [
-                'type' => GraphQl::listOf(GraphQL::type(HreflangType::NAME)),
+                'type' => GraphQL::listOf(GraphQL::type(HreflangType::NAME)),
                 'resolve' => $this->resolver(),
             ],
             'canonical' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'site_schema' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'breadcrumbs' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
         ];

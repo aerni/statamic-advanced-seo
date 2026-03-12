@@ -24,6 +24,8 @@ use Aerni\AdvancedSeo\GraphQL\Types\SitemapUrlType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
 use Aerni\AdvancedSeo\View\CascadeComposer;
@@ -100,8 +102,8 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function registerFileDriver(): void
     {
-        Statamic::repository(Contracts\SeoSetConfigRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository::class);
-        Statamic::repository(Contracts\SeoSetLocalizationRepository::class, \Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository::class);
+        Statamic::repository(Contracts\SeoSetConfigRepository::class, SeoSetConfigRepository::class);
+        Statamic::repository(Contracts\SeoSetLocalizationRepository::class, SeoSetLocalizationRepository::class);
     }
 
     protected function bootStacheStore(): self

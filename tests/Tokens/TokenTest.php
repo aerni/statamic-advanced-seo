@@ -146,4 +146,3 @@ it('passes parent context via withParent()', function () {
 
     expect($token->withParent($parent)->value())->toBe('My Site');
 });
-

@@ -42,7 +42,7 @@ it('has required arguments', function () {
 it('resolves sitemaps for a site', function () {
     $result = (new SeoSitemapsQuery)->resolve(null, ['site' => 'english']);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Support\Collection::class);
+    expect($result)->toBeInstanceOf(Illuminate\Support\Collection::class);
 });
 
 it('returns null for non-existent site', function () {

@@ -82,7 +82,7 @@ class SeoSetLocalizationRepository implements Contract
     public static function bindings(): array
     {
         return [
-            \Aerni\AdvancedSeo\Contracts\SeoSetLocalization::class => \Aerni\AdvancedSeo\Eloquent\SeoSetLocalization::class,
+            SeoSetLocalization::class => \Aerni\AdvancedSeo\Eloquent\SeoSetLocalization::class,
         ];
     }
 }

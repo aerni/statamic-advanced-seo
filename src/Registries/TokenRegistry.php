@@ -2,8 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
+use Aerni\AdvancedSeo\Tokens\Normalizers\BardTokenNormalizer;
+use Aerni\AdvancedSeo\Tokens\Normalizers\MarkdownTokenNormalizer;
+use Aerni\AdvancedSeo\Tokens\Normalizers\TextareaTokenNormalizer;
+use Aerni\AdvancedSeo\Tokens\Normalizers\TextTokenNormalizer;
+use Aerni\AdvancedSeo\Tokens\Normalizers\UsersTokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\TokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\ValueToken;
+use Aerni\AdvancedSeo\Tokens\ValueTokens\SeparatorToken;
+use Aerni\AdvancedSeo\Tokens\ValueTokens\SiteNameToken;
 use Illuminate\Support\Collection;
 
 class TokenRegistry extends Registry
@@ -25,13 +32,13 @@ class TokenRegistry extends Registry
     protected function items(): array
     {
         return collect([
-            \Aerni\AdvancedSeo\Tokens\Normalizers\BardTokenNormalizer::class,
-            \Aerni\AdvancedSeo\Tokens\Normalizers\MarkdownTokenNormalizer::class,
-            \Aerni\AdvancedSeo\Tokens\Normalizers\TextTokenNormalizer::class,
-            \Aerni\AdvancedSeo\Tokens\Normalizers\TextareaTokenNormalizer::class,
-            \Aerni\AdvancedSeo\Tokens\Normalizers\UsersTokenNormalizer::class,
-            \Aerni\AdvancedSeo\Tokens\ValueTokens\SeparatorToken::class,
-            \Aerni\AdvancedSeo\Tokens\ValueTokens\SiteNameToken::class,
+            BardTokenNormalizer::class,
+            MarkdownTokenNormalizer::class,
+            TextTokenNormalizer::class,
+            TextareaTokenNormalizer::class,
+            UsersTokenNormalizer::class,
+            SeparatorToken::class,
+            SiteNameToken::class,
             ...config('advanced-seo.tokens', []),
         ])
             ->filter(fn (mixed $class) => is_subclass_of($class, TokenNormalizer::class) || is_subclass_of($class, ValueToken::class))

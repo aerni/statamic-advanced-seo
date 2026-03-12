@@ -3,6 +3,7 @@
 use Aerni\AdvancedSeo\Ai\SeoAgent;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -36,7 +37,7 @@ it('returns 403 when user lacks seo.edit-content permission', function () {
 });
 
 it('resolves taxonomy blueprints', function () {
-    \Statamic\Facades\Taxonomy::make('tags')->sites(['english'])->saveQuietly();
+    Taxonomy::make('tags')->sites(['english'])->saveQuietly();
 
     $user = User::make()->makeSuper()->save();
 

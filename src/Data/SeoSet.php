@@ -6,6 +6,8 @@ use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigDeleted;
+use Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigSaved;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
@@ -13,6 +15,7 @@ use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Contracts\Taxonomies\Taxonomy as StatamicTaxonomy;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 
 class SeoSet implements Arrayable, QueryableValue
@@ -54,7 +57,7 @@ class SeoSet implements Arrayable, QueryableValue
         return Blink::once($this->blinkKey('parent'), function () {
             return match ($this->type) {
                 'collections' => \Statamic\Facades\Collection::find($this->handle),
-                'taxonomies' => \Statamic\Facades\Taxonomy::find($this->handle),
+                'taxonomies' => Taxonomy::find($this->handle),
                 'site' => null,
             };
         });
@@ -143,7 +146,7 @@ class SeoSet implements Arrayable, QueryableValue
      * Saves the config and triggers cascading side effects.
      * Side effects are handled by the HandleSeoSetConfigSaved event listener.
      *
-     * @see \Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigSaved
+     * @see HandleSeoSetConfigSaved
      */
     public function save(): self
     {
@@ -156,7 +159,7 @@ class SeoSet implements Arrayable, QueryableValue
      * Deletes the config and triggers cascading cleanup.
      * Side effects are handled by the HandleSeoSetConfigDeleted event listener.
      *
-     * @see \Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigDeleted
+     * @see HandleSeoSetConfigDeleted
      */
     public function delete(): bool
     {

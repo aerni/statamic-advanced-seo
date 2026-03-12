@@ -47,7 +47,7 @@ it('returns a collection of sitemaps sorted by handle', function () {
     $handles = $sitemaps->map->handle()->values()->all();
 
     expect($sitemaps)
-        ->toBeInstanceOf(\Illuminate\Support\Collection::class)
+        ->toBeInstanceOf(Illuminate\Support\Collection::class)
         ->not->toBeEmpty()
         ->and($handles)->toBe(['blog', 'pages', 'tags']);
 });

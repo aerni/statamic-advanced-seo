@@ -23,7 +23,7 @@ beforeEach(function (): void {
     $this->store = (new SeoSetConfigsStore($stache, $this->files))->directory(tempPath());
     $stache->registerStore($this->store);
 
-    $collection = (new \Statamic\Entries\Collection)
+    $collection = (new Statamic\Entries\Collection)
         ->handle('articles')
         ->title('Articles')
         ->sites(['english', 'german']);

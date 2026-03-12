@@ -9,6 +9,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -43,7 +44,7 @@ it('creates a Tokens instance for a given parent', function () {
 });
 
 it('normalizes a value using the correct normalizer', function () {
-    $fieldtype = Mockery::mock(\Statamic\Fields\Fieldtype::class);
+    $fieldtype = Mockery::mock(Fieldtype::class);
     $fieldtype->shouldReceive('handle')->andReturn('text');
 
     $value = Mockery::mock(Value::class);
@@ -54,7 +55,7 @@ it('normalizes a value using the correct normalizer', function () {
 });
 
 it('returns null when normalizing a value with no matching normalizer', function () {
-    $fieldtype = Mockery::mock(\Statamic\Fields\Fieldtype::class);
+    $fieldtype = Mockery::mock(Fieldtype::class);
     $fieldtype->shouldReceive('handle')->andReturn('video');
 
     $value = Mockery::mock(Value::class);

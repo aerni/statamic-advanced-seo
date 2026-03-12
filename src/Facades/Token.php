@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Facades;
 
+use Aerni\AdvancedSeo\Tokens\TokenService;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -10,12 +11,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static ?string normalize(\Statamic\Fields\Value $value)
  * @method static ?string parse(?string $data, \Statamic\Fields\Field $field)
  *
- * @see \Aerni\AdvancedSeo\Tokens\TokenService
+ * @see TokenService
  */
 class Token extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Aerni\AdvancedSeo\Tokens\TokenService::class;
+        return TokenService::class;
     }
 }

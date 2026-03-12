@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Context\Context;
+use Laravel\Ai\AiServiceProvider;
 
 class Ai extends Feature
 {
@@ -17,7 +18,7 @@ class Ai extends Feature
 
     protected static function aiSdkConfigured(): bool
     {
-        if (! class_exists(\Laravel\Ai\AiServiceProvider::class)) {
+        if (! class_exists(AiServiceProvider::class)) {
             return false;
         }
 
