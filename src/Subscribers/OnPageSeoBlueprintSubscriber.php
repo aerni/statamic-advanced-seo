@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
 use Statamic\Events;
 use Statamic\Events\Event;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Statamic;
 
 class OnPageSeoBlueprintSubscriber
@@ -62,13 +61,13 @@ class OnPageSeoBlueprintSubscriber
             return false;
         }
 
-        // Don't add fields on any addon views in the CP.
-        if (Helpers::isAddonCpRoute()) {
+        // Don't add fields on addon views in the CP, except the AI generate route.
+        if (Helpers::isAddonCpRoute() && ! Helpers::isAiCpRoute()) {
             return false;
         }
 
-        // Don't add fields to any other CP route other than the entry/term view and when performing an action on the listing view (necessary for the social images generator action to work).
-        if (Statamic::isCpRoute() && ! $this->isModelCpRoute($event) && ! $this->isActionCpRoute()) {
+        // Only add fields on entry/term views, action routes, and the AI generate route.
+        if (Statamic::isCpRoute() && ! $this->isModelCpRoute($event) && ! $this->isActionCpRoute() && ! Helpers::isAiCpRoute()) {
             return false;
         }
 
@@ -77,7 +76,7 @@ class OnPageSeoBlueprintSubscriber
             return false;
         }
 
-        // Check if user has permission to edit SEO content
+        // Check if user has permission to edit SEO content.
         if (Statamic::isCpRoute() && Gate::denies('seo.edit-content')) {
             return false;
         }

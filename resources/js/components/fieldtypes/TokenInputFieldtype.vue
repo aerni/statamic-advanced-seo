@@ -1,5 +1,5 @@
 <script setup>
-import { computed, markRaw, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, getCurrentInstance, markRaw, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 import { Fieldtype } from '@statamic/cms';
 import { Button, injectPublishContext } from '@statamic/cms/ui';
 import { Editor } from '@tiptap/vue-3';
@@ -25,6 +25,7 @@ defineExpose(fieldtype.expose);
 
 const publishContext = injectPublishContext();
 const { resolveAntlers } = useSeoValues();
+const { $axios } = getCurrentInstance().appContext.config.globalProperties;
 
 // ─── Refs ────────────────────────────────────────────────────────────────────
 
@@ -34,10 +35,43 @@ const suggestionState = ref(null);
 const suggestionListEl = ref(null);
 const editorEl = ref(null);
 const editor = shallowRef(null);
+const loading = ref(false);
 
 // ─── Computed ────────────────────────────────────────────────────────────────
 
+const field = computed(() => props.handle.replace(/_child$/, ''));
+
+const actions = computed(() => {
+    if (publishContext.name.value === 'seo-set-localizations') return [];
+    return props.meta.actions;
+});
+
 const tokens = computed(() => props.meta.tokens);
+
+const items = computed(() => {
+    if (!suggestionState.value) return [];
+
+    const result = [];
+
+    if (!suggestionState.value.query) {
+        for (const action of actions.value) {
+            result.push({ ...action, group: 'actions', onSelect: () => generateWithAi() });
+        }
+    }
+
+    let lastGroup = null;
+
+    for (const item of suggestionState.value.items) {
+        if (item.group !== lastGroup) {
+            result.push({ group: 'header', label: item.group });
+            lastGroup = item.group;
+        }
+
+        result.push({ ...item, onSelect: () => suggestionState.value.command(item) });
+    }
+
+    return result;
+});
 
 const characterLimit = computed(() => {
     if (publishContext.name.value === 'seo-set-localizations') return null;
@@ -45,8 +79,6 @@ const characterLimit = computed(() => {
 });
 
 const characterCount = computed(() => (resolveAntlers(props.value) ?? '').length);
-
-const suggestionEmpty = computed(() => suggestionState.value && !suggestionState.value.query);
 
 // ─── Actions ────────────────────────────────────────────────────────────────
 
@@ -64,6 +96,40 @@ function openTokenSuggestion() {
     const end = editor.value.state.doc.content.size - 1;
 
     editor.value.chain().focus().setTextSelection(end).insertContent(content).run();
+}
+
+async function generateWithAi() {
+    if (loading.value) return;
+
+    if (suggestionState.value) {
+        editor.value.chain().focus().deleteRange(suggestionState.value.range).run();
+    }
+
+    loading.value = true;
+    editor.value.setEditable(false);
+
+    try {
+        const response = await $axios.post(cp_url('advanced-seo/ai/generate'), {
+            field: field.value,
+            blueprint: publishContext.blueprint.value.fqh,
+            site: publishContext.site.value,
+            content: publishContext.values.value,
+        });
+
+        const text = response.data.replace(/\n+/g, ' ').trim();
+
+        withInternalUpdate(() => {
+            editor.value.commands.setContent(parse(text, tokens.value));
+            fieldtype.update(text);
+        });
+    } catch (error) {
+        const message = error.response?.data?.error ?? error.message;
+        console.error('[Advanced SEO]', message, ...(error.response?.data?.reason ? [error.response.data.reason] : []));
+        Statamic.$toast.error(message);
+    } finally {
+        editor.value.setEditable(true);
+        loading.value = false;
+    }
 }
 
 // ─── Editor ─────────────────────────────────────────────────────────────────
@@ -142,8 +208,12 @@ onMounted(() => {
         onUpdate: ({ editor }) => {
             if (isInternalUpdate.value) return;
 
-            withInternalUpdate(() => {
-                fieldtype.update(stringify(editor.getJSON()));
+            nextTick(() => {
+                if (suggestionState.value) return;
+
+                withInternalUpdate(() => {
+                    fieldtype.update(stringify(editor.getJSON()));
+                });
             });
         },
         onFocus: () => {
@@ -184,13 +254,15 @@ watch(() => props.value, (value) => {
     <div class="relative">
         <div class="relative">
             <div
-                class="bg-white border border-gray-300 rounded-lg appearance-none dark:bg-gray-900 dark:border-gray-700 shadow-ui-sm min-h-11"
+                class="border border-gray-300 rounded-lg appearance-none dark:border-gray-700 shadow-ui-sm min-h-11"
                 data-ui-input
-                :data-suggestion-empty="suggestionEmpty || undefined"
+                :data-suggestion-empty="(suggestionState && !suggestionState.query) || undefined"
                 :style="{ '--suggestion-placeholder': `'${__('advanced-seo::messages.token_suggestion_placeholder')}'` }"
                 :class="{
                     'pe-9': !fieldtype.isReadOnly.value,
                     'border-dashed pointer-events-none': fieldtype.isReadOnly.value,
+                    'animate-pulse pointer-events-none bg-gray-100 dark:bg-gray-800': loading,
+                    'bg-white dark:bg-gray-900': !loading,
                 }"
             >
                 <div class="px-3 py-2.5 overflow-x-auto [scrollbar-width:none]">
@@ -200,12 +272,11 @@ watch(() => props.value, (value) => {
                 <TokenSuggestionList
                     v-if="suggestionState && isEditorFocused"
                     ref="suggestionListEl"
-                    :items="suggestionState.items"
-                    :command="suggestionState.command"
+                    :items="items"
                 />
             </div>
 
-            <div v-if="!fieldtype.isReadOnly.value" class="absolute inset-y-0 right-1.5 flex items-center">
+            <div v-if="!fieldtype.isReadOnly.value && !loading" class="absolute top-0 right-1.5 flex items-center h-11">
                 <Button v-tooltip="__('Add Token')" round icon="plus" size="xs" icon-only :aria-label="__('Add Token')" @mousedown.prevent @click="openTokenSuggestion" />
             </div>
         </div>

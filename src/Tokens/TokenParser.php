@@ -1,10 +1,11 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Support;
+namespace Aerni\AdvancedSeo\Tokens;
 
 use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Facades\Token;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\SeoFieldtypeCascade;
-use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Antlers;
@@ -12,12 +13,13 @@ use Statamic\Facades\Blink;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\CoreModifiers;
+use Statamic\Support\Str;
 
-class AntlersParser
+class TokenParser
 {
-    protected static array $parsing = [];
+    protected array $parsing = [];
 
-    public static function parse(?string $data, Field $field): ?string
+    public function parse(?string $data, Field $field): ?string
     {
         if ($data === null) {
             return null;
@@ -29,27 +31,25 @@ class AntlersParser
             return $data;
         }
 
-        if ($parent instanceof Term) {
-            $parent = $parent->in(Context::from($parent)->site);
-        }
+        $parent = Helpers::localizedContent($parent);
 
-        $data = static::stripCircularReferences($data, $field);
+        $data = $this->stripCircularReferences($data, $field);
 
         if (! Str::contains($data, '{{')) {
             return $data;
         }
 
-        static::$parsing[] = $field->handle();
+        $this->parsing[] = $field->handle();
 
         try {
-            $variables = static::cascade($field->parent())->data()
+            $variables = $this->cascade($parent)->data()
                 ->merge($parent->toAugmentedArray())
-                ->when($field->type() !== 'json_ld', fn ($data) => $data->map(static::toPlainText(...)))
+                ->when($field->type() !== 'json_ld', fn ($data) => $data->map($this->toPlainText(...)))
                 ->all();
 
             return Antlers::parse($data, $variables);
         } finally {
-            array_pop(static::$parsing);
+            array_pop($this->parsing);
         }
     }
 
@@ -57,9 +57,9 @@ class AntlersParser
      * Strip references to the current field and any fields already being parsed
      * up the call stack to prevent infinite recursion during Antlers augmentation.
      */
-    protected static function stripCircularReferences(string $data, Field $field): string
+    protected function stripCircularReferences(string $data, Field $field): string
     {
-        $handles = array_unique([...static::$parsing, $field->handle()]);
+        $handles = array_unique([...$this->parsing, $field->handle()]);
         $escaped = array_map(fn ($h) => preg_quote($h, '/'), $handles);
 
         return preg_replace('/\{\{\s*(?:'.implode('|', $escaped).')\s*\}\}/', '', $data);
@@ -69,17 +69,13 @@ class AntlersParser
      * Convert markup-producing field values to plain text,
      * capped at a generous limit to prevent large content dumps in meta tags.
      */
-    protected static function toPlainText(mixed $value): mixed
+    protected function toPlainText(mixed $value): mixed
     {
         if (! $value instanceof Value) {
             return $value;
         }
 
-        $text = match ($value->fieldtype()?->handle()) {
-            'markdown' => (new CoreModifiers)->stripTags($value->value(), [], []),
-            'bard' => (new CoreModifiers)->bardText($value),
-            default => null,
-        };
+        $text = Token::normalize($value);
 
         if ($text === null) {
             return $value;
@@ -88,7 +84,7 @@ class AntlersParser
         return (new CoreModifiers)->safeTruncate($text, [320, '…']);
     }
 
-    protected static function cascade(mixed $parent): SeoFieldtypeCascade
+    protected function cascade(mixed $parent): SeoFieldtypeCascade
     {
         $context = Context::from($parent);
 

@@ -282,4 +282,69 @@ return [
 
     'site_verification' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Tokens
+    |--------------------------------------------------------------------------
+    |
+    | Register custom token normalizers for fieldtypes not covered by
+    | the defaults, or add custom value tokens. Both are available
+    | in the token input fieldtype.
+    |
+    */
+
+    'tokens' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI
+    |--------------------------------------------------------------------------
+    |
+    | Configure AI-powered content generation.
+    | Requires the Laravel AI SDK (laravel/ai) to be installed and configured.
+    |
+    */
+
+    'ai' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Enable or disable AI content generation.
+        |
+        */
+
+        'enabled' => false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Provider
+        |--------------------------------------------------------------------------
+        |
+        | The AI provider to use for content generation. This should match
+        | a provider configured in your config/ai.php file. When set to null,
+        | the SDK's default provider will be used.
+        |
+        */
+
+        'provider' => null,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Model
+        |--------------------------------------------------------------------------
+        |
+        | The AI model to use for content generation. When set to null,
+        | the provider's cheapest model will be used for cost optimization.
+        |
+        */
+
+        'model' => null,
+
+    ],
+
 ];

@@ -3,6 +3,7 @@
 .idea
 .env
 .phpunit.result.cache
+agents
 composer.lock
 coverage
 node_modules

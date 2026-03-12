@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Aerni\AdvancedSeo\Support\AntlersParser;
+use Aerni\AdvancedSeo\Facades\Token;
 use Statamic\Fieldtypes\Code;
 
 class JsonLdFieldtype extends Code
@@ -15,6 +15,6 @@ class JsonLdFieldtype extends Code
 
     public function augment($value)
     {
-        return parent::augment(AntlersParser::parse($value, $this->field));
+        return parent::augment(Token::parse($value, $this->field));
     }
 }

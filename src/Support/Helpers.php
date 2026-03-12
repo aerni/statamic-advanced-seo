@@ -43,6 +43,11 @@ class Helpers
         return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
     }
 
+    public static function isAiCpRoute(): bool
+    {
+        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo', 'ai']);
+    }
+
     public static function isBlueprintCpRoute(): bool
     {
         return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints']);

@@ -1,4 +1,5 @@
 import { ANTLERS_PATTERN } from '../utils/antlers.js';
+import { normalize } from '../utils/normalizers.js';
 import { usePublishFields } from './usePublishFields.js';
 
 /**
@@ -8,57 +9,6 @@ function truncate(value, max) {
     return value?.length > max
         ? value.substring(0, max) + ' ...'
         : value;
-}
-
-/**
- * Strip HTML tags from a string.
- */
-function stripTags(html) {
-    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-/**
- * Extract plain text from a ProseMirror (Bard) JSON structure.
- * Iterative traversal collecting text nodes.
- */
-function extractBardText(value) {
-    if (typeof value === 'string') {
-        return stripTags(value);
-    }
-
-    if (!Array.isArray(value)) return '';
-
-    let text = '';
-
-    const queue = [...value];
-
-    while (queue.length > 0) {
-        const item = queue.shift();
-
-        if (!item?.type) continue;
-
-        if (item.type === 'text') {
-            text += ` ${item.text || ''}`;
-        }
-
-        queue.unshift(...(item.content ?? []));
-    }
-
-    return text.replace(/\s+/g, ' ').trim();
-}
-
-/**
- * Convert a field value to plain text based on the field type.
- */
-function toPlainText(value, fieldType) {
-    switch (fieldType) {
-        case 'markdown':
-            return stripTags(markdown(value));
-        case 'bard':
-            return extractBardText(value);
-        default:
-            return typeof value === 'string' ? value : '';
-    }
 }
 
 /**
@@ -83,27 +33,26 @@ export function useSeoValues() {
     const resolving = new Set();
 
     /**
-     * Resolve a blueprint field value to plain text.
+     * Resolve a field token's value to plain text.
      */
-    function resolveFieldValue(handle) {
+    function resolveFieldToken(handle) {
         const field = getField(handle);
 
         if (!field) return;
 
-        return field.type === 'seo'
-            ? resolve(handle)
-            : toPlainText(getFieldRawValue(handle), field.type);
+        if (field.type === 'seo') return resolve(handle);
+
+        return normalize(field.type, getFieldRawValue(handle), getFieldMeta(handle));
     }
 
     /**
-     * Find a token value from field meta.
-     * Checks meta.tokens (standalone) and meta.meta.tokens (seo-wrapped).
+     * Resolve a value token's pre-computed value from field meta.
      */
-    function resolveTokenValue(handle) {
+    function resolveValueToken(handle) {
         return Object.values(fields.value)
             .flatMap(field => getFieldMeta(field.handle))
             .flatMap(meta => meta?.tokens ?? meta?.meta?.tokens ?? [])
-            .find(token => token.handle === handle)
+            .find(token => token.handle === handle && 'value' in token)
             ?.value;
     }
 
@@ -115,7 +64,7 @@ export function useSeoValues() {
         if (!value || typeof value !== 'string') return value;
 
         return value.replace(new RegExp(ANTLERS_PATTERN.source, 'g'), (match, handle) => {
-            return resolveFieldValue(handle) ?? resolveTokenValue(handle) ?? match;
+            return resolveFieldToken(handle) ?? resolveValueToken(handle) ?? match;
         });
     }
 
@@ -148,7 +97,7 @@ export function useSeoValues() {
                 case 'custom':
                     return resolveAntlers(value.value)?.trim();
                 default:
-                    return toPlainText(value, field.type);
+                    return normalize(field.type, value, getFieldMeta(handle));
             }
         } finally {
             resolving.delete(handle);

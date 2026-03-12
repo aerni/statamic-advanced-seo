@@ -28,6 +28,7 @@
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {
+        "laravel/ai": "^0.2",
         "laravel/pint": "^1.26",
         "nunomaduro/collision": "^8.0",
         "orchestra/testbench": "^10.0",

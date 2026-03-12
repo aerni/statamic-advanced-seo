@@ -6,6 +6,7 @@ import SiteOriginsFieldtype from './components/fieldtypes/SiteOriginsFieldtype.v
 import SearchPreviewFieldtype from './components/fieldtypes/SearchPreviewFieldtype.vue'
 import SocialPreviewFieldtype from './components/fieldtypes/SocialPreviewFieldtype.vue'
 import TokenInputFieldtype from './components/fieldtypes/TokenInputFieldtype.vue'
+import { add } from './utils/normalizers.js'
 
 Statamic.booting(() => {
     Statamic.$inertia.register('advanced-seo::Dashboard', Dashboard)
@@ -19,4 +20,5 @@ Statamic.booting(() => {
     Statamic.$components.register('search_preview-fieldtype', SearchPreviewFieldtype)
     Statamic.$components.register('social_preview-fieldtype', SocialPreviewFieldtype)
     Statamic.$components.register('token_input-fieldtype', TokenInputFieldtype)
+    Statamic.$advancedSeo = { normalizers: { add } }
 })
