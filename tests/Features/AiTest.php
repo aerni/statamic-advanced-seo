@@ -20,7 +20,7 @@ it('is disabled when config is false', function () {
 });
 
 it('is disabled when the ai package is not installed', function () {
-    $this->uninstallAiPackage();
+    $this->uninstallPackages();
 
     expect(Ai::enabled())->toBeFalse();
 });

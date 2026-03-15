@@ -42,7 +42,7 @@ it('is disabled when config is false', function () {
 });
 
 it('is disabled when the screenshot package is not installed', function () {
-    $this->uninstallScreenshotPackage();
+    $this->uninstallPackages();
 
     expect(SocialImagesGenerator::enabled())->toBeFalse();
 });

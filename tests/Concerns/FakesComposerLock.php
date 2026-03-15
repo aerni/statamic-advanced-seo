@@ -4,14 +4,14 @@ namespace Aerni\AdvancedSeo\Tests\Concerns;
 
 trait FakesComposerLock
 {
+    protected function installEloquentDriver(): void
+    {
+        $this->fakeComposerLock('composer.eloquent.lock');
+    }
+
     protected function installAiPackage(): void
     {
         $this->fakeComposerLock('composer.ai.lock');
-    }
-
-    protected function uninstallAiPackage(): void
-    {
-        $this->fakeComposerLock('composer.empty.lock');
     }
 
     protected function installScreenshotPackage(): void
@@ -19,7 +19,7 @@ trait FakesComposerLock
         $this->fakeComposerLock('composer.screenshot.lock');
     }
 
-    protected function uninstallScreenshotPackage(): void
+    protected function uninstallPackages(): void
     {
         $this->fakeComposerLock('composer.empty.lock');
     }

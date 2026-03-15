@@ -5,12 +5,15 @@ namespace Aerni\AdvancedSeo\Tests;
 use Aerni\AdvancedSeo\ServiceProvider;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
+use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\GraphQL\TypeRegistrar;
 use Statamic\Testing\AddonTestCase;
 
 abstract class TestCase extends AddonTestCase
 {
+    use FakesComposerLock;
+
     protected string $addonServiceProvider = ServiceProvider::class;
 
     protected function resolveApplicationConfiguration($app)
@@ -42,10 +45,10 @@ abstract class TestCase extends AddonTestCase
 
     protected function setUp(): void
     {
-        /* Need to copy the correct composer.lock file to the correct location so that Composer::isInstalled() won't fail in the service provider. */
+        /* Need to fake the composer.lock so that Composer::isInstalled() works correctly in the service provider. */
         $this->usesEloquentDriver()
-            ? copy(__DIR__.'/__fixtures__/composer.eloquent.lock', __DIR__.'/../vendor/orchestra/testbench-core/laravel/composer.lock')
-            : copy(__DIR__.'/__fixtures__/composer.empty.lock', __DIR__.'/../vendor/orchestra/testbench-core/laravel/composer.lock');
+            ? $this->installEloquentDriver()
+            : $this->uninstallPackages();
 
         parent::setUp();
 
