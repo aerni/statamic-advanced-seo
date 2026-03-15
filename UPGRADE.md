@@ -2,6 +2,38 @@
 
 v3 introduces a significant internal refactor that improves the architecture and maintainability of the addon and improves the overall user experience. Most breaking changes have automated upgrade scripts, so the upgrade should be seamless for most users.
 
+## Upgrade Summary
+
+| Change | Action |
+|--------|--------|
+| [Requirements](#requirements) | ⚠️ Verify compatibility |
+| [Permissions](#permissions) | ✅ Automated |
+| [Single-site data structure](#single-site-data-structure) | ✅ Automated |
+| [Site SEO sets consolidated](#site-seo-sets) | ✅ Automated |
+| [Disabled config removed](#disabled-collections--taxonomies-config) | ✅ Automated |
+| [Origin field centralized](#localization-origin-field) | ✅ Automated |
+| [Eloquent schema](#eloquent-driver) | ✅ Automated |
+| [Simplified field UI](#simplified-field-ui) | ✅ Automated |
+| [`@field:handle` syntax](#fieldhandle-syntax-replaced-with-antlers) | ✅ Automated |
+| [Site name position composed into title](#site-name-position-composed-into-title) | ✅ Automated |
+| [Title separator renamed](#title-separator-renamed) | ✅ Automated |
+| [Twitter fields simplified](#removed-fields) | ✅ Automated |
+| [Twitter card moved to config](#twitter-card-setting) | ✅ Automated |
+| [Twitter custom views](#custom-views) | ⚠️ Update published views |
+| [Screenshot package](#screenshot-package) | ✅ No changes needed |
+| [Social images per-collection](#per-collection-settings) | ✅ Automated |
+| [`generate_on_save` removed](#removed-generate_on_save-config-option) | ⚠️ Remove from published config |
+| [Twitter image generation removed](#removed-twitter-image-generation) | ⚠️ Remove custom templates |
+| [Social images template `$group`](#template-changes) | ⚠️ Update custom templates |
+| [Social images directory](#image-storage-directory) | ⚠️ Delete orphaned images |
+| [Social image preview targets](#removed-social-image-preview-targets) | ✅ No changes needed |
+| [Unified social image field](#unified-social-image-field) | ⚠️ Update published views |
+| [Sitemap per-collection/taxonomy](#per-collectiontaxonomy-settings) | ✅ Automated |
+| [Sitemap domain scoping](#domain-scoping) | ✅ No changes needed |
+| [Custom sitemap registration](#custom-sitemap-registration) | ⚠️ Update `Sitemap::register()` calls |
+| [Events](#events) | ⚠️ Update event listeners |
+| [GraphQL](#graphql) | ⚠️ Update queries |
+
 ## Requirements
 
 - PHP 8.4+
@@ -18,7 +50,7 @@ The permission system has been simplified. Old granular permissions have been re
 
 **Important:** The `edit seo defaults` and `edit seo content` permissions work in conjunction with Statamic's native collection and taxonomy permissions. For example, to edit SEO defaults for the Pages collection, a user needs the `edit seo defaults` permission AND either Statamic's `configure collections` or `edit pages entries` permission.
 
-> **Automated Migration**: User role permissions are automatically migrated. All existing roles receive the `edit seo content` permission to maintain backward compatibility.
+> ✅ **Automated** — User role permissions are automatically migrated. All existing roles receive the `edit seo content` permission to maintain backward compatibility.
 
 ## Single-Site Data Structure
 
@@ -29,7 +61,7 @@ Single-site installations now use the same data structure as multi-site. Config 
 + content/seo/collections/{site}/pages.yaml
 ```
 
-> **Automated Migration**: Your existing data is automatically migrated to the new structure, whether you use file-based storage or the Eloquent driver.
+> ✅ **Automated** — Your existing data is automatically migrated to the new structure, whether you use file-based storage or the Eloquent driver.
 
 ## Site SEO Sets
 
@@ -52,7 +84,7 @@ For file-based installations, the file structure has changed:
 + content/seo/site/{site}/defaults.yaml
 ```
 
-> **Automated Migration**: Your existing config and localization data is automatically merged into the single `site::defaults` set.
+> ✅ **Automated** — Your existing config and localization data is automatically merged into the single `site::defaults` set.
 
 ## Disabled Collections & Taxonomies Config
 
@@ -65,13 +97,13 @@ The `disabled` configuration option has been removed from `config/advanced-seo.p
 - ],
 ```
 
-> **Automated Migration**: Your existing disabled collections and taxonomies are automatically migrated. Collections and taxonomies can now be disabled individually through the Control Panel by clicking the "Configure" button on each set.
+> ✅ **Automated** — Your existing disabled collections and taxonomies are automatically migrated. Collections and taxonomies can now be disabled individually through the Control Panel by clicking the "Configure" button on each set. You can safely remove the `disabled` option from your published config file.
 
 ## Localization Origin Field
 
 The `origin` field has been removed from localizations. Origin configuration is now stored centrally in the set config using an `origins` array.
 
-> **Automated Migration**: Your existing origin configuration is automatically migrated from localizations to the set config.
+> ✅ **Automated** — Your existing origin configuration is automatically migrated from localizations to the set config.
 
 ## Eloquent Driver
 
@@ -79,7 +111,7 @@ If you're using the Eloquent driver, the database schema has changed:
 
 The `advanced_seo_defaults` table has been replaced by `seo_set_localizations`. Additionally, a new `seo_set_configs` table has been added to store configuration data (enabled state, origins, etc.).
 
-> **Automated Migration**: When updating to v3.0, new migrations will be published and run automatically. Data will be migrated from the old table to the new tables, and the old `advanced_seo_defaults` table will be dropped.
+> ✅ **Automated** — When updating to v3.0, new migrations will be published and run automatically. Data will be migrated from the old table to the new tables, and the old `advanced_seo_defaults` table will be dropped.
 
 ## SEO Field Values
 
@@ -91,7 +123,7 @@ The SEO source fields have been simplified from a three-state toggle (Auto/Defau
 
 The `@field:handle` syntax for referencing other fields has been replaced with standard Antlers `{{ handle }}` syntax. This means you can now use the full power of Antlers in your SEO fields, including modifiers like `{{ content | truncate(90, '...') }}`.
 
-> **Automated Migration**: All `@field:handle` references, as well as `@auto` and `@null` sentinel values, are automatically migrated during the upgrade.
+> ✅ **Automated** — All `@field:handle` references, as well as `@auto` and `@null` sentinel values, are automatically migrated during the upgrade.
 
 ### Site Name Position Composed into Title
 
@@ -103,13 +135,13 @@ The `seo_site_name_position` field has been removed. Its value is now composed d
 | `end` | `{{ title }} {{ separator }} {{ site_name }}` |
 | `disabled` | `{{ title }}` (no site name appended) |
 
-> **Automated Migration**: The position is automatically composed into the title during the upgrade.
+> ✅ **Automated** — The position is automatically composed into the title during the upgrade.
 
 ### Title Separator Renamed
 
 The `title_separator` field in site defaults has been renamed to `separator`.
 
-> **Automated Migration**: Existing `title_separator` values are automatically renamed to `separator` across all site localizations.
+> ✅ **Automated** — Existing `title_separator` values are automatically renamed to `separator` across all site localizations.
 
 ## X (Twitter) Social Sharing
 
@@ -133,17 +165,17 @@ The following fields have been removed from the site-wide social media defaults:
 | `twitter_summary_image` | Uses `og_image` |
 | `twitter_summary_large_image` | Uses `og_image` |
 
-> **Automated Migration**: Existing Twitter field data is automatically removed from your content during the upgrade.
+> ✅ **Automated** — Existing Twitter field data is automatically removed from your content during the upgrade.
 
 ### Twitter Card Setting
 
 The `seo_twitter_card` field has been moved from a per-localization setting to a per-collection/taxonomy configuration setting. It is now available in the "Social Appearance" section of the collection/taxonomy config, alongside other collection-level settings like the sitemap and social images generator toggles.
 
-> **Automated Migration**: The existing `seo_twitter_card` value from the default site's localization is automatically migrated to the collection/taxonomy config.
+> ✅ **Automated** — The existing `seo_twitter_card` value from the default site's localization is automatically migrated to the collection/taxonomy config.
 
 ### Custom Views
 
-If you've published or customized the `_twitter.antlers.html` snippet, update the following references:
+> ⚠️ **Manual** — If you've published or customized the `_twitter.antlers.html` snippet, update the following references:
 
 | Old Variable | New Variable |
 |--------------|--------------|
@@ -174,7 +206,7 @@ php artisan vendor:publish --tag=laravel-screenshot-config
 
 The `social_images_generator_collections` field has been removed from the site defaults. The social images generator is now enabled per-collection using the `social_images_generator` toggle in the collection config.
 
-> **Automated Migration**: Your existing settings are automatically migrated to per-collection configuration.
+> ✅ **Automated** — Your existing settings are automatically migrated to per-collection configuration.
 
 ### Removed `generate_on_save` Config Option
 
@@ -186,7 +218,7 @@ The `generate_on_save` config option has been removed from the generator config:
   ],
 ```
 
-You can safely remove this option from your published config file.
+> ⚠️ **Manual** — Remove this option from your published config file if present.
 
 Social image generation now works as follows:
 
@@ -197,17 +229,17 @@ Social image generation now works as follows:
 
 The social images generator no longer generates separate Twitter images. Only the Open Graph image is generated. The `twitter_summary` and `twitter_summary_large_image` config presets are still used to resize the shared image for the Twitter meta tags via Glide, but no separate images are generated for them.
 
-If you have custom social images generator themes, you can remove the `twitter_summary.antlers.html` and `twitter_summary_large_image.antlers.html` templates — only `open_graph.antlers.html` is used.
+> ⚠️ **Manual** — If you have custom social images generator themes, remove the `twitter_summary.antlers.html` and `twitter_summary_large_image.antlers.html` templates — only `open_graph.antlers.html` is used.
 
 ### Template Changes
 
-The `$group` variable has been removed from the data passed to social images generator templates. If your templates reference this variable, you'll need to update them.
+> ⚠️ **Manual** — The `$group` variable has been removed from the data passed to social images generator templates. If your templates reference this variable, update them.
 
 ### Image Storage Directory
 
 Generated social images are now stored in `social_images/collection-{handle}/` and `social_images/taxonomy-{handle}/` subdirectories instead of `social_images/{handle}/`. This change adds support for taxonomy terms and avoids collisions between collections and taxonomies with the same handle.
 
-Existing generated images in the old directory structure will not be migrated automatically. They will be regenerated in the new location on the next save or frontend request. You may delete the orphaned images in the old directories manually.
+> ⚠️ **Manual** — Existing generated images in the old directory structure will not be migrated automatically. They will be regenerated in the new location on the next save or frontend request. You may delete the orphaned images in the old directories.
 
 ### Removed Social Image Preview Targets
 
@@ -219,7 +251,7 @@ The `seo_generated_og_image` field has been removed. The `seo_og_image` field no
 
 When the toggle is enabled, `seo_og_image` returns the generated image. When disabled, it returns the user-defined image. This change simplifies the data model and eliminates the need to check multiple fields.
 
-**Custom Views:** If you published or customized views that reference `seo:generated_og_image`, update them to use `seo:og_image`.
+> ⚠️ **Manual** — If you published or customized views that reference `seo:generated_og_image`, update them to use `seo:og_image`.
 
 ## Sitemaps
 
@@ -227,7 +259,7 @@ When the toggle is enabled, `seo_og_image` returns the generated image. When dis
 
 The `excluded_collections` and `excluded_taxonomies` fields have been removed from the site defaults. The sitemap is now enabled per-collection/taxonomy using the `sitemap` toggle in the collection/taxonomy config.
 
-> **Automated Migration**: Your existing settings are automatically migrated to per-collection/taxonomy configuration.
+> ✅ **Automated** — Your existing settings are automatically migrated to per-collection/taxonomy configuration.
 
 ### Domain Scoping
 
@@ -250,6 +282,8 @@ Due to domain scoping, the API for registering custom sitemaps has changed. Inst
 + Sitemap::index('english')->add($sitemap);
 ```
 
+> ⚠️ **Manual** — Update any custom sitemap registration calls in your application code.
+
 ## Events
 
 The `SeoDefaultSetSaved` event has been renamed to `SeoSetLocalizationSaved`. Both events handle the same localization data. The public property has been renamed from `$defaults` to `$localization`.
@@ -259,9 +293,13 @@ Additionally, new events have been added for config and deletion operations:
 - `SeoSetConfigDeleted` - Fired when a set's configuration is deleted
 - `SeoSetLocalizationDeleted` - Fired when a localization is deleted
 
+> ⚠️ **Manual** — If you listen for `SeoDefaultSetSaved`, update your listener to use `SeoSetLocalizationSaved` and rename the `$defaults` property reference to `$localization`.
+
 ## GraphQL
 
 The GraphQL API has been simplified and restructured for consistency. If you're using the GraphQL API, you'll need to update your queries.
+
+> ⚠️ **Manual** — All GraphQL changes below require updating your queries.
 
 ### `seoSet` Query
 
