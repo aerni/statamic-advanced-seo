@@ -91,24 +91,14 @@ return [
         | Social Images Generator
         |--------------------------------------------------------------------------
         |
-        | Uses spatie/laravel-screenshot under the hood. It supports Browsershot
-        | and Cloudflare as screenshot drivers. Read the documentation for setup
-        | and configuration: https://spatie.be/docs/laravel-screenshot
+        | Requires spatie/laravel-screenshot to be installed.
+        | It supports Browsershot and Cloudflare as screenshot drivers.
+        | Read the documentation for setup and configuration:
+        | https://spatie.be/docs/laravel-screenshot
         |
         */
 
         'generator' => [
-
-            /*
-            |--------------------------------------------------------------------------
-            | Enabled
-            |--------------------------------------------------------------------------
-            |
-            | Enable or disable the generator for all collections.
-            |
-            */
-
-            'enabled' => false,
 
             /*
             |--------------------------------------------------------------------------

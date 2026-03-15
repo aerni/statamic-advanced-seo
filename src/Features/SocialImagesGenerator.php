@@ -4,12 +4,13 @@ namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Statamic\Console\Processes\Composer;
 
 class SocialImagesGenerator extends Feature
 {
     public static function enabled(?Context $context = null): bool
     {
-        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+        if (! app(Composer::class)->isInstalled('spatie/laravel-screenshot')) {
             return false;
         }
 

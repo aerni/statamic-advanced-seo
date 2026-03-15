@@ -4,12 +4,13 @@ use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
+use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, FakesComposerLock::class);
 
 beforeEach(function () {
     Site::setSites([
@@ -18,7 +19,7 @@ beforeEach(function () {
 
     Collection::make('pages')->sites(['english'])->saveQuietly();
 
-    config(['advanced-seo.social_images.generator.enabled' => true]);
+    $this->installScreenshotPackage();
 
     File::ensureDirectoryExists(resource_path('views/social_images/default'));
     File::put(resource_path('views/social_images/default/open_graph.antlers.html'), '');
@@ -28,12 +29,12 @@ afterEach(function () {
     File::deleteDirectory(resource_path('views/social_images'));
 });
 
-it('is enabled when config is true', function () {
+it('is enabled when the screenshot package is installed', function () {
     expect(SocialImagesGenerator::enabled())->toBeTrue();
 });
 
-it('is disabled when config is false', function () {
-    config(['advanced-seo.social_images.generator.enabled' => false]);
+it('is disabled when the screenshot package is not installed', function () {
+    $this->uninstallScreenshotPackage();
 
     expect(SocialImagesGenerator::enabled())->toBeFalse();
 });

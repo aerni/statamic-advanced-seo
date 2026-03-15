@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Registries\SocialImageThemeRegistry;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -22,7 +23,7 @@ class SocialImagesController extends Controller
         $template = Str::replace('-', '_', $template);
 
         // Throw if the social images generator is disabled.
-        throw_unless(config('advanced-seo.social_images.generator.enabled', false), new NotFoundHttpException);
+        throw_unless(SocialImagesGenerator::enabled(), new NotFoundHttpException);
 
         // Throw if no data was found.
         throw_unless($data = Data::find($id)?->in($site), new NotFoundHttpException);

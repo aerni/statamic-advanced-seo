@@ -3,10 +3,9 @@
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\GraphQL\Types\BaseContentSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\CollectionSetType;
+use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 
-beforeEach(function () {
-    config()->set('advanced-seo.social_images.generator.enabled', true);
-});
+uses(FakesComposerLock::class);
 
 it('extends BaseContentSetType', function () {
     expect(new CollectionSetType)->toBeInstanceOf(BaseContentSetType::class);
@@ -17,6 +16,8 @@ it('has the correct name', function () {
 });
 
 it('exposes all expected fields', function () {
+    $this->installScreenshotPackage();
+
     SocialImageTheme::shouldReceive('all')->andReturn(collect(['default']));
 
     expect((new CollectionSetType)->fields())->toHaveKeys([
@@ -39,9 +40,7 @@ it('exposes all expected fields', function () {
     ]);
 });
 
-it('excludes social image fields when generator is disabled', function () {
-    config()->set('advanced-seo.social_images.generator.enabled', false);
-
+it('excludes social image fields when the screenshot package is not installed', function () {
     $fields = (new CollectionSetType)->fields();
 
     expect($fields)->not->toHaveKey('generate_social_images');

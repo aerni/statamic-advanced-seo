@@ -2,16 +2,17 @@
 
 use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
+use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 
-beforeEach(function () {
-    config()->set('advanced-seo.social_images.generator.enabled', true);
-});
+uses(FakesComposerLock::class);
 
 it('has the correct name', function () {
     expect(RawMetaDataType::NAME)->toBe('rawMetaData');
 });
 
 it('exposes all expected fields', function () {
+    $this->installScreenshotPackage();
+
     SocialImageTheme::shouldReceive('all')->andReturn(collect(['default']));
 
     expect((new RawMetaDataType)->fields())->toHaveKeys([
@@ -34,9 +35,7 @@ it('exposes all expected fields', function () {
     ]);
 });
 
-it('excludes social image fields when generator is disabled', function () {
-    config()->set('advanced-seo.social_images.generator.enabled', false);
-
+it('excludes social image fields when the screenshot package is not installed', function () {
     $fields = (new RawMetaDataType)->fields();
 
     expect($fields)->not->toHaveKey('generate_social_images');
