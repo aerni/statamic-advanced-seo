@@ -18,6 +18,8 @@ it('has the correct name', function () {
 it('exposes all expected fields', function () {
     $this->installScreenshotPackage();
 
+    config(['advanced-seo.social_images.generator.enabled' => true]);
+
     SocialImageTheme::shouldReceive('all')->andReturn(collect(['default']));
 
     expect((new CollectionSetType)->fields())->toHaveKeys([

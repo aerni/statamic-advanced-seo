@@ -88,17 +88,41 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Queue
+        | Social Images Generator
         |--------------------------------------------------------------------------
         |
-        | The queue that is used when generating the social images.
-        | The social images generator requires spatie/laravel-screenshot.
+        | Requires spatie/laravel-screenshot to be installed.
         | It supports Browsershot and Cloudflare as screenshot drivers.
+        | Read the documentation for setup and configuration:
         | https://spatie.be/docs/laravel-screenshot
         |
         */
 
-        'queue' => 'default',
+        'generator' => [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | Enable or disable the social images generator.
+            |
+            */
+
+            'enabled' => false,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Queue
+            |--------------------------------------------------------------------------
+            |
+            | The queue that is used when generating the social images.
+            |
+            */
+
+            'queue' => 'default',
+
+        ],
 
     ],
 

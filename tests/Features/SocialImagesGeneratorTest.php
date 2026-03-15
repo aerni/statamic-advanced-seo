@@ -21,6 +21,8 @@ beforeEach(function () {
 
     $this->installScreenshotPackage();
 
+    config(['advanced-seo.social_images.generator.enabled' => true]);
+
     File::ensureDirectoryExists(resource_path('views/social_images/default'));
     File::put(resource_path('views/social_images/default/open_graph.antlers.html'), '');
 });
@@ -31,6 +33,12 @@ afterEach(function () {
 
 it('is enabled when the screenshot package is installed', function () {
     expect(SocialImagesGenerator::enabled())->toBeTrue();
+});
+
+it('is disabled when config is false', function () {
+    config(['advanced-seo.social_images.generator.enabled' => false]);
+
+    expect(SocialImagesGenerator::enabled())->toBeFalse();
 });
 
 it('is disabled when the screenshot package is not installed', function () {

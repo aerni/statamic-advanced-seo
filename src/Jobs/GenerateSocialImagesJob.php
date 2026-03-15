@@ -18,7 +18,7 @@ class GenerateSocialImagesJob implements ShouldQueue
 
     public function __construct(protected Entry|Term $content)
     {
-        $this->queue = config('advanced-seo.social_images.queue', 'default');
+        $this->queue = config('advanced-seo.social_images.generator.queue', 'default');
     }
 
     public function handle(): void

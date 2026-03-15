@@ -10,6 +10,10 @@ class SocialImagesGenerator extends Feature
 {
     public static function enabled(?Context $context = null): bool
     {
+        if (! config('advanced-seo.social_images.generator.enabled', false)) {
+            return false;
+        }
+
         if (! app(Composer::class)->isInstalled('spatie/laravel-screenshot')) {
             return false;
         }
