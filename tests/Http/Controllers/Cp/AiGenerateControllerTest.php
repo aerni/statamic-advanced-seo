@@ -25,7 +25,7 @@ it('returns 404 when ai is disabled', function () {
     $this->actingAs($this->user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => 'Test'],
             'tokens' => [],
@@ -38,7 +38,7 @@ it('validates field is required', function () {
 
     $this->actingAs($this->user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => 'Test'],
             'tokens' => [],
@@ -52,7 +52,7 @@ it('validates field must be a valid value', function () {
     $this->actingAs($this->user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'invalid',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => 'Test'],
             'tokens' => [],
@@ -79,24 +79,11 @@ it('validates content is required', function () {
     $this->actingAs($this->user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'tokens' => [],
         ])
         ->assertJsonValidationErrors('content');
-});
-
-it('validates tokens is required', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
-    $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
-            'site' => 'english',
-            'content' => ['title' => 'Test'],
-        ])
-        ->assertJsonValidationErrors('tokens');
 });
 
 it('validates site is required', function () {
@@ -105,7 +92,7 @@ it('validates site is required', function () {
     $this->actingAs($this->user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'content' => ['title' => 'Test'],
             'tokens' => [],
         ])

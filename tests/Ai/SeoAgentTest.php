@@ -15,7 +15,7 @@ beforeEach(function () {
 
     Collection::make('pages')->routes('/{slug}')->sites(['english'])->saveQuietly();
 
-    $this->blueprint = Collection::findByHandle('pages')->entryBlueprint('default');
+    $this->blueprint = Collection::findByHandle('pages')->entryBlueprint();
 });
 
 function makeAgent(string $field = 'seo_title', array $content = [], ?string $site = 'english', $blueprint = null): SeoAgent

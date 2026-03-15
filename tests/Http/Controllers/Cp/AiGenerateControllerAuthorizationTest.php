@@ -29,7 +29,7 @@ it('returns 403 when user lacks seo.edit-content permission', function () {
     $this->actingAs($user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => 'Test'],
         ])
@@ -46,7 +46,7 @@ it('resolves taxonomy blueprints', function () {
     $this->actingAs($user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'taxonomies.tags.default',
+            'blueprint' => 'taxonomies.tags.tag',
             'site' => 'english',
             'content' => ['title' => str_repeat('Enough content for validation. ', 5)],
         ])
@@ -65,7 +65,7 @@ it('returns 422 when content is insufficient', function () {
     $this->actingAs($user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => 'Short'],
         ])
@@ -80,7 +80,7 @@ it('returns 503 when generation throws an unexpected error', function () {
     $this->actingAs($user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => str_repeat('Enough content for validation. ', 5)],
         ])
@@ -96,7 +96,7 @@ it('includes reason in debug mode on 503', function () {
     $this->actingAs($user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => str_repeat('Enough content for validation. ', 5)],
         ])
@@ -112,7 +112,7 @@ it('excludes reason when not in debug mode on 503', function () {
     $this->actingAs($user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
-            'blueprint' => 'collections.pages.default',
+            'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => str_repeat('Enough content for validation. ', 5)],
         ])
