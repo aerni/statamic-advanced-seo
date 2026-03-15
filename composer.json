@@ -35,7 +35,9 @@
         "statamic/eloquent-driver": "^5.0"
     },
     "suggest": {
-        "spatie/laravel-screenshot": "Required for social image generation"
+        "laravel/ai": "Required for AI-powered content generation",
+        "spatie/laravel-screenshot": "Required for social image generation",
+        "statamic/eloquent-driver": "Required for storing SEO data in the database"
     },
     "autoload": {
         "psr-4": {
