@@ -22,8 +22,7 @@ v3 introduces a significant internal refactor that improves the architecture and
 | [Twitter custom views](#custom-views) | ⚠️ Update published views |
 | [Screenshot package](#screenshot-package) | ⚠️ Require package manually |
 | [Social images per-collection](#per-collection-settings) | ✅ Automated |
-| [`enabled` config removed](#removed-enabled-config-option) | ⚠️ Remove from published config |
-| [`generate_on_save` removed](#removed-generate_on_save-config-option) | ⚠️ Remove from published config |
+| [Generator config changes](#generator-config-changes) | ⚠️ Update published config |
 | [Twitter image generation removed](#removed-twitter-image-generation) | ⚠️ Remove custom templates |
 | [Social images template `$group`](#template-changes) | ⚠️ Update custom templates |
 | [Social images directory](#image-storage-directory) | ⚠️ Delete orphaned images |
@@ -215,31 +214,24 @@ The `social_images_generator_collections` field has been removed from the site d
 
 > ✅ **Automated** — Your existing settings are automatically migrated to per-collection configuration.
 
-### Removed `enabled` Config Option
+### Generator Config Changes
 
-The `enabled` config option has been removed from the generator config:
+The `generator` config has been simplified. The `enabled` and `generate_on_save` options have been removed, and the `generator` nesting has been flattened so that `queue` lives directly under `social_images`:
 
 ```diff
-  'generator' => [
--     'enabled' => false,
+  'social_images' => [
+-     'generator' => [
+-         'enabled' => false,
+-         'generate_on_save' => true,
+-         'queue' => 'default',
+-     ],
++     'queue' => 'default',
   ],
 ```
 
 The social images generator is now automatically enabled when `spatie/laravel-screenshot` is installed. See [Screenshot Package](#screenshot-package) for details.
 
-> ⚠️ **Manual** — Remove this option from your published config file if present.
-
-### Removed `generate_on_save` Config Option
-
-The `generate_on_save` config option has been removed from the generator config:
-
-```diff
-  'generator' => [
--     'generate_on_save' => true,
-  ],
-```
-
-> ⚠️ **Manual** — Remove this option from your published config file if present.
+> ⚠️ **Manual** — Update your published config file to match the new structure.
 
 Social image generation now works as follows:
 
