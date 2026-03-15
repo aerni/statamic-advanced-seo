@@ -1,6 +1,13 @@
 <?php
 
 use Aerni\AdvancedSeo\Features\Ai;
+use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
+
+uses(FakesComposerLock::class);
+
+beforeEach(function () {
+    $this->installAiPackage();
+});
 
 it('is disabled by default', function () {
     expect(Ai::enabled())->toBeFalse();
@@ -8,6 +15,12 @@ it('is disabled by default', function () {
 
 it('is disabled when config is false', function () {
     config(['advanced-seo.ai.enabled' => false]);
+
+    expect(Ai::enabled())->toBeFalse();
+});
+
+it('is disabled when the ai package is not installed', function () {
+    $this->uninstallAiPackage();
 
     expect(Ai::enabled())->toBeFalse();
 });

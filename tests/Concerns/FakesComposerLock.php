@@ -4,6 +4,16 @@ namespace Aerni\AdvancedSeo\Tests\Concerns;
 
 trait FakesComposerLock
 {
+    protected function installAiPackage(): void
+    {
+        $this->fakeComposerLock('composer.ai.lock');
+    }
+
+    protected function uninstallAiPackage(): void
+    {
+        $this->fakeComposerLock('composer.empty.lock');
+    }
+
     protected function installScreenshotPackage(): void
     {
         $this->fakeComposerLock('composer.screenshot.lock');

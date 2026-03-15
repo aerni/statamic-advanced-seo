@@ -1,18 +1,21 @@
 <?php
 
 use Aerni\AdvancedSeo\Ai\SeoAgent;
+use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, FakesComposerLock::class);
 
 beforeEach(function () {
     Site::setSites([
         'english' => ['name' => 'English', 'url' => '/', 'locale' => 'en'],
     ]);
+
+    $this->installAiPackage();
 
     config([
         'advanced-seo.ai.enabled' => true,

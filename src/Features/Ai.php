@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Context\Context;
-use Laravel\Ai\AiServiceProvider;
+use Statamic\Console\Processes\Composer;
 
 class Ai extends Feature
 {
@@ -18,7 +18,7 @@ class Ai extends Feature
 
     protected static function aiSdkConfigured(): bool
     {
-        if (! class_exists(AiServiceProvider::class)) {
+        if (! app(Composer::class)->isInstalled('laravel/ai')) {
             return false;
         }
 
