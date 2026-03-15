@@ -196,17 +196,21 @@ If you're using the GraphQL API, see the [Computed Field Changes](#computed-fiel
 
 ### Screenshot Package
 
-The social images generator now uses [spatie/laravel-screenshot](https://spatie.be/docs/laravel-screenshot/v1/introduction) and is no longer bundled as a dependency. If you use the social images generator, you must require the package manually:
+The social images generator now uses [spatie/laravel-screenshot](https://spatie.be/docs/laravel-screenshot/v1/introduction) and is no longer bundled as a dependency. This package supports Browsershot and Cloudflare Browser Rendering as screenshot drivers.
+
+To restore existing functionality, require both the screenshot package and Browsershot:
 
 ```
-composer require spatie/laravel-screenshot
+composer require spatie/laravel-screenshot spatie/browsershot
 ```
 
-The `social_images.generator.enabled` config option has been removed — installing the package is sufficient to enable the feature. You will also need to install and configure a screenshot driver such as Browsershot or Cloudflare Browser Rendering. Refer to the [installation guide](https://spatie.be/docs/laravel-screenshot/v1/installation-setup) for details. To customize screenshot settings, publish the config:
+Alternatively, you can use Cloudflare Browser Rendering instead of Browsershot. Refer to the [installation guide](https://spatie.be/docs/laravel-screenshot/v1/installation-setup) for details. To customize screenshot settings, publish the config:
 
 ```
 php artisan vendor:publish --tag=laravel-screenshot-config
 ```
+
+> ⚠️ **Manual** — If you were using the social images generator, run the `composer require` command above after upgrading to ensure the packages remain installed.
 
 ### Per-Collection Settings
 
