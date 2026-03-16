@@ -13,7 +13,7 @@ import { SingleLine } from '../../extensions/SingleLine.js';
 import { TokenNode } from '../../extensions/TokenNode.js';
 import { TokenSelectionHighlight } from '../../extensions/TokenSelectionHighlight.js';
 import { TokenSuggestion } from '../../extensions/TokenSuggestion.js';
-import { parse, stringify } from '../../utils/antlers.js';
+import { ANTLERS_PATTERN, normalizeHandle, parse, stringify } from '../../utils/antlers.js';
 import { useSeoValues } from '../../composables/useSeoValues.js';
 import CharacterCounter from '../ui/CharacterCounter.vue';
 import TokenSuggestionList from '../ui/TokenSuggestionList.vue';
@@ -119,7 +119,7 @@ async function generateWithAi() {
         const text = response.data.replace(/\n+/g, ' ').trim();
 
         withInternalUpdate(() => {
-            editor.value.commands.setContent(parse(text, tokens.value));
+            editor.value.commands.setContent(parse(text));
             fieldtype.update(text);
         });
     } catch (error) {
@@ -146,15 +146,37 @@ function withInternalUpdate(callback) {
 }
 
 function collapseRemainingAntlers(instance) {
-    const json = instance.getJSON();
-    const reparsed = parse(stringify(json), tokens.value);
+    const { doc, schema } = instance.state;
+    const replacements = [];
 
-    if (JSON.stringify(json) !== JSON.stringify(reparsed)) {
-        withInternalUpdate(() => {
-            instance.commands.setContent(reparsed);
-            fieldtype.update(stringify(instance.getJSON()));
-        });
-    }
+    doc.descendants((node, pos) => {
+        if (!node.isText) return;
+
+        for (const match of node.text.matchAll(new RegExp(ANTLERS_PATTERN.source, 'g'))) {
+            const handle = normalizeHandle(match[1]);
+            if (!handle) continue;
+
+            replacements.push({
+                from: pos + match.index,
+                to: pos + match.index + match[0].length,
+                handle,
+            });
+        }
+    });
+
+    if (replacements.length === 0) return;
+
+    withInternalUpdate(() => {
+        const tr = instance.state.tr;
+
+        for (let i = replacements.length - 1; i >= 0; i--) {
+            const { from, to, handle } = replacements[i];
+            tr.replaceWith(from, to, schema.nodes.token.create({ handle }));
+        }
+
+        instance.view.dispatch(tr);
+        fieldtype.update(stringify(instance.getJSON()));
+    });
 }
 
 onMounted(() => {
@@ -182,7 +204,7 @@ onMounted(() => {
                 },
             }),
         ],
-        content: parse(props.value, tokens.value),
+        content: parse(props.value),
         editable: !fieldtype.isReadOnly.value,
         editorProps: {
             attributes: {
@@ -202,6 +224,11 @@ onMounted(() => {
                     return false;
                 }
 
+                if (event.key === 'Escape' && !suggestionState.value && editor.value) {
+                    collapseRemainingAntlers(editor.value);
+                    return true;
+                }
+
                 return false;
             },
         },
@@ -215,6 +242,33 @@ onMounted(() => {
                     fieldtype.update(stringify(editor.getJSON()));
                 });
             });
+        },
+        onSelectionUpdate: ({ editor: instance }) => {
+            if (isInternalUpdate.value || suggestionState.value) return;
+
+            const { $from } = instance.state.selection;
+            let hasAntlersText = false;
+            let insideExpression = false;
+
+            $from.parent.forEach((child, offset) => {
+                if (!child.isText) return;
+                if (!new RegExp(ANTLERS_PATTERN.source).test(child.text)) return;
+
+                hasAntlersText = true;
+
+                const cursorOffset = $from.parentOffset - offset;
+                if (cursorOffset <= 0 || cursorOffset >= child.nodeSize) return;
+
+                for (const match of child.text.matchAll(new RegExp(ANTLERS_PATTERN.source, 'g'))) {
+                    if (cursorOffset > match.index && cursorOffset < match.index + match[0].length) {
+                        insideExpression = true;
+                    }
+                }
+            });
+
+            if (hasAntlersText && !insideExpression) {
+                collapseRemainingAntlers(instance);
+            }
         },
         onFocus: () => {
             isEditorFocused.value = true;
@@ -244,7 +298,7 @@ watch(() => props.value, (value) => {
 
     if (value !== current) {
         withInternalUpdate(() => {
-            editor.value.commands.setContent(parse(value, tokens.value));
+            editor.value.commands.setContent(parse(value));
         });
     }
 }, { flush: 'post' });
@@ -295,22 +349,6 @@ watch(() => props.value, (value) => {
 
 [data-antlers-input] p {
     margin: 0;
-}
-
-[data-antlers-input].ProseMirror-focused [data-token]:is(.ProseMirror-selectednode, .is-selected) {
-    background-color: var(--color-sky-100);
-}
-
-:is(.dark) [data-antlers-input].ProseMirror-focused [data-token]:is(.ProseMirror-selectednode, .is-selected) {
-    background-color: var(--color-gray-700);
-}
-
-[data-antlers-input] [data-token]:hover {
-    background-color: var(--color-sky-100);
-}
-
-:is(.dark) [data-antlers-input] [data-token]:hover {
-    background-color: var(--color-gray-700);
 }
 
 [data-antlers-input] p.is-editor-empty:first-child::before {
