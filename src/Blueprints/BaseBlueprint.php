@@ -120,10 +120,10 @@ abstract class BaseBlueprint
         return match ([$this->context?->scope, $this->context?->type]) {
             [Scope::CONFIG, 'collections'] => __('collection'),
             [Scope::CONFIG, 'taxonomies'] => __('taxonomy'),
-            [Scope::LOCALIZATION, 'collections'] => lcfirst(__('advanced-seo::messages.entries')),
-            [Scope::LOCALIZATION, 'taxonomies'] => lcfirst(__('advanced-seo::messages.terms')),
-            [Scope::CONTENT, 'collections'] => lcfirst(__('advanced-seo::messages.entry')),
-            [Scope::CONTENT, 'taxonomies'] => lcfirst(__('advanced-seo::messages.term')),
+            [Scope::LOCALIZATION, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entries')),
+            [Scope::LOCALIZATION, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.terms')),
+            [Scope::CONTENT, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entry')),
+            [Scope::CONTENT, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.term')),
             default => '',
         };
     }
@@ -134,9 +134,17 @@ abstract class BaseBlueprint
     protected function contentLabel(): string
     {
         return match ($this->context?->type) {
-            'collections' => lcfirst(__('advanced-seo::messages.entries')),
-            'taxonomies' => lcfirst(__('advanced-seo::messages.terms')),
+            'collections' => $this->lcfirst(__('advanced-seo::messages.entries')),
+            'taxonomies' => $this->lcfirst(__('advanced-seo::messages.terms')),
             default => '',
         };
+    }
+
+    /**
+     * Lowercase the first character, except for languages like German where nouns are always capitalized.
+     */
+    protected function lcfirst(string $value): string
+    {
+        return str_starts_with(app()->getLocale(), 'de') ? $value : lcfirst($value);
     }
 }

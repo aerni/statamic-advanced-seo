@@ -308,7 +308,7 @@ return [
 
     'twitter_card' => [
         'display' => 'X (Twitter) Card',
-        'instructions' => 'Kartengrösse beim Teilen von Inhalten dieses :type.',
+        'instructions' => 'Kartengröße beim Teilen von Inhalten dieses :type.',
         'summary' => 'Klein',
         'summary_large_image' => 'Groß',
     ],
