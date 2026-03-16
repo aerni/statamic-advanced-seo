@@ -3,6 +3,7 @@ import { computed, getCurrentInstance, markRaw, nextTick, onBeforeUnmount, onMou
 import { Fieldtype } from '@statamic/cms';
 import { Button, injectPublishContext } from '@statamic/cms/ui';
 import { Editor } from '@tiptap/vue-3';
+import { NodeSelection } from '@tiptap/pm/state';
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
@@ -78,7 +79,17 @@ const characterLimit = computed(() => {
     return props.config.character_limit;
 });
 
-const characterCount = computed(() => (resolveAntlers(props.value) ?? '').length);
+const characterCount = computed(() => {
+    const resolved = resolveAntlers(props.value) ?? '';
+    const hasUnresolvable = antlersPatternGlobal.test(resolved);
+
+    antlersPatternGlobal.lastIndex = 0;
+
+    return {
+        count: hasUnresolvable ? resolved.replace(antlersPatternGlobal, '').length : resolved.length,
+        approximate: hasUnresolvable,
+    };
+});
 
 // ─── Actions ────────────────────────────────────────────────────────────────
 
@@ -135,6 +146,7 @@ async function generateWithAi() {
 // ─── Editor ─────────────────────────────────────────────────────────────────
 
 const SingleLineDoc = Document.extend({ content: 'paragraph' });
+const antlersPatternGlobal = new RegExp(ANTLERS_PATTERN.source, 'g');
 
 function withInternalUpdate(callback) {
     isInternalUpdate.value = true;
@@ -145,14 +157,14 @@ function withInternalUpdate(callback) {
     }
 }
 
-function collapseRemainingAntlers(instance) {
+function collapseRemainingAntlers(instance, { selectCollapsed = false } = {}) {
     const { doc, schema } = instance.state;
     const replacements = [];
 
     doc.descendants((node, pos) => {
         if (!node.isText) return;
 
-        for (const match of node.text.matchAll(new RegExp(ANTLERS_PATTERN.source, 'g'))) {
+        for (const match of node.text.matchAll(antlersPatternGlobal)) {
             const handle = normalizeHandle(match[1]);
             if (!handle) continue;
 
@@ -164,7 +176,7 @@ function collapseRemainingAntlers(instance) {
         }
     });
 
-    if (replacements.length === 0) return;
+    if (replacements.length === 0) return false;
 
     withInternalUpdate(() => {
         const tr = instance.state.tr;
@@ -174,9 +186,15 @@ function collapseRemainingAntlers(instance) {
             tr.replaceWith(from, to, schema.nodes.token.create({ handle }));
         }
 
+        if (selectCollapsed && replacements.length === 1) {
+            tr.setSelection(NodeSelection.create(tr.doc, replacements[0].from));
+        }
+
         instance.view.dispatch(tr);
         fieldtype.update(stringify(instance.getJSON()));
     });
+
+    return true;
 }
 
 onMounted(() => {
@@ -224,9 +242,8 @@ onMounted(() => {
                     return false;
                 }
 
-                if (event.key === 'Escape' && !suggestionState.value && editor.value) {
-                    collapseRemainingAntlers(editor.value);
-                    return true;
+                if ((event.key === 'Escape' || event.key === 'Enter') && !suggestionState.value && editor.value) {
+                    if (collapseRemainingAntlers(editor.value, { selectCollapsed: true })) return true;
                 }
 
                 return false;
@@ -246,22 +263,28 @@ onMounted(() => {
         onSelectionUpdate: ({ editor: instance }) => {
             if (isInternalUpdate.value || suggestionState.value) return;
 
-            const { $from } = instance.state.selection;
+            const { selection } = instance.state;
+
+            if (!selection.empty) return;
+
+            const { $from } = selection;
             let hasAntlersText = false;
             let insideExpression = false;
 
             $from.parent.forEach((child, offset) => {
-                if (!child.isText) return;
-                if (!new RegExp(ANTLERS_PATTERN.source).test(child.text)) return;
+                if (insideExpression || !child.isText) return;
+                if (!antlersPatternGlobal.test(child.text)) return;
 
+                antlersPatternGlobal.lastIndex = 0;
                 hasAntlersText = true;
 
                 const cursorOffset = $from.parentOffset - offset;
                 if (cursorOffset <= 0 || cursorOffset >= child.nodeSize) return;
 
-                for (const match of child.text.matchAll(new RegExp(ANTLERS_PATTERN.source, 'g'))) {
+                for (const match of child.text.matchAll(antlersPatternGlobal)) {
                     if (cursorOffset > match.index && cursorOffset < match.index + match[0].length) {
                         insideExpression = true;
+                        break;
                     }
                 }
             });
@@ -335,7 +358,7 @@ watch(() => props.value, (value) => {
             </div>
         </div>
 
-        <CharacterCounter v-if="characterLimit && !fieldtype.isReadOnly.value" :count="characterCount" :limit="characterLimit" />
+        <CharacterCounter v-if="characterLimit && !fieldtype.isReadOnly.value" :count="characterCount.count" :limit="characterLimit" :approximate="characterCount.approximate" />
     </div>
 </template>
 

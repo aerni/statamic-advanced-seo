@@ -1,7 +1,17 @@
-export const ANTLERS_PATTERN = /\{\{\s*([^}]+?)\s*\}\}/;
+export const ANTLERS_PATTERN = /\{\{\s*([^{}]+?)\s*\}\}/;
 
 export function normalizeHandle(raw) {
-    return raw.replace(/\s*\|\s*/g, ' | ').replace(/(\s*\|\s*)+$/, '').trim();
+    const trimmed = raw.trim();
+
+    // No field reference: "|foo" or ":foo" are invalid.
+    if (trimmed.startsWith('|') || trimmed.startsWith(':')) return '';
+
+    const normalized = trimmed
+        .replace(/\s*\|\s*/g, ' | ')  // Normalize pipe spacing: "a|b" → "a | b"
+        .replace(/(\s*\|\s*)+$/, '')   // Strip trailing pipes: "a |" → "a"
+        .replace(/:+$/, '');           // Strip trailing colons: "a:" → "a"
+
+    return normalized;
 }
 
 /**

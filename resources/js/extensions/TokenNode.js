@@ -167,6 +167,8 @@ export const TokenNode = Node.create({
     addKeyboardShortcuts() {
         return {
             Enter: ({ editor }) => {
+                if (!editor.isEditable) return false;
+
                 const { selection } = editor.state;
 
                 if (
