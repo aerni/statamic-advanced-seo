@@ -5,8 +5,9 @@ namespace Aerni\AdvancedSeo\Commands;
 use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
 use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
 use Illuminate\Console\Command;
-use function Laravel\Prompts\select;
 use Statamic\Console\RunsInPlease;
+
+use function Laravel\Prompts\select;
 
 class Migrate extends Command
 {
