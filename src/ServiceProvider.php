@@ -76,8 +76,7 @@ class ServiceProvider extends AddonServiceProvider
             ->bootViewCascade()
             ->bootBladeDirective()
             ->bootGraphQL()
-            ->bootMigrations()
-            ->autoPublishConfig();
+            ->bootMigrations();
     }
 
     public function register(): void
@@ -260,17 +259,6 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../database/migrations/2026_01_13_100001_create_seo_set_localizations_table.php' => database_path('migrations/2026_01_13_100001_create_seo_set_localizations_table.php'),
             __DIR__.'/../database/migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php' => database_path('migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php'),
         ], 'advanced-seo-migrations');
-
-        return $this;
-    }
-
-    protected function autoPublishConfig(): self
-    {
-        Statamic::afterInstalled(function ($command) {
-            $command->call('vendor:publish', [
-                '--tag' => 'advanced-seo-config',
-            ]);
-        });
 
         return $this;
     }
