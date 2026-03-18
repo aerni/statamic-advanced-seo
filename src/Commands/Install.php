@@ -10,6 +10,7 @@ use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Statamic\Console\RunsInPlease;
 
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\multiselect;
@@ -18,7 +19,6 @@ use function Laravel\Prompts\select;
 use function Laravel\Prompts\spin;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\warning;
-use Statamic\Console\RunsInPlease;
 
 class Install extends Command
 {

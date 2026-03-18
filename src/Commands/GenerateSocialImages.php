@@ -6,13 +6,13 @@ use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Illuminate\Console\Command;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Entry;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\progress;
 use function Laravel\Prompts\warning;
-use Statamic\Console\RunsInPlease;
-use Statamic\Facades\Entry;
 
 class GenerateSocialImages extends Command
 {
