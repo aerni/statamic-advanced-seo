@@ -46,7 +46,7 @@ class Install extends Command
             ->setupFeatures()
             ->runMigration();
 
-        info('Advanced SEO has been installed successfully!');
+        info('Advanced SEO has been installed successfully.');
     }
 
     protected function askFeatures(): self
@@ -233,7 +233,7 @@ class Install extends Command
             message: 'Migrating data...',
         );
 
-        info('Migration completed.');
+        info('The migration has been completed successfully.');
 
         return $this;
     }

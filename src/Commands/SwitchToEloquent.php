@@ -23,6 +23,7 @@ use Statamic\Statamic;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\progress;
 
 class SwitchToEloquent extends Command
 {
@@ -30,16 +31,16 @@ class SwitchToEloquent extends Command
 
     protected $signature = 'seo:switch-to-eloquent';
 
-    protected $description = 'Switch from flat-files to Eloquent.';
+    protected $description = 'Switch from flat-files to Eloquent';
 
     public function handle()
     {
         if (! Composer::isInstalled('statamic/eloquent-driver')) {
-            return error('You need to install the Eloquent driver before running this command. Run `composer require statamic/eloquent-driver`.');
+            return error('The Eloquent driver is not installed. Run `composer require statamic/eloquent-driver` first.');
         }
 
         if ($this->isUsingEloquentDriver()) {
-            return info('Already using the Eloquent driver.');
+            return info('Already using the Eloquent driver. No changes needed.');
         }
 
         $this->switchToEloquentDriver();
@@ -83,7 +84,7 @@ class SwitchToEloquent extends Command
 
         file_put_contents($configPath, $config);
 
-        info('Updated config to use the Eloquent driver.');
+        info('Switched config to the Eloquent driver.');
     }
 
     protected function runMigrations(): void
@@ -94,7 +95,7 @@ class SwitchToEloquent extends Command
 
         $this->call('migrate');
 
-        info('Published and migrated the Advanced SEO migrations.');
+        info('Published and ran database migrations.');
     }
 
     protected function migrateContent(): void
@@ -117,28 +118,28 @@ class SwitchToEloquent extends Command
         $this->importConfigs();
         $this->importLocalizations();
 
-        info('Advanced SEO is now using Eloquent to store its data.');
+        info('Successfully switched to the Eloquent driver.');
     }
 
     protected function importConfigs(): void
     {
-        $this->withProgressBar(SeoConfig::all(), function ($config) {
-            EloquentSeoSetConfig::makeModelFromContract($config)->save();
-        });
+        progress(
+            label: 'Importing configs...',
+            steps: SeoConfig::all(),
+            callback: fn ($config) => EloquentSeoSetConfig::makeModelFromContract($config)->save(),
+        );
 
-        $this->newline();
-
-        info('Configs imported successfully');
+        info('Imported configs.');
     }
 
     protected function importLocalizations(): void
     {
-        $this->withProgressBar(SeoLocalization::all(), function ($localization) {
-            EloquentSeoSetLocalization::makeModelFromContract($localization)->save();
-        });
+        progress(
+            label: 'Importing localizations...',
+            steps: SeoLocalization::all(),
+            callback: fn ($localization) => EloquentSeoSetLocalization::makeModelFromContract($localization)->save(),
+        );
 
-        $this->newline();
-
-        info('Localizations imported successfully');
+        info('Imported localizations.');
     }
 }

@@ -19,6 +19,7 @@ use Statamic\Statamic;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\progress;
 
 class SwitchToFile extends Command
 {
@@ -26,16 +27,16 @@ class SwitchToFile extends Command
 
     protected $signature = 'seo:switch-to-file';
 
-    protected $description = 'Switch from Eloquent to flat-files.';
+    protected $description = 'Switch from Eloquent to flat-files';
 
     public function handle()
     {
         if (! Composer::isInstalled('statamic/eloquent-driver')) {
-            return error('You need to install the Eloquent driver before running this command. Run `composer require statamic/eloquent-driver`.');
+            return error('The Eloquent driver is not installed. Run `composer require statamic/eloquent-driver` first.');
         }
 
         if ($this->isUsingFileDriver()) {
-            return info('Already using the file driver.');
+            return info('Already using the file driver. No changes needed.');
         }
 
         $this->switchToFileDriver();
@@ -61,7 +62,7 @@ class SwitchToFile extends Command
 
         file_put_contents($configPath, $config);
 
-        info('Updated config to use the file driver.');
+        info('Switched config to the file driver.');
     }
 
     protected function migrateContent(): void
@@ -79,28 +80,28 @@ class SwitchToFile extends Command
         $this->exportConfigs();
         $this->exportLocalizations();
 
-        info('Advanced SEO is now using flat-files to store its data.');
+        info('Successfully switched to the file driver.');
     }
 
     protected function exportConfigs(): void
     {
-        $this->withProgressBar(SeoSetConfigModel::all(), function ($model) {
-            EloquentSeoSetConfig::fromModel($model)->save();
-        });
+        progress(
+            label: 'Exporting configs...',
+            steps: SeoSetConfigModel::all(),
+            callback: fn ($model) => EloquentSeoSetConfig::fromModel($model)->save(),
+        );
 
-        $this->newline();
-
-        info('Configs exported successfully');
+        info('Exported configs.');
     }
 
     protected function exportLocalizations(): void
     {
-        $this->withProgressBar(SeoSetLocalizationModel::all(), function ($model) {
-            EloquentSeoSetLocalization::fromModel($model)->save();
-        });
+        progress(
+            label: 'Exporting localizations...',
+            steps: SeoSetLocalizationModel::all(),
+            callback: fn ($model) => EloquentSeoSetLocalization::fromModel($model)->save(),
+        );
 
-        $this->newline();
-
-        info('Localizations exported successfully');
+        info('Exported localizations.');
     }
 }

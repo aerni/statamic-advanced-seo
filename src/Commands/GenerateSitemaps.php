@@ -20,18 +20,18 @@ class GenerateSitemaps extends Command
 
     protected $signature = 'seo:generate-sitemaps {--queue} {--site=* : Only generate sitemaps for the provided site}';
 
-    protected $description = 'Generate the sitemaps';
+    protected $description = 'Generate all sitemaps';
 
     protected bool $shouldQueue = false;
 
     public function handle()
     {
         if (! config('advanced-seo.sitemap.enabled')) {
-            return error('The sitemap feature is disabled. You need to enable it to generate the sitemaps.');
+            return error('The sitemap feature is disabled. Enable it in config/advanced-seo.php.');
         }
 
         if (! in_array(app()->environment(), config('advanced-seo.crawling.environments', []))) {
-            return error('The current environment is protected from being crawled. To generate the sitemaps, you need to add this environment to the crawling config.');
+            return error('The current environment is not configured for crawling. Add it to the crawling environments in config/advanced-seo.php.');
         }
 
         $this->shouldQueue = $this->option('queue');
@@ -45,10 +45,10 @@ class GenerateSitemaps extends Command
 
         $this->shouldQueue
             ? $sites->each(fn (string $site) => GenerateSitemapsJob::dispatch($site))
-            : spin(fn () => $sites->each(fn (string $site) => GenerateSitemapsJob::dispatchSync($site)), 'Generating sitemaps ...');
+            : spin(fn () => $sites->each(fn (string $site) => GenerateSitemapsJob::dispatchSync($site)), 'Generating sitemaps...');
 
         $this->shouldQueue
-            ? info('All requests to generate the sitemaps have been added to the queue.')
+            ? info('The sitemaps have been queued for generation.')
             : info('The sitemaps have been successfully generated.');
     }
 

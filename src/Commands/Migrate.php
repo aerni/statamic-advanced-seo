@@ -7,7 +7,9 @@ use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 
+use function Laravel\Prompts\info;
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\spin;
 
 class Migrate extends Command
 {
@@ -15,7 +17,7 @@ class Migrate extends Command
 
     protected $signature = 'seo:migrate {migrator? : The migrator to run (aardvark-seo, seo-pro)}';
 
-    protected $description = 'Migrate your existing content';
+    protected $description = 'Migrate content from another SEO addon';
 
     public function handle(): void
     {
@@ -26,9 +28,12 @@ class Migrate extends Command
             options: array_combine(array_keys($migrators), array_column($migrators, 'label')),
         );
 
-        resolve($migrators[$key]['class'])::run();
+        spin(
+            callback: fn () => resolve($migrators[$key]['class'])::run(),
+            message: 'Migrating data...',
+        );
 
-        $this->line('<info>[✓]</info> The migration has been successful!');
+        info('The migration has been completed successfully.');
     }
 
     protected function migrators(): array

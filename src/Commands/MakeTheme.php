@@ -33,7 +33,7 @@ class MakeTheme extends Command
         if (! File::exists($target.$layout)) {
             File::ensureDirectoryExists($target);
             File::copy($source.$layout, $target.$layout);
-            info("The layout was successfully created: {$this->getRelativePath($target.$layout)}");
+            info("Created layout: {$this->getRelativePath($target.$layout)}");
         }
     }
 
@@ -41,7 +41,8 @@ class MakeTheme extends Command
     {
         $theme = $this->argument('name') ?? text(
             label: 'What do you want to call the theme?',
-            default: 'default',
+            placeholder: 'default',
+            required: true,
         );
 
         $source = __DIR__.'/../../resources/stubs/social_images/templates';
@@ -53,7 +54,7 @@ class MakeTheme extends Command
 
         File::ensureDirectoryExists($target);
         File::copyDirectory($source, $target);
-        info("The theme was successfully created: {$this->getRelativePath($target)}");
+        info("Created theme: {$this->getRelativePath($target)}");
     }
 
     protected function getRelativePath($path): string
