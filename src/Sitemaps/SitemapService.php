@@ -16,9 +16,7 @@ class SitemapService
 {
     use ForwardsCalls;
 
-    public function __construct(protected SitemapRegistry $registry)
-    {
-    }
+    public function __construct(protected SitemapRegistry $registry) {}
 
     /**
      * Create a new custom sitemap builder.
