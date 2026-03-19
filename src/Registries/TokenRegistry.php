@@ -40,6 +40,7 @@ class TokenRegistry extends Registry
             SeparatorToken::class,
             SiteNameToken::class,
             ...config('advanced-seo.tokens', []),
+            ...app('advanced-seo.tokens'),
         ])
             ->filter(fn (mixed $class) => is_subclass_of($class, TokenNormalizer::class) || is_subclass_of($class, ValueToken::class))
             ->map(fn (string $class) => app($class))

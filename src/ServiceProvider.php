@@ -81,6 +81,7 @@ class ServiceProvider extends AddonServiceProvider
 
     public function register(): void
     {
+        app()->instance('advanced-seo.tokens', collect());
         app()->instance('advanced-seo.sitemaps', collect());
 
         $this->usesEloquentDriver() ? $this->registerEloquentDriver() : $this->registerFileDriver();

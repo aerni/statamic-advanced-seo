@@ -42,4 +42,9 @@ abstract class ValueToken implements Token
             'value' => $this->value(),
         ];
     }
+
+    public static function register(): void
+    {
+        app('advanced-seo.tokens')->push(static::class);
+    }
 }
