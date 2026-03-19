@@ -11,7 +11,5 @@ interface SitemapIndex
 
     public function sites(): Collection;
 
-    public function add(Sitemap $sitemap): self;
-
     public function sitemaps(): Collection;
 }

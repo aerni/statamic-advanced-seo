@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
-use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Custom\SitemapBuilder;
 
 it('returns null for sitemap when not set', function () {
     $url = new TestSitemapUrl;
@@ -11,7 +11,7 @@ it('returns null for sitemap when not set', function () {
 
 it('can set and retrieve the parent sitemap', function () {
     $url = new TestSitemapUrl;
-    $sitemap = new CustomSitemap('test');
+    $sitemap = new SitemapBuilder('test');
 
     $url->sitemap($sitemap);
 

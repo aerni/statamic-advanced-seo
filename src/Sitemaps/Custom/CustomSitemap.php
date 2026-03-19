@@ -3,36 +3,36 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
-use Illuminate\Support\Collection;
+use Statamic\Facades\Site;
 
-class CustomSitemap extends BaseSitemap
+abstract class CustomSitemap extends BaseSitemap
 {
-    protected Collection $urls;
+    protected string $handle;
 
-    public function __construct(protected string $handle)
-    {
-        $this->urls = collect();
-    }
+    protected string $site;
 
-    public function type(): string
+    final public function type(): string
     {
         return 'custom';
     }
 
-    public function handle(): string
+    final public function handle(): string
     {
         return $this->handle;
     }
 
-    public function add(CustomSitemapUrl $item): self
+    public function site(): string
     {
-        $this->urls = $this->urls->push($item)->unique();
-
-        return $this;
+        return isset($this->site) ? $this->site : Site::default()->handle();
     }
 
-    public function urls(): Collection
+    public function makeUrl(string $url): CustomSitemapUrl
     {
-        return $this->urls->each->sitemap($this);
+        return new CustomSitemapUrl($url);
+    }
+
+    public static function register(): void
+    {
+        app('advanced-seo.sitemaps')->push(static::class);
     }
 }

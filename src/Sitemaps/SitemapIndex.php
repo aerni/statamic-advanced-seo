@@ -24,8 +24,6 @@ use Statamic\Facades\Taxonomy;
 
 class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, SitemapFile
 {
-    protected array $sitemaps = [];
-
     public function __construct(protected Domain $domain) {}
 
     /**
@@ -52,20 +50,10 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
         return $this->sitemaps()->first(fn (Sitemap $sitemap) => $sitemap->id() === $id);
     }
 
-    public function add(Sitemap $sitemap): self
-    {
-        $this->sitemaps = collect($this->sitemaps)
-            ->push($sitemap)
-            ->unique(fn ($sitemap) => $sitemap->handle())
-            ->all();
-
-        return $this;
-    }
-
     public function sitemaps(): Collection
     {
         return Blink::once($this->cacheKey(), function () {
-            return collect($this->sitemaps)
+            return $this->customSitemaps()
                 ->merge($this->collectionSitemaps())
                 ->merge($this->taxonomySitemaps())
                 ->each->index($this);
@@ -75,6 +63,19 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
     protected function cacheKey(): string
     {
         return "advanced-seo.sitemap-index.{$this->domain}";
+    }
+
+    protected function customSitemaps(): Collection
+    {
+        return collect([
+            ...config('advanced-seo.sitemap.custom', []),
+            ...app('advanced-seo.sitemaps'),
+        ])
+            ->map(fn ($sitemap) => is_string($sitemap) ? app($sitemap) : $sitemap)
+            ->unique(fn ($sitemap) => $sitemap->id())
+            ->filter(fn ($sitemap) => $this->sites()->contains($sitemap->site()))
+            ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty())
+            ->values();
     }
 
     protected function collectionSitemaps(): Collection

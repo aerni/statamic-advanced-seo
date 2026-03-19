@@ -3,8 +3,7 @@
 namespace Aerni\AdvancedSeo\Registries;
 
 use Aerni\AdvancedSeo\Facades\Domain;
-use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
-use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
+use Aerni\AdvancedSeo\Sitemaps\Custom\SitemapBuilder;
 use Aerni\AdvancedSeo\Sitemaps\SitemapIndex;
 use Illuminate\Support\Facades\File;
 use Statamic\Exceptions\SiteNotFoundException;
@@ -28,19 +27,11 @@ class SitemapRegistry extends Registry
     }
 
     /**
-     * Create a new custom sitemap.
+     * Create a new custom sitemap builder.
      */
-    public function make(string $handle): CustomSitemap
+    public function make(string $handle): SitemapBuilder
     {
-        return new CustomSitemap($handle);
-    }
-
-    /**
-     * Create a new custom sitemap URL.
-     */
-    public function makeUrl(string $loc): CustomSitemapUrl
-    {
-        return new CustomSitemapUrl($loc);
+        return new SitemapBuilder($handle);
     }
 
     /**

@@ -2,15 +2,31 @@
 
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
-use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
+use Aerni\AdvancedSeo\Sitemaps\Custom\SitemapBuilder;
 use Aerni\AdvancedSeo\Sitemaps\SitemapIndex;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\File;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+
+class TestCustomSitemap extends CustomSitemap
+{
+    protected string $handle = 'test-sitemap';
+
+    protected string $site = 'english';
+
+    public function urls(): BaseCollection
+    {
+        return collect([
+            $this->makeUrl('https://example.com/test-1'),
+            $this->makeUrl('https://example.com/test-2'),
+        ]);
+    }
+}
 
 uses(PreventsSavingStacheItemsToDisk::class, EnablesSitemap::class);
 
@@ -28,14 +44,11 @@ afterEach(function () {
     File::deleteDirectory(Sitemap::path());
 });
 
-it('can create a custom sitemap', function () {
-    expect(Sitemap::make('custom-pages'))
-        ->toBeInstanceOf(CustomSitemap::class);
-});
+it('can create a custom sitemap without registering', function () {
+    $sitemap = Sitemap::make('custom-pages');
 
-it('can create a custom sitemap url', function () {
-    expect(Sitemap::makeUrl('https://example.com/page'))
-        ->toBeInstanceOf(CustomSitemapUrl::class);
+    expect($sitemap)->toBeInstanceOf(SitemapBuilder::class)
+        ->and(app('advanced-seo.sitemaps'))->not->toContain($sitemap);
 });
 
 it('can get the xsl stylesheet', function () {
@@ -116,4 +129,103 @@ it('clears existing sitemaps before generating', function () {
 
     expect(File::exists($path.'stale-sitemap.xml'))->toBeFalse()
         ->and(File::exists($path.'sitemap.xml'))->toBeTrue();
+});
+
+it('registers an in-memory sitemap to the correct index', function () {
+    Sitemap::make('my-pages')
+        ->site('english')
+        ->add('https://example.com/page-1')
+        ->register();
+
+    $index = Sitemap::index('english');
+    $handles = $index->sitemaps()->map->handle()->all();
+
+    expect($handles)->toContain('my-pages');
+});
+
+it('registers a class-based sitemap via static register', function () {
+    TestCustomSitemap::register();
+
+    $index = Sitemap::index('english');
+    $found = $index->find('custom-test-sitemap');
+
+    expect($found)
+        ->not->toBeNull()
+        ->and($found->handle())->toBe('test-sitemap')
+        ->and($found->type())->toBe('custom');
+});
+
+it('registers a class-based sitemap via config', function () {
+    config(['advanced-seo.sitemap.custom' => [TestCustomSitemap::class]]);
+
+    $index = Sitemap::index('english');
+    $found = $index->find('custom-test-sitemap');
+
+    expect($found)
+        ->not->toBeNull()
+        ->and($found->handle())->toBe('test-sitemap')
+        ->and($found->type())->toBe('custom');
+});
+
+it('does not include sitemap in wrong domain index', function () {
+    Sitemap::make('french-pages')
+        ->site('french')
+        ->add('https://french.example.com/page-1')
+        ->register();
+
+    $englishIndex = Sitemap::index('english');
+    $frenchIndex = Sitemap::index('french');
+
+    expect($englishIndex->sitemaps()->map->handle()->all())->not->toContain('french-pages')
+        ->and($frenchIndex->sitemaps()->map->handle()->all())->toContain('french-pages');
+});
+
+it('defaults site to the default statamic site', function () {
+    Sitemap::make('default-pages')
+        ->add('https://example.com/page-1')
+        ->register();
+
+    $index = Sitemap::index('english');
+    $handles = $index->sitemaps()->map->handle()->all();
+
+    expect($handles)->toContain('default-pages');
+});
+
+it('excludes empty sitemaps from the index', function () {
+    Sitemap::make('empty-sitemap')
+        ->site('english')
+        ->register();
+
+    $index = Sitemap::index('english');
+    $handles = $index->sitemaps()->map->handle()->all();
+
+    expect($handles)->not->toContain('empty-sitemap');
+});
+
+it('deduplicates sitemaps with the same id', function () {
+    Sitemap::make('dup-pages')
+        ->site('english')
+        ->add('https://example.com/page-1')
+        ->register();
+
+    Sitemap::make('dup-pages')
+        ->site('english')
+        ->add('https://example.com/page-2')
+        ->register();
+
+    $index = Sitemap::index('english');
+    $matches = $index->sitemaps()->filter(fn ($s) => $s->handle() === 'dup-pages');
+
+    expect($matches)->toHaveCount(1);
+});
+
+it('does not auto-register via make', function () {
+    Sitemap::make('not-registered')
+        ->site('english')
+        ->add('https://example.com/page-1');
+
+    $index = Sitemap::index('english');
+    $handles = $index->sitemaps()->map->handle()->all();
+
+    expect($handles)->not->toContain('not-registered');
 });

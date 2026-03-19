@@ -230,6 +230,21 @@ return [
 
         'queue' => 'default',
 
+        /*
+        |--------------------------------------------------------------------------
+        | Custom Sitemaps
+        |--------------------------------------------------------------------------
+        |
+        | Register custom sitemap classes. Each class should extend
+        | CustomSitemap and define a handle and urls.
+        | The site defaults to the default Statamic site if not set.
+        |
+        */
+
+        'custom' => [
+            //
+        ],
+
     ],
 
     /*

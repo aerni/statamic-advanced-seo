@@ -98,35 +98,35 @@ it('excludes taxonomies not assigned to any site on this domain', function () {
     expect($handles)->not->toContain('categories');
 });
 
-it('can add a custom sitemap', function () {
-    $sitemap = Sitemap::make('pages')
-        ->add(Sitemap::makeUrl('https://example.com/custom'));
+it('includes registered custom sitemaps', function () {
+    Sitemap::make('custom-pages')
+        ->site('english')
+        ->add('https://example.com/custom')
+        ->register();
 
-    $index = Sitemap::index('english')->add($sitemap);
-
-    $found = $index->find('custom-pages');
+    $found = Sitemap::index('english')->find('custom-custom-pages');
 
     expect($found)
         ->not->toBeNull()
-        ->and($found->handle())->toBe('pages')
+        ->and($found->handle())->toBe('custom-pages')
         ->and($found->type())->toBe('custom');
 });
 
-it('prevents duplicate sitemaps by handle', function () {
-    $index = Sitemap::index('english');
+it('prevents duplicate custom sitemaps by id', function () {
+    Sitemap::make('custom-pages')
+        ->site('english')
+        ->add('https://example.com/page-1')
+        ->register();
 
-    $index->add(Sitemap::make('pages'));
-    $index->add(Sitemap::make('pages'));
+    Sitemap::make('custom-pages')
+        ->site('english')
+        ->add('https://example.com/page-2')
+        ->register();
 
-    $customPages = $index->sitemaps()->filter(fn ($sitemap) => $sitemap->type() === 'custom' && $sitemap->handle() === 'pages');
+    $customPages = Sitemap::index('english')->sitemaps()
+        ->filter(fn ($sitemap) => $sitemap->type() === 'custom' && $sitemap->handle() === 'custom-pages');
 
     expect($customPages)->toHaveCount(1);
-});
-
-it('returns self when adding for chaining', function () {
-    $index = Sitemap::index('english');
-
-    expect($index->add(Sitemap::make('chain')))->toBe($index);
 });
 
 it('can find a sitemap by id', function () {
