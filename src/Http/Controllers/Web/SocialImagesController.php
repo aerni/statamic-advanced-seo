@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Facades\SocialImageTheme;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Aerni\AdvancedSeo\Registries\SocialImageThemeRegistry;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
@@ -35,7 +35,7 @@ class SocialImagesController extends Controller
         throw_unless($socialImage = SocialImage::find($template), new NotFoundHttpException);
 
         // Get the view path for the template from the theme.
-        $templatePath = (new SocialImageThemeRegistry)->find($theme)?->template($template);
+        $templatePath = SocialImageTheme::find($theme)?->template($template);
 
         // Throw if no template was found for the given theme.
         throw_unless($templatePath, new NotFoundHttpException);
