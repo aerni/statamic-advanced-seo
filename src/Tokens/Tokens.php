@@ -37,7 +37,7 @@ class Tokens
     {
         $fieldTokens = $this->fieldTokens();
 
-        return TokenFacade::registry()->tokens()
+        return TokenFacade::tokens()
             ->reject(fn (ValueToken $token) => $fieldTokens->has($token->handle()))
             ->map(fn (ValueToken $token) => $token->withParent($this->parent))
             ->sortBy(fn (ValueToken $token) => $token->display());
@@ -71,7 +71,7 @@ class Tokens
      */
     protected function tokenizableFields(Blueprint $blueprint): Collection
     {
-        $normalizers = TokenFacade::registry()->normalizers();
+        $normalizers = TokenFacade::normalizers();
 
         return $blueprint->fields()->all()
             ->filter(fn (Field $field) => $normalizers->has($field->type()));

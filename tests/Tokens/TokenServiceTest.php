@@ -1,6 +1,5 @@
 <?php
 
-use Aerni\AdvancedSeo\Registries\TokenRegistry;
 use Aerni\AdvancedSeo\Tokens\Tokens;
 use Aerni\AdvancedSeo\Tokens\TokenService;
 use Statamic\Facades\AssetContainer;
@@ -26,10 +25,6 @@ beforeEach(function () {
     AssetContainer::make('assets')->disk('local')->saveQuietly();
 
     $this->service = app(TokenService::class);
-});
-
-it('returns the token registry', function () {
-    expect($this->service->registry())->toBeInstanceOf(TokenRegistry::class);
 });
 
 it('creates a Tokens instance for a given parent', function () {
