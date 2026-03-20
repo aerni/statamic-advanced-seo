@@ -8,6 +8,7 @@ use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
 use Aerni\AdvancedSeo\Context\Context as SeoContext;
 use Facades\Statamic\Modifiers\CoreModifiers;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\Conditionable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
@@ -19,6 +20,7 @@ use Statamic\Tags\Context;
 
 abstract class BaseCascade implements Augmentable
 {
+    use Conditionable;
     use ContainsData;
     use HasAugmentedInstance;
 

@@ -15,7 +15,10 @@ class SeoFieldtypeCascade extends BaseCascade
     {
         return $this
             ->withSiteDefaults()
-            ->withContentDefaults()
+            ->when(
+                $this->model->isContent(),
+                fn (self $cascade) => $cascade->withContentDefaults()
+            )
             ->removeSeoPrefix()
             ->ensureOverrides()
             ->sortKeys();

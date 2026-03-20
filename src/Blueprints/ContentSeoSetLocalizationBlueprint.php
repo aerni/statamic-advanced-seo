@@ -97,14 +97,19 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 ],
                 [
                     'handle' => 'seo_og_image',
-                    'field' => $this->getAssetFieldConfig([
+                    'field' => [
+                        'type' => 'seo',
                         'display' => $this->trans('seo_og_image.display'),
                         'instructions' => $this->trans('seo_og_image.default_instructions'),
-                        'validate' => [
-                            'image',
-                            'mimes:jpg,png',
-                        ],
-                    ]),
+                        'default' => '@default',
+                        'localizable' => true,
+                        'field' => $this->getAssetFieldConfig([
+                            'validate' => [
+                                'image',
+                                'mimes:jpg,png',
+                            ],
+                        ]),
+                    ],
                 ],
                 [
                     'handle' => 'seo_generate_social_images',
@@ -147,25 +152,31 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_noindex',
                     'field' => [
-                        'type' => 'toggle',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_noindex.display'),
                         'instructions' => $this->trans('seo_noindex.default_instructions'),
-                        'default' => false,
+                        'default' => '@default',
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
+                        'field' => [
+                            'type' => 'toggle',
+                        ],
                     ],
                 ],
                 [
                     'handle' => 'seo_nofollow',
                     'field' => [
-                        'type' => 'toggle',
+                        'type' => 'seo',
                         'display' => $this->trans('seo_nofollow.display'),
                         'instructions' => $this->trans('seo_nofollow.default_instructions'),
-                        'default' => false,
+                        'default' => '@default',
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
+                        'field' => [
+                            'type' => 'toggle',
+                        ],
                     ],
                 ],
             ],
