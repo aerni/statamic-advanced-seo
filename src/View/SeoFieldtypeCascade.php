@@ -20,7 +20,6 @@ class SeoFieldtypeCascade extends BaseCascade
                 fn (self $cascade) => $cascade->withContentDefaults()
             )
             ->removeSeoPrefix()
-            ->ensureOverrides()
             ->sortKeys();
     }
 }
