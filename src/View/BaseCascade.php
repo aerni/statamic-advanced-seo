@@ -93,26 +93,16 @@ abstract class BaseCascade implements Augmentable
     }
 
     /**
-     * Make sure to get the site defaults if there is no value
-     * for the overrides keys in the current data.
+     * Site-level noindex/nofollow are OR overrides: if the site says true, it always wins.
      */
     protected function ensureOverrides(): self
     {
-        // The keys that should be considered for the overrides.
-        $overrides = ['noindex', 'nofollow', 'og_image'];
+        $overrides = GetSiteDefaults::handle($this->model)
+            ->only(['noindex', 'nofollow'])
+            ->map(fn ($value) => $value->value())
+            ->filter();
 
-        // The values that should be used as overrides.
-        $defaults = GetSiteDefaults::handle($this->model)
-            ->only($overrides)
-            ->map(fn ($value) => $value->value());
-
-        // The values from the existing data that should be overriden.
-        $data = $this->data->only($overrides)->filter();
-
-        // Only merge the defaults overrides if they don't exist in the data.
-        $merged = $defaults->diffKeys($data)->merge($data);
-
-        return $this->merge($merged);
+        return $this->merge($overrides);
     }
 
     public function values(): Collection
