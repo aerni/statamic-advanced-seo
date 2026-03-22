@@ -4,8 +4,8 @@ namespace Aerni\AdvancedSeo\Context;
 
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Enums\Scope;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Collection;

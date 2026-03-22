@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 
 trait ManagesSeoSetLocalizations
 {

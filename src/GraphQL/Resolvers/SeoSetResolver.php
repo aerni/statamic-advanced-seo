@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Resolvers;
 
-use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 
 class SeoSetResolver
 {

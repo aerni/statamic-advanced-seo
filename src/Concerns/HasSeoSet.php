@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 trait HasSeoSet

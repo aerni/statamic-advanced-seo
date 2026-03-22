@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Context;
 
-use Aerni\AdvancedSeo\SeoSets\SeoSet;
-use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 
 class Context
 {

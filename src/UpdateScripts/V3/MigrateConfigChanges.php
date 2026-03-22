@@ -2,11 +2,11 @@
 
 namespace Aerni\AdvancedSeo\UpdateScripts\V3;
 
-use Aerni\AdvancedSeo\SeoSets\SeoSet;
-use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalizationModel;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;

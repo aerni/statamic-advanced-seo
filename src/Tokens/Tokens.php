@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Tokens;
 
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Token as TokenFacade;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as EntryCollection;
 use Statamic\Contracts\Taxonomies\Taxonomy;

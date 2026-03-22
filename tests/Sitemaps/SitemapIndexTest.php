@@ -1,8 +1,8 @@
 <?php
 
-use Aerni\AdvancedSeo\Sitemaps\Domain;
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
+use Aerni\AdvancedSeo\Sitemaps\Domain;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\Collection;

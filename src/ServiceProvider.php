@@ -2,8 +2,6 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\SeoSets\SeoSet;
-use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Gates\SeoGate;
 use Aerni\AdvancedSeo\GraphQL\Enums\SitemapTypeEnum;
@@ -24,6 +22,8 @@ use Aerni\AdvancedSeo\GraphQL\Types\SitemapUrlType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;

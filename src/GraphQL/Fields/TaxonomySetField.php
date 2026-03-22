@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
-use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetResolver;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Field;

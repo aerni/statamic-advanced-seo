@@ -1,13 +1,13 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
-use Aerni\AdvancedSeo\SeoSets\AugmentedSeoSetLocalization;
-use Aerni\AdvancedSeo\SeoSets\SeoSet;
-use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Aerni\AdvancedSeo\SeoSets\AugmentedSeoSetLocalization;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
