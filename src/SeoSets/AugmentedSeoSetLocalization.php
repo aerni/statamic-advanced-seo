@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\SeoSets;
 
 use Statamic\Data\AbstractAugmented;
 
-class AugmentedLocalization extends AbstractAugmented
+class AugmentedSeoSetLocalization extends AbstractAugmented
 {
     public function keys()
     {

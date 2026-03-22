@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
-use Aerni\AdvancedSeo\SeoSets\AugmentedLocalization;
+use Aerni\AdvancedSeo\SeoSets\AugmentedSeoSetLocalization;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
@@ -254,7 +254,7 @@ it('returns a new augmented instance', function () {
 
     $augmented = $localization->newAugmentedInstance();
 
-    expect($augmented)->toBeInstanceOf(AugmentedLocalization::class);
+    expect($augmented)->toBeInstanceOf(AugmentedSeoSetLocalization::class);
 });
 
 it('resolves GraphQL values for valid blueprint fields', function () {
