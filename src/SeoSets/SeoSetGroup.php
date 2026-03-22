@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Data;
+namespace Aerni\AdvancedSeo\SeoSets;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;

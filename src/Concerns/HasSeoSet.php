@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 

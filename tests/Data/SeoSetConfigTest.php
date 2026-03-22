@@ -1,8 +1,8 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Data\SeoSetConfig;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetConfig;
 use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
 use Aerni\AdvancedSeo\Facades\Seo;

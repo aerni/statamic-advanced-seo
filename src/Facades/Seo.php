@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \Illuminate\Support\Collection all()
- * @method static \Aerni\AdvancedSeo\Data\SeoSet|null find(string $id)
+ * @method static \Aerni\AdvancedSeo\SeoSets\SeoSet|null find(string $id)
  * @method static \Illuminate\Support\Collection whereType(string $type)
  * @method static mixed defaultValue(string $key, mixed $default = null)
  *

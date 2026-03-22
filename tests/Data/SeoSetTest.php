@@ -2,7 +2,7 @@
 
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Illuminate\Support\Collection;

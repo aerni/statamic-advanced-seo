@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Data;
+namespace Aerni\AdvancedSeo\SeoSets;
 
 use Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint;
 use Aerni\AdvancedSeo\Blueprints\SiteDefaultsBlueprint;

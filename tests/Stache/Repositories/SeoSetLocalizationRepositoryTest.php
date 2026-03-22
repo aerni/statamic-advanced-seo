@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Data\SeoSetLocalization as StacheSeoSetLocalization;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization as StacheSeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Statamic\Facades\Collection;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;

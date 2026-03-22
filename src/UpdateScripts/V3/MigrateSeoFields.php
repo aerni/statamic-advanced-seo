@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\UpdateScripts\V3;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;

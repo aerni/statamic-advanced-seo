@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SocialImages\Theme;
 use Aerni\AdvancedSeo\SocialImages\ThemeCollection;
 use Illuminate\Support\Arr;

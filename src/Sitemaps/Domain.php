@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Data;
+namespace Aerni\AdvancedSeo\Sitemaps;
 
 use Illuminate\Support\Collection;
 use Stringable;

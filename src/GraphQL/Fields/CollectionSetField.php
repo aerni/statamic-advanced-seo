@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Fields;
 
-use Aerni\AdvancedSeo\Data\SeoSetLocalization;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetResolver;
 use Aerni\AdvancedSeo\GraphQL\Types\CollectionSetType;
 use GraphQL\Type\Definition\ResolveInfo;

@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Data\SeoSetGroup;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Statamic\Facades\Collection as Collections;

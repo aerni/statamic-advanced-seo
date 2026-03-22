@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Context;
 
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Str;

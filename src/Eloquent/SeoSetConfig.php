@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as Contract;
-use Aerni\AdvancedSeo\Data\SeoSetConfig as StacheSeoSetConfig;
+use Aerni\AdvancedSeo\SeoSets\SeoSetConfig as StacheSeoSetConfig;
 use Illuminate\Database\Eloquent\Model;
 
 class SeoSetConfig extends StacheSeoSetConfig

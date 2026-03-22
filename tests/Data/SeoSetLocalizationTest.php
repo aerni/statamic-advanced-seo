@@ -1,9 +1,9 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
-use Aerni\AdvancedSeo\Data\AugmentedLocalization;
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Data\SeoSetLocalization;
+use Aerni\AdvancedSeo\SeoSets\AugmentedLocalization;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetLocalizationSaved;
 use Aerni\AdvancedSeo\Facades\Seo;

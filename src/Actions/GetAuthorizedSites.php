@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 

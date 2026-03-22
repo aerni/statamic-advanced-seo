@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\View;
 
 use Aerni\AdvancedSeo\Actions\ResolveBreadcrumbs;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
-use Aerni\AdvancedSeo\Data\HasComputedData;
+use Aerni\AdvancedSeo\Concerns\HasComputedData;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Aerni\AdvancedSeo\View\Concerns\HasHreflang;

@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
-use Aerni\AdvancedSeo\Data\Domain;
+use Aerni\AdvancedSeo\Sitemaps\Domain;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;

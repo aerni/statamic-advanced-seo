@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Data\SeoSetGroup;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Gates\SeoGate;
 use Aerni\AdvancedSeo\GraphQL\Enums\SitemapTypeEnum;

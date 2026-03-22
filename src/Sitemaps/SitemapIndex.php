@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
 use Aerni\AdvancedSeo\Contracts\SitemapIndex as Contract;
-use Aerni\AdvancedSeo\Data\Domain;
+use Aerni\AdvancedSeo\Sitemaps\Domain;
 use Aerni\AdvancedSeo\Facades\Sitemap as SitemapRegistry;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;

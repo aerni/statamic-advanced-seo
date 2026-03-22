@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
-use Aerni\AdvancedSeo\Data\SeoSetLocalization as StacheSeoSetLocalization;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization as StacheSeoSetLocalization;
 use Illuminate\Database\Eloquent\Model;
 
 class SeoSetLocalization extends StacheSeoSetLocalization

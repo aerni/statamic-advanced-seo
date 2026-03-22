@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Aerni\AdvancedSeo\Data\Domain;
+use Aerni\AdvancedSeo\Sitemaps\Domain;
 use Illuminate\Support\Collection;
 
 interface SitemapIndex

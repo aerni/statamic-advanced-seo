@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\UpdateScripts\V3;
 
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Data\SeoSetLocalization;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetLocalization;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalizationModel;
 use Aerni\AdvancedSeo\Facades\Seo;

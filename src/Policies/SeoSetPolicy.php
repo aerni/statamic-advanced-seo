@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Policies;
 
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
-use Aerni\AdvancedSeo\Data\SeoSet;
-use Aerni\AdvancedSeo\Data\SeoSetGroup;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
+use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\User as UserFacade;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
