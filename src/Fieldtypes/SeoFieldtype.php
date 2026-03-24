@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Cascades\SeoFieldtypeCascade;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\View\SeoFieldtypeCascade;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;

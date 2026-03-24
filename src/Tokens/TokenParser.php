@@ -2,10 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Tokens;
 
+use Aerni\AdvancedSeo\Cascades\SeoFieldtypeCascade;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\Token;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\View\SeoFieldtypeCascade;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Antlers;

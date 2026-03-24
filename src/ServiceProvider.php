@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo;
 
+use Aerni\AdvancedSeo\Cascades\CascadeComposer;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Gates\SeoGate;
 use Aerni\AdvancedSeo\GraphQL\Enums\SitemapTypeEnum;
@@ -28,7 +29,6 @@ use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
-use Aerni\AdvancedSeo\View\CascadeComposer;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;

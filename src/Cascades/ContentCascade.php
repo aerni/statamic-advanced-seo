@@ -1,30 +1,25 @@
 <?php
 
-namespace Aerni\AdvancedSeo\View;
+namespace Aerni\AdvancedSeo\Cascades;
 
 use Aerni\AdvancedSeo\Actions\ResolveBreadcrumbs;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Concerns\HasComputedData;
+use Aerni\AdvancedSeo\Concerns\HasHreflang;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Aerni\AdvancedSeo\View\Concerns\HasHreflang;
 use Illuminate\Support\Collection;
+use Spatie\SchemaOrg\Organization;
+use Spatie\SchemaOrg\Person;
 use Spatie\SchemaOrg\Schema;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
 
-class GraphQlCascade extends BaseCascade
+class ContentCascade extends BaseCascade
 {
     use EvaluatesIndexability;
     use HasComputedData;
     use HasHreflang;
-
-    public function __construct(Entry|Term $model)
-    {
-        parent::__construct($model);
-    }
 
     protected function process(): self
     {
@@ -40,8 +35,10 @@ class GraphQlCascade extends BaseCascade
     public function computedKeys(): Collection
     {
         return collect([
+            'site_name',
+            'title',
+            'og_title',
             'og_image_preset',
-            'twitter_card',
             'twitter_image_preset',
             'twitter_handle',
             'indexing',
@@ -49,8 +46,24 @@ class GraphQlCascade extends BaseCascade
             'hreflang',
             'canonical',
             'site_schema',
+            'page_schema',
             'breadcrumbs',
         ]);
+    }
+
+    public function siteName(): string
+    {
+        return $this->get('site_name');
+    }
+
+    public function title(): string
+    {
+        return $this->get('title') ?? $this->model->title() ?? $this->siteName();
+    }
+
+    public function ogTitle(): string
+    {
+        return $this->get('og_title') ?? $this->title();
     }
 
     public function ogImagePreset(): array
@@ -77,17 +90,12 @@ class GraphQlCascade extends BaseCascade
 
     public function indexing(): ?string
     {
-        // TODO: Could use crawlingIsEnabled() method instead.
-        if (! in_array(app()->environment(), config('advanced-seo.crawling.environments', []))) {
-            $this->merge(['noindex' => true, 'nofollow' => true]);
-        }
-
         $indexing = collect([
-            'noindex' => $this->get('noindex'),
-            'nofollow' => $this->get('nofollow'),
+            'noindex' => $this->get('noindex') || ! $this->crawlingIsEnabled(),
+            'nofollow' => $this->get('nofollow') || ! $this->crawlingIsEnabled(),
         ])->filter()->keys()->implode(', ');
 
-        return ! empty($indexing) ? $indexing : null;
+        return $indexing ?: null;
     }
 
     public function locale(): string
@@ -110,16 +118,19 @@ class GraphQlCascade extends BaseCascade
             return null;
         }
 
-        $type = $this->get('canonical_type');
+        return match ($this->get('canonical_type')) {
+            'other' => $this->get('canonical_entry')?->absoluteUrl(),
+            'custom' => $this->get('canonical_custom'),
+            default => $this->canonicalUrl(),
+        };
+    }
 
-        if ($type == 'other' && $this->has('canonical_entry')) {
-            return $this->get('canonical_entry')->absoluteUrl();
-        }
-
-        if ($type == 'custom' && $this->has('canonical_custom')) {
-            return $this->get('canonical_custom');
-        }
-
+    /**
+     * Returns the default canonical URL for this model.
+     * Overridden by ContextViewCascade to use Context::get('current_url').
+     */
+    protected function canonicalUrl(): string
+    {
         return $this->model->absoluteUrl();
     }
 
@@ -127,53 +138,88 @@ class GraphQlCascade extends BaseCascade
     {
         $type = $this->get('site_json_ld_type');
 
-        if ($type == 'none') {
+        if (! $type || $type === 'none') {
             return null;
         }
 
-        if ($type == 'custom') {
+        if ($type === 'custom') {
             return $this->get('site_json_ld');
         }
 
-        if ($type == 'organization') {
-            $schema = Schema::organization()
-                ->name($this->get('organization_name'))
-                ->url($this->model->site()->absoluteUrl());
+        $siteUrl = $this->siteUrl();
 
-            if ($logo = $this->get('organization_logo')) {
-                $logo = Schema::imageObject()
+        $schema = match ($type) {
+            'organization' => $this->organizationSchema($siteUrl),
+            'person' => $this->personSchema($siteUrl),
+            default => null,
+        };
+
+        return $schema ? json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE) : null;
+    }
+
+    protected function organizationSchema(string $siteUrl): Organization
+    {
+        $schema = Schema::organization()
+            ->name($this->get('organization_name'))
+            ->url($siteUrl);
+
+        if ($logo = $this->get('organization_logo')) {
+            $schema->logo(
+                Schema::imageObject()
                     ->url($logo->absoluteUrl())
                     ->width($logo->width())
-                    ->height($logo->height());
-
-                $schema->logo($logo);
-            }
+                    ->height($logo->height())
+            );
         }
 
-        if ($type == 'person') {
-            $schema = Schema::person()
-                ->name($this->get('person_name'))
-                ->url($this->model->site()->absoluteUrl());
-        }
+        return $schema;
+    }
 
-        return json_encode($schema->toArray(), JSON_UNESCAPED_UNICODE);
+    protected function personSchema(string $siteUrl): Person
+    {
+        return Schema::person()
+            ->name($this->get('person_name'))
+            ->url($siteUrl);
+    }
+
+    protected function siteUrl(): string
+    {
+        return $this->model->site()->absoluteUrl();
+    }
+
+    protected function siteHandle(): string
+    {
+        return $this->model->site()->handle();
+    }
+
+    protected function isHomepage(): bool
+    {
+        return $this->model->absoluteUrl() === $this->siteUrl();
+    }
+
+    protected function breadcrumbSegments(): array
+    {
+        return explode('/', trim($this->model->url(), '/'));
+    }
+
+    public function pageSchema(): ?string
+    {
+        return $this->get('json_ld')?->value();
     }
 
     public function breadcrumbs(): ?string
     {
-        // Don't render breadcrumbs if deactivated in the site defaults.
         if (! $this->get('use_breadcrumbs')) {
             return null;
         }
 
-        // Don't render breadcrumbs on the homepage.
-        if ($this->model->absoluteUrl() === $this->model->site()->absoluteUrl()) {
+        if ($this->isHomepage()) {
             return null;
         }
 
-        $segments = array_merge(['/'], explode('/', trim($this->model->url(), '/')));
+        $segments = array_merge(['/'], $this->breadcrumbSegments());
 
-        $listItems = ResolveBreadcrumbs::handle($segments, $this->model->site()->handle())
+        $listItems = ResolveBreadcrumbs::handle($segments, $this->siteHandle())
             ->map(fn ($crumb) => Schema::listItem()
                 ->position($crumb['position'])
                 ->name($crumb['title'])

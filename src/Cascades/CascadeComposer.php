@@ -1,7 +1,8 @@
 <?php
 
-namespace Aerni\AdvancedSeo\View;
+namespace Aerni\AdvancedSeo\Cascades;
 
+use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Contracts\View\View;
@@ -11,11 +12,13 @@ use Statamic\Tags\Context;
 
 class CascadeComposer
 {
+    use EvaluatesContextType;
+
     public function compose(View $view): void
     {
         /**
          * This prevents a "Serialization of 'Closure' is not allowed" exception when using the {{ nocache }} tag.
-         * The issue is caused by closures in the config array. We don't need this value for the ViewCascade
+         * The issue is caused by closures in the config array. We don't need this value for the cascades.
          * so we can safely remove it here. See: https://github.com/aerni/statamic-advanced-seo/issues/175
          */
         $values = collect($view->getData())->except('config');
@@ -30,7 +33,11 @@ class CascadeComposer
             return;
         }
 
-        $view->with('seo', ViewCascade::from($context));
+        $cascade = $this->contextIsEntryOrTerm($context)
+            ? ContentViewCascade::from($context->get('id')->augmentable())
+            : ContextViewCascade::from($context);
+
+        $view->with('seo', $cascade);
     }
 
     protected function getContextFromCascade(Context $context): Context

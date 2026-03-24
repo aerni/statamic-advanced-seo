@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\View\GraphQlCascade;
+use Aerni\AdvancedSeo\Cascades\ContentCascade;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\Type;
 use Statamic\Facades\GraphQL;
@@ -64,6 +64,6 @@ class ComputedMetaDataType extends Type
 
     private function resolver(): callable
     {
-        return fn (GraphQlCascade $cascade, array $args, mixed $context, ResolveInfo $info) => $cascade->{$info->fieldName};
+        return fn (ContentCascade $cascade, array $args, mixed $context, ResolveInfo $info) => $cascade->{$info->fieldName};
     }
 }

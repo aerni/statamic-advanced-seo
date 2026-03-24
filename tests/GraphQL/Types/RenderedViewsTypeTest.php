@@ -1,7 +1,7 @@
 <?php
 
+use Aerni\AdvancedSeo\Cascades\ContentCascade;
 use Aerni\AdvancedSeo\GraphQL\Types\RenderedViewsType;
-use Aerni\AdvancedSeo\View\GraphQlCascade;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -12,7 +12,7 @@ uses(PreventsSavingStacheItemsToDisk::class);
 beforeEach(function () {
     Collection::make('pages')->saveQuietly();
     AssetContainer::make('assets')->disk('local')->saveQuietly();
-    $this->cascade = GraphQlCascade::from(
+    $this->cascade = ContentCascade::from(
         Entry::make()->collection('pages')->data(['title' => 'Test Page'])
     );
 });

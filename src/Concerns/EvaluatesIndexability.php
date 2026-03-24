@@ -16,9 +16,10 @@ trait EvaluatesIndexability
     {
         return match (true) {
             $model instanceof Context => $this->isIndexableContext($model),
-            $model instanceof Entry => $this->isIndexableEntryOrTerm($model),
+            $model instanceof Entry,
             $model instanceof LocalizedTerm => $this->isIndexableEntryOrTerm($model),
             $model instanceof Site => $this->isIndexableSite($model->handle()),
+            default => false,
         };
     }
 

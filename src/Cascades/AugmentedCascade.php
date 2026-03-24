@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\AdvancedSeo\View;
+namespace Aerni\AdvancedSeo\Cascades;
 
 use Statamic\Data\AbstractAugmented;
 

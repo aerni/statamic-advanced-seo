@@ -1,8 +1,7 @@
 <?php
 
-namespace Aerni\AdvancedSeo\View\Concerns;
+namespace Aerni\AdvancedSeo\Concerns;
 
-use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
@@ -54,50 +53,28 @@ trait HasHreflang
 
     protected function taxonomyHreflang(Taxonomy $taxonomy): ?array
     {
-        // Save initial site so that we can restore it later.
         $initialSite = Site::current()->handle();
 
-        if (! $this->isIndexableSite($initialSite)) {
-            return null;
+        try {
+            return $this->buildTaxonomyHreflang($taxonomy, function ($site) use ($taxonomy) {
+                Site::setCurrent($site);
+
+                return $taxonomy->absoluteUrl();
+            });
+        } finally {
+            Site::setCurrent($initialSite);
         }
-
-        $sites = $taxonomy
-            ->sites()
-            ->filter($this->isIndexableSite(...));
-
-        if ($sites->count() < 2) {
-            return null;
-        }
-
-        $hreflang = $sites->map(function ($site) use ($taxonomy) {
-            // Set the site so we can get the localized absolute URLs of the taxonomy.
-            Site::setCurrent($site);
-
-            return [
-                'url' => $taxonomy->absoluteUrl(),
-                'locale' => Helpers::parseLocale(Site::current()->locale()),
-            ];
-        });
-
-        $originSite = $taxonomy->sites()->first();
-
-        $xDefaultSite = $sites->contains($originSite) ? $originSite : $initialSite;
-
-        // Set the site so we can get the localized absolute URL for the x-default.
-        Site::setCurrent($xDefaultSite);
-
-        $hreflang->push([
-            'url' => $taxonomy->absoluteUrl(),
-            'locale' => 'x-default',
-        ]);
-
-        // Reset the site to the site of the model.
-        Site::setCurrent($initialSite);
-
-        return $hreflang->values()->all();
     }
 
     protected function collectionTaxonomyHreflang(Taxonomy $taxonomy): ?array
+    {
+        return $this->buildTaxonomyHreflang(
+            $taxonomy,
+            fn ($site) => $this->collectionTaxonomyUrl($taxonomy, $site),
+        );
+    }
+
+    protected function buildTaxonomyHreflang(Taxonomy $taxonomy, callable $resolveUrl): ?array
     {
         $initialSite = Site::current()->handle();
 
@@ -105,25 +82,22 @@ trait HasHreflang
             return null;
         }
 
-        $sites = $taxonomy
-            ->sites()
-            ->filter($this->isIndexableSite(...));
+        $sites = $taxonomy->sites()->filter($this->isIndexableSite(...));
 
         if ($sites->count() < 2) {
             return null;
         }
 
         $hreflang = $sites->map(fn ($site) => [
-            'url' => $this->collectionTaxonomyUrl($taxonomy, $site),
+            'url' => $resolveUrl($site),
             'locale' => Helpers::parseLocale(Site::get($site)->locale()),
         ]);
 
         $originSite = $taxonomy->sites()->first();
-
         $xDefaultSite = $sites->contains($originSite) ? $originSite : $initialSite;
 
         return $hreflang->push([
-            'url' => $this->collectionTaxonomyUrl($taxonomy, $xDefaultSite),
+            'url' => $resolveUrl($xDefaultSite),
             'locale' => 'x-default',
         ])->values()->all();
     }
