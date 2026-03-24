@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\GraphQL\Types;
 
-use Aerni\AdvancedSeo\Blueprints\SiteDefaultsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SiteSeoSetLocalizationBlueprint;
 use Aerni\AdvancedSeo\GraphQL\Resolvers\SeoSetLocalizationResolver;
 use Rebing\GraphQL\Support\Type;
 
@@ -17,7 +17,7 @@ class SiteSetType extends Type
 
     public function fields(): array
     {
-        return SiteDefaultsBlueprint::definition()->fields()->toGql()
+        return SiteSeoSetLocalizationBlueprint::definition()->fields()->toGql()
             ->map(fn ($field, $handle) => [...$field, 'resolve' => SeoSetLocalizationResolver::resolve($field, $handle)])
             ->all();
     }

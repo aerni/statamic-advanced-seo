@@ -9,7 +9,7 @@ use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Support\Str;
 
-class OnPageSeoBlueprint extends BaseBlueprint
+class ContentSeoBlueprint extends BaseBlueprint
 {
     use HasAssetField;
 

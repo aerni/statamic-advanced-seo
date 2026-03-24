@@ -9,13 +9,13 @@ use Aerni\AdvancedSeo\Features\Favicons;
 use Aerni\AdvancedSeo\Features\GoogleTagManager;
 use Aerni\AdvancedSeo\Features\SiteVerification;
 
-class SiteDefaultsBlueprint extends BaseBlueprint
+class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
 {
     use HasAssetField;
 
     protected function handle(): string
     {
-        return 'site_defaults';
+        return 'site_localization';
     }
 
     protected function tabs(): array

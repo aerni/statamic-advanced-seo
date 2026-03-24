@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\SeoSets;
 
 use Aerni\AdvancedSeo\Blueprints\ContentSeoSetLocalizationBlueprint;
-use Aerni\AdvancedSeo\Blueprints\SiteDefaultsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SiteSeoSetLocalizationBlueprint;
 use Aerni\AdvancedSeo\Concerns\HasDefaultValues;
 use Aerni\AdvancedSeo\Concerns\HasSeoSet;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as Contract;
@@ -129,7 +129,7 @@ class SeoSetLocalization implements Augmentable, Contract
     public function blueprint(): Blueprint
     {
         $class = match ($this->type()) {
-            'site' => SiteDefaultsBlueprint::class,
+            'site' => SiteSeoSetLocalizationBlueprint::class,
             'collections', 'taxonomies' => ContentSeoSetLocalizationBlueprint::class,
         };
 

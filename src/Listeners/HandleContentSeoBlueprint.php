@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Listeners;
 
-use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
+use Aerni\AdvancedSeo\Blueprints\ContentSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -15,7 +15,7 @@ use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
 
-class HandleOnPageSeoBlueprint
+class HandleContentSeoBlueprint
 {
     use GetsEventData;
 
@@ -42,7 +42,7 @@ class HandleOnPageSeoBlueprint
 
         $contents = array_replace_recursive(
             $event->blueprint->contents(),
-            OnPageSeoBlueprint::resolve($model)->contents()
+            ContentSeoBlueprint::resolve($model)->contents()
         );
 
         // Quick and dirty solution to ensure we capitalize the tab title
