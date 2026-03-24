@@ -113,7 +113,7 @@ it('can get the blueprint for taxonomies', function () {
 it('can get the blueprint for site defaults', function () {
     $blueprint = Seo::find('site::defaults')->inDefaultSite()->blueprint();
 
-    expect($blueprint->handle())->toBe('site_defaults');
+    expect($blueprint->handle())->toBe('site_localization');
 });
 
 it('can get blueprint fields', function () {
