@@ -1,35 +1,37 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Subscribers;
+namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Blueprints\OnPageSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
-use Statamic\Events;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\Event;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
 
-class OnPageSeoBlueprintSubscriber
+class HandleOnPageSeoBlueprint
 {
     use GetsEventData;
 
     protected Context $context;
 
-    public function subscribe(Dispatcher $events): array
+    public function handleEntryBlueprintFound(EntryBlueprintFound $event): void
     {
-        return [
-            Events\EntryBlueprintFound::class => 'extendBlueprint',
-            Events\TermBlueprintFound::class => 'extendBlueprint',
-        ];
+        $this->extendBlueprint($event);
     }
 
-    public function extendBlueprint(Event $event): void
+    public function handleTermBlueprintFound(TermBlueprintFound $event): void
+    {
+        $this->extendBlueprint($event);
+    }
+
+    protected function extendBlueprint(Event $event): void
     {
         $model = $this->getProperty($event) ?? $event;
         $this->context = $this->resolveEventContext($event);

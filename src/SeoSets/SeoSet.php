@@ -6,8 +6,7 @@ use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
-use Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigDeleted;
-use Aerni\AdvancedSeo\Listeners\HandleSeoSetConfigSaved;
+use Aerni\AdvancedSeo\Listeners\HandleSeoSetConfig;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
@@ -144,9 +143,9 @@ class SeoSet implements Arrayable, QueryableValue
 
     /**
      * Saves the config and triggers cascading side effects.
-     * Side effects are handled by the HandleSeoSetConfigSaved event listener.
+     * Side effects are handled by the HandleSeoSetConfig event listener.
      *
-     * @see HandleSeoSetConfigSaved
+     * @see HandleSeoSetConfig::handleSeoSetConfigSaved()
      */
     public function save(): self
     {
@@ -157,9 +156,9 @@ class SeoSet implements Arrayable, QueryableValue
 
     /**
      * Deletes the config and triggers cascading cleanup.
-     * Side effects are handled by the HandleSeoSetConfigDeleted event listener.
+     * Side effects are handled by the HandleSeoSetConfig event listener.
      *
-     * @see HandleSeoSetConfigDeleted
+     * @see HandleSeoSetConfig::handleSeoSetConfigDeleted()
      */
     public function delete(): bool
     {

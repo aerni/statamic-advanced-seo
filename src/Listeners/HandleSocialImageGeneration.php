@@ -1,35 +1,37 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Subscribers;
+namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Events;
+use Statamic\Events\EntrySaved;
 use Statamic\Events\Event;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Statamic;
 
 use function Illuminate\Support\defer;
 
-class SocialImagesGeneratorSubscriber
+class HandleSocialImageGeneration
 {
     use GetsEventData;
 
-    public function subscribe(Dispatcher $events): array
+    public function handleEntrySaved(EntrySaved $event): void
     {
-        return [
-            Events\EntrySaved::class => 'generateSocialImages',
-            Events\LocalizedTermSaved::class => 'generateSocialImages',
-        ];
+        $this->generateSocialImages($event);
     }
 
-    public function generateSocialImages(Event $event): void
+    public function handleLocalizedTermSaved(LocalizedTermSaved $event): void
+    {
+        $this->generateSocialImages($event);
+    }
+
+    protected function generateSocialImages(Event $event): void
     {
         // Only handle the initially saved localization, not cascaded descendants. Only for EntrySaved.
         if (method_exists($event, 'isInitial') && ! $event->isInitial()) {

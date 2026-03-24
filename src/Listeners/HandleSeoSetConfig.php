@@ -5,13 +5,14 @@ namespace Aerni\AdvancedSeo\Listeners;
 use Aerni\AdvancedSeo\Actions\RemoveSeoValues;
 use Aerni\AdvancedSeo\Concerns\ManagesSeoSetLocalizations;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\Events\SeoSetConfigDeleted;
 use Aerni\AdvancedSeo\Events\SeoSetConfigSaved;
 
-class HandleSeoSetConfigSaved
+class HandleSeoSetConfig
 {
     use ManagesSeoSetLocalizations;
 
-    public function handle(SeoSetConfigSaved $event): void
+    public function handleSeoSetConfigSaved(SeoSetConfigSaved $event): void
     {
         $seoSet = $event->config->seoSet();
 
@@ -24,6 +25,15 @@ class HandleSeoSetConfigSaved
             $this->deleteLocalizations($seoSet);
             RemoveSeoValues::handle($seoSet->parent());
         }
+    }
+
+    public function handleSeoSetConfigDeleted(SeoSetConfigDeleted $event): void
+    {
+        $seoSet = $event->config->seoSet();
+
+        $this->deleteLocalizations($seoSet);
+
+        RemoveSeoValues::handle($seoSet->parent());
     }
 
     /**
