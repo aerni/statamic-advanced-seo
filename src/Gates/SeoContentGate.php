@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Gates;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\User as UserFacade;
 
-class SeoGate
+class SeoContentGate
 {
     /**
      * Determine if the user can access the SEO tab and edit content on entries and terms.

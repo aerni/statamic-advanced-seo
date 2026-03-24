@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Cascades\CascadeComposer;
 use Aerni\AdvancedSeo\Facades\Seo;
-use Aerni\AdvancedSeo\Gates\SeoGate;
+use Aerni\AdvancedSeo\Gates\SeoContentGate;
 use Aerni\AdvancedSeo\GraphQL\Enums\SitemapTypeEnum;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
@@ -166,7 +166,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootPermissions(): self
     {
-        Gate::define('seo.edit-content', [SeoGate::class, 'editContent']);
+        Gate::define('seo.edit-content', [SeoContentGate::class, 'editContent']);
 
         Permission::extend(function () {
             Permission::group('advanced-seo', 'Advanced SEO', function () {
