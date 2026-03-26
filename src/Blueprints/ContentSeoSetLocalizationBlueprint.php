@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Support\Str;
@@ -133,7 +133,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_social_images_theme.default_instructions'),
                         'localizable' => true,
                         'listable' => 'hidden',
-                        'visibility' => $this->lazy(fn (?Context $context) => SocialImageTheme::allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),
+                        'visibility' => $this->lazy(fn (?Context $context) => SocialImage::themes()->allowedFor($context->seoSet())->count() === 1 ? 'hidden' : 'visible', 'visible'),
                         'feature' => SocialImagesGenerator::class,
                         'width' => 50,
                     ],

@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\GraphQL\Types\RawMetaDataType;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 
@@ -15,7 +15,7 @@ it('exposes all expected fields', function () {
 
     config(['advanced-seo.social_images.generator.enabled' => true]);
 
-    SocialImageTheme::shouldReceive('all')->andReturn(collect(['default']));
+    SocialImage::shouldReceive('themes->all')->andReturn(collect(['default']));
 
     expect((new RawMetaDataType)->fields())->toHaveKeys([
         'title',

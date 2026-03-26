@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\SocialImages\ThemeCollection;
 use Statamic\Facades\Blink;
 use Statamic\Fieldtypes\Select;
@@ -51,7 +51,7 @@ class SocialImagesThemeFieldtype extends Select
         return Blink::once("advanced-seo.allowed-themes.{$this->field()->parent()->id()}", function () {
             $context = Context::from($this->field()->parent());
 
-            return SocialImageTheme::allowedFor($context->seoSet());
+            return SocialImage::themes()->allowedFor($context->seoSet());
         });
     }
 }

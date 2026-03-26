@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
@@ -128,8 +128,8 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                         'type' => 'select',
                         'display' => $this->trans('config_social_images_themes.display'),
                         'instructions' => $this->trans('config_social_images_themes.instructions'),
-                        'options' => SocialImageTheme::all()->options(),
-                        'default' => SocialImageTheme::all()->default()?->handle,
+                        'options' => SocialImage::themes()->all()->options(),
+                        'default' => SocialImage::themes()->all()->default()?->handle,
                         'multiple' => true,
                         'validate' => [
                             'required',

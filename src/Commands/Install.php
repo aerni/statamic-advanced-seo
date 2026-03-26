@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
@@ -209,7 +209,7 @@ class Install extends Command
             $this->addEnvironmentVariables($this->cloudflareVariables);
         }
 
-        if (SocialImageTheme::all()->isEmpty()) {
+        if (SocialImage::themes()->all()->isEmpty()) {
             $this->callSilently('seo:theme', ['name' => 'default']);
         }
 

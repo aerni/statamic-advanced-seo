@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Facades\SocialImageTheme;
+use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Console\Processes\Composer;
 
 class SocialImagesGenerator extends Feature
@@ -18,7 +18,7 @@ class SocialImagesGenerator extends Feature
             return false;
         }
 
-        if (SocialImageTheme::all()->isEmpty()) {
+        if (SocialImage::themes()->all()->isEmpty()) {
             return false;
         }
 
