@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Aerni\AdvancedSeo\Contracts\SeoSetConfig findOrMake(string $id)
  * @method static \Illuminate\Support\Collection all()
  * @method static void save(\Aerni\AdvancedSeo\Contracts\SeoSetConfig $config)
- * @method static bool delete(\Aerni\AdvancedSeo\Contracts\SeoSetConfig $config)
+ * @method static void delete(\Aerni\AdvancedSeo\Contracts\SeoSetConfig $config)
  *
  * @see SeoSetConfigRepository
  * @see \Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository
  */
 class SeoConfig extends Facade
 {
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return SeoSetConfigRepository::class;
     }

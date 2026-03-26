@@ -9,13 +9,14 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Illuminate\Support\Collection all()
  * @method static \Aerni\AdvancedSeo\SeoSets\SeoSet|null find(string $id)
  * @method static \Illuminate\Support\Collection whereType(string $type)
+ * @method static \Illuminate\Support\Collection groups()
  * @method static mixed defaultValue(string $key, mixed $default = null)
  *
  * @see SeoSetRegistry
  */
 class Seo extends Facade
 {
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return SeoSetRegistry::class;
     }
