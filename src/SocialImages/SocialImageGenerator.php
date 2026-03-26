@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\SocialImages;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelScreenshot\Facades\Screenshot;
@@ -157,23 +158,13 @@ class SocialImageGenerator
     }
 
     /**
-     * Hash the content values and theme.
-     * Excludes fields that change on every save but don't affect template output.
+     * Hash the rendered social image template HTML.
+     * Only changes when the actual template output changes,
+     * regardless of which entry fields were modified.
      */
     protected function contentHash(): string
     {
-        return md5(json_encode([
-            'values' => $this->content->values()
-                ->except([
-                    'seo_generate_social_images',
-                    'seo_og_image',
-                    'updated_at',
-                    'updated_by',
-                ])
-                ->reject(fn ($value) => is_null($value) || $value === [])
-                ->all(),
-            'theme' => (string) $this->content->seo_social_images_theme,
-        ]));
+        return md5(once(fn () => Http::get($this->templateUrl())->body()));
     }
 
     protected function contentHashCacheKey(): string
