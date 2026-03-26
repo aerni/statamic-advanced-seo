@@ -163,12 +163,15 @@ class SocialImageGenerator
     protected function contentHash(): string
     {
         return md5(json_encode([
-            'values' => $this->content->values()->except([
-                'seo_generate_social_images',
-                'seo_og_image',
-                'updated_at',
-                'updated_by',
-            ])->all(),
+            'values' => $this->content->values()
+                ->except([
+                    'seo_generate_social_images',
+                    'seo_og_image',
+                    'updated_at',
+                    'updated_by',
+                ])
+                ->reject(fn ($value) => is_null($value) || $value === [])
+                ->all(),
             'theme' => (string) $this->content->seo_social_images_theme,
         ]));
     }
