@@ -97,7 +97,10 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
 
     public function toArray(): array
     {
-        return $this->sitemaps()->toArray();
+        return $this->sitemaps()->map(fn (Sitemap $sitemap) => [
+            'url' => $sitemap->url(),
+            'lastmod' => $sitemap->lastmod(),
+        ])->all();
     }
 
     public function render(): string
