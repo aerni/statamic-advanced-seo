@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\SeoSets\SeoData;
+use Illuminate\Contracts\Support\Arrayable;
 use Spatie\SchemaOrg\Schema;
 
 it('can be created via the Seo facade', function () {
@@ -124,5 +125,5 @@ it('produces the expected full output', function () {
 it('implements Arrayable', function () {
     $data = (new SeoData)->title('Login');
 
-    expect($data)->toBeInstanceOf(\Illuminate\Contracts\Support\Arrayable::class);
+    expect($data)->toBeInstanceOf(Arrayable::class);
 });
