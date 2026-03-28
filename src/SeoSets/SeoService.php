@@ -1,9 +1,8 @@
 <?php
 
-namespace Aerni\AdvancedSeo\Services;
+namespace Aerni\AdvancedSeo\SeoSets;
 
 use Aerni\AdvancedSeo\Registries\SeoSetRegistry;
-use Aerni\AdvancedSeo\SeoSets\SeoData;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 class SeoService

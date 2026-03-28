@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Facades;
 
-use Aerni\AdvancedSeo\Services\SeoService;
+use Aerni\AdvancedSeo\SeoSets\SeoService;
 use Illuminate\Support\Facades\Facade;
 
 /**
