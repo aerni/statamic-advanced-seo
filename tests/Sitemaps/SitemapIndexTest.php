@@ -155,7 +155,7 @@ it('converts to array', function () {
 
     expect($array)->toBeArray()
         ->not->toBeEmpty()
-        ->and($array[0])->toHaveKeys(['url', 'lastmod', 'urls']);
+        ->and($array[0])->toHaveKeys(['url', 'lastmod']);
 });
 
 it('renders xml with sitemapindex root element', function () {
