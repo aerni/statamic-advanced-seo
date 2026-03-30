@@ -3,6 +3,15 @@
 use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemapUrl;
 use Aerni\AdvancedSeo\Sitemaps\Custom\SitemapBuilder;
 use Statamic\Facades\Site;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+
+uses(PreventsSavingStacheItemsToDisk::class);
+
+beforeEach(function () {
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => '/', 'locale' => 'en'],
+    ]);
+});
 
 it('has a type of custom', function () {
     $sitemap = new SitemapBuilder('test');
@@ -28,6 +37,12 @@ it('can set and get site fluently', function () {
     expect($sitemap->site('english'))->toBe($sitemap)
         ->and($sitemap->site())->toBe('english');
 });
+
+it('throws an exception for an invalid site', function () {
+    $sitemap = new SitemapBuilder('test');
+
+    $sitemap->site('nonexistent');
+})->throws(InvalidArgumentException::class, 'Invalid site: nonexistent');
 
 it('starts with an empty url collection', function () {
     $sitemap = new SitemapBuilder('test');

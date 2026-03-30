@@ -11,7 +11,7 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 {
     use FluentlyGetsAndSets;
 
-    protected ?Sitemap $sitemap = null;
+    protected Sitemap $sitemap;
 
     abstract public function loc(): string|self;
 
@@ -25,7 +25,7 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 
     abstract public function site(): string|self;
 
-    public function sitemap(?Sitemap $sitemap = null): self|Sitemap|null
+    public function sitemap(?Sitemap $sitemap = null): self|Sitemap
     {
         return $this->fluentlyGetOrSet('sitemap')->args(func_get_args());
     }

@@ -50,13 +50,15 @@ it('returns the sites from the index', function () {
 it('returns the most recent lastmod from its urls', function () {
     Carbon::setTestNow('2025-06-15 12:00:00');
 
-    $older = new CustomSitemapUrl('https://example.com/old');
+    $sitemap = new TestSitemap;
+
+    $older = new CustomSitemapUrl($sitemap, 'https://example.com/old');
     $older->lastmod(now()->subDays(10));
 
-    $newer = new CustomSitemapUrl('https://example.com/new');
+    $newer = new CustomSitemapUrl($sitemap, 'https://example.com/new');
     $newer->lastmod(now());
 
-    $sitemap = new TestSitemap(testUrls: collect([$older, $newer]));
+    $sitemap->setTestUrls(collect([$older, $newer]));
 
     expect($sitemap->lastmod())->toBe($newer->lastmod());
 
@@ -90,9 +92,12 @@ it('responds with xml content type and noindex header', function () {
 
 class TestSitemap extends BaseSitemap
 {
-    public function __construct(
-        private ?Collection $testUrls = null,
-    ) {}
+    private Collection $testUrls;
+
+    public function __construct()
+    {
+        $this->testUrls = collect();
+    }
 
     public function type(): string
     {
@@ -104,8 +109,13 @@ class TestSitemap extends BaseSitemap
         return 'pages';
     }
 
+    public function setTestUrls(Collection $urls): void
+    {
+        $this->testUrls = $urls;
+    }
+
     public function urls(): Collection
     {
-        return $this->testUrls ?? collect();
+        return $this->testUrls;
     }
 }

@@ -34,18 +34,18 @@ class SitemapBuilder extends BaseSitemap
 
     public function site(?string $site = null): string|self
     {
-        if ($site === null) {
-            return $this->site;
-        }
+        return $this->fluentlyGetOrSet('site')
+            ->setter(function ($site) {
+                throw_unless(Site::get($site), new \InvalidArgumentException("Invalid site: {$site}"));
 
-        $this->site = $site;
-
-        return $this;
+                return $site;
+            })
+            ->args(func_get_args());
     }
 
     public function add(string $url, ?Closure $callback = null): self
     {
-        $url = new CustomSitemapUrl($url);
+        $url = new CustomSitemapUrl($this, $url);
 
         if ($callback) {
             $callback($url);
@@ -58,7 +58,7 @@ class SitemapBuilder extends BaseSitemap
 
     public function urls(): Collection
     {
-        return $this->urls->each->sitemap($this);
+        return $this->urls;
     }
 
     public function register(): void

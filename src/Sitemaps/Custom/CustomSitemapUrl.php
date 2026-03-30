@@ -2,24 +2,25 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
+use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Illuminate\Support\Carbon;
-use Statamic\Facades\Site;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class CustomSitemapUrl extends BaseSitemapUrl
 {
     use FluentlyGetsAndSets;
 
-    public function __construct(
-        protected string $loc,
-        protected ?array $alternates = null,
-        protected ?string $lastmod = null,
-        protected ?string $changefreq = null,
-        protected ?string $priority = null,
-        protected ?string $site = null,
-    ) {}
+    protected ?array $alternates = null;
+
+    protected ?string $lastmod = null;
+
+    protected ?string $changefreq = null;
+
+    protected ?string $priority = null;
+
+    public function __construct(protected Sitemap $sitemap, protected string $loc) {}
 
     public function loc(?string $loc = null): string|self
     {
@@ -78,10 +79,8 @@ class CustomSitemapUrl extends BaseSitemapUrl
             ->args(func_get_args());
     }
 
-    public function site(?string $site = null): string|self
+    public function site(): string
     {
-        return $this->fluentlyGetOrSet('site')
-            ->getter(fn () => $this->site ?? Site::default()->handle())
-            ->args(func_get_args());
+        return $this->sitemap()->site();
     }
 }

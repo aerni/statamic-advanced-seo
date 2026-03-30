@@ -28,7 +28,7 @@ abstract class CustomSitemap extends BaseSitemap
 
     public function makeUrl(string $url): CustomSitemapUrl
     {
-        return new CustomSitemapUrl($url);
+        return new CustomSitemapUrl($this, $url);
     }
 
     public static function register(): void

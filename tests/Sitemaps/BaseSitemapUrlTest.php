@@ -3,11 +3,11 @@
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Sitemaps\Custom\SitemapBuilder;
 
-it('returns null for sitemap when not set', function () {
+it('throws when accessing sitemap before it is set', function () {
     $url = new TestSitemapUrl;
 
-    expect($url->sitemap())->toBeNull();
-});
+    $url->sitemap();
+})->throws(\Error::class);
 
 it('can set and retrieve the parent sitemap', function () {
     $url = new TestSitemapUrl;

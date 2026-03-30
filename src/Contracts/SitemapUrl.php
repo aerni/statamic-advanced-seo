@@ -16,5 +16,5 @@ interface SitemapUrl
 
     public function site(): string|self;
 
-    public function sitemap(?Sitemap $sitemap = null): self|Sitemap|null;
+    public function sitemap(?Sitemap $sitemap = null): self|Sitemap;
 }
