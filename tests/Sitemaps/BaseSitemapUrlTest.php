@@ -7,7 +7,7 @@ it('throws when accessing sitemap before it is set', function () {
     $url = new TestSitemapUrl;
 
     $url->sitemap();
-})->throws(\Error::class);
+})->throws(Error::class);
 
 it('can set and retrieve the parent sitemap', function () {
     $url = new TestSitemapUrl;
