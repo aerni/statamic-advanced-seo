@@ -15,6 +15,6 @@ class SeoSetLocalizationDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('advanced-seo::messages.commit_message', [], config('statamic.git.locale'));
+        return __('advanced-seo::messages.seo_set_localization_deleted', [], config('statamic.git.locale'));
     }
 }

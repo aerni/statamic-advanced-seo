@@ -18,7 +18,10 @@ return [
     'term' => 'Begriff',
     'terms' => 'Begriffe',
 
-    'commit_message' => 'SEO-Standards gespeichert',
+    'seo_set_localization_saved' => 'SEO-Standards gespeichert',
+    'seo_set_localization_deleted' => 'SEO-Standards gelöscht',
+    'seo_set_config_saved' => 'SEO-Konfiguration gespeichert',
+    'seo_set_config_deleted' => 'SEO-Konfiguration gelöscht',
 
     'origins' => 'Ursprünge',
     'origins_instructions' => 'Wähle aus, um Werte von ausgewählten Ursprüngen zu übernehmen.',

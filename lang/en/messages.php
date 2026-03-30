@@ -18,7 +18,10 @@ return [
     'term' => 'Term',
     'terms' => 'Terms',
 
-    'commit_message' => 'SEO defaults saved',
+    'seo_set_localization_saved' => 'SEO defaults saved',
+    'seo_set_localization_deleted' => 'SEO defaults deleted',
+    'seo_set_config_saved' => 'SEO config saved',
+    'seo_set_config_deleted' => 'SEO config deleted',
 
     'origins' => 'Origins',
     'origins_instructions' => 'Choose to inherit values from selected origins.',
