@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref, useTemplateRef, computed, nextTick, getCur
 import { Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer } from '@statamic/cms/ui';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
 import { Head } from '@statamic/cms/inertia';
-import SiteSelector from '../components/SiteSelector.vue';
+import SiteSelector from '../components/ui/SiteSelector.vue';
 
 const instance = getCurrentInstance();
 const { $axios } = instance.appContext.config.globalProperties;
