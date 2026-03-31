@@ -45,6 +45,7 @@ class ContentCascade extends BaseCascade
             'locale',
             'hreflang',
             'canonical',
+            'og_url',
             'site_schema',
             'page_schema',
             'breadcrumbs',
@@ -64,6 +65,11 @@ class ContentCascade extends BaseCascade
     public function ogTitle(): string
     {
         return $this->get('og_title') ?? $this->title();
+    }
+
+    public function ogUrl(): ?string
+    {
+        return $this->model->absoluteUrl();
     }
 
     public function ogImagePreset(): array
