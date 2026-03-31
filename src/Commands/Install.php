@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
@@ -12,6 +13,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Statamic\Console\RunsInPlease;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\note;
@@ -28,6 +30,8 @@ class Install extends Command
 
     protected $description = 'Install and configure Advanced SEO';
 
+    protected bool $enableProEdition = false;
+
     protected array $selectedFeatures = [];
 
     protected ?string $screenshotDriver = null;
@@ -39,9 +43,10 @@ class Install extends Command
     public function handle(): void
     {
         $this
-            ->askFeatures()
+            ->askPro()
             ->askMigration()
             ->publishConfig()
+            ->enablePro()
             ->setupLayout()
             ->setupFeatures()
             ->runMigration();
@@ -49,7 +54,22 @@ class Install extends Command
         info('Advanced SEO has been installed successfully.');
     }
 
-    protected function askFeatures(): self
+    protected function askPro(): self
+    {
+        $this->enableProEdition = AdvancedSeo::edition() === 'pro' || confirm(
+            label: 'Would you like to enable Pro?',
+            default: false,
+            hint: 'Includes multi-site, permissions, sitemaps, AI content generation, and more.',
+        );
+
+        if ($this->enableProEdition) {
+            $this->askProFeatures();
+        }
+
+        return $this;
+    }
+
+    protected function askProFeatures(): void
     {
         $features = collect([
             [
@@ -71,7 +91,7 @@ class Install extends Command
 
         if ($features->isNotEmpty()) {
             $this->selectedFeatures = multiselect(
-                label: 'Select the features you would like to enable.',
+                label: 'Select the Pro features you would like to enable.',
                 options: $features->pluck('label', 'key'),
             );
         }
@@ -79,8 +99,6 @@ class Install extends Command
         if (in_array('social_images', $this->selectedFeatures)) {
             $this->askScreenshotDriver();
         }
-
-        return $this;
     }
 
     protected function askScreenshotDriver(): void
@@ -139,6 +157,37 @@ class Install extends Command
         $this->callSilently('vendor:publish', [
             '--tag' => 'advanced-seo-config',
         ]);
+
+        return $this;
+    }
+
+    protected function enablePro(): self
+    {
+        if (! $this->enableProEdition) {
+            return $this;
+        }
+
+        $configPath = config_path('statamic/editions.php');
+        $contents = file_get_contents($configPath);
+
+        if (Str::contains($contents, "'aerni/advanced-seo'")) {
+            $contents = preg_replace(
+                "/'aerni\/advanced-seo'\s*=>\s*'[^']*'/",
+                "'aerni/advanced-seo' => 'pro'",
+                $contents,
+            );
+        } else {
+            $contents = preg_replace(
+                "/'addons'\s*=>\s*\[\s*(?:\/\/\s*)?\n/",
+                "'addons' => [\n        'aerni/advanced-seo' => 'pro',\n",
+                $contents,
+                1,
+            );
+        }
+
+        file_put_contents($configPath, $contents);
+
+        info('Advanced SEO Pro has been enabled.');
 
         return $this;
     }
