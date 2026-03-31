@@ -18,7 +18,9 @@
 
 {{ if seo:hreflang }}
     {{ seo:hreflang }}
-        <meta property='og:locale:alternate' content="{{ locale }}" >
+        {{ unless locale == "x-default" }}
+            <meta property='og:locale:alternate' content="{{ locale }}" >
+        {{ /unless }}
     {{ /seo:hreflang }}
 {{ /if }}
 
