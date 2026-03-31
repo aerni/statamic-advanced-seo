@@ -16,13 +16,9 @@
     <meta property="og:url" content="{{ seo:og_url }}">
 {{ /if }}
 
-{{ if seo:hreflang }}
-    {{ seo:hreflang }}
-        {{ unless locale == "x-default" }}
-            <meta property='og:locale:alternate' content="{{ locale }}" >
-        {{ /unless }}
-    {{ /seo:hreflang }}
-{{ /if }}
+{{ seo:hreflang | where('locale', '!=', 'x-default') }}
+    <meta property='og:locale:alternate' content="{{ locale }}" >
+{{ /seo:hreflang }}
 
 {{ if seo:og_description }}
     <meta property="og:description" content="{{ seo:og_description }}">
