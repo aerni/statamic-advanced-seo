@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Console\Processes\Composer;
@@ -10,6 +11,10 @@ class SocialImagesGenerator extends Feature
 {
     public static function enabled(?Context $context = null): bool
     {
+        if (! AdvancedSeo::pro()) {
+            return false;
+        }
+
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
             return false;
         }

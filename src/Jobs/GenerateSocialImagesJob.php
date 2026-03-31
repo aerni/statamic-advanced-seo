@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Jobs;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -23,6 +24,10 @@ class GenerateSocialImagesJob implements ShouldQueue
 
     public function handle(): void
     {
+        if (! SocialImagesGenerator::enabled()) {
+            return;
+        }
+
         $asset = SocialImage::openGraph()
             ->for($this->content)
             ->generate();

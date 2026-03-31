@@ -88,7 +88,7 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Social Images Generator
+        | Social Images Generator (Requires Pro)
         |--------------------------------------------------------------------------
         |
         | Requires spatie/laravel-screenshot to be installed.

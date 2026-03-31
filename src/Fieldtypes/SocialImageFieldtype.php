@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
@@ -21,11 +22,14 @@ class SocialImageFieldtype extends Assets
 
     public function augment($value)
     {
-        $parent = $this->field->parent();
+        return $this->shouldGenerateSocialImage()
+            ? $this->augmentGeneratedSocialImage($value)
+            : parent::augment($value);
+    }
 
-        if (! ($parent instanceof Entry || $parent instanceof Term) || ! $parent->seo_generate_social_images) {
-            return parent::augment($value);
-        }
+    protected function augmentGeneratedSocialImage($value)
+    {
+        $parent = $this->field->parent();
 
         // Resolve the existing asset or generate a new one on demand.
         // This ensures the first request always returns an image (e.g. social platform crawlers).
@@ -42,6 +46,21 @@ class SocialImageFieldtype extends Assets
         }
 
         return $asset;
+    }
+
+    protected function shouldGenerateSocialImage(): bool
+    {
+        $parent = $this->field->parent();
+
+        if (! ($parent instanceof Entry || $parent instanceof Term)) {
+            return false;
+        }
+
+        if (! SocialImagesGenerator::enabled()) {
+            return false;
+        }
+
+        return $parent->seo_generate_social_images;
     }
 
     protected function generator(Entry|Term $content): SocialImageGenerator

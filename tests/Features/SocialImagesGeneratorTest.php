@@ -4,9 +4,11 @@ use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -31,7 +33,13 @@ afterEach(function () {
     File::deleteDirectory(resource_path('views/social_images'));
 });
 
-it('is enabled when the screenshot package is installed', function () {
+it('is disabled on the free edition', function () {
+    useFreeEdition();
+
+    expect(SocialImagesGenerator::enabled())->toBeFalse();
+});
+
+it('is enabled on the pro edition', function () {
     expect(SocialImagesGenerator::enabled())->toBeTrue();
 });
 
@@ -101,6 +109,30 @@ it('is disabled if the generator is disabled in the config', function () {
     );
 
     expect(SocialImagesGenerator::enabled($context))->toBeFalse();
+});
+
+it('prevents the make theme command on the free edition', function () {
+    useFreeEdition();
+
+    $this->artisan('seo:theme', ['name' => 'test'])
+        ->assertSuccessful();
+
+    expect(File::isDirectory(resource_path('views/social_images/test')))->toBeFalse();
+});
+
+it('prevents the generate job on the free edition', function () {
+    useFreeEdition();
+
+    $entry = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->slug('test');
+
+    $entry->saveQuietly();
+
+    GenerateSocialImagesJob::dispatchSync($entry);
+
+    expect($entry->get('seo_og_image'))->toBeNull();
 });
 
 it('shows in all contexts when enabled', function () {
