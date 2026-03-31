@@ -14,6 +14,7 @@ it('exposes all expected fields', function () {
     $this->installScreenshotPackage();
 
     config(['advanced-seo.social_images.generator.enabled' => true]);
+    config(['advanced-seo.sitemap.enabled' => true]);
 
     SocialImage::shouldReceive('themes->all')->andReturn(collect(['default']));
 

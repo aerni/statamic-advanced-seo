@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Commands;
 use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
+use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
 use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
@@ -72,6 +73,11 @@ class Install extends Command
     protected function askProFeatures(): void
     {
         $features = collect([
+            [
+                'key' => 'sitemap',
+                'label' => 'Sitemaps',
+                'enabled' => Sitemap::enabled(),
+            ],
             [
                 'key' => 'ai',
                 'label' => 'AI Content Generation',
@@ -212,6 +218,7 @@ class Install extends Command
     {
         foreach ($this->selectedFeatures as $feature) {
             match ($feature) {
+                'sitemap' => $this->setupSitemap(),
                 'ai' => $this->setupAi(),
                 'social_images' => $this->setupSocialImages(),
                 'graphql' => $this->setupGraphQl(),
@@ -219,6 +226,12 @@ class Install extends Command
         }
 
         return $this;
+    }
+
+    protected function setupSitemap(): void
+    {
+        $this->enableConfigValue('sitemap');
+        info('Sitemaps have been enabled.');
     }
 
     protected function setupAi(): void
@@ -334,6 +347,7 @@ class Install extends Command
         $config = file_get_contents($configPath);
 
         $patterns = [
+            'sitemap' => "/('sitemap'.*?'enabled'\s*=>\s*)false/s",
             'social_images' => "/('social_images'.*?'generator'.*?'enabled'\s*=>\s*)false/s",
             'ai' => "/('ai'.*?'enabled'\s*=>\s*)false/s",
             'graphql' => "/('graphql'\s*=>\s*)false/",

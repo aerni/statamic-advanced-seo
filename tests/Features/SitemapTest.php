@@ -18,6 +18,14 @@ beforeEach(function () {
     Collection::make('pages')->sites(['english'])->saveQuietly();
 });
 
+it('is disabled on the free edition', function () {
+    useFreeEdition();
+
+    config(['advanced-seo.sitemap.enabled' => true]);
+
+    expect(Sitemap::enabled())->toBeFalse();
+});
+
 it('is enabled when config is true', function () {
     config(['advanced-seo.sitemap.enabled' => true]);
 
@@ -37,6 +45,8 @@ it('is enabled when no context is provided', function () {
 });
 
 it('is enabled in config scope even when seoSet sitemap is disabled', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
+
     $context = new Context(
         parent: Collection::find('pages'),
         type: 'collections',
@@ -49,6 +59,8 @@ it('is enabled in config scope even when seoSet sitemap is disabled', function (
 });
 
 it('is disabled if the seoSet is disabled', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
+
     Seo::find('collections::pages')
         ->config()
         ->enabled(false)
@@ -66,6 +78,8 @@ it('is disabled if the seoSet is disabled', function () {
 });
 
 it('is disabled if the sitemap is disabled in the config', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
+
     Seo::find('collections::pages')
         ->config()
         ->set('sitemap', false)
@@ -83,6 +97,8 @@ it('is disabled if the sitemap is disabled in the config', function () {
 });
 
 it('shows in all contexts when enabled', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
+
     Seo::find('collections::pages')
         ->config()
         ->set('sitemap', true)

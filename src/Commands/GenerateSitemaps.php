@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Commands;
 
 use Aerni\AdvancedSeo\Facades\Domain;
+use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Jobs\GenerateSitemapsJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
@@ -26,7 +27,7 @@ class GenerateSitemaps extends Command
 
     public function handle()
     {
-        if (! config('advanced-seo.sitemap.enabled')) {
+        if (! Sitemap::enabled()) {
             return error('The sitemap feature is disabled. Enable it in config/advanced-seo.php.');
         }
 

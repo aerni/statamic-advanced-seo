@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Jobs;
 
 use Aerni\AdvancedSeo\Facades\Sitemap;
+use Aerni\AdvancedSeo\Features\Sitemap as Feature;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,6 +22,10 @@ class GenerateSitemapsJob implements ShouldQueue
 
     public function handle(): void
     {
+        if (! Feature::enabled()) {
+            return;
+        }
+
         Sitemap::generate($this->site);
     }
 }

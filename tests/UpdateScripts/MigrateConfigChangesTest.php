@@ -75,6 +75,7 @@ it('migrates origins from localizations to set configs', function () {
 });
 
 it('migrates sitemap config from site defaults to individual collections/taxonomies sets', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
     $siteDefaults = Seo::find('site::defaults');
 
     $siteDefaults->in('english')
