@@ -68,7 +68,8 @@
     "extra": {
         "statamic": {
             "name": "Advanced SEO",
-            "description": "Comprehensive SEO addon for Statamic with flexibility in mind"
+            "description": "Comprehensive SEO addon for Statamic with flexibility in mind",
+            "editions": ["free", "pro"]
         },
         "laravel": {
             "providers": [
