@@ -166,6 +166,24 @@ it('can get the localization of the default site', function () {
     expect($set->inDefaultSite()->locale())->toBe(invade($set)->defaultSite());
 });
 
+it('resolves the default localization for all sites on free edition', function () {
+    useFreeEdition();
+
+    $set = Seo::find('collections::articles');
+
+    expect($set->in('english')->locale())->toBe('english')
+        ->and($set->in('german')->locale())->toBe('english');
+});
+
+it('resolves the default localization for site defaults on free edition', function () {
+    useFreeEdition();
+
+    $set = Seo::find('site::defaults');
+
+    expect($set->in('english')->locale())->toBe('english')
+        ->and($set->in('german')->locale())->toBe('english');
+});
+
 it('can save the set', function () {
     $set = new SeoSet(
         type: 'collections',

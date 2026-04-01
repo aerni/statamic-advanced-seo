@@ -18,6 +18,7 @@ class SeoSetLocalizationController extends CpController
     public function edit(Request $request, SeoSetGroup $seoSetGroup, SeoSet $seoSet, SeoSetLocalization $localization): mixed
     {
         throw_unless($seoSet->enabled(), new NotFoundHttpException);
+        throw_unless($this->isAuthorizedSite($seoSet, $localization), new NotFoundHttpException);
 
         $this->authorize('edit', [SeoSet::class, $localization]);
 
@@ -50,7 +51,8 @@ class SeoSetLocalizationController extends CpController
             'initialLocalizedFields' => $localization->data()->keys()->all(),
             'initialEditUrl' => $localization->editUrl(),
             'configUrl' => $seoSet->config()->editUrl(),
-            'configurable' => User::current()->can('configure', [SeoSet::class, $seoSet]),
+            'configurable' => $seoSet->config()->blueprint()->fields()->all()->isNotEmpty()
+                && User::current()->can('configure', [SeoSet::class, $seoSet]),
         ];
 
         if ($request->wantsJson()) {
@@ -63,6 +65,7 @@ class SeoSetLocalizationController extends CpController
     public function update(Request $request, SeoSetGroup $seoSetGroup, SeoSet $seoSet, SeoSetLocalization $localization): void
     {
         throw_unless($seoSet->enabled(), new NotFoundHttpException);
+        throw_unless($this->isAuthorizedSite($seoSet, $localization), new NotFoundHttpException);
 
         $this->authorize('edit', [SeoSet::class, $localization]);
 
@@ -90,5 +93,11 @@ class SeoSetLocalizationController extends CpController
             ->preProcess();
 
         return [$fields->values()->all(), $fields->meta()->all()];
+    }
+
+    protected function isAuthorizedSite(SeoSet $seoSet, SeoSetLocalization $localization): bool
+    {
+        return GetAuthorizedSites::handle($seoSet)
+            ->contains(fn ($site) => $site->handle() === $localization->locale());
     }
 }

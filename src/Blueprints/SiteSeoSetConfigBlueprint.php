@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Features\MultiSite;
+
 class SiteSeoSetConfigBlueprint extends BaseBlueprint
 {
     protected function handle(): string
@@ -30,6 +32,7 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                         'display' => __('advanced-seo::messages.origins'),
                         'instructions' => __('advanced-seo::messages.origins_instructions'),
                         'default' => [],
+                        'feature' => MultiSite::class,
                     ],
                 ],
             ],

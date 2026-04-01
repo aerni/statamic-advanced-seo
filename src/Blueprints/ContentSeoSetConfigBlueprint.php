@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\MultiSite;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
@@ -66,6 +67,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                         'instructions' => __('advanced-seo::messages.origins_instructions'),
                         'default' => [],
                         'if' => ['enabled' => 'true'],
+                        'feature' => MultiSite::class,
                     ],
                 ],
             ],

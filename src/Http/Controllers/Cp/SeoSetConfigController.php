@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Statamic\CP\PublishForm;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
 
 class SeoSetConfigController extends CpController
@@ -16,6 +17,8 @@ class SeoSetConfigController extends CpController
         $this->authorize('configure', [SeoSet::class, $seoSet]);
 
         $config = $seoSet->config();
+
+        throw_unless($config->blueprint()->fields()->all()->isNotEmpty(), new NotFoundHttpException);
 
         return PublishForm::make($config->blueprint())
             ->parent($seoSet)
@@ -34,6 +37,8 @@ class SeoSetConfigController extends CpController
         $this->authorize('configure', [SeoSet::class, $seoSet]);
 
         $config = $seoSet->config();
+
+        throw_unless($config->blueprint()->fields()->all()->isNotEmpty(), new NotFoundHttpException);
 
         $values = PublishForm::make($config->blueprint())
             ->submit($request->all());

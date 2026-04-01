@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
+use Aerni\AdvancedSeo\Features\MultiSite;
 use Aerni\AdvancedSeo\Listeners\HandleSeoSetConfig;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
@@ -128,6 +129,10 @@ class SeoSet implements Arrayable, QueryableValue
 
     public function in(string $locale): ?SeoSetLocalization
     {
+        if (! MultiSite::enabled()) {
+            $locale = $this->defaultSite();
+        }
+
         return $this->localizations()->get($locale);
     }
 
