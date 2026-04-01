@@ -83,7 +83,7 @@ class SeoSetRegistry extends Registry
                 type: 'taxonomies',
                 handle: $taxonomy->handle(),
                 title: $taxonomy->title(),
-                icon: 'tags',
+                icon: 'taxonomies',
             ))
             ->sortBy(fn (SeoSet $set) => $set->handle());
     }
