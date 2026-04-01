@@ -31,7 +31,7 @@
         "nunomaduro/collision": "^8.0",
         "orchestra/testbench": "^10.0",
         "pestphp/pest": "^4.0",
-        "statamic/eloquent-driver": "dev-master"
+        "statamic/eloquent-driver": "^5.0"
     },
     "autoload": {
         "psr-4": {
