@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo;
 
-use Statamic\Facades\Addon;
 use Statamic\Licensing\LicenseManager;
 
 class AdvancedSeo
@@ -18,9 +17,11 @@ class AdvancedSeo
 
     /**
      * The configured edition of the addon.
+     * Reads config directly instead of Addon::get()->edition()
+     * so it can be called during service provider registration.
      */
     public static function edition(): string
     {
-        return Addon::get('aerni/advanced-seo')->edition();
+        return config('statamic.editions.addons.aerni/advanced-seo', 'free');
     }
 }

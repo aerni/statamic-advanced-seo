@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig as SeoSetConfigContract;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfigRepository as SeoSetConfigRepositoryContract;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as SeoSetLocalizationContract;
@@ -35,6 +36,10 @@ class SwitchToEloquent extends Command
 
     public function handle()
     {
+        if (! AdvancedSeo::pro()) {
+            return error('The Eloquent driver requires the Pro edition.');
+        }
+
         if (! Composer::isInstalled('statamic/eloquent-driver')) {
             return error('The Eloquent driver is not installed. Run `composer require statamic/eloquent-driver` first.');
         }

@@ -29,7 +29,6 @@ use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
-use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -84,13 +83,7 @@ class ServiceProvider extends AddonServiceProvider
         app()->instance('advanced-seo.tokens', collect());
         app()->instance('advanced-seo.sitemaps', collect());
 
-        $this->usesEloquentDriver() ? $this->registerEloquentDriver() : $this->registerFileDriver();
-    }
-
-    protected function usesEloquentDriver(): bool
-    {
-        return Composer::isInstalled('statamic/eloquent-driver')
-            && config('advanced-seo.driver') === 'eloquent';
+        Features\EloquentDriver::enabled() ? $this->registerEloquentDriver() : $this->registerFileDriver();
     }
 
     protected function registerEloquentDriver(): void

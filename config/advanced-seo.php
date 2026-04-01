@@ -4,10 +4,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Database Driver
+    | Database Driver (Requires Pro)
     |--------------------------------------------------------------------------
     |
     | Choose the driver for storing data. This can either be 'file' or 'eloquent'.
+    | The 'eloquent' driver requires Pro.
     |
     */
 

@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Commands;
 use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
+use Aerni\AdvancedSeo\Features\EloquentDriver;
 use Aerni\AdvancedSeo\Features\GraphQL;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
@@ -48,10 +49,9 @@ class Install extends Command
             ->askPro()
             ->askMigration()
             ->publishConfig()
-            ->enablePro()
             ->setupLayout()
-            ->setupFeatures()
-            ->runMigration();
+            ->runMigration()
+            ->setupPro();
 
         info('Advanced SEO has been installed successfully.');
     }
@@ -64,15 +64,10 @@ class Install extends Command
             hint: 'Includes multi-site, permissions, sitemaps, AI content generation, and more.',
         );
 
-        if ($this->enableProEdition) {
-            $this->askProFeatures();
+        if (! $this->enableProEdition) {
+            return $this;
         }
 
-        return $this;
-    }
-
-    protected function askProFeatures(): void
-    {
         $features = collect([
             [
                 'key' => 'sitemap',
@@ -88,6 +83,11 @@ class Install extends Command
                 'key' => 'social_images',
                 'label' => 'Social Images Generator',
                 'enabled' => SocialImagesGenerator::enabled(),
+            ],
+            [
+                'key' => 'eloquent',
+                'label' => 'Eloquent Driver',
+                'enabled' => EloquentDriver::enabled(),
             ],
             [
                 'key' => 'graphql',
@@ -106,6 +106,8 @@ class Install extends Command
         if (in_array('social_images', $this->selectedFeatures)) {
             $this->askScreenshotDriver();
         }
+
+        return $this;
     }
 
     protected function askScreenshotDriver(): void
@@ -168,12 +170,45 @@ class Install extends Command
         return $this;
     }
 
-    protected function enablePro(): self
+    protected function setupLayout(): self
+    {
+        $layout = config('statamic.system.layout', 'layout');
+
+        $antlersLayout = resource_path("views/{$layout}.antlers.html");
+        $bladeLayout = resource_path("views/{$layout}.blade.php");
+
+        match (true) {
+            file_exists($antlersLayout) => $this->injectIntoLayout($antlersLayout),
+            file_exists($bladeLayout) => $this->injectIntoLayout($bladeLayout),
+            default => warning('Could not find a layout file. Please add the SEO tags manually.'),
+        };
+
+        return $this;
+    }
+
+    protected function setupPro(): self
     {
         if (! $this->enableProEdition) {
             return $this;
         }
 
+        $this->enableProEdition();
+
+        foreach ($this->selectedFeatures as $feature) {
+            match ($feature) {
+                'sitemap' => $this->setupSitemap(),
+                'ai' => $this->setupAi(),
+                'social_images' => $this->setupSocialImages(),
+                'graphql' => $this->setupGraphQl(),
+                'eloquent' => $this->setupEloquent(),
+            };
+        }
+
+        return $this;
+    }
+
+    protected function enableProEdition(): void
+    {
         $configPath = config_path('statamic/editions.php');
         $contents = file_get_contents($configPath);
 
@@ -195,38 +230,6 @@ class Install extends Command
         file_put_contents($configPath, $contents);
 
         info('Advanced SEO Pro has been enabled.');
-
-        return $this;
-    }
-
-    protected function setupLayout(): self
-    {
-        $layout = config('statamic.system.layout', 'layout');
-
-        $antlersLayout = resource_path("views/{$layout}.antlers.html");
-        $bladeLayout = resource_path("views/{$layout}.blade.php");
-
-        match (true) {
-            file_exists($antlersLayout) => $this->injectIntoLayout($antlersLayout),
-            file_exists($bladeLayout) => $this->injectIntoLayout($bladeLayout),
-            default => warning('Could not find a layout file. Please add the SEO tags manually.'),
-        };
-
-        return $this;
-    }
-
-    protected function setupFeatures(): self
-    {
-        foreach ($this->selectedFeatures as $feature) {
-            match ($feature) {
-                'sitemap' => $this->setupSitemap(),
-                'ai' => $this->setupAi(),
-                'social_images' => $this->setupSocialImages(),
-                'graphql' => $this->setupGraphQl(),
-            };
-        }
-
-        return $this;
     }
 
     protected function setupSitemap(): void
@@ -283,6 +286,11 @@ class Install extends Command
     {
         $this->enableConfigValue('graphql');
         info('GraphQL API has been enabled.');
+    }
+
+    protected function setupEloquent(): void
+    {
+        $this->call('seo:switch-to-eloquent');
     }
 
     protected function runMigration(): self
