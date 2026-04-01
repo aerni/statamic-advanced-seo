@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Git;
@@ -75,7 +76,8 @@ class ServiceProvider extends AddonServiceProvider
             ->bootViewCascade()
             ->bootBladeDirective()
             ->bootGraphQL()
-            ->bootMigrations();
+            ->bootMigrations()
+            ->bootInertiaSharedData();
     }
 
     public function register(): void
@@ -259,6 +261,18 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../database/migrations/2026_01_13_100001_create_seo_set_localizations_table.php' => database_path('migrations/2026_01_13_100001_create_seo_set_localizations_table.php'),
             __DIR__.'/../database/migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php' => database_path('migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php'),
         ], 'advanced-seo-migrations');
+
+        return $this;
+    }
+
+    protected function bootInertiaSharedData(): self
+    {
+        Inertia::share([
+            'advancedSeo' => fn () => [
+                'promoteUpgrade' => AdvancedSeo::shouldPromoteUpgrade(),
+                'proFeatures' => AdvancedSeo::proFeatures(),
+            ],
+        ]);
 
         return $this;
     }

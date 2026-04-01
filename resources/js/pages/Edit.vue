@@ -4,6 +4,7 @@ import { Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer 
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
 import { Head } from '@statamic/cms/inertia';
 import SiteSelector from '../components/ui/SiteSelector.vue';
+import UpgradeBadge from '../components/ui/UpgradeBadge.vue';
 
 const instance = getCurrentInstance();
 const { $axios } = instance.appContext.config.globalProperties;
@@ -24,6 +25,7 @@ const props = defineProps({
     initialEditUrl: String,
     configUrl: String,
     configurable: Boolean,
+    advancedSeo: Object,
     // docs: Array,
 });
 
@@ -133,6 +135,8 @@ const refreshLocalization = () => {
 
     <div class="max-w-5xl mx-auto">
         <Header :title :icon>
+            <UpgradeBadge v-if="advancedSeo.promoteUpgrade" :class="{ 'me-3': !configurable }" />
+
             <Dropdown v-if="configurable">
 				<template #trigger>
 					<Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />

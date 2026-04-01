@@ -1,13 +1,15 @@
 <script setup>
 import { ref } from 'vue';
 import { Head, Link, router } from '@statamic/cms/inertia';
-import { Header, Icon, Listing, Badge, DropdownItem, DropdownSeparator, ConfirmationModal } from '@statamic/cms/ui';
+import { Header, Icon, Badge, Button, Listing, DropdownItem, DropdownSeparator, ConfirmationModal } from '@statamic/cms/ui';
+import UpgradeBadge from '../components/ui/UpgradeBadge.vue';
 
 const props = defineProps({
     title: String,
     icon: String,
     items: Array,
     columns: Array,
+    advancedSeo: Object,
 });
 
 const showLink = (item) => {
@@ -38,7 +40,9 @@ const cancelDisable = () => {
     <Head :title />
 
     <div class="max-w-5xl mx-auto">
-        <Header :title :icon />
+        <Header :title :icon>
+            <UpgradeBadge v-if="advancedSeo.promoteUpgrade" />
+        </Header>
 
         <Listing
             v-if="items.length"
