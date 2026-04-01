@@ -11,6 +11,7 @@ use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 
@@ -22,6 +23,12 @@ class MigrateConfigChanges
 
     public function run(): void
     {
+        /**
+         * Existing v2 users get upgraded to Pro since they paid for all features.
+         * This must happen first so that pro-gated features work during migration.
+         */
+        $this->enableProEdition();
+
         /**
          * For Eloquent users, we need to run migrations first to create the new tables
          * and migrate data from the old table before we can work with the new architecture.
@@ -44,6 +51,30 @@ class MigrateConfigChanges
         $this->migrateSitemapsConfig();
         $this->migrateSocialImagesGeneratorConfig();
         $this->saveSetsAndLocalizations();
+    }
+
+    protected function enableProEdition(): void
+    {
+        $configPath = config_path('statamic/editions.php');
+
+        if (! file_exists($configPath)) {
+            return;
+        }
+
+        $contents = file_get_contents($configPath);
+
+        if (Str::contains($contents, "'aerni/advanced-seo'")) {
+            return;
+        }
+
+        $contents = preg_replace(
+            "/'addons'\s*=>\s*\[\s*(?:\/\/\s*)?\n/",
+            "'addons' => [\n        'aerni/advanced-seo' => 'pro',\n",
+            $contents,
+            1,
+        );
+
+        file_put_contents($configPath, $contents);
     }
 
     protected function usesEloquentDriver(): bool

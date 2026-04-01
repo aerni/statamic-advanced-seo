@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\UpdateScripts\V3\MigrateConfigChanges;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\Collection;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Site;
@@ -31,6 +32,61 @@ beforeEach(function () {
 
     Taxonomy::make('tags')->sites(['english'])->saveQuietly();
     Taxonomy::make('categories')->sites(['english', 'german'])->saveQuietly();
+});
+
+it('enables the pro edition for existing v2 users', function () {
+    $configPath = config_path('statamic/editions.php');
+
+    File::ensureDirectoryExists(dirname($configPath));
+    File::put($configPath, <<<'PHP'
+<?php
+
+return [
+
+    'pro' => env('STATAMIC_PRO_ENABLED', false),
+
+    'addons' => [
+        //
+    ],
+
+];
+PHP);
+
+    runConfigMigrationScript();
+
+    $contents = File::get($configPath);
+
+    expect($contents)->toContain("'aerni/advanced-seo' => 'pro'");
+
+    File::deleteDirectory(config_path('statamic'));
+});
+
+it('does not duplicate pro edition if already set', function () {
+    $configPath = config_path('statamic/editions.php');
+
+    File::ensureDirectoryExists(dirname($configPath));
+    File::put($configPath, <<<'PHP'
+<?php
+
+return [
+
+    'pro' => env('STATAMIC_PRO_ENABLED', false),
+
+    'addons' => [
+        'aerni/advanced-seo' => 'free',
+    ],
+
+];
+PHP);
+
+    runConfigMigrationScript();
+
+    $contents = File::get($configPath);
+
+    expect($contents)->toContain("'aerni/advanced-seo' => 'free'")
+        ->and(substr_count($contents, 'aerni/advanced-seo'))->toBe(1);
+
+    File::deleteDirectory(config_path('statamic'));
 });
 
 it('deletes title from config set', function () {
