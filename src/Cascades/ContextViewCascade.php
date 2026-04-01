@@ -43,6 +43,11 @@ class ContextViewCascade extends ContentViewCascade
         };
     }
 
+    public function ogUrl(): ?string
+    {
+        return $this->model->get('current_url');
+    }
+
     protected function canonicalUrl(): string
     {
         return $this->model->get('current_url');
