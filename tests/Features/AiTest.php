@@ -9,6 +9,18 @@ beforeEach(function () {
     $this->installAiPackage();
 });
 
+it('is disabled on the free edition', function () {
+    useFreeEdition();
+
+    config([
+        'advanced-seo.ai.enabled' => true,
+        'ai.default' => 'openai',
+        'ai.providers.openai.key' => 'test-key',
+    ]);
+
+    expect(Ai::enabled())->toBeFalse();
+});
+
 it('is disabled by default', function () {
     expect(Ai::enabled())->toBeFalse();
 });

@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Context\Context;
 use Statamic\Console\Processes\Composer;
 
@@ -9,6 +10,10 @@ class Ai extends Feature
 {
     public static function enabled(?Context $context = null): bool
     {
+        if (! AdvancedSeo::pro()) {
+            return false;
+        }
+
         if (! config('advanced-seo.ai.enabled', false)) {
             return false;
         }
