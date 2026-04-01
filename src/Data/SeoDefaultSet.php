@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Data;
 
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Data\ExistsAsFile;
@@ -141,8 +142,8 @@ class SeoDefaultSet implements Contract
             $this->in($site) ?? $this->addLocalization($this->makeLocalization($site));
         });
 
-        // TODO: Need to ensure that we still get the correct default data. Do we even need this method anymore?
-        $this->localizations()->each(fn ($item) => $item->withDefaultData());
+        // Determine the origin and set the default data for each localization based on the provided sites.
+        $this->localizations()->each(fn ($item) => $item->determineOrigin($sites)->withDefaultData());
 
         return $this;
     }
@@ -224,20 +225,20 @@ class SeoDefaultSet implements Contract
 
     public function save(): self
     {
-        \Aerni\AdvancedSeo\Facades\Seo::save($this);
+        Seo::save($this);
 
         return $this;
     }
 
     public function delete(): bool
     {
-        \Aerni\AdvancedSeo\Facades\Seo::delete($this);
+        Seo::delete($this);
 
         return true;
     }
 
     public static function __callStatic($method, $parameters)
     {
-        return \Aerni\AdvancedSeo\Facades\Seo::{$method}(...$parameters);
+        return Seo::{$method}(...$parameters);
     }
 }

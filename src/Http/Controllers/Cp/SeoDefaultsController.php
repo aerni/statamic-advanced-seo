@@ -101,7 +101,6 @@ class SeoDefaultsController extends CpController
             'initialLocalizedFields' => $localization->data()->keys()->all(),
             'readOnly' => User::current()->cant('edit', [SeoVariables::class, $set]),
             'action' => $localization->updateUrl(),
-            'configureUrl' => $localization->configureUrl(),
         ];
 
         if ($request->wantsJson()) {

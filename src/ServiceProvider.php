@@ -3,6 +3,8 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Data\SeoVariables;
+use Aerni\AdvancedSeo\Eloquent\SeoDefaultModel;
+use Aerni\AdvancedSeo\Eloquent\SeoDefaultsRepository;
 use Aerni\AdvancedSeo\GraphQL\Fields\SeoField;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoDefaultsQuery;
 use Aerni\AdvancedSeo\GraphQL\Queries\SeoMetaQuery;
@@ -90,9 +92,9 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function registerEloquentDriver(): void
     {
-        Statamic::repository(Contracts\SeoDefaultsRepository::class, \Aerni\AdvancedSeo\Eloquent\SeoDefaultsRepository::class);
+        Statamic::repository(Contracts\SeoDefaultsRepository::class, SeoDefaultsRepository::class);
 
-        $this->app->bind('advanced_seo.model', \Aerni\AdvancedSeo\Eloquent\SeoDefaultModel::class);
+        $this->app->bind('advanced_seo.model', SeoDefaultModel::class);
     }
 
     protected function registerFileDriver(): void
