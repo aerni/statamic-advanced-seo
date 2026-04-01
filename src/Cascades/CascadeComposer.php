@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Cascades;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -82,7 +83,8 @@ class CascadeComposer
         }
 
         // Don't process the cascade for any custom route that doesn't explicitly want to use Advanced SEO.
-        if (Helpers::isCustomRoute() && ! $context->bool('seo_enabled')) {
+        // Custom route SEO requires the Pro edition.
+        if (Helpers::isCustomRoute() && (! AdvancedSeo::pro() || ! $context->bool('seo_enabled'))) {
             return false;
         }
 
