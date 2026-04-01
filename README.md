@@ -1,34 +1,39 @@
-![Statamic](https://flat.badgen.net/badge/Statamic/4.0+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
+![Statamic](https://flat.badgen.net/badge/Statamic/6.0+/FF269E) ![Packagist version](https://flat.badgen.net/packagist/v/aerni/advanced-seo/latest) ![Packagist Total Downloads](https://flat.badgen.net/packagist/dt/aerni/advanced-seo)
 
 # Advanced SEO
-Advanced SEO is a comprehensive solution providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project’s needs.
+Advanced SEO is a comprehensive SEO addon for Statamic, providing you with all the tools you need to step up your SEO game. It was designed with the focus on a top-notch user experience, multi-site support, and flexibility, letting you tailor its features to your project’s needs.
 
-[Read the documentation](https://advanced-seo.michaelaerni.ch) to learn how to install, setup and use Advanced SEO.
+Version 3 introduces a free edition covering essential meta tags and a polished control panel experience, and a Pro edition for advanced needs like sitemaps, multi-site, eloquent driver, AI content generation, and more.
 
-## What's new in version 2.0
-- Extensive GraphQL support
-- Support for variables in any `text`, `textarea`, and `code` field
-- Ability to customize the SEO fields in the blueprint of your entries and terms
-- Ability to use Advanced SEO with any custom `Statamic::route()` and `Route::get()`
-- New action to generate the social images from the entries listing view
-- All the data is now available in Antlers in the `seo` array
+[Read the documentation](https://advanced-seo.michaelaerni.ch) to learn how to install, set up, and use Advanced SEO.
 
-## Features
+## Free
+Everything you need for solid on-page SEO. Compose titles and descriptions using dynamic tokens pulled from your content fields, preview how they look in search results and social media, and reset any value back to its inherited default. The most polished SEO editing experience available for Statamic.
+
+- Intuitive editing with dynamic token inputs and reset-to-default
+- Live-updating search & social previews
+- Complete meta tag output (Open Graph, hreflang, canonical, JSON-LD, and more)
+- Global site defaults (site name, trackers, verification, and more)
+- Collection & taxonomy defaults inherited by entries and terms
+- Git integration
+- Migration from SEO Pro & Aardvark SEO
+
+## Pro
+Unlock the full potential of Advanced SEO. Includes sitemaps, social images, AI content generation, multi-site support, granular permissions, and more.
+
+- Every feature from the Free edition
+- Sitemaps
 - Multi-site support
-- Site, collection & taxonomy defaults
-- Excellent user experience leveraging a custom fieldtype
+- AI content generation
 - Social images generator
-- Sitemaps for collections & taxonomies
-- Sitemaps for custom routes
-- Customizable On-Page SEO blueprint
-- GraphQL support
-- Fine-grained user permissions
-- Metadata for custom routes
-- Migration command for SEO Pro and Aardvark SEO
-- Support for Statamic’s git integration
+- Granular permissions
+- SEO for custom routes
+- Custom tokens for title & description inputs
+- GraphQL API
+- Eloquent driver
 
 ## License
-Advanced SEO is paid software with an open-source codebase. If you want to use it in production, you’ll need to [buy a license from the Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
+Advanced SEO is available in two editions. The **Free** edition can be used without a license. The **Pro** edition requires a [license from the Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
 
 ## Credits
 Developed by [Michael Aerni](https://www.michaelaerni.ch)
