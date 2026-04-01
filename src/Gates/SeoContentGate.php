@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Gates;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\User as UserFacade;
 
@@ -12,6 +13,10 @@ class SeoContentGate
      */
     public function editContent(User $user): bool
     {
+        if (! AdvancedSeo::pro()) {
+            return true;
+        }
+
         $user = UserFacade::fromUser($user);
 
         if ($user->isSuper()) {

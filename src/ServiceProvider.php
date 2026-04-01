@@ -161,6 +161,10 @@ class ServiceProvider extends AddonServiceProvider
     {
         Gate::define('seo.edit-content', [SeoContentGate::class, 'editContent']);
 
+        if (! AdvancedSeo::pro()) {
+            return $this;
+        }
+
         Permission::extend(function () {
             Permission::group('advanced-seo', 'Advanced SEO', function () {
                 Permission::register('configure seo', function ($permission) {

@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
@@ -15,6 +16,10 @@ class SeoSetPolicy
 
     public function before(User $user)
     {
+        if (! AdvancedSeo::pro()) {
+            return true;
+        }
+
         $user = UserFacade::fromUser($user);
 
         if ($user->isSuper()) {
