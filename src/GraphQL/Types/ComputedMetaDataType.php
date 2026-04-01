@@ -21,66 +21,66 @@ class ComputedMetaDataType extends Type
     {
         return [
             'site_name' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'title' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'og_image' => [
-                'type' => GraphQl::type(AssetInterface::NAME),
+                'type' => GraphQL::type(AssetInterface::NAME),
                 'resolve' => $this->resolver(),
             ],
             'og_image_preset' => [
-                'type' => GraphQl::type(SocialImagePresetType::NAME),
+                'type' => GraphQL::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
             'og_title' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'twitter_image' => [
-                'type' => GraphQl::type(AssetInterface::NAME),
+                'type' => GraphQL::type(AssetInterface::NAME),
                 'resolve' => $this->resolver(),
             ],
             'twitter_image_preset' => [
-                'type' => GraphQl::type(SocialImagePresetType::NAME),
+                'type' => GraphQL::type(SocialImagePresetType::NAME),
                 'resolve' => $this->resolver(),
             ],
             'twitter_title' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'twitter_handle' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'indexing' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'locale' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => $this->resolver(),
             ],
             'hreflang' => [
-                'type' => GraphQl::listOf(GraphQL::type(HreflangType::NAME)),
+                'type' => GraphQL::listOf(GraphQL::type(HreflangType::NAME)),
                 'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],
             'canonical' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],
             'site_schema' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],
             'breadcrumbs' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'args' => $this->args(),
                 'resolve' => $this->resolver(),
             ],

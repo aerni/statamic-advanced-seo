@@ -2,6 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Models;
 
+use Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint;
+use Aerni\AdvancedSeo\Blueprints\GeneralBlueprint;
+use Aerni\AdvancedSeo\Blueprints\IndexingBlueprint;
+use Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -21,7 +27,7 @@ class Defaults extends Model
                 'type' => 'site',
                 'handle' => 'general',
                 'title' => 'General',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\GeneralBlueprint::class,
+                'blueprint' => GeneralBlueprint::class,
                 'data' => __DIR__.'/../../content/general.yaml',
                 'enabled' => true,
                 'icon' => 'utilities',
@@ -33,7 +39,7 @@ class Defaults extends Model
                 'type' => 'site',
                 'handle' => 'indexing',
                 'title' => 'Indexing',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\IndexingBlueprint::class,
+                'blueprint' => IndexingBlueprint::class,
                 'data' => __DIR__.'/../../content/indexing.yaml',
                 'enabled' => true,
                 'icon' => 'hierarchy',
@@ -45,7 +51,7 @@ class Defaults extends Model
                 'type' => 'site',
                 'handle' => 'social_media',
                 'title' => 'Social Media',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\SocialMediaBlueprint::class,
+                'blueprint' => SocialMediaBlueprint::class,
                 'data' => __DIR__.'/../../content/social_media.yaml',
                 'enabled' => true,
                 'icon' => 'assets',
@@ -57,7 +63,7 @@ class Defaults extends Model
                 'type' => 'site',
                 'handle' => 'analytics',
                 'title' => 'Analytics',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\AnalyticsBlueprint::class,
+                'blueprint' => AnalyticsBlueprint::class,
                 'data' => __DIR__.'/../../content/analytics.yaml',
                 'enabled' => collect(config('advanced-seo.analytics'))->reject(fn ($value, $key) => $key === 'environments')->filter()->isNotEmpty(),
                 'icon' => 'money-graph-bar-increase',
@@ -69,7 +75,7 @@ class Defaults extends Model
                 'type' => 'site',
                 'handle' => 'favicons',
                 'title' => 'Favicons',
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\FaviconsBlueprint::class,
+                'blueprint' => FaviconsBlueprint::class,
                 'data' => __DIR__.'/../../content/favicons.yaml',
                 'enabled' => config('advanced-seo.favicons.enabled', false),
                 'icon' => 'edit-paint-palette',
@@ -84,7 +90,7 @@ class Defaults extends Model
                 'type' => 'collections',
                 'handle' => $collection->handle(),
                 'title' => $collection->title(),
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
+                'blueprint' => ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($collection->handle(), config('advanced-seo.disabled.collections', [])),
                 'icon' => 'collections',
@@ -99,7 +105,7 @@ class Defaults extends Model
                 'type' => 'taxonomies',
                 'handle' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
-                'blueprint' => \Aerni\AdvancedSeo\Blueprints\ContentDefaultsBlueprint::class,
+                'blueprint' => ContentDefaultsBlueprint::class,
                 'data' => __DIR__.'/../../content/content.yaml',
                 'enabled' => ! in_array($taxonomy->handle(), config('advanced-seo.disabled.taxonomies', [])),
                 'icon' => 'taxonomies',

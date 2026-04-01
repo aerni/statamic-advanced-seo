@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Support;
 
 use Illuminate\Support\Str;
+use WhiteCube\Lingua\Service;
 
 class Helpers
 {
@@ -10,7 +11,7 @@ class Helpers
     {
         $parsed = preg_replace('/\.utf8/i', '', $locale);
 
-        return \WhiteCube\Lingua\Service::create($parsed)->toW3C();
+        return Service::create($parsed)->toW3C();
     }
 
     public static function isAddonCpRoute(): bool

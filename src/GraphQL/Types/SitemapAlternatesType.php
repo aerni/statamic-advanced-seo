@@ -17,11 +17,11 @@ class SitemapAlternatesType extends Type
     {
         return [
             'href' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => fn (array $alternate) => $alternate['href'],
             ],
             'hreflang' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => fn (array $alternate) => $alternate['hreflang'],
             ],
         ];

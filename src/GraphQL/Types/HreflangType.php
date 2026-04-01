@@ -17,11 +17,11 @@ class HreflangType extends Type
     {
         return [
             'url' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => fn (array $hreflang) => $hreflang['url'],
             ],
             'locale' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => fn (array $hreflang) => $hreflang['locale'],
             ],
         ];

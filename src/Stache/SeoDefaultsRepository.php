@@ -67,7 +67,7 @@ class SeoDefaultsRepository implements Contract
     public static function bindings(): array
     {
         return [
-            \Aerni\AdvancedSeo\Contracts\SeoDefaultSet::class => \Aerni\AdvancedSeo\Data\SeoDefaultSet::class,
+            SeoDefaultSet::class => \Aerni\AdvancedSeo\Data\SeoDefaultSet::class,
         ];
     }
 }

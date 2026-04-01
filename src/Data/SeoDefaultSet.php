@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Data;
 
 use Aerni\AdvancedSeo\Concerns\HasDefaultsData;
 use Aerni\AdvancedSeo\Contracts\SeoDefaultSet as Contract;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Models\Defaults;
 use Illuminate\Support\Collection;
 use Statamic\Data\ExistsAsFile;
@@ -224,20 +225,20 @@ class SeoDefaultSet implements Contract
 
     public function save(): self
     {
-        \Aerni\AdvancedSeo\Facades\Seo::save($this);
+        Seo::save($this);
 
         return $this;
     }
 
     public function delete(): bool
     {
-        \Aerni\AdvancedSeo\Facades\Seo::delete($this);
+        Seo::delete($this);
 
         return true;
     }
 
     public static function __callStatic($method, $parameters)
     {
-        return \Aerni\AdvancedSeo\Facades\Seo::{$method}(...$parameters);
+        return Seo::{$method}(...$parameters);
     }
 }

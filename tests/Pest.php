@@ -1,5 +1,7 @@
 <?php
 
+use Aerni\AdvancedSeo\Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +13,7 @@
 |
 */
 
-uses(Aerni\AdvancedSeo\Tests\TestCase::class)->in('.');
+uses(TestCase::class)->in('.');
 
 /*
 |--------------------------------------------------------------------------

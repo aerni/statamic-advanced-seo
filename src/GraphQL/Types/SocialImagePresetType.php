@@ -17,11 +17,11 @@ class SocialImagePresetType extends Type
     {
         return [
             'width' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => fn (array $preset) => $preset['width'],
             ],
             'height' => [
-                'type' => GraphQl::string(),
+                'type' => GraphQL::string(),
                 'resolve' => fn (array $preset) => $preset['height'],
             ],
         ];
