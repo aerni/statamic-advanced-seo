@@ -228,7 +228,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootGraphQL(): self
     {
-        if (config('statamic.graphql.enabled') && config('advanced-seo.graphql')) {
+        if (Features\GraphQL::enabled()) {
             GraphQL::addQuery(SeoSetQuery::class);
             GraphQL::addQuery(SeoMetaQuery::class);
             GraphQL::addQuery(SeoSitemapsQuery::class);

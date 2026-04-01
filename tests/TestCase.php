@@ -7,7 +7,7 @@ use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
-use Statamic\Facades\Addon;
+use Statamic\Addons\Manifest;
 use Statamic\GraphQL\TypeRegistrar;
 use Statamic\Testing\AddonTestCase;
 
@@ -16,6 +16,15 @@ abstract class TestCase extends AddonTestCase
     use FakesComposerLock;
 
     protected string $addonServiceProvider = ServiceProvider::class;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $manifest = $app->make(Manifest::class)->manifest;
+        $manifest['aerni/advanced-seo']['editions'] = ['free', 'pro'];
+        $app->make(Manifest::class)->manifest = $manifest;
+    }
 
     protected function resolveApplicationConfiguration($app)
     {
@@ -53,8 +62,6 @@ abstract class TestCase extends AddonTestCase
             : $this->uninstallPackages();
 
         parent::setUp();
-
-        Addon::get('aerni/advanced-seo')->editions(['free', 'pro']);
 
         if ($this->usesGraphQL()) {
             app(TypeRegistrar::class)->register();

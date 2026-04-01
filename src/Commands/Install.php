@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Commands;
 use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
+use Aerni\AdvancedSeo\Features\GraphQL;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
@@ -91,7 +92,7 @@ class Install extends Command
             [
                 'key' => 'graphql',
                 'label' => 'GraphQL API',
-                'enabled' => config('advanced-seo.graphql', false),
+                'enabled' => GraphQL::enabled(),
             ],
         ])->reject(fn ($feature) => $feature['enabled']);
 
