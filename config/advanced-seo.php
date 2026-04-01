@@ -301,7 +301,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Tokens
+    | Tokens (Requires Pro)
     |--------------------------------------------------------------------------
     |
     | Register custom token normalizers for fieldtypes not covered by

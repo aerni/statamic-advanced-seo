@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Registries;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Tokens\Normalizers\BardTokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\Normalizers\MarkdownTokenNormalizer;
 use Aerni\AdvancedSeo\Tokens\Normalizers\TextareaTokenNormalizer;
@@ -39,8 +40,8 @@ class TokenRegistry extends Registry
             UsersTokenNormalizer::class,
             SeparatorToken::class,
             SiteNameToken::class,
-            ...config('advanced-seo.tokens', []),
-            ...app('advanced-seo.tokens'),
+            ...(AdvancedSeo::pro() ? config('advanced-seo.tokens', []) : []),
+            ...(AdvancedSeo::pro() ? app('advanced-seo.tokens')->all() : []),
         ])
             ->filter(fn (mixed $class) => is_subclass_of($class, TokenNormalizer::class) || is_subclass_of($class, ValueToken::class))
             ->map(fn (string $class) => app($class))
