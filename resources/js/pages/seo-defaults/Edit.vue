@@ -1,10 +1,9 @@
 <script setup>
 import { onMounted, onUnmounted, ref, useTemplateRef, computed, nextTick, getCurrentInstance } from 'vue';
-import { DocsCallout, Header, Dropdown, DropdownMenu, DropdownItem, Button, PublishContainer } from '@statamic/cms/ui';
+import { DocsCallout, Header, Button, PublishContainer } from '@statamic/cms/ui';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } from '@statamic/cms/save-pipeline';
 import { Head } from '@statamic/cms/inertia';
 import SiteSelector from '../../components/SiteSelector.vue';
-import ConfigureModal from '../../components/ConfigureModal.vue';
 
 const instance = getCurrentInstance();
 const { $axios } = instance.appContext.config.globalProperties;
@@ -23,7 +22,6 @@ const props = defineProps({
 	initialOriginMeta: Object,
     initialSite: String,
     action: String,
-    configureUrl: String,
     readOnly: Boolean,
 });
 
@@ -42,7 +40,6 @@ const site = ref(props.initialSite);
 const syncFieldConfirmationText = ref(__('messages.sync_entry_field_confirmation_text'));
 const pendingLocalization = ref(null);
 const saving = ref(false);
-const configureModalOpen = ref(false);
 
 function save() {
 	new Pipeline()
@@ -133,15 +130,6 @@ const refreshLocalization = () => {
 
     <div class="max-w-5xl mx-auto">
         <Header :title :icon>
-            <Dropdown v-if="!props.readOnly && showLocalizationSelector">
-				<template #trigger>
-					<Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
-				</template>
-				<DropdownMenu>
-					<DropdownItem :text="__('Configure')" icon="cog" @click="configureModalOpen = true" />
-				</DropdownMenu>
-			</Dropdown>
-
             <SiteSelector
 				v-if="showLocalizationSelector"
 				:sites="localizations"
@@ -168,13 +156,6 @@ const refreshLocalization = () => {
             :track-dirty-state="true"
             :read-only
         />
-
-        <ConfigureModal
-			v-if="configureModalOpen"
-			:route="configureUrl"
-			@saved="refreshLocalization"
-			@closed="configureModalOpen = false"
-		/>
 
         <confirmation-modal
 			v-if="pendingLocalization"

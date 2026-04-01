@@ -96,15 +96,6 @@ class SeoVariables implements Augmentable, Localization
         ][$this->type()];
     }
 
-    public function configureUrl()
-    {
-        return [
-            'site' => $this->cpUrl('advanced-seo.site.configure.edit'),
-            'collections' => $this->cpUrl('advanced-seo.collections.configure.edit'),
-            'taxonomies' => $this->cpUrl('advanced-seo.taxonomies.configure.edit'),
-        ][$this->type()];
-    }
-
     protected function cpUrl($route)
     {
         $params = [$this->handle()];
@@ -207,6 +198,21 @@ class SeoVariables implements Augmentable, Localization
         return $this->seoSet()
             ->defaultsData($this->defaultsData())
             ->blueprint();
+    }
+
+    public function determineOrigin(Collection $sites): self
+    {
+        $defaultSite = Site::default()->handle();
+
+        $origin = $sites->contains($defaultSite)
+            ? $defaultSite
+            : $sites->first();
+
+        $this->locale === $origin
+            ? $this->origin(null)
+            : $this->origin($origin);
+
+        return $this;
     }
 
     protected function getOriginByString($origin)
