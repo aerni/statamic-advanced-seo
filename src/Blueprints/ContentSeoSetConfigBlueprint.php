@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\MultiSite;
+use Aerni\AdvancedSeo\Features\Pro;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
@@ -48,6 +49,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('config_editable.instructions'),
                         'default' => true,
                         'if' => ['enabled' => 'true'],
+                        'feature' => Pro::class,
                     ],
                 ],
             ],
