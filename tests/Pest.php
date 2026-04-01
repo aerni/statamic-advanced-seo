@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Tests\TestCase;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
-use Statamic\Licensing\LicenseManager;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,10 +56,6 @@ function flushBlink(): void
 function useFreeEdition(): void
 {
     config(['statamic.editions.addons.aerni/advanced-seo' => 'free']);
-
-    test()->mock(LicenseManager::class)
-        ->shouldReceive('isOnTestDomain')
-        ->andReturn(false);
 }
 
 function clearStache(): void

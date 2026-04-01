@@ -8,14 +8,12 @@ use Statamic\Licensing\LicenseManager;
 class AdvancedSeo
 {
     /**
-     * Whether pro features should be available.
-     * Returns true if the addon is on the pro edition,
-     * or if the site is running on a test/local domain (trial mode).
+     * Whether the addon is running the pro edition.
      */
     public static function pro(): bool
     {
-        return static::edition() === 'pro'
-            || app(LicenseManager::class)->isOnTestDomain();
+        return static::edition() === 'pro';
+    }
     }
 
     /**
