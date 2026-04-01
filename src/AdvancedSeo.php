@@ -13,7 +13,6 @@ class AdvancedSeo
     {
         return static::edition() === 'pro';
     }
-    }
 
     /**
      * The configured edition of the addon.
