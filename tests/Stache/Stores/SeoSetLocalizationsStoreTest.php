@@ -62,6 +62,33 @@ it('filters yaml files two levels deep', function (): void {
         ->and(tempPath('collections/english/nested/ignore.yaml'))->toBeFile();
 });
 
+it('filters out unknown types', function (): void {
+    $this->files->ensureDirectoryExists(tempPath('collections/english'));
+    $this->files->ensureDirectoryExists(tempPath('unknown/english'));
+    $this->files->put(tempPath('collections/english/articles.yaml'), '');
+    $this->files->put(tempPath('unknown/english/articles.yaml'), '');
+
+    $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+    expect($files->keys()->all())->toMatchArray([
+        tempPath('collections/english/articles.yaml'),
+    ]);
+});
+
+it('filters out old site set handles', function (): void {
+    $this->files->ensureDirectoryExists(tempPath('site/english'));
+    $this->files->put(tempPath('site/english/defaults.yaml'), '');
+    $this->files->put(tempPath('site/english/general.yaml'), '');
+    $this->files->put(tempPath('site/english/indexing.yaml'), '');
+    $this->files->put(tempPath('site/english/analytics.yaml'), '');
+
+    $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+    expect($files->keys()->all())->toMatchArray([
+        tempPath('site/english/defaults.yaml'),
+    ]);
+});
+
 it('creates localization from file data', function (): void {
     $path = tempPath('collections/english/articles.yaml');
 

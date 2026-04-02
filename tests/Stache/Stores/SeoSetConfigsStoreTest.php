@@ -61,6 +61,33 @@ it('filters yaml files one level deep', function (): void {
         ->and(tempPath('collections/en/ignored.yaml'))->toBeFile();
 });
 
+it('filters out unknown types', function (): void {
+    $this->files->ensureDirectoryExists(tempPath('collections'));
+    $this->files->ensureDirectoryExists(tempPath('unknown'));
+    $this->files->put(tempPath('collections/articles.yaml'), '');
+    $this->files->put(tempPath('unknown/articles.yaml'), '');
+
+    $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+    expect($files->keys()->all())->toMatchArray([
+        tempPath('collections/articles.yaml'),
+    ]);
+});
+
+it('filters out old site set handles', function (): void {
+    $this->files->ensureDirectoryExists(tempPath('site'));
+    $this->files->put(tempPath('site/defaults.yaml'), '');
+    $this->files->put(tempPath('site/general.yaml'), '');
+    $this->files->put(tempPath('site/indexing.yaml'), '');
+    $this->files->put(tempPath('site/analytics.yaml'), '');
+
+    $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+    expect($files->keys()->all())->toMatchArray([
+        tempPath('site/defaults.yaml'),
+    ]);
+});
+
 it('makes SeoSetConfig instances from file', function (): void {
     $path = tempPath('collections/articles.yaml');
 

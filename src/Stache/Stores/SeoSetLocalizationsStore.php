@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Stache\Stores;
 
+use Aerni\AdvancedSeo\Concerns\ParsesSeoSetPath;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Statamic\Facades\Path;
@@ -12,6 +13,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class SeoSetLocalizationsStore extends BasicStore
 {
+    use ParsesSeoSetPath;
+
     public function key(): string
     {
         return 'seo-set-localizations';
@@ -21,15 +24,20 @@ class SeoSetLocalizationsStore extends BasicStore
     {
         $filename = Path::tidy($file->getRelativePathname());
 
-        return substr_count($filename, '/') === 2
-            && $file->getExtension() === 'yaml';
+        if ($file->getExtension() !== 'yaml') {
+            return false;
+        }
+
+        if (substr_count($filename, '/') !== 2) {
+            return false;
+        }
+
+        return $this->isValidSeoSet($filename);
     }
 
     public function makeItemFromFile($path, $contents): SeoSetLocalization
     {
-        $relative = Str::after($path, $this->directory());
-        [$type, $locale] = explode('/', $relative);
-        $handle = pathinfo($path, PATHINFO_FILENAME);
+        ['type' => $type, 'locale' => $locale, 'handle' => $handle] = $this->parseRelativePath(Str::after($path, $this->directory()));
 
         return SeoLocalization::make()
             ->initialPath($path)

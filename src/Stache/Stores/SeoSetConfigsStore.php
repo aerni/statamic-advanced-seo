@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Stache\Stores;
 
+use Aerni\AdvancedSeo\Concerns\ParsesSeoSetPath;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Statamic\Facades\Path;
@@ -13,6 +14,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class SeoSetConfigsStore extends BasicStore
 {
+    use ParsesSeoSetPath;
+
     public function key(): string
     {
         return 'seo-set-configs';
@@ -22,15 +25,20 @@ class SeoSetConfigsStore extends BasicStore
     {
         $filename = Path::tidy($file->getRelativePathname());
 
-        return substr_count($filename, '/') === 1
-            && $file->getExtension() === 'yaml';
+        if ($file->getExtension() !== 'yaml') {
+            return false;
+        }
+
+        if (substr_count($filename, '/') !== 1) {
+            return false;
+        }
+
+        return $this->isValidSeoSet($filename);
     }
 
     public function makeItemFromFile($path, $contents): SeoSetConfig
     {
-        $relative = Str::after($path, $this->directory());
-        [$type] = explode('/', $relative);
-        $handle = pathinfo($path, PATHINFO_FILENAME);
+        ['type' => $type, 'handle' => $handle] = $this->parseRelativePath(Str::after($path, $this->directory()));
 
         $data = YAML::file($path)->parse();
 
