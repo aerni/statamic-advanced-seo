@@ -15,6 +15,10 @@ class JsonLdFieldtype extends Code
 
     public function augment($value)
     {
-        return parent::augment(Token::parse($value, $this->field));
+        $value = is_array($value) ? $value['code'] : $value;
+
+        $parsed = Token::parse($value, $this->field);
+
+        return parent::augment($parsed);
     }
 }
