@@ -35,6 +35,9 @@ return [
     'social_image_generates_on_first_save' => 'The image generates on first save.',
     'from_domain' => 'From :domain',
 
+    'overridden_by_site_defaults_badge' => 'Overridden',
+    'overridden_by_site_defaults_tooltip' => 'This value is overridden by site defaults and won\'t take effect until the site default is removed.',
+
     'ai_generate' => 'Generate with AI',
     'ai_insufficient_content' => 'Add at least :characters more characters of content to generate with AI.',
     'ai_generation_failed' => 'AI generation failed. Please try again.',

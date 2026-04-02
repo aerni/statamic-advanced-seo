@@ -35,6 +35,9 @@ return [
     'social_image_generates_on_first_save' => 'Das Bild wird beim ersten Speichern generiert.',
     'from_domain' => 'Von :domain',
 
+    'overridden_by_site_defaults_badge' => 'Überschrieben',
+    'overridden_by_site_defaults_tooltip' => 'Dieser Wert wird von den Website-Standards überschrieben und wird erst wirksam, wenn der Website-Standardwert entfernt wird.',
+
     'ai_generate' => 'Mit KI generieren',
     'ai_insufficient_content' => 'Füge mindestens :characters weitere Zeichen hinzu, um mit KI zu generieren.',
     'ai_generation_failed' => 'KI-Generierung fehlgeschlagen. Bitte versuche es erneut.',

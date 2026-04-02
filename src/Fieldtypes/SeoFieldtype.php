@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Actions\GetSiteDefaults;
 use Aerni\AdvancedSeo\Cascades\SeoFieldtypeCascade;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Support\Helpers;
@@ -33,6 +34,7 @@ class SeoFieldtype extends Fieldtype
             'defaultMeta' => $this->childDefaultMeta(),
             'originDefaultValue' => $this->originDefaultValue(),
             'isTextBasedField' => $this->isTextBasedField(),
+            'isOverriddenBySiteDefaults' => $this->isOverriddenBySiteDefaults(),
         ];
     }
 
@@ -244,5 +246,22 @@ class SeoFieldtype extends Fieldtype
             ($value instanceof Arrayable) => $value->value(),
             default => $value,
         };
+    }
+
+    protected function isOverriddenBySiteDefaults(): bool
+    {
+        $key = Str::remove('seo_', $this->field->handle());
+
+        if (! in_array($key, ['noindex', 'nofollow'])) {
+            return false;
+        }
+
+        $context = Context::from($this->field->parent());
+
+        if (! $context?->isContent()) {
+            return false;
+        }
+
+        return (bool) GetSiteDefaults::handle($this->field->parent())->get($key)?->value();
     }
 }
