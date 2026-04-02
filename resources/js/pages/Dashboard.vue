@@ -39,12 +39,14 @@ useArchitecturalBackground();
                     class="mt-0.5 text-xs text-gray-600 dark:text-gray-300"
                     v-html="__('advanced-seo::messages.pro_features_instructions')"
                 />
-                <div class="mt-5 flex flex-wrap items-center justify-center gap-1.5">
+                <div class="mt-5 flex flex-wrap items-center justify-center gap-1.5 select-none">
                     <Badge
                         v-for="feature in advancedSeo.proFeatures"
                         :key="feature.title"
                         :icon="feature.icon"
                         :text="feature.title"
+                        :href="feature.url"
+                        target="_blank"
                         color="white"
                     />
                 </div>

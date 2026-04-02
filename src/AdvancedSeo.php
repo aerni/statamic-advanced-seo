@@ -28,16 +28,18 @@ class AdvancedSeo
      */
     public static function proFeatures(): array
     {
+        $docs = 'https://advanced-seo.michaelaerni.ch';
+
         return [
-            ['title' => __('advanced-seo::messages.pro_feature_sitemaps'), 'icon' => 'hierarchy'],
+            ['title' => __('advanced-seo::messages.pro_feature_sitemaps'), 'icon' => 'hierarchy', 'url' => "$docs/usage/sitemaps"],
             ['title' => __('advanced-seo::messages.pro_feature_multi_site'), 'icon' => 'earth'],
-            ['title' => __('advanced-seo::messages.pro_feature_ai'), 'icon' => 'ai-spark'],
-            ['title' => __('advanced-seo::messages.pro_feature_social_images'), 'icon' => 'media-image-picture-gallery'],
-            ['title' => __('advanced-seo::messages.pro_feature_permissions'), 'icon' => 'permissions'],
-            ['title' => __('advanced-seo::messages.pro_feature_custom_routes'), 'icon' => 'arrow-roadmap-path-flow'],
-            ['title' => __('advanced-seo::messages.pro_feature_custom_tokens'), 'icon' => 'programming-script-code-brackets'],
-            ['title' => __('advanced-seo::messages.pro_feature_graphql'), 'icon' => 'graphql'],
-            ['title' => __('advanced-seo::messages.pro_feature_eloquent'), 'icon' => 'fieldtype-grid'],
+            ['title' => __('advanced-seo::messages.pro_feature_ai'), 'icon' => 'ai-spark', 'url' => "$docs/usage/on-page-seo#ai-content-generation"],
+            ['title' => __('advanced-seo::messages.pro_feature_social_images'), 'icon' => 'media-image-picture-gallery', 'url' => "$docs/usage/social-images-generator"],
+            ['title' => __('advanced-seo::messages.pro_feature_permissions'), 'icon' => 'permissions', 'url' => "$docs/usage/permissions"],
+            ['title' => __('advanced-seo::messages.pro_feature_custom_routes'), 'icon' => 'arrow-roadmap-path-flow', 'url' => "$docs/extending/custom-routes"],
+            ['title' => __('advanced-seo::messages.pro_feature_custom_tokens'), 'icon' => 'programming-script-code-brackets', 'url' => "$docs/extending/tokens"],
+            ['title' => __('advanced-seo::messages.pro_feature_graphql'), 'icon' => 'graphql', 'url' => "$docs/reference/graphql"],
+            ['title' => __('advanced-seo::messages.pro_feature_eloquent'), 'icon' => 'fieldtype-grid', 'url' => "$docs/usage/configuration#eloquent-driver"],
         ];
     }
 
