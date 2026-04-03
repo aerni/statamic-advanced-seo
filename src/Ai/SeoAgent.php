@@ -70,7 +70,7 @@ class SeoAgent implements Agent
         $seoFields = $content
             ->only(array_column(self::fields(), 'handle'))
             ->map(fn (array $value) => $value['value'])
-            ->map(fn (string $value) => trim(preg_replace('/\{\{.*?\}\}/', '', $value)));
+            ->map(fn ($value) => trim(preg_replace('/\{\{.*?\}\}/', '', $value)));
 
         $this->content = $this->blueprint->fields()->all()
             ->filter(fn (Field $field) => in_array('text', $field->fieldtype()->categories()))
@@ -86,11 +86,11 @@ class SeoAgent implements Agent
         return Str::length(trim($text));
     }
 
-    protected function toPlainText(string $type, mixed $value): mixed
+    protected function toPlainText(string $type, mixed $value): ?string
     {
         return match ($type) {
             'bard' => (new CoreModifiers)->bardText($value),
-            default => $value,
+            default => is_string($value) ? $value : null,
         };
     }
 

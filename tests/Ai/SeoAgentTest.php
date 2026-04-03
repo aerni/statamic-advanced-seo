@@ -123,6 +123,22 @@ it('includes other seo fields in the content section', function () {
     expect($instructions)->toContain('seo_title:');
 });
 
+it('handles null seo field values without error', function () {
+    $agent = makeAgent('seo_title', [
+        'seo_description' => ['value' => null],
+    ]);
+
+    expect($agent->instructions())->toBeString();
+});
+
+it('handles non-string content field values without error', function () {
+    $agent = makeAgent('seo_title', [
+        'seo_json_ld' => ['code' => '{"@type": "Article"}', 'mode' => 'javascript'],
+    ]);
+
+    expect($agent->instructions())->toBeString();
+});
+
 // --- instructions() ---
 
 it('generates instructions with a content section', function () {
