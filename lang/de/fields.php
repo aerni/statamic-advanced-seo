@@ -347,4 +347,16 @@ return [
         'instructions' => 'Wähle die verfügbaren Social-Media-Bild-Themes für diesen :type.',
     ],
 
+    'seo_section_ai' => [
+        'display' => 'KI-Inhaltserstellung',
+    ],
+
+    'ai_instructions' => [
+        'display' => 'Anweisungen',
+        'instructions' => 'Allgemeine Anweisungen für die Erstellung von Titeln und Beschreibungen über alle Collections und Taxonomien hinweg.',
+        'placeholder' => 'Beispiel: Verwende einen freundlichen, umgangssprachlichen Ton. Sage immer „nachhaltig" statt „umweltfreundlich".',
+        'config_instructions' => 'Spezifische Anweisungen für die Erstellung von Titeln und Beschreibungen für diese/n :type.',
+        'config_placeholder' => 'Beispiel: Die :content dieser/s :type sind Produkte. Hebe Funktionen und Preise hervor.',
+    ],
+
 ];

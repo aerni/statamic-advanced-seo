@@ -18,13 +18,14 @@ beforeEach(function () {
     $this->blueprint = Collection::findByHandle('pages')->entryBlueprint();
 });
 
-function makeAgent(string $field = 'seo_title', array $content = [], ?string $site = 'english', $blueprint = null): SeoAgent
+function makeAgent(string $field = 'seo_title', array $content = [], ?string $site = 'english', $blueprint = null, ?string $additionalInstructions = null): SeoAgent
 {
     return new SeoAgent(
         field: $field,
         blueprint: $blueprint ?? test()->blueprint,
         content: array_merge(['title' => str_repeat('This is enough content to pass the minimum character validation. ', 5)], $content),
         site: $site,
+        additionalInstructions: $additionalInstructions,
     );
 }
 
@@ -175,4 +176,34 @@ it('includes the complementary pair rule', function () {
     $agent = makeAgent();
 
     expect($agent->instructions())->toContain('seo_title + seo_description');
+});
+
+// --- instructionsSection() ---
+
+it('includes custom AI instructions in the prompt', function () {
+    $agent = makeAgent(additionalInstructions: 'Always use the brand name "Acme" at the end of titles.');
+
+    $instructions = $agent->instructions();
+
+    expect($instructions)->toContain('## Instructions')
+        ->and($instructions)->toContain('Always use the brand name "Acme" at the end of titles.');
+});
+
+it('does not include an instructions section when AI instructions are null', function () {
+    $agent = makeAgent(additionalInstructions: null);
+
+    expect($agent->instructions())->not->toContain('## Instructions');
+});
+
+it('places the instructions section between content and rules', function () {
+    $agent = makeAgent(additionalInstructions: 'Use formal language.');
+
+    $instructions = $agent->instructions();
+
+    $contentPos = strpos($instructions, '## Content');
+    $instructionsPos = strpos($instructions, '## Instructions');
+    $rulesPos = strpos($instructions, '## Rules');
+
+    expect($contentPos)->toBeLessThan($instructionsPos)
+        ->and($instructionsPos)->toBeLessThan($rulesPos);
 });

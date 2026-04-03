@@ -347,4 +347,16 @@ return [
         'instructions' => 'Select the social image themes available for this :type.',
     ],
 
+    'seo_section_ai' => [
+        'display' => 'AI Content Generation',
+    ],
+
+    'ai_instructions' => [
+        'display' => 'Instructions',
+        'instructions' => 'General instructions for generating titles and descriptions across all collections and taxonomies.',
+        'placeholder' => 'Example: Use a friendly, conversational tone. Always say "sustainable" instead of "eco-friendly".',
+        'config_instructions' => 'Specific instructions for generating titles and descriptions for this :type.',
+        'config_placeholder' => 'Example: The :content of this :type are products. Highlight features and pricing.',
+    ],
+
 ];

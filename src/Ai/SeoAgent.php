@@ -22,6 +22,7 @@ class SeoAgent implements Agent
         protected Blueprint $blueprint,
         protected array|Collection $content,
         protected string $site,
+        protected ?string $additionalInstructions = null,
     ) {
         $this->processContent();
     }
@@ -40,8 +41,9 @@ class SeoAgent implements Agent
     public function instructions(): string
     {
         return collect([
-            'You are an SEO specialist. Analyze the content below and write compelling, accurate, and optimized SEO text.',
+            'You are an SEO specialist. Analyze the content below and write compelling, accurate, and optimized SEO text. Follow the provided instructions and rules.',
             $this->contentSection(),
+            $this->additionalInstructionsSection(),
             $this->rulesSection(),
         ])->filter()->implode("\n\n");
     }
@@ -110,13 +112,22 @@ class SeoAgent implements Agent
             ->implode("\n");
     }
 
+    protected function additionalInstructionsSection(): ?string
+    {
+        if ($this->additionalInstructions === null) {
+            return null;
+        }
+
+        return "## Instructions\n{$this->additionalInstructions}";
+    }
+
     protected function rulesSection(): string
     {
         $rules = collect([
-            "Stay within {$this->fieldSpec()->characters} characters. Use the full space to write something compelling — don't be too short.",
+            "Stay within {$this->fieldSpec()->characters} characters. Use the full space to write something compelling and don't be too short.",
             'SEO fields come in pairs: seo_title + seo_description (search engines), and seo_og_title + seo_og_description (social sharing). If the other field in your pair is present in the content, complement it — avoid repeating the same phrasing and ensure the title and description read as a cohesive unit.',
             'Write in '.locale_get_display_language(Site::get($this->site)->locale()).'.',
-            'Output only plain text — no explanations, wrapping, or markdown formatting.',
+            'Output only plain text. No explanations, wrapping, or markdown formatting.',
         ]);
 
         return collect(['## Rules'])

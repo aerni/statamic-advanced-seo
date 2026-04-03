@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Ai\SeoAgent;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Ai;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AiGenerateController extends CpController
@@ -28,10 +30,16 @@ class AiGenerateController extends CpController
             'site' => ['required', 'string'],
         ]);
 
-        $validated['blueprint'] = $this->resolveBlueprint($validated['blueprint']);
+        [$type, $handle, $blueprint] = explode('.', $validated['blueprint']);
 
         try {
-            return response()->json(new SeoAgent(...$validated)->generate());
+            return response()->json(new SeoAgent(
+                field: $validated['field'],
+                blueprint: $this->resolveBlueprint($type, $handle, $blueprint),
+                content: $validated['content'],
+                site: $validated['site'],
+                additionalInstructions: $this->resolveAdditionalInstructions($type, $handle),
+            )->generate());
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         } catch (\Throwable $e) {
@@ -44,13 +52,22 @@ class AiGenerateController extends CpController
         }
     }
 
-    protected function resolveBlueprint(string $handle): Blueprint
+    protected function resolveBlueprint(string $type, string $handle, string $blueprint): Blueprint
     {
-        [$type, $handle, $blueprint] = explode('.', $handle);
-
         return match ($type) {
             'collections' => Collection::findByHandle($handle)->entryBlueprint($blueprint),
             'taxonomies' => Taxonomy::findByHandle($handle)->termBlueprint($blueprint),
         };
+    }
+
+    protected function resolveAdditionalInstructions(string $type, string $handle): ?string
+    {
+        $global = Seo::find('site::defaults')->config()->data()->get('ai_instructions');
+        $scoped = Seo::find("{$type}::{$handle}")?->config()->data()->get('ai_instructions');
+
+        return collect([
+            $global ? "### General\n{$global}" : null,
+            $scoped ? '### Specific to this '.Str::singular($type)."\n{$scoped}" : null,
+        ])->filter()->implode("\n\n") ?: null;
     }
 }

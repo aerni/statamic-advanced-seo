@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\MultiSite;
 use Aerni\AdvancedSeo\Features\Pro;
 use Aerni\AdvancedSeo\Features\Sitemap;
@@ -23,6 +24,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                 $this->origins(),
                 $this->sitemaps(),
                 $this->socialAppearance(),
+                $this->ai(),
             ],
         ];
     }
@@ -144,6 +146,26 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                             'social_images_generator' => 'true',
                         ],
                         'feature' => SocialImagesGenerator::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function ai(): array
+    {
+        return [
+            'display' => $this->trans('seo_section_ai.display'),
+            'fields' => [
+                [
+                    'handle' => 'ai_instructions',
+                    'field' => [
+                        'type' => 'textarea',
+                        'display' => $this->trans('ai_instructions.display'),
+                        'instructions' => $this->trans('ai_instructions.config_instructions'),
+                        'placeholder' => $this->trans('ai_instructions.config_placeholder'),
+                        'if' => ['enabled' => 'true'],
+                        'feature' => Ai::class,
                     ],
                 ],
             ],

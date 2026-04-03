@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\MultiSite;
 
 class SiteSeoSetConfigBlueprint extends BaseBlueprint
@@ -16,6 +17,7 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
         return [
             'main' => [
                 $this->origins(),
+                $this->ai(),
             ],
         ];
     }
@@ -33,6 +35,25 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                         'instructions' => __('advanced-seo::messages.origins_instructions'),
                         'default' => [],
                         'feature' => MultiSite::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function ai(): array
+    {
+        return [
+            'display' => $this->trans('seo_section_ai.display'),
+            'fields' => [
+                [
+                    'handle' => 'ai_instructions',
+                    'field' => [
+                        'type' => 'textarea',
+                        'display' => $this->trans('ai_instructions.display'),
+                        'instructions' => $this->trans('ai_instructions.instructions'),
+                        'placeholder' => $this->trans('ai_instructions.placeholder'),
+                        'feature' => Ai::class,
                     ],
                 ],
             ],
