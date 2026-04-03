@@ -256,7 +256,7 @@ class SeoFieldtype extends Fieldtype
 
         $context = Context::from($this->field->parent());
 
-        if (! $context?->isContent()) {
+        if (! $context?->isContent() && ! $context?->isLocalization()) {
             return false;
         }
 
