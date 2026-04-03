@@ -19,8 +19,6 @@ use Statamic\Fieldtypes\Code;
 
 class SeoFieldtype extends Fieldtype
 {
-    protected static $handle = 'seo';
-
     protected $defaultValue = '@default';
 
     protected $selectable = false;

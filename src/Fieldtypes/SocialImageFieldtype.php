@@ -14,8 +14,6 @@ use function Illuminate\Support\defer;
 
 class SocialImageFieldtype extends Assets
 {
-    protected static $handle = 'social_image';
-
     protected $component = 'assets';
 
     protected $selectable = false;

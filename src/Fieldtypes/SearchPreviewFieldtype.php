@@ -9,8 +9,6 @@ use Statamic\Fields\Fieldtype;
 
 class SearchPreviewFieldtype extends Fieldtype
 {
-    protected static $handle = 'search_preview';
-
     protected $selectable = false;
 
     public function preload(): array

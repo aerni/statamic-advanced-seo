@@ -10,8 +10,6 @@ use Statamic\Fieldtypes\Select;
 
 class SocialImagesThemeFieldtype extends Select
 {
-    protected static $handle = 'social_images_theme';
-
     protected $component = 'select';
 
     protected $selectable = false;

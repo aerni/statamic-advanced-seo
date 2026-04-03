@@ -7,11 +7,9 @@ use Statamic\Fieldtypes\Code;
 
 class JsonLdFieldtype extends Code
 {
-    protected static $handle = 'json_ld';
+    protected $component = 'code';
 
     protected $selectable = false;
-
-    protected $component = 'code';
 
     public function augment($value)
     {

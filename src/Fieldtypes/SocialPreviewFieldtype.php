@@ -12,8 +12,6 @@ use Statamic\Fields\Fieldtype;
 
 class SocialPreviewFieldtype extends Fieldtype
 {
-    protected static $handle = 'social_preview';
-
     protected $selectable = false;
 
     public function preload(): array

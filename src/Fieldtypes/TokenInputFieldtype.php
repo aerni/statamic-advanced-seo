@@ -9,10 +9,6 @@ use Statamic\Fields\Fieldtype;
 
 class TokenInputFieldtype extends Fieldtype
 {
-    protected static $handle = 'token_input';
-
-    protected $categories = ['text'];
-
     protected $selectable = false;
 
     public function augment($value): ?string
