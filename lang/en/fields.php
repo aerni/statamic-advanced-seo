@@ -347,16 +347,25 @@ return [
         'instructions' => 'Select the social image themes available for this :type.',
     ],
 
-    'seo_section_ai' => [
-        'display' => 'AI Content Generation',
+    'section_ai' => [
+        'display' => 'AI',
+    ],
+
+    'config_ai' => [
+        'display' => 'Enable AI',
+        'instructions' => 'Enables AI features for this :type.',
+    ],
+
+    'config_ai_instructions' => [
+        'display' => 'Copywriting Instructions',
+        'instructions' => 'Specific instructions for generating titles and descriptions for this :type.',
+        'placeholder' => 'Example: The :content of this :type are products. Highlight features and pricing.',
     ],
 
     'ai_instructions' => [
-        'display' => 'Instructions',
+        'display' => 'Copywriting Instructions',
         'instructions' => 'General instructions for generating titles and descriptions across all collections and taxonomies.',
         'placeholder' => 'Example: Use a friendly, conversational tone. Always say "sustainable" instead of "eco-friendly".',
-        'config_instructions' => 'Specific instructions for generating titles and descriptions for this :type.',
-        'config_placeholder' => 'Example: The :content of this :type are products. Highlight features and pricing.',
     ],
 
 ];

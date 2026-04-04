@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\Token;
 use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Tokens\Token as TokenContract;
@@ -30,7 +31,9 @@ class TokenInputFieldtype extends Fieldtype
 
     protected function actions(): array
     {
-        if (! Ai::enabled()) {
+        $context = Context::from($this->field->parent());
+
+        if (! Ai::enabled($context)) {
             return [];
         }
 

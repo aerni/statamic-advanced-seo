@@ -18,7 +18,24 @@ class Ai extends Feature
             return false;
         }
 
-        return static::aiSdkConfigured();
+        if (! static::aiSdkConfigured()) {
+            return false;
+        }
+
+        if (! $context) {
+            return true;
+        }
+
+        /* Always show toggle in the config */
+        if ($context->isConfig()) {
+            return true;
+        }
+
+        if (! $context->seoSet()->enabled()) {
+            return false;
+        }
+
+        return $context->seoSet()->config()->value('ai');
     }
 
     protected static function aiSdkConfigured(): bool

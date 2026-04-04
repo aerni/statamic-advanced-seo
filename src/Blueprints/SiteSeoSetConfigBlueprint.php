@@ -44,7 +44,7 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
     protected function ai(): array
     {
         return [
-            'display' => $this->trans('seo_section_ai.display'),
+            'display' => $this->trans('section_ai.display'),
             'fields' => [
                 [
                     'handle' => 'ai_instructions',

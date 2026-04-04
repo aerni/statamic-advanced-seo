@@ -155,16 +155,30 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
     protected function ai(): array
     {
         return [
-            'display' => $this->trans('seo_section_ai.display'),
+            'display' => $this->trans('section_ai.display'),
             'fields' => [
+                [
+                    'handle' => 'ai',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('config_ai.display'),
+                        'instructions' => $this->trans('config_ai.instructions'),
+                        'default' => true,
+                        'if' => ['enabled' => 'true'],
+                        'feature' => Ai::class,
+                    ],
+                ],
                 [
                     'handle' => 'ai_instructions',
                     'field' => [
                         'type' => 'textarea',
-                        'display' => $this->trans('ai_instructions.display'),
-                        'instructions' => $this->trans('ai_instructions.config_instructions'),
-                        'placeholder' => $this->trans('ai_instructions.config_placeholder'),
-                        'if' => ['enabled' => 'true'],
+                        'display' => $this->trans('config_ai_instructions.display'),
+                        'instructions' => $this->trans('config_ai_instructions.instructions'),
+                        'placeholder' => $this->trans('config_ai_instructions.placeholder'),
+                        'if' => [
+                            'enabled' => 'true',
+                            'ai' => 'true',
+                        ],
                         'feature' => Ai::class,
                     ],
                 ],
