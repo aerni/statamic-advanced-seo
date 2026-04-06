@@ -20,7 +20,7 @@ class FieldToken implements Token
 
     public function group(): string
     {
-        return __('advanced-seo::tokens.group_fields');
+        return __('advanced-seo::messages.token_group_fields');
     }
 
     public function toArray(): array

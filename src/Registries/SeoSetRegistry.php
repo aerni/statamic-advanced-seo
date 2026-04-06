@@ -58,7 +58,7 @@ class SeoSetRegistry extends Registry
             new SeoSet(
                 type: 'site',
                 handle: 'defaults',
-                title: __('advanced-seo::messages.site_defaults'),
+                title: __('advanced-seo::messages.site'),
                 icon: 'utilities',
             ),
         ]);

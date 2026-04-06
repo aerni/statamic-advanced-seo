@@ -13,7 +13,7 @@ abstract class ValueToken implements Token
 
     public function display(): string
     {
-        $key = "advanced-seo::tokens.{$this->handle()}";
+        $key = "advanced-seo::messages.token_{$this->handle()}";
 
         return Lang::has($key)
             ? __($key)
@@ -22,7 +22,7 @@ abstract class ValueToken implements Token
 
     public function group(): string
     {
-        return __('advanced-seo::tokens.group_common');
+        return __('advanced-seo::messages.token_group_common');
     }
 
     public function withParent(mixed $parent): static

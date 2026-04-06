@@ -66,7 +66,7 @@ const cancelDisable = () => {
                 <Badge
                     v-if="item.enabled"
                     color="green"
-                    :text="__('Enabled')"
+                    :text="__('advanced-seo::messages.enabled')"
                     pill
                 />
                 <Badge
@@ -80,8 +80,8 @@ const cancelDisable = () => {
                 <DropdownItem v-if="item.enabled" :text="__('Edit')" icon="edit" :href="item.localization_url" />
                 <DropdownSeparator v-if="item.enabled && item.configurable" />
                 <DropdownItem v-if="item.configurable" :text="__('Configure')" icon="cog" :href="item.config_url" />
-                <DropdownItem v-if="item.configurable && !item.enabled" :text="__('Enable')" icon="eye" @click="enable(item)" />
-                <DropdownItem v-if="item.configurable && item.enabled" :text="__('Disable')" icon="eye-slash" @click="disable(item)" />
+                <DropdownItem v-if="item.configurable && !item.enabled" :text="__('advanced-seo::messages.enable')" icon="eye" @click="enable(item)" />
+                <DropdownItem v-if="item.configurable && item.enabled" :text="__('advanced-seo::messages.disable')" icon="eye-slash" @click="disable(item)" />
             </template>
         </Listing>
 
@@ -94,8 +94,8 @@ const cancelDisable = () => {
         <ConfirmationModal
             v-if="disabling"
             :open="true"
-            :title="__('Disable :title', { title: __(disabling.title) })"
-            :buttonText="__('Disable')"
+            :title="__('advanced-seo::messages.disable_title', { title: __(disabling.title) })"
+            :buttonText="__('advanced-seo::messages.disable')"
             :danger="true"
             @confirm="confirmDisable"
             @cancel="cancelDisable"

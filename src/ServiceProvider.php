@@ -171,20 +171,20 @@ class ServiceProvider extends AddonServiceProvider
             Permission::group('advanced-seo', 'Advanced SEO', function () {
                 Permission::register('configure seo', function ($permission) {
                     $permission
-                        ->label('Configure SEO (Full Access)')
-                        ->description('Grants all permissions including the ability to edit settings, defaults, and content');
+                        ->label(__('advanced-seo::messages.permission_configure_seo'))
+                        ->description(__('advanced-seo::messages.permission_configure_seo_description'));
                 });
 
                 Permission::register('edit seo defaults', function ($permission) {
                     $permission
-                        ->label('Edit Defaults')
-                        ->description('Grants ability to edit collection and taxonomy defaults, and access the SEO tab on entries and terms');
+                        ->label(__('advanced-seo::messages.permission_edit_defaults'))
+                        ->description(__('advanced-seo::messages.permission_edit_defaults_description'));
                 });
 
                 Permission::register('edit seo content', function ($permission) {
                     $permission
-                        ->label('Edit Content')
-                        ->description('Grants access to the SEO tab on entries and terms');
+                        ->label(__('advanced-seo::messages.permission_edit_content'))
+                        ->description(__('advanced-seo::messages.permission_edit_content_description'));
                 });
             });
         });

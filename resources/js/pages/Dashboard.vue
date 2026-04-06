@@ -27,7 +27,7 @@ useArchitecturalBackground();
                     v-for="item in groups" :key="item.type"
                     :href="item.url"
                     :icon="item.icon"
-                    :heading="__(item.title)"
+                    :heading="__(`advanced-seo::messages.${item.type}`)"
                     :description="__(`advanced-seo::messages.${item.type}_description`)"
                 />
             </ul>

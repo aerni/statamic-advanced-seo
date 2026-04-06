@@ -2,6 +2,15 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Content Fields
+    |--------------------------------------------------------------------------
+    |
+    | Used by ContentSeoBlueprint and ContentSeoSetLocalizationBlueprint.
+    |
+    */
+
     'seo_section_search_appearance' => [
         'display' => 'Search Appearance',
         'instructions' => 'Control how this :type appears in search results.',
@@ -20,10 +29,32 @@ return [
         'default_instructions' => 'The default description for your :type in search results.',
     ],
 
+    'seo_search_preview' => [
+        'display' => 'Search Preview',
+    ],
+
     'seo_section_social_appearance' => [
         'display' => 'Social Appearance',
         'instructions' => 'Control how this :type looks when shared on social media.',
         'default_instructions' => 'Set defaults for how your :type look when shared on social media.',
+    ],
+
+    'seo_og_title' => [
+        'display' => 'Social Title',
+        'instructions' => 'Shown as the title when sharing on social media.',
+        'default_instructions' => 'The default social title for your :type.',
+    ],
+
+    'seo_og_description' => [
+        'display' => 'Social Description',
+        'instructions' => 'Shown as the description when sharing on social media.',
+        'default_instructions' => 'The default social description for your :type.',
+    ],
+
+    'seo_og_image' => [
+        'display' => 'Social Image',
+        'instructions' => 'Recommended size: 1200x630px. Automatically resized as needed.',
+        'default_instructions' => 'The default social image for your :type. Recommended size: 1200x630px.',
     ],
 
     'seo_generate_social_images' => [
@@ -38,22 +69,26 @@ return [
         'default_instructions' => 'The default theme for generated social images.',
     ],
 
-    'seo_og_image' => [
-        'display' => 'Social Image',
-        'instructions' => 'Recommended size: 1200x630px. Automatically resized as needed.',
-        'default_instructions' => 'The default social image for your :type. Recommended size: 1200x630px.',
+    'seo_social_preview' => [
+        'display' => 'Social Preview',
     ],
 
-    'seo_og_title' => [
-        'display' => 'Social Title',
-        'instructions' => 'Shown as the title when sharing on social media.',
-        'default_instructions' => 'The default social title for your :type.',
+    'seo_section_indexing' => [
+        'display' => 'Indexing',
+        'instructions' => 'Control search engine indexing for this :type.',
+        'default_instructions' => 'Set default indexing behavior for your :type.',
     ],
 
-    'seo_og_description' => [
-        'display' => 'Social Description',
-        'instructions' => 'Shown as the description when sharing on social media.',
-        'default_instructions' => 'The default social description for your :type.',
+    'seo_noindex' => [
+        'display' => 'Noindex',
+        'instructions' => 'Prevent search engines from indexing this :type.',
+        'default_instructions' => 'Prevent search engines from indexing your :type.',
+    ],
+
+    'seo_nofollow' => [
+        'display' => 'Nofollow',
+        'instructions' => 'Prevent crawlers from following links on this :type.',
+        'default_instructions' => 'Prevent crawlers from following links on your :type.',
     ],
 
     'seo_section_canonical_url' => [
@@ -81,24 +116,6 @@ return [
         'display' => 'URL',
         'instructions' => 'A fully qualified [active URL](https://laravel.com/docs/master/validation#rule-active-url).',
         'default_instructions' => 'A fully qualified [active URL](https://laravel.com/docs/master/validation#rule-active-url).',
-    ],
-
-    'seo_section_indexing' => [
-        'display' => 'Indexing',
-        'instructions' => 'Control search engine indexing for this :type.',
-        'default_instructions' => 'Set default indexing behavior for your :type.',
-    ],
-
-    'seo_noindex' => [
-        'display' => 'Noindex',
-        'instructions' => 'Prevent search engines from indexing this :type.',
-        'default_instructions' => 'Prevent search engines from indexing your :type.',
-    ],
-
-    'seo_nofollow' => [
-        'display' => 'Nofollow',
-        'instructions' => 'Prevent crawlers from following links on this :type.',
-        'default_instructions' => 'Prevent crawlers from following links on your :type.',
     ],
 
     'seo_section_sitemap' => [
@@ -144,12 +161,122 @@ return [
         'default_instructions' => 'Default structured data for your :type. Automatically wrapped in a script tag.',
     ],
 
-    'seo_search_preview' => [
-        'display' => 'Search Preview',
+    /*
+    |--------------------------------------------------------------------------
+    | Site Fields
+    |--------------------------------------------------------------------------
+    |
+    | Used by SiteSeoSetLocalizationBlueprint.
+    |
+    */
+
+    'section_titles' => [
+        'display' => 'Titles',
+        'instructions' => 'Configure how page titles are displayed.',
     ],
 
-    'seo_social_preview' => [
-        'display' => 'Social Preview',
+    'site_name' => [
+        'display' => 'Site Name',
+        'instructions' => 'Appended to your meta titles.',
+    ],
+
+    'separator' => [
+        'display' => 'Separator',
+        'instructions' => 'The character between the page title and site name.',
+    ],
+
+    'section_structured_data' => [
+        'display' => 'Structured Data',
+        'instructions' => 'Help search engines understand your site with [structured data](https://developers.google.com/search/docs/guides/intro-structured-data).',
+    ],
+
+    'site_json_ld_type' => [
+        'display' => 'Content Type',
+        'instructions' => 'What this site represents.',
+        'none' => 'None',
+        'organization' => 'Organization',
+        'person' => 'Person',
+        'custom' => 'Custom',
+    ],
+
+    'use_breadcrumbs' => [
+        'display' => 'Breadcrumbs',
+        'instructions' => 'Add [breadcrumb](https://developers.google.com/search/docs/data-types/breadcrumb) structured data.',
+    ],
+
+    'organization_name' => [
+        'display' => 'Organization Name',
+        'instructions' => 'The name of the organization.',
+    ],
+
+    'organization_logo' => [
+        'display' => 'Organization Logo',
+        'instructions' => 'Minimum size: 112x112px.',
+    ],
+
+    'person_name' => [
+        'display' => 'Person Name',
+        'instructions' => 'The name of the person.',
+    ],
+
+    'site_json_ld' => [
+        'display' => 'JSON-LD Schema',
+        'instructions' => 'Structured data added to every page. Automatically wrapped in a script tag.',
+    ],
+
+    'section_favicon' => [
+        'display' => 'Favicon',
+        'instructions' => 'The icon displayed in browser tabs.',
+    ],
+
+    'favicon_svg' => [
+        'display' => 'Favicon (SVG)',
+        'instructions' => 'Upload an SVG favicon.',
+    ],
+
+    'section_social_appearance' => [
+        'display' => 'Social Appearance',
+        'instructions' => 'Site-wide social sharing settings.',
+    ],
+
+    'og_image' => [
+        'display' => 'Social Image',
+        'instructions' => 'Fallback image when none is set on the content. Recommended size: 1200x630px.',
+    ],
+
+    'twitter_handle' => [
+        'display' => 'X (Twitter) Username',
+        'instructions' => 'Your X (Twitter) username.',
+    ],
+
+    'section_indexing' => [
+        'display' => 'Indexing',
+        'instructions' => 'Site-wide indexing settings. These override entry and term settings.',
+    ],
+
+    'noindex' => [
+        'display' => 'Noindex',
+        'instructions' => 'Prevent search engines from indexing your entire site.',
+    ],
+
+    'nofollow' => [
+        'display' => 'Nofollow',
+        'instructions' => 'Prevent crawlers from following any links on your site.',
+    ],
+
+    'section_verification' => [
+        'display' => 'Site Verification',
+        'instructions' => 'Verify ownership of this site.',
+    ],
+
+    'google_site_verification_code' => [
+        'display' => 'Google Verification Code',
+        'instructions' => 'From [Google Search Console](https://search.google.com/search-console).',
+    ],
+
+    'bing_site_verification_code' => [
+        'display' => 'Bing Verification Code',
+        'instructions' => 'From [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
     ],
 
     'section_fathom' => [
@@ -202,121 +329,14 @@ return [
         'instructions' => 'Your GTM container ID.',
     ],
 
-    'section_favicon' => [
-        'display' => 'Favicon',
-        'instructions' => 'The icon displayed in browser tabs.',
-    ],
-
-    'favicon_svg' => [
-        'display' => 'Favicon (SVG)',
-        'instructions' => 'Upload an SVG favicon.',
-    ],
-
-    'section_titles' => [
-        'display' => 'Titles',
-        'instructions' => 'Configure how page titles are displayed.',
-    ],
-
-    'site_name' => [
-        'display' => 'Site Name',
-        'instructions' => 'Appended to your meta titles.',
-    ],
-
-    'separator' => [
-        'display' => 'Separator',
-        'instructions' => 'The character between the page title and site name.',
-    ],
-
-    'section_structured_data' => [
-        'display' => 'Structured Data',
-        'instructions' => 'Help search engines understand your site with [structured data](https://developers.google.com/search/docs/guides/intro-structured-data).',
-    ],
-
-    'site_json_ld_type' => [
-        'display' => 'Content Type',
-        'instructions' => 'What this site represents.',
-        'none' => 'None',
-        'organization' => 'Organization',
-        'person' => 'Person',
-        'custom' => 'Custom',
-    ],
-
-    'organization_name' => [
-        'display' => 'Organization Name',
-        'instructions' => 'The name of the organization.',
-    ],
-
-    'organization_logo' => [
-        'display' => 'Organization Logo',
-        'instructions' => 'Minimum size: 112x112px.',
-    ],
-
-    'person_name' => [
-        'display' => 'Person Name',
-        'instructions' => 'The name of the person.',
-    ],
-
-    'site_json_ld' => [
-        'display' => 'JSON-LD Schema',
-        'instructions' => 'Structured data added to every page. Automatically wrapped in a script tag.',
-    ],
-
-    'use_breadcrumbs' => [
-        'display' => 'Breadcrumbs',
-        'instructions' => 'Add [breadcrumb](https://developers.google.com/search/docs/data-types/breadcrumb) structured data.',
-    ],
-
-    'section_indexing' => [
-        'display' => 'Indexing',
-        'instructions' => 'Site-wide indexing settings. These override entry and term settings.',
-    ],
-
-    'noindex' => [
-        'display' => 'Noindex',
-        'instructions' => 'Prevent search engines from indexing your entire site.',
-    ],
-
-    'nofollow' => [
-        'display' => 'Nofollow',
-        'instructions' => 'Prevent crawlers from following any links on your site.',
-    ],
-
-    'section_verification' => [
-        'display' => 'Site Verification',
-        'instructions' => 'Verify ownership of this site.',
-    ],
-
-    'google_site_verification_code' => [
-        'display' => 'Google Verification Code',
-        'instructions' => 'From [Google Search Console](https://search.google.com/search-console).',
-    ],
-
-    'bing_site_verification_code' => [
-        'display' => 'Bing Verification Code',
-        'instructions' => 'From [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
-    ],
-
-    'section_social_appearance' => [
-        'display' => 'Social Appearance',
-        'instructions' => 'Site-wide social sharing settings.',
-    ],
-
-    'og_image' => [
-        'display' => 'Social Image',
-        'instructions' => 'Fallback image when none is set on the content. Recommended size: 1200x630px.',
-    ],
-
-    'twitter_card' => [
-        'display' => 'X (Twitter) Card',
-        'instructions' => 'Card size when sharing content from this :type.',
-        'summary' => 'Small',
-        'summary_large_image' => 'Large',
-    ],
-
-    'twitter_handle' => [
-        'display' => 'X (Twitter) Username',
-        'instructions' => 'Your X (Twitter) username.',
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Config Fields
+    |--------------------------------------------------------------------------
+    |
+    | Used by ContentSeoSetConfigBlueprint and SiteSeoSetConfigBlueprint.
+    |
+    */
 
     'config_enabled' => [
         'display' => 'Enable SEO',
@@ -335,6 +355,13 @@ return [
     'config_sitemap' => [
         'display' => 'Sitemap',
         'instructions' => 'Enables the sitemap for this :type.',
+    ],
+
+    'config_twitter_card' => [
+        'display' => 'X (Twitter) Card',
+        'instructions' => 'Card size when sharing content from this :type.',
+        'summary' => 'Small',
+        'summary_large_image' => 'Large',
     ],
 
     'config_social_images_generator' => [
@@ -362,7 +389,7 @@ return [
         'placeholder' => 'Example: The :content of this :type are products. Highlight features and pricing.',
     ],
 
-    'ai_instructions' => [
+    'config_ai_instructions_site' => [
         'display' => 'Copywriting Instructions',
         'instructions' => 'General instructions for generating titles and descriptions across all collections and taxonomies.',
         'placeholder' => 'Example: Use a friendly, conversational tone. Always say "sustainable" instead of "eco-friendly".',

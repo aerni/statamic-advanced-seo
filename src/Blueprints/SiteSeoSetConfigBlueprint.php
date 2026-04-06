@@ -50,9 +50,9 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                     'handle' => 'ai_instructions',
                     'field' => [
                         'type' => 'textarea',
-                        'display' => $this->trans('ai_instructions.display'),
-                        'instructions' => $this->trans('ai_instructions.instructions'),
-                        'placeholder' => $this->trans('ai_instructions.placeholder'),
+                        'display' => $this->trans('config_ai_instructions_site.display'),
+                        'instructions' => $this->trans('config_ai_instructions_site.instructions'),
+                        'placeholder' => $this->trans('config_ai_instructions_site.placeholder'),
                         'feature' => Ai::class,
                     ],
                 ],

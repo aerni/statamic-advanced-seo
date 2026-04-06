@@ -107,11 +107,11 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                     'handle' => 'twitter_card',
                     'field' => [
                         'type' => 'button_group',
-                        'display' => $this->trans('twitter_card.display'),
-                        'instructions' => $this->trans('twitter_card.instructions'),
+                        'display' => $this->trans('config_twitter_card.display'),
+                        'instructions' => $this->trans('config_twitter_card.instructions'),
                         'options' => [
-                            'summary_large_image' => $this->trans('twitter_card.summary_large_image'),
-                            'summary' => $this->trans('twitter_card.summary'),
+                            'summary_large_image' => $this->trans('config_twitter_card.summary_large_image'),
+                            'summary' => $this->trans('config_twitter_card.summary'),
                         ],
                         'default' => 'summary_large_image',
                         'if' => ['enabled' => 'true'],

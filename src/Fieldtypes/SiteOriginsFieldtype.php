@@ -68,7 +68,7 @@ class SiteOriginsFieldtype extends Fieldtype
                     ->all();
 
                 if (HasCircularOrigins::handle($origins)) {
-                    $fail(__('Circular site origin dependencies are not allowed.'));
+                    $fail(__('advanced-seo::messages.origins_circular_dependency'));
                 }
             }
         };

@@ -354,7 +354,7 @@ watch(() => props.value, (value) => {
             </div>
 
             <div v-if="!fieldtype.isReadOnly.value && !loading" class="absolute top-0 right-1.5 flex items-center h-11">
-                <Button v-tooltip="__('Add Token')" round icon="plus" size="xs" icon-only :aria-label="__('Add Token')" @mousedown.prevent @click="openTokenSuggestion" />
+                <Button v-tooltip="__('advanced-seo::messages.token_add')" round icon="plus" size="xs" icon-only :aria-label="__('advanced-seo::messages.token_add')" @mousedown.prevent @click="openTokenSuggestion" />
             </div>
         </div>
 
