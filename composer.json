@@ -20,7 +20,7 @@
         "laravel/framework": "^12.0 || ^13.0",
         "laravel/prompts": "^0.3.0",
         "spatie/schema-org": "^3.23",
-        "statamic/cms": "^6.0",
+        "statamic/cms": "^6.10",
         "whitecube/lingua": "^1.1"
     },
     "require-dev": {
