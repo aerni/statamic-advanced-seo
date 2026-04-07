@@ -82,6 +82,10 @@ class ServiceProvider extends AddonServiceProvider
 
     public function register(): void
     {
+        /**
+         * Allow these classes to be safely unserialized from Laravel's cache,
+         * so that Stache reads of our items rehydrate as real objects.
+         */
         $this->registerSerializableClasses([
             SeoSets\SeoSetConfig::class,
             SeoSets\SeoSetLocalization::class,
