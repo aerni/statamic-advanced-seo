@@ -82,6 +82,11 @@ class ServiceProvider extends AddonServiceProvider
 
     public function register(): void
     {
+        $this->registerSerializableClasses([
+            SeoSets\SeoSetConfig::class,
+            SeoSets\SeoSetLocalization::class,
+        ]);
+
         app()->instance('advanced-seo.tokens', collect());
         app()->instance('advanced-seo.sitemaps', collect());
 
