@@ -6,20 +6,18 @@ const fieldTokenClass =
     "inline-flex items-center justify-center border dark:border-0 font-normal antialiased whitespace-nowrap text-xs leading-5 dark:leading-5.5 px-2 rounded-sm select-none cursor-default align-top shadow-ui-sm bg-sky-50 border-sky-300 text-sky-700 dark:bg-gray-800 dark:text-sky-300 hover:!bg-sky-100 dark:hover:!bg-gray-700 [&.ProseMirror-selectednode]:!bg-sky-100 [&.is-selected]:!bg-sky-100 dark:[&.ProseMirror-selectednode]:!bg-gray-700 dark:[&.is-selected]:!bg-gray-700";
 const expressionTokenClass =
     "inline-flex items-center justify-center gap-1.5 border dark:border-0 antialiased whitespace-nowrap text-xs leading-5 dark:leading-5.5 px-2 rounded-sm select-none cursor-default align-top shadow-ui-sm bg-gray-50 border-gray-300 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:!bg-gray-100 dark:hover:!bg-gray-700 [&.ProseMirror-selectednode]:!bg-gray-100 [&.is-selected]:!bg-gray-100 dark:[&.ProseMirror-selectednode]:!bg-gray-700 dark:[&.is-selected]:!bg-gray-700";
-const expressionModifierClass = "border-s border-inherit ps-1.5 opacity-70";
+const expressionModifierClass = "border-s border-inherit ps-1.5 opacity-60";
 
 // ─── Token resolution ────────────────────────────────────────────────────────
 
-function parseExpression(handle) {
-    const parts = handle
-        .split("|")
-        .map((p) => p.trim())
-        .filter(Boolean);
+function extractField(handle) {
+    return handle.split("|")[0].trim();
+}
 
-    return {
-        field: parts[0],
-        modifiers: parts.slice(1),
-    };
+// True when the handle is anything beyond a bare variable reference
+// like `title` or `meta:title`, e.g. has modifiers like `title | upper`.
+function hasLogic(handle) {
+    return !/^[a-zA-Z_][a-zA-Z0-9_]*(:[a-zA-Z_][a-zA-Z0-9_]*)*$/.test(handle.trim());
 }
 
 function resolveFieldToken(token) {
@@ -33,12 +31,9 @@ function resolveFieldToken(token) {
 }
 
 function resolveExpressionToken(handle) {
-    const { field, modifiers } = parseExpression(handle);
-
     return {
         display: handle,
-        field,
-        modifiers,
+        field: extractField(handle),
         attrs: {
             "data-token": handle,
             class: expressionTokenClass,
@@ -118,7 +113,7 @@ export const TokenNode = Node.create({
 
     addNodeView() {
         return ({ node, getPos, editor }) => {
-            const { attrs, display, field, modifiers } = resolveToken(
+            const { attrs, display, field } = resolveToken(
                 node.attrs.handle,
                 this.options.tokens,
             );
@@ -129,17 +124,17 @@ export const TokenNode = Node.create({
                 .filter(([key, value]) => value !== undefined)
                 .forEach(([key, value]) => dom.setAttribute(key, value));
 
-            if (modifiers?.length) {
+            if (field !== undefined && hasLogic(node.attrs.handle)) {
                 const fieldSpan = document.createElement("span");
                 fieldSpan.textContent = field;
                 dom.appendChild(fieldSpan);
 
                 const modSpan = document.createElement("span");
-                modSpan.textContent = modifiers.length;
+                modSpan.textContent = "{}";
                 modSpan.className = expressionModifierClass;
                 dom.appendChild(modSpan);
             } else {
-                dom.textContent = display;
+                dom.textContent = field ?? display;
             }
 
             const onMousedown = (event) => selectNode(event, editor, getPos);

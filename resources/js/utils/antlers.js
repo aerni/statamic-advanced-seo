@@ -3,8 +3,10 @@ export const ANTLERS_PATTERN = /\{\{\s*([^{}]+?)\s*\}\}/;
 export function normalizeHandle(raw) {
     const trimmed = raw.trim();
 
-    // No field reference: "|foo" or ":foo" are invalid.
-    if (trimmed.startsWith('|') || trimmed.startsWith(':')) return '';
+    // No field reference: "|foo" or ":foo" are invalid. Closing tags
+    // (`/name`) are intentionally skipped — they stay as raw text so they
+    // don't collide with the slash-command suggestion trigger on edit.
+    if (trimmed.startsWith('|') || trimmed.startsWith(':') || trimmed.startsWith('/')) return '';
 
     const normalized = trimmed
         .replace(/\s*\|\s*/g, ' | ')  // Normalize pipe spacing: "a|b" → "a | b"
