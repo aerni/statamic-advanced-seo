@@ -76,7 +76,7 @@ class Install extends Command
             ],
             [
                 'key' => 'ai',
-                'label' => 'AI Content Generation',
+                'label' => 'AI Copywriting',
                 'enabled' => Ai::enabled(),
             ],
             [
@@ -249,8 +249,8 @@ class Install extends Command
             );
         }
 
-        info('AI Content Generation has been set up.');
-        note("To use AI Content Generation, you need to configure a provider in config/ai.php.\nYou can optionally override the provider and model in config/advanced-seo.php.");
+        info('AI Copywriting has been set up.');
+        note("To use AI Copywriting, you need to configure a provider in config/ai.php.\nYou can optionally override the provider and model in config/advanced-seo.php.");
     }
 
     protected function setupSocialImages(): void
