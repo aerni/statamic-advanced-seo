@@ -3,12 +3,11 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
-use Aerni\AdvancedSeo\Context\Context;
 use Facades\Statamic\Console\Processes\Composer;
 
 class EloquentDriver extends Feature
 {
-    public static function enabled(?Context $context = null): bool
+    protected static function available(): bool
     {
         if (! AdvancedSeo::pro()) {
             return false;

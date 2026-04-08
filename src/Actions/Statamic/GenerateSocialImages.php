@@ -14,7 +14,7 @@ class GenerateSocialImages extends Action
     protected string $icon = 'assets';
 
     /**
-     * Determine if the current thing is an entry and if it's opted in to the auto generation config (global).
+     * Determine if the item is an entry and if its SeoSet has the social images generator enabled.
      *
      * @return bool
      */

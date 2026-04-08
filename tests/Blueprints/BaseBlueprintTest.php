@@ -64,7 +64,7 @@ class TestBlueprint extends BaseBlueprint
 
 class EnabledFeature extends Feature
 {
-    public static function enabled(?Context $context = null): bool
+    protected static function available(): bool
     {
         return true;
     }
@@ -72,7 +72,7 @@ class EnabledFeature extends Feature
 
 class DisabledFeature extends Feature
 {
-    public static function enabled(?Context $context = null): bool
+    protected static function available(): bool
     {
         return false;
     }

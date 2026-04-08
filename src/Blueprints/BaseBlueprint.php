@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Actions\EvaluateFeature;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Closure;
@@ -67,7 +66,7 @@ abstract class BaseBlueprint
                 ...$section,
                 'fields' => collect($section['fields'])
                     ->filter(fn (array $field) => ! isset($field['field']['feature']) ||
-                        EvaluateFeature::handle($field['field']['feature'], $this->context)
+                        $field['field']['feature']::enabled($this->context)
                     )
                     ->all(),
             ])

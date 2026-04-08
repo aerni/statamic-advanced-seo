@@ -8,6 +8,7 @@ use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Addons\Manifest;
+use Statamic\Facades\Blink;
 use Statamic\GraphQL\TypeRegistrar;
 use Statamic\Testing\AddonTestCase;
 
@@ -62,6 +63,11 @@ abstract class TestCase extends AddonTestCase
             : $this->uninstallPackages();
 
         parent::setUp();
+
+        // Blink is request-scoped in production but persists across tests in
+        // a single PHPUnit process. Flush it to simulate a fresh request for
+        // every test and prevent cached results from bleeding between tests.
+        Blink::flush();
 
         if ($this->usesGraphQL()) {
             app(TypeRegistrar::class)->register();

@@ -47,6 +47,11 @@ it('is enabled when no context is provided', function () {
 it('is enabled in config scope even when seoSet sitemap is disabled', function () {
     config(['advanced-seo.sitemap.enabled' => true]);
 
+    Seo::find('collections::pages')
+        ->config()
+        ->set('sitemap', false)
+        ->save();
+
     $context = new Context(
         parent: Collection::find('pages'),
         type: 'collections',

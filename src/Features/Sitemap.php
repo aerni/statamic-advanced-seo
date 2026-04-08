@@ -3,33 +3,17 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
-use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 
 class Sitemap extends Feature
 {
-    public static function enabled(?Context $context = null): bool
+    protected static function available(): bool
     {
-        if (! AdvancedSeo::pro()) {
-            return false;
-        }
+        return AdvancedSeo::pro() && config('advanced-seo.sitemap.enabled', true);
+    }
 
-        if (! config('advanced-seo.sitemap.enabled', true)) {
-            return false;
-        }
-
-        if (! $context) {
-            return true;
-        }
-
-        /* Always show toggle in the config */
-        if ($context->isConfig()) {
-            return true;
-        }
-
-        if (! $context->seoSet()->enabled()) {
-            return false;
-        }
-
-        return $context->seoSet()->config()->value('sitemap');
+    protected static function enabledInConfig(SeoSetConfig $config): bool
+    {
+        return $config->value('sitemap');
     }
 }

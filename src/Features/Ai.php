@@ -3,12 +3,12 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
-use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Statamic\Console\Processes\Composer;
 
 class Ai extends Feature
 {
-    public static function enabled(?Context $context = null): bool
+    protected static function available(): bool
     {
         if (! AdvancedSeo::pro()) {
             return false;
@@ -18,28 +18,6 @@ class Ai extends Feature
             return false;
         }
 
-        if (! static::aiSdkConfigured()) {
-            return false;
-        }
-
-        if (! $context) {
-            return true;
-        }
-
-        /* Always show toggle in the config */
-        if ($context->isConfig()) {
-            return true;
-        }
-
-        if (! $context->seoSet()->enabled()) {
-            return false;
-        }
-
-        return $context->seoSet()->config()->value('ai');
-    }
-
-    protected static function aiSdkConfigured(): bool
-    {
         if (! app(Composer::class)->isInstalled('laravel/ai')) {
             return false;
         }
@@ -47,5 +25,10 @@ class Ai extends Feature
         $provider = config('advanced-seo.ai.provider') ?? config('ai.default');
 
         return (bool) config("ai.providers.{$provider}.key");
+    }
+
+    protected static function enabledInConfig(SeoSetConfig $config): bool
+    {
+        return $config->value('ai');
     }
 }

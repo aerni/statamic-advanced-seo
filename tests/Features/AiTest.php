@@ -106,6 +106,11 @@ it('is enabled in config scope even when seoSet ai is disabled', function () {
         'ai.providers.openai.key' => 'test-key',
     ]);
 
+    Seo::find('collections::pages')
+        ->config()
+        ->set('ai', false)
+        ->save();
+
     $context = new Context(
         parent: Collection::find('pages'),
         type: 'collections',

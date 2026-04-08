@@ -2,11 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
-use Aerni\AdvancedSeo\Context\Context;
-
 class GoogleTagManager extends Feature
 {
-    public static function enabled(?Context $context = null): bool
+    protected static function available(): bool
     {
         return config('advanced-seo.analytics.google_tag_manager', true);
     }

@@ -66,6 +66,11 @@ it('is enabled when no context is provided', function () {
 });
 
 it('is enabled in config scope even when seoSet generator is disabled', function () {
+    Seo::find('collections::pages')
+        ->config()
+        ->set('social_images_generator', false)
+        ->save();
+
     $context = new Context(
         parent: Collection::find('pages'),
         type: 'collections',

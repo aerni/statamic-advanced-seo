@@ -3,13 +3,13 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
-use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Statamic\Console\Processes\Composer;
 
 class SocialImagesGenerator extends Feature
 {
-    public static function enabled(?Context $context = null): bool
+    protected static function available(): bool
     {
         if (! AdvancedSeo::pro()) {
             return false;
@@ -23,23 +23,11 @@ class SocialImagesGenerator extends Feature
             return false;
         }
 
-        if (SocialImage::themes()->all()->isEmpty()) {
-            return false;
-        }
+        return SocialImage::themes()->all()->isNotEmpty();
+    }
 
-        if (! $context) {
-            return true;
-        }
-
-        /* Always show toggle in the config */
-        if ($context->isConfig()) {
-            return true;
-        }
-
-        if (! $context->seoSet()->enabled()) {
-            return false;
-        }
-
-        return $context->seoSet()->config()->value('social_images_generator');
+    protected static function enabledInConfig(SeoSetConfig $config): bool
+    {
+        return $config->value('social_images_generator');
     }
 }
