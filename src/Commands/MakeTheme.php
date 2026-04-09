@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\AdvancedSeo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
@@ -67,6 +68,6 @@ class MakeTheme extends Command
 
     protected function getRelativePath($path): string
     {
-        return str_replace(base_path().'/', '', $path);
+        return Str::after($path, base_path('/'));
     }
 }
