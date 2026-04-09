@@ -15,7 +15,7 @@ class Migrate extends Command
 {
     use RunsInPlease;
 
-    protected $signature = 'seo:migrate {migrator? : The migrator to run (aardvark-seo, seo-pro)}';
+    protected $signature = 'seo:migrate';
 
     protected $description = 'Migrate content from another SEO addon';
 
@@ -23,7 +23,7 @@ class Migrate extends Command
     {
         $migrators = $this->migrators();
 
-        $key = $this->argument('migrator') ?? select(
+        $key = select(
             label: 'Which addon are you migrating from?',
             options: array_combine(array_keys($migrators), array_column($migrators, 'label')),
         );
