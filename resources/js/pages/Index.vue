@@ -39,7 +39,7 @@ const cancelDisable = () => {
 <template>
     <Head :title />
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl 3xl:max-w-6xl mx-auto">
         <Header :title :icon>
             <UpgradeBadge v-if="advancedSeo.promoteUpgrade" />
         </Header>
