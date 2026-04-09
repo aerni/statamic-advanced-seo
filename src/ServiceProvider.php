@@ -87,6 +87,7 @@ class ServiceProvider extends AddonServiceProvider
          * so that Stache reads of our items rehydrate as real objects.
          */
         $this->registerSerializableClasses([
+            SeoSet::class,
             SeoSets\SeoSetConfig::class,
             SeoSets\SeoSetLocalization::class,
         ]);
