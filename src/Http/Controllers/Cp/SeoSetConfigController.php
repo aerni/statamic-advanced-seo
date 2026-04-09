@@ -27,6 +27,7 @@ class SeoSetConfigController extends CpController
             ->title(__('advanced-seo::messages.configure_title', ['title' => $seoSet->title()]))
             ->values(array_merge($config->values()->all(), [
                 'enabled' => $config->enabled(),
+                'editable' => $config->editable(),
                 'origins' => $config->origins(),
             ]))
             ->submittingTo($config->editUrl());
@@ -45,11 +46,12 @@ class SeoSetConfigController extends CpController
 
         if ($seoSet->type() !== 'site') {
             $config->enabled(Arr::get($values, 'enabled'));
+            $config->editable(Arr::get($values, 'editable'));
         }
 
         $config
             ->origins(Arr::get($values, 'origins'))
-            ->data(Arr::except($values, ['enabled', 'origins']))
+            ->data(Arr::except($values, ['enabled', 'editable', 'origins']))
             ->save();
     }
 }
