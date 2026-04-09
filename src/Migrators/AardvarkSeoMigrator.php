@@ -51,6 +51,6 @@ class AardvarkSeoMigrator extends BaseMigrator
         return Str::of($value)
             ->remove('<script type="application/ld+json">')
             ->remove('</script>')
-            ->replaceFirst("\n", null);
+            ->replaceFirst("\n", '');
     }
 }
