@@ -37,7 +37,7 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_search_appearance.display'),
             'instructions' => $this->trans('seo_section_search_appearance.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_title',
@@ -83,7 +83,7 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_social_appearance.display'),
             'instructions' => $this->trans('seo_section_social_appearance.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_og_title',
@@ -188,7 +188,7 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_indexing.display'),
             'instructions' => $this->trans('seo_section_indexing.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_noindex',
@@ -227,7 +227,7 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_canonical_url.display'),
             'instructions' => $this->trans('seo_section_canonical_url.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_canonical_type',
@@ -305,7 +305,7 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_sitemap.display'),
             'instructions' => $this->trans('seo_section_sitemap.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_sitemap_enabled',
@@ -441,7 +441,7 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_structured_data.display'),
             'instructions' => $this->trans('seo_section_structured_data.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_json_ld',

@@ -53,7 +53,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_titles.display'),
             'instructions' => $this->trans('section_titles.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'site_name',
@@ -103,7 +103,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_structured_data.display'),
             'instructions' => $this->trans('section_structured_data.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'site_json_ld_type',
@@ -214,7 +214,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_favicon.display'),
             'instructions' => $this->trans('section_favicon.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'favicon_svg',
@@ -240,7 +240,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_social_appearance.display'),
             'instructions' => $this->trans('section_social_appearance.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'og_image',
@@ -275,7 +275,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_indexing.display'),
             'instructions' => $this->trans('section_indexing.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'noindex',
@@ -310,7 +310,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_verification.display'),
             'instructions' => $this->trans('section_verification.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'google_site_verification_code',
@@ -347,7 +347,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_fathom.display'),
             'instructions' => $this->trans('section_fathom.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'use_fathom',
@@ -410,7 +410,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_cloudflare_web_analytics.display'),
             'instructions' => $this->trans('section_cloudflare_web_analytics.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'use_cloudflare_web_analytics',
@@ -452,7 +452,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_google_tag_manager.display'),
             'instructions' => $this->trans('section_google_tag_manager.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'use_google_tag_manager',
@@ -494,7 +494,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_ai.display'),
             'instructions' => $this->trans('section_ai.instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'ai_instructions',

@@ -37,7 +37,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_search_appearance.display'),
             'instructions' => $this->trans('seo_section_search_appearance.default_instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_title',
@@ -71,7 +71,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_social_appearance.display'),
             'instructions' => $this->trans('seo_section_social_appearance.default_instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_og_title',
@@ -147,7 +147,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_indexing.display'),
             'instructions' => $this->trans('seo_section_indexing.default_instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_noindex',
@@ -188,7 +188,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_canonical_url.display'),
             'instructions' => $this->trans('seo_section_canonical_url.default_instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_canonical_type',
@@ -249,7 +249,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_sitemap.display'),
             'instructions' => $this->trans('seo_section_sitemap.default_instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_sitemap_enabled',
@@ -332,7 +332,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_structured_data.display'),
             'instructions' => $this->trans('seo_section_structured_data.default_instructions'),
-            'collapsible' => true,
+
             'fields' => [
                 [
                     'handle' => 'seo_json_ld',
