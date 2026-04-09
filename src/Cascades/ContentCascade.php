@@ -25,7 +25,6 @@ class ContentCascade extends BaseCascade
     {
         return $this
             ->withSiteDefaults()
-            ->withContentConfig()
             ->withPageData()
             ->removeSeoPrefix()
             ->ensureOverrides()

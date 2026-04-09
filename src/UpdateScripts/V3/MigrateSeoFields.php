@@ -14,25 +14,10 @@ class MigrateSeoFields
 {
     public function run(): void
     {
-        $this->migrateTwitterCardToConfig();
         $this->migrateEntries();
         $this->migrateTerms();
         $this->migrateSeoSetLocalizations();
         $this->migrateSiteDefaults();
-    }
-
-    /**
-     * Move seo_twitter_card from the default site's localization to the SeoSet config.
-     */
-    protected function migrateTwitterCardToConfig(): void
-    {
-        Seo::all()
-            ->filter(fn (SeoSet $set) => in_array($set->type(), ['collections', 'taxonomies']))
-            ->each(function (SeoSet $set) {
-                if ($value = $set->inDefaultSite()->get('seo_twitter_card')) {
-                    $set->config()->set('twitter_card', $value)->save();
-                }
-            });
     }
 
     protected function migrateEntries(): void

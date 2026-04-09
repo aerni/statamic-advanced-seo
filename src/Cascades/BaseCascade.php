@@ -52,17 +52,6 @@ abstract class BaseCascade implements Augmentable
         return $this->merge($contentDefaults);
     }
 
-    protected function withContentConfig(): self
-    {
-        $config = SeoContext::from($this->model)?->seoSet()?->config();
-
-        if ($config) {
-            $this->merge(['twitter_card' => $config->value('twitter_card')]);
-        }
-
-        return $this;
-    }
-
     protected function withPageData(): self
     {
         $pageData = GetPageData::handle($this->model)

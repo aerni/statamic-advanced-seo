@@ -190,20 +190,6 @@ it('removes twitter fields from seo set localizations', function () {
     expect($localization->has('seo_twitter_summary_large_image'))->toBeFalse();
 });
 
-it('migrates twitter card value from default site localization to config', function () {
-    Seo::find('collections::pages')
-        ->inDefaultSite()
-        ->data(['seo_twitter_card' => 'summary'])
-        ->save();
-
-    runMigrateSeoFieldsScript();
-
-    $seo = Seo::find('collections::pages');
-
-    expect($seo->inDefaultSite()->get('twitter_card'))->toBeNull();
-    expect($seo->config()->get('twitter_card'))->toBe('summary');
-});
-
 it('removes twitter image fields from site defaults', function () {
     Seo::find('site::defaults')
         ->inDefaultSite()

@@ -47,6 +47,7 @@ it('exposes all expected fields', function () {
         'favicon_svg',
         // Social Media
         'og_image',
+        'twitter_card',
         'twitter_handle',
         // Indexing: Crawling
         'noindex',

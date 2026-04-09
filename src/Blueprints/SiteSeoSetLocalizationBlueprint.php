@@ -254,6 +254,21 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                     ]),
                 ],
                 [
+                    'handle' => 'twitter_card',
+                    'field' => [
+                        'type' => 'button_group',
+                        'display' => $this->trans('twitter_card.display'),
+                        'instructions' => $this->trans('twitter_card.instructions'),
+                        'options' => [
+                            'summary_large_image' => $this->trans('twitter_card.summary_large_image'),
+                            'summary' => $this->trans('twitter_card.summary'),
+                        ],
+                        'default' => 'summary_large_image',
+                        'localizable' => true,
+                        'width' => 50,
+                    ],
+                ],
+                [
                     'handle' => 'twitter_handle',
                     'field' => [
                         'type' => 'text',
@@ -264,6 +279,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'prepend' => '@',
                         'antlers' => false,
+                        'width' => 50,
                     ],
                 ],
             ],

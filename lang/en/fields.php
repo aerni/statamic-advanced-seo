@@ -244,6 +244,13 @@ return [
         'instructions' => 'Fallback image when none is set on the content. Recommended size: 1200x630px.',
     ],
 
+    'twitter_card' => [
+        'display' => 'X (Twitter) Card',
+        'instructions' => 'Card size when sharing content on X (Twitter).',
+        'summary' => 'Small',
+        'summary_large_image' => 'Large',
+    ],
+
     'twitter_handle' => [
         'display' => 'X (Twitter) Username',
         'instructions' => 'Your X (Twitter) username.',
@@ -355,13 +362,6 @@ return [
     'config_sitemap' => [
         'display' => 'Sitemap',
         'instructions' => 'Enables the sitemap for this :type.',
-    ],
-
-    'config_twitter_card' => [
-        'display' => 'X (Twitter) Card',
-        'instructions' => 'Card size when sharing content from this :type.',
-        'summary' => 'Small',
-        'summary_large_image' => 'Large',
     ],
 
     'config_social_images_generator' => [

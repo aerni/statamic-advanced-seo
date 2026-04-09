@@ -17,13 +17,12 @@ class SocialPreviewFieldtype extends Fieldtype
     public function preload(): array
     {
         $parent = $this->field()->parent();
-        $context = Context::from($parent);
-        $defaults = Seo::find('site::defaults')->in($context->site);
+        $defaults = Seo::find('site::defaults')->in(Context::from($parent)->site);
 
         return [
             'domain' => parse_url($defaults->site()->absoluteUrl(), PHP_URL_HOST),
             'imagePresets' => config('advanced-seo.social_images.presets'),
-            'twitterCard' => $context->seoSet()->config()->value('twitter_card'),
+            'twitterCard' => $defaults->value('twitter_card'),
             'imageTemplateUrl' => $this->imageTemplateUrl($parent),
         ];
     }

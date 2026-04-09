@@ -244,6 +244,13 @@ return [
         'instructions' => 'Fallback-Bild, wenn keines im Inhalt gesetzt ist. Empfohlene Größe: 1200x630px.',
     ],
 
+    'twitter_card' => [
+        'display' => 'X (Twitter) Card',
+        'instructions' => 'Kartengröße beim Teilen von Inhalten auf X (Twitter).',
+        'summary' => 'Klein',
+        'summary_large_image' => 'Groß',
+    ],
+
     'twitter_handle' => [
         'display' => 'X (Twitter) Benutzername',
         'instructions' => 'Dein X (Twitter) Benutzername.',
@@ -355,13 +362,6 @@ return [
     'config_sitemap' => [
         'display' => 'Sitemap',
         'instructions' => 'Aktiviert die Sitemap für diesen :type.',
-    ],
-
-    'config_twitter_card' => [
-        'display' => 'X (Twitter) Card',
-        'instructions' => 'Kartengröße beim Teilen von Inhalten dieses :type.',
-        'summary' => 'Klein',
-        'summary_large_image' => 'Groß',
     ],
 
     'config_social_images_generator' => [
