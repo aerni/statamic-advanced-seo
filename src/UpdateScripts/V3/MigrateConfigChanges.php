@@ -57,11 +57,11 @@ class MigrateConfigChanges
     {
         $configPath = config_path('statamic/editions.php');
 
-        if (! file_exists($configPath)) {
+        if (! File::exists($configPath)) {
             return;
         }
 
-        $contents = file_get_contents($configPath);
+        $contents = File::get($configPath);
 
         if (Str::contains($contents, "'aerni/advanced-seo'")) {
             return;
@@ -74,7 +74,7 @@ class MigrateConfigChanges
             1,
         );
 
-        file_put_contents($configPath, $contents);
+        File::put($configPath, $contents);
     }
 
     protected function usesEloquentDriver(): bool
