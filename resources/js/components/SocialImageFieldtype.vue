@@ -42,6 +42,8 @@ export default {
 
     computed: {
         exists() {
+            if (!this.image) return false;
+
             const http = new XMLHttpRequest();
 
             http.open('HEAD', this.image, false);
