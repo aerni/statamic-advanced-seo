@@ -21,7 +21,7 @@ class IncludeInSitemap
 
     public function handle(Entry|Term|Collection|Taxonomy $model, ?string $site = null): bool
     {
-        if ($this->siteIsRequired($model) && is_null($site)) {
+        if ($this->siteIsRequired($model) && $site === null) {
             throw new \Exception('A site is required if the model is a Collection or Taxonomy.');
         }
 

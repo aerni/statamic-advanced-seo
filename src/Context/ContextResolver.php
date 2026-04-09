@@ -26,7 +26,7 @@ class ContextResolver
 {
     public static function resolve(mixed $model): ?Context
     {
-        if ($model instanceof Context || is_null($model)) {
+        if ($model instanceof Context || $model === null) {
             return $model;
         }
 
