@@ -246,14 +246,14 @@ return [
 
     'twitter_card' => [
         'display' => 'X (Twitter) Card',
-        'instructions' => 'Kartengröße beim Teilen von Inhalten auf X (Twitter).',
+        'instructions' => 'Die Größe der Linkvorschau auf X.',
         'summary' => 'Klein',
         'summary_large_image' => 'Groß',
     ],
 
     'twitter_handle' => [
         'display' => 'X (Twitter) Benutzername',
-        'instructions' => 'Dein X (Twitter) Benutzername.',
+        'instructions' => 'Der mit dieser Website verknüpfte X-Account.',
     ],
 
     'section_indexing' => [
