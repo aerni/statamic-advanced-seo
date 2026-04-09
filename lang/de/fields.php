@@ -376,6 +376,7 @@ return [
 
     'section_ai' => [
         'display' => 'KI',
+        'instructions' => 'Konfiguriere KI-Funktionen für deine Website.',
     ],
 
     'config_ai' => [

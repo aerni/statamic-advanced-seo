@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\Cloudflare;
 use Aerni\AdvancedSeo\Features\Fathom;
 use Aerni\AdvancedSeo\Features\Favicons;
@@ -37,6 +38,12 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                 $this->fathom(),
                 $this->cloudflare(),
                 $this->googleTagManager(),
+            ],
+            'ai' => [
+                'display' => 'AI',
+                'sections' => [
+                    $this->ai(),
+                ],
             ],
         ];
     }
@@ -476,6 +483,28 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                         'if' => [
                             'use_google_tag_manager' => 'equals true',
                         ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function ai(): array
+    {
+        return [
+            'display' => $this->trans('section_ai.display'),
+            'instructions' => $this->trans('section_ai.instructions'),
+            'collapsible' => true,
+            'fields' => [
+                [
+                    'handle' => 'ai_instructions',
+                    'field' => [
+                        'type' => 'textarea',
+                        'display' => $this->trans('config_ai_instructions_site.display'),
+                        'instructions' => $this->trans('config_ai_instructions_site.instructions'),
+                        'placeholder' => $this->trans('config_ai_instructions_site.placeholder'),
+                        'localizable' => true,
+                        'feature' => Ai::class,
                     ],
                 ],
             ],

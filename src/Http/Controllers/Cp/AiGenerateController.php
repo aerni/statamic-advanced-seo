@@ -38,7 +38,7 @@ class AiGenerateController extends CpController
                 blueprint: $this->resolveBlueprint($type, $handle, $blueprint),
                 content: $validated['content'],
                 site: $validated['site'],
-                additionalInstructions: $this->resolveAdditionalInstructions($type, $handle),
+                additionalInstructions: $this->resolveAdditionalInstructions($type, $handle, $validated['site']),
             )->generate());
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -60,9 +60,9 @@ class AiGenerateController extends CpController
         };
     }
 
-    protected function resolveAdditionalInstructions(string $type, string $handle): ?string
+    protected function resolveAdditionalInstructions(string $type, string $handle, string $site): ?string
     {
-        $global = Seo::find('site::defaults')->config()->data()->get('ai_instructions');
+        $global = Seo::find('site::defaults')->in($site)->value('ai_instructions');
         $scoped = Seo::find("{$type}::{$handle}")?->config()->data()->get('ai_instructions');
 
         return collect([

@@ -49,9 +49,9 @@ abstract class BaseBlueprint
     protected function contents(): array
     {
         $tabs = collect($this->tabs())
-            ->map(fn (array $sections, string $handle) => [
-                'display' => Str::slugToTitle($handle),
-                'sections' => $this->sections($sections),
+            ->map(fn (array $tab, string $handle) => [
+                'display' => $tab['display'] ?? Str::slugToTitle($handle),
+                'sections' => $this->sections($tab['sections'] ?? $tab),
             ])
             ->pipe($this->resolveLazyValues(...))
             ->all();

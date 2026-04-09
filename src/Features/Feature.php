@@ -41,7 +41,7 @@ abstract class Feature
 
     private static function configFor(?Context $context): ?SeoSetConfig
     {
-        if ($context === null || $context->isConfig()) {
+        if ($context === null || $context->isConfig() || $context->type === 'site') {
             return null;
         }
 

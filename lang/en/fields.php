@@ -376,6 +376,7 @@ return [
 
     'section_ai' => [
         'display' => 'AI',
+        'instructions' => 'Configure AI features for your site.',
     ],
 
     'config_ai' => [
