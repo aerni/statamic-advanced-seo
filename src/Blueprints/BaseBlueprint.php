@@ -117,12 +117,12 @@ abstract class BaseBlueprint
     protected function contentTypeLabel(): string
     {
         return match ([$this->context?->scope, $this->context?->type]) {
-            [Scope::CONFIG, 'collections'] => __('collection'),
-            [Scope::CONFIG, 'taxonomies'] => __('taxonomy'),
-            [Scope::LOCALIZATION, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entries')),
-            [Scope::LOCALIZATION, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.terms')),
-            [Scope::CONTENT, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entry')),
-            [Scope::CONTENT, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.term')),
+            [Scope::Config, 'collections'] => __('collection'),
+            [Scope::Config, 'taxonomies'] => __('taxonomy'),
+            [Scope::Localization, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entries')),
+            [Scope::Localization, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.terms')),
+            [Scope::Content, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entry')),
+            [Scope::Content, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.term')),
             default => '',
         };
     }

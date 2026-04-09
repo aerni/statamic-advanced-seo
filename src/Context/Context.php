@@ -58,7 +58,7 @@ class Context
      */
     public function isConfig(): bool
     {
-        return $this->scope === Scope::CONFIG;
+        return $this->scope === Scope::Config;
     }
 
     /**
@@ -66,7 +66,7 @@ class Context
      */
     public function isLocalization(): bool
     {
-        return $this->scope === Scope::LOCALIZATION;
+        return $this->scope === Scope::Localization;
     }
 
     /**
@@ -74,6 +74,6 @@ class Context
      */
     public function isContent(): bool
     {
-        return $this->scope === Scope::CONTENT;
+        return $this->scope === Scope::Content;
     }
 }

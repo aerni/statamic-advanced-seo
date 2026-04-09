@@ -7,15 +7,15 @@ enum Scope: string
     /**
      * Config scope: Editing SeoSetConfig
      */
-    case CONFIG = 'config';
+    case Config = 'config';
 
     /**
      * Localization scope: Editing SeoSetLocalization
      */
-    case LOCALIZATION = 'localization';
+    case Localization = 'localization';
 
     /**
      * Content scope: Editing individual entries and terms
      */
-    case CONTENT = 'content';
+    case Content = 'content';
 }

@@ -29,7 +29,7 @@ it('returns available() when the context is config-scope', function () {
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONFIG,
+        scope: Scope::Config,
         site: 'english',
     );
 
@@ -43,7 +43,7 @@ it('returns available() when the context has no associated seoset', function () 
         parent: Collection::make('articles'),
         type: 'collections',
         handle: 'articles',
-        scope: Scope::CONTENT,
+        scope: Scope::Content,
         site: 'english',
     );
 
@@ -56,7 +56,7 @@ it('composes available() and the seoset checks for content-scope contexts', func
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONTENT,
+        scope: Scope::Content,
         site: 'english',
     );
 
@@ -74,7 +74,7 @@ it('returns false when the seoset is disabled for content-scope contexts', funct
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONTENT,
+        scope: Scope::Content,
         site: 'english',
     );
 
@@ -91,7 +91,7 @@ it('returns available() for config-scope contexts even when the seoset is disabl
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONFIG,
+        scope: Scope::Config,
         site: 'english',
     );
 
@@ -103,7 +103,7 @@ it('consults enabledInConfig() for content-scope contexts', function () {
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONTENT,
+        scope: Scope::Content,
         site: 'english',
     );
 
@@ -116,7 +116,7 @@ it('bypasses enabledInConfig() for config-scope contexts', function () {
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONFIG,
+        scope: Scope::Config,
         site: 'english',
     );
 

@@ -19,7 +19,7 @@ it('can resolve fields by context', function () {
         parent: Collection::make('articles'),
         type: 'collections',
         handle: 'articles',
-        scope: Scope::CONTENT,
+        scope: Scope::Content,
         site: 'english',
     );
 

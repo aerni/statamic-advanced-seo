@@ -111,9 +111,9 @@ class ContextResolver
     protected function scope(mixed $model): Scope
     {
         return match (true) {
-            $model instanceof SeoSetConfig => Scope::CONFIG,
-            $model instanceof SeoSetLocalization => Scope::LOCALIZATION,
-            default => Scope::CONTENT,
+            $model instanceof SeoSetConfig => Scope::Config,
+            $model instanceof SeoSetLocalization => Scope::Localization,
+            default => Scope::Content,
         };
     }
 

@@ -75,7 +75,7 @@ it('is enabled in config scope even when seoSet generator is disabled', function
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONFIG,
+        scope: Scope::Config,
         site: 'english',
     );
 
@@ -92,7 +92,7 @@ it('is disabled if the seoSet is disabled', function () {
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::LOCALIZATION,
+        scope: Scope::Localization,
         site: 'english',
     );
 
@@ -109,7 +109,7 @@ it('is disabled if the generator is disabled in the config', function () {
         parent: Collection::find('pages'),
         type: 'collections',
         handle: 'pages',
-        scope: Scope::CONTENT,
+        scope: Scope::Content,
         site: 'english',
     );
 
@@ -146,7 +146,7 @@ it('shows in all contexts when enabled', function () {
         ->set('social_images_generator', true)
         ->save();
 
-    foreach ([Scope::CONFIG, Scope::LOCALIZATION, Scope::CONTENT] as $scope) {
+    foreach ([Scope::Config, Scope::Localization, Scope::Content] as $scope) {
         $context = new Context(
             parent: Collection::find('pages'),
             type: 'collections',
