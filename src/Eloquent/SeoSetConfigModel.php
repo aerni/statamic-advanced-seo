@@ -11,7 +11,10 @@ class SeoSetConfigModel extends BaseModel
 
     protected $table = 'seo_set_configs';
 
-    protected $casts = [
-        'data' => AsCollection::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => AsCollection::class,
+        ];
+    }
 }

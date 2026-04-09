@@ -11,7 +11,10 @@ class SeoSetLocalizationModel extends BaseModel
 
     protected $table = 'seo_set_localizations';
 
-    protected $casts = [
-        'data' => AsCollection::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => AsCollection::class,
+        ];
+    }
 }
