@@ -39,7 +39,7 @@ abstract class BaseCascade implements Augmentable
     protected function withSiteDefaults(): self
     {
         $siteDefaults = GetSiteDefaults::handle($this->model)
-            ->map(fn ($value) => $value->value());
+            ->map->value();
 
         return $this->merge($siteDefaults);
     }
@@ -47,7 +47,7 @@ abstract class BaseCascade implements Augmentable
     protected function withContentDefaults(): self
     {
         $contentDefaults = GetContentDefaults::handle($this->model)
-            ->map(fn ($value) => $value->value());
+            ->map->value();
 
         return $this->merge($contentDefaults);
     }
@@ -55,7 +55,7 @@ abstract class BaseCascade implements Augmentable
     protected function withPageData(): self
     {
         $pageData = GetPageData::handle($this->model)
-            ->map(fn ($value) => $value->value());
+            ->map->value();
 
         return $this->merge($pageData);
     }
@@ -88,7 +88,7 @@ abstract class BaseCascade implements Augmentable
     {
         $overrides = GetSiteDefaults::handle($this->model)
             ->only(['noindex', 'nofollow'])
-            ->map(fn ($value) => $value->value())
+            ->map->value()
             ->filter();
 
         return $this->merge($overrides);

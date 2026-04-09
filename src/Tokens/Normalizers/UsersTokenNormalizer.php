@@ -20,7 +20,7 @@ class UsersTokenNormalizer extends TokenNormalizer
 
         if ($value instanceof Builder) {
             $names = $value->limit(5)->get()
-                ->map(fn ($user) => $user->name())
+                ->map->name()
                 ->filter()
                 ->values()
                 ->all();
