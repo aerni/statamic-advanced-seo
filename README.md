@@ -8,9 +8,11 @@ One place to manage your SEO — from on-page essentials like titles, descriptio
 
 [Read the documentation](https://advanced-seo.michaelaerni.ch) to get started.
 
-## What’s Included
+## Editions
 
-### Free — solid SEO out of the box
+Advanced SEO comes in two editions — a free one that covers the essentials, and a Pro edition for when you need more.
+
+### Free
 
 Everything you need for production-ready on-page SEO, no license required.
 
@@ -22,7 +24,7 @@ Everything you need for production-ready on-page SEO, no license required.
 - Git integration
 - Migration from SEO Pro & Aardvark SEO
 
-### Pro — for power users
+### Pro
 
 Everything in Free, plus the tools to handle complex sites and advanced workflows.
 
