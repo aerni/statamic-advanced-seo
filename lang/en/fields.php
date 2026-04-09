@@ -163,7 +163,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Site Fields
+    | Site Fields — General
     |--------------------------------------------------------------------------
     |
     | Used by SiteSeoSetLocalizationBlueprint.
@@ -184,6 +184,22 @@ return [
         'display' => 'Separator',
         'instructions' => 'The character between the page title and site name.',
     ],
+
+    'section_favicon' => [
+        'display' => 'Favicon',
+        'instructions' => 'The icon displayed in browser tabs.',
+    ],
+
+    'favicon_svg' => [
+        'display' => 'Favicon (SVG)',
+        'instructions' => 'Upload an SVG favicon.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Site Fields — Search Appearance
+    |--------------------------------------------------------------------------
+    */
 
     'section_structured_data' => [
         'display' => 'Structured Data',
@@ -224,38 +240,6 @@ return [
         'instructions' => 'Structured data added to every page. Automatically wrapped in a script tag.',
     ],
 
-    'section_favicon' => [
-        'display' => 'Favicon',
-        'instructions' => 'The icon displayed in browser tabs.',
-    ],
-
-    'favicon_svg' => [
-        'display' => 'Favicon (SVG)',
-        'instructions' => 'Upload an SVG favicon.',
-    ],
-
-    'section_social_appearance' => [
-        'display' => 'Social Appearance',
-        'instructions' => 'Site-wide social sharing settings.',
-    ],
-
-    'og_image' => [
-        'display' => 'Social Image',
-        'instructions' => 'Fallback image when none is set on the content. Recommended size: 1200x630px.',
-    ],
-
-    'twitter_card' => [
-        'display' => 'X (Twitter) Card',
-        'instructions' => 'The size of the link preview on X.',
-        'summary' => 'Small',
-        'summary_large_image' => 'Large',
-    ],
-
-    'twitter_handle' => [
-        'display' => 'X (Twitter) Username',
-        'instructions' => 'The X account associated with this site.',
-    ],
-
     'section_indexing' => [
         'display' => 'Indexing',
         'instructions' => 'Site-wide indexing settings. These override entry and term settings.',
@@ -285,6 +269,45 @@ return [
         'display' => 'Bing Verification Code',
         'instructions' => 'From [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Site Fields — Social Appearance
+    |--------------------------------------------------------------------------
+    */
+
+    'section_social_image' => [
+        'display' => 'Social Image',
+        'instructions' => 'Used as the default when sharing links on social media.',
+    ],
+
+    'og_image' => [
+        'display' => 'Social Image',
+        'instructions' => 'Fallback image when none is set on the content. Recommended size: 1200x630px.',
+    ],
+
+    'section_twitter' => [
+        'display' => 'X (Twitter)',
+        'instructions' => 'Configure how links to your site appear on X.',
+    ],
+
+    'twitter_card' => [
+        'display' => 'X (Twitter) Card',
+        'instructions' => 'The size of the link preview on X.',
+        'summary' => 'Small',
+        'summary_large_image' => 'Large',
+    ],
+
+    'twitter_handle' => [
+        'display' => 'X (Twitter) Username',
+        'instructions' => 'The X account associated with this site.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Site Fields — Analytics
+    |--------------------------------------------------------------------------
+    */
 
     'section_fathom' => [
         'display' => 'Fathom',

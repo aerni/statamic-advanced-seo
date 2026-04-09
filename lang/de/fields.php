@@ -163,7 +163,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Site Fields
+    | Site Fields — General
     |--------------------------------------------------------------------------
     |
     | Used by SiteSeoSetLocalizationBlueprint.
@@ -184,6 +184,22 @@ return [
         'display' => 'Trennzeichen',
         'instructions' => 'Das Zeichen zwischen dem Seitentitel und dem Website-Namen.',
     ],
+
+    'section_favicon' => [
+        'display' => 'Favicon',
+        'instructions' => 'Das Symbol, das in Browser-Tabs angezeigt wird.',
+    ],
+
+    'favicon_svg' => [
+        'display' => 'Favicon (SVG)',
+        'instructions' => 'Ein SVG-Favicon hochladen.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Site Fields — Search Appearance
+    |--------------------------------------------------------------------------
+    */
 
     'section_structured_data' => [
         'display' => 'Strukturierte Daten',
@@ -224,38 +240,6 @@ return [
         'instructions' => 'Strukturierte Daten, die auf jeder Seite hinzugefügt werden. Werden automatisch in ein Skript-Tag eingebettet.',
     ],
 
-    'section_favicon' => [
-        'display' => 'Favicon',
-        'instructions' => 'Das Symbol, das in Browser-Tabs angezeigt wird.',
-    ],
-
-    'favicon_svg' => [
-        'display' => 'Favicon (SVG)',
-        'instructions' => 'Ein SVG-Favicon hochladen.',
-    ],
-
-    'section_social_appearance' => [
-        'display' => 'Social-Media-Darstellung',
-        'instructions' => 'Website-weite Social-Media-Einstellungen.',
-    ],
-
-    'og_image' => [
-        'display' => 'Social-Media-Bild',
-        'instructions' => 'Fallback-Bild, wenn keines im Inhalt gesetzt ist. Empfohlene Größe: 1200x630px.',
-    ],
-
-    'twitter_card' => [
-        'display' => 'X (Twitter) Card',
-        'instructions' => 'Die Größe der Linkvorschau auf X.',
-        'summary' => 'Klein',
-        'summary_large_image' => 'Groß',
-    ],
-
-    'twitter_handle' => [
-        'display' => 'X (Twitter) Benutzername',
-        'instructions' => 'Der mit dieser Website verknüpfte X-Account.',
-    ],
-
     'section_indexing' => [
         'display' => 'Indexierung',
         'instructions' => 'Website-weite Indexierungseinstellungen. Diese überschreiben Eintrags- und Begriffseinstellungen.',
@@ -285,6 +269,45 @@ return [
         'display' => 'Bing-Verifizierungscode',
         'instructions' => 'Aus den [Bing Webmaster Tools](https://www.bing.com/toolbox/webmaster).',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Site Fields — Social Appearance
+    |--------------------------------------------------------------------------
+    */
+
+    'section_social_image' => [
+        'display' => 'Social-Media-Bild',
+        'instructions' => 'Wird als Standard verwendet, wenn Links in sozialen Medien geteilt werden.',
+    ],
+
+    'og_image' => [
+        'display' => 'Social-Media-Bild',
+        'instructions' => 'Fallback-Bild, wenn keines im Inhalt gesetzt ist. Empfohlene Größe: 1200x630px.',
+    ],
+
+    'section_twitter' => [
+        'display' => 'X (Twitter)',
+        'instructions' => 'Lege fest, wie Links zu deiner Website auf X dargestellt werden.',
+    ],
+
+    'twitter_card' => [
+        'display' => 'X (Twitter) Card',
+        'instructions' => 'Die Größe der Linkvorschau auf X.',
+        'summary' => 'Klein',
+        'summary_large_image' => 'Groß',
+    ],
+
+    'twitter_handle' => [
+        'display' => 'X (Twitter) Benutzername',
+        'instructions' => 'Der mit dieser Website verknüpfte X-Account.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Site Fields — Analytics
+    |--------------------------------------------------------------------------
+    */
 
     'section_fathom' => [
         'display' => 'Fathom',

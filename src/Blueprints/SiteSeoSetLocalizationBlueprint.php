@@ -22,17 +22,18 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
     protected function tabs(): array
     {
         return [
-            'search_appearance' => [
+            'general' => [
                 $this->titles(),
-                $this->structuredData(),
                 $this->favicons(),
             ],
-            'social_appearance' => [
-                $this->socialAppearance(),
-            ],
-            'indexing' => [
+            'search_appearance' => [
+                $this->structuredData(),
                 $this->indexing(),
                 $this->siteVerification(),
+            ],
+            'social_appearance' => [
+                $this->socialImage(),
+                $this->twitter(),
             ],
             'analytics' => [
                 $this->fathom(),
@@ -235,11 +236,11 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function socialAppearance(): array
+    protected function socialImage(): array
     {
         return [
-            'display' => $this->trans('section_social_appearance.display'),
-            'instructions' => $this->trans('section_social_appearance.instructions'),
+            'display' => $this->trans('section_social_image.display'),
+            'instructions' => $this->trans('section_social_image.instructions'),
 
             'fields' => [
                 [
@@ -253,6 +254,17 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                         ],
                     ]),
                 ],
+            ],
+        ];
+    }
+
+    protected function twitter(): array
+    {
+        return [
+            'display' => $this->trans('section_twitter.display'),
+            'instructions' => $this->trans('section_twitter.instructions'),
+
+            'fields' => [
                 [
                     'handle' => 'twitter_card',
                     'field' => [
