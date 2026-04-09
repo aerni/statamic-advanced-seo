@@ -36,27 +36,15 @@ class SeoSetIndexController extends CpController
             'title' => __("advanced-seo::messages.{$seoSetGroup->type()}"),
             'icon' => $seoSetGroup->icon(),
             'items' => $items,
-            'columns' => $this->columns($seoSetGroup),
+            'columns' => $this->columns(),
         ]);
     }
 
-    protected function columns(SeoSetGroup $seoSetGroup): array
+    protected function columns(): array
     {
-        $columns = [
+        return [
             Column::make('title')->label(__('Title')),
             Column::make('status')->label(__('Status')),
         ];
-
-        $blueprint = $seoSetGroup->seoSets()->first()->config()->blueprint();
-
-        if ($blueprint->hasField('sitemap')) {
-            $columns[] = Column::make('sitemap')->label(__('Sitemap'))->fieldtype('toggle');
-        }
-
-        if ($blueprint->hasField('social_images_generator')) {
-            $columns[] = Column::make('social_images_generator')->label(__('Social Images Generator'))->fieldtype('toggle');
-        }
-
-        return $columns;
     }
 }
