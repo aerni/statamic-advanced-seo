@@ -1,0 +1,1 @@
+@layer addon-theme{:root,:host{--color-gray-300:var(--theme-color-gray-300);--color-gray-700:var(--theme-color-gray-700)}}@layer addon-utilities;:root{--animation-timing-function-fast-out-slow-in:cubic-bezier(.4,0,.2,1);--color-button-active:hsl(from var(--color-gray-300)h s l/.45)}.dark{--color-button-active:hsl(from var(--color-gray-700)h s l/.45)}
