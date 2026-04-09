@@ -75,7 +75,7 @@ class SeoSetLocalization implements Augmentable, Contract
 
     public function editUrl(): string
     {
-        return cp_route('advanced-seo.sets.localization', [
+        return cp_route('advanced-seo.sets.localization.edit', [
             'seoSetGroup' => $this->type(),
             'seoSet' => $this->handle(),
             'seoSetLocalization' => $this->locale(),

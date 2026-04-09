@@ -12,10 +12,10 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
     Route::get('/{seoSetGroup}', SeoSetIndexController::class)->name('sets.index');
-    Route::get('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'edit'])->name('sets.config');
-    Route::patch('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'update'])->name('sets.config');
+    Route::get('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'edit'])->name('sets.config.edit');
+    Route::patch('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'update'])->name('sets.config.update');
     Route::post('/{seoSetGroup}/{seoSet}/enable', [SeoSetStateController::class, 'enable'])->name('sets.enable');
     Route::post('/{seoSetGroup}/{seoSet}/disable', [SeoSetStateController::class, 'disable'])->name('sets.disable');
-    Route::get('/{seoSetGroup}/{seoSet}/{seoSetLocalization}', [SeoSetLocalizationController::class, 'edit'])->name('sets.localization');
-    Route::patch('/{seoSetGroup}/{seoSet}/{seoSetLocalization}', [SeoSetLocalizationController::class, 'update'])->name('sets.localization');
+    Route::get('/{seoSetGroup}/{seoSet}/{seoSetLocalization}', [SeoSetLocalizationController::class, 'edit'])->name('sets.localization.edit');
+    Route::patch('/{seoSetGroup}/{seoSet}/{seoSetLocalization}', [SeoSetLocalizationController::class, 'update'])->name('sets.localization.update');
 });
