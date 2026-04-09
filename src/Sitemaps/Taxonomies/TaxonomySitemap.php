@@ -84,38 +84,42 @@ class TaxonomySitemap extends BaseSitemap
 
     public function collectionTaxonomies(): Collection
     {
-        return $this->model->collections()
-            ->map(fn ($collection) => $this->freshTaxonomy()->collection($collection)) // Need to get a fresh instance of the Taxonomy, else we'll override the previously set collection.
-            ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
-            ->flatMap(function ($taxonomy) {
-                // Only allow sites that have been set on both the taxonomy and the collection
-                return $taxonomy->sites()
-                    ->merge($taxonomy->collection()->sites())
-                    ->duplicates()
-                    ->intersect($this->sites())
-                    ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
-            })
-            ->filter(fn ($item) => IncludeInSitemap::run($item['taxonomy'], $item['site']));
+        return Blink::once($this->cacheKey().'.collection-taxonomies', function () {
+            return $this->model->collections()
+                ->map(fn ($collection) => $this->freshTaxonomy()->collection($collection)) // Need to get a fresh instance of the Taxonomy, else we'll override the previously set collection.
+                ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
+                ->flatMap(function ($taxonomy) {
+                    // Only allow sites that have been set on both the taxonomy and the collection
+                    return $taxonomy->sites()
+                        ->merge($taxonomy->collection()->sites())
+                        ->duplicates()
+                        ->intersect($this->sites())
+                        ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
+                })
+                ->filter(fn ($item) => IncludeInSitemap::run($item['taxonomy'], $item['site']));
+        });
     }
 
     public function collectionTerms(): Collection
     {
-        $terms = $this->model->queryTerms()->get();
+        return Blink::once($this->cacheKey().'.collection-terms', function () {
+            $terms = $this->model->queryTerms()->get();
 
-        return $this->model->collections()
-            ->flatMap(function ($collection) use ($terms) {
-                return $terms->map(fn ($term) => $term->fresh()->collection($collection)); // Need to get a fresh instance of the Term, else we'll override the previously set collection.
-            })
-            ->filter(fn ($term) => view()->exists($term->template()))
-            ->filter(fn ($term) => $this->sites()->contains($term->locale()))
-            ->filter(function ($term) {
-                // Only allow sites that have been set on both the taxonomy and the collection
-                return $term->taxonomy()->sites()
-                    ->merge($term->collection()->sites())
-                    ->duplicates()
-                    ->contains($term->locale());
-            })
-            ->filter(fn ($term) => IncludeInSitemap::run($term->taxonomy(), $term->locale()));
+            return $this->model->collections()
+                ->flatMap(function ($collection) use ($terms) {
+                    return $terms->map(fn ($term) => $term->fresh()->collection($collection)); // Need to get a fresh instance of the Term, else we'll override the previously set collection.
+                })
+                ->filter(fn ($term) => view()->exists($term->template()))
+                ->filter(fn ($term) => $this->sites()->contains($term->locale()))
+                ->filter(function ($term) {
+                    // Only allow sites that have been set on both the taxonomy and the collection
+                    return $term->taxonomy()->sites()
+                        ->merge($term->collection()->sites())
+                        ->duplicates()
+                        ->contains($term->locale());
+                })
+                ->filter(fn ($term) => IncludeInSitemap::run($term->taxonomy(), $term->locale()));
+        });
     }
 
     protected function freshTaxonomy(): Taxonomy
