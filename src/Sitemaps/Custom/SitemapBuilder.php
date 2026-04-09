@@ -9,15 +9,12 @@ use Statamic\Facades\Site;
 
 class SitemapBuilder extends BaseSitemap
 {
-    protected string $handle;
-
     protected string $site;
 
     protected Collection $urls;
 
-    public function __construct(string $handle)
+    public function __construct(protected string $handle)
     {
-        $this->handle = $handle;
         $this->site = Site::default()->handle();
         $this->urls = collect();
     }
