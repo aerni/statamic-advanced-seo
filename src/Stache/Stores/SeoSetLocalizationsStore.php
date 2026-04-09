@@ -28,7 +28,7 @@ class SeoSetLocalizationsStore extends BasicStore
             return false;
         }
 
-        if (substr_count($filename, '/') !== 2) {
+        if (Str::substrCount($filename, '/') !== 2) {
             return false;
         }
 

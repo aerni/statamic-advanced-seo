@@ -29,7 +29,7 @@ class SeoSetConfigsStore extends BasicStore
             return false;
         }
 
-        if (substr_count($filename, '/') !== 1) {
+        if (Str::substrCount($filename, '/') !== 1) {
             return false;
         }
 

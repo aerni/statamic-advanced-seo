@@ -17,7 +17,7 @@ abstract class ValueToken implements Token
 
         return Lang::has($key)
             ? __($key)
-            : Str::title(str_replace(['_', '-'], ' ', $this->handle()));
+            : Str::of($this->handle())->replace(['_', '-'], ' ')->title()->toString();
     }
 
     public function group(): string
