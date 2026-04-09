@@ -31,7 +31,7 @@ class SitemapService
      */
     public function xsl(): string
     {
-        return file_get_contents(__DIR__.'/../../resources/views/sitemaps/sitemap.xsl');
+        return File::get(__DIR__.'/../../resources/views/sitemaps/sitemap.xsl');
     }
 
     /**
