@@ -164,7 +164,7 @@ class SocialImageGenerator
      */
     protected function contentHash(): string
     {
-        return md5(once(fn () => Http::get($this->templateUrl())->body()));
+        return md5(once(fn () => Http::timeout(10)->get($this->templateUrl())->throw()->body()));
     }
 
     protected function contentHashCacheKey(): string
