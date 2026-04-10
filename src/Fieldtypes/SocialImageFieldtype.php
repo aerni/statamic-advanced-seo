@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
@@ -54,7 +55,7 @@ class SocialImageFieldtype extends Assets
             return false;
         }
 
-        if (! SocialImagesGenerator::enabled()) {
+        if (! SocialImagesGenerator::enabled(Context::from($parent))) {
             return false;
         }
 
