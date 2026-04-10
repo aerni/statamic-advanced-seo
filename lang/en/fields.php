@@ -94,13 +94,11 @@ return [
     'seo_section_canonical_url' => [
         'display' => 'Canonical URL',
         'instructions' => 'Set the canonical URL for this :type.',
-        'default_instructions' => 'Set the default canonical URL for your :type.',
     ],
 
     'seo_canonical_type' => [
         'display' => 'Canonical URL',
         'instructions' => 'Where the canonical URL should point to.',
-        'default_instructions' => 'Where the default canonical URL should point to.',
         'current' => 'Current :type',
         'other' => 'Other Entry',
         'custom' => 'Custom URL',
@@ -109,13 +107,11 @@ return [
     'seo_canonical_entry' => [
         'display' => 'Entry',
         'instructions' => 'The entry with the original content.',
-        'default_instructions' => 'The entry with the original content.',
     ],
 
     'seo_canonical_custom' => [
         'display' => 'URL',
         'instructions' => 'A fully qualified [active URL](https://laravel.com/docs/master/validation#rule-active-url).',
-        'default_instructions' => 'A fully qualified [active URL](https://laravel.com/docs/master/validation#rule-active-url).',
     ],
 
     'seo_section_sitemap' => [

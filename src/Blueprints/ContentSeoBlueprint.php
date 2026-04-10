@@ -232,67 +232,58 @@ class ContentSeoBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_canonical_type',
                     'field' => [
-                        'type' => 'seo',
+                        'type' => 'button_group',
                         'display' => $this->trans('seo_canonical_type.display'),
                         'instructions' => $this->trans('seo_canonical_type.instructions'),
-                        'default' => '@default',
+                        'options' => [
+                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->contentTypeLabel()))]),
+                            'other' => $this->trans('seo_canonical_type.other'),
+                            'custom' => $this->trans('seo_canonical_type.custom'),
+                        ],
+                        'default' => 'current',
                         'localizable' => true,
+                        'listable' => 'hidden',
                         'if' => [
                             'seo_noindex.value' => 'false',
-                        ],
-                        'field' => [
-                            'type' => 'button_group',
-                            'options' => [
-                                'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->contentTypeLabel()))]),
-                                'other' => $this->trans('seo_canonical_type.other'),
-                                'custom' => $this->trans('seo_canonical_type.custom'),
-                            ],
                         ],
                     ],
                 ],
                 [
                     'handle' => 'seo_canonical_entry',
                     'field' => [
-                        'type' => 'seo',
+                        'type' => 'entries',
                         'display' => $this->trans('seo_canonical_entry.display'),
                         'instructions' => $this->trans('seo_canonical_entry.instructions'),
-                        'default' => '@default',
+                        'component' => 'relationship',
+                        'mode' => 'stack',
+                        'max_items' => 1,
                         'localizable' => true,
+                        'listable' => 'hidden',
                         'if' => [
                             'seo_noindex.value' => 'false',
-                            'seo_canonical_type.value' => 'equals other',
+                            'seo_canonical_type' => 'equals other',
                         ],
-                        'field' => [
-                            'type' => 'entries',
-                            'component' => 'relationship',
-                            'mode' => 'stack',
-                            'max_items' => 1,
-                            'validate' => [
-                                'required_if:seo_canonical_type,other',
-                            ],
+                        'validate' => [
+                            'required_if:seo_canonical_type,other',
                         ],
                     ],
                 ],
                 [
                     'handle' => 'seo_canonical_custom',
                     'field' => [
-                        'type' => 'seo',
+                        'type' => 'text',
                         'display' => $this->trans('seo_canonical_custom.display'),
                         'instructions' => $this->trans('seo_canonical_custom.instructions'),
-                        'default' => '@default',
+                        'input_type' => 'url',
                         'localizable' => true,
-
+                        'listable' => 'hidden',
                         'if' => [
                             'seo_noindex.value' => 'false',
-                            'seo_canonical_type.value' => 'equals custom',
+                            'seo_canonical_type' => 'equals custom',
                         ],
-                        'field' => [
-                            'type' => 'text',
-                            'input_type' => 'url',
-                            'validate' => [
-                                'required_if:seo_canonical_type,custom',
-                                'active_url',
-                            ],
+                        'validate' => [
+                            'required_if:seo_canonical_type,custom',
+                            'active_url',
                         ],
                     ],
                 ],
@@ -317,7 +308,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'feature' => Sitemap::class,
                         'if' => [
                             'seo_noindex.value' => 'false',
-                            'seo_canonical_type.value' => 'equals current',
+                            'seo_canonical_type' => 'equals current',
                         ],
                         'field' => [
                             'type' => 'toggle',

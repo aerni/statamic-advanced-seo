@@ -7,7 +7,6 @@ use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Illuminate\Support\Str;
 
 class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
 {
@@ -25,7 +24,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 $this->searchAppearance(),
                 $this->socialAppearance(),
                 $this->indexing(),
-                $this->canonicalUrl(),
                 $this->sitemap(),
                 $this->jsonLd(),
             ],
@@ -176,67 +174,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'width' => 50,
                         'field' => [
                             'type' => 'toggle',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function canonicalUrl(): array
-    {
-        return [
-            'display' => $this->trans('seo_section_canonical_url.display'),
-            'instructions' => $this->trans('seo_section_canonical_url.default_instructions'),
-
-            'fields' => [
-                [
-                    'handle' => 'seo_canonical_type',
-                    'field' => [
-                        'type' => 'button_group',
-                        'display' => $this->trans('seo_canonical_type.display'),
-                        'instructions' => $this->trans('seo_canonical_type.default_instructions'),
-                        'options' => [
-                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->contentTypeLabel()))]),
-                            'other' => $this->trans('seo_canonical_type.other'),
-                            'custom' => $this->trans('seo_canonical_type.custom'),
-                        ],
-                        'default' => 'current',
-                        'icon' => 'button_group',
-                        'listable' => 'hidden',
-                        'localizable' => true,
-                    ],
-                ],
-                [
-                    'handle' => 'seo_canonical_entry',
-                    'field' => [
-                        'type' => 'entries',
-                        'display' => $this->trans('seo_canonical_entry.display'),
-                        'instructions' => $this->trans('seo_canonical_entry.default_instructions'),
-                        'component' => 'relationship',
-                        'mode' => 'stack',
-                        'max_items' => 1,
-                        'localizable' => true,
-                        'listable' => 'hidden',
-                        'width' => 50,
-                        'validate' => [
-                            'required_if:seo_canonical_type,other',
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_canonical_custom',
-                    'field' => [
-                        'type' => 'text',
-                        'display' => $this->trans('seo_canonical_custom.display'),
-                        'instructions' => $this->trans('seo_canonical_custom.default_instructions'),
-                        'input_type' => 'url',
-                        'icon' => 'text',
-                        'listable' => 'hidden',
-                        'localizable' => true,
-                        'width' => 50,
-                        'validate' => [
-                            'required_if:seo_canonical_type,custom',
                         ],
                     ],
                 ],

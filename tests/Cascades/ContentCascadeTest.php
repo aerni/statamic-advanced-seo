@@ -184,6 +184,36 @@ it('returns custom canonical url', function () {
     expect($this->cascade->canonical())->toBe('https://other-site.com/page');
 });
 
+it('returns other entry canonical url', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $other = Entry::make()->collection('pages')->locale('english')->slug('original');
+    $other->save();
+
+    $this->cascade->set('canonical_type', 'other');
+    $this->cascade->set('canonical_entry', $other);
+
+    expect($this->cascade->canonical())->toBe('https://example.com/original');
+});
+
+it('falls back to self-referencing canonical when other entry is null', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $this->cascade->set('canonical_type', 'other');
+    $this->cascade->set('canonical_entry', null);
+
+    expect($this->cascade->canonical())->toBe('https://example.com/about');
+});
+
+it('falls back to self-referencing canonical when custom canonical is null', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $this->cascade->set('canonical_type', 'custom');
+    $this->cascade->set('canonical_custom', null);
+
+    expect($this->cascade->canonical())->toBe('https://example.com/about');
+});
+
 it('returns null site schema when type is none', function () {
     $this->cascade->set('site_json_ld_type', 'none');
 

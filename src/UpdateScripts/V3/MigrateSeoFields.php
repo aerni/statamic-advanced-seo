@@ -27,6 +27,7 @@ class MigrateSeoFields
             $this->composeTitleWithPosition($entry);
             $this->removeTwitterFields($entry);
             $this->removeSitemapFields($entry);
+            $this->migrateCanonicalFields($entry);
             $entry->saveQuietly();
         });
     }
@@ -43,6 +44,7 @@ class MigrateSeoFields
                         $this->composeTitleWithPosition($localization);
                         $this->removeTwitterFields($localization->data());
                         $this->removeSitemapFields($localization->data());
+                        $this->migrateCanonicalFields($localization->data());
                     });
 
                     $term->saveQuietly();
@@ -59,6 +61,7 @@ class MigrateSeoFields
                     $this->migrateLegacyValues($localization);
                     $this->removeTwitterFields($localization);
                     $this->removeSitemapFields($localization);
+                    $this->removeCanonicalFields($localization);
                     $this->composeTitleWithPosition($localization);
                     $localization->save();
                 });
@@ -138,6 +141,32 @@ class MigrateSeoFields
     protected function removeSitemapFields(mixed $item): void
     {
         $fields = ['seo_sitemap_priority', 'seo_sitemap_change_frequency'];
+
+        foreach ($fields as $field) {
+            $this->remove($item, $field);
+        }
+    }
+
+    /**
+     * Convert @default canonical values to removal so the hardcoded 'current' default takes effect.
+     */
+    protected function migrateCanonicalFields(mixed $item): void
+    {
+        $fields = ['seo_canonical_type', 'seo_canonical_entry', 'seo_canonical_custom'];
+
+        foreach ($fields as $field) {
+            if ($item->get($field) === '@default') {
+                $this->remove($item, $field);
+            }
+        }
+    }
+
+    /**
+     * Remove canonical fields entirely from SeoSet localizations (no longer exist at defaults level).
+     */
+    protected function removeCanonicalFields(mixed $item): void
+    {
+        $fields = ['seo_canonical_type', 'seo_canonical_entry', 'seo_canonical_custom'];
 
         foreach ($fields as $field) {
             $this->remove($item, $field);

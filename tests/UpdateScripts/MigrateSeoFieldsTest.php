@@ -259,6 +259,78 @@ it('removes sitemap fields from seo set localizations', function () {
     expect($localization->has('seo_sitemap_change_frequency'))->toBeFalse();
 });
 
+it('migrates @default canonical values to removal on entries and terms', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_canonical_type' => '@default',
+            'seo_canonical_entry' => '@default',
+            'seo_canonical_custom' => '@default',
+        ])
+        ->save();
+
+    Term::make()
+        ->taxonomy('tags')
+        ->slug('test-tag')
+        ->dataForLocale('english', [
+            'title' => 'Test Tag',
+            'seo_canonical_type' => '@default',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+    $term = Term::find('tags::test-tag')->in('english');
+
+    expect($entry->get('title'))->toBe('Test Page');
+    expect($entry->get('seo_canonical_type'))->toBeNull();
+    expect($entry->get('seo_canonical_entry'))->toBeNull();
+    expect($entry->get('seo_canonical_custom'))->toBeNull();
+
+    expect($term->get('title'))->toBe('Test Tag');
+    expect($term->get('seo_canonical_type'))->toBeNull();
+});
+
+it('preserves non-default canonical values on entries', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'seo_canonical_type' => 'custom',
+            'seo_canonical_custom' => 'https://example.com/original',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_canonical_type'))->toBe('custom');
+    expect($entry->get('seo_canonical_custom'))->toBe('https://example.com/original');
+});
+
+it('removes canonical fields from seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data([
+            'seo_canonical_type' => 'current',
+            'seo_canonical_entry' => null,
+            'seo_canonical_custom' => null,
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->has('seo_canonical_type'))->toBeFalse();
+    expect($localization->has('seo_canonical_entry'))->toBeFalse();
+    expect($localization->has('seo_canonical_custom'))->toBeFalse();
+});
+
 it('renames title_separator to separator in site defaults', function () {
     Seo::find('site::defaults')->in('english')->data(['title_separator' => '/'])->save();
     Seo::find('site::defaults')->in('german')->data(['title_separator' => '–'])->save();
