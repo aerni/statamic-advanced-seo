@@ -19,10 +19,6 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
 
     abstract public function lastmod(): string|self|null;
 
-    abstract public function changefreq(): string|self|null;
-
-    abstract public function priority(): string|self|null;
-
     abstract public function site(): string|self;
 
     public function sitemap(?Sitemap $sitemap = null): self|Sitemap
@@ -36,8 +32,6 @@ abstract class BaseSitemapUrl implements Arrayable, SitemapUrl
             'loc' => $this->loc(),
             'alternates' => $this->alternates(),
             'lastmod' => $this->lastmod(),
-            'changefreq' => $this->changefreq(),
-            'priority' => $this->priority(),
             'site' => $this->site(),
         ];
     }

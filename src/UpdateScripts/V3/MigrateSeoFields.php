@@ -26,6 +26,7 @@ class MigrateSeoFields
             $this->migrateLegacyValues($entry);
             $this->composeTitleWithPosition($entry);
             $this->removeTwitterFields($entry);
+            $this->removeSitemapFields($entry);
             $entry->saveQuietly();
         });
     }
@@ -41,6 +42,7 @@ class MigrateSeoFields
                         $this->migrateLegacyValues($localization);
                         $this->composeTitleWithPosition($localization);
                         $this->removeTwitterFields($localization->data());
+                        $this->removeSitemapFields($localization->data());
                     });
 
                     $term->saveQuietly();
@@ -56,6 +58,7 @@ class MigrateSeoFields
                 $set->localizations()->each(function ($localization) {
                     $this->migrateLegacyValues($localization);
                     $this->removeTwitterFields($localization);
+                    $this->removeSitemapFields($localization);
                     $this->composeTitleWithPosition($localization);
                     $localization->save();
                 });
@@ -126,6 +129,15 @@ class MigrateSeoFields
     protected function removeTwitterFields(mixed $item): void
     {
         $fields = ['seo_twitter_card', 'seo_twitter_title', 'seo_twitter_description', 'seo_twitter_summary_image', 'seo_twitter_summary_large_image', 'twitter_summary_image', 'twitter_summary_large_image'];
+
+        foreach ($fields as $field) {
+            $this->remove($item, $field);
+        }
+    }
+
+    protected function removeSitemapFields(mixed $item): void
+    {
+        $fields = ['seo_sitemap_priority', 'seo_sitemap_change_frequency'];
 
         foreach ($fields as $field) {
             $this->remove($item, $field);

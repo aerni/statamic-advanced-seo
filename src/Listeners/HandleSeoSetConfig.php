@@ -48,8 +48,6 @@ class HandleSeoSetConfig
 
         RemoveSeoValues::handle($config->seoSet()->parent(), [
             'seo_sitemap_enabled',
-            'seo_sitemap_priority',
-            'seo_sitemap_change_frequency',
         ]);
     }
 

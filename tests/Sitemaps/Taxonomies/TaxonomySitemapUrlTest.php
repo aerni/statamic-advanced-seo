@@ -85,15 +85,3 @@ it('returns null alternates when sitemap has fewer than two sites', function () 
 
     expect($url->alternates())->toBeNull();
 });
-
-it('returns a default changefreq', function () {
-    $url = new TaxonomySitemapUrl(Taxonomy::find('tags'), 'english');
-
-    expect($url->changefreq())->toBeString()->not->toBeEmpty();
-});
-
-it('returns a default priority', function () {
-    $url = new TaxonomySitemapUrl(Taxonomy::find('tags'), 'english');
-
-    expect($url->priority())->toBeString()->not->toBeEmpty();
-});

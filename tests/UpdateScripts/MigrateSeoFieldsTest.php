@@ -207,6 +207,58 @@ it('removes twitter image fields from site defaults', function () {
     expect($localization->has('twitter_summary_large_image'))->toBeFalse();
 });
 
+it('removes sitemap fields from entries and terms', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'title' => 'Test Page',
+            'seo_sitemap_priority' => '0.8',
+            'seo_sitemap_change_frequency' => 'weekly',
+        ])
+        ->save();
+
+    Term::make()
+        ->taxonomy('tags')
+        ->slug('test-tag')
+        ->dataForLocale('english', [
+            'title' => 'Test Tag',
+            'seo_sitemap_priority' => '0.5',
+            'seo_sitemap_change_frequency' => 'daily',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+    $term = Term::find('tags::test-tag')->in('english');
+
+    expect($entry->get('title'))->toBe('Test Page');
+    expect($entry->get('seo_sitemap_priority'))->toBeNull();
+    expect($entry->get('seo_sitemap_change_frequency'))->toBeNull();
+
+    expect($term->get('title'))->toBe('Test Tag');
+    expect($term->get('seo_sitemap_priority'))->toBeNull();
+    expect($term->get('seo_sitemap_change_frequency'))->toBeNull();
+});
+
+it('removes sitemap fields from seo set localizations', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data([
+            'seo_sitemap_priority' => '0.5',
+            'seo_sitemap_change_frequency' => 'daily',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->has('seo_sitemap_priority'))->toBeFalse();
+    expect($localization->has('seo_sitemap_change_frequency'))->toBeFalse();
+});
+
 it('renames title_separator to separator in site defaults', function () {
     Seo::find('site::defaults')->in('english')->data(['title_separator' => '/'])->save();
     Seo::find('site::defaults')->in('german')->data(['title_separator' => '–'])->save();

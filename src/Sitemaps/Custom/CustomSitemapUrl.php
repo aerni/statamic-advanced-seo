@@ -3,7 +3,6 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
 use Aerni\AdvancedSeo\Contracts\Sitemap;
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Illuminate\Support\Carbon;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -52,7 +51,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
     public function changefreq(?string $changefreq = null): string|self|null
     {
         return $this->fluentlyGetOrSet('changefreq')
-            ->getter(fn () => $this->changefreq ?? Seo::defaultValue('collections.seo_sitemap_change_frequency'))
+            ->getter(fn () => $this->changefreq)
             ->setter(function ($changefreq) {
                 $allowedValues = ['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'];
                 $allowedValuesString = implode(', ', $allowedValues);
@@ -67,7 +66,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
     public function priority(?string $priority = null): string|self|null
     {
         return $this->fluentlyGetOrSet('priority')
-            ->getter(fn () => $this->priority ?? Seo::defaultValue('collections.seo_sitemap_priority'))
+            ->getter(fn () => $this->priority)
             ->setter(function ($priority) {
                 $allowedValues = ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0'];
                 $allowedValuesString = implode(', ', $allowedValues);
@@ -82,5 +81,13 @@ class CustomSitemapUrl extends BaseSitemapUrl
     public function site(): string
     {
         return $this->sitemap()->site();
+    }
+
+    public function toArray(): array
+    {
+        return collect(parent::toArray())
+            ->when($this->changefreq(), fn ($c, $v) => $c->put('changefreq', $v))
+            ->when($this->priority(), fn ($c, $v) => $c->put('priority', $v))
+            ->all();
     }
 }

@@ -130,25 +130,6 @@ return [
         'default_instructions' => 'Deine :type in die Sitemap aufnehmen.',
     ],
 
-    'seo_sitemap_priority' => [
-        'display' => 'Priorität',
-        'instructions' => 'Sitemap-Priorität. 1.0 ist am wichtigsten.',
-        'default_instructions' => 'Standard-Sitemap-Priorität. 1.0 ist am wichtigsten.',
-    ],
-
-    'seo_sitemap_change_frequency' => [
-        'display' => 'Änderungshäufigkeit',
-        'instructions' => 'Wie oft Suchmaschinen diesen :type crawlen sollen.',
-        'default_instructions' => 'Wie oft Suchmaschinen deine :type crawlen sollen.',
-        'always' => 'Immer',
-        'hourly' => 'Stündlich',
-        'daily' => 'Täglich',
-        'weekly' => 'Wöchentlich',
-        'monthly' => 'Monatlich',
-        'yearly' => 'Jährlich',
-        'never' => 'Nie',
-    ],
-
     'seo_section_structured_data' => [
         'display' => 'Strukturierte Daten',
         'instructions' => 'Füge benutzerdefinierte [strukturierte Daten](https://developers.google.com/search/docs/guides/intro-structured-data) für diesen :type hinzu.',

@@ -12,8 +12,8 @@ class AardvarkSeoMigrator extends BaseMigrator
         return collect([
             'no_index_page' => 'seo_noindex',
             'no_follow_links' => 'seo_nofollow',
-            'sitemap_priority' => 'seo_sitemap_priority',
-            'sitemap_changefreq' => 'seo_sitemap_change_frequency',
+            'sitemap_priority' => null,
+            'sitemap_changefreq' => null,
             'twitter_card_type_page' => null,
             'meta_title' => 'seo_title',
             'meta_description' => 'seo_description',

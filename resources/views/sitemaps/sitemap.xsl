@@ -94,9 +94,7 @@
                         <table class="sitemap__table" cellpadding="4">
                             <thead>
                                 <tr>
-                                    <th width="60%">URL</th>
-                                    <th width="10%">Priority</th>
-                                    <th width="10%">Change Freq.</th>
+                                    <th width="80%">URL</th>
                                     <th width="20%">Last Updated</th>
                                 </tr>
                             </thead>
@@ -108,12 +106,6 @@
                                                 <xsl:value-of select="sitemap:loc" />
                                             </xsl:variable>
                                             <a target="_blank" rel="noopener nofollow" href="{$pageLink}"><xsl:value-of select="sitemap:loc" /></a>
-                                        </td>
-                                        <td>
-                                            <xsl:value-of select="sitemap:priority" />
-                                        </td>
-                                        <td>
-                                            <xsl:value-of select="sitemap:changefreq" />
                                         </td>
                                         <td>
                                             <xsl:value-of select="concat(substring(sitemap:lastmod,0,11),concat(' ', substring(sitemap:lastmod,12,5)))" />

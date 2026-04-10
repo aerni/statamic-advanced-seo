@@ -96,21 +96,3 @@ it('returns null alternates for single site collection terms', function () {
 
     expect($url->alternates())->toBeNull();
 });
-
-it('returns a default changefreq', function () {
-    $term = Term::query()->where('slug', 'php')->first();
-    $collectionTerm = $term->fresh()->collection(Collection::find('blog'));
-
-    $url = new CollectionTermSitemapUrl($collectionTerm);
-
-    expect($url->changefreq())->toBeString()->not->toBeEmpty();
-});
-
-it('returns a default priority', function () {
-    $term = Term::query()->where('slug', 'php')->first();
-    $collectionTerm = $term->fresh()->collection(Collection::find('blog'));
-
-    $url = new CollectionTermSitemapUrl($collectionTerm);
-
-    expect($url->priority())->toBeString()->not->toBeEmpty();
-});

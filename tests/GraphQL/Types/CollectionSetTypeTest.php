@@ -37,8 +37,6 @@ it('exposes all expected fields', function () {
         'canonical_entry',
         'canonical_custom',
         'sitemap_enabled',
-        'sitemap_priority',
-        'sitemap_change_frequency',
         'json_ld',
     ]);
 });

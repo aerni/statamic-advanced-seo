@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Facades\Cache;
@@ -69,16 +68,6 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             "advanced-seo::sitemaps::taxonomy::{$this->taxonomy}::lastmod",
             fn () => now()->format('Y-m-d\TH:i:sP')
         );
-    }
-
-    public function changefreq(): string
-    {
-        return Seo::defaultValue('taxonomies.seo_sitemap_change_frequency');
-    }
-
-    public function priority(): string
-    {
-        return Seo::defaultValue('taxonomies.seo_sitemap_priority');
     }
 
     public function site(): string

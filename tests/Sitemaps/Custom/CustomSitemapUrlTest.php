@@ -29,6 +29,18 @@ it('can set loc fluently', function () {
     expect($url->loc())->toBe('https://example.com/updated');
 });
 
+it('defaults changefreq to null', function () {
+    $url = new CustomSitemapUrl($this->sitemap, 'https://example.com/page');
+
+    expect($url->changefreq())->toBeNull();
+});
+
+it('defaults priority to null', function () {
+    $url = new CustomSitemapUrl($this->sitemap, 'https://example.com/page');
+
+    expect($url->priority())->toBeNull();
+});
+
 it('defaults lastmod to current time', function () {
     Carbon::setTestNow('2025-06-15 12:00:00');
 

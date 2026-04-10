@@ -85,19 +85,3 @@ it('returns null alternates for single site collection taxonomies', function () 
 
     expect($url->alternates())->toBeNull();
 });
-
-it('returns a default changefreq', function () {
-    $taxonomy = Taxonomy::find('tags')->collection(Collection::find('blog'));
-
-    $url = new CollectionTaxonomySitemapUrl($taxonomy, 'english');
-
-    expect($url->changefreq())->toBeString()->not->toBeEmpty();
-});
-
-it('returns a default priority', function () {
-    $taxonomy = Taxonomy::find('tags')->collection(Collection::find('blog'));
-
-    $url = new CollectionTaxonomySitemapUrl($taxonomy, 'english');
-
-    expect($url->priority())->toBeString()->not->toBeEmpty();
-});

@@ -81,19 +81,3 @@ it('returns null alternates for single site entries', function () {
 
     expect($url->alternates())->toBeNull();
 });
-
-it('returns a changefreq from the entry', function () {
-    $entry = Entry::query()->where('slug', 'about')->first();
-
-    $url = new EntrySitemapUrl($entry);
-
-    expect($url->changefreq())->toBeString()->not->toBeEmpty();
-});
-
-it('returns a priority from the entry', function () {
-    $entry = Entry::query()->where('slug', 'about')->first();
-
-    $url = new EntrySitemapUrl($entry);
-
-    expect($url->priority())->toMatch('/^\d\.\d$/');
-});

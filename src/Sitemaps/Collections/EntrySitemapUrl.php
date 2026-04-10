@@ -58,17 +58,6 @@ class EntrySitemapUrl extends BaseSitemapUrl
         return $this->entry->lastModified()->format('Y-m-d\TH:i:sP');
     }
 
-    public function changefreq(): string
-    {
-        return $this->entry->seo_sitemap_change_frequency;
-    }
-
-    public function priority(): string
-    {
-        // Make sure we actually return `0.0` and `1.0`.
-        return number_format($this->entry->seo_sitemap_priority->value(), 1);
-    }
-
     public function site(): string
     {
         return $this->entry->locale();

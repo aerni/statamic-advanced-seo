@@ -130,25 +130,6 @@ return [
         'default_instructions' => 'Include your :type in the sitemap.',
     ],
 
-    'seo_sitemap_priority' => [
-        'display' => 'Priority',
-        'instructions' => 'Sitemap priority. 1.0 is the most important.',
-        'default_instructions' => 'Default sitemap priority. 1.0 is the most important.',
-    ],
-
-    'seo_sitemap_change_frequency' => [
-        'display' => 'Change Frequency',
-        'instructions' => 'How often search engines should crawl this :type.',
-        'default_instructions' => 'How often search engines should crawl your :type.',
-        'always' => 'Always',
-        'hourly' => 'Hourly',
-        'daily' => 'Daily',
-        'weekly' => 'Weekly',
-        'monthly' => 'Monthly',
-        'yearly' => 'Yearly',
-        'never' => 'Never',
-    ],
-
     'seo_section_structured_data' => [
         'display' => 'Structured Data',
         'instructions' => 'Add custom [structured data](https://developers.google.com/search/docs/guides/intro-structured-data) for this :type.',

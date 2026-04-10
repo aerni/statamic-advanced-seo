@@ -21,7 +21,7 @@ it('can set and retrieve the parent sitemap', function () {
 it('converts to array with expected keys', function () {
     $url = new TestSitemapUrl;
 
-    expect($url->toArray())->toHaveKeys(['loc', 'alternates', 'lastmod', 'changefreq', 'priority', 'site']);
+    expect($url->toArray())->toHaveKeys(['loc', 'alternates', 'lastmod', 'site']);
 });
 
 it('converts to array with correct values from abstract methods', function () {
@@ -32,8 +32,6 @@ it('converts to array with correct values from abstract methods', function () {
     expect($array['loc'])->toBe('https://example.com/test')
         ->and($array['alternates'])->toBeNull()
         ->and($array['lastmod'])->toBe('2025-06-15T12:00:00+00:00')
-        ->and($array['changefreq'])->toBe('weekly')
-        ->and($array['priority'])->toBe('0.5')
         ->and($array['site'])->toBe('english');
 });
 
@@ -52,16 +50,6 @@ class TestSitemapUrl extends BaseSitemapUrl
     public function lastmod(): ?string
     {
         return '2025-06-15T12:00:00+00:00';
-    }
-
-    public function changefreq(): ?string
-    {
-        return 'weekly';
-    }
-
-    public function priority(): ?string
-    {
-        return '0.5';
     }
 
     public function site(): string

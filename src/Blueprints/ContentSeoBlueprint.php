@@ -305,7 +305,6 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_sitemap.display'),
             'instructions' => $this->trans('seo_section_sitemap.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'seo_sitemap_enabled',
@@ -322,113 +321,6 @@ class ContentSeoBlueprint extends BaseBlueprint
                         ],
                         'field' => [
                             'type' => 'toggle',
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_sitemap_priority',
-                    'field' => [
-                        'type' => 'seo',
-                        'display' => $this->trans('seo_sitemap_priority.display'),
-                        'instructions' => $this->trans('seo_sitemap_priority.instructions'),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'width' => 50,
-                        'feature' => Sitemap::class,
-                        'if' => [
-                            'seo_noindex.value' => 'false',
-                            'seo_canonical_type.value' => 'equals current',
-                            'seo_sitemap_enabled.value' => 'true',
-                        ],
-                        'field' => [
-                            'type' => 'select',
-                            'options' => [
-                                [
-                                    'key' => '0.0',
-                                    'value' => '0.0',
-                                ],
-                                [
-                                    'key' => '0.1',
-                                    'value' => '0.1',
-                                ],
-                                [
-                                    'key' => '0.2',
-                                    'value' => '0.2',
-                                ],
-                                [
-                                    'key' => '0.3',
-                                    'value' => '0.3',
-                                ],
-                                [
-                                    'key' => '0.4',
-                                    'value' => '0.4',
-                                ],
-                                [
-                                    'key' => '0.5',
-                                    'value' => '0.5',
-                                ],
-                                [
-                                    'key' => '0.6',
-                                    'value' => '0.6',
-                                ],
-                                [
-                                    'key' => '0.7',
-                                    'value' => '0.7',
-                                ],
-                                [
-                                    'key' => '0.8',
-                                    'value' => '0.8',
-                                ],
-                                [
-                                    'key' => '0.9',
-                                    'value' => '0.9',
-                                ],
-                                [
-                                    'key' => '1.0',
-                                    'value' => '1.0',
-                                ],
-                            ],
-                            'clearable' => false,
-                            'multiple' => false,
-                            'searchable' => false,
-                            'taggable' => false,
-                            'push_tags' => false,
-                            'cast_booleans' => false,
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_sitemap_change_frequency',
-                    'field' => [
-                        'type' => 'seo',
-                        'display' => $this->trans('seo_sitemap_change_frequency.display'),
-                        'instructions' => $this->trans('seo_sitemap_change_frequency.instructions'),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'width' => 50,
-                        'feature' => Sitemap::class,
-                        'if' => [
-                            'seo_noindex.value' => 'false',
-                            'seo_canonical_type.value' => 'equals current',
-                            'seo_sitemap_enabled.value' => 'true',
-                        ],
-                        'field' => [
-                            'type' => 'select',
-                            'options' => [
-                                'always' => $this->trans('seo_sitemap_change_frequency.always'),
-                                'hourly' => $this->trans('seo_sitemap_change_frequency.hourly'),
-                                'daily' => $this->trans('seo_sitemap_change_frequency.daily'),
-                                'weekly' => $this->trans('seo_sitemap_change_frequency.weekly'),
-                                'monthly' => $this->trans('seo_sitemap_change_frequency.monthly'),
-                                'yearly' => $this->trans('seo_sitemap_change_frequency.yearly'),
-                                'never' => $this->trans('seo_sitemap_change_frequency.never'),
-                            ],
-                            'clearable' => false,
-                            'multiple' => false,
-                            'searchable' => false,
-                            'taggable' => false,
-                            'push_tags' => false,
-                            'cast_booleans' => false,
                         ],
                     ],
                 ],

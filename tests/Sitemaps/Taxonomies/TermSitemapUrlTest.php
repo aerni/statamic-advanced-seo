@@ -75,19 +75,3 @@ it('returns null alternates for single site terms', function () {
 
     expect($url->alternates())->toBeNull();
 });
-
-it('returns a changefreq from the term', function () {
-    $term = Term::query()->where('slug', 'php')->first();
-
-    $url = new TermSitemapUrl($term);
-
-    expect($url->changefreq())->toBeString()->not->toBeEmpty();
-});
-
-it('returns a priority from the term', function () {
-    $term = Term::query()->where('slug', 'php')->first();
-
-    $url = new TermSitemapUrl($term);
-
-    expect($url->priority())->toMatch('/^\d\.\d$/');
-});
