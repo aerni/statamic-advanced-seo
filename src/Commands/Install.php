@@ -13,6 +13,8 @@ use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
 use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Statamic\Console\RunsInPlease;
 
@@ -33,44 +35,108 @@ class Install extends Command
 
     protected $description = 'Install and configure Advanced SEO';
 
-    protected bool $enableProEdition = false;
-
-    protected array $selectedFeatures = [];
-
-    protected ?string $screenshotDriver = null;
-
-    protected array $cloudflareVariables = [];
-
-    protected ?string $migrator = null;
-
     public function handle(): void
     {
         $this
-            ->askPro()
-            ->askMigration()
             ->publishConfig()
-            ->setupLayout()
-            ->runMigration()
-            ->setupPro();
+            ->setupPro()
+            ->migrate()
+            ->setupLayout();
 
         info('Advanced SEO has been installed successfully.');
     }
 
-    protected function askPro(): self
+    protected function publishConfig(): self
     {
-        $this->enableProEdition = AdvancedSeo::edition() === 'pro' || confirm(
-            label: 'Would you like to enable Pro?',
+        $this->callSilently('vendor:publish', [
+            '--tag' => 'advanced-seo-config',
+        ]);
+
+        return $this;
+    }
+
+    protected function setupPro(): self
+    {
+        if (! $this->enableProEdition()) {
+            return $this;
+        }
+
+        foreach ($this->askProFeatures() as $feature) {
+            match ($feature) {
+                'sitemap' => $this->setupSitemap(),
+                'ai' => $this->setupAi(),
+                'social_images' => $this->setupSocialImages(),
+                'graphql' => $this->setupGraphQl(),
+                'eloquent' => $this->setupEloquent(),
+            };
+        }
+
+        return $this;
+    }
+
+    protected function setupLayout(): self
+    {
+        $layout = config('statamic.system.layout', 'layout');
+
+        $antlersLayout = resource_path("views/{$layout}.antlers.html");
+        $bladeLayout = resource_path("views/{$layout}.blade.php");
+
+        match (true) {
+            File::exists($antlersLayout) => $this->injectIntoLayout($antlersLayout),
+            File::exists($bladeLayout) => $this->injectIntoLayout($bladeLayout),
+            default => warning('Could not find a layout file. Please add the SEO tags manually.'),
+        };
+
+        return $this;
+    }
+
+    protected function enableProEdition(): bool
+    {
+        if (AdvancedSeo::edition() === 'pro') {
+            return true;
+        }
+
+        $usePro = confirm(
+            label: 'Would you like to use Pro?',
             default: false,
             hint: 'Includes multi-site, permissions, sitemaps, AI content generation, and more.',
         );
 
-        if (! $this->enableProEdition) {
-            return $this;
+        if (! $usePro) {
+            return false;
         }
 
         // Set the edition at runtime so Feature::enabled() checks work
         config(['statamic.editions.addons.aerni/advanced-seo' => 'pro']);
 
+        $configPath = config_path('statamic/editions.php');
+        $contents = File::get($configPath);
+
+        if (Str::contains($contents, "'aerni/advanced-seo'")) {
+            $contents = preg_replace(
+                "/'aerni\/advanced-seo'\s*=>\s*'[^']*'/",
+                "'aerni/advanced-seo' => 'pro'",
+                $contents,
+            );
+        } else {
+            $contents = preg_replace(
+                "/'addons'\s*=>\s*\[\s*(?:\/\/\s*)?\n/",
+                "'addons' => [\n        'aerni/advanced-seo' => 'pro',\n",
+                $contents,
+                1,
+            );
+        }
+
+        File::put($configPath, $contents);
+
+        return true;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function askProFeatures(): array
+    {
         $features = collect([
             [
                 'key' => 'sitemap',
@@ -99,166 +165,71 @@ class Install extends Command
             ],
         ])->reject(fn ($feature) => $feature['enabled']);
 
-        if ($features->isNotEmpty()) {
-            $this->selectedFeatures = multiselect(
-                label: 'Select the Pro features you would like to enable.',
-                options: $features->pluck('label', 'key'),
-            );
+        if ($features->isEmpty()) {
+            return [];
         }
 
-        if (in_array('social_images', $this->selectedFeatures)) {
-            $this->askScreenshotDriver();
-        }
-
-        return $this;
-    }
-
-    protected function askScreenshotDriver(): void
-    {
-        $this->screenshotDriver = select(
-            label: 'Which screenshot driver would you like to use?',
-            options: [
-                'browsershot' => 'Browsershot',
-                'cloudflare' => 'Cloudflare Browser Rendering',
-            ],
-            default: 'browsershot',
-        );
-
-        if ($this->screenshotDriver === 'browsershot') {
-            return;
-        }
-
-        $this->cloudflareVariables['LARAVEL_SCREENSHOT_DRIVER'] = 'cloudflare';
-
-        if (! $this->envHas('CLOUDFLARE_API_TOKEN')) {
-            $this->cloudflareVariables['CLOUDFLARE_API_TOKEN'] = text(
-                label: 'Cloudflare API Token',
-                hint: 'Leave empty to configure later in your .env file.',
-            );
-        }
-
-        if (! $this->envHas('CLOUDFLARE_ACCOUNT_ID')) {
-            $this->cloudflareVariables['CLOUDFLARE_ACCOUNT_ID'] = text(
-                label: 'Cloudflare Account ID',
-                hint: 'Leave empty to configure later in your .env file.',
-            );
-        }
-    }
-
-    protected function askMigration(): self
-    {
-        $migrator = select(
-            label: 'Do you want to migrate from another SEO addon?',
-            options: [
-                'none' => 'No',
-                AardvarkSeoMigrator::class => 'Aardvark SEO',
-                SeoProMigrator::class => 'SEO Pro',
-            ],
-            default: 'none',
-        );
-
-        if ($migrator !== 'none') {
-            $this->migrator = $migrator;
-        }
-
-        return $this;
-    }
-
-    protected function publishConfig(): self
-    {
-        $this->callSilently('vendor:publish', [
-            '--tag' => 'advanced-seo-config',
-        ]);
-
-        return $this;
-    }
-
-    protected function setupLayout(): self
-    {
-        $layout = config('statamic.system.layout', 'layout');
-
-        $antlersLayout = resource_path("views/{$layout}.antlers.html");
-        $bladeLayout = resource_path("views/{$layout}.blade.php");
-
-        match (true) {
-            file_exists($antlersLayout) => $this->injectIntoLayout($antlersLayout),
-            file_exists($bladeLayout) => $this->injectIntoLayout($bladeLayout),
-            default => warning('Could not find a layout file. Please add the SEO tags manually.'),
-        };
-
-        return $this;
-    }
-
-    protected function setupPro(): self
-    {
-        if (! $this->enableProEdition) {
-            return $this;
-        }
-
-        $this->enableProEdition();
-
-        foreach ($this->selectedFeatures as $feature) {
-            match ($feature) {
-                'sitemap' => $this->setupSitemap(),
-                'ai' => $this->setupAi(),
-                'social_images' => $this->setupSocialImages(),
-                'graphql' => $this->setupGraphQl(),
-                'eloquent' => $this->setupEloquent(),
-            };
-        }
-
-        return $this;
-    }
-
-    protected function enableProEdition(): void
-    {
-        $configPath = config_path('statamic/editions.php');
-        $contents = file_get_contents($configPath);
-
-        if (Str::contains($contents, "'aerni/advanced-seo'")) {
-            $contents = preg_replace(
-                "/'aerni\/advanced-seo'\s*=>\s*'[^']*'/",
-                "'aerni/advanced-seo' => 'pro'",
-                $contents,
-            );
-        } else {
-            $contents = preg_replace(
-                "/'addons'\s*=>\s*\[\s*(?:\/\/\s*)?\n/",
-                "'addons' => [\n        'aerni/advanced-seo' => 'pro',\n",
-                $contents,
-                1,
-            );
-        }
-
-        file_put_contents($configPath, $contents);
-
-        info('Advanced SEO Pro has been enabled.');
+        return collect(multiselect(
+            label: 'Select the Pro features you would like to set up.',
+            options: $features->pluck('label', 'key'),
+        ))->sortBy(fn ($key) => $features->pluck('key')->search($key))->values()->all();
     }
 
     protected function setupSitemap(): void
     {
-        $this->enableConfigValue('sitemap');
-        info('Sitemaps have been enabled.');
+        $this->setConfigValue('sitemap.enabled', 'true');
+        info('Sitemaps enabled.');
     }
 
     protected function setupAi(): void
     {
-        $this->enableConfigValue('ai');
+        note('Setting up AI Copywriting...');
+        $this->setConfigValue('ai.enabled', 'true');
 
         if (! Composer::isInstalled('laravel/ai')) {
             spin(
                 callback: fn () => Composer::withoutQueue()->throwOnFailure()->require('laravel/ai'),
                 message: 'Installing laravel/ai...',
             );
+
+            config(['ai' => require base_path('vendor/laravel/ai/config/ai.php')]);
         }
 
-        info('AI Copywriting has been set up.');
-        note("To use AI Copywriting, you need to configure a provider in config/ai.php.\nYou can optionally override the provider and model in config/advanced-seo.php.");
+        $providers = collect(config('ai.providers'))->keys();
+        $default = config('ai.default');
+
+        $options = collect(['' => "Default ({$default})"])
+            ->merge($providers->mapWithKeys(fn ($provider) => [$provider => Str::title($provider)]))
+            ->all();
+
+        $provider = select(
+            label: 'Which AI provider would you like to use?',
+            options: $options,
+            default: '',
+            info: function (string $value) use ($default) {
+                $provider = $value !== '' ? $value : $default;
+
+                return empty(config("ai.providers.{$provider}.key"))
+                    ? "No API key configured for {$provider}."
+                    : '';
+            },
+        );
+
+        $this->setConfigValue('ai.provider', $provider !== '' ? "'{$provider}'" : 'null');
+
+        $model = text(
+            label: 'Which AI model would you like to use?',
+            hint: 'Leave empty to use the default model.',
+        );
+
+        $this->setConfigValue('ai.model', $model !== '' ? "'{$model}'" : 'null');
+        info('AI Copywriting configured.');
     }
 
     protected function setupSocialImages(): void
     {
-        $this->enableConfigValue('social_images');
+        note('Setting up Social Images Generator...');
+        $this->setConfigValue('social_images.generator.enabled', 'true');
 
         if (! Composer::isInstalled('spatie/laravel-screenshot')) {
             spin(
@@ -267,54 +238,101 @@ class Install extends Command
             );
         }
 
-        if ($this->screenshotDriver === 'browsershot' && ! Composer::isInstalled('spatie/browsershot')) {
+        $screenshotDriver = select(
+            label: 'Which screenshot driver would you like to use?',
+            options: [
+                'browsershot' => 'Browsershot',
+                'cloudflare' => 'Cloudflare Browser Rendering',
+            ],
+            default: 'browsershot',
+        );
+
+        $this->addEnvironmentVariables(['LARAVEL_SCREENSHOT_DRIVER' => $screenshotDriver]);
+
+        if ($screenshotDriver === 'browsershot' && ! Composer::isInstalled('spatie/browsershot')) {
             spin(
                 callback: fn () => Composer::withoutQueue()->throwOnFailure()->require('spatie/browsershot'),
                 message: 'Installing spatie/browsershot...',
             );
         }
 
-        if ($this->screenshotDriver === 'cloudflare') {
-            $this->addEnvironmentVariables($this->cloudflareVariables);
+        if ($screenshotDriver === 'cloudflare') {
+            if (! $this->envHas('CLOUDFLARE_API_TOKEN')) {
+                $this->addEnvironmentVariables(['CLOUDFLARE_API_TOKEN' => text(
+                    label: 'Cloudflare API Token',
+                    hint: 'Leave empty to configure later in your .env file.',
+                )]);
+            }
+
+            if (! $this->envHas('CLOUDFLARE_ACCOUNT_ID')) {
+                $this->addEnvironmentVariables(['CLOUDFLARE_ACCOUNT_ID' => text(
+                    label: 'Cloudflare Account ID',
+                    hint: 'Leave empty to configure later in your .env file.',
+                )]);
+            }
         }
 
         if (SocialImage::themes()->all()->isEmpty()) {
             $this->callSilently('seo:theme', ['name' => 'default']);
         }
 
-        info('Social Images Generator has been set up.');
+        info('Social Images Generator configured.');
     }
 
     protected function setupGraphQl(): void
     {
-        $this->enableConfigValue('graphql');
-        info('GraphQL API has been enabled.');
+        $this->setConfigValue('graphql', 'true');
+        info('GraphQL API enabled.');
     }
 
     protected function setupEloquent(): void
     {
-        $this->call('seo:switch-to-eloquent');
-    }
+        note('Setting up Eloquent Driver...');
 
-    protected function runMigration(): self
-    {
-        if (! $this->migrator) {
-            return $this;
+        if (! Composer::isInstalled('statamic/eloquent-driver')) {
+            spin(
+                callback: fn () => Composer::withoutQueue()->throwOnFailure()->require('statamic/eloquent-driver'),
+                message: 'Installing statamic/eloquent-driver...',
+            );
         }
 
-        spin(
-            callback: fn () => resolve($this->migrator)::run(),
-            message: 'Migrating data...',
+        $success = spin(
+            callback: fn () => $this->runArtisanCommand('seo:switch-to-eloquent --no-interaction'),
+            message: 'Switching to Eloquent driver...',
         );
 
-        info('The migration has been completed successfully.');
+        $success
+            ? info('Eloquent Driver configured.')
+            : warning('Failed to switch to Eloquent driver. Run `php artisan seo:switch-to-eloquent` manually.');
+    }
+
+    protected function migrate(): self
+    {
+        $migrator = select(
+            label: 'Select an addon to migrate from.',
+            options: [
+                'none' => 'None',
+                AardvarkSeoMigrator::class => 'Aardvark SEO',
+                SeoProMigrator::class => 'SEO Pro',
+            ],
+            default: 'none',
+        );
+
+        if ($migrator !== 'none') {
+            spin(
+                callback: fn () => resolve($migrator)::run(),
+                message: 'Migrating data...',
+            );
+
+            info('The migration has been completed successfully.');
+        }
 
         return $this;
     }
 
     protected function injectIntoLayout(string $path): void
     {
-        $content = file_get_contents($path);
+        $content = File::get($path);
         $isAntlers = str_ends_with($path, '.antlers.html');
 
         $headTag = $isAntlers ? '{{ seo:head }}' : "@seo('head')";
@@ -341,34 +359,38 @@ class Install extends Command
         }
 
         if ($content !== $original) {
-            file_put_contents($path, $content);
+            File::put($path, $content);
 
             $relativePath = Str::after($path, base_path('/'));
             info("Added SEO tags to {$relativePath}.");
         }
     }
 
-    protected function envHas(string $key): bool
+    protected function runArtisanCommand(string $command): bool
     {
-        return Str::contains(file_get_contents(base_path('.env')), PHP_EOL.$key.'=');
+        return Process::forever()->run(
+            [PHP_BINARY, defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan', ...explode(' ', $command)],
+        )->successful();
     }
 
-    protected function enableConfigValue(string $key): void
+    protected function envHas(string $key): bool
+    {
+        return (bool) preg_match("/^{$key}=.+/m", File::get(base_path('.env')));
+    }
+
+    protected function setConfigValue(string $key, string $value): void
     {
         $configPath = config_path('advanced-seo.php');
-        $config = file_get_contents($configPath);
+        $config = File::get($configPath);
 
-        $patterns = [
-            'sitemap' => "/('sitemap'.*?'enabled'\s*=>\s*)false/s",
-            'social_images' => "/('social_images'.*?'generator'.*?'enabled'\s*=>\s*)false/s",
-            'ai' => "/('ai'.*?'enabled'\s*=>\s*)false/s",
-            'graphql' => "/('graphql'\s*=>\s*)false/",
-        ];
+        $segments = collect(explode('.', $key))
+            ->map(fn ($segment) => "'{$segment}'")
+            ->join('.*?');
 
-        if (isset($patterns[$key])) {
-            $config = preg_replace($patterns[$key], '${1}true', $config, 1);
-            file_put_contents($configPath, $config);
-        }
+        $pattern = "/({$segments}\s*=>\s*)(null|true|false|'[^']*')/s";
+        $config = preg_replace($pattern, "\${1}{$value}", $config, 1);
+
+        File::put($configPath, $config);
     }
 
     /**
@@ -377,7 +399,7 @@ class Install extends Command
     protected function addEnvironmentVariables(array $variables): void
     {
         $env = base_path('.env');
-        $contents = file_get_contents($env);
+        $contents = File::get($env);
         $newLines = [];
 
         foreach ($variables as $key => $value) {
@@ -395,6 +417,6 @@ class Install extends Command
                 : $contents.PHP_EOL.PHP_EOL.$block.PHP_EOL;
         }
 
-        file_put_contents($env, $contents);
+        File::put($env, $contents);
     }
 }
