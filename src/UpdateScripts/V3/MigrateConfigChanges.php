@@ -308,20 +308,15 @@ class MigrateConfigChanges
     {
         $siteDefaults = $this->siteDefaultsSet();
 
-        $contentSets = $this->seoSets
-            ->filter(fn (SeoSet $set) => in_array($set->type(), ['collections', 'taxonomies']));
-
-        // Remove the deprecated seo_sitemap_enabled field from all localizations.
-        // Entry/term cleanup is handled by MigrateSeoFields::removeDeprecatedFields().
-        $contentSets->each(fn (SeoSet $set) => $this->removeFromLocalizations($set, ['seo_sitemap_enabled']));
-
         if (! config('advanced-seo.sitemap.enabled', true)) {
             $this->removeFromLocalizations($siteDefaults, ['excluded_collections', 'excluded_taxonomies']);
 
             return;
         }
 
-        $contentSets->each(fn (SeoSet $set) => $set->config()->set('sitemap', true));
+        $this->seoSets
+            ->filter(fn (SeoSet $set) => in_array($set->type(), ['collections', 'taxonomies']))
+            ->each(fn (SeoSet $set) => $set->config()->set('sitemap', true));
 
         $excludedCollections = $this->buildLocalizationHandleMap($siteDefaults, 'excluded_collections');
         $excludedTaxonomies = $this->buildLocalizationHandleMap($siteDefaults, 'excluded_taxonomies');
@@ -332,11 +327,6 @@ class MigrateConfigChanges
         $this->removeFromLocalizations($siteDefaults, ['excluded_collections', 'excluded_taxonomies']);
     }
 
-    /**
-     * If a collection/taxonomy was excluded from the sitemap in any site,
-     * disable the sitemap for the entire collection/taxonomy. This is conservative
-     * since sitemap control is now per-collection/taxonomy, not per-site.
-     */
     protected function migrateSitemapType(string $type, Collection $excludedHandles): void
     {
         $excludedHandles->each(function (Collection $excludedSites, string $handle) use ($type) {
@@ -346,7 +336,15 @@ class MigrateConfigChanges
                 return;
             }
 
-            $set->config()->set('sitemap', false);
+            $enabledSites = $set->sites()->keys()->diff($excludedSites);
+
+            if ($enabledSites->isEmpty()) {
+                $set->config()->set('sitemap', false);
+
+                return;
+            }
+
+            $excludedSites->each(fn ($site) => $set->in($site)->set('seo_sitemap_enabled', false));
         });
     }
 

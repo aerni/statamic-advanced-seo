@@ -25,7 +25,7 @@ class MigrateSeoFields
         Entry::all()->each(function ($entry) {
             $this->migrateLegacyValues($entry);
             $this->composeTitleWithPosition($entry);
-            $this->removeDeprecatedFields($entry);
+            $this->removeTwitterFields($entry);
             $entry->saveQuietly();
         });
     }
@@ -40,7 +40,7 @@ class MigrateSeoFields
                     $term->localizations()->each(function ($localization) {
                         $this->migrateLegacyValues($localization);
                         $this->composeTitleWithPosition($localization);
-                        $this->removeDeprecatedFields($localization->data());
+                        $this->removeTwitterFields($localization->data());
                     });
 
                     $term->saveQuietly();
@@ -55,7 +55,7 @@ class MigrateSeoFields
             ->each(function (SeoSet $set) {
                 $set->localizations()->each(function ($localization) {
                     $this->migrateLegacyValues($localization);
-                    $this->removeDeprecatedFields($localization);
+                    $this->removeTwitterFields($localization);
                     $this->composeTitleWithPosition($localization);
                     $localization->save();
                 });
@@ -69,7 +69,7 @@ class MigrateSeoFields
     {
         Seo::find('site::defaults')->localizations()->each(function ($localization) {
             $this->renameTitleSeparator($localization);
-            $this->removeDeprecatedFields($localization);
+            $this->removeTwitterFields($localization);
             $localization->save();
         });
     }
@@ -123,14 +123,9 @@ class MigrateSeoFields
             });
     }
 
-    protected function removeDeprecatedFields(mixed $item): void
+    protected function removeTwitterFields(mixed $item): void
     {
-        $fields = [
-            'seo_sitemap_enabled',
-            'seo_twitter_card', 'seo_twitter_title', 'seo_twitter_description',
-            'seo_twitter_summary_image', 'seo_twitter_summary_large_image',
-            'twitter_summary_image', 'twitter_summary_large_image',
-        ];
+        $fields = ['seo_twitter_card', 'seo_twitter_title', 'seo_twitter_description', 'seo_twitter_summary_image', 'seo_twitter_summary_large_image', 'twitter_summary_image', 'twitter_summary_large_image'];
 
         foreach ($fields as $field) {
             $this->remove($item, $field);

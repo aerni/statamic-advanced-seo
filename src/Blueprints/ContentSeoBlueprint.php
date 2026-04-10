@@ -281,6 +281,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_canonical_custom.instructions'),
                         'default' => '@default',
                         'localizable' => true,
+
                         'if' => [
                             'seo_noindex.value' => 'false',
                             'seo_canonical_type.value' => 'equals custom',
@@ -307,6 +308,24 @@ class ContentSeoBlueprint extends BaseBlueprint
 
             'fields' => [
                 [
+                    'handle' => 'seo_sitemap_enabled',
+                    'field' => [
+                        'type' => 'seo',
+                        'display' => $this->trans('seo_sitemap_enabled.display'),
+                        'instructions' => $this->trans('seo_sitemap_enabled.instructions'),
+                        'default' => '@default',
+                        'localizable' => true,
+                        'feature' => Sitemap::class,
+                        'if' => [
+                            'seo_noindex.value' => 'false',
+                            'seo_canonical_type.value' => 'equals current',
+                        ],
+                        'field' => [
+                            'type' => 'toggle',
+                        ],
+                    ],
+                ],
+                [
                     'handle' => 'seo_sitemap_priority',
                     'field' => [
                         'type' => 'seo',
@@ -319,6 +338,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'if' => [
                             'seo_noindex.value' => 'false',
                             'seo_canonical_type.value' => 'equals current',
+                            'seo_sitemap_enabled.value' => 'true',
                         ],
                         'field' => [
                             'type' => 'select',
@@ -390,6 +410,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'if' => [
                             'seo_noindex.value' => 'false',
                             'seo_canonical_type.value' => 'equals current',
+                            'seo_sitemap_enabled.value' => 'true',
                         ],
                         'field' => [
                             'type' => 'select',

@@ -120,37 +120,6 @@ it('does not modify non-seo fields', function () {
     expect($entry->get('content'))->toBe('Some content');
 });
 
-it('removes seo_sitemap_enabled from entries, terms, and localizations', function () {
-    Entry::make()
-        ->collection('pages')
-        ->locale('english')
-        ->data(['title' => 'Test Page', 'seo_sitemap_enabled' => false])
-        ->save();
-
-    Term::make()
-        ->taxonomy('tags')
-        ->slug('test-tag')
-        ->dataForLocale('english', ['title' => 'Test Tag', 'seo_sitemap_enabled' => true])
-        ->save();
-
-    Seo::find('collections::pages')
-        ->inDefaultSite()
-        ->set('seo_sitemap_enabled', true)
-        ->save();
-
-    runMigrateSeoFieldsScript();
-
-    $entry = Entry::all()->first();
-    $term = Term::find('tags::test-tag')->in('english');
-    $localization = Seo::find('collections::pages')->inDefaultSite();
-
-    expect($entry->get('title'))->toBe('Test Page');
-    expect($entry->get('seo_sitemap_enabled'))->toBeNull();
-    expect($term->get('title'))->toBe('Test Tag');
-    expect($term->get('seo_sitemap_enabled'))->toBeNull();
-    expect($localization->get('seo_sitemap_enabled'))->toBeNull();
-});
-
 it('removes twitter fields from entries and terms', function () {
     Entry::make()
         ->collection('pages')

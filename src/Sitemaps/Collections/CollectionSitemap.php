@@ -29,7 +29,7 @@ class CollectionSitemap extends BaseSitemap
      * This override uses a single query with orderByDesc, avoiding the expensive hydration
      * of all entries, IncludeInSitemap filtering, and URL object creation.
      *
-     * Tradeoff: skips post-query IncludeInSitemap checks (noindex, canonical, etc.),
+     * Tradeoff: skips post-query IncludeInSitemap checks (noindex, sitemap_enabled, etc.),
      * so the lastmod may come from an excluded entry. This is acceptable because lastmod
      * on a sitemap index is a crawl hint — search engines don't validate it against contents.
      */

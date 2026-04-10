@@ -43,6 +43,7 @@ class IncludeInSitemap
     {
         return Sitemap::enabled($this->context)
             && $this->isIndexableEntryOrTerm($model)
+            && $model->seo_sitemap_enabled
             && $model->seo_canonical_type == 'current';
     }
 

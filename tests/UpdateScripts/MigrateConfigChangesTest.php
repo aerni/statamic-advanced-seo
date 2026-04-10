@@ -149,39 +149,34 @@ it('migrates sitemap config from site defaults to individual collections/taxonom
         ->set('excluded_taxonomies', [])
         ->save();
 
-    // Seed a stale seo_sitemap_enabled value on a localization to verify cleanup
-    Seo::find('collections::pages')->in('english')
-        ->set('seo_sitemap_enabled', true)
-        ->save();
-
     runConfigMigrationScript();
 
-    // Assert collections: blog excluded in any site → disabled
+    // Assert collections: blog excluded in all its sites (english, german)
     $blogSet = Seo::find('collections::blog');
     expect($blogSet->config()->get('sitemap'))->toBeFalse();
+    expect($blogSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
+    expect($blogSet->in('german')->get('seo_sitemap_enabled'))->toBeNull();
 
-    // Assert collections: products excluded in any site → disabled
+    // Assert collections: products excluded in all its sites (english, german, french)
     $productsSet = Seo::find('collections::products');
     expect($productsSet->config()->get('sitemap'))->toBeFalse();
+    expect($productsSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
+    expect($productsSet->in('german')->get('seo_sitemap_enabled'))->toBeNull();
+    expect($productsSet->in('french')->get('seo_sitemap_enabled'))->toBeNull();
 
-    // Assert collections: pages not excluded anywhere → enabled
+    // Assert collections: pages has no sitemap config changes (not excluded anywhere)
     $pagesSet = Seo::find('collections::pages');
     expect($pagesSet->config()->get('sitemap'))->toBeTrue();
+    expect($pagesSet->in('english')->value('seo_sitemap_enabled'))->toBeTrue();
 
-    // Assert taxonomies: tags excluded in any site → disabled
+    // Assert taxonomies: tags excluded in all its sites (english only)
     $tagsSet = Seo::find('taxonomies::tags');
     expect($tagsSet->config()->get('sitemap'))->toBeFalse();
+    expect($tagsSet->in('english')->get('seo_sitemap_enabled'))->toBeNull();
 
-    // Assert taxonomies: categories excluded in any site → disabled
+    // Assert taxonomies: categories excluded in all its sites (english, german)
     $categoriesSet = Seo::find('taxonomies::categories');
     expect($categoriesSet->config()->get('sitemap'))->toBeFalse();
-
-    // Assert seo_sitemap_enabled is cleaned up from all localizations
-    Seo::all()
-        ->filter(fn ($set) => in_array($set->type(), ['collections', 'taxonomies']))
-        ->each(fn ($set) => $set->localizations()->each(
-            fn ($localization) => expect($localization->get('seo_sitemap_enabled'))->toBeNull()
-        ));
 
     // Assert old fields are removed from site defaults
     $siteDefaults = Seo::find('site::defaults');
@@ -201,24 +196,12 @@ it('skips sitemap migration and cleans up fields when sitemap is disabled', func
         ->set('excluded_taxonomies', ['tags'])
         ->save();
 
-    // Seed a stale seo_sitemap_enabled value on a localization to verify cleanup
-    Seo::find('collections::blog')->in('english')
-        ->set('seo_sitemap_enabled', true)
-        ->save();
-
     runConfigMigrationScript();
 
     // Assert: Collections and taxonomies should not have sitemap config changes
     expect(Seo::find('collections::blog')->config()->get('sitemap'))->toBeNull();
     expect(Seo::find('collections::products')->config()->get('sitemap'))->toBeNull();
     expect(Seo::find('taxonomies::tags')->config()->get('sitemap'))->toBeNull();
-
-    // Assert: seo_sitemap_enabled is still cleaned up from localizations even when sitemap is disabled
-    Seo::all()
-        ->filter(fn ($set) => in_array($set->type(), ['collections', 'taxonomies']))
-        ->each(fn ($set) => $set->localizations()->each(
-            fn ($localization) => expect($localization->get('seo_sitemap_enabled'))->toBeNull()
-        ));
 
     // Assert: Old fields are still removed from site defaults
     $siteDefaults = Seo::find('site::defaults');

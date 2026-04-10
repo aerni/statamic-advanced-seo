@@ -9,8 +9,8 @@ class SeoSetLocalizationResolver
 {
     /**
      * Wraps field resolvers so GraphQL field names resolve against the correct blueprint handle.
-     * This is necessary when GraphQL exposes unprefixed names (e.g. `sitemap_priority`)
-     * but the blueprint uses prefixed handles (e.g. `seo_sitemap_priority`).
+     * This is necessary when GraphQL exposes unprefixed names (e.g. `sitemap_enabled`)
+     * but the blueprint uses prefixed handles (e.g. `seo_sitemap_enabled`).
      */
     public static function resolve(array $field, string $handle): callable
     {
