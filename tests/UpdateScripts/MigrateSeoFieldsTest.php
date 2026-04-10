@@ -294,7 +294,7 @@ it('migrates @default canonical values to removal on entries and terms', functio
     expect($term->get('seo_canonical_type'))->toBeNull();
 });
 
-it('preserves non-default canonical values on entries', function () {
+it('preserves custom canonical values on entries', function () {
     Entry::make()
         ->collection('pages')
         ->locale('english')
@@ -310,6 +310,24 @@ it('preserves non-default canonical values on entries', function () {
 
     expect($entry->get('seo_canonical_type'))->toBe('custom');
     expect($entry->get('seo_canonical_custom'))->toBe('https://example.com/original');
+});
+
+it('renames other canonical type to entry', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'seo_canonical_type' => 'other',
+            'seo_canonical_entry' => 'some-entry-id',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_canonical_type'))->toBe('entry');
+    expect($entry->get('seo_canonical_entry'))->toBe('some-entry-id');
 });
 
 it('removes canonical fields from seo set localizations', function () {

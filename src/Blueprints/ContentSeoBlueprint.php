@@ -7,7 +7,6 @@ use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
-use Illuminate\Support\Str;
 
 class ContentSeoBlueprint extends BaseBlueprint
 {
@@ -236,13 +235,15 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'display' => $this->trans('seo_canonical_type.display'),
                         'instructions' => $this->trans('seo_canonical_type.instructions'),
                         'options' => [
-                            'current' => $this->trans('seo_canonical_type.current', ['type' => ucfirst(Str::singular($this->contentTypeLabel()))]),
-                            'other' => $this->trans('seo_canonical_type.other'),
+                            'current' => $this->trans('seo_canonical_type.current'),
+                            'entry' => $this->trans('seo_canonical_type.entry'),
+                            'term' => $this->trans('seo_canonical_type.term'),
                             'custom' => $this->trans('seo_canonical_type.custom'),
                         ],
                         'default' => 'current',
                         'localizable' => true,
                         'listable' => 'hidden',
+                        'width' => 50,
                         'if' => [
                             'seo_noindex.value' => 'false',
                         ],
@@ -259,12 +260,34 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'max_items' => 1,
                         'localizable' => true,
                         'listable' => 'hidden',
+                        'width' => 50,
                         'if' => [
                             'seo_noindex.value' => 'false',
-                            'seo_canonical_type' => 'equals other',
+                            'seo_canonical_type' => 'equals entry',
                         ],
                         'validate' => [
-                            'required_if:seo_canonical_type,other',
+                            'required_if:seo_canonical_type,entry',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'seo_canonical_term',
+                    'field' => [
+                        'type' => 'terms',
+                        'display' => $this->trans('seo_canonical_term.display'),
+                        'instructions' => $this->trans('seo_canonical_term.instructions'),
+                        'component' => 'relationship',
+                        'mode' => 'stack',
+                        'max_items' => 1,
+                        'localizable' => true,
+                        'listable' => 'hidden',
+                        'width' => 50,
+                        'if' => [
+                            'seo_noindex.value' => 'false',
+                            'seo_canonical_type' => 'equals term',
+                        ],
+                        'validate' => [
+                            'required_if:seo_canonical_type,term',
                         ],
                     ],
                 ],
@@ -277,6 +300,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'input_type' => 'url',
                         'localizable' => true,
                         'listable' => 'hidden',
+                        'width' => 50,
                         'if' => [
                             'seo_noindex.value' => 'false',
                             'seo_canonical_type' => 'equals custom',

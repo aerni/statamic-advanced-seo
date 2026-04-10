@@ -148,7 +148,7 @@ class MigrateSeoFields
     }
 
     /**
-     * Convert @default canonical values to removal so the hardcoded 'current' default takes effect.
+     * Convert @default canonical values to removal and rename 'other' to 'entry'.
      */
     protected function migrateCanonicalFields(mixed $item): void
     {
@@ -158,6 +158,10 @@ class MigrateSeoFields
             if ($item->get($field) === '@default') {
                 $this->remove($item, $field);
             }
+        }
+
+        if ($item->get('seo_canonical_type') === 'other') {
+            $item->set('seo_canonical_type', 'entry');
         }
     }
 

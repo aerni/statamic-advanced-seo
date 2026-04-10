@@ -30,6 +30,7 @@ it('exposes all expected fields', function () {
         'nofollow',
         'canonical_type',
         'canonical_entry',
+        'canonical_term',
         'canonical_custom',
         'sitemap_enabled',
         'json_ld',

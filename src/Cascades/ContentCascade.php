@@ -124,7 +124,8 @@ class ContentCascade extends BaseCascade
         }
 
         return match ($this->get('canonical_type')) {
-            'other' => $this->get('canonical_entry')?->absoluteUrl() ?? $this->canonicalUrl(),
+            'entry' => $this->get('canonical_entry')?->absoluteUrl() ?? $this->canonicalUrl(),
+            'term' => $this->get('canonical_term')?->absoluteUrl() ?? $this->canonicalUrl(),
             'custom' => $this->get('canonical_custom') ?? $this->canonicalUrl(),
             default => $this->canonicalUrl(),
         };
