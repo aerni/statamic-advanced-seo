@@ -39,7 +39,7 @@ class AardvarkSeoMigrator extends BaseMigrator
     protected function transform(Collection $data, ?Collection $oldData = null): Collection
     {
         $transformed = collect([
-            'seo_json_ld' => $data->has('seo_json_ld') ? $this->transformJsonLd($data->get('seo_json_ld')) : null,
+            'seo_json_ld' => $data->get('seo_json_ld') ? $this->transformJsonLd($data->get('seo_json_ld')) : null,
             'seo_canonical_type' => $data->has('seo_canonical_custom') ? 'custom' : null,
         ])->filter();
 
