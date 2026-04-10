@@ -252,18 +252,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
 
             'fields' => [
                 [
-                    'handle' => 'seo_sitemap_enabled',
-                    'field' => [
-                        'type' => 'toggle',
-                        'display' => $this->trans('seo_sitemap_enabled.display'),
-                        'instructions' => $this->trans('seo_sitemap_enabled.default_instructions'),
-                        'default' => true,
-                        'listable' => 'hidden',
-                        'localizable' => true,
-                        'feature' => Sitemap::class,
-                    ],
-                ],
-                [
                     'handle' => 'seo_sitemap_priority',
                     'field' => [
                         'type' => 'select',

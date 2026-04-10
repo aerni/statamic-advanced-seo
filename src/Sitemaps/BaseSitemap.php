@@ -65,7 +65,6 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
          *
          * $query
          *   ->where('seo_noindex', false)
-         *   ->where('seo_sitemap_enabled', true)
          *   ->where('seo_canonical_type', 'current')
          *
          * But we removed them as they lead to unexpected results due to the following reasons:

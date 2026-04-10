@@ -124,12 +124,6 @@ return [
         'default_instructions' => 'Set default sitemap settings for your :type.',
     ],
 
-    'seo_sitemap_enabled' => [
-        'display' => 'Enabled',
-        'instructions' => 'Include this :type in the sitemap.',
-        'default_instructions' => 'Include your :type in the sitemap.',
-    ],
-
     'seo_sitemap_priority' => [
         'display' => 'Priority',
         'instructions' => 'Sitemap priority. 1.0 is the most important.',

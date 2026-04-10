@@ -124,12 +124,6 @@ return [
         'default_instructions' => 'Lege Standard-Sitemap-Einstellungen für deine :type fest.',
     ],
 
-    'seo_sitemap_enabled' => [
-        'display' => 'Aktiviert',
-        'instructions' => 'Diesen :type in die Sitemap aufnehmen.',
-        'default_instructions' => 'Deine :type in die Sitemap aufnehmen.',
-    ],
-
     'seo_sitemap_priority' => [
         'display' => 'Priorität',
         'instructions' => 'Sitemap-Priorität. 1.0 ist am wichtigsten.',

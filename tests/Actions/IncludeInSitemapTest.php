@@ -105,14 +105,6 @@ it('excludes an entry with a custom canonical', function () {
     expect(IncludeInSitemap::run($entry, 'english'))->toBeFalse();
 });
 
-it('excludes an entry with sitemap disabled', function () {
-    $entry = Entry::make()->collection('pages')->locale('english')->slug('no-sitemap')
-        ->data(['seo_sitemap_enabled' => false]);
-    $entry->save();
-
-    expect(IncludeInSitemap::run($entry, 'english'))->toBeFalse();
-});
-
 // --- Error cases ---
 
 it('throws when a collection is passed without a site', function () {

@@ -274,7 +274,7 @@ it('removes localization field values of disabled features when saving the set c
 
     $seoSet->inDefaultSite()
         ->set('seo_title', 'foo')
-        ->set('seo_sitemap_enabled', true)
+        ->set('seo_sitemap_priority', '0.8')
         ->save();
 
     $seoSet->config()
@@ -287,7 +287,7 @@ it('removes localization field values of disabled features when saving the set c
     $localization = $seoSet->inDefaultSite();
 
     expect($localization->get('seo_title'))->toBe('foo');
-    expect($localization->get('seo_sitemap_enabled'))->toBeNull();
+    expect($localization->get('seo_sitemap_priority'))->toBeNull();
 });
 
 it('can get and set the seoSet', function () {
