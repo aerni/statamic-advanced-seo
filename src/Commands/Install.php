@@ -68,6 +68,9 @@ class Install extends Command
             return $this;
         }
 
+        // Set the edition at runtime so Feature::enabled() checks work
+        config(['statamic.editions.addons.aerni/advanced-seo' => 'pro']);
+
         $features = collect([
             [
                 'key' => 'sitemap',
