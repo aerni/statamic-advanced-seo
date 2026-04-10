@@ -23,7 +23,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                 $this->enabled(),
                 $this->origins(),
                 $this->sitemaps(),
-                $this->socialAppearance(),
+                $this->socialImages(),
                 $this->ai(),
             ],
         ];
@@ -81,7 +81,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
     protected function sitemaps(): array
     {
         return [
-            'display' => $this->trans('config_sitemaps.display'),
+            'display' => $this->trans('config_section_sitemaps.display'),
             'fields' => [
                 [
                     'handle' => 'sitemap',
@@ -98,10 +98,10 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function socialAppearance(): array
+    protected function socialImages(): array
     {
         return [
-            'display' => $this->trans('seo_section_social_appearance.display'),
+            'display' => $this->trans('config_section_social_images.display'),
             'fields' => [
                 [
                     'handle' => 'social_images_generator',
@@ -141,7 +141,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
     protected function ai(): array
     {
         return [
-            'display' => $this->trans('section_ai.display'),
+            'display' => $this->trans('config_section_ai.display'),
             'fields' => [
                 [
                     'handle' => 'ai',

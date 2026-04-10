@@ -361,6 +361,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Site Fields — AI
+    |--------------------------------------------------------------------------
+    */
+
+    'section_ai' => [
+        'display' => 'KI',
+        'instructions' => 'Konfiguriere KI-Funktionen für deine Website.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Config Fields
     |--------------------------------------------------------------------------
     |
@@ -378,13 +389,17 @@ return [
         'instructions' => 'Bearbeitung von SEO-Feldern auf einzelnen :content erlauben.',
     ],
 
-    'config_sitemaps' => [
+    'config_section_sitemaps' => [
         'display' => 'Sitemaps',
     ],
 
     'config_sitemap' => [
         'display' => 'Sitemap',
         'instructions' => 'Aktiviert die Sitemap für diesen :type.',
+    ],
+
+    'config_section_social_images' => [
+        'display' => 'Social-Media-Bilder',
     ],
 
     'config_social_images_generator' => [
@@ -397,9 +412,8 @@ return [
         'instructions' => 'Wähle die verfügbaren Social-Media-Bild-Themes für diesen :type.',
     ],
 
-    'section_ai' => [
+    'config_section_ai' => [
         'display' => 'KI',
-        'instructions' => 'Konfiguriere KI-Funktionen für deine Website.',
     ],
 
     'config_ai' => [

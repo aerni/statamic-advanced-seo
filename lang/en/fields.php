@@ -361,6 +361,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Site Fields — AI
+    |--------------------------------------------------------------------------
+    */
+
+    'section_ai' => [
+        'display' => 'AI',
+        'instructions' => 'Configure AI features for your site.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Config Fields
     |--------------------------------------------------------------------------
     |
@@ -378,13 +389,17 @@ return [
         'instructions' => 'Allow editing of SEO fields on individual :content.',
     ],
 
-    'config_sitemaps' => [
+    'config_section_sitemaps' => [
         'display' => 'Sitemaps',
     ],
 
     'config_sitemap' => [
         'display' => 'Sitemap',
         'instructions' => 'Enables the sitemap for this :type.',
+    ],
+
+    'config_section_social_images' => [
+        'display' => 'Social Images',
     ],
 
     'config_social_images_generator' => [
@@ -397,9 +412,8 @@ return [
         'instructions' => 'Select the social image themes available for this :type.',
     ],
 
-    'section_ai' => [
+    'config_section_ai' => [
         'display' => 'AI',
-        'instructions' => 'Configure AI features for your site.',
     ],
 
     'config_ai' => [
