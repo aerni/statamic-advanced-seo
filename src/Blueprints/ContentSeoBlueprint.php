@@ -237,7 +237,6 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'options' => [
                             'current' => $this->trans('seo_canonical_type.current'),
                             'entry' => $this->trans('seo_canonical_type.entry'),
-                            'term' => $this->trans('seo_canonical_type.term'),
                             'custom' => $this->trans('seo_canonical_type.custom'),
                         ],
                         'default' => 'current',
@@ -267,27 +266,6 @@ class ContentSeoBlueprint extends BaseBlueprint
                         ],
                         'validate' => [
                             'required_if:seo_canonical_type,entry',
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_canonical_term',
-                    'field' => [
-                        'type' => 'terms',
-                        'display' => $this->trans('seo_canonical_term.display'),
-                        'instructions' => $this->trans('seo_canonical_term.instructions'),
-                        'component' => 'relationship',
-                        'mode' => 'stack',
-                        'max_items' => 1,
-                        'localizable' => true,
-                        'listable' => 'hidden',
-                        'width' => 50,
-                        'if' => [
-                            'seo_noindex.value' => 'false',
-                            'seo_canonical_type' => 'equals term',
-                        ],
-                        'validate' => [
-                            'required_if:seo_canonical_type,term',
                         ],
                     ],
                 ],

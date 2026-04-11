@@ -105,14 +105,6 @@ it('excludes an entry with an entry canonical', function () {
     expect(IncludeInSitemap::run($entry, 'english'))->toBeFalse();
 });
 
-it('excludes an entry with a term canonical', function () {
-    $entry = Entry::make()->collection('pages')->locale('english')->slug('canonical-term')
-        ->data(['seo_canonical_type' => 'term']);
-    $entry->save();
-
-    expect(IncludeInSitemap::run($entry, 'english'))->toBeFalse();
-});
-
 it('excludes an entry with a custom canonical', function () {
     $entry = Entry::make()->collection('pages')->locale('english')->slug('canonical-custom')
         ->data(['seo_canonical_type' => 'custom']);

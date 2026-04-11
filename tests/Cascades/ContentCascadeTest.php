@@ -5,8 +5,6 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Term;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
@@ -198,33 +196,11 @@ it('returns entry canonical url', function () {
     expect($this->cascade->canonical())->toBe('https://example.com/original');
 });
 
-it('returns term canonical url', function () {
-    config(['advanced-seo.crawling.environments' => ['testing']]);
-
-    Taxonomy::make('tags')->sites(['english'])->saveQuietly();
-    $term = Term::make()->taxonomy('tags')->inDefaultLocale()->slug('php')->data(['title' => 'PHP']);
-    $term->save();
-
-    $this->cascade->set('canonical_type', 'term');
-    $this->cascade->set('canonical_term', $term->in('english'));
-
-    expect($this->cascade->canonical())->toBe('https://example.com/tags/php');
-});
-
 it('falls back to self-referencing canonical when entry is null', function () {
     config(['advanced-seo.crawling.environments' => ['testing']]);
 
     $this->cascade->set('canonical_type', 'entry');
     $this->cascade->set('canonical_entry', null);
-
-    expect($this->cascade->canonical())->toBe('https://example.com/about');
-});
-
-it('falls back to self-referencing canonical when term is null', function () {
-    config(['advanced-seo.crawling.environments' => ['testing']]);
-
-    $this->cascade->set('canonical_type', 'term');
-    $this->cascade->set('canonical_term', null);
 
     expect($this->cascade->canonical())->toBe('https://example.com/about');
 });

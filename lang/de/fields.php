@@ -101,18 +101,12 @@ return [
         'instructions' => 'Wohin die kanonische URL verweisen soll.',
         'current' => 'Aktuell',
         'entry' => 'Eintrag',
-        'term' => 'Begriff',
         'custom' => 'URL',
     ],
 
     'seo_canonical_entry' => [
         'display' => 'Eintrag',
         'instructions' => 'Der Eintrag mit dem Originalinhalt.',
-    ],
-
-    'seo_canonical_term' => [
-        'display' => 'Begriff',
-        'instructions' => 'Der Begriff mit dem Originalinhalt.',
     ],
 
     'seo_canonical_custom' => [

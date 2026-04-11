@@ -101,18 +101,12 @@ return [
         'instructions' => 'Where the canonical URL should point to.',
         'current' => 'Current',
         'entry' => 'Entry',
-        'term' => 'Term',
         'custom' => 'URL',
     ],
 
     'seo_canonical_entry' => [
         'display' => 'Entry',
         'instructions' => 'The entry with the original content.',
-    ],
-
-    'seo_canonical_term' => [
-        'display' => 'Term',
-        'instructions' => 'The term with the original content.',
     ],
 
     'seo_canonical_custom' => [
