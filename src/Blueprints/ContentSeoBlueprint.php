@@ -257,6 +257,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'component' => 'relationship',
                         'mode' => 'stack',
                         'max_items' => 1,
+                        'query_scopes' => ['routable_entries'],
                         'select_across_sites' => true,
                         'localizable' => true,
                         'listable' => 'hidden',
