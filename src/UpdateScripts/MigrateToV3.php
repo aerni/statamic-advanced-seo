@@ -20,6 +20,6 @@ class MigrateToV3 extends UpdateScript
         (new MigrateSeoFields)->run();
         (new MigrateUserPermissions)->run();
 
-        $this->console()->info('Successfully migrated to Advanced SEO v3.');
+        $this->console()->info('Successfully migrated to Advanced SEO 3.0.');
     }
 }
