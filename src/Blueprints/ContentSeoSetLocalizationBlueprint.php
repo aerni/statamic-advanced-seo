@@ -24,8 +24,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 $this->searchAppearance(),
                 $this->socialAppearance(),
                 $this->indexing(),
-                $this->sitemap(),
-                $this->jsonLd(),
+                $this->structuredData(),
             ],
         ];
     }
@@ -177,17 +176,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         ],
                     ],
                 ],
-            ],
-        ];
-    }
-
-    protected function sitemap(): array
-    {
-        return [
-            'display' => $this->trans('seo_section_sitemap.display'),
-            'instructions' => $this->trans('seo_section_sitemap.default_instructions'),
-
-            'fields' => [
                 [
                     'handle' => 'seo_sitemap_enabled',
                     'field' => [
@@ -204,7 +192,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function jsonLd(): array
+    protected function structuredData(): array
     {
         return [
             'display' => $this->trans('seo_section_structured_data.display'),

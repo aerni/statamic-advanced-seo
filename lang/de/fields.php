@@ -91,11 +91,6 @@ return [
         'default_instructions' => 'Verhindere, dass Crawler Links auf deinen :type folgen.',
     ],
 
-    'seo_section_canonical_url' => [
-        'display' => 'Kanonische URL',
-        'instructions' => 'Lege die kanonische URL für diesen :type fest.',
-    ],
-
     'seo_canonical_type' => [
         'display' => 'Kanonische URL',
         'instructions' => 'Wohin die kanonische URL verweisen soll.',
@@ -114,14 +109,8 @@ return [
         'instructions' => 'Eine vollständig qualifizierte [aktive URL](https://laravel.com/docs/master/validation#rule-active-url).',
     ],
 
-    'seo_section_sitemap' => [
-        'display' => 'Sitemap',
-        'instructions' => 'Konfiguriere Sitemap-Einstellungen für diesen :type.',
-        'default_instructions' => 'Lege Standard-Sitemap-Einstellungen für deine :type fest.',
-    ],
-
     'seo_sitemap_enabled' => [
-        'display' => 'Aktiviert',
+        'display' => 'Sitemap',
         'instructions' => 'Diesen :type in die Sitemap aufnehmen.',
         'default_instructions' => 'Deine :type in die Sitemap aufnehmen.',
     ],

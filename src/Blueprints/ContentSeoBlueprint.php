@@ -24,9 +24,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                 $this->searchAppearance(),
                 $this->socialAppearance(),
                 $this->indexing(),
-                $this->canonicalUrl(),
-                $this->sitemap(),
-                $this->jsonLd(),
+                $this->structuredData(),
             ],
         ];
     }
@@ -217,17 +215,6 @@ class ContentSeoBlueprint extends BaseBlueprint
                         ],
                     ],
                 ],
-            ],
-        ];
-    }
-
-    protected function canonicalUrl(): array
-    {
-        return [
-            'display' => $this->trans('seo_section_canonical_url.display'),
-            'instructions' => $this->trans('seo_section_canonical_url.instructions'),
-
-            'fields' => [
                 [
                     'handle' => 'seo_canonical_type',
                     'field' => [
@@ -245,6 +232,25 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'width' => 50,
                         'if' => [
                             'seo_noindex.value' => 'false',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'seo_sitemap_enabled',
+                    'field' => [
+                        'type' => 'seo',
+                        'display' => $this->trans('seo_sitemap_enabled.display'),
+                        'instructions' => $this->trans('seo_sitemap_enabled.instructions'),
+                        'default' => '@default',
+                        'localizable' => true,
+                        'width' => 50,
+                        'feature' => Sitemap::class,
+                        'if' => [
+                            'seo_noindex.value' => 'false',
+                            'seo_canonical_type' => 'equals current',
+                        ],
+                        'field' => [
+                            'type' => 'toggle',
                         ],
                     ],
                 ],
@@ -295,35 +301,7 @@ class ContentSeoBlueprint extends BaseBlueprint
         ];
     }
 
-    protected function sitemap(): array
-    {
-        return [
-            'display' => $this->trans('seo_section_sitemap.display'),
-            'instructions' => $this->trans('seo_section_sitemap.instructions'),
-            'fields' => [
-                [
-                    'handle' => 'seo_sitemap_enabled',
-                    'field' => [
-                        'type' => 'seo',
-                        'display' => $this->trans('seo_sitemap_enabled.display'),
-                        'instructions' => $this->trans('seo_sitemap_enabled.instructions'),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'feature' => Sitemap::class,
-                        'if' => [
-                            'seo_noindex.value' => 'false',
-                            'seo_canonical_type' => 'equals current',
-                        ],
-                        'field' => [
-                            'type' => 'toggle',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function jsonLd(): array
+    protected function structuredData(): array
     {
         return [
             'display' => $this->trans('seo_section_structured_data.display'),
