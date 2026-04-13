@@ -185,16 +185,13 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_nofollow',
                     'field' => [
-                        'type' => 'seo',
+                        'type' => 'toggle',
                         'display' => $this->trans('seo_nofollow.display'),
                         'instructions' => $this->trans('seo_nofollow.default_instructions'),
-                        'default' => '@default',
+                        'default' => false,
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
-                        'field' => [
-                            'type' => 'toggle',
-                        ],
                     ],
                 ],
                 [

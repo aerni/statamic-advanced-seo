@@ -240,11 +240,6 @@ return [
         'instructions' => 'Exclude your entire site from search engine results.',
     ],
 
-    'nofollow' => [
-        'display' => 'Nofollow',
-        'instructions' => 'Tell crawlers not to follow any links on your site.',
-    ],
-
     'section_verification' => [
         'display' => 'Site Verification',
         'instructions' => 'Verify ownership of this site.',

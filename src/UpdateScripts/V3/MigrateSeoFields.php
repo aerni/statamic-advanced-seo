@@ -68,14 +68,12 @@ class MigrateSeoFields
             });
     }
 
-    /**
-     * Remove twitter image fields from the site defaults.
-     */
     protected function migrateSiteDefaults(): void
     {
         Seo::find('site::defaults')->localizations()->each(function ($localization) {
             $this->renameTitleSeparator($localization);
             $this->removeTwitterFields($localization);
+            $this->removeNofollowField($localization);
             $localization->save();
         });
     }
@@ -145,6 +143,11 @@ class MigrateSeoFields
         foreach ($fields as $field) {
             $this->remove($item, $field);
         }
+    }
+
+    protected function removeNofollowField(mixed $item): void
+    {
+        $this->remove($item, 'nofollow');
     }
 
     /**

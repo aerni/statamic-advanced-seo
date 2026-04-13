@@ -51,7 +51,6 @@ it('exposes all expected fields', function () {
         'twitter_handle',
         // Indexing: Crawling
         'noindex',
-        'nofollow',
         // Indexing: Site Verification
         'google_site_verification_code',
         'bing_site_verification_code',

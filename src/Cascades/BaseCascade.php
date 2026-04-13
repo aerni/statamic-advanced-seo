@@ -82,12 +82,12 @@ abstract class BaseCascade implements Augmentable
     }
 
     /**
-     * Site-level noindex/nofollow are OR overrides: if the site says true, it always wins.
+     * Site-level noindex is an override: if the site says true, it always wins.
      */
     protected function ensureOverrides(): self
     {
         $overrides = GetSiteDefaults::handle($this->model)
-            ->only(['noindex', 'nofollow'])
+            ->only(['noindex'])
             ->map->value()
             ->filter();
 

@@ -240,11 +240,6 @@ return [
         'instructions' => 'Deine gesamte Website aus den Suchergebnissen ausschliessen.',
     ],
 
-    'nofollow' => [
-        'display' => 'Nofollow',
-        'instructions' => 'Crawler anweisen, keinen Links auf deiner Website zu folgen.',
-    ],
-
     'section_verification' => [
         'display' => 'Website-Verifizierung',
         'instructions' => 'Bestätige die Inhaberschaft dieser Website.',

@@ -207,6 +207,23 @@ it('removes twitter image fields from site defaults', function () {
     expect($localization->has('twitter_summary_large_image'))->toBeFalse();
 });
 
+it('removes nofollow field from site defaults', function () {
+    Seo::find('site::defaults')
+        ->inDefaultSite()
+        ->data([
+            'noindex' => true,
+            'nofollow' => true,
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('site::defaults')->inDefaultSite();
+
+    expect($localization->has('noindex'))->toBeTrue();
+    expect($localization->has('nofollow'))->toBeFalse();
+});
+
 it('removes sitemap fields from entries and terms', function () {
     Entry::make()
         ->collection('pages')
