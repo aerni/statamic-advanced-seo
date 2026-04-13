@@ -35,8 +35,16 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_search_appearance.display'),
             'instructions' => $this->trans('seo_section_search_appearance.instructions'),
-
             'fields' => [
+                [
+                    'handle' => 'seo_noindex_alert',
+                    'field' => [
+                        'type' => 'alert',
+                        'alert' => 'indexing_disabled',
+                        'listable' => 'hidden',
+                        'hide_display' => true,
+                    ],
+                ],
                 [
                     'handle' => 'seo_title',
                     'field' => [
