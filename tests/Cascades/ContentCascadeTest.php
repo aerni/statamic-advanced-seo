@@ -138,6 +138,72 @@ it('returns noindex and nofollow when crawling is not enabled for the environmen
     expect($this->cascade->indexing())->toBe('noindex, nofollow');
 });
 
+it('returns noarchive when noarchive is true', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $this->cascade->set('noindex', false);
+    $this->cascade->set('nofollow', false);
+    $this->cascade->set('noarchive', true);
+
+    expect($this->cascade->indexing())->toBe('noarchive');
+});
+
+it('returns nosnippet when nosnippet is true', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $this->cascade->set('noindex', false);
+    $this->cascade->set('nofollow', false);
+    $this->cascade->set('nosnippet', true);
+
+    expect($this->cascade->indexing())->toBe('nosnippet');
+});
+
+it('returns noimageindex when noimageindex is true', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $this->cascade->set('noindex', false);
+    $this->cascade->set('nofollow', false);
+    $this->cascade->set('noimageindex', true);
+
+    expect($this->cascade->indexing())->toBe('noimageindex');
+});
+
+it('returns combined directives when multiple are true and noindex is false', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $this->cascade->set('noindex', false);
+    $this->cascade->set('nofollow', true);
+    $this->cascade->set('noarchive', true);
+    $this->cascade->set('nosnippet', false);
+    $this->cascade->set('noimageindex', true);
+
+    expect($this->cascade->indexing())->toBe('nofollow, noarchive, noimageindex');
+});
+
+it('suppresses noarchive, nosnippet, noimageindex when noindex is true', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    $this->cascade->set('noindex', true);
+    $this->cascade->set('nofollow', false);
+    $this->cascade->set('noarchive', true);
+    $this->cascade->set('nosnippet', true);
+    $this->cascade->set('noimageindex', true);
+
+    expect($this->cascade->indexing())->toBe('noindex');
+});
+
+it('suppresses noarchive, nosnippet, noimageindex when crawling is disabled', function () {
+    config(['advanced-seo.crawling.environments' => ['production']]);
+
+    $this->cascade->set('noindex', false);
+    $this->cascade->set('nofollow', false);
+    $this->cascade->set('noarchive', true);
+    $this->cascade->set('nosnippet', true);
+    $this->cascade->set('noimageindex', true);
+
+    expect($this->cascade->indexing())->toBe('noindex, nofollow');
+});
+
 it('returns the locale from the entry site', function () {
     expect($this->cascade->locale())->toBe('en');
 });

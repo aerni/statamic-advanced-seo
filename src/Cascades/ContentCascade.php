@@ -95,9 +95,14 @@ class ContentCascade extends BaseCascade
 
     public function indexing(): ?string
     {
+        $noindex = $this->get('noindex') || ! $this->crawlingIsEnabled();
+
         $indexing = collect([
-            'noindex' => $this->get('noindex') || ! $this->crawlingIsEnabled(),
+            'noindex' => $noindex,
             'nofollow' => $this->get('nofollow') || ! $this->crawlingIsEnabled(),
+            'noarchive' => ! $noindex && $this->get('noarchive'),
+            'nosnippet' => ! $noindex && $this->get('nosnippet'),
+            'noimageindex' => ! $noindex && $this->get('noimageindex'),
         ])->filter()->keys()->implode(', ');
 
         return $indexing ?: null;

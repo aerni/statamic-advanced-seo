@@ -79,6 +79,24 @@ it('can set nofollow', function () {
     expect($data->toArray())->toHaveKey('seo_nofollow', true);
 });
 
+it('can set noarchive', function () {
+    $data = (new SeoData)->noarchive();
+
+    expect($data->toArray())->toHaveKey('seo_noarchive', true);
+});
+
+it('can set nosnippet', function () {
+    $data = (new SeoData)->nosnippet();
+
+    expect($data->toArray())->toHaveKey('seo_nosnippet', true);
+});
+
+it('can set noimageindex', function () {
+    $data = (new SeoData)->noimageindex();
+
+    expect($data->toArray())->toHaveKey('seo_noimageindex', true);
+});
+
 it('can set a canonical url', function () {
     $data = (new SeoData)->canonicalUrl('https://example.com/canonical');
 

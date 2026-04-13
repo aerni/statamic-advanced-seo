@@ -24,6 +24,7 @@ class ContentSeoBlueprint extends BaseBlueprint
                 $this->searchAppearance(),
                 $this->socialAppearance(),
                 $this->indexing(),
+                $this->robots(),
                 $this->structuredData(),
             ],
         ];
@@ -195,21 +196,6 @@ class ContentSeoBlueprint extends BaseBlueprint
                         'instructions' => $this->trans('seo_noindex.instructions'),
                         'default' => '@default',
                         'localizable' => true,
-                        'width' => 50,
-                        'field' => [
-                            'type' => 'toggle',
-                        ],
-                    ],
-                ],
-                [
-                    'handle' => 'seo_nofollow',
-                    'field' => [
-                        'type' => 'seo',
-                        'display' => $this->trans('seo_nofollow.display'),
-                        'instructions' => $this->trans('seo_nofollow.instructions'),
-                        'default' => '@default',
-                        'localizable' => true,
-                        'width' => 50,
                         'field' => [
                             'type' => 'toggle',
                         ],
@@ -301,11 +287,82 @@ class ContentSeoBlueprint extends BaseBlueprint
         ];
     }
 
+    protected function robots(): array
+    {
+        return [
+            'display' => $this->trans('seo_section_robots.display'),
+            'instructions' => $this->trans('seo_section_robots.instructions'),
+            'collapsible' => true,
+            'collapsed' => true,
+
+            'fields' => [
+                [
+                    'handle' => 'seo_nofollow',
+                    'field' => [
+                        'type' => 'seo',
+                        'display' => $this->trans('seo_nofollow.display'),
+                        'instructions' => $this->trans('seo_nofollow.instructions'),
+                        'default' => '@default',
+                        'localizable' => true,
+                        'width' => 50,
+                        'field' => [
+                            'type' => 'toggle',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'seo_noarchive',
+                    'field' => [
+                        'type' => 'seo',
+                        'display' => $this->trans('seo_noarchive.display'),
+                        'instructions' => $this->trans('seo_noarchive.instructions'),
+                        'default' => '@default',
+                        'localizable' => true,
+                        'width' => 50,
+                        'field' => [
+                            'type' => 'toggle',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'seo_nosnippet',
+                    'field' => [
+                        'type' => 'seo',
+                        'display' => $this->trans('seo_nosnippet.display'),
+                        'instructions' => $this->trans('seo_nosnippet.instructions'),
+                        'default' => '@default',
+                        'localizable' => true,
+                        'width' => 50,
+                        'field' => [
+                            'type' => 'toggle',
+                        ],
+                    ],
+                ],
+                [
+                    'handle' => 'seo_noimageindex',
+                    'field' => [
+                        'type' => 'seo',
+                        'display' => $this->trans('seo_noimageindex.display'),
+                        'instructions' => $this->trans('seo_noimageindex.instructions'),
+                        'default' => '@default',
+                        'localizable' => true,
+                        'width' => 50,
+                        'field' => [
+                            'type' => 'toggle',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     protected function structuredData(): array
     {
         return [
             'display' => $this->trans('seo_section_structured_data.display'),
             'instructions' => $this->trans('seo_section_structured_data.instructions'),
+            'collapsible' => true,
+            'collapsed' => true,
 
             'fields' => [
                 [

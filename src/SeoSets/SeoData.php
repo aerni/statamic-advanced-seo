@@ -81,6 +81,36 @@ class SeoData implements Arrayable
     }
 
     /**
+     * Mark the page as noarchive.
+     */
+    public function noarchive(): self
+    {
+        $this->data['seo_noarchive'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Mark the page as nosnippet.
+     */
+    public function nosnippet(): self
+    {
+        $this->data['seo_nosnippet'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Mark the page as noimageindex.
+     */
+    public function noimageindex(): self
+    {
+        $this->data['seo_noimageindex'] = true;
+
+        return $this;
+    }
+
+    /**
      * Set a custom canonical URL.
      */
     public function canonicalUrl(string $value): self

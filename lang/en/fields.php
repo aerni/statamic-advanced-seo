@@ -81,14 +81,38 @@ return [
 
     'seo_noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Prevent search engines from indexing this :type.',
-        'default_instructions' => 'Prevent search engines from indexing your :type.',
+        'instructions' => 'Exclude this :type from search engine results.',
+        'default_instructions' => 'Exclude your :type from search engine results.',
     ],
 
     'seo_nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Prevent crawlers from following links on this :type.',
-        'default_instructions' => 'Prevent crawlers from following links on your :type.',
+        'instructions' => 'Tell crawlers not to follow links on this :type.',
+        'default_instructions' => 'Tell crawlers not to follow links on your :type.',
+    ],
+
+    'seo_section_robots' => [
+        'display' => 'Robots',
+        'instructions' => 'Additional robots directives for this :type.',
+        'default_instructions' => 'Set default robots directives for your :type.',
+    ],
+
+    'seo_noarchive' => [
+        'display' => 'Noarchive',
+        'instructions' => 'Hide the cached link in search results.',
+        'default_instructions' => 'Hide the cached link in search results.',
+    ],
+
+    'seo_nosnippet' => [
+        'display' => 'Nosnippet',
+        'instructions' => 'Hide the text snippet in search results.',
+        'default_instructions' => 'Hide the text snippet in search results.',
+    ],
+
+    'seo_noimageindex' => [
+        'display' => 'Noimageindex',
+        'instructions' => 'Exclude images on this :type from image search.',
+        'default_instructions' => 'Exclude images on your :type from image search.',
     ],
 
     'seo_canonical_type' => [
@@ -213,12 +237,12 @@ return [
 
     'noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Prevent search engines from indexing your entire site.',
+        'instructions' => 'Exclude your entire site from search engine results.',
     ],
 
     'nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Prevent crawlers from following any links on your site.',
+        'instructions' => 'Tell crawlers not to follow any links on your site.',
     ],
 
     'section_verification' => [

@@ -81,14 +81,38 @@ return [
 
     'seo_noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Verhindere, dass Suchmaschinen diesen :type indexieren.',
-        'default_instructions' => 'Verhindere, dass Suchmaschinen deine :type indexieren.',
+        'instructions' => 'Diesen :type aus den Suchergebnissen ausschliessen.',
+        'default_instructions' => 'Deine :type aus den Suchergebnissen ausschliessen.',
     ],
 
     'seo_nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Verhindere, dass Crawler Links auf diesem :type folgen.',
-        'default_instructions' => 'Verhindere, dass Crawler Links auf deinen :type folgen.',
+        'instructions' => 'Crawler anweisen, Links auf diesem :type nicht zu folgen.',
+        'default_instructions' => 'Crawler anweisen, Links auf deinen :type nicht zu folgen.',
+    ],
+
+    'seo_section_robots' => [
+        'display' => 'Robots',
+        'instructions' => 'Zusätzliche Robots-Anweisungen für diesen :type.',
+        'default_instructions' => 'Standard-Robots-Anweisungen für deine :type festlegen.',
+    ],
+
+    'seo_noarchive' => [
+        'display' => 'Noarchive',
+        'instructions' => 'Den Cache-Link in den Suchergebnissen ausblenden.',
+        'default_instructions' => 'Den Cache-Link in den Suchergebnissen ausblenden.',
+    ],
+
+    'seo_nosnippet' => [
+        'display' => 'Nosnippet',
+        'instructions' => 'Den Textausschnitt in den Suchergebnissen ausblenden.',
+        'default_instructions' => 'Den Textausschnitt in den Suchergebnissen ausblenden.',
+    ],
+
+    'seo_noimageindex' => [
+        'display' => 'Noimageindex',
+        'instructions' => 'Bilder auf diesem :type von der Bildersuche ausschliessen.',
+        'default_instructions' => 'Bilder auf deinen :type von der Bildersuche ausschliessen.',
     ],
 
     'seo_canonical_type' => [
@@ -213,12 +237,12 @@ return [
 
     'noindex' => [
         'display' => 'Noindex',
-        'instructions' => 'Verhindere, dass Suchmaschinen deine gesamte Website indexieren.',
+        'instructions' => 'Deine gesamte Website aus den Suchergebnissen ausschliessen.',
     ],
 
     'nofollow' => [
         'display' => 'Nofollow',
-        'instructions' => 'Verhindere, dass Crawler Links auf deiner Website folgen.',
+        'instructions' => 'Crawler anweisen, keinen Links auf deiner Website zu folgen.',
     ],
 
     'section_verification' => [

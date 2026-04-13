@@ -24,6 +24,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 $this->searchAppearance(),
                 $this->socialAppearance(),
                 $this->indexing(),
+                $this->robots(),
                 $this->structuredData(),
             ],
         ];
@@ -162,6 +163,29 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                     ],
                 ],
                 [
+                    'handle' => 'seo_sitemap_enabled',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('seo_sitemap_enabled.display'),
+                        'instructions' => $this->trans('seo_sitemap_enabled.default_instructions'),
+                        'default' => true,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
+                        'feature' => Sitemap::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function robots(): array
+    {
+        return [
+            'display' => $this->trans('seo_section_robots.display'),
+            'instructions' => $this->trans('seo_section_robots.default_instructions'),
+            'fields' => [
+                [
                     'handle' => 'seo_nofollow',
                     'field' => [
                         'type' => 'seo',
@@ -177,15 +201,39 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                     ],
                 ],
                 [
-                    'handle' => 'seo_sitemap_enabled',
+                    'handle' => 'seo_noarchive',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => $this->trans('seo_sitemap_enabled.display'),
-                        'instructions' => $this->trans('seo_sitemap_enabled.default_instructions'),
-                        'default' => true,
+                        'display' => $this->trans('seo_noarchive.display'),
+                        'instructions' => $this->trans('seo_noarchive.default_instructions'),
+                        'default' => false,
                         'listable' => 'hidden',
                         'localizable' => true,
-                        'feature' => Sitemap::class,
+                        'width' => 50,
+                    ],
+                ],
+                [
+                    'handle' => 'seo_nosnippet',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('seo_nosnippet.display'),
+                        'instructions' => $this->trans('seo_nosnippet.default_instructions'),
+                        'default' => false,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
+                    ],
+                ],
+                [
+                    'handle' => 'seo_noimageindex',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('seo_noimageindex.display'),
+                        'instructions' => $this->trans('seo_noimageindex.default_instructions'),
+                        'default' => false,
+                        'listable' => 'hidden',
+                        'localizable' => true,
+                        'width' => 50,
                     ],
                 ],
             ],
