@@ -150,16 +150,13 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                 [
                     'handle' => 'seo_noindex',
                     'field' => [
-                        'type' => 'seo',
+                        'type' => 'toggle',
                         'display' => $this->trans('seo_noindex.display'),
                         'instructions' => $this->trans('seo_noindex.default_instructions'),
-                        'default' => '@default',
+                        'default' => false,
                         'listable' => 'hidden',
                         'localizable' => true,
                         'width' => 50,
-                        'field' => [
-                            'type' => 'toggle',
-                        ],
                     ],
                 ],
                 [

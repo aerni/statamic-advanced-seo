@@ -46,10 +46,6 @@ return [
     'token_picker_placeholder' => 'Tippe /, um ein Token hinzuzufügen',
     'token_suggestion_placeholder' => 'Tippe, um zu suchen …',
 
-    // Override
-    'overridden_by_site_defaults_badge' => 'Überschrieben',
-    'overridden_by_site_defaults_tooltip' => 'Dieser Wert wird von den Website-Einstellungen überschrieben und wird erst wirksam, wenn die Website-Einstellung entfernt wird.',
-
     // Alerts
     'alert_indexing_disabled' => 'Dieser :type wird nicht in Suchergebnissen erscheinen.',
 

@@ -46,10 +46,6 @@ return [
     'token_picker_placeholder' => 'Type / to add a token',
     'token_suggestion_placeholder' => 'Type to search …',
 
-    // Override
-    'overridden_by_site_defaults_badge' => 'Overridden',
-    'overridden_by_site_defaults_tooltip' => 'This value is overridden by site settings and won\'t take effect until the site setting is removed.',
-
     // Alerts
     'alert_indexing_disabled' => 'This :type will not appear in search results.',
 

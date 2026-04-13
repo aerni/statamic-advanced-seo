@@ -53,7 +53,7 @@ it('can get a default value from specific set', function () {
 });
 
 it('can get a default value by type', function () {
-    expect(Seo::defaultValue('collections.seo_noindex'))->toBe('@default');
+    expect(Seo::defaultValue('collections.seo_noindex'))->toBe(false);
 });
 
 it("returns a fallback when field doesn't exist", function () {

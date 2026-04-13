@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { Fieldtype } from '@statamic/cms';
-import { Badge, Description, injectPublishContext } from '@statamic/cms/ui';
+import { Description, injectPublishContext } from '@statamic/cms/ui';
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const fieldtype = Fieldtype.use(emit, props);
@@ -133,26 +133,12 @@ function handleBlur() {
             @update:value="updateFieldValue"
         />
     </div>
-    <div class="flex items-center gap-2 mt-2">
-        <Badge
-            v-if="props.meta.isOverriddenBySiteDefaults"
-            v-tooltip="__('advanced-seo::messages.overridden_by_site_defaults_tooltip')"
-            class="select-none"
-            color="amber"
-            size="sm"
-            :text="__('advanced-seo::messages.overridden_by_site_defaults_badge')"
-        />
-        <button
-            v-if="showResetButton"
-            type="button"
-            class="select-none"
-            @click.prevent="reset"
-        >
-            <Description class="underline text-2xs" :text="__('advanced-seo::messages.reset_to_default')" />
-        </button>
-    </div>
-
-
-
-
+    <button
+        v-if="showResetButton"
+        type="button"
+        class="mt-2 select-none"
+        @click.prevent="reset"
+    >
+        <Description class="underline text-2xs" :text="__('advanced-seo::messages.reset_to_default')" />
+    </button>
 </template>
