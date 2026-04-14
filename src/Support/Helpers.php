@@ -45,7 +45,7 @@ class Helpers
     public static function isCustomRoute(): bool
     {
         $allowedControllerActions = collect([
-            'Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController@show',
+            'Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController',
             'Statamic\Http\Controllers\FrontendController@index',
         ]);
 
