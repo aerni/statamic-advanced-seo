@@ -21,8 +21,6 @@ class AiGenerateController extends CpController
     {
         throw_unless(Ai::enabled(), new NotFoundHttpException);
 
-        $this->authorize('seo.edit-content');
-
         $validated = $request->validate([
             'field' => ['required', 'string', Rule::in(array_column(SeoAgent::fields(), 'handle'))],
             'blueprint' => ['required', 'string'],
@@ -31,6 +29,8 @@ class AiGenerateController extends CpController
         ]);
 
         [$type, $handle, $blueprint] = explode('.', $validated['blueprint']);
+
+        $this->authorize('seo.edit-content', Seo::find("{$type}::{$handle}"));
 
         try {
             return response()->json(new SeoAgent(

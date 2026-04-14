@@ -127,13 +127,11 @@ it('does not process the cascade on a taxonomy listing view when the taxonomy Se
 // -----------------------------------------------------------------------------
 // Custom routes (Pro + opt-in)
 //
-// Helpers::isCustomRoute() returns true when the request's route controller
-// action is NOT in an allowed list (FrontendController@index,
-// SocialImagesController@show). In test mode, Statamic's FrontendController
-// catches all frontend paths, so we can't register a real custom route via
-// Route::get(). Instead we manually construct a Request with a route resolver
-// that returns a route with a non-allowed controller action — this is the
-// state a real custom route would produce at runtime.
+// Statamic's FrontendController intercepts all frontend paths in test mode,
+// so we can't register a real custom route via Route::get(). Instead we
+// construct a Request with a route resolver that returns a route with a
+// non-allowed controller action — the same state a real custom route would
+// produce at runtime.
 // -----------------------------------------------------------------------------
 
 function fakeCustomRouteRequest(string $path): void
@@ -165,6 +163,24 @@ it('processes the cascade on a custom route with Pro and explicit opt-in', funct
     fakeCustomRouteRequest('/custom');
 
     expect(shouldProcess(['seo_enabled' => true]))->toBeTrue();
+});
+
+// -----------------------------------------------------------------------------
+// Social image routes
+//
+// The social image controller is invokable, so Laravel stores its action as
+// the bare class name (no `@method` suffix). Without the bare-class entry in
+// Helpers::isCustomRoute()'s allowlist, social image requests get classified
+// as "custom routes" and short-circuit, leaving `{{ seo:... }}` tags empty in
+// the rendered templates.
+// -----------------------------------------------------------------------------
+
+it('processes the cascade on a social image route (invokable controller)', function () {
+    // The controller will 404 on the nonsense id, but the route is still bound
+    // to the request — which is all shouldProcess inspects.
+    $this->get('/!/advanced-seo/social-images/default/og/xxx/english');
+
+    expect(shouldProcess(['is_entry' => true, 'collection' => Collection::findByHandle('pages')]))->toBeTrue();
 });
 
 // -----------------------------------------------------------------------------

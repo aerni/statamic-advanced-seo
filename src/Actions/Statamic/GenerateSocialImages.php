@@ -30,7 +30,7 @@ class GenerateSocialImages extends Action
      */
     public function authorize($user, $item)
     {
-        return Gate::allows('seo.edit-content')
+        return Gate::allows('seo.edit-content', Context::from($item)->seoSet())
             && $user->can('edit', $item);
     }
 

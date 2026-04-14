@@ -37,10 +37,19 @@ class HandleContentSeoBlueprint
          */
         $model = $this->getProperty($event) ?? $event;
 
-        $contents = array_replace_recursive(
-            $event->blueprint->contents(),
-            ContentSeoBlueprint::resolve($model)->contents()
-        );
+        $seoContents = ContentSeoBlueprint::resolve($model)->contents();
+
+        /**
+         * In the CP, the gate decides publish-form visibility. When it denies
+         * (non-editable SeoSet OR user without seo.edit-content), the fields are
+         * still extended — just hidden from editors. Automated processes keep
+         * reading the fields; only the UI affordance disappears.
+         */
+        if (Statamic::isCpRoute() && Gate::denies('seo.edit-content', Context::from($model)->seoSet())) {
+            $seoContents = $this->hideSeoFields($seoContents);
+        }
+
+        $contents = array_replace_recursive($event->blueprint->contents(), $seoContents);
 
         // Quick and dirty solution to ensure we capitalize the tab title
         $contents['tabs']['seo']['display'] = 'SEO';
@@ -62,23 +71,13 @@ class HandleContentSeoBlueprint
             return true;
         }
 
-        // In the CP, only extend on routes where it's safe, for editable
-        // contexts, for users with permission.
-        return $this->isOnAllowedCpRoute($context)
-            && $context->seoSet()->editable()
-            && Gate::allows('seo.edit-content');
+        // In the CP, only extend on routes where it's safe.
+        return $this->isOnAllowedCpRoute($context);
     }
 
     /**
-     * The blueprint is dispatched for many CP routes. We want to extend it on
-     * any entry/term-scoped route (edit, create, update, store, publish,
-     * localize, revisions, preview, actions, etc.) plus the AI generate route.
-     *
-     * Match by route name with a prefix wildcard so we catch all current and
-     * future sub-routes under entries/terms without enumerating each one. The
-     * blueprint editor (statamic.cp.fields.blueprints.*) and addon CP routes
-     * (statamic.cp.advanced-seo.sets.*) live under different prefixes, so they
-     * don't match — no false positives from visually similar URLs.
+     * Match all entry/term-scoped CP routes (plus AI generate) by name prefix
+     * so we don't have to enumerate every sub-route (edit, create, publish, …).
      */
     protected function isOnAllowedCpRoute(Context $context): bool
     {
@@ -96,5 +95,21 @@ class HandleContentSeoBlueprint
             "statamic.cp.{$context->type}.{$contentType}.*",
             'statamic.cp.advanced-seo.ai.generate',
         ], request()->route()?->getName());
+    }
+
+    /**
+     * Hide SEO fields in the publish form while keeping them in the blueprint
+     * so automated reads (social image generation, sitemap) still work.
+     */
+    protected function hideSeoFields(array $seoContents): array
+    {
+        foreach ($seoContents['tabs']['seo']['sections'] as &$section) {
+            foreach ($section['fields'] as &$field) {
+                $field['field']['visibility'] = 'hidden';
+                unset($field['field']['validate']); // Strip rules editors can't resolve on a hidden field.
+            }
+        }
+
+        return $seoContents;
     }
 }

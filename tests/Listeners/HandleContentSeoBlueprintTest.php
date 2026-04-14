@@ -62,6 +62,50 @@ function termBlueprintIsExtended(string $taxonomy): bool
     return array_key_exists('seo', Taxonomy::findByHandle($taxonomy)->termBlueprint()->contents()['tabs']);
 }
 
+function entrySeoFieldsAreAllHidden(string $collection): bool
+{
+    $sections = Collection::findByHandle($collection)->entryBlueprint()->contents()['tabs']['seo']['sections'] ?? [];
+
+    foreach ($sections as $section) {
+        foreach ($section['fields'] ?? [] as $field) {
+            if (($field['field']['visibility'] ?? null) !== 'hidden') {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function entrySeoFieldHandles(string $collection): array
+{
+    $sections = Collection::findByHandle($collection)->entryBlueprint()->contents()['tabs']['seo']['sections'] ?? [];
+    $handles = [];
+
+    foreach ($sections as $section) {
+        foreach ($section['fields'] ?? [] as $field) {
+            $handles[] = $field['handle'];
+        }
+    }
+
+    return $handles;
+}
+
+function entrySeoFieldsHaveNoValidateRules(string $collection): bool
+{
+    $sections = Collection::findByHandle($collection)->entryBlueprint()->contents()['tabs']['seo']['sections'] ?? [];
+
+    foreach ($sections as $section) {
+        foreach ($section['fields'] ?? [] as $field) {
+            if (array_key_exists('validate', $field['field'] ?? [])) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 describe('universal check', function () {
     it('does not extend an entry blueprint when the SeoSet is disabled', function () {
         Seo::find('collections::pages')
@@ -146,7 +190,7 @@ describe('CP disallowed routes', function () {
 });
 
 describe('CP editable + permission', function () {
-    it('does not extend an entry blueprint in the CP when the SeoSet is not editable', function () {
+    it('extends but hides all SEO fields in the CP when the SeoSet is not editable', function () {
         $entry = Entry::make()
             ->collection('pages')
             ->locale('english')
@@ -165,17 +209,24 @@ describe('CP editable + permission', function () {
          * request state, where the listener correctly extends the blueprint. In
          * production, each request starts with a fresh Blink; in tests the cache
          * bleeds. Flushing here makes the CP GET's blueprint event fire fresh —
-         * this time under CP state with editable=false, where the listener should
-         * decline to extend.
+         * this time under CP state with editable=false.
          */
         Blink::flush();
 
         $this->actingAs($this->superUser)->get("/cp/collections/pages/entries/{$entry->id()}");
 
-        expect(entryBlueprintIsExtended('pages'))->toBeFalse();
+        // Fields are still present so automated/read paths (sitemap, social image
+        // generation, meta tag rendering) keep working — only the UI disappears.
+        expect(entryBlueprintIsExtended('pages'))->toBeTrue();
+        expect(entrySeoFieldsAreAllHidden('pages'))->toBeTrue();
+        // Sanity check: representative non-feature-gated fields still reach the blueprint.
+        expect(entrySeoFieldHandles('pages'))->toContain('seo_title', 'seo_noindex');
+        // Validation rules must be stripped so editors can't get stuck unable to save
+        // (e.g. required_if on seo_canonical_entry when the user can't edit the field).
+        expect(entrySeoFieldsHaveNoValidateRules('pages'))->toBeTrue();
     });
 
-    it('does not extend an entry blueprint in the CP when the user lacks seo.edit-content permission', function () {
+    it('extends but hides all SEO fields in the CP when the user lacks seo.edit-content permission', function () {
         /*
          * A plain user with no roles has no 'edit seo content' / 'edit seo defaults'
          * / 'configure seo' permissions. Under the Pro edition (default in tests),
@@ -196,7 +247,32 @@ describe('CP editable + permission', function () {
 
         $this->actingAs($user)->get("/cp/collections/pages/entries/{$entry->id()}");
 
-        expect(entryBlueprintIsExtended('pages'))->toBeFalse();
+        expect(entryBlueprintIsExtended('pages'))->toBeTrue();
+        expect(entrySeoFieldsAreAllHidden('pages'))->toBeTrue();
+        expect(entrySeoFieldsHaveNoValidateRules('pages'))->toBeTrue();
+    });
+
+    it('extends an entry blueprint with visible fields on a frontend request when the SeoSet is not editable', function () {
+        Seo::find('collections::pages')
+            ->config()
+            ->editable(false)
+            ->save();
+
+        $entry = Entry::make()
+            ->collection('pages')
+            ->locale('english')
+            ->slug('about')
+            ->data(['title' => 'About']);
+
+        $entry->save();
+
+        Blink::flush();
+
+        $this->get('/about');
+
+        // On the frontend, editable(false) should not hide fields — hiding is CP-only.
+        expect(entryBlueprintIsExtended('pages'))->toBeTrue();
+        expect(entrySeoFieldsAreAllHidden('pages'))->toBeFalse();
     });
 });
 

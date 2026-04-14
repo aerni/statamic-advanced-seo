@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Ai\SeoAgent;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -28,6 +29,21 @@ beforeEach(function () {
 
 it('returns 403 when user lacks seo.edit-content permission', function () {
     $user = User::make()->save();
+
+    $this->actingAs($user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.pages.page',
+            'site' => 'english',
+            'content' => ['title' => 'Test'],
+        ])
+        ->assertForbidden();
+});
+
+it('returns 403 when the target SeoSet is not editable, even for super users', function () {
+    Seo::find('collections::pages')->config()->editable(false)->save();
+
+    $user = User::make()->makeSuper()->save();
 
     $this->actingAs($user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
