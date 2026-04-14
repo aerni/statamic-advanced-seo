@@ -63,7 +63,7 @@ class SeoSetPolicy
         }
 
         return $seoSet->type() === 'site'
-            || $user->hasPermission("configure {$seoSet->type()}");
+            || $this->canEditStatamicContent($user, $seoSet->type(), $seoSet->handle());
     }
 
     protected function canEditStatamicContent(User $user, string $type, string $handle): bool
