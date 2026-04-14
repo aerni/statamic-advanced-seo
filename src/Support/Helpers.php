@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Support;
 
-use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
@@ -37,21 +36,6 @@ class Helpers
         $parsed = preg_replace('/\.utf8/i', '', $locale);
 
         return Service::create($parsed)->toW3C();
-    }
-
-    public static function isAddonCpRoute(): bool
-    {
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
-    }
-
-    public static function isAiCpRoute(): bool
-    {
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo', 'ai']);
-    }
-
-    public static function isBlueprintCpRoute(): bool
-    {
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints']);
     }
 
     /**

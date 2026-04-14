@@ -5,21 +5,15 @@ namespace Aerni\AdvancedSeo\Listeners;
 use Aerni\AdvancedSeo\Blueprints\ContentSeoBlueprint;
 use Aerni\AdvancedSeo\Concerns\GetsEventData;
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Support\Helpers;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Statamic\Events\EntryBlueprintFound;
-use Statamic\Events\Event;
 use Statamic\Events\TermBlueprintFound;
-use Statamic\Facades\Site;
 use Statamic\Statamic;
 
 class HandleContentSeoBlueprint
 {
     use GetsEventData;
-
-    protected Context $context;
 
     public function handleEntryBlueprintFound(EntryBlueprintFound $event): void
     {
@@ -31,14 +25,17 @@ class HandleContentSeoBlueprint
         $this->extendBlueprint($event);
     }
 
-    protected function extendBlueprint(Event $event): void
+    protected function extendBlueprint(EntryBlueprintFound|TermBlueprintFound $event): void
     {
-        $model = $this->getProperty($event) ?? $event;
-        $this->context = $this->resolveEventContext($event);
-
         if (! $this->shouldExtendBlueprint($event)) {
             return;
         }
+
+        /**
+         * Fall back to the event itself when the entry/term property is null,
+         * e.g. during entry/term creation where no model exists yet.
+         */
+        $model = $this->getProperty($event) ?? $event;
 
         $contents = array_replace_recursive(
             $event->blueprint->contents(),
@@ -51,59 +48,53 @@ class HandleContentSeoBlueprint
         $event->blueprint->setContents($contents);
     }
 
-    protected function shouldExtendBlueprint(Event $event): bool
+    protected function shouldExtendBlueprint(EntryBlueprintFound|TermBlueprintFound $event): bool
     {
-        // Don't add fields if the collection/taxonomy is excluded in the config.
-        if (! $this->context->seoSet()->enabled()) {
+        $context = $this->resolveEventContext($event);
+
+        // SEO must be enabled for this context (universal).
+        if (! $context->seoSet()->enabled()) {
             return false;
         }
 
-        // Don't add fields in the blueprint builder.
-        if (Helpers::isBlueprintCpRoute()) {
-            return false;
+        // Frontend requests always get the extended blueprint.
+        if (! Statamic::isCpRoute()) {
+            return true;
         }
 
-        // Don't add fields on addon views in the CP, except the AI generate route.
-        if (Helpers::isAddonCpRoute() && ! Helpers::isAiCpRoute()) {
-            return false;
-        }
-
-        // Only add fields on entry/term views, action routes, and the AI generate route.
-        if (Statamic::isCpRoute() && ! $this->isModelCpRoute($event) && ! $this->isActionCpRoute() && ! Helpers::isAiCpRoute()) {
-            return false;
-        }
-
-        // Don't add fields if content editing is disabled for this collection/taxonomy.
-        if (Statamic::isCpRoute() && ! $this->context->seoSet()->editable()) {
-            return false;
-        }
-
-        // Check if user has permission to edit SEO content.
-        if (Statamic::isCpRoute() && Gate::denies('seo.edit-content')) {
-            return false;
-        }
-
-        return true;
+        // In the CP, only extend on routes where it's safe, for editable
+        // contexts, for users with permission.
+        return $this->isOnAllowedCpRoute($context)
+            && $context->seoSet()->editable()
+            && Gate::allows('seo.edit-content');
     }
 
-    protected function isModelCpRoute(Event $event): bool
+    /**
+     * The blueprint is dispatched for many CP routes. We want to extend it on
+     * any entry/term-scoped route (edit, create, update, store, publish,
+     * localize, revisions, preview, actions, etc.) plus the AI generate route.
+     *
+     * Match by route name with a prefix wildcard so we catch all current and
+     * future sub-routes under entries/terms without enumerating each one. The
+     * blueprint editor (statamic.cp.fields.blueprints.*) and addon CP routes
+     * (statamic.cp.advanced-seo.sets.*) live under different prefixes, so they
+     * don't match — no false positives from visually similar URLs.
+     */
+    protected function isOnAllowedCpRoute(Context $context): bool
     {
-        // Has a value if editing or localizing an existing entry/term.
-        $id = $this->context->type === 'collections' ? $event->entry?->id() : $event->term?->slug();
+        $contentType = match ($context->type) {
+            'collections' => 'entries',
+            'taxonomies' => 'terms',
+            default => null,
+        };
 
-        // The locale a new entry is being created in.
-        $createLocale = Arr::get(Site::all()->map->handle(), basename(request()->path()));
+        if ($contentType === null) {
+            return false;
+        }
 
-        /**
-         * The BlueprintFound event is called for every localization.
-         * But we only want to extend the blueprint for the current localization.
-         * Otherwise we will have issue evaluating conditional fields, e.g. the sitemap fields.
-         */
-        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->context->type, $id ?? $createLocale]);
-    }
-
-    protected function isActionCpRoute(): bool
-    {
-        return Statamic::isCpRoute() && Str::containsAll(request()->path(), [$this->context->type, $this->context->handle, 'actions']);
+        return Str::is([
+            "statamic.cp.{$context->type}.{$contentType}.*",
+            'statamic.cp.advanced-seo.ai.generate',
+        ], request()->route()?->getName());
     }
 }

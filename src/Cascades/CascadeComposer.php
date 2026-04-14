@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Cascades;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Concerns\EvaluatesContextType;
-use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Context\Context as SeoContext;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Contracts\View\View;
 use Statamic\Facades\Cascade;
@@ -56,38 +56,24 @@ class CascadeComposer
         return $context->merge($cascade->toArray());
     }
 
-    protected function shouldProcessCascade(Context $context): bool
+    protected function shouldProcessCascade(Context $viewContext): bool
     {
         if (Statamic::isCpRoute()) {
             return false;
         }
 
-        // Don't process the cascade if it has been processed before.
-        if ($context->has('seo')) {
+        // Don't reprocess if the cascade has already been computed on this view.
+        if ($viewContext->has('seo')) {
             return false;
         }
 
-        // Don't process the cascade for collections that are excluded in the config.
-        if ($context->has('is_entry') && ! Seo::find("collections::{$context->get('collection')}")?->enabled()) {
-            return false;
+        // Custom routes are a Pro feature requiring explicit opt-in.
+        if (Helpers::isCustomRoute()) {
+            return AdvancedSeo::pro() && $viewContext->bool('seo_enabled');
         }
 
-        // Don't process the cascade for taxonomy terms that are excluded in the config.
-        if ($context->has('is_term') && ! Seo::find("taxonomies::{$context->get('taxonomy')}")?->enabled()) {
-            return false;
-        }
-
-        // Don't process the cascade for taxonomies that are excluded in the config.
-        if ($context->has('terms') && ! Seo::find("taxonomies::{$context->get('handle')}")?->enabled()) {
-            return false;
-        }
-
-        // Don't process the cascade for any custom route that doesn't explicitly want to use Advanced SEO.
-        // Custom route SEO requires the Pro edition.
-        if (Helpers::isCustomRoute() && (! AdvancedSeo::pro() || ! $context->bool('seo_enabled'))) {
-            return false;
-        }
-
-        return true;
+        // Process when the SeoSet is enabled. Default-pass when no content
+        // context can be resolved (e.g. partials or custom templates).
+        return SeoContext::from($viewContext)?->seoSet()?->enabled() ?? true;
     }
 }
