@@ -193,7 +193,7 @@ return [
 
     'section_structured_data' => [
         'display' => 'Strukturierte Daten',
-        'instructions' => 'Hilf Suchmaschinen, deine Website mit [strukturierten Daten](https://developers.google.com/search/docs/guides/intro-structured-data) zu verstehen.',
+        'instructions' => 'Website-weite [strukturierte Daten](https://developers.google.com/search/docs/guides/intro-structured-data), die Suchmaschinen helfen, deine Website zu verstehen.',
     ],
 
     'site_json_ld_type' => [
@@ -232,7 +232,7 @@ return [
 
     'section_indexing' => [
         'display' => 'Indexierung',
-        'instructions' => 'Website-weite Indexierungseinstellungen. Diese überschreiben Eintrags- und Begriffseinstellungen.',
+        'instructions' => 'Website-weite Indexierungseinstellungen, die Eintrags- und Begriffseinstellungen überschreiben.',
     ],
 
     'noindex' => [

@@ -193,7 +193,7 @@ return [
 
     'section_structured_data' => [
         'display' => 'Structured Data',
-        'instructions' => 'Help search engines understand your site with [structured data](https://developers.google.com/search/docs/guides/intro-structured-data).',
+        'instructions' => 'Site-wide [structured data](https://developers.google.com/search/docs/guides/intro-structured-data) to help search engines understand your site.',
     ],
 
     'site_json_ld_type' => [
@@ -232,7 +232,7 @@ return [
 
     'section_indexing' => [
         'display' => 'Indexing',
-        'instructions' => 'Site-wide indexing settings. These override entry and term settings.',
+        'instructions' => 'Site-wide indexing settings that override entry and term settings.',
     ],
 
     'noindex' => [
