@@ -296,52 +296,37 @@ return [
 
     'section_fathom' => [
         'display' => 'Fathom',
-        'instructions' => 'Eine datenschutzfreundliche Alternative zu Google Analytics. [Mehr erfahren](https://usefathom.com)',
-    ],
-
-    'use_fathom' => [
-        'display' => 'Fathom',
-        'instructions' => 'Das Fathom-Tracking-Skript hinzufügen.',
+        'instructions' => 'Das Tracking-Skript von [Fathom Analytics](https://usefathom.com) einbinden.',
     ],
 
     'fathom_id' => [
         'display' => 'Website-ID',
-        'instructions' => 'Deine Fathom-Website-ID.',
+        'instructions' => 'Aus deinem Fathom-Dashboard.',
     ],
 
     'fathom_spa' => [
         'display' => 'SPA-Modus',
-        'instructions' => 'Für Single-Page-Applikationen aktivieren.',
+        'instructions' => 'Aktivieren, wenn deine Website clientseitiges Routing verwendet.',
     ],
 
     'section_cloudflare_web_analytics' => [
         'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'Eine datenschutzfreundliche Alternative zu Google Analytics. [Mehr erfahren](https://www.cloudflare.com/web-analytics)',
+        'instructions' => 'Das Tracking-Skript von [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics) einbinden.',
     ],
 
-    'use_cloudflare_web_analytics' => [
-        'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'Das Cloudflare Web Analytics-Tracking-Skript hinzufügen.',
-    ],
-
-    'cloudflare_web_analytics' => [
+    'cloudflare_beacon_token' => [
         'display' => 'Beacon-Token',
-        'instructions' => 'Dein Cloudflare-Beacon-Token.',
+        'instructions' => 'Aus deinem Cloudflare-Analytics-Dashboard.',
     ],
 
     'section_google_tag_manager' => [
         'display' => 'Google Tag Manager',
-        'instructions' => 'Tracking-Skripte über [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager) verwalten.',
+        'instructions' => 'Das Container-Skript von [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager) einbinden.',
     ],
 
-    'use_google_tag_manager' => [
-        'display' => 'Google Tag Manager',
-        'instructions' => 'Die Google Tag Manager-Skripte hinzufügen.',
-    ],
-
-    'google_tag_manager' => [
+    'gtm_container_id' => [
         'display' => 'Container-ID',
-        'instructions' => 'Deine GTM-Container-ID.',
+        'instructions' => 'Aus deinem Google Tag Manager-Arbeitsbereich.',
     ],
 
     /*

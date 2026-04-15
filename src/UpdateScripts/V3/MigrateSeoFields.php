@@ -74,6 +74,8 @@ class MigrateSeoFields
             $this->renameTitleSeparator($localization);
             $this->removeTwitterFields($localization);
             $this->removeNofollowField($localization);
+            $this->removeAnalyticsToggles($localization);
+            $this->renameAnalyticsFields($localization);
             $localization->save();
         });
     }
@@ -148,6 +150,30 @@ class MigrateSeoFields
     protected function removeNofollowField(mixed $item): void
     {
         $this->remove($item, 'nofollow');
+    }
+
+    protected function removeAnalyticsToggles(mixed $item): void
+    {
+        $fields = ['use_fathom', 'use_cloudflare_web_analytics', 'use_google_tag_manager'];
+
+        foreach ($fields as $field) {
+            $this->remove($item, $field);
+        }
+    }
+
+    protected function renameAnalyticsFields(mixed $item): void
+    {
+        $renames = [
+            'cloudflare_web_analytics' => 'cloudflare_beacon_token',
+            'google_tag_manager' => 'gtm_container_id',
+        ];
+
+        foreach ($renames as $from => $to) {
+            if ($value = $item->get($from)) {
+                $item->set($to, $value);
+                $this->remove($item, $from);
+            }
+        }
     }
 
     /**

@@ -224,6 +224,48 @@ it('removes nofollow field from site defaults', function () {
     expect($localization->has('nofollow'))->toBeFalse();
 });
 
+it('removes analytics toggles from site defaults', function () {
+    Seo::find('site::defaults')
+        ->inDefaultSite()
+        ->data([
+            'use_fathom' => true,
+            'fathom_id' => 'ABC123',
+            'use_cloudflare_web_analytics' => true,
+            'use_google_tag_manager' => true,
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('site::defaults')->inDefaultSite();
+
+    expect($localization->has('use_fathom'))->toBeFalse();
+    expect($localization->has('use_cloudflare_web_analytics'))->toBeFalse();
+    expect($localization->has('use_google_tag_manager'))->toBeFalse();
+
+    expect($localization->get('fathom_id'))->toBe('ABC123');
+});
+
+it('renames analytics fields on site defaults', function () {
+    Seo::find('site::defaults')
+        ->inDefaultSite()
+        ->data([
+            'cloudflare_web_analytics' => 'token',
+            'google_tag_manager' => 'GTM-XYZ',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('site::defaults')->inDefaultSite();
+
+    expect($localization->has('cloudflare_web_analytics'))->toBeFalse();
+    expect($localization->has('google_tag_manager'))->toBeFalse();
+
+    expect($localization->get('cloudflare_beacon_token'))->toBe('token');
+    expect($localization->get('gtm_container_id'))->toBe('GTM-XYZ');
+});
+
 it('removes sitemap fields from entries and terms', function () {
     Entry::make()
         ->collection('pages')

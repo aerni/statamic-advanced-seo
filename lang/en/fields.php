@@ -296,52 +296,37 @@ return [
 
     'section_fathom' => [
         'display' => 'Fathom',
-        'instructions' => 'A privacy-friendly alternative to Google Analytics. [Learn more](https://usefathom.com)',
-    ],
-
-    'use_fathom' => [
-        'display' => 'Fathom',
-        'instructions' => 'Add the Fathom tracking script.',
+        'instructions' => 'Add the [Fathom Analytics](https://usefathom.com) tracking script.',
     ],
 
     'fathom_id' => [
         'display' => 'Site ID',
-        'instructions' => 'Your Fathom site ID.',
+        'instructions' => 'From your Fathom dashboard.',
     ],
 
     'fathom_spa' => [
         'display' => 'SPA Mode',
-        'instructions' => 'Enable for single page applications.',
+        'instructions' => 'Enable when your site uses client-side routing.',
     ],
 
     'section_cloudflare_web_analytics' => [
         'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'A privacy-friendly alternative to Google Analytics. [Learn more](https://www.cloudflare.com/web-analytics)',
+        'instructions' => 'Add the [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics) tracking script.',
     ],
 
-    'use_cloudflare_web_analytics' => [
-        'display' => 'Cloudflare Web Analytics',
-        'instructions' => 'Add the Cloudflare Web Analytics tracking script.',
-    ],
-
-    'cloudflare_web_analytics' => [
+    'cloudflare_beacon_token' => [
         'display' => 'Beacon Token',
-        'instructions' => 'Your Cloudflare beacon token.',
+        'instructions' => 'From your Cloudflare Analytics dashboard.',
     ],
 
     'section_google_tag_manager' => [
         'display' => 'Google Tag Manager',
-        'instructions' => 'Manage tracking scripts via [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager).',
+        'instructions' => 'Add the [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager) container script.',
     ],
 
-    'use_google_tag_manager' => [
-        'display' => 'Google Tag Manager',
-        'instructions' => 'Add the Google Tag Manager scripts.',
-    ],
-
-    'google_tag_manager' => [
+    'gtm_container_id' => [
         'display' => 'Container ID',
-        'instructions' => 'Your GTM container ID.',
+        'instructions' => 'From your Google Tag Manager workspace.',
     ],
 
     /*

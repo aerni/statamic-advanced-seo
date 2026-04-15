@@ -29,13 +29,13 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
             'search_appearance' => [
                 $this->structuredData(),
                 $this->indexing(),
-                $this->siteVerification(),
             ],
             'social_appearance' => [
                 $this->socialImage(),
                 $this->twitter(),
             ],
-            'analytics' => [
+            'integrations' => [
+                $this->siteVerification(),
                 $this->fathom(),
                 $this->cloudflare(),
                 $this->googleTagManager(),
@@ -362,20 +362,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_fathom.display'),
             'instructions' => $this->trans('section_fathom.instructions'),
-
             'fields' => [
-                [
-                    'handle' => 'use_fathom',
-                    'field' => [
-                        'type' => 'toggle',
-                        'display' => $this->trans('use_fathom.display'),
-                        'instructions' => $this->trans('use_fathom.instructions'),
-                        'default' => false,
-                        'listable' => false,
-                        'localizable' => true,
-                        'feature' => Fathom::class,
-                    ],
-                ],
                 [
                     'handle' => 'fathom_id',
                     'field' => [
@@ -388,12 +375,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'antlers' => true,
                         'feature' => Fathom::class,
-                        'validate' => [
-                            'required_if:use_fathom,true',
-                        ],
-                        'if' => [
-                            'use_fathom' => 'equals true',
-                        ],
                     ],
                 ],
                 [
@@ -408,12 +389,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                         'localizable' => true,
                         'width' => 50,
                         'feature' => Fathom::class,
-                        'validate' => [
-                            'required_if:use_fathom,true',
-                        ],
-                        'if' => [
-                            'use_fathom' => 'equals true',
-                        ],
                     ],
                 ],
             ],
@@ -425,37 +400,18 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_cloudflare_web_analytics.display'),
             'instructions' => $this->trans('section_cloudflare_web_analytics.instructions'),
-
             'fields' => [
                 [
-                    'handle' => 'use_cloudflare_web_analytics',
-                    'field' => [
-                        'type' => 'toggle',
-                        'display' => $this->trans('use_cloudflare_web_analytics.display'),
-                        'instructions' => $this->trans('use_cloudflare_web_analytics.instructions'),
-                        'default' => false,
-                        'listable' => false,
-                        'localizable' => true,
-                        'feature' => Cloudflare::class,
-                    ],
-                ],
-                [
-                    'handle' => 'cloudflare_web_analytics',
+                    'handle' => 'cloudflare_beacon_token',
                     'field' => [
                         'type' => 'text',
-                        'display' => $this->trans('cloudflare_web_analytics.display'),
-                        'instructions' => $this->trans('cloudflare_web_analytics.instructions'),
+                        'display' => $this->trans('cloudflare_beacon_token.display'),
+                        'instructions' => $this->trans('cloudflare_beacon_token.instructions'),
                         'input_type' => 'text',
-                        'width' => 50,
                         'listable' => 'hidden',
                         'localizable' => true,
+                        'width' => 50,
                         'feature' => Cloudflare::class,
-                        'validate' => [
-                            'required_if:use_cloudflare_web_analytics,true',
-                        ],
-                        'if' => [
-                            'use_cloudflare_web_analytics' => 'equals true',
-                        ],
                     ],
                 ],
             ],
@@ -467,37 +423,18 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_google_tag_manager.display'),
             'instructions' => $this->trans('section_google_tag_manager.instructions'),
-
             'fields' => [
                 [
-                    'handle' => 'use_google_tag_manager',
-                    'field' => [
-                        'type' => 'toggle',
-                        'display' => $this->trans('use_google_tag_manager.display'),
-                        'instructions' => $this->trans('use_google_tag_manager.instructions'),
-                        'default' => false,
-                        'listable' => false,
-                        'localizable' => true,
-                        'feature' => GoogleTagManager::class,
-                    ],
-                ],
-                [
-                    'handle' => 'google_tag_manager',
+                    'handle' => 'gtm_container_id',
                     'field' => [
                         'type' => 'text',
-                        'display' => $this->trans('google_tag_manager.display'),
-                        'instructions' => $this->trans('google_tag_manager.instructions'),
+                        'display' => $this->trans('gtm_container_id.display'),
+                        'instructions' => $this->trans('gtm_container_id.instructions'),
                         'input_type' => 'text',
-                        'width' => 50,
                         'listable' => 'hidden',
                         'localizable' => true,
+                        'width' => 50,
                         'feature' => GoogleTagManager::class,
-                        'validate' => [
-                            'required_if:use_google_tag_manager,true',
-                        ],
-                        'if' => [
-                            'use_google_tag_manager' => 'equals true',
-                        ],
                     ],
                 ],
             ],

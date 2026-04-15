@@ -54,16 +54,11 @@ it('exposes all expected fields', function () {
         // Indexing: Site Verification
         'google_site_verification_code',
         'bing_site_verification_code',
-        // Analytics: Fathom
-        'use_fathom',
+        // Analytics
         'fathom_id',
         'fathom_spa',
-        // Analytics: Cloudflare
-        'use_cloudflare_web_analytics',
-        'cloudflare_web_analytics',
-        // Analytics: Google Tag Manager
-        'use_google_tag_manager',
-        'google_tag_manager',
+        'cloudflare_beacon_token',
+        'gtm_container_id',
     ]);
 });
 
