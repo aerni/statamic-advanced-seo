@@ -47,6 +47,40 @@ function makeSeoFieldWithParent(string $handle = 'seo_title', array $childField 
     return $field;
 }
 
+/**
+ * Set up an english (origin) + french two-site collection with a 'home' entry
+ * in each locale. Returns [origin, french]. Callers seed SeoSet localization
+ * values per-test to exercise cascade differences.
+ */
+function makeTwoSiteHomeEntries(array $originData = [], array $frenchData = []): array
+{
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Collection::make('pages')->sites(['english', 'french'])->saveQuietly();
+
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->slug('home')
+        ->data(array_merge(['title' => 'Home'], $originData));
+
+    $origin->saveQuietly();
+
+    $french = Entry::make()
+        ->collection('pages')
+        ->locale('french')
+        ->slug('home')
+        ->origin($origin)
+        ->data($frenchData);
+
+    $french->saveQuietly();
+
+    return [$origin, $french];
+}
+
 // --- preProcess ---
 
 it('preprocesses @default as inherited state', function () {
@@ -169,73 +203,117 @@ it('augments null by falling through to field default', function () {
     expect($result)->toBe('Test Page | English');
 });
 
-it('augments @default using origin cascade when entry is synced to origin', function () {
-    Site::setSites([
-        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
-        'french' => ['name' => 'French', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
-    ]);
+// --- origin / sync: non-text fields ---
+//
+// Non-text fields (toggles, selects) without a placeholder need the UI and the
+// augmented value to agree on what @default resolves to when an entry is synced
+// to its origin. Both pipelines must swap to the origin's cascade in that case.
 
-    Collection::make('pages')->sites(['english', 'french'])->saveQuietly();
+it('augments @default using origin cascade for synced non-text field', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_noindex' => '@default']);
 
-    // English (origin) localization: noindex=true. French localization: noindex=false.
     Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
     Seo::find('collections::pages')->in('french')->set('seo_noindex', false)->save();
-
-    $origin = Entry::make()
-        ->collection('pages')
-        ->locale('english')
-        ->slug('home')
-        ->data(['title' => 'Home', 'seo_noindex' => '@default']);
-    $origin->saveQuietly();
-
-    // French entry synced to origin (no own value for seo_noindex).
-    $french = Entry::make()
-        ->collection('pages')
-        ->locale('french')
-        ->slug('home')
-        ->origin($origin);
-    $french->saveQuietly();
 
     $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
     $field->setParent($french);
 
-    // Synced entries should resolve @default against the origin's cascade,
-    // matching what the UI displays via originDefaultValue().
     expect($field->fieldtype()->augment('@default'))->toBe(true);
 });
 
-it('augments @default using local cascade when entry explicitly sets @default', function () {
-    Site::setSites([
-        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
-        'french' => ['name' => 'French', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
-    ]);
-
-    Collection::make('pages')->sites(['english', 'french'])->saveQuietly();
+it('preprocesses @default using origin default for synced non-text field', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_noindex' => '@default']);
 
     Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
     Seo::find('collections::pages')->in('french')->set('seo_noindex', false)->save();
 
-    $origin = Entry::make()
-        ->collection('pages')
-        ->locale('english')
-        ->slug('home')
-        ->data(['title' => 'Home', 'seo_noindex' => '@default']);
-    $origin->saveQuietly();
+    $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
+    $field->setParent($french);
 
-    // French entry explicitly stores @default (not synced to origin for this field).
-    $french = Entry::make()
-        ->collection('pages')
-        ->locale('french')
-        ->slug('home')
-        ->origin($origin)
-        ->data(['seo_noindex' => '@default']);
-    $french->saveQuietly();
+    expect($field->fieldtype()->preProcess('@default'))
+        ->toBe(['source' => 'default', 'value' => true]);
+});
+
+it('augments @default using local cascade when entry explicitly sets @default', function () {
+    [, $french] = makeTwoSiteHomeEntries(
+        originData: ['seo_noindex' => '@default'],
+        frenchData: ['seo_noindex' => '@default'],
+    );
+
+    Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
+    Seo::find('collections::pages')->in('french')->set('seo_noindex', false)->save();
 
     $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
     $field->setParent($french);
 
-    // When @default is set explicitly (not inherited), resolve against the local cascade.
     expect($field->fieldtype()->augment('@default'))->toBe(false);
+});
+
+it('preprocesses @default using local default when entry explicitly sets @default', function () {
+    [, $french] = makeTwoSiteHomeEntries(
+        originData: ['seo_noindex' => '@default'],
+        frenchData: ['seo_noindex' => '@default'],
+    );
+
+    Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
+    Seo::find('collections::pages')->in('french')->set('seo_noindex', false)->save();
+
+    $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
+    $field->setParent($french);
+
+    expect($field->fieldtype()->preProcess('@default'))
+        ->toBe(['source' => 'default', 'value' => false]);
+});
+
+// --- origin / sync: text fields ---
+//
+// Text fields (text/textarea/code) use placeholders in the UI and always
+// resolve @default against the local cascade, regardless of sync state.
+// Both pipelines must honor this short-circuit.
+
+it('augments @default using local cascade for synced text field', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_description' => '@default']);
+
+    Seo::find('collections::pages')->in('english')->set('seo_description', 'English description')->save();
+    Seo::find('collections::pages')->in('french')->set('seo_description', 'French description')->save();
+
+    $field = makeSeoField('seo_description', ['type' => 'textarea']);
+    $field->setParent($french);
+
+    expect($field->fieldtype()->augment('@default'))->toBe('French description');
+});
+
+it('preprocesses @default using local default for synced text field', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_description' => '@default']);
+
+    Seo::find('collections::pages')->in('english')->set('seo_description', 'English description')->save();
+    Seo::find('collections::pages')->in('french')->set('seo_description', 'French description')->save();
+
+    $field = makeSeoField('seo_description', ['type' => 'textarea']);
+    $field->setParent($french);
+
+    expect($field->fieldtype()->preProcess('@default'))
+        ->toBe(['source' => 'default', 'value' => 'French description']);
+});
+
+// --- origin / sync: matching cascades ---
+//
+// When origin and local cascades resolve to the same value, the origin-swap
+// short-circuit should kick in and use the local cascade (no work saved,
+// but the equality check is the cheapest path through shouldUseOriginDefault).
+
+it('uses local cascade when origin and local resolve to the same value', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_noindex' => '@default']);
+
+    Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
+    Seo::find('collections::pages')->in('french')->set('seo_noindex', true)->save();
+
+    $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
+    $field->setParent($french);
+
+    expect($field->fieldtype()->augment('@default'))->toBe(true);
+    expect($field->fieldtype()->preProcess('@default'))
+        ->toBe(['source' => 'default', 'value' => true]);
 });
 
 // --- preload ---
@@ -270,6 +348,39 @@ it('returns the child component name for toggle', function () {
     $result = $field->fieldtype()->preload();
 
     expect($result['component'])->toBe('toggle-fieldtype');
+});
+
+it('includes null originDefaultValue when entry has no origin', function () {
+    $field = makeSeoFieldWithParent('seo_noindex', ['type' => 'toggle']);
+    $field->setValue($field->fieldtype()->preProcess('@default'));
+
+    expect($field->fieldtype()->preload()['originDefaultValue'])->toBeNull();
+});
+
+it('includes origin default for synced entries', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_noindex' => '@default']);
+
+    Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
+    Seo::find('collections::pages')->in('french')->set('seo_noindex', false)->save();
+
+    $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
+    $field->setParent($french);
+    $field->setValue($field->fieldtype()->preProcess('@default'));
+
+    $result = $field->fieldtype()->preload();
+
+    // Vue reads both to detect a sync swap: originDefaultValue reflects the
+    // origin's cascade (true) while defaultValue reflects the local cascade (false).
+    expect($result['originDefaultValue'])->toBe(true)
+        ->and($result['defaultValue'])->toBe(false)
+        ->and($result['isTextBasedField'])->toBe(false);
+});
+
+it('flags text-based fields in preload', function () {
+    $field = makeSeoFieldWithParent('seo_description', ['type' => 'textarea']);
+    $field->setValue($field->fieldtype()->preProcess('@default'));
+
+    expect($field->fieldtype()->preload()['isTextBasedField'])->toBe(true);
 });
 
 // --- round-trip ---
