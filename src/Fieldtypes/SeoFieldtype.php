@@ -124,7 +124,9 @@ class SeoFieldtype extends Fieldtype
         $data ??= $this->field->defaultValue();
 
         if ($data === '@default') {
-            $data = $this->defaultValueFromCascade();
+            $data = $this->shouldUseOriginDefault()
+                ? $this->originDefaultValueFromCascade()
+                : $this->defaultValueFromCascade();
         }
 
         return $this->childFieldtype()->augment($data);
@@ -213,6 +215,22 @@ class SeoFieldtype extends Fieldtype
         }
 
         return $this->childDefaultValue($parent->origin());
+    }
+
+    /**
+     * The raw origin cascade value for augmentation of synced entries.
+     * Mirrors originDefaultValue() but skips the child preProcess pass so
+     * the result can be fed into the child fieldtype's augment().
+     */
+    protected function originDefaultValueFromCascade(): mixed
+    {
+        $parent = $this->localizedParent();
+
+        if (! $parent?->hasOrigin()) {
+            return null;
+        }
+
+        return $this->defaultValueFromCascade($parent->origin());
     }
 
     protected function isTextBasedField(): bool

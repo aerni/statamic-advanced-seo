@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -166,6 +167,75 @@ it('augments null by falling through to field default', function () {
 
     // null → field->defaultValue() → '@default' → cascade resolution → {{ title }}
     expect($result)->toBe('Test Page | English');
+});
+
+it('augments @default using origin cascade when entry is synced to origin', function () {
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Collection::make('pages')->sites(['english', 'french'])->saveQuietly();
+
+    // English (origin) localization: noindex=true. French localization: noindex=false.
+    Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
+    Seo::find('collections::pages')->in('french')->set('seo_noindex', false)->save();
+
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->slug('home')
+        ->data(['title' => 'Home', 'seo_noindex' => '@default']);
+    $origin->saveQuietly();
+
+    // French entry synced to origin (no own value for seo_noindex).
+    $french = Entry::make()
+        ->collection('pages')
+        ->locale('french')
+        ->slug('home')
+        ->origin($origin);
+    $french->saveQuietly();
+
+    $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
+    $field->setParent($french);
+
+    // Synced entries should resolve @default against the origin's cascade,
+    // matching what the UI displays via originDefaultValue().
+    expect($field->fieldtype()->augment('@default'))->toBe(true);
+});
+
+it('augments @default using local cascade when entry explicitly sets @default', function () {
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Collection::make('pages')->sites(['english', 'french'])->saveQuietly();
+
+    Seo::find('collections::pages')->in('english')->set('seo_noindex', true)->save();
+    Seo::find('collections::pages')->in('french')->set('seo_noindex', false)->save();
+
+    $origin = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->slug('home')
+        ->data(['title' => 'Home', 'seo_noindex' => '@default']);
+    $origin->saveQuietly();
+
+    // French entry explicitly stores @default (not synced to origin for this field).
+    $french = Entry::make()
+        ->collection('pages')
+        ->locale('french')
+        ->slug('home')
+        ->origin($origin)
+        ->data(['seo_noindex' => '@default']);
+    $french->saveQuietly();
+
+    $field = makeSeoField('seo_noindex', ['type' => 'toggle']);
+    $field->setParent($french);
+
+    // When @default is set explicitly (not inherited), resolve against the local cascade.
+    expect($field->fieldtype()->augment('@default'))->toBe(false);
 });
 
 // --- preload ---
