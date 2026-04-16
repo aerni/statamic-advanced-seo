@@ -219,6 +219,12 @@ class SeoSet implements Arrayable, QueryableValue
         Blink::flushStartingWith($this->blinkKey());
     }
 
+    /**
+     * Namespace for all Blink keys that should be flushed when this set's
+     * config or localizations change. Any cache key anywhere in the codebase
+     * that starts with this prefix (e.g. feature toggles per context) will
+     * be invalidated by flushBlink() via Blink::flushStartingWith().
+     */
     protected function blinkKey(?string $suffix = null): string
     {
         return "advanced-seo::{$this->id()}::{$suffix}";
