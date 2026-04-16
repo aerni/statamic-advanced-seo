@@ -35,16 +35,11 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                 $this->twitter(),
             ],
             'integrations' => [
+                $this->ai(),
                 $this->siteVerification(),
                 $this->fathom(),
                 $this->cloudflare(),
                 $this->googleTagManager(),
-            ],
-            'ai' => [
-                'display' => 'AI',
-                'sections' => [
-                    $this->ai(),
-                ],
             ],
         ];
     }
