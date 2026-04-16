@@ -37,17 +37,20 @@ class HandleContentSeoBlueprint
          */
         $model = $this->getProperty($event) ?? $event;
 
-        $seoContents = ContentSeoBlueprint::resolve($model)->contents();
-
         /**
          * In the CP, the gate decides publish-form visibility. When it denies
          * (non-editable SeoSet OR user without seo.edit-content), the fields are
          * still extended — just hidden from editors. Automated processes keep
          * reading the fields; only the UI affordance disappears.
          */
-        if (Statamic::isCpRoute() && Gate::denies('seo.edit-content', Context::from($model)->seoSet())) {
-            $seoContents = $this->hideSeoFields($seoContents);
-        }
+        $shouldHide = Statamic::isCpRoute()
+            && Gate::denies('seo.edit-content', Context::from($model)->seoSet());
+
+        $seoContents = ContentSeoBlueprint::make()
+            ->for($model)
+            ->hidden($shouldHide)
+            ->get()
+            ->contents();
 
         $contents = array_replace_recursive($event->blueprint->contents(), $seoContents);
 
@@ -95,21 +98,5 @@ class HandleContentSeoBlueprint
             "statamic.cp.{$context->type}.{$contentType}.*",
             'statamic.cp.advanced-seo.ai.generate',
         ], request()->route()?->getName());
-    }
-
-    /**
-     * Hide SEO fields in the publish form while keeping them in the blueprint
-     * so automated reads (social image generation, sitemap) still work.
-     */
-    protected function hideSeoFields(array $seoContents): array
-    {
-        foreach ($seoContents['tabs']['seo']['sections'] as &$section) {
-            foreach ($section['fields'] as &$field) {
-                $field['field']['visibility'] = 'hidden';
-                unset($field['field']['validate']); // Strip rules editors can't resolve on a hidden field.
-            }
-        }
-
-        return $seoContents;
     }
 }

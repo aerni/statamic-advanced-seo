@@ -13,6 +13,8 @@ abstract class BaseBlueprint
 {
     protected ?Context $context = null;
 
+    protected bool $hidden = false;
+
     abstract protected function handle(): string;
 
     abstract protected function tabs(): array;
@@ -39,6 +41,17 @@ abstract class BaseBlueprint
         return $this;
     }
 
+    /**
+     * Mask all fields as hidden on resolution so the publish form renders them
+     * as inaccessible while the blueprint still exposes them to automated reads.
+     */
+    public function hidden(bool $hidden = true): static
+    {
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
     public function get(): Blueprint
     {
         return \Statamic\Facades\Blueprint::make()
@@ -54,6 +67,7 @@ abstract class BaseBlueprint
                 'sections' => $this->sections($tab['sections'] ?? $tab),
             ])
             ->pipe($this->resolveLazyValues(...))
+            ->pipe($this->hideFields(...))
             ->all();
 
         return ['tabs' => $tabs];
@@ -73,6 +87,34 @@ abstract class BaseBlueprint
             ->filter(fn (array $section) => $section['fields'])
             ->values()
             ->all();
+    }
+
+    /**
+     * Applied after lazy resolution so it overrides any per-field `visibility`
+     * set inline (e.g. via `$this->lazy(...)`).
+     */
+    protected function hideFields(Collection $tabs): Collection
+    {
+        if (! $this->hidden) {
+            return $tabs;
+        }
+
+        return $tabs->map(fn (array $tab) => [
+            ...$tab,
+            'sections' => collect($tab['sections'])
+                ->map(fn (array $section) => [
+                    ...$section,
+                    'fields' => collect($section['fields'])
+                        ->map(function (array $field) {
+                            $field['field']['visibility'] = 'hidden';
+                            unset($field['field']['validate']);
+
+                            return $field;
+                        })
+                        ->all(),
+                ])
+                ->all(),
+        ]);
     }
 
     protected function lazy(callable $callback, mixed $fallback = null): Closure
