@@ -1,7 +1,9 @@
 <?php
 
 use Aerni\AdvancedSeo\Cascades\ContentCascade;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -376,4 +378,56 @@ it('returns twitter image preset dimensions', function () {
     expect($preset)->toHaveKeys(['width', 'height'])
         ->and($preset['width'])->toBeInt()
         ->and($preset['height'])->toBeInt();
+});
+
+it('forces noindex from site defaults regardless of entry-level noindex', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    Blink::flush();
+
+    Seo::find('site::defaults')->in('english')->set('noindex', true)->save();
+
+    $entry = Entry::make()->collection('pages')->locale('english')->slug('forced-noindex')
+        ->data(['title' => 'Forced', 'seo_noindex' => false]);
+    $entry->save();
+
+    $cascade = ContentCascade::from($entry);
+
+    expect($cascade->get('noindex'))->toBeTrue()
+        ->and($cascade->indexing())->toContain('noindex')
+        ->and($cascade->canonical())->toBeNull();
+});
+
+it('respects entry-level noindex when site default does not force it', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    Blink::flush();
+
+    Seo::find('site::defaults')->in('english')->set('noindex', false)->save();
+
+    $entry = Entry::make()->collection('pages')->locale('english')->slug('entry-noindex')
+        ->data(['title' => 'Entry', 'seo_noindex' => true]);
+    $entry->save();
+
+    $cascade = ContentCascade::from($entry);
+
+    expect($cascade->get('noindex'))->toBeTrue()
+        ->and($cascade->indexing())->toContain('noindex');
+});
+
+it('allows indexing when neither site default nor entry sets noindex', function () {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+
+    Blink::flush();
+
+    Seo::find('site::defaults')->in('english')->set('noindex', false)->save();
+
+    $entry = Entry::make()->collection('pages')->locale('english')->slug('indexable')
+        ->data(['title' => 'Indexable', 'seo_noindex' => false]);
+    $entry->save();
+
+    $cascade = ContentCascade::from($entry);
+
+    expect($cascade->get('noindex'))->toBeFalse()
+        ->and($cascade->indexing())->toBeNull();
 });
