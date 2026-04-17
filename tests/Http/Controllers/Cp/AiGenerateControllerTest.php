@@ -101,3 +101,45 @@ it('validates site is required', function () {
         ])
         ->assertJsonValidationErrors('site');
 });
+
+it('rejects blueprint strings with the wrong number of segments', function () {
+    config(['advanced-seo.ai.enabled' => true]);
+
+    $this->actingAs($this->user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.pages',
+            'site' => 'english',
+            'content' => ['title' => 'Test'],
+            'tokens' => [],
+        ])
+        ->assertJsonValidationErrors('blueprint');
+});
+
+it('rejects blueprint strings with an unknown type', function () {
+    config(['advanced-seo.ai.enabled' => true]);
+
+    $this->actingAs($this->user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'globals.site.page',
+            'site' => 'english',
+            'content' => ['title' => 'Test'],
+            'tokens' => [],
+        ])
+        ->assertJsonValidationErrors('blueprint');
+});
+
+it('returns 404 when the referenced collection does not exist', function () {
+    config(['advanced-seo.ai.enabled' => true]);
+
+    $this->actingAs($this->user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.nonexistent.page',
+            'site' => 'english',
+            'content' => ['title' => 'Test'],
+            'tokens' => [],
+        ])
+        ->assertNotFound();
+});

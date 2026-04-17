@@ -23,14 +23,18 @@ class AiGenerateController extends CpController
 
         $validated = $request->validate([
             'field' => ['required', 'string', Rule::in(array_column(SeoAgent::fields(), 'handle'))],
-            'blueprint' => ['required', 'string'],
+            'blueprint' => ['required', 'string', 'regex:/^(collections|taxonomies)\.[^.]+\.[^.]+$/'],
             'content' => ['required', 'array'],
             'site' => ['required', 'string'],
         ]);
 
         [$type, $handle, $blueprint] = explode('.', $validated['blueprint']);
 
-        $this->authorize('seo.edit-content', Seo::find("{$type}::{$handle}"));
+        $seoSet = Seo::find("{$type}::{$handle}");
+
+        throw_unless($seoSet, new NotFoundHttpException);
+
+        $this->authorize('seo.edit-content', $seoSet);
 
         try {
             return response()->json(new SeoAgent(
@@ -54,10 +58,16 @@ class AiGenerateController extends CpController
 
     protected function resolveBlueprint(string $type, string $handle, string $blueprint): Blueprint
     {
-        return match ($type) {
-            'collections' => Collection::findByHandle($handle)->entryBlueprint($blueprint),
-            'taxonomies' => Taxonomy::findByHandle($handle)->termBlueprint($blueprint),
+        $parent = match ($type) {
+            'collections' => Collection::findByHandle($handle),
+            'taxonomies' => Taxonomy::findByHandle($handle),
         };
+
+        throw_unless($parent, new NotFoundHttpException);
+
+        return $type === 'collections'
+            ? $parent->entryBlueprint($blueprint)
+            : $parent->termBlueprint($blueprint);
     }
 
     protected function resolveAdditionalInstructions(string $type, string $handle, string $site): ?string
