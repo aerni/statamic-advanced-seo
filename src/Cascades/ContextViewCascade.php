@@ -20,8 +20,12 @@ class ContextViewCascade extends ContentViewCascade
         };
     }
 
-    protected function fallbackTitle(string $pageTitle): string
+    protected function fallbackTitle(?string $pageTitle): string
     {
+        if ($pageTitle === null) {
+            return $this->siteName();
+        }
+
         return "{$pageTitle} {$this->get('separator')} {$this->siteName()}";
     }
 

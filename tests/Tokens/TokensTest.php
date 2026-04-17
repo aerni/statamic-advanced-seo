@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Tokens\FieldToken;
 use Aerni\AdvancedSeo\Tokens\Tokens;
 use Aerni\AdvancedSeo\Tokens\ValueToken;
@@ -96,6 +97,16 @@ it('caches field tokens via Blink', function () {
     $second = $tokens->fieldTokens();
 
     expect($first)->toBe($second);
+});
+
+// --- Site-scoped SeoSetLocalization parent ---
+
+it('returns an empty blueprint collection for a site-scoped SeoSetLocalization', function () {
+    $localization = Seo::find('site::defaults')->in('english');
+
+    $tokens = new Tokens($localization);
+
+    expect($tokens->fieldTokens())->toBeEmpty();
 });
 
 // --- Taxonomy parent ---

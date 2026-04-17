@@ -36,6 +36,20 @@ it('returns taxonomy title with separator and site name', function () {
     expect($cascade->title())->toContain('Tags');
 });
 
+it('falls back to site name when fallback title has no page title', function () {
+    $taxonomy = Taxonomy::find('tags');
+
+    $context = new Context(collect([
+        'page' => $taxonomy,
+        'current_url' => 'https://example.com/tags',
+        'site' => Site::get('english'),
+    ]));
+
+    $cascade = ContextViewCascade::from($context);
+
+    expect($cascade->title())->toBe($cascade->siteName());
+});
+
 it('returns 404 title with separator and site name', function () {
     $context = new Context(collect([
         'response_code' => 404,

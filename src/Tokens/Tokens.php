@@ -24,9 +24,9 @@ class Tokens
     public function fieldTokens(): Collection
     {
         return Blink::once("advanced-seo.tokens.fields.{$this->parent->id()}", function () {
-            return $this->blueprints()
+            return ($this->blueprints()
                 ->map(fn (Blueprint $blueprint) => $this->tokenizableFields($blueprint))
-                ->reduce(fn (mixed $carry, Collection $fields) => $carry ? $carry->intersectByKeys($fields) : $fields)
+                ->reduce(fn (mixed $carry, Collection $fields) => $carry ? $carry->intersectByKeys($fields) : $fields) ?? collect())
                 ->merge($this->seoFields())
                 ->mapInto(FieldToken::class)
                 ->sortBy(fn (FieldToken $token) => $token->display());
@@ -54,6 +54,7 @@ class Tokens
         return match (true) {
             $seoSetParent instanceof EntryCollection => $seoSetParent->entryBlueprints(),
             $seoSetParent instanceof Taxonomy => $seoSetParent->termBlueprints(),
+            default => collect(),
         };
     }
 
