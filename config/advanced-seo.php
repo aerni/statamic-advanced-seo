@@ -183,7 +183,7 @@ return [
         |
         */
 
-        'environments' => ['production'],
+        'environments' => ['local', 'production'],
 
     ],
 
