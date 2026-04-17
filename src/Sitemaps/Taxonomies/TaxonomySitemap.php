@@ -70,16 +70,12 @@ class TaxonomySitemap extends BaseSitemap
 
     protected function terms(): Collection
     {
-        $terms = $this->model
+        return $this->model
             ->queryTerms()
             ->where($this->includeInSitemapQuery(...))
-            ->get();
-
-        if (! view()->exists($terms->first()?->template())) {
-            return collect();
-        }
-
-        return $terms->filter(IncludeInSitemap::run(...));
+            ->get()
+            ->filter(fn ($term) => view()->exists($term->template()))
+            ->filter(IncludeInSitemap::run(...));
     }
 
     public function collectionTaxonomies(): Collection

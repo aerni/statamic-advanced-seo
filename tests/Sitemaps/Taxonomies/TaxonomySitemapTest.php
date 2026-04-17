@@ -2,9 +2,12 @@
 
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
+use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TermSitemapUrl;
+use Illuminate\Support\Facades\View;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
@@ -55,4 +58,23 @@ it('creates sitemaps for all taxonomies', function () {
 
     expect($taxonomySitemaps)->toContain('tags')
         ->toContain('categories');
+});
+
+it('excludes terms whose template view does not exist', function () {
+    View::addLocation(__DIR__.'/../../__fixtures__/views');
+
+    Term::make()->taxonomy('tags')->inDefaultLocale()->slug('php')
+        ->data(['title' => 'PHP', 'template' => 'nonexistent-template'])->save();
+    Term::make()->taxonomy('tags')->inDefaultLocale()->slug('laravel')
+        ->data(['title' => 'Laravel'])->save();
+
+    $sitemap = Sitemap::index('english')->sitemaps()
+        ->first(fn ($s) => $s instanceof TaxonomySitemap && $s->handle() === 'tags');
+
+    $termLocs = $sitemap->urls()
+        ->filter(fn ($url) => $url instanceof TermSitemapUrl)
+        ->map->loc();
+
+    expect($termLocs)->toContain('https://example.com/tags/laravel')
+        ->and($termLocs)->not->toContain('https://example.com/tags/php');
 });
