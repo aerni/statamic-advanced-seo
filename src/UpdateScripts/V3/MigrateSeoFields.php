@@ -58,7 +58,7 @@ class MigrateSeoFields
             ->filter(fn (SeoSet $set) => in_array($set->type(), ['collections', 'taxonomies']))
             ->each(function (SeoSet $set) {
                 $set->localizations()->each(function ($localization) {
-                    $this->migrateLegacyValues($localization);
+                    $this->removeLegacyValues($localization);
                     $this->removeTwitterFields($localization);
                     $this->removeSitemapFields($localization);
                     $this->removeCanonicalFields($localization);
@@ -123,6 +123,24 @@ class MigrateSeoFields
             ->each(function ($value, $key) use ($item) {
                 if ($value === '@auto' || $value === '@null') {
                     $item->set($key, '@default');
+                } elseif (is_string($value) && str_contains($value, '@field:')) {
+                    $item->set($key, preg_replace('/@field:([A-Za-z\d_-]+)/', '{{ $1 }}', $value));
+                }
+            });
+    }
+
+    /**
+     * SeoSet localizations are the defaults — the @default sentinel is meaningless
+     * there, so drop legacy @auto/@null values outright and let the blueprint's
+     * concrete default apply.
+     */
+    protected function removeLegacyValues(mixed $item): void
+    {
+        collect($item->data())
+            ->filter(fn ($value, $key) => str_starts_with($key, 'seo_'))
+            ->each(function ($value, $key) use ($item) {
+                if ($value === '@auto' || $value === '@null') {
+                    $this->remove($item, $key);
                 } elseif (is_string($value) && str_contains($value, '@field:')) {
                     $item->set($key, preg_replace('/@field:([A-Za-z\d_-]+)/', '{{ $1 }}', $value));
                 }

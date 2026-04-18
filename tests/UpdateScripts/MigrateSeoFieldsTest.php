@@ -83,7 +83,7 @@ it('migrates @field references to Antlers syntax', function () {
     expect(Term::find('tags::test-tag')->in('english')->get('seo_title'))->toBe('{{ title }}');
 });
 
-it('migrates legacy values on seo set localizations', function () {
+it('removes legacy sentinels and migrates @field references on seo set localizations', function () {
     Seo::find('collections::pages')
         ->inDefaultSite()
         ->data([
@@ -97,8 +97,8 @@ it('migrates legacy values on seo set localizations', function () {
 
     $localization = Seo::find('collections::pages')->inDefaultSite();
 
-    expect($localization->get('seo_description'))->toBe('@default');
-    expect($localization->get('seo_og_title'))->toBe('@default');
+    expect($localization->get('seo_description'))->toBeNull();
+    expect($localization->get('seo_og_title'))->toBeNull();
     expect($localization->get('seo_og_description'))->toBe('{{ seo_title }}');
 });
 
