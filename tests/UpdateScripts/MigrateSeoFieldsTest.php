@@ -26,23 +26,57 @@ function runMigrateSeoFieldsScript(): void
     (new MigrateSeoFields)->run();
 }
 
-it('migrates @auto values to @default', function () {
+it('migrates @auto to the field-specific Antlers template on text fields', function () {
     Entry::make()
         ->collection('pages')
         ->locale('english')
-        ->set('seo_title', '@auto')
+        ->data([
+            'seo_title' => '@auto',
+            'seo_og_title' => '@auto',
+            'seo_og_description' => '@auto',
+        ])
         ->save();
 
     Term::make()
         ->taxonomy('tags')
         ->slug('test-tag')
-        ->dataForLocale('english', ['seo_title' => '@auto'])
+        ->dataForLocale('english', [
+            'seo_title' => '@auto',
+            'seo_og_title' => '@auto',
+            'seo_og_description' => '@auto',
+        ])
         ->save();
 
     runMigrateSeoFieldsScript();
 
-    expect(Entry::all()->first()->get('seo_title'))->toBe('@default');
-    expect(Term::find('tags::test-tag')->in('english')->get('seo_title'))->toBe('@default');
+    $entry = Entry::all()->first();
+    $term = Term::find('tags::test-tag')->in('english');
+
+    expect($entry->get('seo_title'))->toBe('{{ title }}');
+    expect($entry->get('seo_og_title'))->toBe('{{ seo_title }}');
+    expect($entry->get('seo_og_description'))->toBe('{{ seo_description }}');
+
+    expect($term->get('seo_title'))->toBe('{{ title }}');
+    expect($term->get('seo_og_title'))->toBe('{{ seo_title }}');
+    expect($term->get('seo_og_description'))->toBe('{{ seo_description }}');
+});
+
+it('migrates @auto to @default on fields without an explicit template', function () {
+    Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->data([
+            'seo_noindex' => '@auto',
+            'seo_generate_social_images' => '@auto',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $entry = Entry::all()->first();
+
+    expect($entry->get('seo_noindex'))->toBe('@default');
+    expect($entry->get('seo_generate_social_images'))->toBe('@default');
 });
 
 it('migrates @null values to @default', function () {

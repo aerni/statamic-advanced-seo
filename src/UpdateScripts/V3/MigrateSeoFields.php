@@ -12,6 +12,19 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class MigrateSeoFields
 {
+    /**
+     * v2 text fields whose @auto sentinel pointed at another field via the
+     * seo_source fieldtype's `auto` config. These need to become explicit
+     * Antlers templates in v3 — converting them to @default would make the
+     * entry inherit the set's (possibly customised) value instead of its
+     * own field, silently changing output.
+     */
+    private const AUTO_TEMPLATES = [
+        'seo_title' => '{{ title }}',
+        'seo_og_title' => '{{ seo_title }}',
+        'seo_og_description' => '{{ seo_description }}',
+    ];
+
     public function run(): void
     {
         $this->migrateEntries();
@@ -121,7 +134,9 @@ class MigrateSeoFields
         collect($item->data())
             ->filter(fn ($value, $key) => str_starts_with($key, 'seo_'))
             ->each(function ($value, $key) use ($item) {
-                if ($value === '@auto' || $value === '@null') {
+                if ($value === '@auto' && isset(self::AUTO_TEMPLATES[$key])) {
+                    $item->set($key, self::AUTO_TEMPLATES[$key]);
+                } elseif ($value === '@auto' || $value === '@null') {
                     $item->set($key, '@default');
                 } elseif (is_string($value) && str_contains($value, '@field:')) {
                     $item->set($key, preg_replace('/@field:([A-Za-z\d_-]+)/', '{{ $1 }}', $value));
