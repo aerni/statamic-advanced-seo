@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\UpdateScripts\V3;
 
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Illuminate\Support\Collection;
@@ -123,7 +124,19 @@ class MigrateSeoFields
                 default => $titleTemplate,
             };
 
-            $item->set('seo_title', $composedTitle);
+            /**
+             * On SeoSet localizations, the v3 blueprint default for seo_title
+             * already matches the position=end + no custom title composition,
+             * so persisting it would bury the blueprint default and stop the
+             * site from picking up future changes to it.
+             */
+            $matchesSetBlueprintDefault = $item instanceof SeoSetLocalization
+                && ! $title
+                && $position === 'end';
+
+            if (! $matchesSetBlueprintDefault) {
+                $item->set('seo_title', $composedTitle);
+            }
         }
 
         $this->remove($item, 'seo_site_name_position');

@@ -520,6 +520,20 @@ it('composes seo_title with default title and position on seo set localizations'
     expect($localization->has('seo_site_name_position'))->toBeFalse();
 });
 
+it('does not persist seo_title on seo set localizations when position=end matches the blueprint default', function () {
+    Seo::find('collections::pages')
+        ->inDefaultSite()
+        ->data(['seo_site_name_position' => 'end'])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('collections::pages')->inDefaultSite();
+
+    expect($localization->has('seo_title'))->toBeFalse();
+    expect($localization->has('seo_site_name_position'))->toBeFalse();
+});
+
 it('does not modify seo_title when both title and position are absent on seo set localizations', function () {
     Seo::find('collections::pages')
         ->inDefaultSite()
