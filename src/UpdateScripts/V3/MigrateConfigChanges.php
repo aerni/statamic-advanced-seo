@@ -316,6 +316,7 @@ class MigrateConfigChanges
 
         $this->seoSets
             ->filter(fn (SeoSet $set) => in_array($set->type(), ['collections', 'taxonomies']))
+            ->filter(fn (SeoSet $set) => $set->enabled())
             ->each(fn (SeoSet $set) => $set->config()->set('sitemap', true));
 
         $excludedCollections = $this->buildLocalizationHandleMap($siteDefaults, 'excluded_collections');
@@ -332,7 +333,7 @@ class MigrateConfigChanges
         $excludedHandles->each(function (Collection $excludedSites, string $handle) use ($type) {
             $set = $this->seoSets->first(fn ($set) => $set->id() === "{$type}::{$handle}");
 
-            if (! $set) {
+            if (! $set || ! $set->enabled()) {
                 return;
             }
 
@@ -363,6 +364,7 @@ class MigrateConfigChanges
 
         $this->seoSets
             ->filter(fn (SeoSet $set) => $set->type() === 'collections')
+            ->filter(fn (SeoSet $set) => $set->enabled())
             ->each(fn (SeoSet $set) => $set->config()->set('social_images_generator', false));
 
         $enabledCollectionsMap = $this->buildLocalizationHandleMap($siteDefaults, 'social_images_generator_collections');
@@ -383,7 +385,7 @@ class MigrateConfigChanges
         $enabledHandles->keys()->each(function (string $handle) {
             $set = $this->seoSets->first(fn ($set) => $set->id() === "collections::{$handle}");
 
-            if (! $set) {
+            if (! $set || ! $set->enabled()) {
                 return;
             }
 

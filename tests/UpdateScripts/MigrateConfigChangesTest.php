@@ -301,6 +301,35 @@ it('skips social images generator migration and cleans up fields when generator 
     expect(Seo::find('site::defaults')->in('english')->get('social_images_generator_collections'))->toBeNull();
 });
 
+it('does not write sitemap or social_images_generator flags on disabled sets', function () {
+    config([
+        'advanced-seo.disabled.collections' => ['blog'],
+        'advanced-seo.disabled.taxonomies' => ['tags'],
+        'advanced-seo.sitemap.enabled' => true,
+        'advanced-seo.social_images.generator.enabled' => true,
+    ]);
+
+    Seo::find('site::defaults')->in('english')
+        ->set('social_images_generator_collections', ['blog'])
+        ->save();
+
+    runConfigMigrationScript();
+
+    $blogSet = Seo::find('collections::blog');
+    expect($blogSet->config()->enabled())->toBeFalse();
+    expect($blogSet->config()->get('sitemap'))->toBeNull();
+    expect($blogSet->config()->get('social_images_generator'))->toBeNull();
+    expect($blogSet->in('english')->get('seo_generate_social_images'))->toBeNull();
+
+    $tagsSet = Seo::find('taxonomies::tags');
+    expect($tagsSet->config()->enabled())->toBeFalse();
+    expect($tagsSet->config()->get('sitemap'))->toBeNull();
+
+    // Enabled sets still get their flags
+    expect(Seo::find('collections::pages')->config()->get('sitemap'))->toBeTrue();
+    expect(Seo::find('taxonomies::categories')->config()->get('sitemap'))->toBeTrue();
+});
+
 it('calls migrateEloquentTables and skips file-based migrations for Eloquent users', function () {
     // Set title and origin BEFORE running the migration
     Seo::find('collections::pages')->config()->set('title', 'Pages')->save();
