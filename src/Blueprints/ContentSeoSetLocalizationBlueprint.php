@@ -77,7 +77,7 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
                         'type' => 'token_input',
                         'display' => $this->trans('seo_og_title.display'),
                         'instructions' => $this->trans('seo_og_title.default_instructions'),
-                        'default' => '{{ seo_title }}',
+                        'default' => '{{ title }}',
                         'localizable' => true,
                         'character_limit' => 70,
                     ],

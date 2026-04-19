@@ -19,10 +19,15 @@ class MigrateSeoFields
      * Antlers templates in v3 — converting them to @default would make the
      * entry inherit the set's (possibly customised) value instead of its
      * own field, silently changing output.
+     *
+     * `seo_og_title` diverges from v2: v2 resolved it through the composed
+     * seo_title (with site name appended), but the v3 blueprint default is
+     * just `{{ title }}`. Migrated entries follow v3 semantics so new and
+     * migrated data behave the same way.
      */
     private const AUTO_TEMPLATES = [
         'seo_title' => '{{ title }}',
-        'seo_og_title' => '{{ seo_title }}',
+        'seo_og_title' => '{{ title }}',
         'seo_og_description' => '{{ seo_description }}',
     ];
 

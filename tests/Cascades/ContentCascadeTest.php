@@ -71,8 +71,8 @@ it('returns the og title from cascade data', function () {
     expect($this->cascade->ogTitle())->toBe('Custom OG Title');
 });
 
-it('falls back to title when og title is null', function () {
-    expect($this->cascade->ogTitle())->toBe($this->cascade->title());
+it('falls back to the entry title when og title is null', function () {
+    expect($this->cascade->ogTitle())->toBe('About');
 });
 
 it('returns the absolute url as og url', function () {

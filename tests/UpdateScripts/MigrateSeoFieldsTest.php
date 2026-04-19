@@ -53,11 +53,11 @@ it('migrates @auto to the field-specific Antlers template on text fields', funct
     $term = Term::find('tags::test-tag')->in('english');
 
     expect($entry->get('seo_title'))->toBe('{{ title }}');
-    expect($entry->get('seo_og_title'))->toBe('{{ seo_title }}');
+    expect($entry->get('seo_og_title'))->toBe('{{ title }}');
     expect($entry->get('seo_og_description'))->toBe('{{ seo_description }}');
 
     expect($term->get('seo_title'))->toBe('{{ title }}');
-    expect($term->get('seo_og_title'))->toBe('{{ seo_title }}');
+    expect($term->get('seo_og_title'))->toBe('{{ title }}');
     expect($term->get('seo_og_description'))->toBe('{{ seo_description }}');
 });
 
