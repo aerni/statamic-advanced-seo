@@ -147,7 +147,14 @@ class SeoSetConfig implements Contract
             $data->put('origins', $this->origins()->all());
         }
 
-        return $data->merge($this->data())->all();
+        return $data->merge($this->data())
+            ->only($this->blueprintFields())
+            ->all();
+    }
+
+    public function blueprintFields(): array
+    {
+        return $this->blueprint()->fields()->all()->keys()->all();
     }
 
     public function editUrl(): string

@@ -301,7 +301,7 @@ it('skips social images generator migration and cleans up fields when generator 
     expect(Seo::find('site::defaults')->in('english')->get('social_images_generator_collections'))->toBeNull();
 });
 
-it('does not write sitemap or social_images_generator flags on disabled sets', function () {
+it('writes complete config data to disabled sets so re-enabling restores the full config', function () {
     config([
         'advanced-seo.disabled.collections' => ['blog'],
         'advanced-seo.disabled.taxonomies' => ['tags'],
@@ -317,15 +317,14 @@ it('does not write sitemap or social_images_generator flags on disabled sets', f
 
     $blogSet = Seo::find('collections::blog');
     expect($blogSet->config()->enabled())->toBeFalse();
-    expect($blogSet->config()->get('sitemap'))->toBeNull();
-    expect($blogSet->config()->get('social_images_generator'))->toBeNull();
-    expect($blogSet->in('english')->get('seo_generate_social_images'))->toBeNull();
+    expect($blogSet->config()->get('sitemap'))->toBeTrue();
+    expect($blogSet->config()->get('social_images_generator'))->toBeTrue();
+    expect($blogSet->in('english')->get('seo_generate_social_images'))->toBeFalse();
 
     $tagsSet = Seo::find('taxonomies::tags');
     expect($tagsSet->config()->enabled())->toBeFalse();
-    expect($tagsSet->config()->get('sitemap'))->toBeNull();
+    expect($tagsSet->config()->get('sitemap'))->toBeTrue();
 
-    // Enabled sets still get their flags
     expect(Seo::find('collections::pages')->config()->get('sitemap'))->toBeTrue();
     expect(Seo::find('taxonomies::categories')->config()->get('sitemap'))->toBeTrue();
 });

@@ -46,8 +46,11 @@ it('can get all configs', function () {
 });
 
 it('can save a config', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
+    flushBlink();
+
     $config = SeoConfig::find('collections::pages')
-        ->set('key', 'value');
+        ->set('sitemap', false);
 
     $modelBeforeSave = $config->model();
 
@@ -61,7 +64,7 @@ it('can save a config', function () {
     $fresh = SeoConfig::find('collections::pages');
 
     expect($fresh)->toBeInstanceOf(SeoSetConfig::class)
-        ->and($fresh->get('key'))->toBe('value');
+        ->and($fresh->get('sitemap'))->toBeFalse();
 });
 
 it('can delete a config', function () {

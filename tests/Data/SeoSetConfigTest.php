@@ -182,6 +182,8 @@ it('can merge data', function () {
 });
 
 it('can get file data', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
+
     $config = Seo::find('collections::articles')->config();
 
     $config->enabled(true);
@@ -239,6 +241,8 @@ it('can save the config', function () {
 });
 
 it('persists data when saved', function () {
+    config(['advanced-seo.sitemap.enabled' => true]);
+
     $config = Seo::find('collections::articles')->config();
 
     $config->set('sitemap', true)->save();
