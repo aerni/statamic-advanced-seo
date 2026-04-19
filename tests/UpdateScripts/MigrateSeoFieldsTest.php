@@ -300,6 +300,52 @@ it('renames analytics fields on site defaults', function () {
     expect($localization->get('gtm_container_id'))->toBe('GTM-XYZ');
 });
 
+it('drops analytics tokens whose use_* toggle was disabled in v2', function () {
+    Seo::find('site::defaults')
+        ->inDefaultSite()
+        ->data([
+            'use_fathom' => false,
+            'fathom_id' => 'ABC123',
+            'fathom_spa' => true,
+            'use_cloudflare_web_analytics' => false,
+            'cloudflare_web_analytics' => 'cf-token',
+            'use_google_tag_manager' => false,
+            'google_tag_manager' => 'GTM-XYZ',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('site::defaults')->inDefaultSite();
+
+    expect($localization->has('fathom_id'))->toBeFalse();
+    expect($localization->has('fathom_spa'))->toBeFalse();
+    expect($localization->has('cloudflare_beacon_token'))->toBeFalse();
+    expect($localization->has('gtm_container_id'))->toBeFalse();
+});
+
+it('preserves analytics tokens whose use_* toggle was enabled in v2', function () {
+    Seo::find('site::defaults')
+        ->inDefaultSite()
+        ->data([
+            'use_fathom' => true,
+            'fathom_id' => 'ABC123',
+            'use_cloudflare_web_analytics' => true,
+            'cloudflare_web_analytics' => 'cf-token',
+            'use_google_tag_manager' => true,
+            'google_tag_manager' => 'GTM-XYZ',
+        ])
+        ->save();
+
+    runMigrateSeoFieldsScript();
+
+    $localization = Seo::find('site::defaults')->inDefaultSite();
+
+    expect($localization->get('fathom_id'))->toBe('ABC123');
+    expect($localization->get('cloudflare_beacon_token'))->toBe('cf-token');
+    expect($localization->get('gtm_container_id'))->toBe('GTM-XYZ');
+});
+
 it('removes sitemap fields from entries and terms', function () {
     Entry::make()
         ->collection('pages')

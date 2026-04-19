@@ -71,3 +71,38 @@ it('consolidates old site localizations into defaults per locale', function () {
     expect(File::exists("{$siteDir}/english/indexing.yaml"))->toBeFalse();
     expect(File::exists("{$siteDir}/english/defaults.yaml"))->toBeTrue();
 });
+
+it('consolidates v2 single-site inline data from root YAMLs into the default locale defaults.yaml', function () {
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => '/', 'locale' => 'en'],
+    ]);
+
+    $siteDir = Stache::store('seo-set-configs')->directory().'site';
+
+    File::ensureDirectoryExists($siteDir);
+
+    File::put("{$siteDir}/general.yaml", YAML::dump([
+        'title' => 'General',
+        'data' => [
+            'site_name' => 'Legacy Site Name',
+            'separator' => '|',
+        ],
+    ]));
+    File::put("{$siteDir}/indexing.yaml", YAML::dump([
+        'title' => 'Indexing',
+        'data' => [
+            'noindex' => true,
+        ],
+    ]));
+
+    runFileConfigMigration();
+
+    $siteDefaults = Seo::find('site::defaults')->in('english');
+
+    expect($siteDefaults->get('site_name'))->toBe('Legacy Site Name');
+    expect($siteDefaults->get('separator'))->toBe('|');
+    expect($siteDefaults->get('noindex'))->toBeTrue();
+    expect(File::exists("{$siteDir}/general.yaml"))->toBeFalse();
+    expect(File::exists("{$siteDir}/indexing.yaml"))->toBeFalse();
+    expect(File::exists("{$siteDir}/english/defaults.yaml"))->toBeTrue();
+});

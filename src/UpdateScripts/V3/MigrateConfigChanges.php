@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 
@@ -121,8 +122,14 @@ class MigrateConfigChanges
             return;
         }
 
-        $this->consolidateFileSiteConfigs($directory);
+        /**
+         * Localizations must be consolidated before configs: single-site
+         * v2 persisted the SEO payload under a `data` key in the root
+         * `site/{handle}.yaml` files, which consolidateFileSiteConfigs()
+         * then deletes — so we need to read them first.
+         */
         $this->consolidateFileSiteLocalizations($directory);
+        $this->consolidateFileSiteConfigs($directory);
     }
 
     /**
@@ -137,9 +144,22 @@ class MigrateConfigChanges
     }
 
     /**
-     * For each locale directory, merge all old localization files into a single defaults.yaml.
+     * Merge all old site-level localization files into a single defaults.yaml
+     * per locale, handling both multi-site (locale subdirectories) and
+     * single-site (root YAMLs with inline `data` key).
      */
     protected function consolidateFileSiteLocalizations(string $directory): void
+    {
+        if (Site::hasMultiple()) {
+            $this->consolidateFileMultiSiteLocalizations($directory);
+
+            return;
+        }
+
+        $this->consolidateFileSingleSiteLocalization($directory);
+    }
+
+    protected function consolidateFileMultiSiteLocalizations(string $directory): void
     {
         collect(File::directories($directory))->each(function (string $directory) {
             $mergedData = collect($this->oldSiteSetHandles)
@@ -155,6 +175,36 @@ class MigrateConfigChanges
 
             File::put("{$directory}/defaults.yaml", YAML::dump($mergedData));
         });
+    }
+
+    /**
+     * In v2 single-site, each root `site/{handle}.yaml` wrapped the SEO
+     * payload under a `data` key (see v2 SeoDefaultSet::fileData). Merge
+     * those payloads into the default site's `defaults.yaml` before the
+     * config consolidation step deletes the source files.
+     */
+    protected function consolidateFileSingleSiteLocalization(string $directory): void
+    {
+        $mergedData = collect($this->oldSiteSetHandles)
+            ->map(fn ($handle) => "{$directory}/{$handle}.yaml")
+            ->filter(fn ($path) => File::exists($path))
+            ->reduce(function ($carry, $path) {
+                $yaml = YAML::file($path)->parse() ?: [];
+
+                return array_merge($carry, $yaml['data'] ?? []);
+            }, []);
+
+        if (empty($mergedData)) {
+            return;
+        }
+
+        $localeDir = "{$directory}/".Site::default()->handle();
+
+        if (! File::isDirectory($localeDir)) {
+            File::makeDirectory($localeDir, 0755, true);
+        }
+
+        File::put("{$localeDir}/defaults.yaml", YAML::dump($mergedData));
     }
 
     protected function consolidateEloquentSiteSeoSets(): void

@@ -88,6 +88,7 @@ class MigrateSeoFields
             $this->renameTitleSeparator($localization);
             $this->removeTwitterFields($localization);
             $this->removeNofollowField($localization);
+            $this->dropDisabledAnalyticsTokens($localization);
             $this->removeAnalyticsToggles($localization);
             $this->renameAnalyticsFields($localization);
             $localization->save();
@@ -204,6 +205,32 @@ class MigrateSeoFields
 
         foreach ($fields as $field) {
             $this->remove($item, $field);
+        }
+    }
+
+    /**
+     * v2 analytics tags were gated by `use_*` toggles; v3 renders based on
+     * token presence alone. If a v2 user disabled a tracker via the toggle
+     * but left a token stored, removing the toggle (see removeAnalyticsToggles)
+     * would silently re-enable rendering. Drop the associated tokens first
+     * whenever the toggle is explicitly false.
+     */
+    protected function dropDisabledAnalyticsTokens(mixed $item): void
+    {
+        $toggleTokens = [
+            'use_fathom' => ['fathom_id', 'fathom_spa'],
+            'use_cloudflare_web_analytics' => ['cloudflare_web_analytics'],
+            'use_google_tag_manager' => ['google_tag_manager'],
+        ];
+
+        foreach ($toggleTokens as $toggle => $tokens) {
+            if ($item->get($toggle) !== false) {
+                continue;
+            }
+
+            foreach ($tokens as $token) {
+                $this->remove($item, $token);
+            }
         }
     }
 
