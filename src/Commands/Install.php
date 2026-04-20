@@ -363,6 +363,7 @@ class Install extends Command
 
             $relativePath = Str::after($path, base_path('/'));
             info("Added SEO tags to {$relativePath}.");
+            note("Review your layout's <head> and remove any existing SEO tags (title, description, Open Graph, etc.) that would conflict with {$headTag}.");
         }
     }
 
