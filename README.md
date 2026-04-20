@@ -22,7 +22,7 @@ Everything you need for production-ready on-page SEO, no license required.
 
 ### Pro
 
-Everything in Free, plus the tools to handle complex sites and advanced workflows. The **Pro** edition requires a [license from the Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
+Everything in Free, plus the tools to handle complex sites and advanced workflows. Requires a license from the [Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
 
 - Sitemaps
 - Multi-site support
