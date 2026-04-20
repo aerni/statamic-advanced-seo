@@ -3,11 +3,13 @@
 namespace Aerni\AdvancedSeo\Jobs;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 
 class GenerateSocialImagesJob implements ShouldQueue
 {
@@ -15,13 +17,22 @@ class GenerateSocialImagesJob implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
 
-    public function __construct(protected Entry $entry)
+    public function __construct(protected Entry|Term $content)
     {
         $this->queue = config('advanced-seo.social_images.generator.queue', 'default');
     }
 
     public function handle(): void
     {
-        SocialImage::all($this->entry)->each->generate();
+        if (! SocialImagesGenerator::enabled()) {
+            return;
+        }
+
+        $asset = SocialImage::openGraph()
+            ->for($this->content)
+            ->generate();
+
+        $this->content->set('seo_og_image', $asset->path());
+        $this->content->saveQuietly();
     }
 }

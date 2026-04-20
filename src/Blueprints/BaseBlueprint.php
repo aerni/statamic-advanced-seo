@@ -2,54 +2,190 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Contracts\Blueprint as Contract;
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Statamic\Facades\Blueprint;
-use Statamic\Fields\Blueprint as BlueprintFields;
+use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Enums\Scope;
+use Closure;
+use Illuminate\Support\Collection;
+use Statamic\Fields\Blueprint;
 use Statamic\Support\Str;
 
-abstract class BaseBlueprint implements Contract
+abstract class BaseBlueprint
 {
-    protected DefaultsData $data;
+    protected ?Context $context = null;
 
-    public static function make(): self
+    protected bool $hidden = false;
+
+    abstract protected function handle(): string;
+
+    abstract protected function tabs(): array;
+
+    public static function make(): static
     {
         return new static;
     }
 
-    public function data(DefaultsData $data): self
+    public static function resolve(mixed $model): Blueprint
     {
-        $this->data = $data;
+        return static::make()->for($model)->get();
+    }
+
+    public static function definition(): Blueprint
+    {
+        return static::make()->get();
+    }
+
+    public function for(mixed $model): static
+    {
+        $this->context = Context::from($model);
 
         return $this;
     }
 
-    public function get(): BlueprintFields
+    /**
+     * Mask all fields as hidden on resolution so the publish form renders them
+     * as inaccessible while the blueprint still exposes them to automated reads.
+     */
+    public function hidden(bool $hidden = true): static
     {
-        return Blueprint::make()
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function get(): Blueprint
+    {
+        return \Statamic\Facades\Blueprint::make()
             ->setHandle($this->handle())
-            ->setContents(['tabs' => $this->processedTabs()]);
+            ->setContents($this->contents());
     }
 
-    public function items(): array
+    protected function contents(): array
     {
-        return $this->get()->fields()->all()
-            ->mapWithKeys(fn ($field, $handle) => [$handle => $field->config()])
-            ->toArray();
-    }
-
-    protected function processedTabs(): array
-    {
-        return collect($this->tabs())
-            ->map(fn ($tab, $handle) => [
-                'display' => Str::slugToTitle($handle),
-                'sections' => isset($this->data) ? $tab::make()->data($this->data)->get() : $tab::make()->get(),
+        $tabs = collect($this->tabs())
+            ->map(fn (array $tab, string $handle) => [
+                'display' => $tab['display'] ?? Str::slugToTitle($handle),
+                'sections' => $this->sections($tab['sections'] ?? $tab),
             ])
-            ->filter(fn ($tab) => ! empty($tab['sections']))
+            ->pipe($this->resolveLazyValues(...))
+            ->pipe($this->hideFields(...))
+            ->all();
+
+        return ['tabs' => $tabs];
+    }
+
+    protected function sections(array $sections): array
+    {
+        return collect($sections)
+            ->map(fn (array $section) => [
+                ...$section,
+                'fields' => collect($section['fields'])
+                    ->filter(fn (array $field) => ! isset($field['field']['feature']) ||
+                        $field['field']['feature']::enabled($this->context)
+                    )
+                    ->all(),
+            ])
+            ->filter(fn (array $section) => $section['fields'])
+            ->values()
             ->all();
     }
 
-    abstract protected function tabs(): array;
+    /**
+     * Applied after lazy resolution so it overrides any per-field `visibility`
+     * set inline (e.g. via `$this->lazy(...)`).
+     */
+    protected function hideFields(Collection $tabs): Collection
+    {
+        if (! $this->hidden) {
+            return $tabs;
+        }
 
-    abstract protected function handle(): string;
+        return $tabs->map(fn (array $tab) => [
+            ...$tab,
+            'sections' => collect($tab['sections'])
+                ->map(fn (array $section) => [
+                    ...$section,
+                    'fields' => collect($section['fields'])
+                        ->map(function (array $field) {
+                            $field['field']['visibility'] = 'hidden';
+                            unset($field['field']['validate']);
+
+                            return $field;
+                        })
+                        ->all(),
+                ])
+                ->all(),
+        ]);
+    }
+
+    protected function lazy(callable $callback, mixed $fallback = null): Closure
+    {
+        return fn (?Context $context) => $context ? $callback($context) : $fallback;
+    }
+
+    protected function resolveLazyValues(Collection $tabs): Collection
+    {
+        return $tabs->map(fn ($value) => $this->resolveValue($value));
+    }
+
+    protected function resolveValue(mixed $value): mixed
+    {
+        if ($value instanceof Closure) {
+            return $value($this->context);
+        }
+
+        if (is_array($value) || $value instanceof Collection) {
+            return collect($value)->map(fn ($item) => $this->resolveValue($item))->all();
+        }
+
+        return $value;
+    }
+
+    protected function trans(string $key, array $placeholders = []): ?string
+    {
+        if (! $this->context) {
+            return null;
+        }
+
+        return __("advanced-seo::fields.$key", [
+            'type' => $this->contentTypeLabel(),
+            'content' => $this->contentLabel(),
+            ...$placeholders,
+        ]);
+    }
+
+    /**
+     * Scope-aware label: "collection"/"taxonomy" for config, "entries"/"terms" for localizations, "entry"/"term" for content.
+     */
+    protected function contentTypeLabel(): string
+    {
+        return match ([$this->context?->scope, $this->context?->type]) {
+            [Scope::Config, 'collections'] => __('collection'),
+            [Scope::Config, 'taxonomies'] => __('taxonomy'),
+            [Scope::Localization, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entries')),
+            [Scope::Localization, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.terms')),
+            [Scope::Content, 'collections'] => $this->lcfirst(__('advanced-seo::messages.entry')),
+            [Scope::Content, 'taxonomies'] => $this->lcfirst(__('advanced-seo::messages.term')),
+            default => '',
+        };
+    }
+
+    /**
+     * The content items label: "entries" or "terms".
+     */
+    protected function contentLabel(): string
+    {
+        return match ($this->context?->type) {
+            'collections' => $this->lcfirst(__('advanced-seo::messages.entries')),
+            'taxonomies' => $this->lcfirst(__('advanced-seo::messages.terms')),
+            default => '',
+        };
+    }
+
+    /**
+     * Lowercase the first character, except for languages like German where nouns are always capitalized.
+     */
+    protected function lcfirst(string $value): string
+    {
+        return str_starts_with(app()->getLocale(), 'de') ? $value : lcfirst($value);
+    }
 }

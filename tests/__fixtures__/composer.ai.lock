@@ -1,0 +1,7 @@
+{
+    "packages": [
+        {
+            "name": "laravel/ai"
+        }
+    ]
+}

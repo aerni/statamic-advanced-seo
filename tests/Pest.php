@@ -1,6 +1,11 @@
 <?php
 
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
 use Aerni\AdvancedSeo\Tests\TestCase;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +19,8 @@ use Aerni\AdvancedSeo\Tests\TestCase;
 */
 
 uses(TestCase::class)->in('.');
+uses(EnablesGraphQL::class)->in('GraphQL');
+uses(EnablesSitemap::class)->in('Sitemaps');
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +48,26 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function flushBlink(): void
 {
-    // ..
+    Blink::flush();
+}
+
+function useFreeEdition(): void
+{
+    config(['statamic.editions.addons.aerni/advanced-seo' => 'free']);
+}
+
+function clearStache(): void
+{
+    Stache::clear();
+}
+
+function tempPath(?string $path = null): string
+{
+    $tempDir = __DIR__.'/tmp';
+
+    return $path === null
+        ? Path::tidy($tempDir)
+        : Path::tidy($tempDir.'/'.ltrim($path, '/'));
 }

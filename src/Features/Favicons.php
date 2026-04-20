@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
-class Favicons
+class Favicons extends Feature
 {
-    public static function enabled(): bool
+    protected static function available(): bool
     {
         return config('advanced-seo.favicons.enabled', true);
     }

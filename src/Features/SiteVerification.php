@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
-class SiteVerification
+class SiteVerification extends Feature
 {
-    public static function enabled(): bool
+    protected static function available(): bool
     {
         return config('advanced-seo.site_verification', true);
     }

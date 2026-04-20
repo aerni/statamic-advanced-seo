@@ -2,10 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
-use Aerni\AdvancedSeo\Contracts\SeoDefaultsRepository as SeoDefaultsRepositoryContract;
-use Aerni\AdvancedSeo\Eloquent\SeoDefaultModel;
-use Aerni\AdvancedSeo\Eloquent\SeoDefaultSet as EloquentSeoDefaultSet;
-use Aerni\AdvancedSeo\Stache\SeoDefaultsRepository as StacheSeoDefaultsRepository;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfigRepository as SeoSetConfigRepositoryContract;
+use Aerni\AdvancedSeo\Contracts\SeoSetLocalizationRepository as SeoSetLocalizationRepositoryContract;
+use Aerni\AdvancedSeo\Eloquent\SeoSetConfig as EloquentSeoSetConfig;
+use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
+use Aerni\AdvancedSeo\Eloquent\SeoSetLocalization as EloquentSeoSetLocalization;
+use Aerni\AdvancedSeo\Eloquent\SeoSetLocalizationModel;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository as StacheSeoSetConfigRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository as StacheSeoSetLocalizationRepository;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Facade;
@@ -15,95 +19,89 @@ use Statamic\Statamic;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\progress;
 
 class SwitchToFile extends Command
 {
     use RunsInPlease;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'seo:switch-to-file';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Switch from Eloquent to using flat-files.';
+    protected $description = 'Switch from Eloquent to flat-files';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         if (! Composer::isInstalled('statamic/eloquent-driver')) {
-            return error('You need to install the Eloquent Driver before running this command. Run `composer require statamic/eloquent-driver`.');
+            return error('The Eloquent driver is not installed. Run `composer require statamic/eloquent-driver` first.');
         }
 
-        $this
-            ->switchToFileDriver()
-            ->migrateContent();
+        if ($this->isUsingFileDriver()) {
+            return info('Already using the file driver. No changes needed.');
+        }
 
-        info('Advanced SEO is now using flat-files to store its data.');
+        $this->switchToFileDriver();
+        $this->migrateContent();
     }
 
-    protected function switchToFileDriver(): self
+    protected function isUsingFileDriver(): bool
     {
-        $this->callSilently('vendor:publish', [
-            '--tag' => 'advanced-seo-config',
-        ]);
+        $configPath = config_path('advanced-seo.php');
 
-        $config = file_get_contents(config_path('advanced-seo.php'));
-
-        if (preg_match("/('driver'\s*=>\s*)'[^']*'/", $config)) {
-            $config = preg_replace("/('driver'\s*=>\s*)'[^']*'/", "\${1}'file'", $config, 1);
-        } else {
-            $driver = <<<'EOD'
-                /*
-                |--------------------------------------------------------------------------
-                | Database Driver
-                |--------------------------------------------------------------------------
-                |
-                | Choose the driver for storing data. This can either be 'file' or 'eloquent'.
-                |
-                */
-
-                'driver' => 'file',
-            EOD;
-
-            $config = preg_replace("/return\s*\[/", "return [\n\n$driver", $config, 1);
+        if (! file_exists($configPath)) {
+            return true;
         }
 
-        file_put_contents(config_path('advanced-seo.php'), $config);
-
-        info('Updated config to use the File driver.');
-
-        return $this;
+        return ! preg_match("/('driver'\s*=>\s*)'eloquent'/", file_get_contents($configPath));
     }
 
-    protected function migrateContent(): self
+    protected function switchToFileDriver(): void
     {
-        if (! confirm('Do you want to export existing data from the database to flat-files?')) {
-            return $this;
+        $configPath = config_path('advanced-seo.php');
+
+        $config = preg_replace("/('driver'\s*=>\s*)'eloquent'/", "\${1}'file'", file_get_contents($configPath), 1);
+
+        file_put_contents($configPath, $config);
+
+        info('Switched config to the file driver.');
+    }
+
+    protected function migrateContent(): void
+    {
+        if (! confirm('Do you want to export existing data to flat-files?')) {
+            return;
         }
 
-        Facade::clearResolvedInstance(SeoDefaultsRepositoryContract::class);
+        Facade::clearResolvedInstance(SeoSetConfigRepositoryContract::class);
+        Facade::clearResolvedInstance(SeoSetLocalizationRepositoryContract::class);
 
-        Statamic::repository(SeoDefaultsRepositoryContract::class, StacheSeoDefaultsRepository::class);
+        Statamic::repository(SeoSetConfigRepositoryContract::class, StacheSeoSetConfigRepository::class);
+        Statamic::repository(SeoSetLocalizationRepositoryContract::class, StacheSeoSetLocalizationRepository::class);
 
-        app()->bind('advanced_seo.model', SeoDefaultModel::class);
+        $this->exportConfigs();
+        $this->exportLocalizations();
 
-        $this->withProgressBar(app('advanced_seo.model')::all(), function ($model) {
-            EloquentSeoDefaultSet::fromModel($model)->save();
-        });
+        info('Successfully switched to the file driver.');
+    }
 
-        $this->newline(2);
+    protected function exportConfigs(): void
+    {
+        progress(
+            label: 'Exporting configs...',
+            steps: SeoSetConfigModel::all(),
+            callback: fn ($model) => EloquentSeoSetConfig::fromModel($model)->save(),
+        );
 
-        info('Exported data to flat-files.');
+        info('Exported configs.');
+    }
 
-        return $this;
+    protected function exportLocalizations(): void
+    {
+        progress(
+            label: 'Exporting localizations...',
+            steps: SeoSetLocalizationModel::all(),
+            callback: fn ($model) => EloquentSeoSetLocalization::fromModel($model)->save(),
+        );
+
+        info('Exported localizations.');
     }
 }

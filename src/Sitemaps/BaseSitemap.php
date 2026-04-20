@@ -4,10 +4,8 @@ namespace Aerni\AdvancedSeo\Sitemaps;
 
 use Aerni\AdvancedSeo\Contracts\Sitemap as Contract;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
+use Aerni\AdvancedSeo\Contracts\SitemapIndex;
 use Aerni\AdvancedSeo\Facades\Sitemap;
-use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
-use Aerni\AdvancedSeo\Sitemaps\Custom\CustomSitemap;
-use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Support\Responsable;
@@ -23,35 +21,32 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 {
     use FluentlyGetsAndSets;
 
+    protected ?SitemapIndex $index = null;
+
+    abstract public function type(): string;
+
+    abstract public function handle(): string;
+
     abstract public function urls(): Collection;
-
-    public function handle(): string
-    {
-        return match (static::class) {
-            CollectionSitemap::class => $this->model->handle(),
-            TaxonomySitemap::class => $this->model->handle(),
-            CustomSitemap::class => $this->handle,
-            default => Str::of(static::class)->afterLast('\\')->remove('Sitemap')->snake(),
-        };
-    }
-
-    public function type(): string
-    {
-        return match (static::class) {
-            CollectionSitemap::class => 'collection',
-            TaxonomySitemap::class => 'taxonomy',
-            default => 'custom',
-        };
-    }
 
     public function id(): string
     {
         return Str::slug("{$this->type()}-{$this->handle()}");
     }
 
+    public function index(?SitemapIndex $index = null): self|SitemapIndex|null
+    {
+        return $this->fluentlyGetOrSet('index')->args(func_get_args());
+    }
+
+    public function sites(): Collection
+    {
+        return $this->index()->sites();
+    }
+
     public function url(): string
     {
-        return URL::tidy(config('app.url')."/sitemaps/{$this->filename()}");
+        return URL::tidy(request()->getSchemeAndHttpHost()."/sitemaps/{$this->filename()}");
     }
 
     public function lastmod(): ?string
@@ -62,8 +57,8 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
     protected function includeInSitemapQuery(Builder $query): Builder
     {
         return $query
-            ->where('published', true)
-            ->whereNotNull('uri');
+            ->whereIn('site', $this->sites()->all())
+            ->where('published', true);
 
         /**
          * A reminder for my later self. We used to also include the following queries here:
@@ -123,16 +118,23 @@ abstract class BaseSitemap implements Arrayable, Contract, Renderable, Responsab
 
     public function path(): string
     {
-        return Sitemap::path($this->filename());
+        return Sitemap::path($this->index()->domain(), $this->filename());
     }
 
     public function save(): self
     {
-        File::ensureDirectoryExists(Sitemap::path());
+        File::ensureDirectoryExists(Sitemap::path($this->index()->domain()));
 
         File::put($this->path(), $this->render());
 
         return $this;
+    }
+
+    protected function cacheKey(): string
+    {
+        $sites = $this->sites()->sort()->implode('-');
+
+        return "advanced-seo.sitemap.{$this->id()}.{$sites}";
     }
 
     public function __call(string $name, array $arguments): mixed

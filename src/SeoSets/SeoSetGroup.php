@@ -1,0 +1,58 @@
+<?php
+
+namespace Aerni\AdvancedSeo\SeoSets;
+
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
+
+class SeoSetGroup implements Arrayable
+{
+    public function __construct(protected readonly Collection $seoSets)
+    {
+        //
+    }
+
+    public function seoSets(): Collection
+    {
+        return $this->seoSets;
+    }
+
+    public function type(): string
+    {
+        return $this->seoSets()->first()->type();
+    }
+
+    public function title(): string
+    {
+        return ucfirst($this->type());
+    }
+
+    public function url(): string
+    {
+        if ($this->type() === 'site') {
+            return $this->seoSets()->first()->inSelectedSite()->editUrl();
+        }
+
+        return cp_route('advanced-seo.sets.index', ['seoSetGroup' => $this->type()]);
+    }
+
+    public function icon(): string
+    {
+        return match ($this->type()) {
+            'site' => 'utilities',
+            'collections' => 'collections',
+            'taxonomies' => 'taxonomies',
+            default => 'folder-generic',
+        };
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'type' => $this->type(),
+            'title' => $this->title(),
+            'url' => $this->url(),
+            'icon' => $this->icon(),
+        ];
+    }
+}

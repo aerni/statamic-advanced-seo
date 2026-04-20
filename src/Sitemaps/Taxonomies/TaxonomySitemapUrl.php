@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Facades\Cache;
@@ -12,13 +11,13 @@ use Statamic\Facades\Site;
 
 class TaxonomySitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap) {}
+    public function __construct(protected Taxonomy $taxonomy, protected string $site) {}
 
     public function loc(): string
     {
         Site::setCurrent($this->site);
 
-        return $this->absoluteUrl($this->taxonomy);
+        return $this->taxonomy->absoluteUrl();
     }
 
     public function alternates(): ?array
@@ -27,7 +26,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $sites = $this->sitemap->taxonomies()->keys();
+        $sites = $this->sitemap()->taxonomies()->keys();
 
         if ($sites->count() < 2) {
             return null;
@@ -38,7 +37,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             Site::setCurrent($site);
 
             return [
-                'href' => $this->absoluteUrl($this->taxonomy),
+                'href' => $this->taxonomy->absoluteUrl(),
                 'hreflang' => Helpers::parseLocale(Site::current()->locale()),
             ];
         });
@@ -51,7 +50,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
         Site::setCurrent($xDefaultSite);
 
         return $hreflang->push([
-            'href' => $this->absoluteUrl($this->taxonomy),
+            'href' => $this->taxonomy->absoluteUrl(),
             'hreflang' => 'x-default',
         ])->values()->all();
     }
@@ -69,16 +68,6 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             "advanced-seo::sitemaps::taxonomy::{$this->taxonomy}::lastmod",
             fn () => now()->format('Y-m-d\TH:i:sP')
         );
-    }
-
-    public function changefreq(): string
-    {
-        return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
-    }
-
-    public function priority(): string
-    {
-        return Defaults::data('taxonomies')->get('seo_sitemap_priority');
     }
 
     public function site(): string

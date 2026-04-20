@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Controllers\Web;
 
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Facades\Statamic\CP\LivePreview;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
@@ -16,23 +16,28 @@ use Statamic\View\View;
 
 class SocialImagesController extends Controller
 {
-    public function show(string $theme, string $type, string $id): Response
+    public function __invoke(string $theme, string $template, string $id, string $site): Response
     {
+        $theme = Str::replace('-', '_', $theme);
+        $template = Str::replace('-', '_', $template);
+
         // Throw if the social images generator is disabled.
-        throw_unless(config('advanced-seo.social_images.generator.enabled', false), new NotFoundHttpException);
+        throw_unless(SocialImagesGenerator::enabled(), new NotFoundHttpException);
 
         // Throw if no data was found.
-        throw_unless($data = $this->getData($id), new NotFoundHttpException);
+        throw_unless($data = Data::find($id)?->in($site), new NotFoundHttpException);
 
         // Throw if the data is not an entry or term.
         throw_unless($data instanceof Entry || $data instanceof LocalizedTerm, new NotFoundHttpException);
 
-        // Throw if the social image type is not supported.
-        throw_unless($model = SocialImage::findModel(Str::replace('-', '_', $type)), new NotFoundHttpException);
+        // Throw if we can't find a social image.
+        throw_unless($socialImage = SocialImage::find($template), new NotFoundHttpException);
 
-        $template = $model['templates']->get(Str::replace('-', '_', $theme)) // Get the template based on the theme in the request.
-            ?? $model['templates']->get('default') // If no theme is set, use the default theme.
-            ?? $model['templates']->first(); // If the default doesn't exist either, fall back to the first theme.
+        // Get the view path for the template from the theme.
+        $templatePath = SocialImage::themes()->find($theme)?->template($template);
+
+        // Throw if no template was found for the given theme.
+        throw_unless($templatePath, new NotFoundHttpException);
 
         // Prevent an infinite loop when an image is generated in the augment method of the SocialImageFieldtype.
         $data->set('seo_generate_social_images', false);
@@ -40,20 +45,15 @@ class SocialImagesController extends Controller
         Site::setCurrent($data->site()->handle());
 
         $view = (new View)
-            ->template($template)
-            ->layout($model['layout'])
+            ->template($templatePath)
+            ->layout('social_images/layout')
             ->cascadeContent($data)
-            ->with($model);
+            ->with([
+                'width' => $socialImage->width(),
+                'height' => $socialImage->height(),
+                'type' => $socialImage->type,
+            ]);
 
         return response($view)->header('X-Robots-Tag', 'noindex, nofollow');
-    }
-
-    protected function getData(string $id): ?Entry
-    {
-        if (request()->statamicToken()) {
-            return LivePreview::item(request()->statamicToken());
-        }
-
-        return Data::find($id);
     }
 }

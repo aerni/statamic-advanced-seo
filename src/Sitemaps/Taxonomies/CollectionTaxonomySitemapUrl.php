@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
-use Aerni\AdvancedSeo\Models\Defaults;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
@@ -14,7 +13,7 @@ use Statamic\Facades\URL;
 
 class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 {
-    public function __construct(protected Taxonomy $taxonomy, protected string $site, protected TaxonomySitemap $sitemap) {}
+    public function __construct(protected Taxonomy $taxonomy, protected string $site) {}
 
     public function loc(): string
     {
@@ -63,16 +62,6 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
         );
     }
 
-    public function changefreq(): string
-    {
-        return Defaults::data('taxonomies')->get('seo_sitemap_change_frequency');
-    }
-
-    public function priority(): string
-    {
-        return Defaults::data('taxonomies')->get('seo_sitemap_priority');
-    }
-
     public function site(): string
     {
         return $this->site;
@@ -88,7 +77,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
 
     protected function taxonomies(): Collection
     {
-        return $this->sitemap->collectionTaxonomies()
+        return $this->sitemap()->collectionTaxonomies()
             ->filter(function ($item) {
                 return $item['taxonomy']->handle() === $this->taxonomy->handle()
                     && $item['taxonomy']->collection()->handle() === $this->taxonomy->collection()->handle();
@@ -99,10 +88,8 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
     // TODO: Should be able to remove this once https://github.com/statamic/cms/pull/10439 is merged.
     protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
-        $siteUrl = $this->absoluteUrl(Site::get($site));
-        $taxonomyHandle = $taxonomy->handle();
-        $collectionHandle = $taxonomy->collection()->handle();
+        $siteUrl = Site::get($site)->absoluteUrl();
 
-        return URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}");
+        return URL::tidy("{$siteUrl}/{$taxonomy->collection()->handle()}/{$taxonomy->handle()}");
     }
 }

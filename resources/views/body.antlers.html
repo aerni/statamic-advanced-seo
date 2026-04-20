@@ -1,6 +1,6 @@
 {{# Google Tag Manager #}}
-{{ if seo:use_google_tag_manager }}
+{{ if seo:gtm_container_id }}
     <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id={{ seo:google_tag_manager }}" height="0" width="0" style="display: none; visibility: hidden"></iframe>
+        <iframe src="https://www.googletagmanager.com/ns.html?id={{ seo:gtm_container_id }}" height="0" width="0" style="display: none; visibility: hidden"></iframe>
     </noscript>
 {{ /if }}

@@ -2,85 +2,33 @@
 
 namespace Aerni\AdvancedSeo\SocialImages;
 
-use Aerni\AdvancedSeo\Facades\SocialImage as SocialImageApi;
-use Aerni\AdvancedSeo\Models\SocialImageTheme;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
-use Spatie\Browsershot\Browsershot;
-use Statamic\Contracts\Assets\Asset;
-use Statamic\Contracts\Assets\AssetContainer as Container;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\AssetContainer;
+use Statamic\Contracts\Taxonomies\Term;
 
 class SocialImage
 {
-    public function __construct(protected Entry $entry, protected array $model)
+    public function __construct(
+        public readonly string $type,
+        public readonly string $handle,
+    ) {}
+
+    public function for(Entry|Term $content): SocialImageGenerator
     {
-        //
+        return new SocialImageGenerator($this, $content);
     }
 
-    public function generate(): self
+    public function width(): int
     {
-        $this->ensureDirectoryExists();
-
-        Browsershot::url($this->templateUrl())
-            ->windowSize($this->model['width'], $this->model['height'])
-            ->waitUntilNetworkIdle()
-            ->save($this->absolutePath());
-
-        $this->container()->makeAsset($this->path())->save();
-
-        return $this;
+        return config("advanced-seo.social_images.presets.{$this->type}.width");
     }
 
-    public function asset(): ?Asset
+    public function height(): int
     {
-        return $this->container()->asset($this->path());
+        return config("advanced-seo.social_images.presets.{$this->type}.height");
     }
 
-    public function delete(): void
+    public function url(string $theme, string $id, string $site): string
     {
-        $this->asset()?->delete();
-    }
-
-    public function path(): string
-    {
-        return "social_images/{$this->entry->collection}/{$this->filename()}";
-    }
-
-    protected function absolutePath($path = null): string
-    {
-        return $this->container()->disk()->path($path ?? $this->path());
-    }
-
-    protected function container(): Container
-    {
-        $container = config('advanced-seo.social_images.container', 'assets');
-
-        return AssetContainer::find($container);
-    }
-
-    protected function filename(): string
-    {
-        $id = $this->entry->id;
-        $type = Str::replace('_', '-', $this->model['group']);
-
-        return "{$id}_{$type}.png";
-    }
-
-    protected function templateUrl(): string
-    {
-        return url('/').SocialImageApi::route(
-            theme: $this->entry->seo_social_images_theme ?? SocialImageTheme::fieldtypeDefault(),
-            type: $this->model['type'],
-            id: $this->entry->id,
-        );
-    }
-
-    protected function ensureDirectoryExists(): void
-    {
-        $directory = $this->absolutePath(pathinfo($this->path(), PATHINFO_DIRNAME));
-
-        File::ensureDirectoryExists($directory);
+        return url("/!/advanced-seo/social-images/{$theme}/{$this->type}/{$id}/{$site}");
     }
 }

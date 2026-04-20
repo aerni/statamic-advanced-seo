@@ -2,9 +2,16 @@
 
 namespace Aerni\AdvancedSeo\Commands;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
+
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\text;
 
 class MakeTheme extends Command
 {
@@ -16,6 +23,12 @@ class MakeTheme extends Command
 
     public function handle(): void
     {
+        if (! AdvancedSeo::pro()) {
+            error('The social images theme command requires the Pro edition.');
+
+            return;
+        }
+
         $this->publishTheme();
         $this->publishLayout();
     }
@@ -29,26 +42,32 @@ class MakeTheme extends Command
         if (! File::exists($target.$layout)) {
             File::ensureDirectoryExists($target);
             File::copy($source.$layout, $target.$layout);
-            $this->line("<info>[✓]</info> The layout was successfully created: <comment>{$this->getRelativePath($target.$layout)}</comment>");
+            info("Created layout: {$this->getRelativePath($target.$layout)}");
         }
     }
 
     protected function publishTheme(): void
     {
-        $theme = $this->argument('name') ?? $this->ask('What do you want to call the theme?', 'default');
+        $theme = $this->argument('name') ?? text(
+            label: 'What do you want to call the theme?',
+            placeholder: 'default',
+            required: true,
+        );
 
         $source = __DIR__.'/../../resources/stubs/social_images/templates';
         $target = resource_path('views/social_images/'.$theme);
 
-        if (! File::exists($target) || $this->confirm("A theme with the name <comment>$theme</comment> already exists. Do you want to overwrite it?")) {
-            File::ensureDirectoryExists($target);
-            File::copyDirectory($source, $target);
-            $this->line("<info>[✓]</info> The theme was successfully created: <comment>{$this->getRelativePath($target)}</comment>");
+        if (File::exists($target) && ! confirm("A theme with the name {$theme} already exists. Do you want to overwrite it?")) {
+            return;
         }
+
+        File::ensureDirectoryExists($target);
+        File::copyDirectory($source, $target);
+        info("Created theme: {$this->getRelativePath($target)}");
     }
 
     protected function getRelativePath($path): string
     {
-        return str_replace(base_path().'/', '', $path);
+        return Str::after($path, base_path('/'));
     }
 }

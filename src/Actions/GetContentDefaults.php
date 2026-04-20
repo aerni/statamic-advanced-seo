@@ -2,20 +2,21 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Context\Context;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
 
 class GetContentDefaults
 {
-    public static function handle(mixed $data): Collection
+    public static function handle(mixed $model): Collection
     {
-        if (! $data = GetDefaultsData::handle($data)) {
+        if (! $context = Context::from($model)) {
             return collect();
         }
 
         return Blink::once(
-            "advanced-seo::{$data->type}::{$data->handle}::{$data->locale}",
-            fn () => GetAugmentedDefaults::handle($data)
+            "advanced-seo::{$context->id()}",
+            fn () => $context->seoSetLocalization()?->toAugmentedCollection() ?? collect()
         );
     }
 }

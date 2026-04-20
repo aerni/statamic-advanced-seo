@@ -7,28 +7,40 @@ use Aerni\AdvancedSeo\Migrators\SeoProMigrator;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\spin;
+
 class Migrate extends Command
 {
     use RunsInPlease;
 
     protected $signature = 'seo:migrate';
 
-    protected $description = 'Migrate your existing content';
+    protected $description = 'Migrate content from another SEO addon';
 
     public function handle(): void
     {
-        $choice = $this->choice('Choose your migration', array_keys($this->migrations()));
+        $migrators = $this->migrators();
 
-        resolve($this->migrations()[$choice])::run();
+        $key = select(
+            label: 'Which addon are you migrating from?',
+            options: array_combine(array_keys($migrators), array_column($migrators, 'label')),
+        );
 
-        $this->line('<info>[✓]</info> The migration has been successful!');
+        spin(
+            callback: fn () => resolve($migrators[$key]['class'])::run(),
+            message: 'Migrating data...',
+        );
+
+        info('The migration has been completed successfully.');
     }
 
-    protected function migrations(): array
+    protected function migrators(): array
     {
         return [
-            'Aardvark SEO' => AardvarkSeoMigrator::class,
-            'SEO Pro' => SeoProMigrator::class,
+            'aardvark-seo' => ['label' => 'Aardvark SEO', 'class' => AardvarkSeoMigrator::class],
+            'seo-pro' => ['label' => 'SEO Pro', 'class' => SeoProMigrator::class],
         ];
     }
 }

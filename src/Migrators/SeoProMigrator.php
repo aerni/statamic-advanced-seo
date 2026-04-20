@@ -15,14 +15,24 @@ class SeoProMigrator extends BaseMigrator
                 'title' => 'seo_title',
                 'description' => 'seo_description',
                 'canonical_url' => 'seo_canonical_custom',
-                'priority' => 'seo_sitemap_priority',
-                'change_frequency' => 'seo_sitemap_change_frequency',
+                'priority' => null,
+                'change_frequency' => null,
+                'json_ld_schema' => 'seo_json_ld',
+                'og_title' => 'seo_og_title',
+                'enabled' => null,
                 'image' => null,
                 'robots' => null,
+                'robots_indexing' => null,
+                'robots_following' => null,
+                'robots_noarchive' => null,
+                'robots_noimageindex' => null,
+                'robots_nosnippet' => null,
                 'site_name' => null,
                 'site_name_position' => null,
                 'site_name_separator' => null,
                 'twitter_handle' => null,
+                'twitter_title' => null,
+                'twitter_description' => null,
                 'sitemap' => null,
             ]),
         ]);
@@ -49,19 +59,17 @@ class SeoProMigrator extends BaseMigrator
         $image = Arr::get($oldData, 'image');
 
         $transformed = collect([
-            'seo_noindex' => in_array('noindex', $robots) ? true : null,
-            'seo_nofollow' => in_array('nofollow', $robots) ? true : null,
+            'seo_noindex' => in_array('noindex', $robots) || Arr::get($oldData, 'robots_indexing') === 'noindex' ? true : null,
+            'seo_nofollow' => in_array('nofollow', $robots) || Arr::get($oldData, 'robots_following') === 'nofollow' ? true : null,
             'seo_canonical_type' => $data->has('seo_canonical_custom') ? 'custom' : null,
             'seo_og_image' => $image ?? null,
-            'seo_twitter_summary_image' => $image ?? null,
-            'seo_twitter_summary_large_image' => $image ?? null,
         ])->filter();
 
         return $data
             ->merge($transformed)
             ->map(
                 fn ($value) => is_string($value) && Str::contains($value, '@seo:')
-                ? Str::replace('@seo:', '@field:', $value)
+                ? preg_replace('/@seo:([A-Za-z\d_-]+)/', '{{ $1 }}', $value)
                 : $value
             );
     }

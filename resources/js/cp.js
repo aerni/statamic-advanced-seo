@@ -1,15 +1,26 @@
-import SiteIndex from './pages/site/Index.vue';
-import CollectionsIndex from './pages/collections/Index.vue';
-import TaxonomiesIndex from './pages/taxonomies/Index.vue';
-import SeoDefaultsEdit from './pages/seo-defaults/Edit.vue';
-import SourceFieldtype from './components/SourceFieldtype.vue'
-import SocialImageFieldtype from './components/SocialImageFieldtype.vue'
+import Dashboard from './pages/Dashboard.vue';
+import Index from './pages/Index.vue';
+import Edit from './pages/Edit.vue';
+import SeoFieldtype from './components/fieldtypes/SeoFieldtype.vue'
+import SiteOriginsFieldtype from './components/fieldtypes/SiteOriginsFieldtype.vue'
+import SearchPreviewFieldtype from './components/fieldtypes/SearchPreviewFieldtype.vue'
+import SocialPreviewFieldtype from './components/fieldtypes/SocialPreviewFieldtype.vue'
+import TokenInputFieldtype from './components/fieldtypes/TokenInputFieldtype.vue'
+import AlertFieldtype from './components/fieldtypes/AlertFieldtype.vue'
+import { add } from './utils/normalizers.js'
 
 Statamic.booting(() => {
-    Statamic.$inertia.register('advanced-seo::Site/Index', SiteIndex)
-    Statamic.$inertia.register('advanced-seo::Collections/Index', CollectionsIndex)
-    Statamic.$inertia.register('advanced-seo::Taxonomies/Index', TaxonomiesIndex)
-    Statamic.$inertia.register('advanced-seo::SeoDefaults/Edit', SeoDefaultsEdit)
-    Statamic.$components.register('seo_source-fieldtype', SourceFieldtype)
-    Statamic.$components.register('social_image-fieldtype', SocialImageFieldtype)
+    Statamic.$inertia.register('advanced-seo::Dashboard', Dashboard)
+    Statamic.$inertia.register('advanced-seo::Site/Edit', Edit)
+    Statamic.$inertia.register('advanced-seo::Collections/Index', Index)
+    Statamic.$inertia.register('advanced-seo::Collections/Edit', Edit)
+    Statamic.$inertia.register('advanced-seo::Taxonomies/Index', Index)
+    Statamic.$inertia.register('advanced-seo::Taxonomies/Edit', Edit)
+    Statamic.$components.register('seo-fieldtype', SeoFieldtype)
+    Statamic.$components.register('site_origins-fieldtype', SiteOriginsFieldtype)
+    Statamic.$components.register('search_preview-fieldtype', SearchPreviewFieldtype)
+    Statamic.$components.register('social_preview-fieldtype', SocialPreviewFieldtype)
+    Statamic.$components.register('token_input-fieldtype', TokenInputFieldtype)
+    Statamic.$components.register('alert-fieldtype', AlertFieldtype)
+    Statamic.$advancedSeo = { normalizers: { add } }
 })

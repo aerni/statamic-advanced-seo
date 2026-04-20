@@ -4,10 +4,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Database Driver
+    | Database Driver (Requires Pro)
     |--------------------------------------------------------------------------
     |
     | Choose the driver for storing data. This can either be 'file' or 'eloquent'.
+    | The 'eloquent' driver requires Pro.
     |
     */
 
@@ -26,7 +27,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | GraphQL
+    | GraphQL (Requires Pro)
     |--------------------------------------------------------------------------
     |
     | You may enable the GraphQL API for this addon.
@@ -34,22 +35,6 @@ return [
     */
 
     'graphql' => false,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Disabled Collections & Taxonomies
-    |--------------------------------------------------------------------------
-    |
-    | Disable Advanced SEO for any collection and taxonomy by adding
-    | its handle to the appropriate array below. This will remove the SEO tab,
-    | stop the output of meta data on the frontend, and remove the sitemap.
-    |
-    */
-
-    'disabled' => [
-        'collections' => [],
-        'taxonomies' => [],
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -99,16 +84,18 @@ return [
         'presets' => [
             'open_graph' => ['width' => 1200, 'height' => 630],
             'twitter_summary' => ['width' => 240, 'height' => 240],
-            'twitter_summary_large_image' => ['width' => 1260, 'height' => 630],
+            'twitter_summary_large_image' => ['width' => 1200, 'height' => 630],
         ],
 
         /*
         |--------------------------------------------------------------------------
-        | Social Images Generator
+        | Social Images Generator (Requires Pro)
         |--------------------------------------------------------------------------
         |
-        | To use the social images generator, you need to install Puppeteer:
-        | https://spatie.be/docs/browsershot/v2/requirements
+        | Requires spatie/laravel-screenshot to be installed.
+        | It supports Browsershot and Cloudflare as screenshot drivers.
+        | Read the documentation for setup and configuration:
+        | https://spatie.be/docs/laravel-screenshot
         |
         */
 
@@ -119,24 +106,11 @@ return [
             | Enabled
             |--------------------------------------------------------------------------
             |
-            | Enable or disable the generator for all collections.
+            | Enable or disable the social images generator.
             |
             */
 
             'enabled' => false,
-
-            /*
-            |--------------------------------------------------------------------------
-            | Generate on Save
-            |--------------------------------------------------------------------------
-            |
-            | Generate the social images every time an entry is saved.
-            | Disable this to generate the image the first time an entry is
-            | viewed on the frontend instead.
-            |
-            */
-
-            'generate_on_save' => true,
 
             /*
             |--------------------------------------------------------------------------
@@ -209,13 +183,13 @@ return [
         |
         */
 
-        'environments' => ['production'],
+        'environments' => ['local', 'production'],
 
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Sitemap
+    | Sitemap (Requires Pro)
     |--------------------------------------------------------------------------
     |
     | Configure the sitemap feature to your liking.
@@ -233,7 +207,7 @@ return [
         |
         */
 
-        'enabled' => true,
+        'enabled' => false,
 
         /*
         |--------------------------------------------------------------------------
@@ -256,6 +230,21 @@ return [
         */
 
         'queue' => 'default',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Custom Sitemaps
+        |--------------------------------------------------------------------------
+        |
+        | Register custom sitemap classes. Each class should extend
+        | CustomSitemap and define a handle and urls.
+        | The site defaults to the default Statamic site if not set.
+        |
+        */
+
+        'custom' => [
+            //
+        ],
 
     ],
 
@@ -309,5 +298,70 @@ return [
     */
 
     'site_verification' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tokens (Requires Pro)
+    |--------------------------------------------------------------------------
+    |
+    | Register custom token normalizers for fieldtypes not covered by
+    | the defaults, or add custom value tokens. Both are available
+    | in the token input fieldtype.
+    |
+    */
+
+    'tokens' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI (Requires Pro)
+    |--------------------------------------------------------------------------
+    |
+    | Configure AI-powered content generation.
+    | Requires the Laravel AI SDK (laravel/ai) to be installed and configured.
+    |
+    */
+
+    'ai' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Enable or disable AI content generation.
+        |
+        */
+
+        'enabled' => false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Provider
+        |--------------------------------------------------------------------------
+        |
+        | The AI provider to use for content generation. This should match
+        | a provider configured in your config/ai.php file. When set to null,
+        | the SDK's default provider will be used.
+        |
+        */
+
+        'provider' => null,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Model
+        |--------------------------------------------------------------------------
+        |
+        | The AI model to use for content generation. When set to null,
+        | the provider's cheapest model will be used for cost optimization.
+        |
+        */
+
+        'model' => null,
+
+    ],
 
 ];

@@ -2,22 +2,25 @@
 
 namespace Aerni\AdvancedSeo\Actions\Statamic;
 
-use Aerni\AdvancedSeo\Actions\GetDefaultsData;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
+use Illuminate\Support\Facades\Gate;
 use Statamic\Actions\Action;
 use Statamic\Contracts\Entries\Entry;
 
 class GenerateSocialImages extends Action
 {
+    protected string $icon = 'assets';
+
     /**
-     * Determine if the current thing is an entry and if it's opted in to the auto generation config (global).
+     * Determine if the item is an entry and if its SeoSet has the social images generator enabled.
      *
      * @return bool
      */
     public function visibleTo($item)
     {
-        return $item instanceof Entry && SocialImagesGenerator::enabled(GetDefaultsData::handle($item));
+        return $item instanceof Entry && SocialImagesGenerator::enabled(Context::from($item));
     }
 
     /**
@@ -27,7 +30,8 @@ class GenerateSocialImages extends Action
      */
     public function authorize($user, $item)
     {
-        return $user->can('edit', $item);
+        return Gate::allows('seo.edit-content', Context::from($item)->seoSet())
+            && $user->can('edit', $item);
     }
 
     /**
@@ -37,10 +41,6 @@ class GenerateSocialImages extends Action
      */
     public function run($items, $values)
     {
-        $items->each(fn ($item) => GenerateSocialImagesJob::dispatch($item));
-
-        return config('queue.default') === 'sync'
-            ? __('advanced-seo::messages.social_images_generator_generated')
-            : __('advanced-seo::messages.social_images_generator_generating_queue');
+        $items->each(fn ($item) => defer(fn () => GenerateSocialImagesJob::dispatch($item)));
     }
 }

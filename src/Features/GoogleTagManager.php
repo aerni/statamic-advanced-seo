@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
-class GoogleTagManager
+class GoogleTagManager extends Feature
 {
-    public static function enabled(): bool
+    protected static function available(): bool
     {
         return config('advanced-seo.analytics.google_tag_manager', true);
     }

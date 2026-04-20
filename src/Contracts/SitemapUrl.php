@@ -10,9 +10,7 @@ interface SitemapUrl
 
     public function lastmod(): string|self|null;
 
-    public function changefreq(): string|self|null;
-
-    public function priority(): string|self|null;
-
     public function site(): string|self;
+
+    public function sitemap(?Sitemap $sitemap = null): self|Sitemap;
 }

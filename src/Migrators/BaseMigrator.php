@@ -38,7 +38,7 @@ abstract class BaseMigrator
             $localization->data($updated);
         });
 
-        $term->save();
+        $term->saveQuietly();
     }
 
     /**

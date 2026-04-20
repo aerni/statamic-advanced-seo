@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
-class Cloudflare
+class Cloudflare extends Feature
 {
-    public static function enabled(): bool
+    protected static function available(): bool
     {
         return config('advanced-seo.analytics.cloudflare_analytics', true);
     }

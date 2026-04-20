@@ -1,18 +1,21 @@
 <?php
 
-use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoDefaultsController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\AiGenerateController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\DashboardController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetConfigController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetIndexController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetLocalizationController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetStateController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
-    Route::get('/site', [SeoDefaultsController::class, 'index'])->name('site.index');
-    Route::get('/site/{default}', [SeoDefaultsController::class, 'edit'])->name('site.edit');
-    Route::patch('/site/{default}', [SeoDefaultsController::class, 'update'])->name('site.update');
-
-    Route::get('/collections', [SeoDefaultsController::class, 'index'])->name('collections.index');
-    Route::get('/collections/{collection}', [SeoDefaultsController::class, 'edit'])->name('collections.edit');
-    Route::patch('/collections/{collection}', [SeoDefaultsController::class, 'update'])->name('collections.update');
-
-    Route::get('/taxonomies', [SeoDefaultsController::class, 'index'])->name('taxonomies.index');
-    Route::get('/taxonomies/{taxonomy}', [SeoDefaultsController::class, 'edit'])->name('taxonomies.edit');
-    Route::patch('/taxonomies/{taxonomy}', [SeoDefaultsController::class, 'update'])->name('taxonomies.update');
+    Route::get('/', DashboardController::class)->name('dashboard');
+    Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
+    Route::get('/{seoSetGroup}', SeoSetIndexController::class)->name('sets.index');
+    Route::get('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'edit'])->name('sets.config.edit');
+    Route::patch('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'update'])->name('sets.config.update');
+    Route::post('/{seoSetGroup}/{seoSet}/enable', [SeoSetStateController::class, 'enable'])->name('sets.enable');
+    Route::post('/{seoSetGroup}/{seoSet}/disable', [SeoSetStateController::class, 'disable'])->name('sets.disable');
+    Route::get('/{seoSetGroup}/{seoSet}/{seoSetLocalization}', [SeoSetLocalizationController::class, 'edit'])->name('sets.localization.edit');
+    Route::patch('/{seoSetGroup}/{seoSet}/{seoSetLocalization}', [SeoSetLocalizationController::class, 'update'])->name('sets.localization.update');
 });

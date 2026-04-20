@@ -2,58 +2,68 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Facades\SocialImage;
-use Statamic\Contracts\Assets\Asset;
+use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
+use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
+use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\GraphQL;
-use Statamic\Fields\Fieldtype;
-use Statamic\GraphQL\Types\AssetInterface;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Fieldtypes\Assets\Assets;
 
-class SocialImageFieldtype extends Fieldtype
+use function Illuminate\Support\defer;
+
+class SocialImageFieldtype extends Assets
 {
+    protected $component = 'assets';
+
     protected $selectable = false;
 
-    public function preload(): ?array
+    public function augment($value)
+    {
+        return $this->shouldGenerateSocialImage()
+            ? $this->augmentGeneratedSocialImage($value)
+            : parent::augment($value);
+    }
+
+    protected function augmentGeneratedSocialImage($value)
     {
         $parent = $this->field->parent();
 
-        if (! $parent instanceof Entry) {
-            return null;
+        // Resolve the existing asset or generate a new one on demand.
+        // This ensures the first request always returns an image (e.g. social platform crawlers).
+        $generator = $this->generator($parent);
+        $asset = $generator->asset() ?? $generator->generate();
+
+        // Persist the asset path to the entry file so the image survives
+        // if the generator is later disabled without requiring a manual save.
+        if ($value !== $asset->path()) {
+            defer(function () use ($parent, $asset) {
+                $parent->set('seo_og_image', $asset->path());
+                $parent->saveQuietly();
+            });
         }
 
-        $type = $this->config()['image_type'];
-        $image = SocialImage::all($parent)->get($type);
-
-        $generateOnSaveMessage = config('queue.default') === 'sync'
-            ? trans('advanced-seo::messages.social_images_generator_save_sync')
-            : trans('advanced-seo::messages.social_images_generator_save_queue');
-
-        $message = config('advanced-seo.social_images.generator.generate_on_save', true)
-            ? $generateOnSaveMessage
-            : trans('advanced-seo::messages.social_images_generator_on_demand');
-
-        return [
-            'message' => $message,
-            'image' => $image->asset()?->absoluteUrl(),
-        ];
+        return $asset;
     }
 
-    public function augment($value): ?Asset
+    protected function shouldGenerateSocialImage(): bool
     {
         $parent = $this->field->parent();
 
-        if (! $parent->seo_generate_social_images) {
-            return null;
+        if (! ($parent instanceof Entry || $parent instanceof Term)) {
+            return false;
         }
 
-        $type = $this->config()['image_type'];
-        $image = SocialImage::all($parent)->get($type);
+        if (! SocialImagesGenerator::enabled(Context::from($parent))) {
+            return false;
+        }
 
-        return $image->asset() ?? $image->generate()->asset();
+        return $parent->seo_generate_social_images;
     }
 
-    public function toGqlType()
+    protected function generator(Entry|Term $content): SocialImageGenerator
     {
-        return GraphQL::type(AssetInterface::NAME);
+        return SocialImage::openGraph()->for(Helpers::localizedContent($content));
     }
 }

@@ -24,4 +24,9 @@ trait EvaluatesContextType
         return $context->get('page') instanceof Taxonomy
             && $context->get('page')->collection() instanceof Collection;
     }
+
+    protected function contextIs404(Context $context): bool
+    {
+        return $context->get('response_code') === 404;
+    }
 }

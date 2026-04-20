@@ -2,42 +2,33 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Custom;
 
-use Aerni\AdvancedSeo\Models\Defaults;
+use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Illuminate\Support\Carbon;
-use Statamic\Facades\Site;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class CustomSitemapUrl extends BaseSitemapUrl
 {
     use FluentlyGetsAndSets;
 
-    public function __construct(
-        protected string $loc,
-        protected ?array $alternates = null,
-        protected ?string $lastmod = null,
-        protected ?string $changefreq = null,
-        protected ?string $priority = null,
-        protected ?string $site = null,
-    ) {}
+    protected ?array $alternates = null;
+
+    protected ?string $lastmod = null;
+
+    protected ?string $changefreq = null;
+
+    protected ?string $priority = null;
+
+    public function __construct(protected Sitemap $sitemap, protected string $loc) {}
 
     public function loc(?string $loc = null): string|self
     {
-        return $this->fluentlyGetOrSet('loc')
-            ->getter(fn ($loc) => $this->absoluteUrl($loc))
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('loc')->args(func_get_args());
     }
 
     public function alternates(?array $alternates = null): array|self|null
     {
         return $this->fluentlyGetOrSet('alternates')
-            ->getter(function ($alternates) {
-                return collect($alternates)->map(function ($alternate) {
-                    $alternate['href'] = $this->absoluteUrl($alternate['href']);
-
-                    return $alternate;
-                })->all();
-            })
             ->setter(function ($alternates) {
                 foreach ($alternates as $alternate) {
                     throw_unless(array_key_exists('href', $alternate), new \Exception("One of your alternate links is missing the 'href' attribute."));
@@ -60,7 +51,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
     public function changefreq(?string $changefreq = null): string|self|null
     {
         return $this->fluentlyGetOrSet('changefreq')
-            ->getter(fn () => $this->changefreq ?? Defaults::data('collections')->get('seo_sitemap_change_frequency'))
+            ->getter(fn () => $this->changefreq)
             ->setter(function ($changefreq) {
                 $allowedValues = ['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'];
                 $allowedValuesString = implode(', ', $allowedValues);
@@ -75,7 +66,7 @@ class CustomSitemapUrl extends BaseSitemapUrl
     public function priority(?string $priority = null): string|self|null
     {
         return $this->fluentlyGetOrSet('priority')
-            ->getter(fn () => $this->priority ?? Defaults::data('collections')->get('seo_sitemap_priority'))
+            ->getter(fn () => $this->priority)
             ->setter(function ($priority) {
                 $allowedValues = ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0'];
                 $allowedValuesString = implode(', ', $allowedValues);
@@ -87,10 +78,16 @@ class CustomSitemapUrl extends BaseSitemapUrl
             ->args(func_get_args());
     }
 
-    public function site(?string $site = null): string|self
+    public function site(): string
     {
-        return $this->fluentlyGetOrSet('site')
-            ->getter(fn () => $this->site ?? Site::default()->handle())
-            ->args(func_get_args());
+        return $this->sitemap()->site();
+    }
+
+    public function toArray(): array
+    {
+        return collect(parent::toArray())
+            ->when($this->changefreq(), fn ($c, $v) => $c->put('changefreq', $v))
+            ->when($this->priority(), fn ($c, $v) => $c->put('priority', $v))
+            ->all();
     }
 }

@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Contracts\Sitemap;
 use Aerni\AdvancedSeo\Contracts\SitemapFile;
 use Aerni\AdvancedSeo\Contracts\SitemapIndex as Contract;
-use Aerni\AdvancedSeo\Facades\Sitemap as SitemapRepository;
+use Aerni\AdvancedSeo\Facades\Sitemap as SitemapRegistry;
 use Aerni\AdvancedSeo\Sitemaps\Collections\CollectionSitemap;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Illuminate\Contracts\Support\Arrayable;
@@ -23,30 +23,64 @@ use Statamic\Facades\Taxonomy;
 
 class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, SitemapFile
 {
-    protected array $sitemaps = [];
+    public function __construct(protected Domain $domain) {}
 
-    public function add(Sitemap $sitemap): self
+    /**
+     * Get the domain of this index.
+     */
+    public function domain(): Domain
     {
-        $this->sitemaps = collect($this->sitemaps)
-            ->push($sitemap)
-            ->unique(fn ($sitemap) => $sitemap->handle())
-            ->all();
+        return $this->domain;
+    }
 
-        return $this;
+    /**
+     * Get the site handles for this index's domain.
+     */
+    public function sites(): Collection
+    {
+        return $this->domain->sites->map->handle();
+    }
+
+    /**
+     * Find a sitemap by ID.
+     */
+    public function find(string $id): ?Sitemap
+    {
+        return $this->sitemaps()->first(fn (Sitemap $sitemap) => $sitemap->id() === $id);
     }
 
     public function sitemaps(): Collection
     {
-        return Blink::once($this->filename(), function () {
-            return collect($this->sitemaps)
+        return Blink::once($this->cacheKey(), function () {
+            return $this->customSitemaps()
                 ->merge($this->collectionSitemaps())
-                ->merge($this->taxonomySitemaps());
+                ->merge($this->taxonomySitemaps())
+                ->each->index($this);
         });
+    }
+
+    protected function cacheKey(): string
+    {
+        return "advanced-seo.sitemap-index.{$this->domain}";
+    }
+
+    protected function customSitemaps(): Collection
+    {
+        return collect([
+            ...config('advanced-seo.sitemap.custom', []),
+            ...app('advanced-seo.sitemaps'),
+        ])
+            ->map(fn ($sitemap) => is_string($sitemap) ? app($sitemap) : $sitemap)
+            ->unique(fn ($sitemap) => $sitemap->id())
+            ->filter(fn ($sitemap) => $this->sites()->contains($sitemap->site()))
+            ->filter(fn ($sitemap) => $sitemap->urls()->isNotEmpty())
+            ->values();
     }
 
     protected function collectionSitemaps(): Collection
     {
         return CollectionFacade::all()
+            ->sortBy('handle')
             ->filter($this->shouldProcessSitemap(...))
             ->mapInto(CollectionSitemap::class)
             ->values();
@@ -55,6 +89,7 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
     protected function taxonomySitemaps(): Collection
     {
         return Taxonomy::all()
+            ->sortBy('handle')
             ->filter($this->shouldProcessSitemap(...))
             ->mapInto(TaxonomySitemap::class)
             ->values();
@@ -62,7 +97,10 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
 
     public function toArray(): array
     {
-        return $this->sitemaps()->toArray();
+        return $this->sitemaps()->map(fn (Sitemap $sitemap) => [
+            'url' => $sitemap->url(),
+            'lastmod' => $sitemap->lastmod(),
+        ])->all();
     }
 
     public function render(): string
@@ -96,12 +134,12 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
 
     public function path(): string
     {
-        return SitemapRepository::path($this->filename());
+        return SitemapRegistry::path($this->domain, $this->filename());
     }
 
     public function save(): self
     {
-        File::ensureDirectoryExists(SitemapRepository::path());
+        File::ensureDirectoryExists(SitemapRegistry::path($this->domain));
 
         File::put($this->path(), $this->render());
 
@@ -111,7 +149,7 @@ class SitemapIndex implements Arrayable, Contract, Renderable, Responsable, Site
     protected function shouldProcessSitemap(CollectionContract|TaxonomyContract $model): bool
     {
         return $model->sites()
-            ->map(fn ($site) => IncludeInSitemap::run($model, $site))
-            ->contains('true');
+            ->intersect($this->sites())
+            ->contains(fn ($site) => IncludeInSitemap::run($model, $site));
     }
 }

@@ -2,26 +2,40 @@
 
 namespace Aerni\AdvancedSeo\Support;
 
-use Illuminate\Support\Str;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
+use Statamic\Statamic;
+use Statamic\Taxonomies\LocalizedTerm;
 use WhiteCube\Lingua\Service;
 
 class Helpers
 {
+    /**
+     * Ensure we have an augmentable content instance.
+     *
+     * The base Term class doesn't have augmented data access (HasAugmentedInstance trait),
+     * only LocalizedTerm does. This method converts a base Term to its LocalizedTerm
+     * for the current site context.
+     */
+    public static function localizedContent(Entry|Term $content): Entry|LocalizedTerm
+    {
+        if ($content instanceof Entry || $content instanceof LocalizedTerm) {
+            return $content;
+        }
+
+        $site = Statamic::isCpRoute()
+            ? request()->route('site')?->handle() ?? basename(request()->path())
+            : Site::current()->handle();
+
+        return $content->in($site);
+    }
+
     public static function parseLocale(string $locale): string
     {
         $parsed = preg_replace('/\.utf8/i', '', $locale);
 
         return Service::create($parsed)->toW3C();
-    }
-
-    public static function isAddonCpRoute(): bool
-    {
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'advanced-seo']);
-    }
-
-    public static function isBlueprintCpRoute(): bool
-    {
-        return Str::containsAll(request()->path(), [config('statamic.cp.route', 'cp'), 'blueprints']);
     }
 
     /**
@@ -31,7 +45,7 @@ class Helpers
     public static function isCustomRoute(): bool
     {
         $allowedControllerActions = collect([
-            'Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController@show',
+            'Aerni\AdvancedSeo\Http\Controllers\Web\SocialImagesController',
             'Statamic\Http\Controllers\FrontendController@index',
         ]);
 

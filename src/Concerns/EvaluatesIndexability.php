@@ -16,9 +16,10 @@ trait EvaluatesIndexability
     {
         return match (true) {
             $model instanceof Context => $this->isIndexableContext($model),
-            $model instanceof Entry => $this->isIndexableEntryOrTerm($model),
+            $model instanceof Entry,
             $model instanceof LocalizedTerm => $this->isIndexableEntryOrTerm($model),
             $model instanceof Site => $this->isIndexableSite($model->handle()),
+            default => false,
         };
     }
 
@@ -42,7 +43,7 @@ trait EvaluatesIndexability
     protected function isIndexableSite(string $site): bool
     {
         return $this->crawlingIsEnabled()
-            && ! Seo::find('site', 'indexing')?->in($site)?->noindex;
+            && ! Seo::find('site::defaults')?->in($site)?->noindex;
     }
 
     protected function crawlingIsEnabled(): bool

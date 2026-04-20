@@ -2,39 +2,32 @@
 
 namespace Aerni\AdvancedSeo\Features;
 
-use Aerni\AdvancedSeo\Data\DefaultsData;
-use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\AdvancedSeo;
+use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\Facades\SocialImage;
+use Statamic\Console\Processes\Composer;
 
-class SocialImagesGenerator
+class SocialImagesGenerator extends Feature
 {
-    public static function enabled(DefaultsData $data): bool
+    protected static function available(): bool
     {
-        // Don't show the generator section if the generator is disabled.
+        if (! AdvancedSeo::pro()) {
+            return false;
+        }
+
         if (! config('advanced-seo.social_images.generator.enabled', false)) {
             return false;
         }
 
-        $disabled = config("advanced-seo.disabled.{$data->type}", []);
-
-        // Check if the collection/taxonomy is set to be disabled globally.
-        if (in_array($data->handle, $disabled)) {
+        if (! app(Composer::class)->isInstalled('spatie/laravel-screenshot')) {
             return false;
         }
 
-        // Terms are not yet supported.
-        if ($data->type === 'taxonomies') {
-            return false;
-        }
+        return SocialImage::themes()->all()->isNotEmpty();
+    }
 
-        $enabledCollections = Seo::find('site', 'social_media')
-            ?->in($data->locale)
-            ?->value('social_images_generator_collections') ?? [];
-
-        // Don't show the generator section if the collection is not configured.
-        if ($data->type === 'collections' && ! in_array($data->handle, $enabledCollections)) {
-            return false;
-        }
-
-        return true;
+    protected static function enabledInConfig(SeoSetConfig $config): bool
+    {
+        return $config->value('social_images_generator');
     }
 }

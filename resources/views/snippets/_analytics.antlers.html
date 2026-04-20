@@ -1,7 +1,7 @@
 {{ if {seo:should_render_analytics_tags} }}
 
     {{# Fathom #}}
-    {{ if seo:use_fathom }}
+    {{ if seo:fathom_id }}
         <script
             src="https://cdn.usefathom.com/script.js"
             data-site="{{ seo:fathom_id }}"
@@ -11,13 +11,13 @@
     {{ /if }}
 
     {{# Cloudflare Web Analytics #}}
-    {{ if seo:use_cloudflare_web_analytics }}
-        <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ seo:cloudflare_web_analytics }}"}'></script>
+    {{ if seo:cloudflare_beacon_token }}
+        <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ seo:cloudflare_beacon_token }}"}'></script>
     {{ /if }}
 
     {{# Google Tag Manager #}}
-    {{ if seo:use_google_tag_manager }}
-        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ seo:google_tag_manager }}');</script>
+    {{ if seo:gtm_container_id }}
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ seo:gtm_container_id }}');</script>
         {{# The noscript tag is found in the body view #}}
     {{ /if }}
 
