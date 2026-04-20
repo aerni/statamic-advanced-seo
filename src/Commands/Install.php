@@ -129,6 +129,8 @@ class Install extends Command
 
         File::put($configPath, $contents);
 
+        info('Pro edition enabled.');
+
         return true;
     }
 
