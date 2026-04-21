@@ -35,7 +35,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_search_appearance.display'),
             'instructions' => $this->trans('seo_section_search_appearance.default_instructions'),
-
             'fields' => [
                 [
                     'handle' => 'seo_title',
@@ -69,7 +68,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_social_appearance.display'),
             'instructions' => $this->trans('seo_section_social_appearance.default_instructions'),
-
             'fields' => [
                 [
                     'handle' => 'seo_og_title',
@@ -145,7 +143,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_indexing.display'),
             'instructions' => $this->trans('seo_section_indexing.default_instructions'),
-
             'fields' => [
                 [
                     'handle' => 'seo_noindex',
@@ -239,7 +236,6 @@ class ContentSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_structured_data.display'),
             'instructions' => $this->trans('seo_section_structured_data.default_instructions'),
-
             'fields' => [
                 [
                     'handle' => 'seo_json_ld',

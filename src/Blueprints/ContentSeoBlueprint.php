@@ -89,7 +89,6 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_social_appearance.display'),
             'instructions' => $this->trans('seo_section_social_appearance.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'seo_og_title',
@@ -194,7 +193,6 @@ class ContentSeoBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('seo_section_indexing.display'),
             'instructions' => $this->trans('seo_section_indexing.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'seo_noindex',

@@ -51,7 +51,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_titles.display'),
             'instructions' => $this->trans('section_titles.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'site_name',
@@ -102,7 +101,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_structured_data.display'),
             'instructions' => $this->trans('section_structured_data.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'site_json_ld_type',
@@ -213,7 +211,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_favicon.display'),
             'instructions' => $this->trans('section_favicon.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'favicon_svg',
@@ -239,7 +236,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_social_image.display'),
             'instructions' => $this->trans('section_social_image.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'og_image',
@@ -261,7 +257,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_twitter.display'),
             'instructions' => $this->trans('section_twitter.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'twitter_card',
@@ -301,7 +296,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_indexing.display'),
             'instructions' => $this->trans('section_indexing.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'noindex',
@@ -323,7 +317,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_verification.display'),
             'instructions' => $this->trans('section_verification.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'google_site_verification_code',
@@ -444,7 +437,6 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
         return [
             'display' => $this->trans('section_ai.display'),
             'instructions' => $this->trans('section_ai.instructions'),
-
             'fields' => [
                 [
                     'handle' => 'ai_instructions',
