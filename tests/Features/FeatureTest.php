@@ -1,10 +1,10 @@
 <?php
 
 use Aerni\AdvancedSeo\Context\Context;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Feature;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -24,11 +24,11 @@ it('returns available() when no context is provided', function () {
     expect(UnavailableFeature::enabled())->toBeFalse();
 });
 
-it('returns available() when the context is config-scope', function () {
+it('returns available() for site-type contexts', function () {
     $context = new Context(
-        parent: Collection::find('pages'),
-        type: 'collections',
-        handle: 'pages',
+        parent: Seo::find('site::defaults'),
+        type: 'site',
+        handle: 'defaults',
         scope: Scope::Config,
         site: 'english',
     );
@@ -98,7 +98,7 @@ it('returns available() for config-scope contexts even when the seoset is disabl
     expect(AvailableFeature::enabled($context))->toBeTrue();
 });
 
-it('consults enabledInConfig() for content-scope contexts', function () {
+it('consults enabledInLocalization() for content-scope contexts', function () {
     $context = new Context(
         parent: Collection::find('pages'),
         type: 'collections',
@@ -107,11 +107,11 @@ it('consults enabledInConfig() for content-scope contexts', function () {
         site: 'english',
     );
 
-    expect(FeatureWithConfigCheckTrue::enabled($context))->toBeTrue();
-    expect(FeatureWithConfigCheckFalse::enabled($context))->toBeFalse();
+    expect(FeatureWithLocalizationCheckTrue::enabled($context))->toBeTrue();
+    expect(FeatureWithLocalizationCheckFalse::enabled($context))->toBeFalse();
 });
 
-it('bypasses enabledInConfig() for config-scope contexts', function () {
+it('consults enabledInConfig() for config-scope contexts', function () {
     $context = new Context(
         parent: Collection::find('pages'),
         type: 'collections',
@@ -120,9 +120,36 @@ it('bypasses enabledInConfig() for config-scope contexts', function () {
         site: 'english',
     );
 
-    // Config scope bypasses the SeoSet checks entirely, so a feature whose
-    // enabledInConfig() would return false still reports enabled.
+    expect(FeatureWithConfigCheckTrue::enabled($context))->toBeTrue();
+    expect(FeatureWithConfigCheckFalse::enabled($context))->toBeFalse();
+});
+
+it('does not call enabledInConfig() for content-scope contexts', function () {
+    $context = new Context(
+        parent: Collection::find('pages'),
+        type: 'collections',
+        handle: 'pages',
+        scope: Scope::Content,
+        site: 'english',
+    );
+
+    // enabledInConfig would return false; content scope uses enabledInLocalization instead,
+    // which defaults to true.
     expect(FeatureWithConfigCheckFalse::enabled($context))->toBeTrue();
+});
+
+it('does not call enabledInLocalization() for config-scope contexts', function () {
+    $context = new Context(
+        parent: Collection::find('pages'),
+        type: 'collections',
+        handle: 'pages',
+        scope: Scope::Config,
+        site: 'english',
+    );
+
+    // enabledInLocalization would return false; config scope uses enabledInConfig instead,
+    // which defaults to true.
+    expect(FeatureWithLocalizationCheckFalse::enabled($context))->toBeTrue();
 });
 
 class AvailableFeature extends Feature
@@ -148,7 +175,7 @@ class FeatureWithConfigCheckTrue extends Feature
         return true;
     }
 
-    protected static function enabledInConfig(SeoSetConfig $config): bool
+    protected static function enabledInConfig(SeoSet $set): bool
     {
         return true;
     }
@@ -161,7 +188,33 @@ class FeatureWithConfigCheckFalse extends Feature
         return true;
     }
 
-    protected static function enabledInConfig(SeoSetConfig $config): bool
+    protected static function enabledInConfig(SeoSet $set): bool
+    {
+        return false;
+    }
+}
+
+class FeatureWithLocalizationCheckTrue extends Feature
+{
+    protected static function available(): bool
+    {
+        return true;
+    }
+
+    protected static function enabledInLocalization(SeoSet $set): bool
+    {
+        return true;
+    }
+}
+
+class FeatureWithLocalizationCheckFalse extends Feature
+{
+    protected static function available(): bool
+    {
+        return true;
+    }
+
+    protected static function enabledInLocalization(SeoSet $set): bool
     {
         return false;
     }

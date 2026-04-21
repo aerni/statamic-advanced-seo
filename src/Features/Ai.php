@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Statamic\Console\Processes\Composer;
 
 class Ai extends Feature
@@ -27,8 +27,8 @@ class Ai extends Feature
         return (bool) config("ai.providers.{$provider}.key");
     }
 
-    protected static function enabledInConfig(SeoSetConfig $config): bool
+    protected static function enabledInLocalization(SeoSet $set): bool
     {
-        return $config->value('ai');
+        return $set->config()->value('ai');
     }
 }

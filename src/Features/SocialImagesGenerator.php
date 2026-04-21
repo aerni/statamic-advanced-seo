@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Statamic\Console\Processes\Composer;
 
 class SocialImagesGenerator extends Feature
@@ -26,8 +26,8 @@ class SocialImagesGenerator extends Feature
         return SocialImage::themes()->all()->isNotEmpty();
     }
 
-    protected static function enabledInConfig(SeoSetConfig $config): bool
+    protected static function enabledInLocalization(SeoSet $set): bool
     {
-        return $config->value('social_images_generator');
+        return $set->config()->value('social_images_generator');
     }
 }

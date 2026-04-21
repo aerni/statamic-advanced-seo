@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Features;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
-use Aerni\AdvancedSeo\Contracts\SeoSetConfig;
+use Aerni\AdvancedSeo\SeoSets\SeoSet;
 
 class Sitemap extends Feature
 {
@@ -12,8 +12,8 @@ class Sitemap extends Feature
         return AdvancedSeo::pro() && config('advanced-seo.sitemap.enabled', true);
     }
 
-    protected static function enabledInConfig(SeoSetConfig $config): bool
+    protected static function enabledInLocalization(SeoSet $set): bool
     {
-        return $config->value('sitemap');
+        return $set->config()->value('sitemap');
     }
 }
