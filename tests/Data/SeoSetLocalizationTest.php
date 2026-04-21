@@ -116,6 +116,16 @@ it('can get the blueprint for site defaults', function () {
     expect($blueprint->handle())->toBe('site_localization');
 });
 
+it('defaults site_name to the statamic site name on the site defaults blueprint', function () {
+    $set = Seo::find('site::defaults');
+
+    expect($set->in('english')->blueprint()->field('site_name')->defaultValue())->toBe('English');
+
+    Blink::flush();
+
+    expect($set->in('german')->blueprint()->field('site_name')->defaultValue())->toBe('German');
+});
+
 it('can get blueprint fields', function () {
     $localization = Seo::find('collections::articles')->inDefaultSite();
 

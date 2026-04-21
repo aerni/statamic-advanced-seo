@@ -3,12 +3,14 @@
 namespace Aerni\AdvancedSeo\Blueprints;
 
 use Aerni\AdvancedSeo\Concerns\HasAssetField;
+use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\Cloudflare;
 use Aerni\AdvancedSeo\Features\Fathom;
 use Aerni\AdvancedSeo\Features\Favicons;
 use Aerni\AdvancedSeo\Features\GoogleTagManager;
 use Aerni\AdvancedSeo\Features\SiteVerification;
+use Statamic\Facades\Site;
 
 class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
 {
@@ -58,6 +60,7 @@ class SiteSeoSetLocalizationBlueprint extends BaseBlueprint
                         'display' => $this->trans('site_name.display'),
                         'instructions' => $this->trans('site_name.instructions'),
                         'input_type' => 'text',
+                        'default' => $this->lazy(fn (Context $context) => Site::get($context->site)?->name()),
                         'localizable' => true,
                         'listable' => 'hidden',
                         'width' => 50,
