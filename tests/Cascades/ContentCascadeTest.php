@@ -7,6 +7,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Fields\LabeledValue;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
@@ -246,7 +247,7 @@ it('returns the default canonical url', function () {
 it('returns custom canonical url', function () {
     config(['advanced-seo.crawling.environments' => ['testing']]);
 
-    $this->cascade->set('canonical_type', 'custom');
+    $this->cascade->set('canonical_type', new LabeledValue('custom', 'Custom'));
     $this->cascade->set('canonical_custom', 'https://other-site.com/page');
 
     expect($this->cascade->canonical())->toBe('https://other-site.com/page');
@@ -258,7 +259,7 @@ it('returns entry canonical url', function () {
     $other = Entry::make()->collection('pages')->locale('english')->slug('original');
     $other->save();
 
-    $this->cascade->set('canonical_type', 'entry');
+    $this->cascade->set('canonical_type', new LabeledValue('entry', 'Entry'));
     $this->cascade->set('canonical_entry', $other);
 
     expect($this->cascade->canonical())->toBe('https://example.com/original');
@@ -267,7 +268,7 @@ it('returns entry canonical url', function () {
 it('falls back to self-referencing canonical when entry is null', function () {
     config(['advanced-seo.crawling.environments' => ['testing']]);
 
-    $this->cascade->set('canonical_type', 'entry');
+    $this->cascade->set('canonical_type', new LabeledValue('entry', 'Entry'));
     $this->cascade->set('canonical_entry', null);
 
     expect($this->cascade->canonical())->toBe('https://example.com/about');
@@ -276,14 +277,14 @@ it('falls back to self-referencing canonical when entry is null', function () {
 it('falls back to self-referencing canonical when custom canonical is null', function () {
     config(['advanced-seo.crawling.environments' => ['testing']]);
 
-    $this->cascade->set('canonical_type', 'custom');
+    $this->cascade->set('canonical_type', new LabeledValue('custom', 'Custom'));
     $this->cascade->set('canonical_custom', null);
 
     expect($this->cascade->canonical())->toBe('https://example.com/about');
 });
 
 it('returns null site schema when type is none', function () {
-    $this->cascade->set('site_json_ld_type', 'none');
+    $this->cascade->set('site_json_ld_type', new LabeledValue('none', 'None'));
 
     expect($this->cascade->siteSchema())->toBeNull();
 });
@@ -293,14 +294,14 @@ it('returns null site schema when type is not set', function () {
 });
 
 it('returns custom site schema json', function () {
-    $this->cascade->set('site_json_ld_type', 'custom');
+    $this->cascade->set('site_json_ld_type', new LabeledValue('custom', 'Custom'));
     $this->cascade->set('site_json_ld', '{"@type": "Organization"}');
 
     expect($this->cascade->siteSchema())->toBe('{"@type": "Organization"}');
 });
 
 it('returns organization schema json', function () {
-    $this->cascade->set('site_json_ld_type', 'organization');
+    $this->cascade->set('site_json_ld_type', new LabeledValue('organization', 'Organization'));
     $this->cascade->set('organization_name', 'Acme Inc');
 
     $schema = json_decode($this->cascade->siteSchema(), true);
@@ -311,7 +312,7 @@ it('returns organization schema json', function () {
 });
 
 it('returns person schema json', function () {
-    $this->cascade->set('site_json_ld_type', 'person');
+    $this->cascade->set('site_json_ld_type', new LabeledValue('person', 'Person'));
     $this->cascade->set('person_name', 'John Doe');
 
     $schema = json_decode($this->cascade->siteSchema(), true);

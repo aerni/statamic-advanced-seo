@@ -128,7 +128,7 @@ class ContentCascade extends BaseCascade
             return null;
         }
 
-        return match ($this->get('canonical_type')) {
+        return match ($this->get('canonical_type')?->value()) {
             'entry' => $this->get('canonical_entry')?->absoluteUrl() ?? $this->canonicalUrl(),
             'custom' => $this->get('canonical_custom') ?? $this->canonicalUrl(),
             default => $this->canonicalUrl(),
@@ -146,7 +146,7 @@ class ContentCascade extends BaseCascade
 
     public function siteSchema(): ?string
     {
-        $type = $this->get('site_json_ld_type');
+        $type = $this->get('site_json_ld_type')?->value();
 
         if (! $type || $type === 'none') {
             return null;
