@@ -333,7 +333,14 @@ it('returns breadcrumbs json ld when enabled and not homepage', function () {
 
     $breadcrumbs = json_decode($this->cascade->breadcrumbs(), true);
 
-    expect($breadcrumbs['@type'])->toBe('BreadcrumbList');
+    expect($breadcrumbs['@context'])->toBe('https://schema.org')
+        ->and($breadcrumbs['@type'])->toBe('BreadcrumbList')
+        ->and($breadcrumbs['itemListElement'])->toBeArray();
+
+    foreach ($breadcrumbs['itemListElement'] as $item) {
+        expect($item)->not->toHaveKey('@context')
+            ->and($item['@type'])->toBe('ListItem');
+    }
 });
 
 it('returns null page schema when json ld is not set', function () {
