@@ -233,7 +233,8 @@ class ContentCascade extends BaseCascade
             ->map(fn ($crumb) => Schema::listItem()
                 ->position($crumb['position'])
                 ->name($crumb['title'])
-                ->item($crumb['url']));
+                ->item($crumb['url']))
+            ->all();
 
         return json_encode(
             Schema::breadcrumbList()->itemListElement($listItems),
