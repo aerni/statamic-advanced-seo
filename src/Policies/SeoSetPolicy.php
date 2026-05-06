@@ -6,39 +6,38 @@ use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
-use Statamic\Contracts\Auth\User;
-use Statamic\Facades\User as UserFacade;
+use Statamic\Facades\User;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
 
 class SeoSetPolicy
 {
     use HasMultisitePolicy;
 
-    public function before(User $user)
+    public function before($user)
     {
         if (! AdvancedSeo::pro()) {
             return true;
         }
 
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         if ($user->isSuper()) {
             return true;
         }
     }
 
-    public function viewAny(User $user, SeoSetGroup $group): bool
+    public function viewAny($user, SeoSetGroup $group): bool
     {
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         return $group->seoSets()->contains(function (SeoSet $seoSet) use ($user) {
             return $seoSet->localizations()->contains(fn (SeoSetLocalization $localization) => $this->edit($user, $localization));
         });
     }
 
-    public function edit(User $user, SeoSetLocalization $localization): bool
+    public function edit($user, SeoSetLocalization $localization): bool
     {
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         if (! $this->userCanAccessSite($user, $localization->site())) {
             return false;
@@ -54,9 +53,9 @@ class SeoSetPolicy
         return $canEditLocalization && $this->canEditStatamicContent($user, $localization->type(), $localization->handle());
     }
 
-    public function configure(User $user, SeoSet $seoSet): bool
+    public function configure($user, SeoSet $seoSet): bool
     {
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         if (! $user->hasPermission('configure seo')) {
             return false;
@@ -66,7 +65,7 @@ class SeoSetPolicy
             || $this->canEditStatamicContent($user, $seoSet->type(), $seoSet->handle());
     }
 
-    protected function canEditStatamicContent(User $user, string $type, string $handle): bool
+    protected function canEditStatamicContent($user, string $type, string $handle): bool
     {
         $itemType = match ($type) {
             'collections' => 'entries',
