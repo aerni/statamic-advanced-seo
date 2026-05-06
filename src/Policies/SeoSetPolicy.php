@@ -14,7 +14,7 @@ class SeoSetPolicy
 {
     use HasMultisitePolicy;
 
-    public function before(User $user)
+    public function before($user)
     {
         if (! AdvancedSeo::pro()) {
             return true;
@@ -27,7 +27,7 @@ class SeoSetPolicy
         }
     }
 
-    public function viewAny(User $user, SeoSetGroup $group): bool
+    public function viewAny($user, SeoSetGroup $group): bool
     {
         $user = UserFacade::fromUser($user);
 
@@ -36,7 +36,7 @@ class SeoSetPolicy
         });
     }
 
-    public function edit(User $user, SeoSetLocalization $localization): bool
+    public function edit($user, SeoSetLocalization $localization): bool
     {
         $user = UserFacade::fromUser($user);
 
@@ -54,7 +54,7 @@ class SeoSetPolicy
         return $canEditLocalization && $this->canEditStatamicContent($user, $localization->type(), $localization->handle());
     }
 
-    public function configure(User $user, SeoSet $seoSet): bool
+    public function configure($user, SeoSet $seoSet): bool
     {
         $user = UserFacade::fromUser($user);
 
