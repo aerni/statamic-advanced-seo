@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
-use Statamic\Facades\User as UserFacade;
+use Statamic\Facades\User;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
 
 class SeoSetPolicy
@@ -19,7 +19,7 @@ class SeoSetPolicy
             return true;
         }
 
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         if ($user->isSuper()) {
             return true;
@@ -28,7 +28,7 @@ class SeoSetPolicy
 
     public function viewAny($user, SeoSetGroup $group): bool
     {
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         return $group->seoSets()->contains(function (SeoSet $seoSet) use ($user) {
             return $seoSet->localizations()->contains(fn (SeoSetLocalization $localization) => $this->edit($user, $localization));
@@ -37,7 +37,7 @@ class SeoSetPolicy
 
     public function edit($user, SeoSetLocalization $localization): bool
     {
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         if (! $this->userCanAccessSite($user, $localization->site())) {
             return false;
@@ -55,7 +55,7 @@ class SeoSetPolicy
 
     public function configure($user, SeoSet $seoSet): bool
     {
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         if (! $user->hasPermission('configure seo')) {
             return false;

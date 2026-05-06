@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Gates;
 
 use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
-use Statamic\Facades\User as UserFacade;
+use Statamic\Facades\User;
 
 class SeoContentGate
 {
@@ -22,7 +22,7 @@ class SeoContentGate
             return false;
         }
 
-        $user = UserFacade::fromUser($user);
+        $user = User::fromUser($user);
 
         if ($user->isSuper()) {
             return true;
