@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
-use Statamic\Contracts\Auth\User;
 use Statamic\Facades\User as UserFacade;
 use Statamic\Policies\Concerns\HasMultisitePolicy;
 
@@ -66,7 +65,7 @@ class SeoSetPolicy
             || $this->canEditStatamicContent($user, $seoSet->type(), $seoSet->handle());
     }
 
-    protected function canEditStatamicContent(User $user, string $type, string $handle): bool
+    protected function canEditStatamicContent($user, string $type, string $handle): bool
     {
         $itemType = match ($type) {
             'collections' => 'entries',
