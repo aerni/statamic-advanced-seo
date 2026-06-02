@@ -343,6 +343,47 @@ it('returns breadcrumbs json ld when enabled and not homepage', function () {
     }
 });
 
+it('resolves all breadcrumb ancestors on a site with a url prefix', function () {
+    $collection = Collection::make('docs')
+        ->routes('{parent_uri}/{slug}')
+        ->sites(['english', 'german'])
+        ->structureContents(['root' => true])
+        ->save();
+
+    // Rebuild the memoized SeoSet registry so the new collection is recognised.
+    flushBlink();
+
+    $home = Entry::make()->collection('docs')->locale('german')->slug('home')->data(['title' => 'Home']);
+    $home->save();
+
+    $levelOne = Entry::make()->collection('docs')->locale('german')->slug('level-1')->data(['title' => 'Level 1']);
+    $levelOne->save();
+
+    $levelTwo = Entry::make()->collection('docs')->locale('german')->slug('level-2')->data(['title' => 'Level 2']);
+    $levelTwo->save();
+
+    $collection->structure()->in('german')->tree([
+        ['entry' => $home->id()],
+        ['entry' => $levelOne->id(), 'children' => [
+            ['entry' => $levelTwo->id()],
+        ]],
+    ])->save();
+
+    flushBlink();
+
+    $cascade = ContentCascade::from(Entry::find($levelTwo->id()));
+    $cascade->set('use_breadcrumbs', true);
+
+    $items = collect(json_decode($cascade->breadcrumbs(), true)['itemListElement']);
+
+    expect($items->pluck('name')->all())->toBe(['Home', 'Level 1', 'Level 2'])
+        ->and($items->pluck('item')->all())->toBe([
+            'https://example.com/de/',
+            'https://example.com/de/level-1',
+            'https://example.com/de/level-1/level-2',
+        ]);
+});
+
 it('returns null page schema when json ld is not set', function () {
     expect($this->cascade->pageSchema())->toBeNull();
 });

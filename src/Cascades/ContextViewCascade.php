@@ -74,6 +74,8 @@ class ContextViewCascade extends ContentViewCascade
 
     protected function breadcrumbSegments(): array
     {
-        return request()->segments();
+        $uri = Site::current()->relativePath($this->model->get('current_url'));
+
+        return explode('/', trim($uri, '/'));
     }
 }

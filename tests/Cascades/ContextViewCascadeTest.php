@@ -3,6 +3,7 @@
 use Aerni\AdvancedSeo\Cascades\ContextViewCascade;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Tags\Context;
@@ -136,6 +137,54 @@ it('detects homepage from context is_homepage flag', function () {
 
     // Homepage should return null breadcrumbs.
     expect($cascade->breadcrumbs())->toBeNull();
+});
+
+it('resolves all breadcrumb ancestors on a site with a url prefix', function () {
+    $collection = Collection::make('docs')
+        ->routes('{parent_uri}/{slug}')
+        ->sites(['english', 'german'])
+        ->structureContents(['root' => true])
+        ->save();
+
+    // Rebuild the memoized SeoSet registry so the new collection is recognised.
+    flushBlink();
+
+    $home = Entry::make()->collection('docs')->locale('german')->slug('home')->data(['title' => 'Home']);
+    $home->save();
+
+    $levelOne = Entry::make()->collection('docs')->locale('german')->slug('level-1')->data(['title' => 'Level 1']);
+    $levelOne->save();
+
+    $levelTwo = Entry::make()->collection('docs')->locale('german')->slug('level-2')->data(['title' => 'Level 2']);
+    $levelTwo->save();
+
+    $collection->structure()->in('german')->tree([
+        ['entry' => $home->id()],
+        ['entry' => $levelOne->id(), 'children' => [
+            ['entry' => $levelTwo->id()],
+        ]],
+    ])->save();
+
+    flushBlink();
+
+    Site::setCurrent('german');
+
+    $context = new Context(collect([
+        'current_url' => 'https://example.com/de/level-1/level-2',
+        'site' => Site::get('german'),
+    ]));
+
+    $cascade = ContextViewCascade::from($context);
+    $cascade->set('use_breadcrumbs', true);
+
+    $items = collect(json_decode($cascade->breadcrumbs(), true)['itemListElement']);
+
+    expect($items->pluck('name')->all())->toBe(['Home', 'Level 1', 'Level 2'])
+        ->and($items->pluck('item')->all())->toBe([
+            'https://example.com/de/',
+            'https://example.com/de/level-1',
+            'https://example.com/de/level-1/level-2',
+        ]);
 });
 
 it('returns default title when context has a title', function () {

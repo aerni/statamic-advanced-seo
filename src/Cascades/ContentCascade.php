@@ -209,7 +209,7 @@ class ContentCascade extends BaseCascade
 
     protected function breadcrumbSegments(): array
     {
-        return explode('/', trim($this->model->url(), '/'));
+        return explode('/', trim($this->model->uri(), '/'));
     }
 
     public function pageSchema(): ?string
