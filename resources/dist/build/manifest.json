@@ -1,20 +1,20 @@
 {
   "resources/css/cp.css": {
-    "file": "assets/cp-Bfpyqp5z.css",
-    "src": "resources/css/cp.css",
-    "isEntry": true,
+    "file": "assets/cp-Cm8kWBaw.css",
     "name": "cp",
     "names": [
       "cp.css"
-    ]
+    ],
+    "src": "resources/css/cp.css",
+    "isEntry": true
   },
   "resources/js/cp.js": {
-    "file": "assets/cp-BfdYPhak.js",
+    "file": "assets/cp-D8UzmSwm.js",
     "name": "cp",
     "src": "resources/js/cp.js",
     "isEntry": true,
     "css": [
-      "assets/cp-DeKy4ccO.css"
+      "assets/cp-Be_T7A-J.css"
     ]
   }
 }
