@@ -7,9 +7,12 @@ use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Illuminate\Support\Facades\File;
+use Spatie\LaravelScreenshot\Facades\Screenshot;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Fields\Field;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class, FakesComposerLock::class);
@@ -138,6 +141,35 @@ it('prevents the generate job on the free edition', function () {
     GenerateSocialImagesJob::dispatchSync($entry);
 
     expect($entry->get('seo_og_image'))->toBeNull();
+});
+
+it('does not generate a social image when resolving the listing index', function () {
+    Screenshot::shouldReceive('url')->never();
+
+    AssetContainer::make('assets')->disk('local')->saveQuietly();
+
+    Seo::find('collections::pages')->config()->set('social_images_generator', true)->save();
+
+    $entry = tap(Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->slug('test')
+        ->data(['seo_generate_social_images' => true]))
+        ->saveQuietly();
+
+    // The generation path must be live for this guard test to be meaningful.
+    expect(SocialImagesGenerator::enabled(Context::from($entry)))->toBeTrue();
+
+    $field = (new Field('seo_og_image', [
+        'type' => 'social_image',
+        'container' => 'assets',
+        'max_files' => 1,
+    ]))->setParent($entry);
+
+    $result = $field->fieldtype()->preProcessIndex(null);
+
+    expect($result['total'])->toBe(0)
+        ->and($result['assets'])->toBeEmpty();
 });
 
 it('shows in all contexts when enabled', function () {
