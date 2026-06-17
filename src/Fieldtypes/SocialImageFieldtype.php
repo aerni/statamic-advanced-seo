@@ -26,6 +26,20 @@ class SocialImageFieldtype extends Assets
             : parent::augment($value);
     }
 
+    public function preProcessIndex($data)
+    {
+        if (! $this->shouldGenerateSocialImage()) {
+            return parent::preProcessIndex($data);
+        }
+
+        // Listings show an already-generated image but never generate one on render.
+        $asset = $this->generator($this->field->parent())->asset();
+
+        return $asset
+            ? parent::preProcessIndex($asset->path())
+            : ['total' => 0, 'assets' => collect()];
+    }
+
     protected function augmentGeneratedSocialImage($value)
     {
         $parent = $this->field->parent();

@@ -14,6 +14,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Assets\Assets;
 use Statamic\Fieldtypes\Code;
 
 class SeoFieldtype extends Fieldtype
@@ -121,15 +122,34 @@ class SeoFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
+        return $this->childFieldtype()->augment($this->resolveValue($data));
+    }
+
+    public function preProcessIndex(mixed $data): array
+    {
+        $childFieldtype = $this->childFieldtype();
+
+        $value = $childFieldtype instanceof Assets
+            ? $childFieldtype->preProcessIndex($this->resolveValue($data))
+            : $this->augment($data);
+
+        return [
+            'component' => "{$childFieldtype->component()}-fieldtype-index",
+            'value' => $value,
+        ];
+    }
+
+    protected function resolveValue(mixed $data): mixed
+    {
         $data ??= $this->field->defaultValue();
 
         if ($data === '@default') {
-            $data = $this->shouldUseOriginDefault()
+            return $this->shouldUseOriginDefault()
                 ? $this->originDefaultValueFromCascade()
                 : $this->defaultValueFromCascade();
         }
 
-        return $this->childFieldtype()->augment($data);
+        return $data;
     }
 
     public function preProcessValidatable(mixed $value): mixed

@@ -203,6 +203,42 @@ it('augments null by falling through to field default', function () {
     expect($result)->toBe('Test Page | English');
 });
 
+// --- preProcessIndex ---
+
+it('preProcessIndex augments a custom value for a text child', function () {
+    $field = makeSeoFieldWithParent('seo_title');
+    $result = $field->fieldtype()->preProcessIndex('Custom Title');
+
+    expect($result)->toBe([
+        'component' => 'token_input-fieldtype-index',
+        'value' => 'Custom Title',
+    ]);
+});
+
+it('preProcessIndex resolves @default through the cascade for a text child', function () {
+    $field = makeSeoFieldWithParent('seo_title');
+    $result = $field->fieldtype()->preProcessIndex('@default');
+
+    expect($result)->toBe([
+        'component' => 'token_input-fieldtype-index',
+        'value' => 'Test Page | English',
+    ]);
+});
+
+it('preProcessIndex produces asset thumbnail data for the social image child', function () {
+    $field = makeSeoFieldWithParent('seo_og_image', [
+        'type' => 'social_image',
+        'container' => 'assets',
+        'max_files' => 1,
+    ]);
+
+    $result = $field->fieldtype()->preProcessIndex('some/image.png');
+
+    expect($result['component'])->toBe('assets-fieldtype-index')
+        ->and($result['value'])->toHaveKeys(['total', 'assets'])
+        ->and($result['value']['total'])->toBe(1);
+});
+
 // --- origin / sync: non-text fields ---
 //
 // Non-text fields (toggles, selects) without a placeholder need the UI and the
