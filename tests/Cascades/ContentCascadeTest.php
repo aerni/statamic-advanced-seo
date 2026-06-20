@@ -490,3 +490,46 @@ it('allows indexing when neither site default nor entry sets noindex', function 
     expect($cascade->get('noindex'))->toBeFalse()
         ->and($cascade->indexing())->toBeNull();
 });
+
+it('resolves page tokens in custom site schema', function () {
+    $this->cascade->set('site_json_ld_type', new LabeledValue('custom', 'Custom'));
+    $this->cascade->set('site_json_ld', '{"@type": "WebSite", "name": "{{ title }}"}');
+
+    expect($this->cascade->siteSchema())->toBe('{"@type": "WebSite", "name": "About"}');
+});
+
+it('resolves config tokens in custom site schema', function () {
+    config()->set('app.name', 'Acme Inc');
+
+    $this->cascade->set('site_json_ld_type', new LabeledValue('custom', 'Custom'));
+    $this->cascade->set('site_json_ld', '{"publisher": "{{ config:app:name }}"}');
+
+    expect($this->cascade->siteSchema())->toBe('{"publisher": "Acme Inc"}');
+});
+
+it('normalizes empty custom site schema to null', function () {
+    $this->cascade->set('site_json_ld_type', new LabeledValue('custom', 'Custom'));
+    $this->cascade->set('site_json_ld', '');
+
+    expect($this->cascade->siteSchema())->toBeNull();
+});
+
+it('leaves token-free custom site schema unchanged', function () {
+    $this->cascade->set('site_json_ld_type', new LabeledValue('custom', 'Custom'));
+    $this->cascade->set('site_json_ld', '{"@type": "Organization"}');
+
+    expect($this->cascade->siteSchema())->toBe('{"@type": "Organization"}');
+});
+
+it('resolves tokens in site defaults set through the seo set', function () {
+    Blink::flush();
+
+    $defaults = Seo::find('site::defaults')->in('english');
+    $defaults->set('site_json_ld_type', 'custom');
+    $defaults->set('site_json_ld', '{"name": "{{ title }}"}');
+    $defaults->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->siteSchema())->toBe('{"name": "About"}');
+});

@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Cascades;
 
 use Aerni\AdvancedSeo\Actions\ResolveBreadcrumbs;
+use Aerni\AdvancedSeo\Actions\ResolveSchema;
 use Aerni\AdvancedSeo\Concerns\EvaluatesIndexability;
 use Aerni\AdvancedSeo\Concerns\HasComputedData;
 use Aerni\AdvancedSeo\Concerns\HasHreflang;
@@ -153,7 +154,15 @@ class ContentCascade extends BaseCascade
         }
 
         if ($type === 'custom') {
-            return $this->get('site_json_ld');
+            $schema = $this->get('site_json_ld');
+
+            if ($schema === null) {
+                return null;
+            }
+
+            $parsed = ResolveSchema::handle((string) $schema, $this->model, 'site_json_ld');
+
+            return Str::of($parsed ?? '')->trim()->isEmpty() ? null : $parsed;
         }
 
         $siteUrl = $this->siteUrl();
