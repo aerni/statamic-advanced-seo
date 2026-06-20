@@ -44,7 +44,7 @@ class TokenParser
         try {
             $variables = $this->cascade($parent)->data()
                 ->merge($parent->toAugmentedArray())
-                ->when($field->type() !== 'json_ld', fn ($data) => $data->map($this->toPlainText(...)))
+                ->map($this->toPlainText(...))
                 ->all();
 
             return Antlers::parse($data, $variables);

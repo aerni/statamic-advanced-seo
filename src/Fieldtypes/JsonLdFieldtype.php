@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Aerni\AdvancedSeo\Facades\Token;
+use Aerni\AdvancedSeo\Actions\ResolveSchema;
 use Statamic\Fieldtypes\Code;
 
 class JsonLdFieldtype extends Code
@@ -15,7 +15,7 @@ class JsonLdFieldtype extends Code
     {
         $value = is_array($value) ? $value['code'] : $value;
 
-        $parsed = Token::parse($value, $this->field);
+        $parsed = ResolveSchema::handle($value, $this->field->parent(), $this->field->handle());
 
         return parent::augment($parsed);
     }

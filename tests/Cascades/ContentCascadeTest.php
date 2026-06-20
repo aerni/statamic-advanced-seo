@@ -464,6 +464,16 @@ it('respects entry-level noindex when site default does not force it', function 
         ->and($cascade->indexing())->toContain('noindex');
 });
 
+it('resolves page and config tokens in content json_ld', function () {
+    config()->set('app.name', 'Acme Inc');
+
+    $this->entry->set('seo_json_ld', '{"name": "{{ title }}", "publisher": "{{ config:app:name }}"}')->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->pageSchema())->toBe('{"name": "About", "publisher": "Acme Inc"}');
+});
+
 it('allows indexing when neither site default nor entry sets noindex', function () {
     config(['advanced-seo.crawling.environments' => ['testing']]);
 
