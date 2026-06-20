@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Cascades\ContextViewCascade;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\LabeledValue;
@@ -201,7 +202,13 @@ it('returns default title when context has a title', function () {
     expect($cascade->title())->toContain('Custom Page');
 });
 
-it('resolves tokens in custom site schema on a custom route', function () {
+it('resolves tokens in custom site schema against the view context', function () {
+    config()->set('app.name', 'Acme Inc');
+
+    $set = GlobalSet::make('company')->sites(['english']);
+    $set->save();
+    $set->in('english')->data(['tagline' => 'We build things'])->save();
+
     $context = new Context(collect([
         'title' => 'Custom Page',
         'current_url' => 'https://example.com/custom',
@@ -210,7 +217,7 @@ it('resolves tokens in custom site schema on a custom route', function () {
 
     $cascade = ContextViewCascade::from($context);
     $cascade->set('site_json_ld_type', new LabeledValue('custom', 'Custom'));
-    $cascade->set('site_json_ld', '{"name": "{{ title }}", "url": "{{ current_url }}"}');
+    $cascade->set('site_json_ld', '{"name": "{{ title }}", "url": "{{ current_url }}", "publisher": "{{ config:app:name }}", "slogan": "{{ company:tagline }}"}');
 
-    expect($cascade->siteSchema())->toBe('{"name": "Custom Page", "url": "https://example.com/custom"}');
+    expect($cascade->siteSchema())->toBe('{"name": "Custom Page", "url": "https://example.com/custom", "publisher": "Acme Inc", "slogan": "We build things"}');
 });
