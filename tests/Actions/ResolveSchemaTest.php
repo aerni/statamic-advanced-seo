@@ -77,6 +77,5 @@ it('returns token-free values unchanged', function () {
 });
 
 it('does not recurse on a self-reference', function () {
-    // json_ld is unset from the variable set, so it resolves to empty.
     expect(ResolveSchema::handle('a{{ json_ld }}b', $this->entry, 'seo_json_ld'))->toBe('ab');
 });
