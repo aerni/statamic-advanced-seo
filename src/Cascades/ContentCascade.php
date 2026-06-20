@@ -156,7 +156,7 @@ class ContentCascade extends BaseCascade
         if ($type === 'custom') {
             $schema = ResolveSchema::handle((string) $this->get('site_json_ld'), $this->model, 'site_json_ld');
 
-            return Str::of($schema ?? '')->trim()->isEmpty() ? null : $schema;
+            return blank($schema) ? null : $schema;
         }
 
         $siteUrl = $this->siteUrl();
