@@ -26,32 +26,19 @@ class ResolveSchema
      */
     protected static array $schemaKeys = ['json_ld', 'site_json_ld', 'site_schema', 'page_schema'];
 
-    public static function handle(?string $value, mixed $model): ?string
+    public static function handle(?string $value, Entry|Term|ViewContext $model): ?string
     {
         if ($value === null || ! Str::contains($value, '{{')) {
             return $value;
         }
 
-        $variables = static::variables($model);
-
-        if ($variables === null) {
-            return $value;
-        }
-
-        return Antlers::parse($value, $variables);
-    }
-
-    /**
-     * @return array<string, mixed>|null
-     */
-    protected static function variables(mixed $model): ?array
-    {
-        return match (true) {
+        $variables = match (true) {
             $model instanceof Entry,
             $model instanceof Term => static::contentVariables($model),
             $model instanceof ViewContext => static::contextVariables($model),
-            default => null,
         };
+
+        return Antlers::parse($value, $variables);
     }
 
     /**

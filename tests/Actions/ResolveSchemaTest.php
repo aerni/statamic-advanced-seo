@@ -63,10 +63,6 @@ it('resolves against a localized entry', function () {
     expect(ResolveSchema::handle('{{ title }}', $german))->toBe('Über uns');
 });
 
-it('returns the raw value when there is no content context', function () {
-    expect(ResolveSchema::handle('{{ title }}', null))->toBe('{{ title }}');
-});
-
 it('returns null when the value is null', function () {
     expect(ResolveSchema::handle(null, $this->entry))->toBeNull();
 });

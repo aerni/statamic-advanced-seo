@@ -3,6 +3,8 @@
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
 use Aerni\AdvancedSeo\Actions\ResolveSchema;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fieldtypes\Code;
 
 class JsonLdFieldtype extends Code
@@ -28,7 +30,13 @@ class JsonLdFieldtype extends Code
         static::$augmenting = true;
 
         try {
-            return parent::augment(ResolveSchema::handle($value, $this->field->parent()));
+            $parent = $this->field->parent();
+
+            return parent::augment(match (true) {
+                $parent instanceof Entry,
+                $parent instanceof Term => ResolveSchema::handle($value, $parent),
+                default => $value,
+            });
         } finally {
             static::$augmenting = false;
         }
