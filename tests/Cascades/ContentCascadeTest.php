@@ -474,6 +474,14 @@ it('resolves page and config tokens in content json_ld', function () {
     expect($cascade->pageSchema())->toBe('{"name": "About", "publisher": "Acme Inc"}');
 });
 
+it('does not infinitely recurse when content json_ld references its own field', function () {
+    $this->entry->set('seo_json_ld', '{{ seo_json_ld }}')->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->pageSchema())->toBe('');
+});
+
 it('allows indexing when neither site default nor entry sets noindex', function () {
     config(['advanced-seo.crawling.environments' => ['testing']]);
 

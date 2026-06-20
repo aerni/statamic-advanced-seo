@@ -19,14 +19,6 @@ use Statamic\View\Cascade;
 class ResolveSchema
 {
     /**
-     * Field handles currently being parsed, to bail on re-entry and prevent
-     * infinite recursion across nested augmentation.
-     *
-     * @var array<int, string>
-     */
-    protected static array $parsing = [];
-
-    /**
      * Schema-producing keys removed from the variable set so a reference to
      * them resolves to empty instead of re-augmenting.
      *
@@ -34,14 +26,10 @@ class ResolveSchema
      */
     protected static array $schemaKeys = ['json_ld', 'site_json_ld', 'site_schema', 'page_schema'];
 
-    public static function handle(?string $value, mixed $model, string $handle): ?string
+    public static function handle(?string $value, mixed $model): ?string
     {
         if ($value === null || ! Str::contains($value, '{{')) {
             return $value;
-        }
-
-        if (in_array($handle, static::$parsing, true)) {
-            return null;
         }
 
         $variables = static::variables($model);
@@ -50,13 +38,7 @@ class ResolveSchema
             return $value;
         }
 
-        static::$parsing[] = $handle;
-
-        try {
-            return Antlers::parse($value, $variables);
-        } finally {
-            array_pop(static::$parsing);
-        }
+        return Antlers::parse($value, $variables);
     }
 
     /**

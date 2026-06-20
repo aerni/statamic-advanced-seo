@@ -11,12 +11,26 @@ class JsonLdFieldtype extends Code
 
     protected $selectable = false;
 
+    /**
+     * Whether a schema is currently being augmented, used to bail on re-entry
+     * (e.g. a schema referencing its own field) and prevent infinite recursion.
+     */
+    protected static bool $augmenting = false;
+
     public function augment($value)
     {
         $value = is_array($value) ? $value['code'] : $value;
 
-        $parsed = ResolveSchema::handle($value, $this->field->parent(), $this->field->handle());
+        if (static::$augmenting) {
+            return parent::augment(null);
+        }
 
-        return parent::augment($parsed);
+        static::$augmenting = true;
+
+        try {
+            return parent::augment(ResolveSchema::handle($value, $this->field->parent()));
+        } finally {
+            static::$augmenting = false;
+        }
     }
 }
