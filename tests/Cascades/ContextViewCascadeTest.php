@@ -6,6 +6,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
+use Statamic\Fields\LabeledValue;
 use Statamic\Tags\Context;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -198,4 +199,18 @@ it('returns default title when context has a title', function () {
 
     // For non-taxonomy, non-404 contexts, the title comes from cascade or context title.
     expect($cascade->title())->toContain('Custom Page');
+});
+
+it('resolves tokens in custom site schema on a custom route', function () {
+    $context = new Context(collect([
+        'title' => 'Custom Page',
+        'current_url' => 'https://example.com/custom',
+        'site' => Site::get('english'),
+    ]));
+
+    $cascade = ContextViewCascade::from($context);
+    $cascade->set('site_json_ld_type', new LabeledValue('custom', 'Custom'));
+    $cascade->set('site_json_ld', '{"name": "{{ title }}", "url": "{{ current_url }}"}');
+
+    expect($cascade->siteSchema())->toBe('{"name": "Custom Page", "url": "https://example.com/custom"}');
 });
