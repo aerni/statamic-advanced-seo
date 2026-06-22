@@ -91,24 +91,20 @@ class ResolveSchema
     }
 
     /**
+     * Global sets as template variables, mirroring Statamic: the default
+     * "global" set is flattened to the top level, the rest namespaced
+     * under their handle.
+     *
      * @return array<string, mixed>
      */
     protected static function globals(SiteInstance $site): array
     {
-        $variables = [];
-
-        foreach (GlobalSet::all() as $set) {
-            if (! $localized = $set->in($site->handle())) {
-                continue;
-            }
-
-            if ($set->handle() === 'global') {
-                $variables = array_merge($variables, $localized->toDeferredAugmentedArray());
-            } else {
-                $variables[$set->handle()] = $localized;
-            }
-        }
-
-        return $variables;
+        return GlobalSet::all()
+            ->map->in($site->handle())
+            ->filter()
+            ->flatMap(fn ($set) => $set->handle() === 'global'
+                ? $set->toDeferredAugmentedArray()
+                : [$set->handle() => $set])
+            ->all();
     }
 }

@@ -54,6 +54,14 @@ it('resolves global tokens under the set handle', function () {
     expect(ResolveSchema::handle('{{ company:tagline }}', $this->entry))->toBe('We build things');
 });
 
+it('flattens the default global set to the top level', function () {
+    $set = GlobalSet::make('global')->sites(['english']);
+    $set->save();
+    $set->in('english')->data(['tagline' => 'Top level'])->save();
+
+    expect(ResolveSchema::handle('{{ tagline }}', $this->entry))->toBe('Top level');
+});
+
 it('derives current_url from the model', function () {
     expect(ResolveSchema::handle('{{ current_url }}', $this->entry))
         ->toBe($this->entry->absoluteUrl());
