@@ -464,6 +464,24 @@ it('respects entry-level noindex when site default does not force it', function 
         ->and($cascade->indexing())->toContain('noindex');
 });
 
+it('resolves page and config tokens in content json_ld', function () {
+    config()->set('app.name', 'Acme Inc');
+
+    $this->entry->set('seo_json_ld', '{"name": "{{ title }}", "publisher": "{{ config:app:name }}"}')->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->pageSchema())->toBe('{"name": "About", "publisher": "Acme Inc"}');
+});
+
+it('does not infinitely recurse when content json_ld references its own field', function () {
+    $this->entry->set('seo_json_ld', '{{ seo_json_ld }}')->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->pageSchema())->toBe('');
+});
+
 it('allows indexing when neither site default nor entry sets noindex', function () {
     config(['advanced-seo.crawling.environments' => ['testing']]);
 
@@ -479,4 +497,58 @@ it('allows indexing when neither site default nor entry sets noindex', function 
 
     expect($cascade->get('noindex'))->toBeFalse()
         ->and($cascade->indexing())->toBeNull();
+});
+
+it('resolves page tokens in custom site schema', function () {
+    Blink::flush();
+
+    $defaults = Seo::find('site::defaults')->in('english');
+    $defaults->set('site_json_ld_type', 'custom');
+    $defaults->set('site_json_ld', '{"@type": "WebSite", "name": "{{ title }}"}');
+    $defaults->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->siteSchema())->toBe('{"@type": "WebSite", "name": "About"}');
+});
+
+it('resolves config tokens in custom site schema', function () {
+    config()->set('app.name', 'Acme Inc');
+
+    Blink::flush();
+
+    $defaults = Seo::find('site::defaults')->in('english');
+    $defaults->set('site_json_ld_type', 'custom');
+    $defaults->set('site_json_ld', '{"publisher": "{{ config:app:name }}"}');
+    $defaults->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->siteSchema())->toBe('{"publisher": "Acme Inc"}');
+});
+
+it('normalizes empty custom site schema to null', function () {
+    Blink::flush();
+
+    $defaults = Seo::find('site::defaults')->in('english');
+    $defaults->set('site_json_ld_type', 'custom');
+    $defaults->set('site_json_ld', '');
+    $defaults->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->siteSchema())->toBeNull();
+});
+
+it('leaves token-free custom site schema unchanged', function () {
+    Blink::flush();
+
+    $defaults = Seo::find('site::defaults')->in('english');
+    $defaults->set('site_json_ld_type', 'custom');
+    $defaults->set('site_json_ld', '{"@type": "Organization"}');
+    $defaults->save();
+
+    $cascade = ContentCascade::from($this->entry);
+
+    expect($cascade->siteSchema())->toBe('{"@type": "Organization"}');
 });
