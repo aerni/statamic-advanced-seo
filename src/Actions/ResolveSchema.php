@@ -42,19 +42,22 @@ class ResolveSchema
     }
 
     /**
+     * Variables ordered from lowest to highest precedence, so the entry's own
+     * data wins over config, globals and SEO defaults.
+     *
      * @return array<string, mixed>
      */
     protected static function contentVariables(Entry|Term $model): array
     {
         $model = Helpers::localizedContent($model);
 
-        return Blink::once("advanced-seo::schema-context::{$model->id()}::{$model->locale()}", function () use ($model) {
-            return array_merge(
-                static::baseVariables(Context::from($model), $model->site()),
-                ['current_url' => $model->absoluteUrl()],
-                $model->toAugmentedArray(),
-            );
-        });
+        return Blink::once("advanced-seo::schema-context::{$model->id()}::{$model->locale()}", fn () => [
+            ...static::seoDefaults(Context::from($model)),
+            ...static::globals($model->site()),
+            'config' => Cascade::config(),
+            'current_url' => $model->absoluteUrl(),
+            ...$model->toAugmentedArray(),
+        ]);
     }
 
     /**
@@ -62,24 +65,25 @@ class ResolveSchema
      */
     protected static function contextVariables(ViewContext $model): array
     {
-        $site = $model->get('site') ?? Site::current();
-
-        return array_merge(
-            static::baseVariables(Context::from($model), $site),
-            $model->all(),
-        );
+        return [
+            ...static::seoDefaults(Context::from($model)),
+            ...static::globals($model->get('site') ?? Site::current()),
+            'config' => Cascade::config(),
+            ...$model->all(),
+        ];
     }
 
     /**
+     * The resolved SEO field values (site and content defaults, de-prefixed).
+     * The context is null for custom routes that resolve to no SEO set.
+     *
      * @return array<string, mixed>
      */
-    protected static function baseVariables(?Context $context, SiteInstance $site): array
+    protected static function seoDefaults(?Context $context): array
     {
-        $seo = $context ? SeoFieldtypeCascade::from($context)->data()->all() : [];
-
-        $seo = collect($seo)->except(static::$schemaKeys)->all();
-
-        return array_merge($seo, static::globals($site), ['config' => Cascade::config()]);
+        return $context
+            ? SeoFieldtypeCascade::from($context)->data()->except(static::$schemaKeys)->all()
+            : [];
     }
 
     /**
