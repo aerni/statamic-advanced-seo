@@ -28,7 +28,7 @@ class ResolveSchema
 
     public static function handle(?string $value, Entry|Term|ViewContext $model): ?string
     {
-        if ($value === null || ! Str::contains($value, '{{')) {
+        if (! Str::contains($value, '{{')) {
             return $value;
         }
 
