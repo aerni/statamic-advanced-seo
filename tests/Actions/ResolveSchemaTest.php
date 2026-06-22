@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Actions\ResolveSchema;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -35,6 +36,14 @@ it('resolves config tokens', function () {
     config()->set('app.name', 'Acme Inc');
 
     expect(ResolveSchema::handle('{{ config:app:name }}', $this->entry))->toBe('Acme Inc');
+});
+
+it('resolves site default tokens', function () {
+    $defaults = Seo::find('site::defaults')->in('english');
+    $defaults->set('site_name', 'My Site');
+    $defaults->save();
+
+    expect(ResolveSchema::handle('{{ site_name }}', $this->entry))->toBe('My Site');
 });
 
 it('resolves global tokens under the set handle', function () {

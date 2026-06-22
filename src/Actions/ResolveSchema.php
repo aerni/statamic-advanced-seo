@@ -2,8 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
-use Aerni\AdvancedSeo\Cascades\SeoFieldtypeCascade;
-use Aerni\AdvancedSeo\Context\Context;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
@@ -43,7 +42,7 @@ class ResolveSchema
 
     /**
      * Variables ordered from lowest to highest precedence, so the entry's own
-     * data wins over config, globals and SEO defaults.
+     * data wins over config, globals and site defaults.
      *
      * @return array<string, mixed>
      */
@@ -52,7 +51,7 @@ class ResolveSchema
         $model = Helpers::localizedContent($model);
 
         return Blink::once("advanced-seo::schema-context::{$model->id()}::{$model->locale()}", fn () => [
-            ...static::seoDefaults(Context::from($model)),
+            ...static::siteDefaults($model->site()),
             ...static::globals($model->site()),
             'config' => Cascade::config(),
             'current_url' => $model->absoluteUrl(),
@@ -65,25 +64,30 @@ class ResolveSchema
      */
     protected static function contextVariables(ViewContext $model): array
     {
+        $site = $model->get('site') ?? Site::current();
+
         return [
-            ...static::seoDefaults(Context::from($model)),
-            ...static::globals($model->get('site') ?? Site::current()),
+            ...static::siteDefaults($site),
+            ...static::globals($site),
             'config' => Cascade::config(),
             ...$model->all(),
         ];
     }
 
     /**
-     * The resolved SEO field values (site and content defaults, de-prefixed).
-     * The context is null for custom routes that resolve to no SEO set.
+     * The site-level SEO defaults (e.g. site_name), de-prefixed. Content
+     * defaults are excluded as they only serve to cascade into entry fields.
      *
      * @return array<string, mixed>
      */
-    protected static function seoDefaults(?Context $context): array
+    protected static function siteDefaults(SiteInstance $site): array
     {
-        return $context
-            ? SeoFieldtypeCascade::from($context)->data()->except(static::$schemaKeys)->all()
-            : [];
+        return Seo::find('site::defaults')->in($site->handle())
+            ->toAugmentedCollection()
+            ->map->value()
+            ->mapWithKeys(fn ($value, $key) => [Str::remove('seo_', $key) => $value])
+            ->except(static::$schemaKeys)
+            ->all();
     }
 
     /**
