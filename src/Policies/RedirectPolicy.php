@@ -37,12 +37,8 @@ class RedirectPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $site = Site::get($redirect->site())) {
-            return false;
-        }
-
         return $user->hasPermission('view redirects')
-            && $this->userCanAccessSite($user, $site);
+            && $this->userCanAccessSite($user, Site::get($redirect->site()));
     }
 
     public function create($user): bool
@@ -57,23 +53,15 @@ class RedirectPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $site = Site::get($redirect->site())) {
-            return false;
-        }
-
         return $user->hasPermission('edit redirects')
-            && $this->userCanAccessSite($user, $site);
+            && $this->userCanAccessSite($user, Site::get($redirect->site()));
     }
 
     public function delete($user, Redirect $redirect): bool
     {
         $user = User::fromUser($user);
 
-        if (! $site = Site::get($redirect->site())) {
-            return false;
-        }
-
         return $user->hasPermission('delete redirects')
-            && $this->userCanAccessSite($user, $site);
+            && $this->userCanAccessSite($user, Site::get($redirect->site()));
     }
 }
