@@ -34,14 +34,40 @@ it('denies viewAny without any redirect permission', function () {
 it('maps abilities to their permissions', function () {
     $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
 
-    $viewer = userWith(['view redirects']);
-    $editor = userWith(['edit redirects']);
+    $viewer = userWith(['view redirects', 'access default site']);
+    $editor = userWith(['edit redirects', 'access default site']);
     $creator = userWith(['create redirects']);
-    $deleter = userWith(['delete redirects']);
+    $deleter = userWith(['delete redirects', 'access default site']);
 
     expect($viewer->can('update', $redirect))->toBeFalse();
     expect($editor->can('update', $redirect))->toBeTrue();
     expect($creator->can('create', RedirectContract::class))->toBeTrue();
     expect($deleter->can('delete', $redirect))->toBeTrue();
     expect($editor->can('delete', $redirect))->toBeFalse();
+});
+
+it('grants super users all abilities without explicit permissions', function () {
+    $user = tap(User::make()->makeSuper())->save();
+    $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
+
+    expect($user->can('viewAny', RedirectContract::class))->toBeTrue();
+    expect($user->can('view', $redirect))->toBeTrue();
+    expect($user->can('create', RedirectContract::class))->toBeTrue();
+    expect($user->can('update', $redirect))->toBeTrue();
+    expect($user->can('delete', $redirect))->toBeTrue();
+});
+
+it('denies update when user cannot access the redirect site', function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+
+    $user = userWith(['edit redirects', 'access default site']);
+
+    $defaultRedirect = Redirects::make()->source('/old')->destination('/new')->site('default');
+    $frenchRedirect = Redirects::make()->source('/vieux')->destination('/nouveau')->site('french');
+
+    expect($user->can('update', $defaultRedirect))->toBeTrue();
+    expect($user->can('update', $frenchRedirect))->toBeFalse();
 });

@@ -2,11 +2,29 @@
 
 namespace Aerni\AdvancedSeo\Policies;
 
+use Aerni\AdvancedSeo\AdvancedSeo;
 use Aerni\AdvancedSeo\Contracts\Redirect;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Policies\Concerns\HasMultisitePolicy;
 
 class RedirectPolicy
 {
+    use HasMultisitePolicy;
+
+    public function before($user)
+    {
+        if (! AdvancedSeo::pro()) {
+            return true;
+        }
+
+        $user = User::fromUser($user);
+
+        if ($user->isSuper()) {
+            return true;
+        }
+    }
+
     public function viewAny($user): bool
     {
         return User::fromUser($user)->hasPermission('view redirects');
@@ -14,7 +32,10 @@ class RedirectPolicy
 
     public function view($user, Redirect $redirect): bool
     {
-        return $this->viewAny($user);
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('view redirects')
+            && $this->userCanAccessSite($user, Site::get($redirect->site()));
     }
 
     public function create($user): bool
@@ -24,11 +45,17 @@ class RedirectPolicy
 
     public function update($user, Redirect $redirect): bool
     {
-        return User::fromUser($user)->hasPermission('edit redirects');
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('edit redirects')
+            && $this->userCanAccessSite($user, Site::get($redirect->site()));
     }
 
     public function delete($user, Redirect $redirect): bool
     {
-        return User::fromUser($user)->hasPermission('delete redirects');
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('delete redirects')
+            && $this->userCanAccessSite($user, Site::get($redirect->site()));
     }
 }
