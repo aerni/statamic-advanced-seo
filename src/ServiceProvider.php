@@ -58,6 +58,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $policies = [
         SeoSet::class => Policies\SeoSetPolicy::class,
+        Contracts\Redirect::class => Policies\RedirectPolicy::class,
     ];
 
     protected $vite = [
@@ -215,6 +216,22 @@ class ServiceProvider extends AddonServiceProvider
                     $permission
                         ->label(__('advanced-seo::messages.permission_edit_content'))
                         ->description(__('advanced-seo::messages.permission_edit_content_description'));
+                });
+
+                Permission::register('view redirects', function ($permission) {
+                    $permission
+                        ->label(__('advanced-seo::messages.permission_view_redirects'))
+                        ->description(__('advanced-seo::messages.permission_view_redirects_description'))
+                        ->children([
+                            Permission::make('edit redirects')
+                                ->label(__('advanced-seo::messages.permission_edit_redirects'))
+                                ->children([
+                                    Permission::make('create redirects')
+                                        ->label(__('advanced-seo::messages.permission_create_redirects')),
+                                    Permission::make('delete redirects')
+                                        ->label(__('advanced-seo::messages.permission_delete_redirects')),
+                                ]),
+                        ]);
                 });
             });
         });
