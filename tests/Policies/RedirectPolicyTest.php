@@ -23,12 +23,26 @@ function userWith(array $permissions)
     return tap(User::make()->assignRole($handle))->save();
 }
 
-it('grants viewAny to a user with view redirects', function () {
-    expect(userWith(['view redirects'])->can('viewAny', RedirectContract::class))->toBeTrue();
+it('grants viewAny to a user with view redirects and site access', function () {
+    expect(userWith(['view redirects', 'access default site'])->can('viewAny', RedirectContract::class))->toBeTrue();
 });
 
 it('denies viewAny without any redirect permission', function () {
     expect(userWith([])->can('viewAny', RedirectContract::class))->toBeFalse();
+});
+
+it('denies viewAny when user lacks site access', function () {
+    expect(userWith(['view redirects'])->can('viewAny', RedirectContract::class))->toBeFalse();
+});
+
+it('grants view to a user with view redirects and site access', function () {
+    $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
+
+    expect(userWith(['view redirects', 'access default site'])->can('view', $redirect))->toBeTrue();
+});
+
+it('denies create when user lacks site access', function () {
+    expect(userWith(['create redirects'])->can('create', RedirectContract::class))->toBeFalse();
 });
 
 it('maps abilities to their permissions', function () {
@@ -36,7 +50,7 @@ it('maps abilities to their permissions', function () {
 
     $viewer = userWith(['view redirects', 'access default site']);
     $editor = userWith(['edit redirects', 'access default site']);
-    $creator = userWith(['create redirects']);
+    $creator = userWith(['create redirects', 'access default site']);
     $deleter = userWith(['delete redirects', 'access default site']);
 
     expect($viewer->can('update', $redirect))->toBeFalse();

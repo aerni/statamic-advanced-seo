@@ -58,17 +58,17 @@ return [
     'ai_generation_failed' => 'AI generation failed. Please try again.',
 
     // Permissions
-    'permission_view_redirects' => 'View Redirects',
-    'permission_view_redirects_description' => 'Grants access to view redirects. Child permissions grant editing, creating, and deleting.',
-    'permission_edit_redirects' => 'Edit Redirects',
-    'permission_create_redirects' => 'Create Redirects',
-    'permission_delete_redirects' => 'Delete Redirects',
     'permission_configure_seo' => 'Configure SEO (Full Access)',
     'permission_configure_seo_description' => 'Grants all permissions including the ability to edit settings, defaults, and content',
     'permission_edit_defaults' => 'Edit Defaults',
     'permission_edit_defaults_description' => 'Grants ability to edit collection and taxonomy defaults, and access the SEO tab on entries and terms',
     'permission_edit_content' => 'Edit Content',
     'permission_edit_content_description' => 'Grants access to the SEO tab on entries and terms',
+    'permission_view_redirects' => 'View Redirects',
+    'permission_view_redirects_description' => 'Grants access to view redirects. Child permissions grant editing, creating, and deleting.',
+    'permission_edit_redirects' => 'Edit Redirects',
+    'permission_create_redirects' => 'Create Redirects',
+    'permission_delete_redirects' => 'Delete Redirects',
 
     // Pro
     'pro_features' => 'Upgrade to Pro',

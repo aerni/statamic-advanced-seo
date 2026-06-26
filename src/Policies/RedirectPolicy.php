@@ -27,35 +27,53 @@ class RedirectPolicy
 
     public function viewAny($user): bool
     {
-        return User::fromUser($user)->hasPermission('view redirects');
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('view redirects')
+            && $this->userCanAccessSite($user, Site::selected());
     }
 
     public function view($user, Redirect $redirect): bool
     {
         $user = User::fromUser($user);
 
+        if (! $site = Site::get($redirect->site())) {
+            return false;
+        }
+
         return $user->hasPermission('view redirects')
-            && $this->userCanAccessSite($user, Site::get($redirect->site()));
+            && $this->userCanAccessSite($user, $site);
     }
 
     public function create($user): bool
     {
-        return User::fromUser($user)->hasPermission('create redirects');
+        $user = User::fromUser($user);
+
+        return $user->hasPermission('create redirects')
+            && $this->userCanAccessSite($user, Site::selected());
     }
 
     public function update($user, Redirect $redirect): bool
     {
         $user = User::fromUser($user);
 
+        if (! $site = Site::get($redirect->site())) {
+            return false;
+        }
+
         return $user->hasPermission('edit redirects')
-            && $this->userCanAccessSite($user, Site::get($redirect->site()));
+            && $this->userCanAccessSite($user, $site);
     }
 
     public function delete($user, Redirect $redirect): bool
     {
         $user = User::fromUser($user);
 
+        if (! $site = Site::get($redirect->site())) {
+            return false;
+        }
+
         return $user->hasPermission('delete redirects')
-            && $this->userCanAccessSite($user, Site::get($redirect->site()));
+            && $this->userCanAccessSite($user, $site);
     }
 }
