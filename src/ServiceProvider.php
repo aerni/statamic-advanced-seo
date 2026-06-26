@@ -25,8 +25,11 @@ use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
+use Aerni\AdvancedSeo\Stache\Query\RedirectQueryBuilder;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository;
+use Aerni\AdvancedSeo\Stache\Stores\RedirectsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
 use Illuminate\Support\Arr;
@@ -69,6 +72,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this
             ->bootStacheStore()
+            ->bootRedirects()
             ->bootRouteBindings()
             ->bootNav()
             ->bootPermissions()
@@ -90,6 +94,7 @@ class ServiceProvider extends AddonServiceProvider
             SeoSet::class,
             SeoSets\SeoSetConfig::class,
             SeoSets\SeoSetLocalization::class,
+            Redirects\Redirect::class,
         ]);
 
         app()->instance('advanced-seo.tokens', collect());
@@ -102,15 +107,22 @@ class ServiceProvider extends AddonServiceProvider
     {
         Statamic::repository(Contracts\SeoSetConfigRepository::class, Eloquent\SeoSetConfigRepository::class);
         Statamic::repository(Contracts\SeoSetLocalizationRepository::class, Eloquent\SeoSetLocalizationRepository::class);
+        Statamic::repository(Contracts\RedirectRepository::class, Eloquent\RedirectRepository::class);
 
         $this->app->bind('statamic.eloquent.seo_set_config.model', Eloquent\SeoSetConfigModel::class);
         $this->app->bind('statamic.eloquent.seo_set_localization.model', Eloquent\SeoSetLocalizationModel::class);
+        $this->app->bind('statamic.eloquent.redirect.model', Eloquent\RedirectModel::class);
     }
 
     protected function registerFileDriver(): void
     {
         Statamic::repository(Contracts\SeoSetConfigRepository::class, SeoSetConfigRepository::class);
         Statamic::repository(Contracts\SeoSetLocalizationRepository::class, SeoSetLocalizationRepository::class);
+        Statamic::repository(Contracts\RedirectRepository::class, RedirectRepository::class);
+
+        $this->app->bind(RedirectQueryBuilder::class, fn () => new RedirectQueryBuilder(
+            app('stache')->store('redirects')
+        ));
     }
 
     protected function bootStacheStore(): self
@@ -118,7 +130,15 @@ class ServiceProvider extends AddonServiceProvider
         Stache::registerStores([
             app(SeoSetConfigsStore::class)->directory(config('advanced-seo.directory')),
             app(SeoSetLocalizationsStore::class)->directory(config('advanced-seo.directory')),
+            app(RedirectsStore::class)->directory(config('advanced-seo.redirects.directory')),
         ]);
+
+        return $this;
+    }
+
+    protected function bootRedirects(): self
+    {
+        NotFoundHttpException::renderUsing(fn ($request) => app(Redirects\RedirectHandler::class)($request));
 
         return $this;
     }
@@ -209,6 +229,9 @@ class ServiceProvider extends AddonServiceProvider
             Git::listen(Events\SeoSetConfigDeleted::class);
             Git::listen(Events\SeoSetLocalizationSaved::class);
             Git::listen(Events\SeoSetLocalizationDeleted::class);
+            Git::listen(Events\RedirectCreated::class);
+            Git::listen(Events\RedirectSaved::class);
+            Git::listen(Events\RedirectDeleted::class);
         }
 
         return $this;
@@ -270,6 +293,7 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../database/migrations/2026_01_13_100000_create_seo_set_configs_table.php' => database_path('migrations/2026_01_13_100000_create_seo_set_configs_table.php'),
             __DIR__.'/../database/migrations/2026_01_13_100001_create_seo_set_localizations_table.php' => database_path('migrations/2026_01_13_100001_create_seo_set_localizations_table.php'),
             __DIR__.'/../database/migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php' => database_path('migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php'),
+            __DIR__.'/../database/migrations/2026_06_23_100000_create_redirects_table.php' => database_path('migrations/2026_06_23_100000_create_redirects_table.php'),
         ], 'advanced-seo-migrations');
 
         return $this;
