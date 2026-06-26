@@ -41,6 +41,7 @@ abstract class TestCase extends AddonTestCase
         $app['config']->set('advanced-seo', require (__DIR__.'/../config/advanced-seo.php'));
 
         $app['config']->set('advanced-seo.directory', __DIR__.'/__fixtures__/content/seo');
+        $app['config']->set('advanced-seo.redirects.directory', __DIR__.'/__fixtures__/content/redirects');
 
         if ($this->usesEloquentDriver()) {
             $app['config']->set('advanced-seo.driver', 'eloquent');

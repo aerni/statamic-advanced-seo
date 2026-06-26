@@ -31,5 +31,18 @@ trait UseEloquentDriver
 
             $table->unique(['type', 'handle', 'locale']);
         });
+
+        Schema::create('redirects', function ($table) {
+            $table->string('id')->primary();
+            $table->string('source');
+            $table->text('destination')->nullable();
+            $table->integer('type')->default(301);
+            $table->string('site');
+            $table->boolean('enabled')->default(true);
+            $table->text('description')->nullable();
+            $table->timestamps();
+
+            $table->index(['site', 'enabled', 'source']);
+        });
     }
 }
