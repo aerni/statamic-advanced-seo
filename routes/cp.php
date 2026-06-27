@@ -12,12 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
-    Route::get('/redirects', [RedirectController::class, 'index'])->name('redirects.index');
-    Route::get('/redirects/create', [RedirectController::class, 'create'])->name('redirects.create');
-    Route::post('/redirects', [RedirectController::class, 'store'])->name('redirects.store');
-    Route::get('/redirects/{redirect}/edit', [RedirectController::class, 'edit'])->name('redirects.edit');
-    Route::patch('/redirects/{redirect}', [RedirectController::class, 'update'])->name('redirects.update');
-    Route::delete('/redirects/{redirect}', [RedirectController::class, 'destroy'])->name('redirects.destroy');
+    Route::resource('redirects', RedirectController::class)->except('show');
     Route::get('/{seoSetGroup}', SeoSetIndexController::class)->name('sets.index');
     Route::get('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'edit'])->name('sets.config.edit');
     Route::patch('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'update'])->name('sets.config.update');
