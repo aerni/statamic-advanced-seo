@@ -225,11 +225,14 @@ class ServiceProvider extends AddonServiceProvider
                         ->children([
                             Permission::make('edit redirects')
                                 ->label(__('advanced-seo::messages.permission_edit_redirects'))
+                                ->description(__('advanced-seo::messages.permission_edit_redirects_description'))
                                 ->children([
                                     Permission::make('create redirects')
-                                        ->label(__('advanced-seo::messages.permission_create_redirects')),
+                                        ->label(__('advanced-seo::messages.permission_create_redirects'))
+                                        ->description(__('advanced-seo::messages.permission_create_redirects_description')),
                                     Permission::make('delete redirects')
-                                        ->label(__('advanced-seo::messages.permission_delete_redirects')),
+                                        ->label(__('advanced-seo::messages.permission_delete_redirects'))
+                                        ->description(__('advanced-seo::messages.permission_delete_redirects_description')),
                                 ]),
                         ]);
                 });

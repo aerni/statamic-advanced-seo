@@ -69,6 +69,9 @@ return [
     'permission_edit_redirects' => 'Edit Redirects',
     'permission_create_redirects' => 'Create Redirects',
     'permission_delete_redirects' => 'Delete Redirects',
+    'permission_edit_redirects_description' => 'Grants the ability to edit existing redirects.',
+    'permission_create_redirects_description' => 'Grants the ability to create new redirects.',
+    'permission_delete_redirects_description' => 'Grants the ability to delete redirects.',
 
     // Pro
     'pro_features' => 'Upgrade to Pro',
