@@ -5,6 +5,12 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Rules\UniqueRedirectSource;
+use Aerni\AdvancedSeo\Rules\ValidRedirectSource;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\Site;
@@ -54,5 +60,59 @@ class RedirectController extends CpController
                 'site' => $redirect->site(),
             ])
             ->submittingTo(cp_route('advanced-seo.redirects.update', $redirect->id()));
+    }
+
+    public function store(Request $request): array
+    {
+        $this->authorize('create', Redirect::class);
+
+        $site = $request->input('site', Site::selected()->handle());
+
+        Validator::make($request->all(), [
+            'source' => [new ValidRedirectSource, new UniqueRedirectSource($site)],
+        ])->validate();
+
+        $values = PublishForm::make(RedirectBlueprint::definition())->submit($request->all());
+
+        $redirect = $this->fill(Redirects::make(), $values)->save();
+
+        return ['redirect' => $redirect->editUrl()];
+    }
+
+    public function update(Request $request, Redirect $redirect): array
+    {
+        $this->authorize('edit', $redirect);
+
+        $site = $request->input('site', $redirect->site());
+
+        Validator::make($request->all(), [
+            'source' => [new ValidRedirectSource, new UniqueRedirectSource($site, $redirect->id())],
+        ])->validate();
+
+        $values = PublishForm::make(RedirectBlueprint::definition())->submit($request->all());
+
+        $this->fill($redirect, $values)->save();
+
+        return ['redirect' => $redirect->editUrl()];
+    }
+
+    public function destroy(Redirect $redirect)
+    {
+        $this->authorize('delete', $redirect);
+
+        $redirect->delete();
+
+        return response('', 200);
+    }
+
+    protected function fill(Redirect $redirect, array $values): Redirect
+    {
+        return $redirect
+            ->source(Arr::get($values, 'source'))
+            ->destination(Arr::get($values, 'destination'))
+            ->type(RedirectType::from((int) Arr::get($values, 'type', 301)))
+            ->enabled((bool) Arr::get($values, 'enabled', true))
+            ->description(Arr::get($values, 'description'))
+            ->site(Arr::get($values, 'site', Site::selected()->handle()));
     }
 }

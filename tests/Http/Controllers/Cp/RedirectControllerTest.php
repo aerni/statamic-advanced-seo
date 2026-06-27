@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
@@ -61,4 +62,111 @@ it('404s editing a missing redirect', function () {
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', 'missing'))
         ->assertNotFound();
+});
+
+it('creates a redirect', function () {
+    $this->actingAs($this->super)
+        ->post(cp_route('advanced-seo.redirects.store'), [
+            'source' => '/old',
+            'destination' => '/new',
+            'type' => 301,
+            'enabled' => true,
+            'site' => 'default',
+        ])
+        ->assertOk();
+
+    $redirect = Redirects::query()->where('site', 'default')->where('source', '/old')->first();
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->destination())->toBe('/new')
+        ->and($redirect->type())->toBe(RedirectType::Permanent);
+});
+
+it('requires a source', function () {
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->assertJsonValidationErrors('source');
+});
+
+it('rejects a duplicate source on the same site', function () {
+    Redirects::make()->source('/old')->destination('/x')->site('default')->save();
+
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->assertJsonValidationErrors('source');
+});
+
+it('rejects a malformed regex source', function () {
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '#^/p/(\d+$#', 'destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->assertJsonValidationErrors('source');
+});
+
+it('requires a destination unless the type is gone', function () {
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'type' => 301, 'site' => 'default'])
+        ->assertJsonValidationErrors('destination');
+
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/gone', 'type' => 410, 'site' => 'default'])
+        ->assertValid();
+});
+
+it('forbids a viewer from storing a redirect', function () {
+    $this->actingAs(redirectViewer())
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->assertForbidden();
+});
+
+it('updates a redirect', function () {
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
+            'source' => '/old', 'destination' => '/newer', 'type' => 302, 'enabled' => true, 'site' => 'default',
+        ])->assertOk();
+
+    expect(Redirects::find($redirect->id())->destination())->toBe('/newer');
+});
+
+it('moves a redirect when its site changes', function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
+            'source' => '/old', 'destination' => '/new', 'type' => 301, 'enabled' => true, 'site' => 'french',
+        ])->assertOk();
+
+    expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first())->toBeNull();
+    expect(Redirects::query()->where('site', 'french')->where('source', '/old')->first())->not->toBeNull();
+});
+
+it('forbids a viewer from updating a redirect', function () {
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs(redirectViewer())
+        ->patchJson(cp_route('advanced-seo.redirects.update', $redirect->id()), [
+            'source' => '/old', 'destination' => '/newer', 'type' => 301, 'enabled' => true, 'site' => 'default',
+        ])->assertForbidden();
+});
+
+it('deletes a redirect', function () {
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->delete(cp_route('advanced-seo.redirects.destroy', $redirect->id()))
+        ->assertOk();
+
+    expect(Redirects::find($redirect->id()))->toBeNull();
+});
+
+it('forbids a viewer from deleting a redirect', function () {
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs(redirectViewer())
+        ->deleteJson(cp_route('advanced-seo.redirects.destroy', $redirect->id()))
+        ->assertForbidden();
 });
