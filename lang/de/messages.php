@@ -17,9 +17,6 @@ return [
     'terms' => 'Begriffe',
     'reset_to_default' => 'Auf Standard zurücksetzen',
 
-    // Redirect blueprint
-    'redirect_tab_main' => 'Allgemein',
-
     // Validation
     'redirect_source_invalid' => 'Die Quelle muss mit einem Schrägstrich beginnen oder ein in # eingeschlossener regulärer Ausdruck sein.',
     'redirect_source_invalid_regex' => 'Die Quelle ist kein gültiger regulärer Ausdruck.',

@@ -17,9 +17,6 @@ return [
     'terms' => 'Terms',
     'reset_to_default' => 'Reset to default',
 
-    // Redirect blueprint
-    'redirect_tab_main' => 'Main',
-
     // Validation
     'redirect_source_invalid' => 'The source must start with a forward slash, or be a regular expression wrapped in #.',
     'redirect_source_invalid_regex' => 'The source is not a valid regular expression.',
