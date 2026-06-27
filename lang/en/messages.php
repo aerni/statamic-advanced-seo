@@ -32,6 +32,11 @@ return [
     'seo_set_config_deleted' => 'SEO config deleted',
     'disable_confirmation' => 'Are you sure you want to disable this item? All SEO data will be deleted.',
 
+    // Redirects
+    'redirects' => 'Redirects',
+    'redirect_create_title' => 'Create Redirect',
+    'redirect_edit_title' => 'Edit Redirect',
+
     // UI
     'origins' => 'Origins',
     'origins_instructions' => 'Choose to inherit values from selected origins.',

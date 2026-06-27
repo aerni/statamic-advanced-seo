@@ -23,6 +23,8 @@ interface Redirect
 
     public function description(?string $description = null): string|self|null;
 
+    public function editUrl(): string;
+
     public function path(): string;
 
     public function fileData(): array;

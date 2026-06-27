@@ -127,6 +127,11 @@ class Redirect implements Contract
             ->args(func_get_args());
     }
 
+    public function editUrl(): string
+    {
+        return cp_route('advanced-seo.redirects.edit', $this->id());
+    }
+
     public function path(): string
     {
         return Path::assemble(
