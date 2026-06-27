@@ -17,13 +17,27 @@ beforeEach(function () {
 
 function redirectViewer()
 {
-    tap(Role::make('viewer')->addPermission('view redirects'))->save();
+    tap(Role::make('viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
 
     return tap(User::make()->assignRole('viewer'))->save();
 }
 
 it('shows the index to an authorized user', function () {
-    $this->actingAs($this->super)->get(cp_route('advanced-seo.redirects.index'))->assertOk();
+    $this->actingAs($this->super)->getJson(cp_route('advanced-seo.redirects.index'))->assertOk();
+});
+
+it('allows a viewer to load the index', function () {
+    $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.index'))->assertOk();
+});
+
+it('forbids a viewer from loading the create form', function () {
+    $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.create'))->assertForbidden();
+});
+
+it('forbids a viewer from loading the edit form', function () {
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.edit', $redirect->id()))->assertForbidden();
 });
 
 it('forbids the index without permission', function () {
