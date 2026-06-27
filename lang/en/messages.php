@@ -17,6 +17,22 @@ return [
     'terms' => 'Terms',
     'reset_to_default' => 'Reset to default',
 
+    // Redirect blueprint
+    'redirect_tab_main' => 'Main',
+    'redirect_source' => 'Source',
+    'redirect_source_instructions' => 'The path to redirect from. Use an exact path (`/old`), a wildcard (`/blog/*`, capture with `$1`), or a regular expression (`#^/p/(\d+)$#`).',
+    'redirect_destination' => 'Destination',
+    'redirect_destination_instructions' => 'Where to redirect to. A path, full URL, or entry. Use `$1`, `$2` to insert wildcard/regex captures.',
+    'redirect_type' => 'Type',
+    'redirect_type_instructions' => 'The HTTP response. Gone (410) marks the URL as permanently removed and needs no destination.',
+    'redirect_type_301' => '301 — Permanent',
+    'redirect_type_302' => '302 — Temporary',
+    'redirect_type_410' => '410 — Gone',
+    'redirect_description' => 'Description',
+    'redirect_enabled' => 'Enabled',
+    'redirect_enabled_instructions' => 'Disable to keep the redirect without it being active.',
+    'redirect_site' => 'Site',
+
     // Validation
     'redirect_source_invalid' => 'The source must start with a forward slash, or be a regular expression wrapped in #.',
     'redirect_source_invalid_regex' => 'The source is not a valid regular expression.',
