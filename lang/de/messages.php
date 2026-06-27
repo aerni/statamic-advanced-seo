@@ -17,6 +17,14 @@ return [
     'terms' => 'Begriffe',
     'reset_to_default' => 'Auf Standard zurücksetzen',
 
+    // Redirect blueprint
+    'redirect_tab_main' => 'Allgemein',
+
+    // Validation
+    'redirect_source_invalid' => 'Die Quelle muss mit einem Schrägstrich beginnen oder ein in # eingeschlossener regulärer Ausdruck sein.',
+    'redirect_source_invalid_regex' => 'Die Quelle ist kein gültiger regulärer Ausdruck.',
+    'redirect_source_not_unique' => 'Eine Weiterleitung mit dieser Quelle existiert bereits für diese Website.',
+
     // Flash messages
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',
     'seo_set_localization_deleted' => 'SEO-Standards gelöscht',
@@ -61,6 +69,14 @@ return [
     'permission_edit_defaults_description' => 'Ermöglicht das Bearbeiten von Sammlungs- und Taxonomie-Standards sowie den Zugriff auf den SEO-Tab bei Einträgen und Begriffen',
     'permission_edit_content' => 'Inhalte bearbeiten',
     'permission_edit_content_description' => 'Gewährt Zugriff auf den SEO-Tab bei Einträgen und Begriffen',
+    'permission_view_redirects' => 'Weiterleitungen anzeigen',
+    'permission_view_redirects_description' => 'Gewährt Zugriff auf die Anzeige von Weiterleitungen. Untergeordnete Berechtigungen ermöglichen das Bearbeiten, Erstellen und Löschen.',
+    'permission_edit_redirects' => 'Weiterleitungen bearbeiten',
+    'permission_create_redirects' => 'Weiterleitungen erstellen',
+    'permission_delete_redirects' => 'Weiterleitungen löschen',
+    'permission_edit_redirects_description' => 'Gewährt die Möglichkeit, bestehende Weiterleitungen zu bearbeiten.',
+    'permission_create_redirects_description' => 'Gewährt die Möglichkeit, neue Weiterleitungen zu erstellen.',
+    'permission_delete_redirects_description' => 'Gewährt die Möglichkeit, Weiterleitungen zu löschen.',
 
     // Pro
     'pro_features' => 'Upgrade auf Pro',

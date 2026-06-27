@@ -18,8 +18,8 @@ class RedirectBlueprint extends BaseBlueprint
                 'handle' => 'enabled',
                 'field' => [
                     'type' => 'toggle',
-                    'display' => __('advanced-seo::messages.redirect_enabled'),
-                    'instructions' => __('advanced-seo::messages.redirect_enabled_instructions'),
+                    'display' => __('advanced-seo::fields.redirect_enabled.display'),
+                    'instructions' => __('advanced-seo::fields.redirect_enabled.instructions'),
                     'default' => true,
                 ],
             ],
@@ -30,7 +30,7 @@ class RedirectBlueprint extends BaseBlueprint
                 'handle' => 'site',
                 'field' => [
                     'type' => 'select',
-                    'display' => __('advanced-seo::messages.redirect_site'),
+                    'display' => __('advanced-seo::fields.redirect_site.display'),
                     'options' => Site::all()->mapWithKeys(fn ($site) => [$site->handle() => $site->name()])->all(),
                     'default' => Site::default()->handle(),
                     'clearable' => false,
@@ -49,8 +49,8 @@ class RedirectBlueprint extends BaseBlueprint
                                 'handle' => 'source',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('advanced-seo::messages.redirect_source'),
-                                    'instructions' => __('advanced-seo::messages.redirect_source_instructions'),
+                                    'display' => __('advanced-seo::fields.redirect_source.display'),
+                                    'instructions' => __('advanced-seo::fields.redirect_source.instructions'),
                                     'validate' => ['required'],
                                     'width' => 50,
                                 ],
@@ -59,8 +59,8 @@ class RedirectBlueprint extends BaseBlueprint
                                 'handle' => 'destination',
                                 'field' => [
                                     'type' => 'link',
-                                    'display' => __('advanced-seo::messages.redirect_destination'),
-                                    'instructions' => __('advanced-seo::messages.redirect_destination_instructions'),
+                                    'display' => __('advanced-seo::fields.redirect_destination.display'),
+                                    'instructions' => __('advanced-seo::fields.redirect_destination.instructions'),
                                     'validate' => ['required_unless:type,410'],
                                     'width' => 50,
                                     'if' => ['type' => 'isnt 410'],
@@ -70,12 +70,12 @@ class RedirectBlueprint extends BaseBlueprint
                                 'handle' => 'type',
                                 'field' => [
                                     'type' => 'select',
-                                    'display' => __('advanced-seo::messages.redirect_type'),
-                                    'instructions' => __('advanced-seo::messages.redirect_type_instructions'),
+                                    'display' => __('advanced-seo::fields.redirect_type.display'),
+                                    'instructions' => __('advanced-seo::fields.redirect_type.instructions'),
                                     'options' => [
-                                        301 => __('advanced-seo::messages.redirect_type_301'),
-                                        302 => __('advanced-seo::messages.redirect_type_302'),
-                                        410 => __('advanced-seo::messages.redirect_type_410'),
+                                        301 => __('advanced-seo::fields.redirect_type.option_301'),
+                                        302 => __('advanced-seo::fields.redirect_type.option_302'),
+                                        410 => __('advanced-seo::fields.redirect_type.option_410'),
                                     ],
                                     'default' => 301,
                                     'clearable' => false,
@@ -87,7 +87,7 @@ class RedirectBlueprint extends BaseBlueprint
                                 'handle' => 'description',
                                 'field' => [
                                     'type' => 'textarea',
-                                    'display' => __('advanced-seo::messages.redirect_description'),
+                                    'display' => __('advanced-seo::fields.redirect_description.display'),
                                     'width' => 100,
                                 ],
                             ],

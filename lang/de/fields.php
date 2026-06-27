@@ -403,4 +403,44 @@ return [
         'placeholder' => 'Beispiel: Verwende einen freundlichen, umgangssprachlichen Ton. Sage immer „nachhaltig" statt „umweltfreundlich".',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect Fields
+    |--------------------------------------------------------------------------
+    |
+    | Used by RedirectBlueprint.
+    |
+    */
+
+    'redirect_source' => [
+        'display' => 'Quelle',
+        'instructions' => 'Der Pfad, von dem weitergeleitet wird. Verwende einen exakten Pfad (`/alt`), einen Platzhalter (`/blog/*`, Capture mit `$1`) oder einen regulären Ausdruck (`#^/p/(\d+)$#`).',
+    ],
+
+    'redirect_destination' => [
+        'display' => 'Ziel',
+        'instructions' => 'Wohin weitergeleitet wird. Ein Pfad, eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2`, um Platzhalter- oder Regex-Captures einzufügen.',
+    ],
+
+    'redirect_type' => [
+        'display' => 'Typ',
+        'instructions' => 'Die HTTP-Antwort. Entfernt (410) markiert die URL als dauerhaft entfernt und benötigt kein Ziel.',
+        'option_301' => 'Dauerhaft (301)',
+        'option_302' => 'Temporär (302)',
+        'option_410' => 'Entfernt (410)',
+    ],
+
+    'redirect_description' => [
+        'display' => 'Beschreibung',
+    ],
+
+    'redirect_enabled' => [
+        'display' => 'Aktiviert',
+        'instructions' => 'Deaktivieren, um die Weiterleitung zu behalten, ohne dass sie aktiv ist.',
+    ],
+
+    'redirect_site' => [
+        'display' => 'Website',
+    ],
+
 ];

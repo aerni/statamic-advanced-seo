@@ -403,4 +403,44 @@ return [
         'placeholder' => 'Example: Use a friendly, conversational tone. Always say "sustainable" instead of "eco-friendly".',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect Fields
+    |--------------------------------------------------------------------------
+    |
+    | Used by RedirectBlueprint.
+    |
+    */
+
+    'redirect_source' => [
+        'display' => 'Source',
+        'instructions' => 'The path to redirect from. Use an exact path (`/old`), a wildcard (`/blog/*`, capture with `$1`), or a regular expression (`#^/p/(\d+)$#`).',
+    ],
+
+    'redirect_destination' => [
+        'display' => 'Destination',
+        'instructions' => 'Where to redirect to. A path, full URL, or entry. Use `$1`, `$2` to insert wildcard/regex captures.',
+    ],
+
+    'redirect_type' => [
+        'display' => 'Type',
+        'instructions' => 'The HTTP response. Gone (410) marks the URL as permanently removed and needs no destination.',
+        'option_301' => 'Permanent (301)',
+        'option_302' => 'Temporary (302)',
+        'option_410' => 'Gone (410)',
+    ],
+
+    'redirect_description' => [
+        'display' => 'Description',
+    ],
+
+    'redirect_enabled' => [
+        'display' => 'Enabled',
+        'instructions' => 'Disable to keep the redirect without it being active.',
+    ],
+
+    'redirect_site' => [
+        'display' => 'Site',
+    ],
+
 ];
