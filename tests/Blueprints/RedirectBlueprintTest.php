@@ -1,6 +1,11 @@
 <?php
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
+use Statamic\Facades\User;
+
+beforeEach(function () {
+    $this->actingAs(User::make()->makeSuper()->save());
+});
 
 it('builds with the expected fields', function () {
     $blueprint = RedirectBlueprint::definition();

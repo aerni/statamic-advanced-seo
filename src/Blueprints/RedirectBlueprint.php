@@ -97,8 +97,8 @@ class RedirectBlueprint extends BaseBlueprint
                 'field' => [
                     'type' => 'select',
                     'display' => __('advanced-seo::fields.redirect_site.display'),
-                    'options' => Site::all()->mapWithKeys(fn ($site) => [$site->handle() => $site->name()])->all(),
-                    'default' => Site::default()->handle(),
+                    'options' => Site::authorized()->mapWithKeys(fn ($site) => [$site->handle() => $site->name()])->all(),
+                    'default' => Site::selected()->handle(),
                     'clearable' => false,
                     'validate' => ['required'],
                 ],
