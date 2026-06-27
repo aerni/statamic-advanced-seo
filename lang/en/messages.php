@@ -17,6 +17,11 @@ return [
     'terms' => 'Terms',
     'reset_to_default' => 'Reset to default',
 
+    // Validation
+    'redirect_source_invalid' => 'The source must start with a forward slash, or be a regular expression wrapped in #.',
+    'redirect_source_invalid_regex' => 'The source is not a valid regular expression.',
+    'redirect_source_not_unique' => 'A redirect with this source already exists for this site.',
+
     // Flash messages
     'redirect_created' => 'Redirect created',
     'redirect_saved' => 'Redirect saved',
