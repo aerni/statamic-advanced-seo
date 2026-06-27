@@ -35,12 +35,6 @@ it('denies viewAny when user lacks site access', function () {
     expect(userWith(['view redirects'])->can('viewAny', RedirectContract::class))->toBeFalse();
 });
 
-it('grants view to a user with view redirects and site access', function () {
-    $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
-
-    expect(userWith(['view redirects', 'access default site'])->can('view', $redirect))->toBeTrue();
-});
-
 it('denies create when user lacks site access', function () {
     expect(userWith(['create redirects'])->can('create', RedirectContract::class))->toBeFalse();
 });
@@ -48,16 +42,18 @@ it('denies create when user lacks site access', function () {
 it('maps abilities to their permissions', function () {
     $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
 
-    $viewer = userWith(['view redirects', 'access default site']);
     $editor = userWith(['edit redirects', 'access default site']);
     $creator = userWith(['create redirects', 'access default site']);
     $deleter = userWith(['delete redirects', 'access default site']);
 
-    expect($viewer->can('update', $redirect))->toBeFalse();
-    expect($editor->can('update', $redirect))->toBeTrue();
-    expect($creator->can('create', RedirectContract::class))->toBeTrue();
-    expect($deleter->can('delete', $redirect))->toBeTrue();
+    expect($editor->can('edit', $redirect))->toBeTrue();
+    expect($editor->can('create', RedirectContract::class))->toBeFalse();
     expect($editor->can('delete', $redirect))->toBeFalse();
+    expect($creator->can('create', RedirectContract::class))->toBeTrue();
+    expect($creator->can('edit', $redirect))->toBeFalse();
+    expect($creator->can('delete', $redirect))->toBeFalse();
+    expect($deleter->can('delete', $redirect))->toBeTrue();
+    expect($deleter->can('edit', $redirect))->toBeFalse();
 });
 
 it('grants super users all abilities without explicit permissions', function () {
@@ -65,13 +61,12 @@ it('grants super users all abilities without explicit permissions', function () 
     $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
 
     expect($user->can('viewAny', RedirectContract::class))->toBeTrue();
-    expect($user->can('view', $redirect))->toBeTrue();
     expect($user->can('create', RedirectContract::class))->toBeTrue();
-    expect($user->can('update', $redirect))->toBeTrue();
+    expect($user->can('edit', $redirect))->toBeTrue();
     expect($user->can('delete', $redirect))->toBeTrue();
 });
 
-it('denies update when user cannot access the redirect site', function () {
+it('denies edit when user cannot access the redirect site', function () {
     Site::setSites([
         'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
         'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
@@ -82,6 +77,6 @@ it('denies update when user cannot access the redirect site', function () {
     $defaultRedirect = Redirects::make()->source('/old')->destination('/new')->site('default');
     $frenchRedirect = Redirects::make()->source('/vieux')->destination('/nouveau')->site('french');
 
-    expect($user->can('update', $defaultRedirect))->toBeTrue();
-    expect($user->can('update', $frenchRedirect))->toBeFalse();
+    expect($user->can('edit', $defaultRedirect))->toBeTrue();
+    expect($user->can('edit', $frenchRedirect))->toBeFalse();
 });

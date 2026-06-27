@@ -33,14 +33,6 @@ class RedirectPolicy
             && $this->userCanAccessSite($user, Site::selected());
     }
 
-    public function view($user, Redirect $redirect): bool
-    {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('view redirects')
-            && $this->userCanAccessSite($user, Site::get($redirect->site()));
-    }
-
     public function create($user): bool
     {
         $user = User::fromUser($user);
@@ -49,7 +41,7 @@ class RedirectPolicy
             && $this->userCanAccessSite($user, Site::selected());
     }
 
-    public function update($user, Redirect $redirect): bool
+    public function edit($user, Redirect $redirect): bool
     {
         $user = User::fromUser($user);
 
