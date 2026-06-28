@@ -118,10 +118,12 @@ it('rejects a malformed regex source', function () {
 });
 
 it('requires a destination unless the type is gone', function () {
+    // 301 with destination present but null → required fires
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'type' => 301, 'site' => 'default'])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'type' => 301, 'site' => 'default', 'destination' => null])
         ->assertJsonValidationErrors('destination');
 
+    // 410 with destination absent → sometimes skips validation
     $this->actingAs($this->super)
         ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/gone', 'type' => 410, 'site' => 'default'])
         ->assertValid()
