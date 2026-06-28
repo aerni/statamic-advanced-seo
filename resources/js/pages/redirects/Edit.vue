@@ -53,6 +53,7 @@ onUnmounted(() => saveKeyBinding.destroy());
             <StatusIndicator :status="enabled ? 'published' : 'draft'" />
             {{ values.source ?? title }}
         </template>
+        <Button v-if="testUrl" :href="testUrl" :text="__('advanced-seo::messages.test_redirect')" icon="external-link" target="_blank" rel="noopener noreferrer" />
         <Button variant="primary" :text="__('Save')" :disabled="saving" @click="save" />
     </Header>
 
@@ -66,7 +67,6 @@ onUnmounted(() => saveKeyBinding.destroy());
     >
         <PublishTabs>
             <template #actions>
-                <Button v-if="testUrl" :href="testUrl" :text="__('advanced-seo::messages.test_redirect')" icon="external-link" target="_blank" rel="noopener noreferrer" />
                 <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!">
                     <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
                     <Switch v-model="enabled" />
