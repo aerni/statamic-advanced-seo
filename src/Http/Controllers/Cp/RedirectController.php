@@ -78,6 +78,7 @@ class RedirectController extends CpController
         $this->authorize('create', Redirect::class);
 
         return PublishForm::make(RedirectBlueprint::definition())
+            ->icon('moved')
             ->title(__('advanced-seo::messages.redirect_create_title'))
             ->submittingTo(cp_route('advanced-seo.redirects.store'), 'POST');
     }
@@ -87,6 +88,7 @@ class RedirectController extends CpController
         $this->authorize('edit', $redirect);
 
         return PublishForm::make(RedirectBlueprint::definition())
+            ->icon('moved')
             ->title(__('advanced-seo::messages.redirect_edit_title'))
             ->values([
                 'source' => $redirect->source(),
