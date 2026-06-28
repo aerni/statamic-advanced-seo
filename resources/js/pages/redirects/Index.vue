@@ -47,7 +47,11 @@ const listing = useTemplateRef('listing');
                 />
             </template>
             <template #cell-destination="{ row: redirect }">
-                {{ redirect.destination }}
+                <div class="flex items-center gap-1.5">
+                    <Icon v-if="redirect.destination_is_entry" name="entry" class="shrink-0 size-4 text-gray-500" />
+                    <Icon v-else-if="redirect.destination" name="external-link" class="shrink-0 size-4 text-gray-500" />
+                    <span v-text="redirect.destination" />
+                </div>
             </template>
             <template #cell-type="{ row: redirect }">
                 {{ redirect.type_label }}

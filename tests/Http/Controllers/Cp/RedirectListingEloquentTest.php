@@ -3,6 +3,8 @@
 use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -130,4 +132,54 @@ it('only returns redirects for sites a non-super user is authorized to view', fu
         ->json('data');
 
     expect($data)->toHaveCount(1)->and($data[0]['source'])->toBe('/en-page');
+});
+
+it('resolves an entry destination to the entry url with destination_is_entry true', function () {
+    Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+
+    $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
+
+    Redirects::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['destination'])->toBe('/about')
+        ->and($data[0]['destination_is_entry'])->toBeTrue();
+});
+
+it('shows a plain path destination with destination_is_entry false', function () {
+    Redirects::make()->source('/old')->destination('/new-path')->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['destination'])->toContain('/new-path')
+        ->and($data[0]['destination_is_entry'])->toBeFalse();
+});
+
+it('falls back to the raw destination when an entry destination no longer exists', function () {
+    $raw = 'entry::non-existent-id';
+
+    Redirects::make()->source('/old')->destination($raw)->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['destination'])->toBe($raw)
+        ->and($data[0]['destination_is_entry'])->toBeTrue();
+});
+
+it('shows a null destination for a 410 gone redirect', function () {
+    Redirects::make()->source('/gone')->destination(null)->site('default')->type(RedirectType::Gone)->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['destination'])->toBeNull()
+        ->and($data[0]['destination_is_entry'])->toBeFalse();
 });

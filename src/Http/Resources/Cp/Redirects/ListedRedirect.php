@@ -3,8 +3,10 @@
 namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Support\Str;
 
 class ListedRedirect extends JsonResource
 {
@@ -12,10 +14,17 @@ class ListedRedirect extends JsonResource
     {
         $redirect = $this->resource;
 
+        $destinationIsEntry = Str::startsWith($redirect->destination() ?? '', 'entry::');
+
+        $destinationUrl = $destinationIsEntry
+            ? $this->entryDestinationUrl($redirect)
+            : $redirect->destinationUrl();
+
         return [
             'id' => $redirect->id(),
             'source' => $redirect->source(),
-            'destination' => $redirect->destination(),
+            'destination' => $destinationUrl ?? $redirect->destination(),
+            'destination_is_entry' => $destinationIsEntry,
             'type' => $redirect->type()->value,
             'type_label' => __('advanced-seo::fields.redirect_type.option_'.$redirect->type()->value),
             'site' => $redirect->site(),
@@ -26,5 +35,12 @@ class ListedRedirect extends JsonResource
             'editable' => User::current()->can('edit', $redirect),
             'deletable' => User::current()->can('delete', $redirect),
         ];
+    }
+
+    protected function entryDestinationUrl($redirect): ?string
+    {
+        $id = Str::after($redirect->destination(), 'entry::');
+
+        return Entry::find($id)?->in($redirect->site())?->url();
     }
 }
