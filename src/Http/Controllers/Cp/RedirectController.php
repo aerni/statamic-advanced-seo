@@ -17,6 +17,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Statamic;
 
 class RedirectController extends CpController
 {
@@ -50,7 +51,7 @@ class RedirectController extends CpController
                 $query->orderBy($sortField, $sortDirection);
             }
 
-            $redirects = $query->paginate(request('perPage'));
+            $redirects = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
             return (new RedirectsResource($redirects))
                 ->blueprint(RedirectBlueprint::definition())

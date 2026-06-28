@@ -27,7 +27,7 @@ class ListedRedirect extends JsonResource
             'type' => $redirect->type()->value,
             'type_label' => __('advanced-seo::fields.redirect_type.option_'.$redirect->type()->value),
             'match_type' => $redirect->matchType()->value,
-            'enabled' => $redirect->enabled(),
+            'status' => $redirect->enabled(),
             'edit_url' => $redirect->editUrl(),
             'editable' => User::current()->can('edit', $redirect),
             'deletable' => User::current()->can('delete', $redirect),
