@@ -18,4 +18,13 @@ enum MatchType: string
             default => self::Exact,
         };
     }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Exact => __('advanced-seo::messages.match_type_exact'),
+            self::Wildcard => __('advanced-seo::messages.match_type_wildcard'),
+            self::Regex => __('advanced-seo::messages.match_type_regex'),
+        };
+    }
 }
