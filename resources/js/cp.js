@@ -11,6 +11,7 @@ import SearchPreviewFieldtype from './components/fieldtypes/SearchPreviewFieldty
 import SocialPreviewFieldtype from './components/fieldtypes/SocialPreviewFieldtype.vue'
 import TokenInputFieldtype from './components/fieldtypes/TokenInputFieldtype.vue'
 import AlertFieldtype from './components/fieldtypes/AlertFieldtype.vue'
+import RedirectSourceFieldtype from './components/fieldtypes/RedirectSourceFieldtype.vue'
 import { add } from './utils/normalizers.js'
 
 Statamic.booting(() => {
@@ -30,5 +31,6 @@ Statamic.booting(() => {
     Statamic.$components.register('social_preview-fieldtype', SocialPreviewFieldtype)
     Statamic.$components.register('token_input-fieldtype', TokenInputFieldtype)
     Statamic.$components.register('alert-fieldtype', AlertFieldtype)
+    Statamic.$components.register('redirect_source-fieldtype', RedirectSourceFieldtype)
     Statamic.$advancedSeo = { normalizers: { add } }
 })

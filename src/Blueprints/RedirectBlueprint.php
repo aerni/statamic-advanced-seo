@@ -31,7 +31,7 @@ class RedirectBlueprint extends BaseBlueprint
                 [
                     'handle' => 'source',
                     'field' => [
-                        'type' => 'text',
+                        'type' => 'redirect_source',
                         'display' => __('advanced-seo::fields.redirect_source.display'),
                         'instructions' => __('advanced-seo::fields.redirect_source.instructions'),
                         'validate' => [
