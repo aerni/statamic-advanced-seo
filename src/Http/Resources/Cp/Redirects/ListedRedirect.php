@@ -29,6 +29,7 @@ class ListedRedirect extends JsonResource
             'status' => $redirect->enabled(),
             'edit_url' => $redirect->editUrl(),
             'delete_url' => $redirect->deleteUrl(),
+            'test_url' => $redirect->sourceUrl(),
             'editable' => User::current()->can('edit', $redirect),
             'deletable' => User::current()->can('delete', $redirect),
         ];

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, useTemplateRef } from 'vue';
 import { Head, router } from '@statamic/cms/inertia';
-import { Header, Button, Badge, Listing, DropdownItem, Icon, Panel, Card, EmptyStateItem } from '@statamic/cms/ui';
+import { Header, Button, Badge, Listing, DropdownItem, DropdownSeparator, Icon, Panel, Card, EmptyStateItem } from '@statamic/cms/ui';
 
 const props = defineProps({
     title: String,
@@ -75,7 +75,16 @@ const listing = useTemplateRef('listing');
                 />
             </template>
             <template #prepended-row-actions="{ row: redirect }">
+                <DropdownItem
+                    v-if="redirect.test_url"
+                    :text="__('advanced-seo::messages.test_redirect')"
+                    icon="external-link"
+                    :href="redirect.test_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                />
                 <DropdownItem v-if="redirect.editable" :text="__('Edit')" icon="edit" :href="redirect.edit_url" />
+                <DropdownSeparator v-if="redirect.deletable" />
                 <DropdownItem
                     v-if="redirect.deletable"
                     :text="__('Delete')"

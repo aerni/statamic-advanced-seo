@@ -226,6 +226,41 @@ it('passes an external destination through unchanged as destination_url', functi
         ->and($data[0]['destination_is_entry'])->toBeFalse();
 });
 
+it('exposes a non-null absolute test_url for an exact redirect', function () {
+    Redirects::make()->source('/old-page')->destination('/new-page')->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0])->toHaveKey('test_url')
+        ->and($data[0]['test_url'])->not->toBeNull()
+        ->and($data[0]['test_url'])->toStartWith('http')
+        ->and($data[0]['test_url'])->toEndWith('/old-page');
+});
+
+it('exposes a null test_url for a wildcard redirect', function () {
+    Redirects::make()->source('/old/*')->destination('/new')->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0])->toHaveKey('test_url')
+        ->and($data[0]['test_url'])->toBeNull();
+});
+
+it('exposes a null test_url for a regex redirect', function () {
+    Redirects::make()->source('#^/old/(.*)$#')->destination('/new')->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0])->toHaveKey('test_url')
+        ->and($data[0]['test_url'])->toBeNull();
+});
+
 it('treats a slashless destination as a site-relative path', function () {
     Site::setSites([
         'default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en'],
