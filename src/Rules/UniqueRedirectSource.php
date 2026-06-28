@@ -4,27 +4,17 @@ namespace Aerni\AdvancedSeo\Rules;
 
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Closure;
-use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
 
-class UniqueRedirectSource implements DataAwareRule, ValidationRule
+class UniqueRedirectSource implements ValidationRule
 {
-    public array $data = [];
-
-    public function __construct(public ?string $exceptId = null) {}
-
-    public function setData(array $data): static
-    {
-        $this->data = $data;
-
-        return $this;
-    }
+    public function __construct(public ?string $site = null, public ?string $exceptId = null) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $site = $this->data['site'] ?? Site::default()->handle();
+        $site = $this->site ?: Site::default()->handle();
 
         $existing = Redirects::query()
             ->where('site', $site)

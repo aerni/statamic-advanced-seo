@@ -10,11 +10,11 @@ uses(PreventsSavingStacheItemsToDisk::class);
 
 beforeEach(fn () => Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]));
 
-function uniquePasses(string $source, string $site, ?string $exceptId = null): bool
+function uniquePasses(string $source, ?string $site, ?string $exceptId = null): bool
 {
     return Validator::make(
-        ['source' => $source, 'site' => $site],
-        ['source' => [new UniqueRedirectSource($exceptId)]]
+        ['source' => $source],
+        ['source' => [new UniqueRedirectSource($site, $exceptId)]]
     )->passes();
 }
 
@@ -35,4 +35,9 @@ it('ignores the excepted redirect (its own id) on update', function () {
 it('matches case-insensitively (sources are stored lowercased)', function () {
     Redirects::make()->source('/old')->destination('/new')->site('default')->save();
     expect(uniquePasses('/OLD', 'default'))->toBeFalse();
+});
+
+it('falls back to the default site when site is null', function () {
+    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+    expect(uniquePasses('/old', null))->toBeFalse();
 });

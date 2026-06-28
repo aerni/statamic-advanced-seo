@@ -108,7 +108,10 @@ it('requires a destination unless the type is gone', function () {
 
     $this->actingAs($this->super)
         ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/gone', 'type' => 410, 'site' => 'default'])
-        ->assertValid();
+        ->assertValid()
+        ->assertOk();
+
+    expect(Redirects::query()->where('site', 'default')->where('source', '/gone')->first())->not->toBeNull();
 });
 
 it('forbids a viewer from storing a redirect', function () {

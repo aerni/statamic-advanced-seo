@@ -32,7 +32,7 @@ class RedirectController extends CpController
     {
         $this->authorize('create', Redirect::class);
 
-        return PublishForm::make(RedirectBlueprint::make()->get())
+        return PublishForm::make(RedirectBlueprint::definition())
             ->title(__('advanced-seo::messages.redirect_create_title'))
             ->submittingTo(cp_route('advanced-seo.redirects.store'), 'POST');
     }
@@ -41,7 +41,7 @@ class RedirectController extends CpController
     {
         $this->authorize('edit', $redirect);
 
-        return PublishForm::make(RedirectBlueprint::make()->forRedirect($redirect)->get())
+        return PublishForm::make(RedirectBlueprint::definition())
             ->title(__('advanced-seo::messages.redirect_edit_title'))
             ->values([
                 'source' => $redirect->source(),
@@ -58,7 +58,7 @@ class RedirectController extends CpController
     {
         $this->authorize('create', Redirect::class);
 
-        $values = PublishForm::make(RedirectBlueprint::make()->get())->submit($request->all());
+        $values = $this->validateAndProcess($request, null);
 
         $redirect = $this->fill(Redirects::make(), $values)->save();
 
@@ -69,7 +69,7 @@ class RedirectController extends CpController
     {
         $this->authorize('edit', $redirect);
 
-        $values = PublishForm::make(RedirectBlueprint::make()->forRedirect($redirect)->get())->submit($request->all());
+        $values = $this->validateAndProcess($request, $redirect);
 
         $this->fill($redirect, $values)->save();
 
@@ -83,6 +83,18 @@ class RedirectController extends CpController
         $redirect->delete();
 
         return response('', 200);
+    }
+
+    protected function validateAndProcess(Request $request, ?Redirect $redirect): array
+    {
+        $fields = RedirectBlueprint::definition()->fields()->addValues($request->all());
+
+        $fields->validator()->withReplacements([
+            'id' => $redirect?->id() ?? '',
+            'site' => $request->input('site', Site::default()->handle()),
+        ])->validate();
+
+        return $fields->process()->values()->all();
     }
 
     protected function fill(Redirect $redirect, array $values): Redirect
