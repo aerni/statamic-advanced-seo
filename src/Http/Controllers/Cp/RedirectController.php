@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Statamic\CP\PublishForm;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
@@ -28,7 +29,8 @@ class RedirectController extends CpController
         $this->authorize('viewAny', Redirect::class);
 
         if ($request->wantsJson()) {
-            $query = Redirects::query()->where('site', Site::selected()->handle());
+            $query = Redirects::query()
+                ->whereIn('site', Site::authorized()->map->handle()->all());
 
             if ($search = request('search')) {
                 $query->where(function ($q) use ($search) {
@@ -64,6 +66,7 @@ class RedirectController extends CpController
             'createUrl' => cp_route('advanced-seo.redirects.create'),
             'listingUrl' => cp_route('advanced-seo.redirects.index'),
             'canCreate' => User::current()->can('create', Redirect::class),
+            'filters' => Scope::filters('redirects'),
         ]);
     }
 
