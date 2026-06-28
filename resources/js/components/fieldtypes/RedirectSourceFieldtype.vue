@@ -12,34 +12,42 @@ defineExpose(expose);
 const publishContext = injectPublishContext();
 
 const siteUrl = computed(() => {
-    const site = publishContext?.values?.value?.site;
+    const site = publishContext?.values?.value?.site ?? props.meta.defaultSite;
 
     return site ? (props.meta.sites[site] ?? null) : null;
 });
 
-function onInput(value) {
-    if (!value) {
-        return update(value);
+const displayValue = computed(() => {
+    if (!props.value) {
+        return props.value;
     }
 
-    if (siteUrl.value && value.startsWith(siteUrl.value)) {
-        value = value.substring(siteUrl.value.length);
+    if (props.value.startsWith('#')) {
+        return props.value;
     }
 
-    if (!value.startsWith('/')) {
-        value = '/' + value;
+    return props.value.replace(/^\//, '');
+});
+
+function onInput(typed) {
+    if (!typed) {
+        return update(typed);
     }
 
-    update(value);
+    if (typed.startsWith('#')) {
+        return update(typed);
+    }
+
+    update('/' + typed.replace(/^\/+/, ''));
 }
 </script>
 
 <template>
     <Input
-        :model-value="value"
+        :model-value="displayValue"
         :focus="config.focus"
         :read-only="isReadOnly"
-        :prepend="siteUrl"
+        :prepend="siteUrl ? siteUrl + '/' : null"
         :placeholder="config.placeholder"
         :name="name"
         :id="id"

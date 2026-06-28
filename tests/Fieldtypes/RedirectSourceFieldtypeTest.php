@@ -33,3 +33,14 @@ it('strips trailing slash from site urls in the preloaded map', function () {
         expect($url)->not->toEndWith('/');
     }
 });
+
+it('preloads the default site handle', function () {
+    $field = new Field('source', ['type' => 'redirect_source']);
+    $fieldtype = (new RedirectSourceFieldtype)->setField($field);
+
+    $result = $fieldtype->preload();
+
+    expect($result)->toHaveKey('defaultSite')
+        ->and($result['defaultSite'])->toBe(Site::default()->handle())
+        ->and($result['sites'])->toHaveKey($result['defaultSite']);
+});

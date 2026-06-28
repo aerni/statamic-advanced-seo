@@ -13,6 +13,7 @@ class RedirectSourceFieldtype extends Fieldtype
     {
         return [
             'sites' => Site::all()->mapWithKeys(fn ($site) => [$site->handle() => rtrim($site->absoluteUrl(), '/')])->all(),
+            'defaultSite' => Site::default()->handle(),
         ];
     }
 }
