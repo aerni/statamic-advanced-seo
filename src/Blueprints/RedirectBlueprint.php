@@ -47,6 +47,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'type' => 'link',
                         'display' => __('advanced-seo::fields.redirect_destination.display'),
                         'instructions' => __('advanced-seo::fields.redirect_destination.instructions'),
+                        'select_across_sites' => true,
                         'validate' => ['sometimes', 'required'],
                         'if' => ['type' => 'isnt '.RedirectType::Gone->value],
                     ],

@@ -28,6 +28,12 @@ it('hides the destination for a gone redirect', function () {
     expect($field->config())->toHaveKey('if');
 });
 
+it('enables selecting destination entries across sites', function () {
+    $field = RedirectBlueprint::definition()->field('destination');
+
+    expect($field->config()['select_across_sites'])->toBeTrue();
+});
+
 it('shows all sites to a super user in the site field', function () {
     Site::setSites([
         'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
