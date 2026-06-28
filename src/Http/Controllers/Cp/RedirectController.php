@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -13,12 +14,49 @@ use Statamic\CP\PublishForm;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Query\OrderBy;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class RedirectController extends CpController
 {
-    public function index()
+    use QueriesFilters;
+
+    public function index(FilteredRequest $request)
     {
         $this->authorize('viewAny', Redirect::class);
+
+        if ($request->wantsJson()) {
+            $query = Redirects::query()->where('site', Site::selected()->handle());
+
+            if ($search = request('search')) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('source', 'LIKE', '%'.$search.'%')
+                        ->orWhere('destination', 'LIKE', '%'.$search.'%');
+                });
+            }
+
+            $activeFilterBadges = $this->queryFilters($query, $request->filters);
+
+            $sortField = OrderBy::column(request('sort'));
+            $sortDirection = request('order', 'asc');
+
+            if (! $sortField && ! request('search')) {
+                $sortField = 'source';
+                $sortDirection = 'asc';
+            }
+
+            if ($sortField) {
+                $query->orderBy($sortField, $sortDirection);
+            }
+
+            $redirects = $query->paginate(request('perPage'));
+
+            return (new RedirectsResource($redirects))
+                ->blueprint(RedirectBlueprint::definition())
+                ->columnPreferenceKey('advanced-seo.redirects.columns')
+                ->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
+        }
 
         return Inertia::render('advanced-seo::Redirects/Index', [
             'title' => __('advanced-seo::messages.redirects'),

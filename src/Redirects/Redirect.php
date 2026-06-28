@@ -9,6 +9,7 @@ use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectDeleted;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirects;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -20,7 +21,7 @@ use Statamic\Facades\URL;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Redirect implements Contract
+class Redirect implements ContainsQueryableValues, Contract
 {
     use ExistsAsFile;
     use FluentlyGetsAndSets;
@@ -125,6 +126,14 @@ class Redirect implements Contract
         return $this
             ->fluentlyGetOrSet('description')
             ->args(func_get_args());
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        return match ($field) {
+            'type' => $this->type()->value,
+            default => $this->{$field}(),
+        };
     }
 
     public function editUrl(): string
