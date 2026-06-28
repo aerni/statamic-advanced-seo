@@ -90,7 +90,7 @@ class RedirectController extends CpController
         $fields = RedirectBlueprint::definition()->fields()->addValues($request->all());
 
         $fields->validator()->withReplacements([
-            'id' => $redirect?->id() ?? '',
+            'id' => $redirect?->id(),
             'site' => $request->input('site', Site::default()->handle()),
         ])->validate();
 
