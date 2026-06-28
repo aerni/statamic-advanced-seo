@@ -102,8 +102,8 @@ class RedirectController extends CpController
         return $redirect
             ->source(Arr::get($values, 'source'))
             ->destination(Arr::get($values, 'destination'))
-            ->type(RedirectType::from((int) Arr::get($values, 'type', 301)))
-            ->enabled((bool) Arr::get($values, 'enabled', true))
+            ->type(RedirectType::from(Arr::get($values, 'type') ?? 301))
+            ->enabled(Arr::get($values, 'enabled') ?? true)
             ->description(Arr::get($values, 'description'))
             ->site(Arr::get($values, 'site', Site::selected()->handle()));
     }
