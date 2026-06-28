@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Enums\RedirectType;
 use Statamic\Facades\Site;
 
 class RedirectBlueprint extends BaseBlueprint
@@ -38,7 +39,6 @@ class RedirectBlueprint extends BaseBlueprint
                             'new \\Aerni\\AdvancedSeo\\Rules\\ValidRedirectSource()',
                             'new \\Aerni\\AdvancedSeo\\Rules\\UniqueRedirectSource({site}, {id})',
                         ],
-                        'width' => 50,
                     ],
                 ],
                 [
@@ -48,7 +48,6 @@ class RedirectBlueprint extends BaseBlueprint
                         'display' => __('advanced-seo::fields.redirect_destination.display'),
                         'instructions' => __('advanced-seo::fields.redirect_destination.instructions'),
                         'validate' => ['sometimes', 'required'],
-                        'width' => 50,
                         'if' => ['type' => 'isnt 410'],
                     ],
                 ],
@@ -58,15 +57,12 @@ class RedirectBlueprint extends BaseBlueprint
                         'type' => 'select',
                         'display' => __('advanced-seo::fields.redirect_type.display'),
                         'instructions' => __('advanced-seo::fields.redirect_type.instructions'),
-                        'options' => [
-                            301 => __('advanced-seo::fields.redirect_type.option_301'),
-                            302 => __('advanced-seo::fields.redirect_type.option_302'),
-                            410 => __('advanced-seo::fields.redirect_type.option_410'),
-                        ],
+                        'options' => collect(RedirectType::cases())
+                            ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
+                            ->all(),
                         'default' => 301,
                         'clearable' => false,
                         'validate' => ['required'],
-                        'width' => 50,
                     ],
                 ],
                 [

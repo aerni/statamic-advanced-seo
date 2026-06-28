@@ -23,7 +23,7 @@ class ListedRedirect extends JsonResource
             'destination_url' => $redirect->destinationUrl(),
             'destination_is_entry' => $destinationIsEntry,
             'type' => $redirect->type()->value,
-            'type_label' => __('advanced-seo::fields.redirect_type.option_'.$redirect->type()->value),
+            'type_label' => $redirect->type()->label(),
             'site' => $redirect->site(),
             'site_name' => Site::get($redirect->site())?->name() ?? $redirect->site(),
             'status' => $redirect->enabled(),
