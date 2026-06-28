@@ -1,6 +1,6 @@
 <script setup>
-import { ref, useTemplateRef } from 'vue';
-import { Head, router } from '@statamic/cms/inertia';
+import { useTemplateRef, getCurrentInstance } from 'vue';
+import { Head } from '@statamic/cms/inertia';
 import { Header, Button, Badge, Listing, DropdownItem, DropdownSeparator, Icon, Panel, Card, EmptyStateItem } from '@statamic/cms/ui';
 
 const props = defineProps({
@@ -13,6 +13,15 @@ const props = defineProps({
 });
 
 const listing = useTemplateRef('listing');
+
+const { $axios } = getCurrentInstance().appContext.config.globalProperties;
+
+const toggleEnabled = (url, successMessage) => {
+    $axios.post(url).then(() => {
+        Statamic.$toast.success(__(successMessage));
+        listing.value.refresh();
+    });
+};
 </script>
 
 <template>
@@ -84,6 +93,19 @@ const listing = useTemplateRef('listing');
                     rel="noopener noreferrer"
                 />
                 <DropdownItem v-if="redirect.editable" :text="__('Edit')" icon="edit" :href="redirect.edit_url" />
+                <DropdownSeparator v-if="redirect.editable" />
+                <DropdownItem
+                    v-if="redirect.editable && redirect.status"
+                    :text="__('advanced-seo::messages.disable')"
+                    icon="eye-slash"
+                    @click="toggleEnabled(redirect.disable_url, 'advanced-seo::messages.redirect_disabled')"
+                />
+                <DropdownItem
+                    v-if="redirect.editable && !redirect.status"
+                    :text="__('advanced-seo::messages.enable')"
+                    icon="eye"
+                    @click="toggleEnabled(redirect.enable_url, 'advanced-seo::messages.redirect_enabled')"
+                />
                 <DropdownSeparator v-if="redirect.deletable" />
                 <DropdownItem
                     v-if="redirect.deletable"

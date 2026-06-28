@@ -13,6 +13,8 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
     Route::resource('redirects', RedirectController::class)->except('show');
+    Route::post('/redirects/{redirect}/enable', [RedirectController::class, 'enable'])->name('redirects.enable');
+    Route::post('/redirects/{redirect}/disable', [RedirectController::class, 'disable'])->name('redirects.disable');
     Route::get('/{seoSetGroup}', SeoSetIndexController::class)->name('sets.index');
     Route::get('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'edit'])->name('sets.config.edit');
     Route::patch('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'update'])->name('sets.config.update');
