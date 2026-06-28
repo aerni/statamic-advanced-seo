@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch } from '@statamic/cms/ui';
+import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 import { Head, router } from '@statamic/cms/inertia';
 
@@ -47,7 +47,11 @@ onUnmounted(() => saveKeyBinding.destroy());
 <template>
     <Head :title />
 
-    <Header :title icon="moved">
+    <Header>
+        <template #title>
+            <StatusIndicator :status="enabled ? 'published' : 'draft'" />
+            {{ values.source ?? title }}
+        </template>
         <Button variant="primary" :text="__('Save')" :disabled="saving" @click="save" />
     </Header>
 
