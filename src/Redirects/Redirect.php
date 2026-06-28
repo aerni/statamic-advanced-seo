@@ -75,6 +75,15 @@ class Redirect implements ContainsQueryableValues, Contract
             ->args(func_get_args());
     }
 
+    public function sourceUrl(): ?string
+    {
+        if ($this->matchType() !== MatchType::Exact) {
+            return null;
+        }
+
+        return URL::assemble(Site::get($this->site())->absoluteUrl(), $this->source());
+    }
+
     public function destinationUrl(): ?string
     {
         $destination = $this->destination();

@@ -102,3 +102,26 @@ it('returns null from destinationUrl when destination is null', function () {
 
     expect((new Redirect)->destination(null)->site('default')->destinationUrl())->toBeNull();
 });
+
+it('builds an absolute sourceUrl for an exact redirect using the site absoluteUrl', function () {
+    Site::setSites([
+        'default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => 'http://localhost/de', 'locale' => 'de'],
+    ]);
+
+    $redirect = (new Redirect)->source('/old')->site('german');
+
+    expect($redirect->sourceUrl())->toBe('http://localhost/de/old');
+});
+
+it('returns null from sourceUrl for a wildcard redirect', function () {
+    Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
+
+    expect((new Redirect)->source('/blog/*')->site('default')->sourceUrl())->toBeNull();
+});
+
+it('returns null from sourceUrl for a regex redirect', function () {
+    Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
+
+    expect((new Redirect)->source('#^/x$#')->site('default')->sourceUrl())->toBeNull();
+});
