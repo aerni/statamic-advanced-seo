@@ -191,6 +191,7 @@ class ServiceProvider extends AddonServiceProvider
                 $navItems->push(
                     $nav->item(__('advanced-seo::messages.redirects'))
                         ->route('advanced-seo.redirects.index')
+                        ->icon('moved')
                 );
             }
 

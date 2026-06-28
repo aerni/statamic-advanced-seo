@@ -8,6 +8,7 @@ const props = defineProps({
     createUrl: String,
     listingUrl: String,
     canCreate: Boolean,
+    filters: Array,
 });
 
 const listing = useTemplateRef('listing');
@@ -16,7 +17,7 @@ const listing = useTemplateRef('listing');
 <template>
     <Head :title />
 
-    <Header :title>
+    <Header :title icon="moved">
         <Button v-if="canCreate" :href="createUrl" :text="__('advanced-seo::messages.redirect_create_title')" variant="primary" />
     </Header>
 
@@ -27,6 +28,7 @@ const listing = useTemplateRef('listing');
         sort-column="source"
         sort-direction="asc"
         preferences-prefix="advanced-seo.redirects"
+        :filters="filters"
         push-query
     >
         <template #cell-source="{ row: redirect }">
