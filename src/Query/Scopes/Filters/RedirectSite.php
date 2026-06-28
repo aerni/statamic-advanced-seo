@@ -27,6 +27,11 @@ class RedirectSite extends Filter
         ];
     }
 
+    public function autoApply(): array
+    {
+        return ['site' => Site::selected()->handle()];
+    }
+
     public function apply($query, $values): void
     {
         $query->where('site', $values['site']);

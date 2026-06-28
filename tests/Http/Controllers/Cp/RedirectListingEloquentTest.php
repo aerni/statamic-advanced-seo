@@ -29,6 +29,31 @@ it('returns all authorized sites redirects as json for a super user', function (
     expect($response->json('meta.total'))->toBe(2);
 });
 
+it('returns correct columns in meta', function () {
+    $response = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->assertOk();
+
+    $columnFields = collect($response->json('meta.columns'))->pluck('field')->all();
+
+    expect($columnFields)->toContain('source')
+        ->toContain('destination')
+        ->toContain('type')
+        ->toContain('site')
+        ->toContain('status');
+});
+
+it('includes site in row data', function () {
+    Redirects::make()->source('/en-page')->destination('/x')->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0])->toHaveKey('site')
+        ->and($data[0]['site'])->toBe('default');
+});
+
 it('searches by source and destination', function () {
     Redirects::make()->source('/alpha')->destination('/x')->site('default')->save();
     Redirects::make()->source('/beta')->destination('/y')->site('default')->save();

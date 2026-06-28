@@ -27,9 +27,9 @@ const listing = useTemplateRef('listing');
             ref="listing"
             :url="listingUrl"
             :allow-presets="false"
+            :allow-customizing-columns="false"
             sort-column="source"
             sort-direction="asc"
-            preferences-prefix="advanced-seo.redirects"
             :filters="filters"
             push-query
         >
@@ -46,8 +46,14 @@ const listing = useTemplateRef('listing');
                     @deleted="listing.refresh()"
                 />
             </template>
+            <template #cell-destination="{ row: redirect }">
+                {{ redirect.destination }}
+            </template>
             <template #cell-type="{ row: redirect }">
                 {{ redirect.type_label }}
+            </template>
+            <template #cell-site="{ row: redirect }">
+                {{ redirect.site_name }}
             </template>
             <template #cell-status="{ row: redirect }">
                 <Badge

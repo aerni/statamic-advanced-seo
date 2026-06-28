@@ -56,8 +56,6 @@ class RedirectController extends CpController
             $redirects = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
             return (new RedirectsResource($redirects))
-                ->blueprint(RedirectBlueprint::definition())
-                ->columnPreferenceKey('advanced-seo.redirects.columns')
                 ->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 

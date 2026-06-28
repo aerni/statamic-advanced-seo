@@ -4,68 +4,49 @@ namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
-use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
+use Statamic\Facades\Site;
 
 class Redirects extends ResourceCollection
 {
-    use HasRequestedColumns;
-
     public $collects = ListedRedirect::class;
-
-    protected $blueprint;
 
     protected $columns;
 
-    protected $columnPreferenceKey;
-
-    public function blueprint($blueprint): static
-    {
-        $this->blueprint = $blueprint;
-
-        return $this;
-    }
-
-    public function columnPreferenceKey($key): static
-    {
-        $this->columnPreferenceKey = $key;
-
-        return $this;
-    }
-
     protected function setColumns(): void
     {
-        $columns = $this->blueprint->columns();
+        $columns = collect([
+            Column::make('source')->label(__('advanced-seo::fields.redirect_source.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
+            Column::make('destination')->label(__('advanced-seo::fields.redirect_destination.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
+            Column::make('type')->label(__('advanced-seo::fields.redirect_type.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
+        ]);
 
-        $status = Column::make('status')
-            ->listable(true)
-            ->visible(true)
-            ->defaultVisibility(true)
-            ->defaultOrder($columns->count() + 1)
-            ->sortable(false);
-
-        $columns->put('status', $status);
-
-        if ($key = $this->columnPreferenceKey) {
-            $columns->setPreferred($key);
+        if (Site::multiEnabled()) {
+            $columns->push(
+                Column::make('site')->label(__('Site'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
+            );
         }
 
-        $this->columns = $columns->rejectUnlisted()->values();
+        $columns->push(
+            Column::make('status')->label(__('Status'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true)
+        );
+
+        $this->columns = $columns->values();
     }
 
     public function toArray($request)
     {
         $this->setColumns();
 
-        return $this->collection->each(function ($redirect) {
-            $redirect->columns($this->requestedColumns());
-        });
+        return $this->collection;
     }
 
     public function with($request)
     {
+        $this->setColumns();
+
         return [
             'meta' => [
-                'columns' => $this->visibleColumns(),
+                'columns' => $this->columns,
             ],
         ];
     }
