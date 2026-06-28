@@ -25,6 +25,8 @@ interface Redirect
 
     public function editUrl(): string;
 
+    public function deleteUrl(): string;
+
     public function path(): string;
 
     public function fileData(): array;
