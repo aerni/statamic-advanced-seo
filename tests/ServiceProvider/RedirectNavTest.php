@@ -77,3 +77,26 @@ it('does not add a Redirects nav item for a user without view redirects permissi
 
     expect($childNames->contains('Redirects'))->toBeFalse();
 });
+
+it('does not add a Redirects nav item when the redirects feature is disabled', function () {
+    flushBlink();
+    config(['advanced-seo.redirects.enabled' => false]);
+
+    $role = tap(Role::make('redirect_viewer')->addPermission(['view redirects', 'access default site']))->save();
+    $user = tap(User::make()->assignRole('redirect_viewer'))->save();
+
+    $this->actingAs($user);
+
+    $extensions = captureNavExtensions();
+    $nav = runNavExtensions($extensions);
+
+    $childNames = collect($nav->items())
+        ->flatMap(function ($item) {
+            $c = $item->children();
+
+            return $c instanceof Collection ? $c : collect($c ?? []);
+        })
+        ->map->name();
+
+    expect($childNames->contains('Redirects'))->toBeFalse();
+});
