@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Fieldtype } from '@statamic/cms';
-import { Badge, Input, injectPublishContext } from '@statamic/cms/ui';
+import { Input, injectPublishContext } from '@statamic/cms/ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -29,30 +29,6 @@ const displayValue = computed(() => {
     return props.value.replace(/^\//, '');
 });
 
-const matchType = computed(() => {
-    if (!props.value) {
-        return null;
-    }
-
-    if (props.value.startsWith('#')) {
-        return 'regex';
-    }
-
-    if (props.value.includes('*')) {
-        return 'wildcard';
-    }
-
-    return 'exact';
-});
-
-const matchTypeLabel = computed(() => {
-    if (!matchType.value) {
-        return null;
-    }
-
-    return __(`advanced-seo::messages.match_type_${matchType.value}`);
-});
-
 function onInput(typed) {
     if (!typed) {
         return update(typed);
@@ -67,20 +43,16 @@ function onInput(typed) {
 </script>
 
 <template>
-    <div class="relative">
-        <Input
-            :model-value="displayValue"
-            :focus="config.focus"
-            :read-only="isReadOnly"
-            :prepend="siteUrl ? siteUrl + '/' : null"
-            :placeholder="config.placeholder"
-            :name="name"
-            :id="id"
-            :class="matchType ? 'pr-20' : ''"
-            @update:model-value="onInput"
-            @focus="$emit('focus')"
-            @blur="$emit('blur')"
-        />
-        <Badge v-if="matchType" :text="matchTypeLabel" class="absolute -translate-y-1/2 right-2 top-1/2" />
-    </div>
+    <Input
+        :model-value="displayValue"
+        :focus="config.focus"
+        :read-only="isReadOnly"
+        :prepend="siteUrl ? siteUrl + '/' : null"
+        :placeholder="config.placeholder"
+        :name="name"
+        :id="id"
+        @update:model-value="onInput"
+        @focus="$emit('focus')"
+        @blur="$emit('blur')"
+    />
 </template>

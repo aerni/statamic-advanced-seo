@@ -32,11 +32,6 @@ return [
     'seo_set_config_deleted' => 'SEO config deleted',
     'disable_confirmation' => 'Are you sure you want to disable this item? All SEO data will be deleted.',
 
-    // Match types
-    'match_type_exact' => 'Exact',
-    'match_type_wildcard' => 'Wildcard',
-    'match_type_regex' => 'Regex',
-
     // Redirects
     'redirects' => 'Redirects',
     'redirects_description' => 'Manage URL redirects for your sites.',

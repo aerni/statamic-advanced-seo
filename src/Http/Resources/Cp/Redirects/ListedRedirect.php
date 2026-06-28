@@ -19,8 +19,6 @@ class ListedRedirect extends JsonResource
         return [
             'id' => $redirect->id(),
             'source' => $redirect->source(),
-            'match_type' => $redirect->matchType()->value,
-            'match_type_label' => $redirect->matchType()->label(),
             'destination' => $this->destinationDisplay($redirect, $destinationIsEntry),
             'destination_url' => $redirect->destinationUrl(),
             'destination_is_entry' => $destinationIsEntry,

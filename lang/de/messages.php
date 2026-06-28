@@ -22,11 +22,6 @@ return [
     'redirect_source_invalid_regex' => 'Die Quelle ist kein gültiger regulärer Ausdruck.',
     'redirect_source_not_unique' => 'Eine Weiterleitung mit dieser Quelle existiert bereits für diese Website.',
 
-    // Match types
-    'match_type_exact' => 'Exakt',
-    'match_type_wildcard' => 'Platzhalter',
-    'match_type_regex' => 'Regex',
-
     // Redirects
     'redirects' => 'Weiterleitungen',
     'redirects_description' => 'URL-Weiterleitungen für deine Websites verwalten.',
