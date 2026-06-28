@@ -184,6 +184,16 @@ class ServiceProvider extends AddonServiceProvider
                 ->filter(fn (SeoSetGroup $group) => User::current()->can('viewAny', [SeoSet::class, $group]))
                 ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->url()));
 
+            $canViewRedirects = Features\Redirects::enabled()
+                && User::current()->can('viewAny', Contracts\Redirect::class);
+
+            if ($canViewRedirects) {
+                $navItems->push(
+                    $nav->item(__('advanced-seo::messages.redirects'))
+                        ->route('advanced-seo.redirects.index')
+                );
+            }
+
             if ($navItems->isEmpty()) {
                 return;
             }
