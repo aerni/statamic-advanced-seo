@@ -24,6 +24,7 @@ return [
 
     // Redirects
     'redirects' => 'Weiterleitungen',
+    'redirects_description' => 'URL-Weiterleitungen für deine Websites verwalten.',
     'redirect_create_title' => 'Weiterleitung erstellen',
     'redirect_create_description' => 'Lege deine erste Weiterleitung an, um loszulegen.',
     'redirect_edit_title' => 'Weiterleitung bearbeiten',
