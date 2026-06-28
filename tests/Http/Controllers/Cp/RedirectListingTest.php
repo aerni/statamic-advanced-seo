@@ -239,7 +239,7 @@ it('exposes a non-null absolute test_url for an exact redirect', function () {
         ->and($data[0]['test_url'])->toEndWith('/old-page');
 });
 
-it('exposes a null test_url for a wildcard redirect', function () {
+it('exposes a non-null test_url for a wildcard redirect', function () {
     Redirects::make()->source('/old/*')->destination('/new')->site('default')->save();
 
     $data = $this->actingAs($this->super)
@@ -247,7 +247,9 @@ it('exposes a null test_url for a wildcard redirect', function () {
         ->json('data');
 
     expect($data[0])->toHaveKey('test_url')
-        ->and($data[0]['test_url'])->toBeNull();
+        ->and($data[0]['test_url'])->not->toBeNull()
+        ->and($data[0]['test_url'])->toStartWith('http')
+        ->and($data[0]['test_url'])->toEndWith('/old/wildcard1');
 });
 
 it('exposes a null test_url for a regex redirect', function () {

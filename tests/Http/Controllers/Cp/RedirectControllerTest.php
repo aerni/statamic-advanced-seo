@@ -264,13 +264,15 @@ it('includes a non-null testUrl for an exact redirect', function () {
         );
 });
 
-it('returns null testUrl for a wildcard redirect', function () {
+it('returns a non-null testUrl for a wildcard redirect', function () {
     $redirect = tap(Redirects::make()->source('/blog/*')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('testUrl', null));
+        ->assertInertia(fn ($page) => $page
+            ->where('testUrl', fn ($testUrl) => str_ends_with($testUrl, '/blog/wildcard1'))
+        );
 });
 
 it('returns null testUrl for a regex redirect', function () {

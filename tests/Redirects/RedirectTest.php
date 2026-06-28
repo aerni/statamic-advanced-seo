@@ -114,10 +114,11 @@ it('builds an absolute sourceUrl for an exact redirect using the site absoluteUr
     expect($redirect->sourceUrl())->toBe('http://localhost/de/old');
 });
 
-it('returns null from sourceUrl for a wildcard redirect', function () {
+it('substitutes wildcard segments with sample values in sourceUrl', function () {
     Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
 
-    expect((new Redirect)->source('/blog/*')->site('default')->sourceUrl())->toBeNull();
+    expect((new Redirect)->source('/blog/*')->site('default')->sourceUrl())->toBe('http://localhost/blog/wildcard1');
+    expect((new Redirect)->source('/a/*/b/*')->site('default')->sourceUrl())->toBe('http://localhost/a/wildcard1/b/wildcard2');
 });
 
 it('returns null from sourceUrl for a regex redirect', function () {
