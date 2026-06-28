@@ -67,7 +67,7 @@ function onInput(typed) {
 </script>
 
 <template>
-    <div class="flex items-center gap-2">
+    <div class="relative">
         <Input
             :model-value="displayValue"
             :focus="config.focus"
@@ -76,10 +76,11 @@ function onInput(typed) {
             :placeholder="config.placeholder"
             :name="name"
             :id="id"
+            :class="matchType ? 'pr-20' : ''"
             @update:model-value="onInput"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         />
-        <Badge v-if="matchType" :text="matchTypeLabel" />
+        <Badge v-if="matchType" :text="matchTypeLabel" class="absolute -translate-y-1/2 right-2 top-1/2" />
     </div>
 </template>
