@@ -20,7 +20,7 @@ class ListedRedirect extends JsonResource
             'id' => $redirect->id(),
             'source' => $redirect->source(),
             'destination' => $this->destinationDisplay($redirect, $destinationIsEntry),
-            'destination_url' => $this->destinationAbsoluteUrl($redirect, $destinationIsEntry),
+            'destination_url' => $redirect->destinationUrl(),
             'destination_is_entry' => $destinationIsEntry,
             'type' => $redirect->type()->value,
             'type_label' => __('advanced-seo::fields.redirect_type.option_'.$redirect->type()->value),
@@ -44,28 +44,5 @@ class ListedRedirect extends JsonResource
         }
 
         return $redirect->destination();
-    }
-
-    protected function destinationAbsoluteUrl($redirect, bool $destinationIsEntry): ?string
-    {
-        if ($destinationIsEntry) {
-            $id = Str::after($redirect->destination(), 'entry::');
-
-            return Entry::find($id)?->in($redirect->site())?->absoluteUrl();
-        }
-
-        $destination = $redirect->destination();
-
-        if (is_null($destination)) {
-            return null;
-        }
-
-        if (Str::startsWith($destination, ['http://', 'https://'])) {
-            return $destination;
-        }
-
-        $siteAbsoluteUrl = Str::removeRight(Site::get($redirect->site())->absoluteUrl(), '/');
-
-        return $siteAbsoluteUrl.$destination;
     }
 }

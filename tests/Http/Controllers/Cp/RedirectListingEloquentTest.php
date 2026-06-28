@@ -195,3 +195,33 @@ it('shows a null destination and null destination_url for a 410 gone redirect', 
         ->and($data[0]['destination_url'])->toBeNull()
         ->and($data[0]['destination_is_entry'])->toBeFalse();
 });
+
+it('assembles destination_url correctly for a site with a path-prefix url', function () {
+    Site::setSites([
+        'default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => 'http://localhost/de', 'locale' => 'de'],
+    ]);
+
+    Redirects::make()->source('/alt')->destination('/new')->site('default')->save();
+    Redirects::make()->source('/alt-de')->destination('/new')->site('german')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    $bySource = collect($data)->keyBy('source');
+
+    expect($bySource['/alt']['destination_url'])->toBe('http://localhost/new')
+        ->and($bySource['/alt-de']['destination_url'])->toBe('http://localhost/de/new');
+});
+
+it('passes an external destination through unchanged as destination_url', function () {
+    Redirects::make()->source('/old')->destination('https://example.com/x')->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['destination_url'])->toBe('https://example.com/x')
+        ->and($data[0]['destination_is_entry'])->toBeFalse();
+});
