@@ -106,7 +106,6 @@ const toggleEnabled = (url, successMessage) => {
                     icon="eye"
                     @click="toggleEnabled(redirect.enable_url, 'advanced-seo::messages.redirect_enabled')"
                 />
-                <DropdownSeparator v-if="redirect.deletable" />
                 <DropdownItem
                     v-if="redirect.deletable"
                     :text="__('Delete')"
