@@ -62,16 +62,33 @@ it('forbids the index without permission', function () {
     $this->actingAs($nobody)->getJson(cp_route('advanced-seo.redirects.index'))->assertForbidden();
 });
 
-it('renders the create form', function () {
-    $this->actingAs($this->super)->get(cp_route('advanced-seo.redirects.create'))->assertOk();
+it('renders the create form as an Inertia page', function () {
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.create'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('advanced-seo::Redirects/Create')
+            ->has('blueprint')
+            ->has('values')
+            ->has('meta')
+            ->where('submitUrl', cp_route('advanced-seo.redirects.store'))
+        );
 });
 
-it('renders the edit form for an existing redirect', function () {
+it('renders the edit form as an Inertia page for an existing redirect', function () {
     $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
-        ->assertOk();
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('advanced-seo::Redirects/Edit')
+            ->has('blueprint')
+            ->has('meta')
+            ->where('submitUrl', cp_route('advanced-seo.redirects.update', $redirect->id()))
+            ->where('values.source', '/old')
+            ->where('values.destination', '/new')
+        );
 });
 
 it('404s editing a missing redirect', function () {

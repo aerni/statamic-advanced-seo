@@ -10,7 +10,6 @@ use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
-use Statamic\CP\PublishForm;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -73,32 +72,45 @@ class RedirectController extends CpController
         ]);
     }
 
-    public function create(): PublishForm
+    public function create(): mixed
     {
         $this->authorize('create', Redirect::class);
 
-        return PublishForm::make(RedirectBlueprint::definition())
-            ->icon('moved')
-            ->title(__('advanced-seo::messages.redirect_create_title'))
-            ->submittingTo(cp_route('advanced-seo.redirects.store'), 'POST');
+        $blueprint = RedirectBlueprint::definition();
+
+        $fields = $blueprint->fields()->preProcess();
+
+        return Inertia::render('advanced-seo::Redirects/Create', [
+            'title' => __('advanced-seo::messages.redirect_create_title'),
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta()->all(),
+            'submitUrl' => cp_route('advanced-seo.redirects.store'),
+        ]);
     }
 
-    public function edit(Redirect $redirect): PublishForm
+    public function edit(Redirect $redirect): mixed
     {
         $this->authorize('edit', $redirect);
 
-        return PublishForm::make(RedirectBlueprint::definition())
-            ->icon('moved')
-            ->title(__('advanced-seo::messages.redirect_edit_title'))
-            ->values([
-                'source' => $redirect->source(),
-                'destination' => $redirect->destination(),
-                'type' => $redirect->type()->value,
-                'enabled' => $redirect->enabled(),
-                'description' => $redirect->description(),
-                'site' => $redirect->site(),
-            ])
-            ->submittingTo(cp_route('advanced-seo.redirects.update', $redirect->id()));
+        $blueprint = RedirectBlueprint::definition();
+
+        $fields = $blueprint->fields()->addValues([
+            'source' => $redirect->source(),
+            'destination' => $redirect->destination(),
+            'type' => $redirect->type()->value,
+            'enabled' => $redirect->enabled(),
+            'description' => $redirect->description(),
+            'site' => $redirect->site(),
+        ])->preProcess();
+
+        return Inertia::render('advanced-seo::Redirects/Edit', [
+            'title' => __('advanced-seo::messages.redirect_edit_title'),
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta()->all(),
+            'submitUrl' => cp_route('advanced-seo.redirects.update', $redirect->id()),
+        ]);
     }
 
     public function store(Request $request): array
