@@ -9,12 +9,14 @@ const props = defineProps({
     blueprint: { type: Object, required: true },
     values: { type: Object, required: true },
     meta: { type: Object, required: true },
+    enabled: { type: Boolean, default: true },
     submitUrl: { type: String, required: true },
 });
 
 const container = useTemplateRef('container');
 const values = ref(props.values);
 const meta = ref(props.meta);
+const enabled = ref(props.enabled);
 const errors = ref({});
 const saving = ref(false);
 
@@ -22,7 +24,7 @@ function save() {
     new Pipeline()
         .provide({ container, errors, saving })
         .through([
-            new Request(props.submitUrl, 'post'),
+            new Request(props.submitUrl, 'post', { enabled: enabled.value }),
         ])
         .then((response) => {
             Statamic.$toast.success(__('Saved'));
@@ -61,10 +63,7 @@ onUnmounted(() => saveKeyBinding.destroy());
             <template #actions>
                 <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!">
                     <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
-                    <Switch
-                        :model-value="values.enabled"
-                        @update:model-value="container.setFieldValue('enabled', $event)"
-                    />
+                    <Switch v-model="enabled" />
                 </Panel>
             </template>
         </PublishTabs>

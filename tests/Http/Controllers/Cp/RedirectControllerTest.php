@@ -71,12 +71,13 @@ it('renders the create form as an Inertia page', function () {
             ->has('blueprint')
             ->has('values')
             ->has('meta')
+            ->where('enabled', true)
             ->where('submitUrl', cp_route('advanced-seo.redirects.store'))
         );
 });
 
 it('renders the edit form as an Inertia page for an existing redirect', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default')->enabled(false))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
@@ -85,6 +86,7 @@ it('renders the edit form as an Inertia page for an existing redirect', function
             ->component('advanced-seo::Redirects/Edit')
             ->has('blueprint')
             ->has('meta')
+            ->where('enabled', false)
             ->where('submitUrl', cp_route('advanced-seo.redirects.update', $redirect->id()))
             ->where('values.source', '/old')
             ->where('values.destination', '/new')
@@ -112,6 +114,37 @@ it('creates a redirect', function () {
     expect($redirect)->not->toBeNull()
         ->and($redirect->destination())->toBe('/new')
         ->and($redirect->type())->toBe(RedirectType::Permanent);
+});
+
+it('creates a disabled redirect when enabled is false', function () {
+    $this->actingAs($this->super)
+        ->post(cp_route('advanced-seo.redirects.store'), [
+            'source' => '/disabled-route',
+            'destination' => '/new',
+            'type' => 301,
+            'enabled' => false,
+            'site' => 'default',
+        ])
+        ->assertOk();
+
+    $redirect = Redirects::query()->where('site', 'default')->where('source', '/disabled-route')->first();
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->enabled())->toBeFalse();
+});
+
+it('defaults enabled to true when omitted from the request', function () {
+    $this->actingAs($this->super)
+        ->post(cp_route('advanced-seo.redirects.store'), [
+            'source' => '/omitted-enabled',
+            'destination' => '/new',
+            'type' => 301,
+            'site' => 'default',
+        ])
+        ->assertOk();
+
+    $redirect = Redirects::query()->where('site', 'default')->where('source', '/omitted-enabled')->first();
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->enabled())->toBeTrue();
 });
 
 it('requires a source', function () {
@@ -164,6 +197,17 @@ it('updates a redirect', function () {
         ])->assertOk();
 
     expect(Redirects::find($redirect->id())->destination())->toBe('/newer');
+});
+
+it('toggles enabled status when updating', function () {
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default')->enabled(true))->save();
+
+    $this->actingAs($this->super)
+        ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
+            'source' => '/old', 'destination' => '/new', 'type' => 301, 'enabled' => false, 'site' => 'default',
+        ])->assertOk();
+
+    expect(Redirects::find($redirect->id())->enabled())->toBeFalse();
 });
 
 it('moves a redirect when its site changes', function () {

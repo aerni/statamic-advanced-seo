@@ -79,17 +79,7 @@ class RedirectBlueprint extends BaseBlueprint
 
     protected function sidebar(): array
     {
-        $fields = [
-            [
-                'handle' => 'enabled',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => __('advanced-seo::fields.redirect_enabled.display'),
-                    'instructions' => __('advanced-seo::fields.redirect_enabled.instructions'),
-                    'default' => true,
-                ],
-            ],
-        ];
+        $fields = [];
 
         if (Site::multiEnabled()) {
             $fields[] = [

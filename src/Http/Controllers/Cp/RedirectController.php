@@ -85,6 +85,7 @@ class RedirectController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values()->all(),
             'meta' => $fields->meta()->all(),
+            'enabled' => true,
             'submitUrl' => cp_route('advanced-seo.redirects.store'),
         ]);
     }
@@ -99,7 +100,6 @@ class RedirectController extends CpController
             'source' => $redirect->source(),
             'destination' => $redirect->destination(),
             'type' => $redirect->type()->value,
-            'enabled' => $redirect->enabled(),
             'description' => $redirect->description(),
             'site' => $redirect->site(),
         ])->preProcess();
@@ -109,6 +109,7 @@ class RedirectController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values()->all(),
             'meta' => $fields->meta()->all(),
+            'enabled' => $redirect->enabled(),
             'submitUrl' => cp_route('advanced-seo.redirects.update', $redirect->id()),
         ]);
     }
@@ -118,6 +119,7 @@ class RedirectController extends CpController
         $this->authorize('create', Redirect::class);
 
         $values = $this->validateAndProcess($request, null);
+        $values['enabled'] = $request->boolean('enabled', true);
 
         $redirect = $this->fill(Redirects::make(), $values)->save();
 
@@ -129,6 +131,7 @@ class RedirectController extends CpController
         $this->authorize('edit', $redirect);
 
         $values = $this->validateAndProcess($request, $redirect);
+        $values['enabled'] = $request->boolean('enabled', true);
 
         $this->fill($redirect, $values)->save();
 
