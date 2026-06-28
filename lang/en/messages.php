@@ -38,6 +38,7 @@ return [
     'redirect_create_title' => 'Create Redirect',
     'redirect_create_description' => 'Get started by creating your first redirect.',
     'redirect_edit_title' => 'Edit Redirect',
+    'test_redirect' => 'Test Redirect',
 
     // UI
     'origins' => 'Origins',

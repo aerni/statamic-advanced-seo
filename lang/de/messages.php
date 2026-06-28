@@ -28,6 +28,7 @@ return [
     'redirect_create_title' => 'Weiterleitung erstellen',
     'redirect_create_description' => 'Lege deine erste Weiterleitung an, um loszulegen.',
     'redirect_edit_title' => 'Weiterleitung bearbeiten',
+    'test_redirect' => 'Weiterleitung testen',
 
     // Flash messages
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',

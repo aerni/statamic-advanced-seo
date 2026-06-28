@@ -11,6 +11,7 @@ const props = defineProps({
     meta: { type: Object, required: true },
     enabled: { type: Boolean, default: true },
     submitUrl: { type: String, required: true },
+    testUrl: { type: String, default: null },
 });
 
 const container = useTemplateRef('container');
@@ -52,6 +53,7 @@ onUnmounted(() => saveKeyBinding.destroy());
             <StatusIndicator :status="enabled ? 'published' : 'draft'" />
             {{ values.source ?? title }}
         </template>
+        <Button v-if="testUrl" :href="testUrl" :text="__('advanced-seo::messages.test_redirect')" icon="external-link" target="_blank" rel="noopener noreferrer" />
         <Button variant="primary" :text="__('Save')" :disabled="saving" @click="save" />
     </Header>
 

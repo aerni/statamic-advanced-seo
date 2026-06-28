@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
+use Aerni\AdvancedSeo\Enums\MatchType;
 use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
@@ -12,6 +13,7 @@ use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -104,6 +106,9 @@ class RedirectController extends CpController
             'site' => $redirect->site(),
         ])->preProcess();
 
+        $isExact = $redirect->matchType() === MatchType::Exact;
+        $testUrl = $isExact ? URL::assemble(Site::get($redirect->site())->absoluteUrl(), $redirect->source()) : null;
+
         return Inertia::render('advanced-seo::Redirects/Edit', [
             'title' => __('advanced-seo::messages.redirect_edit_title'),
             'blueprint' => $blueprint->toPublishArray(),
@@ -111,6 +116,7 @@ class RedirectController extends CpController
             'meta' => $fields->meta()->all(),
             'enabled' => $redirect->enabled(),
             'submitUrl' => cp_route('advanced-seo.redirects.update', $redirect->id()),
+            'testUrl' => $testUrl,
         ]);
     }
 

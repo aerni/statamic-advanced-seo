@@ -252,3 +252,32 @@ it('forbids a viewer from deleting a redirect', function () {
         ->deleteJson(cp_route('advanced-seo.redirects.destroy', $redirect->id()))
         ->assertForbidden();
 });
+
+it('includes a non-null testUrl for an exact redirect', function () {
+    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('testUrl', fn ($testUrl) => str_ends_with($testUrl, '/old'))
+        );
+});
+
+it('returns null testUrl for a wildcard redirect', function () {
+    $redirect = tap(Redirects::make()->source('/blog/*')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('testUrl', null));
+});
+
+it('returns null testUrl for a regex redirect', function () {
+    $redirect = tap(Redirects::make()->source('#^/x$#')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('testUrl', null));
+});
