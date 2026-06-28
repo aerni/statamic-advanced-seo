@@ -134,7 +134,7 @@ it('only returns redirects for sites a non-super user is authorized to view', fu
     expect($data)->toHaveCount(1)->and($data[0]['source'])->toBe('/en-page');
 });
 
-it('resolves an entry destination to the entry url with destination_is_entry true', function () {
+it('resolves an entry destination to the relative entry url with destination_is_entry true', function () {
     Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
 
     $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
@@ -146,17 +146,19 @@ it('resolves an entry destination to the entry url with destination_is_entry tru
         ->json('data');
 
     expect($data[0]['destination'])->toBe('/about')
+        ->and($data[0]['destination_url'])->toContain('/about')
         ->and($data[0]['destination_is_entry'])->toBeTrue();
 });
 
-it('shows a plain path destination with destination_is_entry false', function () {
+it('shows a plain path destination as-is without absolutizing', function () {
     Redirects::make()->source('/old')->destination('/new-path')->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
         ->json('data');
 
-    expect($data[0]['destination'])->toContain('/new-path')
+    expect($data[0]['destination'])->toBe('/new-path')
+        ->and($data[0]['destination_url'])->toContain('/new-path')
         ->and($data[0]['destination_is_entry'])->toBeFalse();
 });
 
@@ -170,10 +172,11 @@ it('falls back to the raw destination when an entry destination no longer exists
         ->json('data');
 
     expect($data[0]['destination'])->toBe($raw)
+        ->and($data[0]['destination_url'])->toBeNull()
         ->and($data[0]['destination_is_entry'])->toBeTrue();
 });
 
-it('shows a null destination for a 410 gone redirect', function () {
+it('shows a null destination and null destination_url for a 410 gone redirect', function () {
     Redirects::make()->source('/gone')->destination(null)->site('default')->type(RedirectType::Gone)->save();
 
     $data = $this->actingAs($this->super)
@@ -181,5 +184,6 @@ it('shows a null destination for a 410 gone redirect', function () {
         ->json('data');
 
     expect($data[0]['destination'])->toBeNull()
+        ->and($data[0]['destination_url'])->toBeNull()
         ->and($data[0]['destination_is_entry'])->toBeFalse();
 });

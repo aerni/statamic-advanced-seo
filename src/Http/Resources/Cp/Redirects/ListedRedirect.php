@@ -16,14 +16,11 @@ class ListedRedirect extends JsonResource
 
         $destinationIsEntry = Str::startsWith($redirect->destination() ?? '', 'entry::');
 
-        $destinationUrl = $destinationIsEntry
-            ? $this->entryDestinationUrl($redirect)
-            : $redirect->destinationUrl();
-
         return [
             'id' => $redirect->id(),
             'source' => $redirect->source(),
-            'destination' => $destinationUrl ?? $redirect->destination(),
+            'destination' => $this->destinationDisplay($redirect, $destinationIsEntry),
+            'destination_url' => $this->destinationAbsoluteUrl($redirect, $destinationIsEntry),
             'destination_is_entry' => $destinationIsEntry,
             'type' => $redirect->type()->value,
             'type_label' => __('advanced-seo::fields.redirect_type.option_'.$redirect->type()->value),
@@ -37,10 +34,26 @@ class ListedRedirect extends JsonResource
         ];
     }
 
-    protected function entryDestinationUrl($redirect): ?string
+    protected function destinationDisplay($redirect, bool $destinationIsEntry): ?string
     {
-        $id = Str::after($redirect->destination(), 'entry::');
+        if ($destinationIsEntry) {
+            $id = Str::after($redirect->destination(), 'entry::');
+            $entry = Entry::find($id)?->in($redirect->site());
 
-        return Entry::find($id)?->in($redirect->site())?->url();
+            return $entry?->url() ?? $redirect->destination();
+        }
+
+        return $redirect->destination();
+    }
+
+    protected function destinationAbsoluteUrl($redirect, bool $destinationIsEntry): ?string
+    {
+        if ($destinationIsEntry) {
+            $id = Str::after($redirect->destination(), 'entry::');
+
+            return Entry::find($id)?->in($redirect->site())?->absoluteUrl();
+        }
+
+        return $redirect->destinationUrl();
     }
 }
