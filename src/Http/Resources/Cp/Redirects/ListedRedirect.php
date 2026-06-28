@@ -54,6 +54,18 @@ class ListedRedirect extends JsonResource
             return Entry::find($id)?->in($redirect->site())?->absoluteUrl();
         }
 
-        return $redirect->destinationUrl();
+        $destination = $redirect->destination();
+
+        if (is_null($destination)) {
+            return null;
+        }
+
+        if (Str::startsWith($destination, ['http://', 'https://'])) {
+            return $destination;
+        }
+
+        $siteAbsoluteUrl = Str::removeRight(Site::get($redirect->site())->absoluteUrl(), '/');
+
+        return $siteAbsoluteUrl.$destination;
     }
 }

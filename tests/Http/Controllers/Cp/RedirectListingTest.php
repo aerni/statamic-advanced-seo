@@ -13,8 +13,8 @@ uses(PreventsSavingStacheItemsToDisk::class);
 
 beforeEach(function () {
     Site::setSites([
-        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
-        'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+        'default' => ['name' => 'Default', 'url' => 'http://localhost/', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => 'http://localhost/fr/', 'locale' => 'fr'],
     ]);
     $this->super = tap(User::make()->makeSuper())->save();
 });
@@ -145,20 +145,28 @@ it('resolves an entry destination to the relative entry url with destination_is_
         ->getJson(cp_route('advanced-seo.redirects.index'))
         ->json('data');
 
+    $siteHost = Site::get('default')->absoluteUrl();
+
     expect($data[0]['destination'])->toBe('/about')
+        ->and($data[0]['destination_url'])->toStartWith($siteHost)
         ->and($data[0]['destination_url'])->toContain('/about')
         ->and($data[0]['destination_is_entry'])->toBeTrue();
 });
 
-it('shows a plain path destination as-is without absolutizing', function () {
+it('shows a plain path destination as-is but absolutizes destination_url', function () {
     Redirects::make()->source('/old')->destination('/new-path')->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
         ->json('data');
 
+    $siteHost = Site::get('default')->absoluteUrl();
+
     expect($data[0]['destination'])->toBe('/new-path')
-        ->and($data[0]['destination_url'])->toContain('/new-path')
+        ->and($data[0]['destination_url'])->toStartWith('http')
+        ->and($data[0]['destination_url'])->toStartWith($siteHost)
+        ->and($data[0]['destination_url'])->toEndWith('/new-path')
+        ->and($data[0]['destination_url'])->not->toContain('/cp/')
         ->and($data[0]['destination_is_entry'])->toBeFalse();
 });
 
