@@ -2,10 +2,20 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Contracts\Redirect;
 use Statamic\Facades\Site;
 
 class RedirectBlueprint extends BaseBlueprint
 {
+    protected ?string $exceptId = null;
+
+    public function forRedirect(?Redirect $redirect = null): static
+    {
+        $this->exceptId = $redirect?->id();
+
+        return $this;
+    }
+
     protected function handle(): string
     {
         return 'redirect';
@@ -25,6 +35,10 @@ class RedirectBlueprint extends BaseBlueprint
 
     protected function redirect(): array
     {
+        $uniqueRule = $this->exceptId
+            ? "new \\Aerni\\AdvancedSeo\\Rules\\UniqueRedirectSource('{$this->exceptId}')"
+            : 'new \\Aerni\\AdvancedSeo\\Rules\\UniqueRedirectSource()';
+
         return [
             'fields' => [
                 [
@@ -33,7 +47,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'type' => 'text',
                         'display' => __('advanced-seo::fields.redirect_source.display'),
                         'instructions' => __('advanced-seo::fields.redirect_source.instructions'),
-                        'validate' => ['required'],
+                        'validate' => ['required', 'new \\Aerni\\AdvancedSeo\\Rules\\ValidRedirectSource()', $uniqueRule],
                         'width' => 50,
                     ],
                 ],

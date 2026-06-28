@@ -6,11 +6,8 @@ use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Facades\Redirects;
-use Aerni\AdvancedSeo\Rules\UniqueRedirectSource;
-use Aerni\AdvancedSeo\Rules\ValidRedirectSource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\Site;
@@ -35,13 +32,8 @@ class RedirectController extends CpController
     {
         $this->authorize('create', Redirect::class);
 
-        return PublishForm::make(RedirectBlueprint::definition())
+        return PublishForm::make(RedirectBlueprint::make()->get())
             ->title(__('advanced-seo::messages.redirect_create_title'))
-            ->values([
-                'type' => RedirectType::Permanent->value,
-                'enabled' => true,
-                'site' => Site::selected()->handle(),
-            ])
             ->submittingTo(cp_route('advanced-seo.redirects.store'), 'POST');
     }
 
@@ -49,7 +41,7 @@ class RedirectController extends CpController
     {
         $this->authorize('edit', $redirect);
 
-        return PublishForm::make(RedirectBlueprint::definition())
+        return PublishForm::make(RedirectBlueprint::make()->forRedirect($redirect)->get())
             ->title(__('advanced-seo::messages.redirect_edit_title'))
             ->values([
                 'source' => $redirect->source(),
@@ -66,13 +58,7 @@ class RedirectController extends CpController
     {
         $this->authorize('create', Redirect::class);
 
-        $site = $request->input('site', Site::selected()->handle());
-
-        Validator::make($request->all(), [
-            'source' => [new ValidRedirectSource, new UniqueRedirectSource($site)],
-        ])->validate();
-
-        $values = PublishForm::make(RedirectBlueprint::definition())->submit($request->all());
+        $values = PublishForm::make(RedirectBlueprint::make()->get())->submit($request->all());
 
         $redirect = $this->fill(Redirects::make(), $values)->save();
 
@@ -83,13 +69,7 @@ class RedirectController extends CpController
     {
         $this->authorize('edit', $redirect);
 
-        $site = $request->input('site', $redirect->site());
-
-        Validator::make($request->all(), [
-            'source' => [new ValidRedirectSource, new UniqueRedirectSource($site, $redirect->id())],
-        ])->validate();
-
-        $values = PublishForm::make(RedirectBlueprint::definition())->submit($request->all());
+        $values = PublishForm::make(RedirectBlueprint::make()->forRedirect($redirect)->get())->submit($request->all());
 
         $this->fill($redirect, $values)->save();
 

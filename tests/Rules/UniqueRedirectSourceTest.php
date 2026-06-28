@@ -12,7 +12,10 @@ beforeEach(fn () => Site::setSites(['default' => ['name' => 'Default', 'url' => 
 
 function uniquePasses(string $source, string $site, ?string $exceptId = null): bool
 {
-    return Validator::make(['source' => $source], ['source' => [new UniqueRedirectSource($site, $exceptId)]])->passes();
+    return Validator::make(
+        ['source' => $source, 'site' => $site],
+        ['source' => [new UniqueRedirectSource($exceptId)]]
+    )->passes();
 }
 
 it('passes when the source is unused on the site', function () {
