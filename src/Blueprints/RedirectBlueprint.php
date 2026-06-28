@@ -48,7 +48,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'display' => __('advanced-seo::fields.redirect_destination.display'),
                         'instructions' => __('advanced-seo::fields.redirect_destination.instructions'),
                         'validate' => ['sometimes', 'required'],
-                        'if' => ['type' => 'isnt 410'],
+                        'if' => ['type' => 'isnt '.RedirectType::Gone->value],
                     ],
                 ],
                 [
@@ -60,7 +60,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'options' => collect(RedirectType::cases())
                             ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
                             ->all(),
-                        'default' => 301,
+                        'default' => RedirectType::Permanent->value,
                         'clearable' => false,
                         'validate' => ['required'],
                     ],
