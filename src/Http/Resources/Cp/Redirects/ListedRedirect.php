@@ -43,6 +43,12 @@ class ListedRedirect extends JsonResource
             return $entry?->url() ?? $redirect->destination();
         }
 
-        return $redirect->destination();
+        $destination = $redirect->destination();
+
+        if ($destination !== null && ! Str::startsWith($destination, ['http://', 'https://'])) {
+            return Str::ensureLeft($destination, '/');
+        }
+
+        return $destination;
     }
 }

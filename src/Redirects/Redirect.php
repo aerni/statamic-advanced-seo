@@ -87,11 +87,11 @@ class Redirect implements ContainsQueryableValues, Contract
             return Entry::find(Str::after($destination, 'entry::'))?->in($this->site())?->absoluteUrl();
         }
 
-        if (! Str::startsWith($destination, '/')) {
+        if (Str::startsWith($destination, ['http://', 'https://'])) {
             return $destination;
         }
 
-        return URL::assemble(Site::get($this->site())->url(), $destination);
+        return URL::assemble(Site::get($this->site())->url(), Str::ensureLeft($destination, '/'));
     }
 
     public function type(?RedirectType $type = null): RedirectType|self

@@ -3,6 +3,7 @@
 use Aerni\AdvancedSeo\Enums\MatchType;
 use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Redirects\Redirect;
+use Statamic\Facades\Site;
 
 it('generates an id when none is set', function () {
     $redirect = (new Redirect)->source('/old')->destination('/new');
@@ -63,4 +64,41 @@ it('builds its path from the redirects store directory, site, and id', function 
     $redirect = (new Redirect)->id('abc')->site('fr');
 
     expect($redirect->path())->toEndWith('fr/abc.yaml');
+});
+
+it('treats a slashless destination as a site-relative path', function () {
+    Site::setSites([
+        'default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => 'http://localhost/de', 'locale' => 'de'],
+    ]);
+
+    $default = (new Redirect)->destination('new')->site('default');
+    $german = (new Redirect)->destination('new')->site('german');
+
+    expect($default->destinationUrl())->toBe('http://localhost/new')
+        ->and($german->destinationUrl())->toBe('http://localhost/de/new');
+});
+
+it('does not alter a leading-slash path destination url', function () {
+    Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
+
+    $redirect = (new Redirect)->destination('/new')->site('default');
+
+    expect($redirect->destinationUrl())->toBe('http://localhost/new');
+});
+
+it('passes an external destination through unchanged in destinationUrl', function () {
+    Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
+
+    expect((new Redirect)->destination('https://example.com/x')->site('default')->destinationUrl())
+        ->toBe('https://example.com/x');
+
+    expect((new Redirect)->destination('http://example.com/x')->site('default')->destinationUrl())
+        ->toBe('http://example.com/x');
+});
+
+it('returns null from destinationUrl when destination is null', function () {
+    Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
+
+    expect((new Redirect)->destination(null)->site('default')->destinationUrl())->toBeNull();
 });

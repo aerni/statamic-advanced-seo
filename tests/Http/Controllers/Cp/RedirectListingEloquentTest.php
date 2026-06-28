@@ -225,3 +225,24 @@ it('passes an external destination through unchanged as destination_url', functi
     expect($data[0]['destination_url'])->toBe('https://example.com/x')
         ->and($data[0]['destination_is_entry'])->toBeFalse();
 });
+
+it('treats a slashless destination as a site-relative path', function () {
+    Site::setSites([
+        'default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => 'http://localhost/de', 'locale' => 'de'],
+    ]);
+
+    Redirects::make()->source('/old-en')->destination('new')->site('default')->save();
+    Redirects::make()->source('/old-de')->destination('new')->site('german')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    $bySource = collect($data)->keyBy('source');
+
+    expect($bySource['/old-en']['destination'])->toBe('/new')
+        ->and($bySource['/old-en']['destination_url'])->toBe('http://localhost/new')
+        ->and($bySource['/old-de']['destination'])->toBe('/new')
+        ->and($bySource['/old-de']['destination_url'])->toBe('http://localhost/de/new');
+});
