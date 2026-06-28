@@ -27,6 +27,22 @@ it('shows the index to an authorized user', function () {
     $this->actingAs($this->super)->getJson(cp_route('advanced-seo.redirects.index'))->assertOk();
 });
 
+it('returns hasRedirects false when there are no redirects', function () {
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('hasRedirects', false));
+});
+
+it('returns hasRedirects true when at least one redirect exists', function () {
+    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('hasRedirects', true));
+});
+
 it('allows a viewer to load the index', function () {
     $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.index'))->assertOk();
 });

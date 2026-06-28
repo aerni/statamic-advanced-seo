@@ -35,6 +35,7 @@ return [
     // Redirects
     'redirects' => 'Redirects',
     'redirect_create_title' => 'Create Redirect',
+    'redirect_create_description' => 'Get started by creating your first redirect.',
     'redirect_edit_title' => 'Edit Redirect',
 
     // UI

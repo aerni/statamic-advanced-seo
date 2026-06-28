@@ -61,12 +61,17 @@ class RedirectController extends CpController
                 ->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 
+        $hasRedirects = Redirects::query()
+            ->whereIn('site', Site::authorized()->map->handle()->all())
+            ->first() !== null;
+
         return Inertia::render('advanced-seo::Redirects/Index', [
             'title' => __('advanced-seo::messages.redirects'),
             'createUrl' => cp_route('advanced-seo.redirects.create'),
             'listingUrl' => cp_route('advanced-seo.redirects.index'),
             'canCreate' => User::current()->can('create', Redirect::class),
             'filters' => Scope::filters('redirects'),
+            'hasRedirects' => $hasRedirects,
         ]);
     }
 

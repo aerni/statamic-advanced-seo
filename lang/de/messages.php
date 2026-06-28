@@ -22,6 +22,12 @@ return [
     'redirect_source_invalid_regex' => 'Die Quelle ist kein gültiger regulärer Ausdruck.',
     'redirect_source_not_unique' => 'Eine Weiterleitung mit dieser Quelle existiert bereits für diese Website.',
 
+    // Redirects
+    'redirects' => 'Weiterleitungen',
+    'redirect_create_title' => 'Weiterleitung erstellen',
+    'redirect_create_description' => 'Lege deine erste Weiterleitung an, um loszulegen.',
+    'redirect_edit_title' => 'Weiterleitung bearbeiten',
+
     // Flash messages
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',
     'seo_set_localization_deleted' => 'SEO-Standards gelöscht',
