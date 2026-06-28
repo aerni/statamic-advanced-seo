@@ -414,7 +414,7 @@ return [
 
     'redirect_source' => [
         'display' => 'Quelle',
-        'instructions' => 'Der Pfad, von dem weitergeleitet wird. Verwende einen exakten Pfad (`/alt`), einen Platzhalter (`/blog/*`, Capture mit `$1`) oder einen regulären Ausdruck (`#^/p/(\d+)$#`).',
+        'instructions' => 'Der Pfad, von dem weitergeleitet wird. Verwende einen exakten Pfad (`alt`), einen Platzhalter (`blog/*`, Capture mit `$1`) oder einen regulären Ausdruck (`#^/p/(\d+)$#`).',
     ],
 
     'redirect_destination' => [
