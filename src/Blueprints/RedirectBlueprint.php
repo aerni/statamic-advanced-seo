@@ -25,6 +25,20 @@ class RedirectBlueprint extends BaseBlueprint
     {
         $fields = [
             [
+                'handle' => 'type',
+                'field' => [
+                    'type' => 'select',
+                    'display' => __('advanced-seo::fields.redirect_type.display'),
+                    'instructions' => __('advanced-seo::fields.redirect_type.instructions'),
+                    'options' => collect(RedirectType::cases())
+                        ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
+                        ->all(),
+                    'default' => RedirectType::Permanent->value,
+                    'clearable' => false,
+                    'validate' => ['required'],
+                ],
+            ],
+            [
                 'handle' => 'source',
                 'field' => [
                     'type' => 'redirect_source',
@@ -51,20 +65,6 @@ class RedirectBlueprint extends BaseBlueprint
                         'new \\Aerni\\AdvancedSeo\\Rules\\PublishedRedirectDestination()',
                     ],
                     'if' => ['type' => 'isnt '.RedirectType::Gone->value],
-                ],
-            ],
-            [
-                'handle' => 'type',
-                'field' => [
-                    'type' => 'select',
-                    'display' => __('advanced-seo::fields.redirect_type.display'),
-                    'instructions' => __('advanced-seo::fields.redirect_type.instructions'),
-                    'options' => collect(RedirectType::cases())
-                        ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
-                        ->all(),
-                    'default' => RedirectType::Permanent->value,
-                    'clearable' => false,
-                    'validate' => ['required'],
                 ],
             ],
             [
