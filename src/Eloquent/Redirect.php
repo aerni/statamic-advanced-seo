@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
+use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Redirects\Redirect as StacheRedirect;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,6 +21,7 @@ class Redirect extends StacheRedirect
             ->type($model->type)
             ->site($model->site)
             ->enabled($model->enabled)
+            ->forwardQueryString($model->forward_query_string ?? true)
             ->description($model->description);
     }
 
@@ -38,6 +40,7 @@ class Redirect extends StacheRedirect
             'type' => $source->type(),
             'site' => $source->site(),
             'enabled' => $source->enabled(),
+            'forward_query_string' => $source->type() === RedirectType::Gone ? null : $source->forwardQueryString(),
             'description' => $source->description(),
         ]);
     }

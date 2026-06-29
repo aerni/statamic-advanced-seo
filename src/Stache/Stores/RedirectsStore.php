@@ -42,6 +42,7 @@ class RedirectsStore extends BasicStore
             ->type(RedirectType::tryFrom(Arr::get($data, 'type', RedirectType::Permanent->value)) ?? RedirectType::Permanent)
             ->site(basename(dirname($path)))
             ->enabled(Arr::get($data, 'enabled', true))
+            ->forwardQueryString(Arr::get($data, 'forward_query_string', true))
             ->description(Arr::get($data, 'description'));
     }
 

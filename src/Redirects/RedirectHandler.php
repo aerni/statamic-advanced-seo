@@ -45,7 +45,9 @@ class RedirectHandler
             return;
         }
 
-        $destination = $this->appendQueryString($redirect->destination, $request);
+        $destination = $redirect->forwardQueryString
+            ? $this->appendQueryString($redirect->destination, $request)
+            : $redirect->destination;
 
         return redirect($destination, $redirect->type->value);
     }
@@ -65,10 +67,6 @@ class RedirectHandler
 
     protected function appendQueryString(string $destination, Request $request): string
     {
-        if (! config('advanced-seo.redirects.forward_query_string')) {
-            return $destination;
-        }
-
         if (! $query = $request->getQueryString()) {
             return $destination;
         }

@@ -41,7 +41,7 @@ class RedirectResolver
             $destination = RedirectPatternMatcher::substitute($destination, $captures);
         }
 
-        return new ResolvedRedirect($redirect->type(), $destination);
+        return new ResolvedRedirect($redirect->type(), $destination, $redirect->forwardQueryString());
     }
 
     protected function findRedirect(): ?Redirect

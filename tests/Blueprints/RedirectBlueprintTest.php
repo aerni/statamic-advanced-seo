@@ -12,7 +12,7 @@ it('builds with the expected fields', function () {
     $blueprint = RedirectBlueprint::definition();
     $handles = $blueprint->fields()->all()->keys()->all();
 
-    expect($handles)->toContain('source', 'destination', 'type', 'description');
+    expect($handles)->toContain('type', 'forward_query_string', 'source', 'destination', 'description');
 });
 
 it('offers the three response types', function () {

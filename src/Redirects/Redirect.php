@@ -40,6 +40,8 @@ class Redirect implements ContainsQueryableValues, Contract
 
     protected $enabled = true;
 
+    protected $forwardQueryString = true;
+
     protected $description;
 
     public function id(?string $id = null): string|self
@@ -143,6 +145,13 @@ class Redirect implements ContainsQueryableValues, Contract
             ->args(func_get_args());
     }
 
+    public function forwardQueryString(?bool $forwardQueryString = null): bool|self
+    {
+        return $this
+            ->fluentlyGetOrSet('forwardQueryString')
+            ->args(func_get_args());
+    }
+
     public function description(?string $description = null): string|self|null
     {
         return $this
@@ -184,6 +193,7 @@ class Redirect implements ContainsQueryableValues, Contract
             'destination' => $this->destination(),
             'type' => $this->type()->value,
             'enabled' => $this->enabled(),
+            'forward_query_string' => $this->type() === RedirectType::Gone ? null : $this->forwardQueryString(),
             'description' => $this->description(),
         ];
     }

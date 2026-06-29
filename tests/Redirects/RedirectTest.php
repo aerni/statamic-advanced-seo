@@ -31,6 +31,7 @@ it('exposes fluent accessors with sensible defaults', function () {
     expect($redirect->type())->toBe(RedirectType::Permanent)
         ->and($redirect->matchType())->toBe(MatchType::Exact)
         ->and($redirect->enabled())->toBeTrue()
+        ->and($redirect->forwardQueryString())->toBeTrue()
         ->and($redirect->site())->toBe('default');
 });
 
@@ -61,8 +62,20 @@ it('serializes only its fields to file data', function () {
         'destination' => '/new',
         'type' => 302,
         'enabled' => false,
+        'forward_query_string' => true,
         'description' => 'Note',
     ]);
+});
+
+it('does not persist a destination or query string forwarding for a gone redirect', function () {
+    $redirect = (new Redirect)
+        ->id('abc')
+        ->source('/old')
+        ->type(RedirectType::Gone)
+        ->site('default');
+
+    expect($redirect->fileData()['destination'])->toBeNull()
+        ->and($redirect->fileData()['forward_query_string'])->toBeNull();
 });
 
 it('builds its path from the redirects store directory, site, and id', function () {

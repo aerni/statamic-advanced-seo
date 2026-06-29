@@ -430,6 +430,13 @@ return [
         'option_410' => 'Gone (410)',
     ],
 
+    'redirect_forward_query_string' => [
+        'display' => 'Query String',
+        'instructions' => 'Append the incoming query string to the destination.',
+        'option_forward' => 'Forward',
+        'option_discard' => "Don't forward",
+    ],
+
     'redirect_description' => [
         'display' => 'Description',
         'instructions' => 'An optional note for your own reference.',

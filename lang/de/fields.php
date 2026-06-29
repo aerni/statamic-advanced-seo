@@ -430,6 +430,13 @@ return [
         'option_410' => 'Entfernt (410)',
     ],
 
+    'redirect_forward_query_string' => [
+        'display' => 'Query-String',
+        'instructions' => 'Den eingehenden Query-String an das Ziel anhängen.',
+        'option_forward' => 'Weiterleiten',
+        'option_discard' => 'Nicht weiterleiten',
+    ],
+
     'redirect_description' => [
         'display' => 'Beschreibung',
         'instructions' => 'Eine optionale Notiz zur eigenen Referenz.',

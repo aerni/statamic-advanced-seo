@@ -379,8 +379,6 @@ return [
 
         'directory' => base_path('content/redirects'),
 
-        'forward_query_string' => true,
-
     ],
 
 ];

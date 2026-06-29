@@ -21,25 +21,25 @@ it('redirects a request that would 404 to the matched destination', function () 
         ->assertRedirect('/new');
 });
 
-it('forwards the query string when enabled', function () {
-    config(['advanced-seo.redirects.forward_query_string' => true]);
-
+it('forwards the query string by default', function () {
     Redirects::make()->source('/old')->destination('/new')->site('default')->save();
 
     $this->get('/old?ref=abc')->assertRedirect('/new?ref=abc');
 });
 
-it('merges the query string into a destination that already has one', function () {
-    config(['advanced-seo.redirects.forward_query_string' => true]);
+it('does not forward the query string when the redirect disables it', function () {
+    Redirects::make()->source('/old')->destination('/new')->site('default')->forwardQueryString(false)->save();
 
+    $this->get('/old?ref=abc')->assertRedirect('/new');
+});
+
+it('merges the query string into a destination that already has one', function () {
     Redirects::make()->source('/old')->destination('/new?ref=internal')->site('default')->save();
 
     $this->get('/old?utm=x')->assertRedirect('/new?ref=internal&utm=x');
 });
 
 it('appends the query string before a destination fragment', function () {
-    config(['advanced-seo.redirects.forward_query_string' => true]);
-
     Redirects::make()->source('/old')->destination('/new#section')->site('default')->save();
 
     $this->get('/old?ref=abc')->assertRedirect('/new?ref=abc#section');
