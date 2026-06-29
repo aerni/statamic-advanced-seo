@@ -419,7 +419,7 @@ return [
 
     'redirect_destination' => [
         'display' => 'Destination',
-        'instructions' => 'Where to redirect to. A path, full URL, or entry. Use `$1`, `$2` to insert wildcard/regex captures.',
+        'instructions' => 'Where to redirect to. A path starting with a slash (`/about`), a full URL, or an entry. Use `$1`, `$2` to insert wildcard/regex captures.',
     ],
 
     'redirect_type' => [
@@ -437,10 +437,6 @@ return [
     'redirect_enabled' => [
         'display' => 'Enabled',
         'instructions' => 'Disable to keep the redirect without it being active.',
-    ],
-
-    'redirect_site' => [
-        'display' => 'Site',
     ],
 
 ];

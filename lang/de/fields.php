@@ -419,7 +419,7 @@ return [
 
     'redirect_destination' => [
         'display' => 'Ziel',
-        'instructions' => 'Wohin weitergeleitet wird. Ein Pfad, eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2`, um Platzhalter- oder Regex-Captures einzufügen.',
+        'instructions' => 'Wohin weitergeleitet wird. Ein Pfad mit führendem Schrägstrich (`/about`), eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2`, um Platzhalter- oder Regex-Captures einzufügen.',
     ],
 
     'redirect_type' => [
@@ -437,10 +437,6 @@ return [
     'redirect_enabled' => [
         'display' => 'Aktiviert',
         'instructions' => 'Deaktivieren, um die Weiterleitung zu behalten, ohne dass sie aktiv ist.',
-    ],
-
-    'redirect_site' => [
-        'display' => 'Website',
     ],
 
 ];

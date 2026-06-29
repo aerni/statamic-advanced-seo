@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Fieldtype } from '@statamic/cms';
-import { Input, injectPublishContext } from '@statamic/cms/ui';
+import { Input, Select, injectPublishContext } from '@statamic/cms/ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
@@ -11,10 +11,13 @@ defineExpose(expose);
 
 const publishContext = injectPublishContext();
 
-const siteUrl = computed(() => {
-    const site = publishContext?.values?.value?.site ?? props.meta.defaultSite;
+const siteOptions = computed(() =>
+    Object.entries(props.meta.sites).map(([value, label]) => ({ value, label })),
+);
 
-    return site ? (props.meta.sites[site] ?? null) : null;
+const selectedSite = computed({
+    get: () => publishContext?.values?.value?.site ?? props.meta.defaultSite,
+    set: (value) => publishContext?.setFieldValue?.('site', value),
 });
 
 const displayValue = computed(() => {
@@ -43,16 +46,22 @@ function onInput(typed) {
 </script>
 
 <template>
-    <Input
-        :model-value="displayValue"
-        :focus="config.focus"
-        :read-only="isReadOnly"
-        :prepend="siteUrl ? siteUrl + '/' : null"
-        :placeholder="config.placeholder"
-        :name="name"
-        :id="id"
-        @update:model-value="onInput"
-        @focus="$emit('focus')"
-        @blur="$emit('blur')"
-    />
+    <div class="flex gap-2">
+        <div v-if="meta.multisite" class="w-fit">
+            <Select :options="siteOptions" v-model="selectedSite" :read-only="isReadOnly" />
+        </div>
+        <div class="flex-1">
+            <Input
+                :model-value="displayValue"
+                :focus="config.focus"
+                :read-only="isReadOnly"
+                :placeholder="config.placeholder"
+                :name="name"
+                :id="id"
+                @update:model-value="onInput"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+            />
+        </div>
+    </div>
 </template>

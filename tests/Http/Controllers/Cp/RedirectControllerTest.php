@@ -167,6 +167,12 @@ it('rejects a malformed regex source', function () {
         ->assertJsonValidationErrors('source');
 });
 
+it('rejects a malformed destination url', function () {
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => 'https//google.com', 'type' => 301, 'site' => 'default'])
+        ->assertJsonValidationErrors('destination');
+});
+
 it('requires a destination unless the type is gone', function () {
     // 301 with destination present but null → required fires
     $this->actingAs($this->super)

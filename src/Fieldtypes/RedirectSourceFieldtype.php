@@ -12,8 +12,9 @@ class RedirectSourceFieldtype extends Fieldtype
     public function preload(): array
     {
         return [
-            'sites' => Site::all()->mapWithKeys(fn ($site) => [$site->handle() => rtrim($site->absoluteUrl(), '/')])->all(),
+            'sites' => Site::authorized()->mapWithKeys(fn ($site) => [$site->handle() => $site->name()])->all(),
             'defaultSite' => Site::default()->handle(),
+            'multisite' => Site::multiEnabled(),
         ];
     }
 }
