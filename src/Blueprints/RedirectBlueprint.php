@@ -72,6 +72,7 @@ class RedirectBlueprint extends BaseBlueprint
                 'field' => [
                     'type' => 'textarea',
                     'display' => __('advanced-seo::fields.redirect_description.display'),
+                    'instructions' => __('advanced-seo::fields.redirect_description.instructions'),
                     'width' => 100,
                 ],
             ],

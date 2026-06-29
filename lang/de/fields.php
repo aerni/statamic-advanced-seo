@@ -414,17 +414,17 @@ return [
 
     'redirect_source' => [
         'display' => 'Quelle',
-        'instructions' => 'Der Pfad, von dem weitergeleitet wird. Verwende einen exakten Pfad (`alt`), einen Platzhalter (`blog/*`, Capture mit `$1`) oder einen regulären Ausdruck (`#^/p/(\d+)$#`).',
+        'instructions' => 'Der Pfad, von dem weitergeleitet wird: ein exakter Pfad, ein Platzhalter (`blog/*`) oder eine Regex (`#…#`).',
     ],
 
     'redirect_destination' => [
         'display' => 'Ziel',
-        'instructions' => 'Wohin weitergeleitet wird. Ein Pfad mit führendem Schrägstrich (`/about`), eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2`, um Platzhalter- oder Regex-Captures einzufügen.',
+        'instructions' => 'Ein Pfad (`/about`), eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2` für Captures.',
     ],
 
     'redirect_type' => [
         'display' => 'Typ',
-        'instructions' => 'Die HTTP-Antwort. Entfernt (410) markiert die URL als dauerhaft entfernt und benötigt kein Ziel.',
+        'instructions' => 'Der HTTP-Status, mit dem geantwortet wird.',
         'option_301' => 'Dauerhaft (301)',
         'option_302' => 'Temporär (302)',
         'option_410' => 'Entfernt (410)',
@@ -432,6 +432,7 @@ return [
 
     'redirect_description' => [
         'display' => 'Beschreibung',
+        'instructions' => 'Eine optionale Notiz zur eigenen Referenz.',
     ],
 
     'redirect_enabled' => [

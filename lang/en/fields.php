@@ -414,17 +414,17 @@ return [
 
     'redirect_source' => [
         'display' => 'Source',
-        'instructions' => 'The path to redirect from. Use an exact path (`old`), a wildcard (`blog/*`, capture with `$1`), or a regular expression (`#^/p/(\d+)$#`).',
+        'instructions' => 'The path to redirect from. Use an exact path, a wildcard (`blog/*`), or a regex (`#…#`).',
     ],
 
     'redirect_destination' => [
         'display' => 'Destination',
-        'instructions' => 'Where to redirect to. A path starting with a slash (`/about`), a full URL, or an entry. Use `$1`, `$2` to insert wildcard/regex captures.',
+        'instructions' => 'A path (`/about`), full URL, or entry. Use `$1`, `$2` for captures.',
     ],
 
     'redirect_type' => [
         'display' => 'Type',
-        'instructions' => 'The HTTP response. Gone (410) marks the URL as permanently removed and needs no destination.',
+        'instructions' => 'The HTTP status to respond with.',
         'option_301' => 'Permanent (301)',
         'option_302' => 'Temporary (302)',
         'option_410' => 'Gone (410)',
@@ -432,6 +432,7 @@ return [
 
     'redirect_description' => [
         'display' => 'Description',
+        'instructions' => 'An optional note for your own reference.',
     ],
 
     'redirect_enabled' => [
