@@ -56,7 +56,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
-    <Head :title />
+    <Head :title="values.source ?? title" />
 
     <Header>
         <template #title>
