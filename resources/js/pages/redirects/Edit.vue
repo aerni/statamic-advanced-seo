@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 import { Head, router } from '@statamic/cms/inertia';
@@ -20,6 +20,16 @@ const meta = ref(props.meta);
 const enabled = ref(props.enabled);
 const errors = ref({});
 const saving = ref(false);
+
+const saveText = computed(() => {
+    if (enabled.value === props.enabled) {
+        return __('Save');
+    }
+
+    return enabled.value
+        ? __('advanced-seo::messages.save_and_enable')
+        : __('advanced-seo::messages.save_and_disable');
+});
 
 function save() {
     new Pipeline()
@@ -53,8 +63,17 @@ onUnmounted(() => saveKeyBinding.destroy());
             <StatusIndicator :status="enabled ? 'published' : 'draft'" />
             {{ values.source ?? title }}
         </template>
-        <Button v-if="testUrl" :href="testUrl" :text="__('advanced-seo::messages.test_redirect')" icon="external-link" target="_blank" rel="noopener noreferrer" />
-        <Button variant="primary" :text="__('Save')" :disabled="saving" @click="save" />
+        <Button
+            v-if="testUrl"
+            v-tooltip="enabled ? null : __('advanced-seo::messages.test_redirect_disabled')"
+            :href="enabled ? testUrl : null"
+            :disabled="!enabled"
+            :text="__('advanced-seo::messages.test_redirect')"
+            icon="external-link"
+            target="_blank"
+            rel="noopener noreferrer"
+        />
+        <Button variant="primary" :text="saveText" :disabled="saving" @click="save" />
     </Header>
 
     <PublishContainer

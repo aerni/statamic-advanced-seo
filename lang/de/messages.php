@@ -21,6 +21,8 @@ return [
     'redirect_source_invalid' => 'Die Quelle muss mit einem Schrägstrich beginnen oder ein in # eingeschlossener regulärer Ausdruck sein.',
     'redirect_source_invalid_regex' => 'Die Quelle ist kein gültiger regulärer Ausdruck.',
     'redirect_source_not_unique' => 'Eine Weiterleitung mit dieser Quelle existiert bereits für diese Website.',
+    'redirect_destination_invalid' => 'Das Ziel muss ein Pfad sein, der mit einem Schrägstrich beginnt (z. B. /about), oder eine vollständige URL inklusive Schema (z. B. https://example.com).',
+    'redirect_destination_unpublished' => 'Das Ziel muss ein veröffentlichter Eintrag sein, sonst würde die Weiterleitung zu einem 404 führen.',
 
     // Redirects
     'redirects' => 'Weiterleitungen',
@@ -29,6 +31,9 @@ return [
     'redirect_create_description' => 'Lege deine erste Weiterleitung an, um loszulegen.',
     'redirect_edit_title' => 'Weiterleitung bearbeiten',
     'test_redirect' => 'Weiterleitung testen',
+    'test_redirect_disabled' => 'Aktiviere die Weiterleitung, um sie zu testen.',
+    'save_and_enable' => 'Speichern & aktivieren',
+    'save_and_disable' => 'Speichern & deaktivieren',
 
     // Flash messages
     'redirect_enabled' => 'Weiterleitung aktiviert',
