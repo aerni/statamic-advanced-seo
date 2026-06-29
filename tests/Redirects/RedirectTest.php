@@ -3,7 +3,12 @@
 use Aerni\AdvancedSeo\Enums\MatchType;
 use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Redirects\Redirect;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
+
+uses(PreventsSavingStacheItemsToDisk::class);
 
 it('generates an id when none is set', function () {
     $redirect = (new Redirect)->source('/old')->destination('/new');
@@ -125,4 +130,19 @@ it('returns null from sourceUrl for a regex redirect', function () {
     Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
 
     expect((new Redirect)->source('#^/x$#')->site('default')->sourceUrl())->toBeNull();
+});
+
+it('resolves an entry destination to the selected localization, not the redirect site', function () {
+    Site::setSites([
+        'default' => ['name' => 'English', 'url' => 'http://localhost/', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => 'http://fr.localhost/', 'locale' => 'fr'],
+    ]);
+
+    Collection::make('pages')->routes('/{slug}')->sites(['default', 'french'])->saveQuietly();
+
+    $entry = tap(Entry::make()->collection('pages')->locale('french')->slug('accueil')->published(true))->save();
+
+    $redirect = (new Redirect)->destination("entry::{$entry->id()}")->site('default');
+
+    expect($redirect->destinationUrl())->toBe('http://fr.localhost/accueil');
 });
