@@ -57,8 +57,8 @@ const toggleEnabled = (url, successMessage) => {
             </template>
             <template #cell-destination="{ row: redirect }">
                 <a v-if="redirect.destination_url" :href="redirect.destination_url" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5">
-                    <Icon v-if="redirect.destination_is_entry" name="entry" class="shrink-0 size-4 text-gray-500" />
-                    <Icon v-else name="external-link" class="shrink-0 size-4 text-gray-500" />
+                    <Icon v-if="redirect.destination_is_entry" name="collections" class="shrink-0 size-4" />
+                    <Icon v-else name="external-link" class="shrink-0 size-4" />
                     <span v-text="redirect.destination" />
                 </a>
                 <span v-else v-text="redirect.destination" />
@@ -85,7 +85,7 @@ const toggleEnabled = (url, successMessage) => {
             </template>
             <template #prepended-row-actions="{ row: redirect }">
                 <DropdownItem
-                    v-if="redirect.test_url"
+                    v-if="redirect.test_url && redirect.status"
                     :text="__('advanced-seo::messages.test_redirect')"
                     icon="external-link"
                     :href="redirect.test_url"

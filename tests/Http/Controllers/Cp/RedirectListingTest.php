@@ -134,7 +134,7 @@ it('only returns redirects for sites a non-super user is authorized to view', fu
     expect($data)->toHaveCount(1)->and($data[0]['source'])->toBe('/en-page');
 });
 
-it('resolves an entry destination to the relative entry url with destination_is_entry true', function () {
+it('shows an entry destination as an absolute url with destination_is_entry true', function () {
     Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
 
     $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
@@ -145,11 +145,25 @@ it('resolves an entry destination to the relative entry url with destination_is_
         ->getJson(cp_route('advanced-seo.redirects.index'))
         ->json('data');
 
-    $siteHost = Site::get('default')->absoluteUrl();
+    expect($data[0]['destination'])->toBe($data[0]['destination_url'])
+        ->and($data[0]['destination_url'])->toStartWith('http')
+        ->and($data[0]['destination_url'])->toEndWith('/about')
+        ->and($data[0]['destination_is_entry'])->toBeTrue();
+});
 
-    expect($data[0]['destination'])->toBe('/about')
-        ->and($data[0]['destination_url'])->toStartWith($siteHost)
-        ->and($data[0]['destination_url'])->toContain('/about')
+it('shows a cross-site entry destination using the other site url', function () {
+    Collection::make('pages')->routes('/{slug}')->sites(['default', 'french'])->saveQuietly();
+
+    $entry = tap(Entry::make()->collection('pages')->locale('french')->slug('accueil'))->save();
+
+    Redirects::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['destination'])->toBe($data[0]['destination_url'])
+        ->and($data[0]['destination_url'])->toContain('/fr/accueil')
         ->and($data[0]['destination_is_entry'])->toBeTrue();
 });
 
@@ -162,7 +176,7 @@ it('shows a plain path destination as-is but absolutizes destination_url', funct
 
     $siteHost = Site::get('default')->absoluteUrl();
 
-    expect($data[0]['destination'])->toBe('/new-path')
+    expect($data[0]['destination'])->toBe($data[0]['destination_url'])
         ->and($data[0]['destination_url'])->toStartWith('http')
         ->and($data[0]['destination_url'])->toStartWith($siteHost)
         ->and($data[0]['destination_url'])->toEndWith('/new-path')
@@ -292,8 +306,8 @@ it('treats a slashless destination as a site-relative path', function () {
 
     $bySource = collect($data)->keyBy('source');
 
-    expect($bySource['/old-en']['destination'])->toBe('/new')
+    expect($bySource['/old-en']['destination'])->toBe('http://localhost/new')
         ->and($bySource['/old-en']['destination_url'])->toBe('http://localhost/new')
-        ->and($bySource['/old-de']['destination'])->toBe('/new')
+        ->and($bySource['/old-de']['destination'])->toBe('http://localhost/de/new')
         ->and($bySource['/old-de']['destination_url'])->toBe('http://localhost/de/new');
 });
