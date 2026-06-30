@@ -23,6 +23,14 @@ function redirectViewer()
     return tap(User::make()->assignRole('viewer'))->save();
 }
 
+it('returns 404 on the free edition', function () {
+    useFreeEdition();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.index'))
+        ->assertNotFound();
+});
+
 it('shows the index to an authorized user', function () {
     $this->actingAs($this->super)->getJson(cp_route('advanced-seo.redirects.index'))->assertOk();
 });

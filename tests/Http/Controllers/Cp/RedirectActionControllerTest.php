@@ -20,6 +20,19 @@ function redirectActionViewer()
     return tap(User::make()->assignRole('action_viewer'))->save();
 }
 
+it('returns 404 for actions on the free edition', function () {
+    $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->save();
+
+    useFreeEdition();
+
+    $this->actingAs($this->super)
+        ->post(cp_route('advanced-seo.redirects.actions.run'), [
+            'action' => 'delete_redirect',
+            'selections' => [$redirect->id()],
+            'values' => [],
+        ])->assertNotFound();
+});
+
 it('lists the available bulk actions for selected redirects', function () {
     $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->save();
 

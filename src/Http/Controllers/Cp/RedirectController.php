@@ -6,10 +6,12 @@ use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\RedirectType;
 use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -25,6 +27,8 @@ class RedirectController extends CpController
 
     public function index(FilteredRequest $request)
     {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
         $this->authorize('viewAny', Redirect::class);
 
         if ($request->wantsJson()) {
@@ -75,6 +79,8 @@ class RedirectController extends CpController
 
     public function create(): mixed
     {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
         $this->authorize('create', Redirect::class);
 
         $blueprint = RedirectBlueprint::definition();
@@ -93,6 +99,8 @@ class RedirectController extends CpController
 
     public function edit(Redirect $redirect): mixed
     {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
         $this->authorize('edit', $redirect);
 
         $blueprint = RedirectBlueprint::definition();
@@ -119,6 +127,8 @@ class RedirectController extends CpController
 
     public function store(Request $request): array
     {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
         $this->authorize('create', Redirect::class);
 
         $values = $this->validateAndProcess($request, null);
@@ -131,6 +141,8 @@ class RedirectController extends CpController
 
     public function update(Request $request, Redirect $redirect): array
     {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
         $this->authorize('edit', $redirect);
 
         $values = $this->validateAndProcess($request, $redirect);
@@ -143,6 +155,8 @@ class RedirectController extends CpController
 
     public function destroy(Redirect $redirect)
     {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
         $this->authorize('delete', $redirect);
 
         $redirect->delete();
