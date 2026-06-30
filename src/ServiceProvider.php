@@ -54,6 +54,9 @@ class ServiceProvider extends AddonServiceProvider
 {
     protected $actions = [
         Actions\Statamic\GenerateSocialImages::class,
+        Actions\Statamic\EnableRedirect::class,
+        Actions\Statamic\DisableRedirect::class,
+        Actions\Statamic\DeleteRedirect::class,
     ];
 
     protected $policies = [

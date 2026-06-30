@@ -66,6 +66,7 @@ class RedirectController extends CpController
             'title' => __('advanced-seo::messages.redirects'),
             'createUrl' => cp_route('advanced-seo.redirects.create'),
             'listingUrl' => cp_route('advanced-seo.redirects.index'),
+            'actionUrl' => cp_route('advanced-seo.redirects.actions.run'),
             'canCreate' => User::current()->can('create', Redirect::class),
             'filters' => Scope::filters('redirects'),
             'hasRedirects' => $hasRedirects,

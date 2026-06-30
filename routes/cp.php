@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Http\Controllers\Cp\AiGenerateController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\DashboardController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\RedirectActionController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\RedirectController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetConfigController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetIndexController;
@@ -15,6 +16,8 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::resource('redirects', RedirectController::class)->except('show');
     Route::post('/redirects/{redirect}/enable', [RedirectController::class, 'enable'])->name('redirects.enable');
     Route::post('/redirects/{redirect}/disable', [RedirectController::class, 'disable'])->name('redirects.disable');
+    Route::post('/redirects/actions', [RedirectActionController::class, 'run'])->name('redirects.actions.run');
+    Route::post('/redirects/actions/list', [RedirectActionController::class, 'bulkActions'])->name('redirects.actions.bulk');
     Route::get('/{seoSetGroup}', SeoSetIndexController::class)->name('sets.index');
     Route::get('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'edit'])->name('sets.config.edit');
     Route::patch('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'update'])->name('sets.config.update');
