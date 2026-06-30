@@ -100,6 +100,7 @@ return [
     'pro_features' => 'Upgrade to Pro',
     'pro_features_instructions' => '<a href="https://statamic.com/addons/aerni/advanced-seo" target="_blank" class="underline">Get Pro</a> to unlock these features and more.',
     'pro_feature_sitemaps' => 'Sitemaps',
+    'pro_feature_redirects' => 'Redirects',
     'pro_feature_multi_site' => 'Multi-Site',
     'pro_feature_ai' => 'AI Copywriting',
     'pro_feature_social_images' => 'Social Images',
