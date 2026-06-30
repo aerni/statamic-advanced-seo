@@ -1,27 +1,16 @@
 <script setup>
-import { useTemplateRef, getCurrentInstance } from 'vue';
 import { Head } from '@statamic/cms/inertia';
-import { Header, Button, Badge, Listing, DropdownItem, DropdownSeparator, Icon, Panel, Card, EmptyStateItem } from '@statamic/cms/ui';
+import { Header, Button, Badge, Listing, DropdownItem, Icon, Panel, Card, EmptyStateItem } from '@statamic/cms/ui';
 
-const props = defineProps({
+defineProps({
     title: String,
     createUrl: String,
     listingUrl: String,
+    actionUrl: String,
     canCreate: Boolean,
     filters: Array,
     hasRedirects: Boolean,
 });
-
-const listing = useTemplateRef('listing');
-
-const { $axios } = getCurrentInstance().appContext.config.globalProperties;
-
-const toggleEnabled = (url, successMessage) => {
-    $axios.post(url).then(() => {
-        Statamic.$toast.success(__(successMessage));
-        listing.value.refresh();
-    });
-};
 </script>
 
 <template>
@@ -33,10 +22,10 @@ const toggleEnabled = (url, successMessage) => {
         </Header>
 
         <Listing
-            ref="listing"
             :url="listingUrl"
+            :action-url="actionUrl"
             :allow-presets="false"
-            :allow-customizing-columns="false"
+            preferences-prefix="advanced-seo.redirects"
             sort-column="source"
             sort-direction="asc"
             :filters="filters"
@@ -47,13 +36,6 @@ const toggleEnabled = (url, successMessage) => {
                     {{ redirect.source }}
                 </a>
                 <span v-else class="title-index-field">{{ redirect.source }}</span>
-
-                <resource-deleter
-                    v-if="redirect.deletable"
-                    :ref="`deleter_${redirect.id}`"
-                    :resource="redirect"
-                    @deleted="listing.refresh()"
-                />
             </template>
             <template #cell-destination="{ row: redirect }">
                 <a v-if="redirect.destination_url" :href="redirect.destination_url" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5">
@@ -65,6 +47,13 @@ const toggleEnabled = (url, successMessage) => {
             </template>
             <template #cell-type="{ row: redirect }">
                 {{ redirect.type_label }}
+            </template>
+            <template #cell-forward_query_string="{ row: redirect }">
+                <span v-if="redirect.forward_query_string !== null">
+                    {{ redirect.forward_query_string
+                        ? __('advanced-seo::fields.redirect_forward_query_string.option_forward')
+                        : __('advanced-seo::fields.redirect_forward_query_string.option_discard') }}
+                </span>
             </template>
             <template #cell-site="{ row: redirect }">
                 {{ redirect.site_name }}
@@ -93,26 +82,6 @@ const toggleEnabled = (url, successMessage) => {
                     rel="noopener noreferrer"
                 />
                 <DropdownItem v-if="redirect.editable" :text="__('Edit')" icon="edit" :href="redirect.edit_url" />
-                <DropdownSeparator v-if="redirect.editable" />
-                <DropdownItem
-                    v-if="redirect.editable && redirect.status"
-                    :text="__('advanced-seo::messages.disable')"
-                    icon="eye-slash"
-                    @click="toggleEnabled(redirect.disable_url, 'advanced-seo::messages.redirect_disabled')"
-                />
-                <DropdownItem
-                    v-if="redirect.editable && !redirect.status"
-                    :text="__('advanced-seo::messages.enable')"
-                    icon="eye"
-                    @click="toggleEnabled(redirect.enable_url, 'advanced-seo::messages.redirect_enabled')"
-                />
-                <DropdownItem
-                    v-if="redirect.deletable"
-                    :text="__('Delete')"
-                    icon="trash"
-                    variant="destructive"
-                    @click="$refs[`deleter_${redirect.id}`].confirm()"
-                />
             </template>
         </Listing>
     </template>
