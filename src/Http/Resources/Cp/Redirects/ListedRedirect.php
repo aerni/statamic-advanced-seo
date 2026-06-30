@@ -31,10 +31,7 @@ class ListedRedirect extends JsonResource
             'site_name' => Site::get($redirect->site())?->name() ?? $redirect->site(),
             'status' => $redirect->enabled(),
             'edit_url' => $redirect->editUrl(),
-            'delete_url' => $redirect->deleteUrl(),
             'test_url' => $redirect->type() === RedirectType::Gone ? null : $redirect->sourceUrl(),
-            'enable_url' => cp_route('advanced-seo.redirects.enable', $redirect->id()),
-            'disable_url' => cp_route('advanced-seo.redirects.disable', $redirect->id()),
             'editable' => User::current()->can('edit', $redirect),
             'deletable' => User::current()->can('delete', $redirect),
         ];

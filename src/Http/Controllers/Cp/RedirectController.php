@@ -141,24 +141,6 @@ class RedirectController extends CpController
         return ['redirect' => $redirect->editUrl()];
     }
 
-    public function enable(Redirect $redirect)
-    {
-        $this->authorize('edit', $redirect);
-
-        $redirect->enabled(true)->save();
-
-        return response('', 204);
-    }
-
-    public function disable(Redirect $redirect)
-    {
-        $this->authorize('edit', $redirect);
-
-        $redirect->enabled(false)->save();
-
-        return response('', 204);
-    }
-
     public function destroy(Redirect $redirect)
     {
         $this->authorize('delete', $redirect);

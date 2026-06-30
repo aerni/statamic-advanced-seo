@@ -35,8 +35,6 @@ return [
     'save_and_disable' => 'Speichern & deaktivieren',
 
     // Flash messages
-    'redirect_enabled' => 'Weiterleitung aktiviert',
-    'redirect_disabled' => 'Weiterleitung deaktiviert',
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',
     'seo_set_localization_deleted' => 'SEO-Standards gelöscht',
     'seo_set_config_saved' => 'SEO-Konfiguration gespeichert',

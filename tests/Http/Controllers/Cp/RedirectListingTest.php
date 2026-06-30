@@ -301,20 +301,6 @@ it('exposes a null test_url for a regex redirect', function () {
         ->and($data[0]['test_url'])->toBeNull();
 });
 
-it('exposes enable_url and disable_url in the listing row', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
-
-    $data = $this->actingAs($this->super)
-        ->getJson(cp_route('advanced-seo.redirects.index'))
-        ->json('data');
-
-    expect($data[0])->toHaveKey('enable_url')
-        ->toHaveKey('disable_url');
-
-    expect($data[0]['enable_url'])->toContain('/redirects/'.$redirect->id().'/enable')
-        ->and($data[0]['disable_url'])->toContain('/redirects/'.$redirect->id().'/disable');
-});
-
 it('treats a slashless destination as a site-relative path', function () {
     Site::setSites([
         'default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en'],

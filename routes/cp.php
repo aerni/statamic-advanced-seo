@@ -14,8 +14,6 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
     Route::resource('redirects', RedirectController::class)->except('show');
-    Route::post('/redirects/{redirect}/enable', [RedirectController::class, 'enable'])->name('redirects.enable');
-    Route::post('/redirects/{redirect}/disable', [RedirectController::class, 'disable'])->name('redirects.disable');
     Route::post('/redirects/actions', [RedirectActionController::class, 'run'])->name('redirects.actions.run');
     Route::post('/redirects/actions/list', [RedirectActionController::class, 'bulkActions'])->name('redirects.actions.bulk');
     Route::get('/{seoSetGroup}', SeoSetIndexController::class)->name('sets.index');

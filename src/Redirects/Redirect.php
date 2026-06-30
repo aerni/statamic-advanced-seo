@@ -172,11 +172,6 @@ class Redirect implements ContainsQueryableValues, Contract
         return cp_route('advanced-seo.redirects.edit', $this->id());
     }
 
-    public function deleteUrl(): string
-    {
-        return cp_route('advanced-seo.redirects.destroy', $this->id());
-    }
-
     public function path(): string
     {
         return Path::assemble(
