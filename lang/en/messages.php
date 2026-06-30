@@ -43,7 +43,6 @@ return [
     'redirect_create_description' => 'Get started by creating your first redirect.',
     'redirect_edit_title' => 'Edit Redirect',
     'test_redirect' => 'Test Redirect',
-    'test_redirect_disabled' => 'Enable the redirect to test it.',
     'save_and_enable' => 'Save & Enable',
     'save_and_disable' => 'Save & Disable',
 

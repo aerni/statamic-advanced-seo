@@ -207,7 +207,8 @@ it('shows a null destination and null destination_url for a 410 gone redirect', 
 
     expect($data[0]['destination'])->toBeNull()
         ->and($data[0]['destination_url'])->toBeNull()
-        ->and($data[0]['destination_is_entry'])->toBeFalse();
+        ->and($data[0]['destination_is_entry'])->toBeFalse()
+        ->and($data[0]['test_url'])->toBeNull();
 });
 
 it('assembles destination_url correctly for a site with a path-prefix url', function () {

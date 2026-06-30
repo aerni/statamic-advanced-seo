@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
+use Aerni\AdvancedSeo\Enums\RedirectType;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -29,7 +30,7 @@ class ListedRedirect extends JsonResource
             'status' => $redirect->enabled(),
             'edit_url' => $redirect->editUrl(),
             'delete_url' => $redirect->deleteUrl(),
-            'test_url' => $redirect->sourceUrl(),
+            'test_url' => $redirect->type() === RedirectType::Gone ? null : $redirect->sourceUrl(),
             'enable_url' => cp_route('advanced-seo.redirects.enable', $redirect->id()),
             'disable_url' => cp_route('advanced-seo.redirects.disable', $redirect->id()),
             'editable' => User::current()->can('edit', $redirect),

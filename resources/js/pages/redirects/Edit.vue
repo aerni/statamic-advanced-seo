@@ -64,10 +64,8 @@ onUnmounted(() => saveKeyBinding.destroy());
             {{ values.source ?? title }}
         </template>
         <Button
-            v-if="testUrl"
-            v-tooltip="enabled ? null : __('advanced-seo::messages.test_redirect_disabled')"
-            :href="enabled ? testUrl : null"
-            :disabled="!enabled"
+            v-if="testUrl && enabled && Number(values.type) !== 410"
+            :href="testUrl"
             :text="__('advanced-seo::messages.test_redirect')"
             icon="external-link"
             target="_blank"

@@ -31,7 +31,6 @@ return [
     'redirect_create_description' => 'Lege deine erste Weiterleitung an, um loszulegen.',
     'redirect_edit_title' => 'Weiterleitung bearbeiten',
     'test_redirect' => 'Weiterleitung testen',
-    'test_redirect_disabled' => 'Aktiviere die Weiterleitung, um sie zu testen.',
     'save_and_enable' => 'Speichern & aktivieren',
     'save_and_disable' => 'Speichern & deaktivieren',
 
