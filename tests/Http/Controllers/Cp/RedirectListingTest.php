@@ -41,8 +41,31 @@ it('returns correct columns in meta', function () {
     expect($columnFields)->toContain('source')
         ->toContain('destination')
         ->toContain('type')
+        ->toContain('forward_query_string')
         ->toContain('site')
-        ->toContain('status');
+        ->toContain('status')
+        ->toContain('description');
+});
+
+it('respects the requested column visibility and order', function () {
+    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+
+    $columns = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['columns' => 'type,source']))
+        ->json('meta.columns'));
+
+    expect($columns->where('visible', true)->pluck('field')->all())->toBe(['type', 'source']);
+});
+
+it('exposes description and query string forwarding in the row data', function () {
+    Redirects::make()->source('/old')->destination('/new')->site('default')->forwardQueryString(false)->description('A note')->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['description'])->toBe('A note')
+        ->and($data[0]['forward_query_string'])->toBeFalse();
 });
 
 it('includes site in row data', function () {

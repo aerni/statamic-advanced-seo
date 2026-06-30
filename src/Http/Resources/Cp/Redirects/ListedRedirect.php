@@ -25,6 +25,8 @@ class ListedRedirect extends JsonResource
             'destination_is_entry' => Str::startsWith($destination ?? '', 'entry::'),
             'type' => $redirect->type()->value,
             'type_label' => $redirect->type()->label(),
+            'forward_query_string' => $redirect->type() === RedirectType::Gone ? null : $redirect->forwardQueryString(),
+            'description' => $redirect->description(),
             'site' => $redirect->site(),
             'site_name' => Site::get($redirect->site())?->name() ?? $redirect->site(),
             'status' => $redirect->enabled(),
