@@ -21,6 +21,8 @@ const enabled = ref(props.enabled);
 const errors = ref({});
 const saving = ref(false);
 
+const heading = props.values.source ?? props.title;
+
 const saveText = computed(() => {
     if (enabled.value === props.enabled) {
         return __('Save');
@@ -56,12 +58,12 @@ onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
-    <Head :title="values.source ?? title" />
+    <Head :title="heading" />
 
     <Header>
         <template #title>
             <StatusIndicator :status="enabled ? 'published' : 'draft'" />
-            {{ values.source ?? title }}
+            {{ heading }}
         </template>
         <Button
             v-if="testUrl && enabled && Number(values.type) !== 410"
