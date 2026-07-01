@@ -20,18 +20,6 @@ const selectedSite = computed({
     set: (value) => publishContext?.setFieldValue?.('site', value),
 });
 
-const displayValue = computed(() => {
-    if (!props.value) {
-        return props.value;
-    }
-
-    if (props.value.startsWith('#')) {
-        return props.value;
-    }
-
-    return props.value.replace(/^\//, '');
-});
-
 function onInput(typed) {
     if (!typed) {
         return update(typed);
@@ -52,7 +40,7 @@ function onInput(typed) {
         </div>
         <div class="flex-1">
             <Input
-                :model-value="displayValue"
+                :model-value="value"
                 :focus="config.focus"
                 :read-only="isReadOnly"
                 :placeholder="config.placeholder"

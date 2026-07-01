@@ -414,7 +414,7 @@ return [
 
     'redirect_source' => [
         'display' => 'Source',
-        'instructions' => 'The path to redirect from. Use an exact path, a wildcard (`blog/*`), or a regex (`#…#`).',
+        'instructions' => 'The path to redirect from. Use an exact path (`/old`), a wildcard (`/blog/*`), or a regex (`#…#`).',
     ],
 
     'redirect_destination' => [

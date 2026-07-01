@@ -414,7 +414,7 @@ return [
 
     'redirect_source' => [
         'display' => 'Quelle',
-        'instructions' => 'Der Pfad, von dem weitergeleitet wird: ein exakter Pfad, ein Platzhalter (`blog/*`) oder eine Regex (`#…#`).',
+        'instructions' => 'Der Pfad, von dem weitergeleitet wird: ein exakter Pfad (`/old`), ein Platzhalter (`/blog/*`) oder eine Regex (`#…#`).',
     ],
 
     'redirect_destination' => [
