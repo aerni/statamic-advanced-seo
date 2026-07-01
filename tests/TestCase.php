@@ -3,10 +3,12 @@
 namespace Aerni\AdvancedSeo\Tests;
 
 use Aerni\AdvancedSeo\ServiceProvider;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesAi;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
+use Laravel\Ai\AiServiceProvider;
 use Statamic\Addons\Manifest;
 use Statamic\Facades\Blink;
 use Statamic\GraphQL\TypeRegistrar;
@@ -53,14 +55,22 @@ abstract class TestCase extends AddonTestCase
             $app['config']->set('advanced-seo.sitemap.enabled', true);
             $app['config']->set('advanced-seo.crawling.environments', ['testing']);
         }
+
+        if ($this->usesAi()) {
+            $app['config']->set('advanced-seo.ai.enabled', true);
+            $app['config']->set('ai.default', 'openai');
+            $app['config']->set('ai.providers.openai', ['driver' => 'openai', 'key' => 'test-key']);
+        }
     }
 
     protected function setUp(): void
     {
         /* Need to fake the composer.lock so that Composer::isInstalled() works correctly in the service provider. */
-        $this->usesEloquentDriver()
-            ? $this->installEloquentDriver()
-            : $this->uninstallPackages();
+        match (true) {
+            $this->usesEloquentDriver() => $this->installEloquentDriver(),
+            $this->usesAi() => $this->installAiPackage(),
+            default => $this->uninstallPackages(),
+        };
 
         parent::setUp();
 
@@ -95,5 +105,18 @@ abstract class TestCase extends AddonTestCase
     protected function usesSitemap(): bool
     {
         return isset(array_flip(class_uses_recursive(static::class))[EnablesSitemap::class]);
+    }
+
+    protected function usesAi(): bool
+    {
+        return isset(array_flip(class_uses_recursive(static::class))[EnablesAi::class]);
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            $this->usesAi() ? [AiServiceProvider::class] : [],
+        );
     }
 }
