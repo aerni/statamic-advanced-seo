@@ -5,14 +5,16 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 use Aerni\AdvancedSeo\Ai\SeoAgent;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Ai;
+use Aerni\AdvancedSeo\Support\ContentExtractor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AiGenerateController extends CpController
@@ -25,7 +27,7 @@ class AiGenerateController extends CpController
             'field' => ['required', 'string', Rule::in(array_column(SeoAgent::fields(), 'handle'))],
             'blueprint' => ['required', 'string', 'regex:/^(collections|taxonomies)\.[^.]+\.[^.]+$/'],
             'content' => ['required', 'array'],
-            'site' => ['required', 'string'],
+            'site' => ['required', 'string', Rule::in(Site::all()->map->handle()->all())],
         ]);
 
         [$type, $handle, $blueprint] = explode('.', $validated['blueprint']);
@@ -36,13 +38,16 @@ class AiGenerateController extends CpController
 
         $this->authorize('seo.edit-content', $seoSet);
 
+        $blueprint = $this->resolveBlueprint($type, $handle, $blueprint);
+        $data = Arr::except($validated['content'], $validated['field']);
+
         try {
             return response()->json(new SeoAgent(
                 field: $validated['field'],
-                blueprint: $this->resolveBlueprint($type, $handle, $blueprint),
-                content: $validated['content'],
-                site: $validated['site'],
-                additionalInstructions: $this->resolveAdditionalInstructions($type, $handle, $validated['site']),
+                content: (new ContentExtractor(blueprint: $blueprint, content: $data))->run(),
+                seoFields: SeoAgent::seoFieldValues($data),
+                locale: Site::get($validated['site'])->locale(),
+                userInstructions: $this->resolveUserInstructions($type, $handle, $validated['site']),
             )->generate());
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -70,14 +75,11 @@ class AiGenerateController extends CpController
             : $parent->termBlueprint($blueprint);
     }
 
-    protected function resolveAdditionalInstructions(string $type, string $handle, string $site): ?string
+    protected function resolveUserInstructions(string $type, string $handle, string $site): array
     {
-        $global = Seo::find('site::defaults')->in($site)->value('ai_instructions');
-        $scoped = Seo::find("{$type}::{$handle}")?->config()->data()->get('ai_instructions');
-
         return collect([
-            $global ? "### General\n{$global}" : null,
-            $scoped ? '### Specific to this '.Str::singular($type)."\n{$scoped}" : null,
-        ])->filter()->implode("\n\n") ?: null;
+            Seo::find('site::defaults')->in($site)->value('ai_instructions'),
+            Seo::find("{$type}::{$handle}")?->config()->data()->get('ai_instructions'),
+        ])->filter()->values()->all();
     }
 }

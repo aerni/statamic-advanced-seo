@@ -8,5 +8,6 @@ readonly class FieldSpec
         public string $handle,
         public string $purpose,
         public int $characters,
+        public string $sibling,
     ) {}
 }

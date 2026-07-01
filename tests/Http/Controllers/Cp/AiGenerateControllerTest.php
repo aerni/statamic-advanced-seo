@@ -1,21 +1,18 @@
 <?php
 
-use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
+use Aerni\AdvancedSeo\Ai\SeoAgent;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesAi;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class, FakesComposerLock::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesAi::class);
 
 beforeEach(function () {
     Site::setSites([
         'english' => ['name' => 'English', 'url' => '/', 'locale' => 'en'],
     ]);
-
-    $this->installAiPackage();
-
-    config(['ai.default' => 'openai', 'ai.providers.openai.key' => 'test-key']);
 
     Collection::make('pages')->routes('/{slug}')->sites(['english'])->saveQuietly();
 
@@ -31,115 +28,111 @@ it('returns 404 when ai is disabled', function () {
             'blueprint' => 'collections.pages.page',
             'site' => 'english',
             'content' => ['title' => 'Test'],
-            'tokens' => [],
         ])
         ->assertNotFound();
 });
 
-it('validates field is required', function () {
-    config(['advanced-seo.ai.enabled' => true]);
+it('validates the request', function (callable $mutate, string $error) {
+    $payload = $mutate([
+        'field' => 'seo_title',
+        'blueprint' => 'collections.pages.page',
+        'site' => 'english',
+        'content' => ['title' => 'Test'],
+    ]);
 
     $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'blueprint' => 'collections.pages.page',
-            'site' => 'english',
-            'content' => ['title' => 'Test'],
-            'tokens' => [],
-        ])
-        ->assertJsonValidationErrors('field');
-});
+        ->postJson(cp_route('advanced-seo.ai.generate'), $payload)
+        ->assertJsonValidationErrors($error);
+})->with([
+    'blueprint must have three segments' => [fn (array $payload) => [...$payload, 'blueprint' => 'collections.pages'], 'blueprint'],
+    'blueprint must reference a known type' => [fn (array $payload) => [...$payload, 'blueprint' => 'globals.site.page'], 'blueprint'],
+    'site must be a known handle' => [fn (array $payload) => [...$payload, 'site' => 'nonexistent'], 'site'],
+]);
 
-it('validates field must be a valid value', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
-    $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'field' => 'invalid',
-            'blueprint' => 'collections.pages.page',
-            'site' => 'english',
-            'content' => ['title' => 'Test'],
-            'tokens' => [],
-        ])
-        ->assertJsonValidationErrors('field');
-});
-
-it('validates blueprint is required', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
+it('returns 404 when the referenced collection or taxonomy does not exist', function (string $blueprint) {
     $this->actingAs($this->user)
         ->postJson(cp_route('advanced-seo.ai.generate'), [
             'field' => 'seo_title',
+            'blueprint' => $blueprint,
             'site' => 'english',
             'content' => ['title' => 'Test'],
-            'tokens' => [],
-        ])
-        ->assertJsonValidationErrors('blueprint');
-});
-
-it('validates content is required', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
-    $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'field' => 'seo_title',
-            'blueprint' => 'collections.pages.page',
-            'site' => 'english',
-            'tokens' => [],
-        ])
-        ->assertJsonValidationErrors('content');
-});
-
-it('validates site is required', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
-    $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'field' => 'seo_title',
-            'blueprint' => 'collections.pages.page',
-            'content' => ['title' => 'Test'],
-            'tokens' => [],
-        ])
-        ->assertJsonValidationErrors('site');
-});
-
-it('rejects blueprint strings with the wrong number of segments', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
-    $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'field' => 'seo_title',
-            'blueprint' => 'collections.pages',
-            'site' => 'english',
-            'content' => ['title' => 'Test'],
-            'tokens' => [],
-        ])
-        ->assertJsonValidationErrors('blueprint');
-});
-
-it('rejects blueprint strings with an unknown type', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
-    $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'field' => 'seo_title',
-            'blueprint' => 'globals.site.page',
-            'site' => 'english',
-            'content' => ['title' => 'Test'],
-            'tokens' => [],
-        ])
-        ->assertJsonValidationErrors('blueprint');
-});
-
-it('returns 404 when the referenced collection does not exist', function () {
-    config(['advanced-seo.ai.enabled' => true]);
-
-    $this->actingAs($this->user)
-        ->postJson(cp_route('advanced-seo.ai.generate'), [
-            'field' => 'seo_title',
-            'blueprint' => 'collections.nonexistent.page',
-            'site' => 'english',
-            'content' => ['title' => 'Test'],
-            'tokens' => [],
         ])
         ->assertNotFound();
+})->with([
+    'collection' => 'collections.nonexistent.page',
+    'taxonomy' => 'taxonomies.nonexistent.term',
+]);
+
+it('returns 403 when the user lacks the seo.edit-content permission', function () {
+    $user = User::make()->save();
+
+    $this->actingAs($user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.pages.page',
+            'site' => 'english',
+            'content' => ['title' => 'Test'],
+        ])
+        ->assertForbidden();
+});
+
+it('generates seo text', function () {
+    SeoAgent::fake(['Generated title']);
+
+    $response = $this->actingAs($this->user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.pages.page',
+            'site' => 'english',
+            'content' => ['title' => str_repeat('Enough content for validation. ', 5)],
+        ]);
+
+    $response->assertOk();
+
+    expect($response->json())->toBe('Generated title');
+});
+
+it('returns 422 when generation reports insufficient content', function () {
+    $this->actingAs($this->user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.pages.page',
+            'site' => 'english',
+            'content' => ['title' => 'Short'],
+        ])
+        ->assertStatus(422)
+        ->assertJsonStructure(['error']);
+});
+
+it('includes the reason in debug mode on 503', function () {
+    config(['app.debug' => true]);
+
+    SeoAgent::fake(fn () => throw new Exception('AI provider unavailable'));
+
+    $this->actingAs($this->user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.pages.page',
+            'site' => 'english',
+            'content' => ['title' => str_repeat('Enough content for validation. ', 5)],
+        ])
+        ->assertStatus(503)
+        ->assertJsonStructure(['error', 'reason']);
+});
+
+it('excludes the reason when not in debug mode on 503', function () {
+    config(['app.debug' => false]);
+
+    SeoAgent::fake(fn () => throw new Exception('AI provider unavailable'));
+
+    $this->actingAs($this->user)
+        ->postJson(cp_route('advanced-seo.ai.generate'), [
+            'field' => 'seo_title',
+            'blueprint' => 'collections.pages.page',
+            'site' => 'english',
+            'content' => ['title' => str_repeat('Enough content for validation. ', 5)],
+        ])
+        ->assertStatus(503)
+        ->assertJsonStructure(['error'])
+        ->assertJsonMissing(['reason']);
 });
