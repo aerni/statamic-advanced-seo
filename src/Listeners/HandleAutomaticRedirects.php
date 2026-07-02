@@ -8,11 +8,15 @@ use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Events\TermSaved;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
 
 class HandleAutomaticRedirects
 {
@@ -83,6 +87,52 @@ class HandleAutomaticRedirects
         $this->deleteShadowingRedirects($currentPath, $site);
     }
 
+    /**
+     * Terms can rely on getOriginal('slug') at TermSaved (unlike entries,
+     * they aren't re-fetched and re-synced mid-save), so no saving-side
+     * capture is needed. Terms carry no date and can't be an entry::
+     * destination, so the redirect points at the new path.
+     *
+     * A base-slug change flows to every localization that inherits it, so a
+     * redirect is created per site. Localizations with their own overridden
+     * slug are unaffected and drop out (old URL equals new URL). An
+     * independently changed localization slug is not detectable and is a
+     * documented limitation.
+     */
+    public function handleTermSaved(TermSaved $event): void
+    {
+        $term = $event->term;
+
+        if (! $this->shouldHandleTerm($term)) {
+            return;
+        }
+
+        $originalSlug = $term->getOriginal('slug');
+        $newSlug = $term->slug();
+
+        // Skip new terms (no original) and unchanged slugs.
+        if (! $originalSlug || $originalSlug === $newSlug) {
+            return;
+        }
+
+        $newPaths = $this->termPathsPerSite($term);
+        $term->slug($originalSlug);
+        $originalPaths = $this->termPathsPerSite($term);
+        $term->slug($newSlug);
+
+        foreach ($newPaths as $site => $newPath) {
+            $originalPath = $originalPaths[$site] ?? null;
+
+            if (! $originalPath || $originalPath === $newPath) {
+                continue;
+            }
+
+            $this->createRedirect($originalPath, $newPath, $site);
+            $this->repointStaleRedirectDestinations($originalPath, $newPath, $site);
+            $this->deleteShadowingRedirects($newPath, $site);
+        }
+    }
+
     protected function shouldHandleEntry(Entry $entry): bool
     {
         if (! RedirectsFeature::enabled()) {
@@ -90,6 +140,49 @@ class HandleAutomaticRedirects
         }
 
         return (bool) Seo::find("collections::{$entry->collectionHandle()}")?->config()->value('redirects');
+    }
+
+    protected function shouldHandleTerm(Term $term): bool
+    {
+        if (! RedirectsFeature::enabled()) {
+            return false;
+        }
+
+        return (bool) Seo::find("taxonomies::{$term->taxonomyHandle()}")?->config()->value('redirects');
+    }
+
+    /**
+     * The site-relative path of the term in each of its localizations, in the
+     * term's current state. Localizations without a URL are omitted.
+     *
+     * @return array<string, string>
+     */
+    protected function termPathsPerSite(Term $term): array
+    {
+        return $term->taxonomy()->sites()
+            ->mapWithKeys(function ($site) use ($term) {
+                $url = $term->in($site)?->urlWithoutRedirect();
+
+                return [$site => $url ? $this->siteRelativePath($url, $site) : null];
+            })
+            ->filter()
+            ->all();
+    }
+
+    /**
+     * Strip the site's path prefix so the path matches how the resolver keys
+     * redirects (a term url includes the prefix, e.g. "/fr/tags/news").
+     */
+    protected function siteRelativePath(string $url, string $site): string
+    {
+        $prefix = rtrim(parse_url(Site::get($site)->url(), PHP_URL_PATH) ?? '', '/');
+        $path = parse_url($url, PHP_URL_PATH) ?? $url;
+
+        if ($prefix && Str::startsWith($path, $prefix)) {
+            $path = Str::removeLeft($path, $prefix);
+        }
+
+        return $path ?: '/';
     }
 
     /**
