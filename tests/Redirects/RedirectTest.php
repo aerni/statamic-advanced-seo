@@ -1,7 +1,7 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\MatchType;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Redirects\Redirect;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -29,7 +29,7 @@ it('exposes fluent accessors with sensible defaults', function () {
         ->site('default');
 
     expect($redirect->responseCode())->toBe(ResponseCode::Permanent)
-        ->and($redirect->matchType())->toBe(MatchType::Exact)
+        ->and($redirect->sourceType())->toBe(SourceType::Exact)
         ->and($redirect->enabled())->toBeTrue()
         ->and($redirect->forwardQueryString())->toBeTrue()
         ->and($redirect->automatic())->toBeFalse()

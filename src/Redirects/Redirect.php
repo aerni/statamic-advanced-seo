@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
-use Aerni\AdvancedSeo\Enums\MatchType;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectDeleted;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
@@ -63,7 +63,7 @@ class Redirect implements ContainsQueryableValues, Contract
                     return $source;
                 }
 
-                if (MatchType::fromSource($source) === MatchType::Regex) {
+                if (SourceType::fromSource($source) === SourceType::Regex) {
                     return $source;
                 }
 
@@ -81,15 +81,15 @@ class Redirect implements ContainsQueryableValues, Contract
 
     public function sourceUrl(): ?string
     {
-        $matchType = $this->matchType();
+        $sourceType = $this->sourceType();
 
-        if ($matchType === MatchType::Regex) {
+        if ($sourceType === SourceType::Regex) {
             return null;
         }
 
         $source = $this->source();
 
-        if ($matchType === MatchType::Wildcard) {
+        if ($sourceType === SourceType::Wildcard) {
             $index = 0;
             $source = preg_replace_callback('/\*/', function () use (&$index) {
                 $index++;
@@ -127,9 +127,9 @@ class Redirect implements ContainsQueryableValues, Contract
             ->args(func_get_args());
     }
 
-    public function matchType(): MatchType
+    public function sourceType(): SourceType
     {
-        return MatchType::fromSource($this->source() ?? '');
+        return SourceType::fromSource($this->source() ?? '');
     }
 
     public function site(?string $site = null): string|self

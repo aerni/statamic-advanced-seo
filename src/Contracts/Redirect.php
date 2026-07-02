@@ -2,8 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Aerni\AdvancedSeo\Enums\MatchType;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\SourceType;
 
 interface Redirect
 {
@@ -15,7 +15,7 @@ interface Redirect
 
     public function responseCode(?ResponseCode $responseCode = null): ResponseCode|self;
 
-    public function matchType(): MatchType;
+    public function sourceType(): SourceType;
 
     public function site(?string $site = null): string|self;
 

@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\MatchType;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Statamic\Support\Str;
 
@@ -36,7 +36,7 @@ class RedirectResolver
             return null;
         }
 
-        if ($redirect->matchType() !== MatchType::Exact) {
+        if ($redirect->sourceType() !== SourceType::Exact) {
             $captures = RedirectPatternMatcher::match($redirect->source(), $this->path);
             $destination = RedirectPatternMatcher::substitute($destination, $captures);
         }
@@ -77,7 +77,7 @@ class RedirectResolver
     protected function specificity(Redirect $redirect): array
     {
         $source = $redirect->source();
-        $isRegex = $redirect->matchType() === MatchType::Regex;
+        $isRegex = $redirect->sourceType() === SourceType::Regex;
 
         $wildcards = $isRegex ? 0 : substr_count($source, '*');
         $literalLength = $isRegex ? strlen($source) : strlen(str_replace('*', '', $source));

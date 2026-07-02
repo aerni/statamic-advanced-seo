@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Enums;
 
 use Statamic\Support\Str;
 
-enum MatchType: string
+enum SourceType: string
 {
     case Exact = 'exact';
     case Wildcard = 'wildcard';
