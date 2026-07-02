@@ -79,6 +79,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'required',
                         'new \\Aerni\\AdvancedSeo\\Rules\\ValidRedirectDestination()',
                         'new \\Aerni\\AdvancedSeo\\Rules\\PublishedRedirectDestination()',
+                        'new \\Aerni\\AdvancedSeo\\Rules\\NonCircularRedirectDestination()',
                     ],
                     'if' => ['type' => 'isnt '.RedirectType::Gone->value],
                 ],

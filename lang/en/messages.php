@@ -23,6 +23,7 @@ return [
     'redirect_source_not_unique' => 'A redirect with this source already exists for this site.',
     'redirect_destination_invalid' => 'The destination must be a path starting with a slash (e.g. /about) or a full URL including the scheme (e.g. https://example.com).',
     'redirect_destination_unpublished' => 'The destination entry must be published, otherwise the redirect would lead to a 404.',
+    'redirect_destination_circular' => 'The destination resolves to the same URL as the source.',
 
     // Flash messages
     'redirect_created' => 'Redirect created',
