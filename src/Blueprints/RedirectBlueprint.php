@@ -16,40 +16,17 @@ class RedirectBlueprint extends BaseBlueprint
     {
         return [
             'main' => [
-                $this->redirect(),
+                $this->main(),
+            ],
+            'sidebar' => [
+                $this->sidebar(),
             ],
         ];
     }
 
-    protected function redirect(): array
+    protected function main(): array
     {
         $fields = [
-            [
-                'handle' => 'type',
-                'field' => [
-                    'type' => 'select',
-                    'display' => __('advanced-seo::fields.redirect_type.display'),
-                    'instructions' => __('advanced-seo::fields.redirect_type.instructions'),
-                    'options' => collect(RedirectType::cases())
-                        ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
-                        ->all(),
-                    'default' => RedirectType::Permanent->value,
-                    'clearable' => false,
-                    'width' => 50,
-                    'validate' => ['required'],
-                ],
-            ],
-            [
-                'handle' => 'forward_query_string',
-                'field' => [
-                    'type' => 'toggle',
-                    'display' => __('advanced-seo::fields.redirect_forward_query_string.display'),
-                    'instructions' => __('advanced-seo::fields.redirect_forward_query_string.instructions'),
-                    'default' => true,
-                    'width' => 50,
-                    'if' => ['type' => 'isnt '.RedirectType::Gone->value],
-                ],
-            ],
             [
                 'handle' => 'source',
                 'field' => [
@@ -103,5 +80,37 @@ class RedirectBlueprint extends BaseBlueprint
         }
 
         return ['fields' => $fields];
+    }
+
+    protected function sidebar(): array
+    {
+        return [
+            'fields' => [
+                [
+                    'handle' => 'type',
+                    'field' => [
+                        'type' => 'select',
+                        'display' => __('advanced-seo::fields.redirect_type.display'),
+                        'instructions' => __('advanced-seo::fields.redirect_type.instructions'),
+                        'options' => collect(RedirectType::cases())
+                            ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
+                            ->all(),
+                        'default' => RedirectType::Permanent->value,
+                        'clearable' => false,
+                        'validate' => ['required'],
+                    ],
+                ],
+                [
+                    'handle' => 'forward_query_string',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => __('advanced-seo::fields.redirect_forward_query_string.display'),
+                        'instructions' => __('advanced-seo::fields.redirect_forward_query_string.instructions'),
+                        'default' => true,
+                        'if' => ['type' => 'isnt '.RedirectType::Gone->value],
+                    ],
+                ],
+            ],
+        ];
     }
 }
