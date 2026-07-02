@@ -432,7 +432,7 @@ return [
     ],
 
     'redirect_type' => [
-        'display' => 'Typ',
+        'display' => 'Antwortcode',
         'instructions' => 'Der HTTP-Status, mit dem geantwortet wird.',
         'option_301' => 'Dauerhaft (301)',
         'option_302' => 'Temporär (302)',

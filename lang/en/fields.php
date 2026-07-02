@@ -432,7 +432,7 @@ return [
     ],
 
     'redirect_type' => [
-        'display' => 'Type',
+        'display' => 'Response Code',
         'instructions' => 'The HTTP status to respond with.',
         'option_301' => 'Permanent (301)',
         'option_302' => 'Temporary (302)',
