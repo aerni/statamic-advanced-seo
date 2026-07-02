@@ -28,7 +28,7 @@ class HandleAutomaticRedirects
     {
         $entry = $event->entry;
 
-        if (! $this->shouldHandleEntry($entry)) {
+        if (! $this->shouldHandle($entry)) {
             return;
         }
 
@@ -79,12 +79,7 @@ class HandleAutomaticRedirects
             return;
         }
 
-        $site = $entry->locale();
-        $destination = "entry::{$entry->id()}";
-
-        $this->createRedirect($originalPath, $destination, $site);
-        $this->repointStaleRedirectDestinations($originalPath, $destination, $site);
-        $this->deleteShadowingRedirects($currentPath, $site);
+        $this->processRedirects($originalPath, $currentPath, "entry::{$entry->id()}", $entry->locale());
     }
 
     /**
@@ -103,7 +98,7 @@ class HandleAutomaticRedirects
     {
         $term = $event->term;
 
-        if (! $this->shouldHandleTerm($term)) {
+        if (! $this->shouldHandle($term)) {
             return;
         }
 
@@ -115,40 +110,34 @@ class HandleAutomaticRedirects
             return;
         }
 
-        $newPaths = $this->termPathsPerSite($term);
+        $currentPaths = $this->termPathsPerSite($term);
         $term->slug($originalSlug);
         $originalPaths = $this->termPathsPerSite($term);
         $term->slug($newSlug);
 
-        foreach ($newPaths as $site => $newPath) {
+        foreach ($currentPaths as $site => $currentPath) {
             $originalPath = $originalPaths[$site] ?? null;
 
-            if (! $originalPath || $originalPath === $newPath) {
+            if (! $originalPath || $originalPath === $currentPath) {
                 continue;
             }
 
-            $this->createRedirect($originalPath, $newPath, $site);
-            $this->repointStaleRedirectDestinations($originalPath, $newPath, $site);
-            $this->deleteShadowingRedirects($newPath, $site);
+            $this->processRedirects($originalPath, $currentPath, $currentPath, $site);
         }
     }
 
-    protected function shouldHandleEntry(Entry $entry): bool
+    protected function shouldHandle(Entry|Term $item): bool
     {
         if (! RedirectsFeature::enabled()) {
             return false;
         }
 
-        return (bool) Seo::find("collections::{$entry->collectionHandle()}")?->config()->value('redirects');
-    }
+        $handle = match (true) {
+            $item instanceof Entry => "collections::{$item->collectionHandle()}",
+            $item instanceof Term => "taxonomies::{$item->taxonomyHandle()}",
+        };
 
-    protected function shouldHandleTerm(Term $term): bool
-    {
-        if (! RedirectsFeature::enabled()) {
-            return false;
-        }
-
-        return (bool) Seo::find("taxonomies::{$term->taxonomyHandle()}")?->config()->value('redirects');
+        return (bool) Seo::find($handle)?->config()->value('redirects');
     }
 
     /**
@@ -227,6 +216,18 @@ class HandleAutomaticRedirects
         Blink::store('entry-uris')->forget($entry->id());
 
         return $url;
+    }
+
+    /**
+     * Create the old to new redirect and bring the existing redirects in line:
+     * repoint any that pointed at the old path, and drop any that would now
+     * shadow the live page at the new path.
+     */
+    protected function processRedirects(string $oldPath, string $newPath, string $destination, string $site): void
+    {
+        $this->createRedirect($oldPath, $destination, $site);
+        $this->repointStaleRedirectDestinations($oldPath, $destination, $site);
+        $this->deleteShadowingRedirects($newPath, $site);
     }
 
     /**
