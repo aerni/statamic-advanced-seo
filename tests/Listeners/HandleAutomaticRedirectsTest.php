@@ -156,6 +156,47 @@ describe('entry redirects', function () {
 
         expect(Redirects::query()->where('site', 'default')->where('source', '/about')->first())->not->toBeNull();
     });
+
+    it('deletes an automatic redirect pointing to a deleted entry', function () {
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('target'))->save();
+        Redirects::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->automatic(true)->save();
+
+        $entry->delete();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/old')->get())->toHaveCount(0);
+    });
+
+    it('keeps a manual redirect pointing to a deleted entry', function () {
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('target'))->save();
+        Redirects::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->save();
+
+        $entry->delete();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first())->not->toBeNull();
+    });
+
+    it('keeps a redirect whose source is the deleted entry url', function () {
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('target'))->save();
+        Redirects::make()->source('/target')->destination('/elsewhere')->site('default')->automatic(true)->save();
+
+        $entry->delete();
+
+        $redirect = Redirects::query()->where('site', 'default')->where('source', '/target')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe('/elsewhere');
+    });
+
+    it('deletes nothing on the free edition when an entry is deleted', function () {
+        useFreeEdition();
+
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('target'))->save();
+        Redirects::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->automatic(true)->save();
+
+        $entry->delete();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first())->not->toBeNull();
+    });
 });
 
 describe('term redirects', function () {
@@ -292,5 +333,23 @@ describe('term redirects', function () {
 
         expect($redirect)->not->toBeNull()
             ->and($redirect->destination())->toBe('/elsewhere');
+    });
+
+    it('deletes an automatic redirect pointing to a deleted term', function () {
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('target')->data(['title' => 'Target']))->save();
+        Redirects::make()->source('/tags/old')->destination('/tags/target')->site('default')->automatic(true)->save();
+
+        Term::find('tags::target')->delete();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/tags/old')->get())->toHaveCount(0);
+    });
+
+    it('keeps a manual redirect pointing to a deleted term', function () {
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('target')->data(['title' => 'Target']))->save();
+        Redirects::make()->source('/tags/old')->destination('/tags/target')->site('default')->save();
+
+        Term::find('tags::target')->delete();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/tags/old')->first())->not->toBeNull();
     });
 });

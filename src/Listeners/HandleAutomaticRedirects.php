@@ -11,8 +11,10 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
+use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Facades\Blink;
 
@@ -93,6 +95,20 @@ class HandleAutomaticRedirects
     }
 
     /**
+     * A deleted entry leaves the auto-created redirects that pointed at it with
+     * a dead destination, so remove them. Manual redirects and redirects whose
+     * source is the now-gone URL are left alone.
+     */
+    public function handleEntryDeleted(EntryDeleted $event): void
+    {
+        if (! RedirectsFeature::enabled()) {
+            return;
+        }
+
+        $this->deleteAutomaticRedirects("entry::{$event->entry->id()}");
+    }
+
+    /**
      * Terms can rely on getOriginal('slug') at TermSaved (unlike entries,
      * they aren't re-fetched and re-synced mid-save), so no saving-side
      * capture is needed. Terms carry no date and can't be an entry::
@@ -140,6 +156,21 @@ class HandleAutomaticRedirects
 
             $this->createRedirect($originalPath, $currentPath, $site);
             $this->repointStaleRedirectDestinations($originalPath, $currentPath, $site);
+        }
+    }
+
+    /**
+     * A deleted term does the same, but its auto-created redirects point at a
+     * path rather than an entry reference, so match on the term's URL per site.
+     */
+    public function handleTermDeleted(TermDeleted $event): void
+    {
+        if (! RedirectsFeature::enabled()) {
+            return;
+        }
+
+        foreach ($this->pathsPerSite($event->term) as $site => $path) {
+            $this->deleteAutomaticRedirects($path, $site);
         }
     }
 
@@ -268,6 +299,20 @@ class HandleAutomaticRedirects
         Redirects::query()
             ->where('site', $site)
             ->where('source', $source)
+            ->where('automatic', true)
+            ->get()
+            ->each(fn (Redirect $redirect) => $redirect->delete());
+    }
+
+    /**
+     * Delete the auto-created redirects that point at a given destination,
+     * used to clear redirects left dangling by a deleted entry or term.
+     */
+    protected function deleteAutomaticRedirects(string $destination, ?string $site = null): void
+    {
+        Redirects::query()
+            ->when($site, fn ($query) => $query->where('site', $site))
+            ->where('destination', $destination)
             ->where('automatic', true)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());
