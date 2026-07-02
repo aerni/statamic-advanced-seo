@@ -28,6 +28,7 @@ return [
     'redirect_created' => 'Redirect created',
     'redirect_saved' => 'Redirect saved',
     'redirect_deleted' => 'Redirect deleted',
+    'redirect_automatic_description' => 'Created automatically because the URL changed.',
     'seo_set_localization_saved' => 'SEO defaults saved',
     'seo_set_localization_deleted' => 'SEO defaults deleted',
     'seo_set_config_saved' => 'SEO config saved',

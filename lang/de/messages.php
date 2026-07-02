@@ -30,6 +30,7 @@ return [
     'redirect_create_title' => 'Weiterleitung erstellen',
     'redirect_create_description' => 'Lege deine erste Weiterleitung an, um loszulegen.',
     'redirect_edit_title' => 'Weiterleitung bearbeiten',
+    'redirect_automatic_description' => 'Automatisch erstellt, weil sich die URL geändert hat.',
     'test_redirect' => 'Weiterleitung testen',
     'save_and_enable' => 'Speichern & aktivieren',
     'save_and_disable' => 'Speichern & deaktivieren',
