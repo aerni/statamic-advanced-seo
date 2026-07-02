@@ -441,7 +441,7 @@ return [
 
     'redirect_forward_query_string' => [
         'display' => 'Query-String weiterleiten',
-        'instructions' => 'Den eingehenden Query-String an das Ziel anhängen.',
+        'instructions' => 'An die Ziel-URL anhängen.',
     ],
 
     'redirect_description' => [

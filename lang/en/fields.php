@@ -441,7 +441,7 @@ return [
 
     'redirect_forward_query_string' => [
         'display' => 'Forward Query String',
-        'instructions' => 'Append the incoming query string to the destination.',
+        'instructions' => 'Append it to the destination URL.',
     ],
 
     'redirect_description' => [
