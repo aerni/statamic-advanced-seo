@@ -440,10 +440,8 @@ return [
     ],
 
     'redirect_forward_query_string' => [
-        'display' => 'Query-String',
+        'display' => 'Query-String weiterleiten',
         'instructions' => 'Den eingehenden Query-String an das Ziel anhängen.',
-        'option_forward' => 'Weiterleiten',
-        'option_discard' => 'Nicht weiterleiten',
     ],
 
     'redirect_description' => [

@@ -440,10 +440,8 @@ return [
     ],
 
     'redirect_forward_query_string' => [
-        'display' => 'Query String',
+        'display' => 'Forward Query String',
         'instructions' => 'Append the incoming query string to the destination.',
-        'option_forward' => 'Forward',
-        'option_discard' => "Don't forward",
     ],
 
     'redirect_description' => [

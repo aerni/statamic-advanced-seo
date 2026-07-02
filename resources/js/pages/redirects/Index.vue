@@ -49,11 +49,7 @@ defineProps({
                 {{ redirect.type_label }}
             </template>
             <template #cell-forward_query_string="{ row: redirect }">
-                <span v-if="redirect.forward_query_string !== null">
-                    {{ redirect.forward_query_string
-                        ? __('advanced-seo::fields.redirect_forward_query_string.option_forward')
-                        : __('advanced-seo::fields.redirect_forward_query_string.option_discard') }}
-                </span>
+                <Icon v-if="redirect.forward_query_string" name="checkmark" class="size-4" />
             </template>
             <template #cell-automatic="{ row: redirect }">
                 {{ redirect.automatic
