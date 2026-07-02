@@ -18,7 +18,7 @@ it('returns null when finding a missing redirect', function () {
 });
 
 it('can save and find a redirect', function () {
-    Redirects::make()->id('abc')->source('/old')->destination('/new')->site('default')->save();
+    Redirects::make()->id('abc')->source('/old')->destination('/new')->site('default')->automatic(true)->save();
 
     clearStache();
 
@@ -27,7 +27,8 @@ it('can save and find a redirect', function () {
     expect($found)->toBeInstanceOf(RedirectContract::class)
         ->and($found->source())->toBe('/old')
         ->and($found->destination())->toBe('/new')
-        ->and($found->site())->toBe('default');
+        ->and($found->site())->toBe('default')
+        ->and($found->automatic())->toBeTrue();
 });
 
 it('can list all redirects', function () {

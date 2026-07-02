@@ -23,6 +23,8 @@ interface Redirect
 
     public function forwardQueryString(?bool $forwardQueryString = null): bool|self;
 
+    public function automatic(?bool $automatic = null): bool|self;
+
     public function description(?string $description = null): string|self|null;
 
     public function sourceUrl(): ?string;

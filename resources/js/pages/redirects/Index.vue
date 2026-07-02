@@ -55,6 +55,11 @@ defineProps({
                         : __('advanced-seo::fields.redirect_forward_query_string.option_discard') }}
                 </span>
             </template>
+            <template #cell-automatic="{ row: redirect }">
+                {{ redirect.automatic
+                    ? __('advanced-seo::messages.redirect_automatic')
+                    : __('advanced-seo::messages.redirect_manual') }}
+            </template>
             <template #cell-site="{ row: redirect }">
                 {{ redirect.site_name }}
             </template>

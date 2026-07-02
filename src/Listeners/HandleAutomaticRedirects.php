@@ -56,14 +56,14 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * Once the save went through and the new URL is known, create the
-     * redirect and bring the existing redirects in line with the change.
+     * Once the save went through, free the entry's URL from any shadowing
+     * redirect and, if the URL changed, create the redirect from the old one.
      */
     public function handleEntrySaved(EntrySaved $event): void
     {
         $entry = $event->entry;
 
-        if (! $originalPath = Blink::pull($this->blinkKey($entry))) {
+        if (! $this->shouldHandle($entry)) {
             return;
         }
 
@@ -73,11 +73,23 @@ class HandleAutomaticRedirects
 
         $currentPath = $entry->site()->relativePath($url);
 
+        // A published entry owns its URL, so drop any auto-created redirect shadowing it.
+        if ($entry->published()) {
+            $this->deleteShadowingRedirects($currentPath, $entry->locale());
+        }
+
+        if (! $originalPath = Blink::pull($this->blinkKey($entry))) {
+            return;
+        }
+
         if ($originalPath === $currentPath) {
             return;
         }
 
-        $this->processRedirects($originalPath, $currentPath, "entry::{$entry->id()}", $entry->locale());
+        $destination = "entry::{$entry->id()}";
+
+        $this->createRedirect($originalPath, $destination, $entry->locale());
+        $this->repointStaleRedirectDestinations($originalPath, $destination, $entry->locale());
     }
 
     /**
@@ -100,6 +112,13 @@ class HandleAutomaticRedirects
             return;
         }
 
+        $currentPaths = $this->pathsPerSite($term);
+
+        // A term owns its URL in every site, so drop any auto-created redirect shadowing it.
+        foreach ($currentPaths as $site => $currentPath) {
+            $this->deleteShadowingRedirects($currentPath, $site);
+        }
+
         $originalSlug = $term->getOriginal('slug');
         $newSlug = $term->slug();
 
@@ -108,7 +127,6 @@ class HandleAutomaticRedirects
             return;
         }
 
-        $currentPaths = $this->pathsPerSite($term);
         $term->slug($originalSlug);
         $originalPaths = $this->pathsPerSite($term);
         $term->slug($newSlug);
@@ -120,7 +138,8 @@ class HandleAutomaticRedirects
                 continue;
             }
 
-            $this->processRedirects($originalPath, $currentPath, $currentPath, $site);
+            $this->createRedirect($originalPath, $currentPath, $site);
+            $this->repointStaleRedirectDestinations($originalPath, $currentPath, $site);
         }
     }
 
@@ -201,18 +220,6 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * Create the old to new redirect and bring the existing redirects in line:
-     * repoint any that pointed at the old path, and drop any that would now
-     * shadow the live page at the new path.
-     */
-    protected function processRedirects(string $oldPath, string $newPath, string $destination, string $site): void
-    {
-        $this->createRedirect($oldPath, $destination, $site);
-        $this->repointStaleRedirectDestinations($oldPath, $destination, $site);
-        $this->deleteShadowingRedirects($newPath, $site);
-    }
-
-    /**
      * Create the redirect from the old to the new URL. An existing redirect
      * with the same source is a deliberate editor decision and wins.
      */
@@ -232,7 +239,7 @@ class HandleAutomaticRedirects
             ->destination($destination)
             ->type(RedirectType::Permanent)
             ->site($site)
-            ->description(__('advanced-seo::messages.redirect_automatic_description'))
+            ->automatic(true)
             ->save();
     }
 
@@ -251,14 +258,17 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * A redirect whose source is the new URL shadows the now-live page and
-     * would misfire once the URL 404s again (e.g. after renaming back).
+     * An auto-created redirect whose source is now a live page shadows it and
+     * would misfire (e.g. after renaming back, or once a new entry claims the
+     * URL). Only auto-created redirects are removed; manual ones are the
+     * editor's to keep.
      */
     protected function deleteShadowingRedirects(string $source, string $site): void
     {
         Redirects::query()
             ->where('site', $site)
             ->where('source', $source)
+            ->where('automatic', true)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());
     }

@@ -22,6 +22,7 @@ class Redirect extends StacheRedirect
             ->site($model->site)
             ->enabled($model->enabled)
             ->forwardQueryString($model->forward_query_string ?? true)
+            ->automatic($model->automatic ?? false)
             ->description($model->description);
     }
 
@@ -41,6 +42,7 @@ class Redirect extends StacheRedirect
             'site' => $source->site(),
             'enabled' => $source->enabled(),
             'forward_query_string' => $source->type() === RedirectType::Gone ? null : $source->forwardQueryString(),
+            'automatic' => $source->automatic(),
             'description' => $source->description(),
         ]);
     }

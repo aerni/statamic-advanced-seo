@@ -36,6 +36,10 @@ class Redirects extends ResourceCollection
         );
 
         $columns->push(
+            Column::make('automatic')->label(__('advanced-seo::messages.redirect_creation'))->sortable(false)->defaultVisibility(false)->visible(false)->listable(true)
+        );
+
+        $columns->push(
             Column::make('description')->label(__('advanced-seo::fields.redirect_description.display'))->sortable(false)->defaultVisibility(false)->visible(false)->listable(true)
         );
 

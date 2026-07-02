@@ -44,6 +44,7 @@ it('returns correct columns in meta', function () {
         ->toContain('forward_query_string')
         ->toContain('site')
         ->toContain('status')
+        ->toContain('automatic')
         ->toContain('description');
 });
 
@@ -66,6 +67,16 @@ it('exposes description and query string forwarding in the row data', function (
 
     expect($data[0]['description'])->toBe('A note')
         ->and($data[0]['forward_query_string'])->toBeFalse();
+});
+
+it('exposes the automatic flag in the row data', function () {
+    Redirects::make()->source('/auto')->destination('/x')->site('default')->automatic(true)->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('data');
+
+    expect($data[0]['automatic'])->toBeTrue();
 });
 
 it('includes site in row data', function () {
@@ -127,6 +138,19 @@ it('filters by status', function () {
         ->json('data');
 
     expect($data)->toHaveCount(1)->and($data[0]['source'])->toBe('/disabled');
+});
+
+it('filters by creation', function () {
+    Redirects::make()->source('/auto')->destination('/x')->site('default')->automatic(true)->save();
+    Redirects::make()->source('/manual')->destination('/y')->site('default')->save();
+
+    $filters = base64_encode(json_encode(['redirect_creation' => ['creation' => 'automatic']]));
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['filters' => $filters]))
+        ->json('data');
+
+    expect($data)->toHaveCount(1)->and($data[0]['source'])->toBe('/auto');
 });
 
 it('filters by site', function () {

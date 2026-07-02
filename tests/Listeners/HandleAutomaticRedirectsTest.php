@@ -34,7 +34,7 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}")
             ->and($redirect->type())->toBe(RedirectType::Permanent)
             ->and($redirect->enabled())->toBeTrue()
-            ->and($redirect->description())->toBe('Created automatically because the URL changed.');
+            ->and($redirect->automatic())->toBeTrue();
     });
 
     it('creates a redirect when the date changes the url', function () {
@@ -129,6 +129,33 @@ describe('entry redirects', function () {
 
         expect($sources->all())->toBe(['/b']);
     });
+
+    it('deletes an automatic redirect shadowed by a newly created entry', function () {
+        Redirects::make()->source('/about')->destination('/elsewhere')->site('default')->automatic(true)->save();
+
+        tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/about')->get())->toHaveCount(0);
+    });
+
+    it('keeps a manual redirect shadowed by a newly created entry', function () {
+        Redirects::make()->source('/about')->destination('/elsewhere')->site('default')->save();
+
+        tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
+
+        $redirect = Redirects::query()->where('site', 'default')->where('source', '/about')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe('/elsewhere');
+    });
+
+    it('keeps an automatic redirect when the shadowing entry is a draft', function () {
+        Redirects::make()->source('/about')->destination('/elsewhere')->site('default')->automatic(true)->save();
+
+        tap(Entry::make()->collection('pages')->locale('default')->slug('about')->published(false))->save();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/about')->first())->not->toBeNull();
+    });
 });
 
 describe('term redirects', function () {
@@ -147,7 +174,7 @@ describe('term redirects', function () {
             ->and($redirect->destination())->toBe('/tags/new')
             ->and($redirect->type())->toBe(RedirectType::Permanent)
             ->and($redirect->enabled())->toBeTrue()
-            ->and($redirect->description())->toBe('Created automatically because the URL changed.');
+            ->and($redirect->automatic())->toBeTrue();
     });
 
     it('creates nothing when saving without a slug change', function () {
@@ -246,5 +273,24 @@ describe('term redirects', function () {
         $sources = Redirects::query()->where('site', 'default')->get()->map->source();
 
         expect($sources->all())->toBe(['/tags/b']);
+    });
+
+    it('deletes an automatic redirect shadowed by a newly created term', function () {
+        Redirects::make()->source('/tags/about')->destination('/elsewhere')->site('default')->automatic(true)->save();
+
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('about')->data(['title' => 'About']))->save();
+
+        expect(Redirects::query()->where('site', 'default')->where('source', '/tags/about')->get())->toHaveCount(0);
+    });
+
+    it('keeps a manual redirect shadowed by a newly created term', function () {
+        Redirects::make()->source('/tags/about')->destination('/elsewhere')->site('default')->save();
+
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('about')->data(['title' => 'About']))->save();
+
+        $redirect = Redirects::query()->where('site', 'default')->where('source', '/tags/about')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe('/elsewhere');
     });
 });

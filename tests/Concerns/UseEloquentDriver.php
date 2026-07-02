@@ -40,6 +40,7 @@ trait UseEloquentDriver
             $table->string('site');
             $table->boolean('enabled')->default(true);
             $table->boolean('forward_query_string')->nullable()->default(true);
+            $table->boolean('automatic')->default(false);
             $table->text('description')->nullable();
             $table->timestamps();
 

@@ -7,13 +7,14 @@ use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 uses(UseEloquentDriver::class);
 
 it('can save and find a redirect via eloquent', function () {
-    Redirects::make()->id('abc')->source('/old')->destination('/new')->site('default')->save();
+    Redirects::make()->id('abc')->source('/old')->destination('/new')->site('default')->automatic(true)->save();
 
     $found = Redirects::find('abc');
 
     expect($found)->toBeInstanceOf(RedirectContract::class)
         ->and($found->source())->toBe('/old')
-        ->and($found->site())->toBe('default');
+        ->and($found->site())->toBe('default')
+        ->and($found->automatic())->toBeTrue();
 });
 
 it('can list and delete redirects via eloquent', function () {

@@ -32,6 +32,7 @@ it('exposes fluent accessors with sensible defaults', function () {
         ->and($redirect->matchType())->toBe(MatchType::Exact)
         ->and($redirect->enabled())->toBeTrue()
         ->and($redirect->forwardQueryString())->toBeTrue()
+        ->and($redirect->automatic())->toBeFalse()
         ->and($redirect->site())->toBe('default');
 });
 
@@ -55,6 +56,7 @@ it('serializes only its fields to file data', function () {
         ->type(RedirectType::Temporary)
         ->site('french')
         ->enabled(false)
+        ->automatic(true)
         ->description('Note');
 
     expect($redirect->fileData())->toBe([
@@ -63,6 +65,7 @@ it('serializes only its fields to file data', function () {
         'type' => 302,
         'enabled' => false,
         'forward_query_string' => true,
+        'automatic' => true,
         'description' => 'Note',
     ]);
 });
