@@ -434,9 +434,9 @@ return [
     'redirect_type' => [
         'display' => 'Antwortcode',
         'instructions' => 'Der HTTP-Status, mit dem geantwortet wird.',
-        'option_301' => 'Dauerhaft (301)',
-        'option_302' => 'Temporär (302)',
-        'option_410' => 'Entfernt (410)',
+        'option_301' => '301 (Dauerhaft)',
+        'option_302' => '302 (Temporär)',
+        'option_410' => '410 (Entfernt)',
     ],
 
     'redirect_forward_query_string' => [

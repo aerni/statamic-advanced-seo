@@ -434,9 +434,9 @@ return [
     'redirect_type' => [
         'display' => 'Response Code',
         'instructions' => 'The HTTP status to respond with.',
-        'option_301' => 'Permanent (301)',
-        'option_302' => 'Temporary (302)',
-        'option_410' => 'Gone (410)',
+        'option_301' => '301 (Permanent)',
+        'option_302' => '302 (Temporary)',
+        'option_410' => '410 (Gone)',
     ],
 
     'redirect_forward_query_string' => [
