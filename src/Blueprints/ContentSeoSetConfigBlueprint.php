@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\MultiSite;
 use Aerni\AdvancedSeo\Features\Pro;
+use Aerni\AdvancedSeo\Features\Redirects;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 
@@ -25,6 +26,7 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                 $this->sitemaps(),
                 $this->socialImages(),
                 $this->ai(),
+                $this->redirects(),
             ],
         ];
     }
@@ -95,6 +97,26 @@ class ContentSeoSetConfigBlueprint extends BaseBlueprint
                         'always_save' => true,
                         'if' => ['enabled' => 'true'],
                         'feature' => Sitemap::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function redirects(): array
+    {
+        return [
+            'display' => $this->trans('config_section_redirects.display'),
+            'fields' => [
+                [
+                    'handle' => 'redirects',
+                    'field' => [
+                        'type' => 'toggle',
+                        'display' => $this->trans('config_redirects.display'),
+                        'instructions' => $this->trans('config_redirects.instructions'),
+                        'default' => true,
+                        'always_save' => true,
+                        'feature' => Redirects::class,
                     ],
                 ],
             ],

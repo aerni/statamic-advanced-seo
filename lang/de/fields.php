@@ -368,6 +368,15 @@ return [
         'instructions' => 'Aktiviert die Sitemap für diesen :type.',
     ],
 
+    'config_section_redirects' => [
+        'display' => 'Weiterleitungen',
+    ],
+
+    'config_redirects' => [
+        'display' => 'Weiterleitungen aktivieren',
+        'instructions' => 'Erstellt automatisch Weiterleitungen, wenn sich URLs in diesem :type ändern.',
+    ],
+
     'config_section_social_images' => [
         'display' => 'Social-Media-Bilder',
     ],

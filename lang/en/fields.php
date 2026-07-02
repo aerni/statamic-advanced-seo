@@ -368,6 +368,15 @@ return [
         'instructions' => 'Enables the sitemap for this :type.',
     ],
 
+    'config_section_redirects' => [
+        'display' => 'Redirects',
+    ],
+
+    'config_redirects' => [
+        'display' => 'Enable Redirects',
+        'instructions' => 'Automatically creates redirects when URLs in this :type change.',
+    ],
+
     'config_section_social_images' => [
         'display' => 'Social Images',
     ],
