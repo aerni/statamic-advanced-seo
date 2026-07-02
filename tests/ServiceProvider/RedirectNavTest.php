@@ -100,3 +100,21 @@ it('does not add a Redirects nav item when the redirects feature is disabled', f
 
     expect($childNames->contains('Redirects'))->toBeFalse();
 });
+
+it('gives the SEO section nav items their icons', function () {
+    $this->actingAs(tap(User::make()->makeSuper())->save());
+
+    $extensions = captureNavExtensions();
+    $nav = runNavExtensions($extensions);
+
+    $icons = collect($nav->items())
+        ->flatMap(function ($item) {
+            $c = $item->children();
+
+            return $c instanceof Collection ? $c : collect($c ?? []);
+        })
+        ->mapWithKeys(fn ($item) => [$item->name() => $item->icon()]);
+
+    expect($icons->get('Site'))->toBe('utilities')
+        ->and($icons->get('Redirects'))->toBe('moved');
+});

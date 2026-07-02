@@ -185,7 +185,7 @@ class ServiceProvider extends AddonServiceProvider
         Nav::extend(function ($nav) {
             $navItems = Seo::groups()
                 ->filter(fn (SeoSetGroup $group) => User::current()->can('viewAny', [SeoSet::class, $group]))
-                ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->url()));
+                ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->url())->icon($group->icon()));
 
             $canViewRedirects = Features\Redirects::enabled()
                 && User::current()->can('viewAny', Contracts\Redirect::class);
