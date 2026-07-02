@@ -42,14 +42,10 @@ class RedirectBlueprint extends BaseBlueprint
             [
                 'handle' => 'forward_query_string',
                 'field' => [
-                    'type' => 'button_group',
+                    'type' => 'toggle',
                     'display' => __('advanced-seo::fields.redirect_forward_query_string.display'),
                     'instructions' => __('advanced-seo::fields.redirect_forward_query_string.instructions'),
-                    'options' => [
-                        'forward' => __('advanced-seo::fields.redirect_forward_query_string.option_forward'),
-                        'discard' => __('advanced-seo::fields.redirect_forward_query_string.option_discard'),
-                    ],
-                    'default' => 'forward',
+                    'default' => true,
                     'width' => 50,
                     'if' => ['type' => 'isnt '.RedirectType::Gone->value],
                 ],

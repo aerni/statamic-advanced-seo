@@ -109,7 +109,7 @@ class RedirectController extends CpController
             'source' => $redirect->source(),
             'destination' => $redirect->destination(),
             'type' => $redirect->type()->value,
-            'forward_query_string' => $redirect->forwardQueryString() ? 'forward' : 'discard',
+            'forward_query_string' => $redirect->forwardQueryString(),
             'description' => $redirect->description(),
             'site' => $redirect->site(),
         ])->preProcess();
@@ -183,7 +183,7 @@ class RedirectController extends CpController
             ->destination(Arr::get($values, 'destination'))
             ->type(RedirectType::from(Arr::get($values, 'type') ?? RedirectType::Permanent->value))
             ->enabled(Arr::get($values, 'enabled') ?? true)
-            ->forwardQueryString(Arr::get($values, 'forward_query_string', 'forward') !== 'discard')
+            ->forwardQueryString((bool) Arr::get($values, 'forward_query_string', true))
             ->description(Arr::get($values, 'description'))
             ->site(Arr::get($values, 'site', Site::selected()->handle()));
     }
