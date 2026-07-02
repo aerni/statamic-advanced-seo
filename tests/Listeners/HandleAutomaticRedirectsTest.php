@@ -3,6 +3,8 @@
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Statamic\Events\EntrySaved;
+use Statamic\Events\EntrySaving;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -48,6 +50,39 @@ describe('entry redirects', function () {
 
         expect($redirect)->not->toBeNull()
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
+    // The Eloquent driver leaves initialPath() null but keeps getOriginal()
+    // reliable. An entry with a synced original and no initial path reproduces
+    // that condition without standing up the whole Eloquent entries driver.
+    it('captures the old url via getOriginal when there is no initial path', function () {
+        $entry = Entry::make()->id('abc')->collection('pages')->locale('default')->slug('old')->published(true);
+        $entry->syncOriginal();
+        $entry->slug('new');
+
+        event(new EntrySaving($entry));
+        event(new EntrySaved($entry));
+
+        $redirect = Redirects::query()->where('site', 'default')->where('source', '/old')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe('entry::abc');
+    });
+
+    it('captures the old dated url via getOriginal when there is no initial path', function () {
+        Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
+
+        $entry = Entry::make()->id('xyz')->collection('posts')->locale('default')->slug('post')->date('2024-01-15')->published(true);
+        $entry->syncOriginal();
+        $entry->date('2025-06-20');
+
+        event(new EntrySaving($entry));
+        event(new EntrySaved($entry));
+
+        $redirect = Redirects::query()->where('site', 'default')->where('source', '/blog/2024/post')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe('entry::xyz');
     });
 
     it('creates nothing when the date changes but the url stays the same', function () {

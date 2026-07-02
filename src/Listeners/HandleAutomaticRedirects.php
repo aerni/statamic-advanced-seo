@@ -32,16 +32,11 @@ class HandleAutomaticRedirects
             return;
         }
 
-        /**
-         * The original slug and date survive in the initial file path,
-         * unlike getOriginal(), which re-syncs on every Stache fetch.
-         */
-        if (! $initialPath = $entry->initialPath()) {
+        [$originalSlug, $originalDate] = $this->originalSlugAndDate($entry);
+
+        if (! $originalSlug) {
             return;
         }
-
-        $originalSlug = (new GetSlugFromPath)($initialPath);
-        $originalDate = (new GetDateFromPath)($initialPath);
 
         $slugChanged = $originalSlug !== $entry->slug();
         $dateChanged = $originalDate && $originalDate !== $this->currentDate($entry, $originalDate);
@@ -191,6 +186,24 @@ class HandleAutomaticRedirects
         };
 
         return (bool) Seo::find($handle)?->config()->value('redirects');
+    }
+
+    /**
+     * The entry's slug and date from before this save. The Stache driver
+     * overwrites the initial file path on save, so its pre-save values live in
+     * that path; getOriginal() is unreliable there because the Stache re-syncs
+     * on fetch. The Eloquent driver has no file path but keeps getOriginal()
+     * reliable, and it already stores the date in the same "Y-m-d-Hi" format.
+     *
+     * @return array{0: ?string, 1: ?string}
+     */
+    protected function originalSlugAndDate(Entry $entry): array
+    {
+        if ($initialPath = $entry->initialPath()) {
+            return [(new GetSlugFromPath)($initialPath), (new GetDateFromPath)($initialPath)];
+        }
+
+        return [$entry->getOriginal('slug'), $entry->getOriginal('date')];
     }
 
     /**
