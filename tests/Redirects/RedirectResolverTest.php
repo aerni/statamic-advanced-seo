@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Redirects\RedirectResolver;
 use Statamic\Facades\Collection;
@@ -19,7 +19,7 @@ it('matches an exact rule for the site', function () {
 
     $resolved = RedirectResolver::resolve('/old', 'default');
 
-    expect($resolved->type)->toBe(RedirectType::Permanent)->and($resolved->destination)->toBe('/new');
+    expect($resolved->responseCode)->toBe(ResponseCode::Permanent)->and($resolved->destination)->toBe('/new');
 });
 
 it('matches an exact rule regardless of trailing slashes', function () {
@@ -104,11 +104,11 @@ it('matches a wildcard segment without crossing slashes', function () {
 });
 
 it('returns a 410 match with no destination', function () {
-    Redirects::make()->source('/gone')->type(RedirectType::Gone)->site('default')->save();
+    Redirects::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
 
     $resolved = RedirectResolver::resolve('/gone', 'default');
 
-    expect($resolved->type)->toBe(RedirectType::Gone)->and($resolved->destination)->toBeNull();
+    expect($resolved->responseCode)->toBe(ResponseCode::Gone)->and($resolved->destination)->toBeNull();
 });
 
 it('substitutes multiple regex captures', function () {

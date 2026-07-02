@@ -36,7 +36,7 @@ trait UseEloquentDriver
             $table->string('id')->primary();
             $table->string('source');
             $table->text('destination')->nullable();
-            $table->integer('type')->default(301);
+            $table->integer('response_code')->default(301);
             $table->string('site');
             $table->boolean('enabled')->default(true);
             $table->boolean('forward_query_string')->nullable()->default(true);

@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\Collection;
@@ -32,7 +32,7 @@ describe('entry redirects', function () {
 
         expect($redirect)->not->toBeNull()
             ->and($redirect->destination())->toBe("entry::{$entry->id()}")
-            ->and($redirect->type())->toBe(RedirectType::Permanent)
+            ->and($redirect->responseCode())->toBe(ResponseCode::Permanent)
             ->and($redirect->enabled())->toBeTrue()
             ->and($redirect->automatic())->toBeTrue();
     });
@@ -172,7 +172,7 @@ describe('term redirects', function () {
 
         expect($redirect)->not->toBeNull()
             ->and($redirect->destination())->toBe('/tags/new')
-            ->and($redirect->type())->toBe(RedirectType::Permanent)
+            ->and($redirect->responseCode())->toBe(ResponseCode::Permanent)
             ->and($redirect->enabled())->toBeTrue()
             ->and($redirect->automatic())->toBeTrue();
     });

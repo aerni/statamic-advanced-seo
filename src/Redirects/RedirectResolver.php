@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\MatchType;
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Statamic\Support\Str;
 
@@ -28,8 +28,8 @@ class RedirectResolver
             return null;
         }
 
-        if ($redirect->type() === RedirectType::Gone) {
-            return new ResolvedRedirect(RedirectType::Gone, null);
+        if ($redirect->responseCode() === ResponseCode::Gone) {
+            return new ResolvedRedirect(ResponseCode::Gone, null);
         }
 
         if (! $destination = $redirect->destinationUrl()) {
@@ -41,7 +41,7 @@ class RedirectResolver
             $destination = RedirectPatternMatcher::substitute($destination, $captures);
         }
 
-        return new ResolvedRedirect($redirect->type(), $destination, $redirect->forwardQueryString());
+        return new ResolvedRedirect($redirect->responseCode(), $destination, $redirect->forwardQueryString());
     }
 
     protected function findRedirect(): ?Redirect

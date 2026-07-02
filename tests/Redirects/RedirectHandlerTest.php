@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -14,7 +14,7 @@ beforeEach(function () {
 });
 
 it('redirects a request that would 404 to the matched destination', function () {
-    Redirects::make()->source('/old')->destination('/new')->type(RedirectType::Permanent)->site('default')->save();
+    Redirects::make()->source('/old')->destination('/new')->responseCode(ResponseCode::Permanent)->site('default')->save();
 
     $this->get('/old')
         ->assertStatus(301)
@@ -46,7 +46,7 @@ it('appends the query string before a destination fragment', function () {
 });
 
 it('returns 410 for a gone rule', function () {
-    Redirects::make()->source('/gone')->type(RedirectType::Gone)->site('default')->save();
+    Redirects::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
 
     $this->get('/gone')->assertStatus(410);
 });

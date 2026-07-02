@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
@@ -108,7 +108,7 @@ class RedirectController extends CpController
         $fields = $blueprint->fields()->addValues([
             'source' => $redirect->source(),
             'destination' => $redirect->destination(),
-            'type' => $redirect->type()->value,
+            'response_code' => $redirect->responseCode()->value,
             'forward_query_string' => $redirect->forwardQueryString(),
             'description' => $redirect->description(),
             'site' => $redirect->site(),
@@ -181,7 +181,7 @@ class RedirectController extends CpController
         return $redirect
             ->source(Arr::get($values, 'source'))
             ->destination(Arr::get($values, 'destination'))
-            ->type(RedirectType::from(Arr::get($values, 'type') ?? RedirectType::Permanent->value))
+            ->responseCode(ResponseCode::from(Arr::get($values, 'response_code') ?? ResponseCode::Permanent->value))
             ->enabled(Arr::get($values, 'enabled') ?? true)
             ->forwardQueryString((bool) Arr::get($values, 'forward_query_string', true))
             ->description(Arr::get($values, 'description'))

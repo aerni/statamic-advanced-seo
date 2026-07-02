@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
 use Aerni\AdvancedSeo\Enums\MatchType;
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectDeleted;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
@@ -34,7 +34,7 @@ class Redirect implements ContainsQueryableValues, Contract
 
     protected $destination;
 
-    protected RedirectType $type = RedirectType::Permanent;
+    protected ResponseCode $responseCode = ResponseCode::Permanent;
 
     protected $site;
 
@@ -120,10 +120,10 @@ class Redirect implements ContainsQueryableValues, Contract
         return URL::assemble(Site::get($this->site())->url(), Str::ensureLeft($destination, '/'));
     }
 
-    public function type(?RedirectType $type = null): RedirectType|self
+    public function responseCode(?ResponseCode $responseCode = null): ResponseCode|self
     {
         return $this
-            ->fluentlyGetOrSet('type')
+            ->fluentlyGetOrSet('responseCode')
             ->args(func_get_args());
     }
 
@@ -171,7 +171,7 @@ class Redirect implements ContainsQueryableValues, Contract
     public function getQueryableValue(string $field)
     {
         return match ($field) {
-            'type' => $this->type()->value,
+            'response_code' => $this->responseCode()->value,
             default => $this->{$field}(),
         };
     }
@@ -195,9 +195,9 @@ class Redirect implements ContainsQueryableValues, Contract
         return [
             'source' => $this->source(),
             'destination' => $this->destination(),
-            'type' => $this->type()->value,
+            'response_code' => $this->responseCode()->value,
             'enabled' => $this->enabled(),
-            'forward_query_string' => $this->type() === RedirectType::Gone ? null : $this->forwardQueryString(),
+            'forward_query_string' => $this->responseCode() === ResponseCode::Gone ? null : $this->forwardQueryString(),
             'automatic' => $this->automatic(),
             'description' => $this->description(),
         ];

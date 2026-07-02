@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
@@ -113,7 +113,7 @@ it('creates a redirect', function () {
         ->post(cp_route('advanced-seo.redirects.store'), [
             'source' => '/old',
             'destination' => '/new',
-            'type' => 301,
+            'response_code' => 301,
             'enabled' => true,
             'site' => 'default',
         ])
@@ -122,7 +122,7 @@ it('creates a redirect', function () {
     $redirect = Redirects::query()->where('site', 'default')->where('source', '/old')->first();
     expect($redirect)->not->toBeNull()
         ->and($redirect->destination())->toBe('/new')
-        ->and($redirect->type())->toBe(RedirectType::Permanent);
+        ->and($redirect->responseCode())->toBe(ResponseCode::Permanent);
 });
 
 it('creates a disabled redirect when enabled is false', function () {
@@ -130,7 +130,7 @@ it('creates a disabled redirect when enabled is false', function () {
         ->post(cp_route('advanced-seo.redirects.store'), [
             'source' => '/disabled-route',
             'destination' => '/new',
-            'type' => 301,
+            'response_code' => 301,
             'enabled' => false,
             'site' => 'default',
         ])
@@ -146,7 +146,7 @@ it('defaults enabled to true when omitted from the request', function () {
         ->post(cp_route('advanced-seo.redirects.store'), [
             'source' => '/omitted-enabled',
             'destination' => '/new',
-            'type' => 301,
+            'response_code' => 301,
             'site' => 'default',
         ])
         ->assertOk();
@@ -158,7 +158,7 @@ it('defaults enabled to true when omitted from the request', function () {
 
 it('requires a source', function () {
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['destination' => '/new', 'response_code' => 301, 'site' => 'default'])
         ->assertJsonValidationErrors('source');
 });
 
@@ -166,31 +166,31 @@ it('rejects a duplicate source on the same site', function () {
     Redirects::make()->source('/old')->destination('/x')->site('default')->save();
 
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default'])
         ->assertJsonValidationErrors('source');
 });
 
 it('rejects a malformed regex source', function () {
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '#^/p/(\d+$#', 'destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '#^/p/(\d+$#', 'destination' => '/new', 'response_code' => 301, 'site' => 'default'])
         ->assertJsonValidationErrors('source');
 });
 
 it('rejects a malformed destination url', function () {
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => 'https//google.com', 'type' => 301, 'site' => 'default'])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => 'https//google.com', 'response_code' => 301, 'site' => 'default'])
         ->assertJsonValidationErrors('destination');
 });
 
 it('requires a destination unless the type is gone', function () {
     // 301 with destination present but null → required fires
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'type' => 301, 'site' => 'default', 'destination' => null])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'response_code' => 301, 'site' => 'default', 'destination' => null])
         ->assertJsonValidationErrors('destination');
 
     // 410 with destination absent → sometimes skips validation
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/gone', 'type' => 410, 'site' => 'default'])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/gone', 'response_code' => 410, 'site' => 'default'])
         ->assertValid()
         ->assertOk();
 
@@ -199,7 +199,7 @@ it('requires a destination unless the type is gone', function () {
 
 it('persists the forward query string choice', function () {
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'type' => 301, 'site' => 'default', 'forward_query_string' => false])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default', 'forward_query_string' => false])
         ->assertOk();
 
     expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first()->forwardQueryString())->toBeFalse();
@@ -207,7 +207,7 @@ it('persists the forward query string choice', function () {
 
 it('forbids a viewer from storing a redirect', function () {
     $this->actingAs(redirectViewer())
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'type' => 301, 'site' => 'default'])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default'])
         ->assertForbidden();
 });
 
@@ -216,7 +216,7 @@ it('updates a redirect', function () {
 
     $this->actingAs($this->super)
         ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
-            'source' => '/old', 'destination' => '/newer', 'type' => 302, 'enabled' => true, 'site' => 'default',
+            'source' => '/old', 'destination' => '/newer', 'response_code' => 302, 'enabled' => true, 'site' => 'default',
         ])->assertOk();
 
     expect(Redirects::find($redirect->id())->destination())->toBe('/newer');
@@ -227,7 +227,7 @@ it('toggles enabled status when updating', function () {
 
     $this->actingAs($this->super)
         ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
-            'source' => '/old', 'destination' => '/new', 'type' => 301, 'enabled' => false, 'site' => 'default',
+            'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => false, 'site' => 'default',
         ])->assertOk();
 
     expect(Redirects::find($redirect->id())->enabled())->toBeFalse();
@@ -242,7 +242,7 @@ it('moves a redirect when its site changes', function () {
 
     $this->actingAs($this->super)
         ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
-            'source' => '/old', 'destination' => '/new', 'type' => 301, 'enabled' => true, 'site' => 'french',
+            'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'french',
         ])->assertOk();
 
     expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first())->toBeNull();
@@ -254,7 +254,7 @@ it('forbids a viewer from updating a redirect', function () {
 
     $this->actingAs(redirectViewer())
         ->patchJson(cp_route('advanced-seo.redirects.update', $redirect->id()), [
-            'source' => '/old', 'destination' => '/newer', 'type' => 301, 'enabled' => true, 'site' => 'default',
+            'source' => '/old', 'destination' => '/newer', 'response_code' => 301, 'enabled' => true, 'site' => 'default',
         ])->assertForbidden();
 });
 

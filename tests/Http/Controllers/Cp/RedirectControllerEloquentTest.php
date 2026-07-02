@@ -17,13 +17,13 @@ beforeEach(function () {
 
 it('creates and moves a redirect via eloquent', function () {
     $this->actingAs($this->super)->post(cp_route('advanced-seo.redirects.store'), [
-        'source' => '/old', 'destination' => '/new', 'type' => 301, 'enabled' => true, 'site' => 'default',
+        'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'default',
     ])->assertOk();
 
     $id = Redirects::query()->where('site', 'default')->where('source', '/old')->first()->id();
 
     $this->actingAs($this->super)->patch(cp_route('advanced-seo.redirects.update', $id), [
-        'source' => '/old', 'destination' => '/new', 'type' => 301, 'enabled' => true, 'site' => 'french',
+        'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'french',
     ])->assertOk();
 
     expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first())->toBeNull();

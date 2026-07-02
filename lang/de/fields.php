@@ -431,7 +431,7 @@ return [
         'instructions' => 'Ein Pfad (`/about`), eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2` für Captures.',
     ],
 
-    'redirect_type' => [
+    'redirect_response_code' => [
         'display' => 'Antwortcode',
         'instructions' => 'Der HTTP-Status, mit dem geantwortet wird.',
         'option_301' => '301 (Dauerhaft)',

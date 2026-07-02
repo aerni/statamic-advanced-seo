@@ -1,9 +1,9 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 
 it('returns a non-empty label for each redirect type', function () {
-    foreach (RedirectType::cases() as $type) {
+    foreach (ResponseCode::cases() as $type) {
         expect($type->label())->toBeString()->not->toBeEmpty();
     }
 });

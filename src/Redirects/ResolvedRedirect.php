@@ -2,12 +2,12 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 
 class ResolvedRedirect
 {
     public function __construct(
-        public readonly RedirectType $type,
+        public readonly ResponseCode $responseCode,
         public readonly ?string $destination,
         public readonly bool $forwardQueryString = true,
     ) {}

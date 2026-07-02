@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Statamic\Facades\Site;
 
 class RedirectBlueprint extends BaseBlueprint
@@ -54,7 +54,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'new \\Aerni\\AdvancedSeo\\Rules\\PublishedRedirectDestination()',
                         'new \\Aerni\\AdvancedSeo\\Rules\\NonCircularRedirectDestination()',
                     ],
-                    'if' => ['type' => 'isnt '.RedirectType::Gone->value],
+                    'if' => ['response_code' => 'isnt '.ResponseCode::Gone->value],
                 ],
             ],
             [
@@ -87,15 +87,15 @@ class RedirectBlueprint extends BaseBlueprint
         return [
             'fields' => [
                 [
-                    'handle' => 'type',
+                    'handle' => 'response_code',
                     'field' => [
                         'type' => 'select',
-                        'display' => __('advanced-seo::fields.redirect_type.display'),
-                        'instructions' => __('advanced-seo::fields.redirect_type.instructions'),
-                        'options' => collect(RedirectType::cases())
+                        'display' => __('advanced-seo::fields.redirect_response_code.display'),
+                        'instructions' => __('advanced-seo::fields.redirect_response_code.instructions'),
+                        'options' => collect(ResponseCode::cases())
                             ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
                             ->all(),
-                        'default' => RedirectType::Permanent->value,
+                        'default' => ResponseCode::Permanent->value,
                         'clearable' => false,
                         'validate' => ['required'],
                     ],
@@ -107,7 +107,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'display' => __('advanced-seo::fields.redirect_forward_query_string.display'),
                         'instructions' => __('advanced-seo::fields.redirect_forward_query_string.instructions'),
                         'default' => true,
-                        'if' => ['type' => 'isnt '.RedirectType::Gone->value],
+                        'if' => ['response_code' => 'isnt '.ResponseCode::Gone->value],
                     ],
                 ],
             ],

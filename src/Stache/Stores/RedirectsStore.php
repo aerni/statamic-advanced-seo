@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Stache\Stores;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
@@ -39,7 +39,7 @@ class RedirectsStore extends BasicStore
             ->id(pathinfo($path, PATHINFO_FILENAME))
             ->source(Arr::get($data, 'source'))
             ->destination(Arr::get($data, 'destination'))
-            ->type(RedirectType::tryFrom(Arr::get($data, 'type', RedirectType::Permanent->value)) ?? RedirectType::Permanent)
+            ->responseCode(ResponseCode::tryFrom(Arr::get($data, 'response_code', ResponseCode::Permanent->value)) ?? ResponseCode::Permanent)
             ->site(basename(dirname($path)))
             ->enabled(Arr::get($data, 'enabled', true))
             ->forwardQueryString(Arr::get($data, 'forward_query_string', true))

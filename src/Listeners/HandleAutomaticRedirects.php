@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
@@ -237,7 +237,7 @@ class HandleAutomaticRedirects
         Redirects::make()
             ->source($source)
             ->destination($destination)
-            ->type(RedirectType::Permanent)
+            ->responseCode(ResponseCode::Permanent)
             ->site($site)
             ->automatic(true)
             ->save();

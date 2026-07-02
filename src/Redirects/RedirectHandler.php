@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Illuminate\Http\Request;
@@ -37,7 +37,7 @@ class RedirectHandler
             return;
         }
 
-        if ($redirect->type === RedirectType::Gone) {
+        if ($redirect->responseCode === ResponseCode::Gone) {
             abort(410);
         }
 
@@ -49,7 +49,7 @@ class RedirectHandler
             ? $this->appendQueryString($redirect->destination, $request)
             : $redirect->destination;
 
-        return redirect($destination, $redirect->type->value);
+        return redirect($destination, $redirect->responseCode->value);
     }
 
     protected function redirectsToItself(string $destination, Request $request): bool

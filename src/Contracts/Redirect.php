@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Contracts;
 
 use Aerni\AdvancedSeo\Enums\MatchType;
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 
 interface Redirect
 {
@@ -13,7 +13,7 @@ interface Redirect
 
     public function destination(?string $destination = null): string|self|null;
 
-    public function type(?RedirectType $type = null): RedirectType|self;
+    public function responseCode(?ResponseCode $responseCode = null): ResponseCode|self;
 
     public function matchType(): MatchType;
 

@@ -45,8 +45,8 @@ defineProps({
                 </a>
                 <span v-else v-text="redirect.destination" />
             </template>
-            <template #cell-type="{ row: redirect }">
-                {{ redirect.type_label }}
+            <template #cell-response_code="{ row: redirect }">
+                {{ redirect.response_code_label }}
             </template>
             <template #cell-forward_query_string="{ row: redirect }">
                 <Icon v-if="redirect.forward_query_string" name="checkmark" class="size-4" />

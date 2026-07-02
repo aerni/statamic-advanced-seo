@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Enums;
 
-enum RedirectType: int
+enum ResponseCode: int
 {
     case Permanent = 301;
     case Temporary = 302;
@@ -10,6 +10,6 @@ enum RedirectType: int
 
     public function label(): string
     {
-        return __("advanced-seo::fields.redirect_type.option_{$this->value}");
+        return __("advanced-seo::fields.redirect_response_code.option_{$this->value}");
     }
 }

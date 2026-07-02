@@ -12,11 +12,11 @@ it('builds with the expected fields', function () {
     $blueprint = RedirectBlueprint::definition();
     $handles = $blueprint->fields()->all()->keys()->all();
 
-    expect($handles)->toContain('type', 'forward_query_string', 'source', 'destination', 'description');
+    expect($handles)->toContain('response_code', 'forward_query_string', 'source', 'destination', 'description');
 });
 
 it('offers the three response types', function () {
-    $field = RedirectBlueprint::definition()->field('type');
+    $field = RedirectBlueprint::definition()->field('response_code');
 
     expect(array_keys($field->config()['options']))->toEqualCanonicalizing([301, 302, 410]);
 });

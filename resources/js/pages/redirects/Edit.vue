@@ -66,7 +66,7 @@ onUnmounted(() => saveKeyBinding.destroy());
             {{ heading }}
         </template>
         <Button
-            v-if="testUrl && enabled && Number(values.type) !== 410"
+            v-if="testUrl && enabled && Number(values.response_code) !== 410"
             :href="testUrl"
             :text="__('advanced-seo::messages.test_redirect')"
             icon="external-link"

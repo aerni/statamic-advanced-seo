@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Enums\MatchType;
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Redirects\Redirect;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -28,7 +28,7 @@ it('exposes fluent accessors with sensible defaults', function () {
         ->destination('/new')
         ->site('default');
 
-    expect($redirect->type())->toBe(RedirectType::Permanent)
+    expect($redirect->responseCode())->toBe(ResponseCode::Permanent)
         ->and($redirect->matchType())->toBe(MatchType::Exact)
         ->and($redirect->enabled())->toBeTrue()
         ->and($redirect->forwardQueryString())->toBeTrue()
@@ -53,7 +53,7 @@ it('serializes only its fields to file data', function () {
         ->id('abc')
         ->source('/old')
         ->destination('/new')
-        ->type(RedirectType::Temporary)
+        ->responseCode(ResponseCode::Temporary)
         ->site('french')
         ->enabled(false)
         ->automatic(true)
@@ -62,7 +62,7 @@ it('serializes only its fields to file data', function () {
     expect($redirect->fileData())->toBe([
         'source' => '/old',
         'destination' => '/new',
-        'type' => 302,
+        'response_code' => 302,
         'enabled' => false,
         'forward_query_string' => true,
         'automatic' => true,
@@ -74,7 +74,7 @@ it('does not persist a destination or query string forwarding for a gone redirec
     $redirect = (new Redirect)
         ->id('abc')
         ->source('/old')
-        ->type(RedirectType::Gone)
+        ->responseCode(ResponseCode::Gone)
         ->site('default');
 
     expect($redirect->fileData()['destination'])->toBeNull()

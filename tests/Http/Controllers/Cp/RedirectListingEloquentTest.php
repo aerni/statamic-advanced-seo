@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Facades\Collection;
@@ -40,7 +40,7 @@ it('returns correct columns in meta', function () {
 
     expect($columnFields)->toContain('source')
         ->toContain('destination')
-        ->toContain('type')
+        ->toContain('response_code')
         ->toContain('site')
         ->toContain('status');
 });
@@ -81,10 +81,10 @@ it('paginates', function () {
 });
 
 it('filters by type', function () {
-    Redirects::make()->source('/perm')->destination('/x')->site('default')->type(RedirectType::Permanent)->save();
-    Redirects::make()->source('/temp')->destination('/y')->site('default')->type(RedirectType::Temporary)->save();
+    Redirects::make()->source('/perm')->destination('/x')->site('default')->responseCode(ResponseCode::Permanent)->save();
+    Redirects::make()->source('/temp')->destination('/y')->site('default')->responseCode(ResponseCode::Temporary)->save();
 
-    $filters = base64_encode(json_encode(['redirect_type' => ['type' => '302']]));
+    $filters = base64_encode(json_encode(['redirect_response_code' => ['response_code' => '302']]));
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index', ['filters' => $filters]))
@@ -199,7 +199,7 @@ it('falls back to the raw destination when an entry destination no longer exists
 });
 
 it('shows a null destination and null destination_url for a 410 gone redirect', function () {
-    Redirects::make()->source('/gone')->destination(null)->site('default')->type(RedirectType::Gone)->save();
+    Redirects::make()->source('/gone')->destination(null)->site('default')->responseCode(ResponseCode::Gone)->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))

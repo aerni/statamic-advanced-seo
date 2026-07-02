@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
-use Aerni\AdvancedSeo\Enums\RedirectType;
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -23,16 +23,16 @@ class ListedRedirect extends JsonResource
             'destination' => $destinationUrl ?? $destination,
             'destination_url' => $destinationUrl,
             'destination_is_entry' => Str::startsWith($destination ?? '', 'entry::'),
-            'type' => $redirect->type()->value,
-            'type_label' => $redirect->type()->label(),
-            'forward_query_string' => $redirect->type() === RedirectType::Gone ? null : $redirect->forwardQueryString(),
+            'response_code' => $redirect->responseCode()->value,
+            'response_code_label' => $redirect->responseCode()->label(),
+            'forward_query_string' => $redirect->responseCode() === ResponseCode::Gone ? null : $redirect->forwardQueryString(),
             'automatic' => $redirect->automatic(),
             'description' => $redirect->description(),
             'site' => $redirect->site(),
             'site_name' => Site::get($redirect->site())?->name() ?? $redirect->site(),
             'status' => $redirect->enabled(),
             'edit_url' => $redirect->editUrl(),
-            'test_url' => $redirect->type() === RedirectType::Gone ? null : $redirect->sourceUrl(),
+            'test_url' => $redirect->responseCode() === ResponseCode::Gone ? null : $redirect->sourceUrl(),
             'editable' => User::current()->can('edit', $redirect),
             'deletable' => User::current()->can('delete', $redirect),
         ];

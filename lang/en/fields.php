@@ -431,7 +431,7 @@ return [
         'instructions' => 'A path (`/about`), full URL, or entry. Use `$1`, `$2` for captures.',
     ],
 
-    'redirect_type' => [
+    'redirect_response_code' => [
         'display' => 'Response Code',
         'instructions' => 'The HTTP status to respond with.',
         'option_301' => '301 (Permanent)',
