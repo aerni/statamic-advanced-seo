@@ -74,6 +74,24 @@ describe('entry redirects', function () {
         expect(Redirects::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
+    it('creates nothing when a draft entry slug changes', function () {
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('old')->published(false))->save();
+
+        $entry->slug('new')->save();
+
+        expect(Redirects::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing when a scheduled entry slug changes', function () {
+        Collection::make('posts')->dated(true)->futureDateBehavior('private')->routes('/blog/{slug}')->sites(['default'])->saveQuietly();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('old')->date('2999-01-01'))->save();
+
+        $entry->slug('new')->save();
+
+        expect(Redirects::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
     it('creates nothing when the collection toggle is off', function () {
         Seo::find('collections::pages')->config()->set('redirects', false)->save();
 

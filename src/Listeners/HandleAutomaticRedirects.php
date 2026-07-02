@@ -65,7 +65,9 @@ class HandleAutomaticRedirects
     {
         $entry = $event->entry;
 
-        if (! $this->shouldHandle($entry)) {
+        // Only a live entry owns its URL, so a draft's shadowing redirect must
+        // stay (its URL still 404s) and no redirect is created from it.
+        if (! $this->shouldHandle($entry) || $entry->status() !== 'published') {
             return;
         }
 
@@ -75,10 +77,7 @@ class HandleAutomaticRedirects
 
         $currentPath = $entry->site()->relativePath($url);
 
-        // A published entry owns its URL, so drop any auto-created redirect shadowing it.
-        if ($entry->published()) {
-            $this->deleteShadowingRedirects($currentPath, $entry->locale());
-        }
+        $this->deleteShadowingRedirects($currentPath, $entry->locale());
 
         if (! $originalPath = Blink::pull($this->blinkKey($entry))) {
             return;
@@ -177,6 +176,12 @@ class HandleAutomaticRedirects
     protected function shouldHandle(Entry|Term $item): bool
     {
         if (! RedirectsFeature::enabled()) {
+            return false;
+        }
+
+        // Only a live item owns its URL; draft, scheduled and expired entries
+        // aren't publicly reachable. Terms are always published.
+        if ($item->status() !== 'published') {
             return false;
         }
 
