@@ -18,6 +18,21 @@ use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Facades\Blink;
 
+/**
+ * Creates and maintains redirects automatically as entry and term URLs change.
+ *
+ * Capture is keyed on the slug, and for dated collections the date, the only
+ * pre-save state the flat-file driver reliably exposes (getOriginal() returns
+ * the new value for other fields on the Stache driver). URL changes from any
+ * other source are out of scope and left to the editor to redirect manually:
+ *
+ * - a route token that reads a non-slug field, since the old value can't be
+ *   recovered on the flat-file driver;
+ * - a structural tree move, which changes the URI without saving the entry;
+ * - a parent slug rename, which changes every descendant's URL without saving
+ *   the descendants;
+ * - a collection route or mount change, which changes every entry's URL at once.
+ */
 class HandleAutomaticRedirects
 {
     /**
