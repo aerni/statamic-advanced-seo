@@ -139,19 +139,6 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * The site-relative path of the term in each of its localizations, in the
-     * term's current state.
-     *
-     * @return array<string, string>
-     */
-    protected function pathsPerSite(Term $term): array
-    {
-        return $term->taxonomy()->sites()
-            ->mapWithKeys(fn ($site) => [$site => $term->in($site)->uri()])
-            ->all();
-    }
-
-    /**
      * The current date formatted at the original date's precision,
      * so the two can be compared as strings.
      */
@@ -193,6 +180,24 @@ class HandleAutomaticRedirects
         Blink::store('entry-uris')->forget($entry->id());
 
         return $url;
+    }
+
+    protected function blinkKey(Entry $entry): string
+    {
+        return "advanced-seo::automatic-redirect::{$entry->id()}";
+    }
+
+    /**
+     * The site-relative path of the term in each of its localizations, in the
+     * term's current state.
+     *
+     * @return array<string, string>
+     */
+    protected function pathsPerSite(Term $term): array
+    {
+        return $term->taxonomy()->sites()
+            ->mapWithKeys(fn ($site) => [$site => $term->in($site)->uri()])
+            ->all();
     }
 
     /**
@@ -256,10 +261,5 @@ class HandleAutomaticRedirects
             ->where('source', $source)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());
-    }
-
-    protected function blinkKey(Entry $entry): string
-    {
-        return "advanced-seo::automatic-redirect::{$entry->id()}";
     }
 }
