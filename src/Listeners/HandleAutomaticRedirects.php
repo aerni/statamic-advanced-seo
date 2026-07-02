@@ -15,8 +15,6 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Events\TermSaved;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Site;
-use Statamic\Support\Str;
 
 class HandleAutomaticRedirects
 {
@@ -110,9 +108,9 @@ class HandleAutomaticRedirects
             return;
         }
 
-        $currentPaths = $this->termPathsPerSite($term);
+        $currentPaths = $this->pathsPerSite($term);
         $term->slug($originalSlug);
-        $originalPaths = $this->termPathsPerSite($term);
+        $originalPaths = $this->pathsPerSite($term);
         $term->slug($newSlug);
 
         foreach ($currentPaths as $site => $currentPath) {
@@ -142,36 +140,15 @@ class HandleAutomaticRedirects
 
     /**
      * The site-relative path of the term in each of its localizations, in the
-     * term's current state. Localizations without a URL are omitted.
+     * term's current state.
      *
      * @return array<string, string>
      */
-    protected function termPathsPerSite(Term $term): array
+    protected function pathsPerSite(Term $term): array
     {
         return $term->taxonomy()->sites()
-            ->mapWithKeys(function ($site) use ($term) {
-                $url = $term->in($site)?->urlWithoutRedirect();
-
-                return [$site => $url ? $this->siteRelativePath($url, $site) : null];
-            })
-            ->filter()
+            ->mapWithKeys(fn ($site) => [$site => $term->in($site)->uri()])
             ->all();
-    }
-
-    /**
-     * Strip the site's path prefix so the path matches how the resolver keys
-     * redirects (a term url includes the prefix, e.g. "/fr/tags/news").
-     */
-    protected function siteRelativePath(string $url, string $site): string
-    {
-        $prefix = rtrim(parse_url(Site::get($site)->url(), PHP_URL_PATH) ?? '', '/');
-        $path = parse_url($url, PHP_URL_PATH) ?? $url;
-
-        if ($prefix && Str::startsWith($path, $prefix)) {
-            $path = Str::removeLeft($path, $prefix);
-        }
-
-        return $path ?: '/';
     }
 
     /**
