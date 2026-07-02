@@ -107,16 +107,16 @@ describe('entry redirects', function () {
             ->and($redirects->first()->destination())->toBe('/custom');
     });
 
-    it('repoints path destinations that referenced the old url to the entry', function () {
+    it('leaves a manual redirect that referenced the old url untouched', function () {
         Redirects::make()->source('/ancient')->destination('/old')->site('default')->save();
 
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('old'))->save();
 
         $entry->slug('new')->save();
 
-        $repointed = Redirects::query()->where('site', 'default')->where('source', '/ancient')->first();
+        $manual = Redirects::query()->where('site', 'default')->where('source', '/ancient')->first();
 
-        expect($repointed->destination())->toBe("entry::{$entry->id()}");
+        expect($manual->destination())->toBe('/old');
     });
 
     it('deletes redirects that would shadow the new url', function () {
@@ -314,6 +314,20 @@ describe('term redirects', function () {
         $sources = Redirects::query()->where('site', 'default')->get()->map->source();
 
         expect($sources->all())->toBe(['/tags/b']);
+    });
+
+    it('flattens an automatic chain by repointing older redirects to the newest url', function () {
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('a')->data(['title' => 'A']))->save();
+
+        $term->slug('b')->save();
+        $term->slug('c')->save();
+
+        $redirects = Redirects::query()->where('site', 'default')->get()
+            ->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+        expect($redirects)->toHaveCount(2)
+            ->and($redirects->get('/tags/a'))->toBe('/tags/c')
+            ->and($redirects->get('/tags/b'))->toBe('/tags/c');
     });
 
     it('deletes an automatic redirect shadowed by a newly created term', function () {

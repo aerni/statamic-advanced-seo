@@ -275,15 +275,18 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * A path destination equal to the old URL is stale: following it would now
-     * take two hops (A → old → new). Point those redirects straight at the entry.
-     * Destinations holding an entry reference resolve live and never go stale.
+     * An auto-created redirect whose destination is the old path is now stale:
+     * following it would take two hops (A → old → new). Point it straight at the
+     * new destination. Only auto-created redirects are repointed; manual ones are
+     * the editor's to keep. Entry redirects use an entry reference that never goes
+     * stale, so in practice this only flattens term chains.
      */
     protected function repointStaleRedirectDestinations(string $staleDestination, string $destination, string $site): void
     {
         Redirects::query()
             ->where('site', $site)
             ->where('destination', $staleDestination)
+            ->where('automatic', true)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->destination($destination)->save());
     }
