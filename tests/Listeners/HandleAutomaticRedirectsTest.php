@@ -85,6 +85,26 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe('entry::xyz');
     });
 
+    it('creates a prefix-stripped redirect in the entry site on a multisite collection', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('pages')->routes('/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('pages')->locale('en')->slug('page'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('old'))->save();
+
+        $fr->slug('new')->save();
+
+        $redirect = Redirects::query()->where('site', 'fr')->where('source', '/old')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$fr->id()}")
+            ->and(Redirects::query()->where('site', 'en')->get())->toHaveCount(0);
+    });
+
     it('creates nothing when the date changes but the url stays the same', function () {
         Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
 
@@ -418,5 +438,25 @@ describe('term redirects', function () {
         Term::find('tags::target')->delete();
 
         expect(Redirects::query()->where('site', 'default')->where('source', '/tags/old')->first())->not->toBeNull();
+    });
+
+    it('deletes automatic redirects in every site when a multisite term is deleted', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('target')->data(['title' => 'Target'])->save();
+        Term::find('topics::target')->in('fr')->data(['title' => 'Cible'])->save();
+
+        Redirects::make()->source('/topics/old')->destination('/topics/target')->site('en')->automatic(true)->save();
+        Redirects::make()->source('/topics/old')->destination('/topics/target')->site('fr')->automatic(true)->save();
+
+        Term::find('topics::target')->delete();
+
+        expect(Redirects::query()->where('site', 'en')->get())->toHaveCount(0)
+            ->and(Redirects::query()->where('site', 'fr')->get())->toHaveCount(0);
     });
 });
