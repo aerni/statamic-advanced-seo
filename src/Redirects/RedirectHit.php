@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\RedirectHit as Contract;
 use Aerni\AdvancedSeo\Facades\Redirects;
+use Illuminate\Support\Carbon;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
@@ -44,6 +45,15 @@ class RedirectHit implements ContainsQueryableValues, Contract
         return $this
             ->fluentlyGetOrSet('lastHitAt')
             ->args(func_get_args());
+    }
+
+    public function lastHitAtIso(): ?string
+    {
+        if (! $lastHitAt = $this->lastHitAt()) {
+            return null;
+        }
+
+        return Carbon::createFromTimestamp($lastHitAt, 'UTC')->toIso8601String();
     }
 
     public function id(): string

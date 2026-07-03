@@ -4,11 +4,9 @@ namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Statamic;
 use Statamic\Support\Str;
 
 class ListedRedirect extends JsonResource
@@ -46,9 +44,7 @@ class ListedRedirect extends JsonResource
             'site_name' => Site::get($redirect->site())?->name() ?? $redirect->site(),
             'status' => $redirect->enabled(),
             'hits' => $hit?->count() ?? 0,
-            'last_hit_at' => $hit?->lastHitAt()
-                ? Carbon::createFromTimestamp($hit->lastHitAt())->setTimezone(Statamic::displayTimezone())->format(Statamic::dateTimeFormat())
-                : null,
+            'last_hit_at' => $hit?->lastHitAtIso(),
             'edit_url' => $redirect->editUrl(),
             'test_url' => $redirect->responseCode() === ResponseCode::Gone ? null : $redirect->sourceUrl(),
             'editable' => User::current()->can('edit', $redirect),

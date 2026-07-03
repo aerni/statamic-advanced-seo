@@ -10,6 +10,8 @@ interface RedirectHit
 
     public function lastHitAt(?int $lastHitAt = null): int|self|null;
 
+    public function lastHitAtIso(): ?string;
+
     public function id(): string;
 
     public function path(): string;
