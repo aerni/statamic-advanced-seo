@@ -14,13 +14,13 @@ class RecordRedirectHitJob implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
 
-    public function __construct(public string $redirectId)
+    public function __construct(public string $redirect)
     {
         $this->queue = config('advanced-seo.redirects.queue', 'default');
     }
 
     public function handle(): void
     {
-        Redirects::hits()->record($this->redirectId);
+        Redirects::hits()->record($this->redirect);
     }
 }

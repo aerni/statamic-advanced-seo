@@ -2,6 +2,8 @@
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
+use Illuminate\Support\Facades\Queue;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -90,4 +92,48 @@ it('does not redirect non-GET requests', function () {
     Redirects::make()->source('/old')->destination('/new')->site('default')->save();
 
     $this->post('/old')->assertNotFound();
+});
+
+it('records a hit when a redirect fires and hit logging is enabled', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+    Queue::fake();
+
+    Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
+
+    $this->get('/old')->assertRedirect('/new');
+
+    Queue::assertPushed(RecordRedirectHitJob::class, fn ($job) => $job->redirect === 'r1');
+});
+
+it('records a hit for a gone redirect', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+    Queue::fake();
+
+    Redirects::make()->id('g1')->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+
+    $this->get('/gone')->assertStatus(410);
+
+    Queue::assertPushed(RecordRedirectHitJob::class, fn ($job) => $job->redirect === 'g1');
+});
+
+it('does not record a hit for a self-referential redirect', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+    Queue::fake();
+
+    Redirects::make()->id('s1')->source('/old')->destination('/old')->site('default')->save();
+
+    $this->get('/old');
+
+    Queue::assertNotPushed(RecordRedirectHitJob::class);
+});
+
+it('does not record a hit when hit logging is disabled', function () {
+    config(['advanced-seo.redirects.hits.enabled' => false]);
+    Queue::fake();
+
+    Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
+
+    $this->get('/old')->assertRedirect('/new');
+
+    Queue::assertNotPushed(RecordRedirectHitJob::class);
 });

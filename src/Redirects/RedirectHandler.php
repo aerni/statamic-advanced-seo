@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
+use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Uri;
 use Statamic\Facades\Site;
@@ -38,6 +39,8 @@ class RedirectHandler
         }
 
         if ($redirect->responseCode === ResponseCode::Gone) {
+            $this->recordHit($redirect);
+
             abort(410);
         }
 
@@ -45,11 +48,22 @@ class RedirectHandler
             return;
         }
 
+        $this->recordHit($redirect);
+
         $destination = $redirect->forwardQueryString
             ? $this->appendQueryString($redirect->destination, $request)
             : $redirect->destination;
 
         return redirect($destination, $redirect->responseCode->value);
+    }
+
+    protected function recordHit(ResolvedRedirect $redirect): void
+    {
+        if (! config('advanced-seo.redirects.hits.enabled')) {
+            return;
+        }
+
+        RecordRedirectHitJob::dispatch($redirect->id);
     }
 
     protected function redirectsToItself(string $destination, Request $request): bool
