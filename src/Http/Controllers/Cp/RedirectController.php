@@ -9,7 +9,9 @@ use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
@@ -47,23 +49,35 @@ class RedirectController extends CpController
             $sortField = OrderBy::column(request('sort'));
             $sortDirection = request('order', 'asc');
 
+            if ($sortField === 'status') {
+                $sortField = 'enabled';
+            }
+
+            $hitsEnabled = config('advanced-seo.redirects.hits.enabled');
+            $hitSortColumn = in_array($sortField, ['hits', 'last_hit_at'], true);
+
+            if ($hitSortColumn && ! $hitsEnabled) {
+                $sortField = null;
+            }
+
             if (! $sortField && ! request('search')) {
                 $sortField = 'source';
                 $sortDirection = 'asc';
             }
 
-            if ($sortField) {
-                $query->orderBy($sortField, $sortDirection);
+            $perPage = Statamic::cpPerPage(request('perPage'));
+
+            if ($hitSortColumn && $hitsEnabled) {
+                [$redirects, $hits] = $this->paginateByHits($query, $sortField, $sortDirection, $perPage);
+            } else {
+                if ($sortField) {
+                    $query->orderBy($sortField, $sortDirection);
+                }
+
+                $redirects = $query->paginate($perPage);
+
+                $hits = $hitsEnabled ? $this->hitsForRedirects($redirects->items()) : null;
             }
-
-            $redirects = $query->paginate(Statamic::cpPerPage(request('perPage')));
-
-            $hits = config('advanced-seo.redirects.hits.enabled')
-                ? Redirects::hits()->query()
-                    ->whereIn('redirect', collect($redirects->items())->map->id()->all())
-                    ->get()
-                    ->keyBy(fn ($hit) => $hit->redirect())
-                : null;
 
             return (new RedirectsResource($redirects))
                 ->hits($hits)
@@ -83,6 +97,47 @@ class RedirectController extends CpController
             'filters' => Scope::filters('redirects'),
             'hasRedirects' => $hasRedirects,
         ]);
+    }
+
+    protected function hitsForRedirects(array $redirects): Collection
+    {
+        return Redirects::hits()->query()
+            ->whereIn('redirect', collect($redirects)->map->id()->all())
+            ->get()
+            ->keyBy(fn ($hit) => $hit->redirect());
+    }
+
+    /**
+     * Sort the redirects by their hit data, which lives in a separate store, by
+     * loading them all, merging the hit values, sorting, then paginating in memory.
+     *
+     * @return array{LengthAwarePaginator, Collection}
+     */
+    protected function paginateByHits($query, string $sortField, string $sortDirection, ?int $perPage): array
+    {
+        $perPage = $perPage ?: 50;
+
+        $redirects = $query->get();
+
+        $hits = $this->hitsForRedirects($redirects->all());
+
+        $sorted = $redirects->sortBy(function ($redirect) use ($hits, $sortField) {
+            $hit = $hits->get($redirect->id());
+
+            return $sortField === 'hits' ? ($hit?->count() ?? 0) : ($hit?->lastHitAt() ?? 0);
+        }, SORT_REGULAR, $sortDirection === 'desc')->values();
+
+        $page = LengthAwarePaginator::resolveCurrentPage();
+
+        $paginator = new LengthAwarePaginator(
+            $sorted->forPage($page, $perPage)->values(),
+            $sorted->count(),
+            $perPage,
+            $page,
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
+
+        return [$paginator, $hits];
     }
 
     public function create(): mixed

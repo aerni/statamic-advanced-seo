@@ -261,3 +261,31 @@ it('treats a slashless destination as a site-relative path', function () {
         ->and($bySource['/old-de']['destination'])->toBe('http://localhost/de/new')
         ->and($bySource['/old-de']['destination_url'])->toBe('http://localhost/de/new');
 });
+
+it('sorts by status, mapping to the enabled field, via eloquent', function () {
+    Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
+    Redirects::make()->source('/b')->destination('/y')->site('default')->enabled(false)->save();
+
+    $statuses = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'status', 'order' => 'asc']))
+        ->json('data'))->pluck('status')->all();
+
+    expect($statuses)->toBe([false, true]);
+});
+
+it('sorts by hits, merging the separate hit store, via eloquent', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    Redirects::make()->id('r1')->source('/a')->destination('/x')->site('default')->save();
+    Redirects::make()->id('r2')->source('/b')->destination('/y')->site('default')->save();
+    Redirects::make()->id('r3')->source('/c')->destination('/z')->site('default')->save();
+
+    Redirects::hits()->make()->redirect('r1')->count(5)->save();
+    Redirects::hits()->make()->redirect('r2')->count(50)->save();
+
+    $order = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'hits', 'order' => 'desc']))
+        ->json('data'))->pluck('id')->all();
+
+    expect($order)->toBe(['r2', 'r1', 'r3']);
+});

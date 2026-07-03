@@ -387,3 +387,88 @@ it('shows the hit columns only when hit logging is enabled', function () {
     expect($enabled)->toContain('hits')->toContain('last_hit_at');
     expect($disabled)->not->toContain('hits')->not->toContain('last_hit_at');
 });
+
+it('marks the native columns as sortable', function () {
+    $columns = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('meta.columns'))->keyBy('field');
+
+    expect($columns['status']['sortable'])->toBeTrue()
+        ->and($columns['automatic']['sortable'])->toBeTrue()
+        ->and($columns['description']['sortable'])->toBeTrue()
+        ->and($columns['forward_query_string']['sortable'])->toBeTrue();
+});
+
+it('sorts by status, mapping to the enabled field', function () {
+    Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
+    Redirects::make()->source('/b')->destination('/y')->site('default')->enabled(false)->save();
+
+    $statuses = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'status', 'order' => 'asc']))
+        ->json('data'))->pluck('status')->all();
+
+    expect($statuses)->toBe([false, true]);
+});
+
+it('sorts by description', function () {
+    Redirects::make()->source('/a')->destination('/x')->site('default')->description('Zebra')->save();
+    Redirects::make()->source('/b')->destination('/y')->site('default')->description('Apple')->save();
+
+    $descriptions = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'description', 'order' => 'asc']))
+        ->json('data'))->pluck('description')->all();
+
+    expect($descriptions)->toBe(['Apple', 'Zebra']);
+});
+
+it('sorts by hits, merging the separate hit store', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    Redirects::make()->id('r1')->source('/a')->destination('/x')->site('default')->save();
+    Redirects::make()->id('r2')->source('/b')->destination('/y')->site('default')->save();
+    Redirects::make()->id('r3')->source('/c')->destination('/z')->site('default')->save();
+
+    Redirects::hits()->make()->redirect('r1')->count(5)->save();
+    Redirects::hits()->make()->redirect('r2')->count(50)->save();
+    // r3 has no hit record (0)
+
+    $order = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'hits', 'order' => 'desc']))
+        ->json('data'))->pluck('id')->all();
+
+    expect($order)->toBe(['r2', 'r1', 'r3']);
+});
+
+it('sorts by last hit, merging the separate hit store', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    Redirects::make()->id('r1')->source('/a')->destination('/x')->site('default')->save();
+    Redirects::make()->id('r2')->source('/b')->destination('/y')->site('default')->save();
+    Redirects::make()->id('r3')->source('/c')->destination('/z')->site('default')->save();
+
+    Redirects::hits()->make()->redirect('r1')->count(1)->lastHitAt(1000)->save();
+    Redirects::hits()->make()->redirect('r2')->count(1)->lastHitAt(9000)->save();
+    // r3 never hit
+
+    $order = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'last_hit_at', 'order' => 'desc']))
+        ->json('data'))->pluck('id')->all();
+
+    expect($order)->toBe(['r2', 'r1', 'r3']);
+});
+
+it('paginates correctly when sorting by hits', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    foreach (range(1, 5) as $i) {
+        Redirects::make()->id("r{$i}")->source("/{$i}")->destination('/x')->site('default')->save();
+        Redirects::hits()->make()->redirect("r{$i}")->count($i)->save();
+    }
+
+    $response = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'hits', 'order' => 'desc', 'perPage' => 2]))
+        ->assertOk();
+
+    expect(collect($response->json('data'))->pluck('id')->all())->toBe(['r5', 'r4'])
+        ->and($response->json('meta.total'))->toBe(5);
+});

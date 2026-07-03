@@ -32,7 +32,7 @@ class Redirects extends ResourceCollection
             Column::make('source')->label(__('advanced-seo::fields.redirect_source.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
             Column::make('destination')->label(__('advanced-seo::fields.redirect_destination.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
             Column::make('response_code')->label(__('advanced-seo::fields.redirect_response_code.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
-            Column::make('forward_query_string')->label(__('advanced-seo::fields.redirect_forward_query_string.display'))->sortable(false)->defaultVisibility(false)->visible(false)->listable(true),
+            Column::make('forward_query_string')->label(__('advanced-seo::fields.redirect_forward_query_string.display'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true),
         ]);
 
         if (Site::multiEnabled()) {
@@ -42,25 +42,25 @@ class Redirects extends ResourceCollection
         }
 
         $columns->push(
-            Column::make('status')->label(__('Status'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true)
+            Column::make('status')->label(__('Status'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
         );
 
         if (config('advanced-seo.redirects.hits.enabled')) {
             $columns->push(
-                Column::make('hits')->label(__('advanced-seo::messages.redirect_hits'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true)
+                Column::make('hits')->label(__('advanced-seo::messages.redirect_hits'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
             );
 
             $columns->push(
-                Column::make('last_hit_at')->label(__('advanced-seo::messages.redirect_last_hit_at'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true)
+                Column::make('last_hit_at')->label(__('advanced-seo::messages.redirect_last_hit_at'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
             );
         }
 
         $columns->push(
-            Column::make('automatic')->label(__('advanced-seo::messages.redirect_creation'))->sortable(false)->defaultVisibility(false)->visible(false)->listable(true)
+            Column::make('automatic')->label(__('advanced-seo::messages.redirect_creation'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true)
         );
 
         $columns->push(
-            Column::make('description')->label(__('advanced-seo::fields.redirect_description.display'))->sortable(false)->defaultVisibility(false)->visible(false)->listable(true)
+            Column::make('description')->label(__('advanced-seo::fields.redirect_description.display'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true)
         );
 
         $columns->setPreferred('advanced-seo.redirects.columns');
