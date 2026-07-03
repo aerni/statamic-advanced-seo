@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Facades\Redirects;
 use Aerni\AdvancedSeo\Redirects\Redirect;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -161,4 +162,17 @@ it('resolves an entry destination to the selected localization, not the redirect
     $redirect = (new Redirect)->destination("entry::{$entry->id()}")->site('default');
 
     expect($redirect->destinationUrl())->toBe('http://fr.localhost/accueil');
+});
+
+it('returns its associated hit record', function () {
+    Redirects::hits()->make()->redirect('r1')->count(5)->save();
+
+    $redirect = (new Redirect)->id('r1');
+
+    expect($redirect->hit())->not->toBeNull()
+        ->and($redirect->hit()->count())->toBe(5);
+});
+
+it('returns a null hit record when it has never been hit', function () {
+    expect((new Redirect)->id('r2')->hit())->toBeNull();
 });

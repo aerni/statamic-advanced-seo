@@ -38,3 +38,10 @@ it('queries redirects by site', function () {
 
     expect($ids)->toBe(['b', 'c']);
 });
+
+it('exposes its associated hit record via eloquent', function () {
+    Redirects::make()->id('r1')->source('/old')->destination('/new')->save();
+    Redirects::hits()->make()->redirect('r1')->count(5)->save();
+
+    expect(Redirects::find('r1')->hit()?->count())->toBe(5);
+});

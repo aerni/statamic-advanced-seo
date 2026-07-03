@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
+use Aerni\AdvancedSeo\Contracts\RedirectHit;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
@@ -174,6 +175,11 @@ class Redirect implements ContainsQueryableValues, Contract
             'response_code' => $this->responseCode()->value,
             default => $this->{$field}(),
         };
+    }
+
+    public function hit(): ?RedirectHit
+    {
+        return Redirects::hits()->find($this->id());
     }
 
     public function editUrl(): string

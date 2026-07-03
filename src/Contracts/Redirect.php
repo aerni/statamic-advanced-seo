@@ -29,6 +29,8 @@ interface Redirect
 
     public function sourceUrl(): ?string;
 
+    public function hit(): ?RedirectHit;
+
     public function editUrl(): string;
 
     public function path(): string;
