@@ -47,6 +47,8 @@ return [
     'redirect_creation' => 'Creation',
     'redirect_automatic' => 'Automatic',
     'redirect_manual' => 'Manual',
+    'redirect_hits' => 'Hits',
+    'redirect_last_hit_at' => 'Last Hit',
 
     // UI
     'origins' => 'Origins',

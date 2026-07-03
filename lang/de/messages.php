@@ -37,6 +37,8 @@ return [
     'redirect_creation' => 'Erstellung',
     'redirect_automatic' => 'Automatisch',
     'redirect_manual' => 'Manuell',
+    'redirect_hits' => 'Aufrufe',
+    'redirect_last_hit_at' => 'Letzter Aufruf',
 
     // Flash messages
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',

@@ -58,7 +58,15 @@ class RedirectController extends CpController
 
             $redirects = $query->paginate(Statamic::cpPerPage(request('perPage')));
 
+            $hits = config('advanced-seo.redirects.hits.enabled')
+                ? Redirects::hits()->query()
+                    ->whereIn('redirect', collect($redirects->items())->map->id()->all())
+                    ->get()
+                    ->keyBy(fn ($hit) => $hit->redirect())
+                : null;
+
             return (new RedirectsResource($redirects))
+                ->hits($hits)
                 ->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 

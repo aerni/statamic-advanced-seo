@@ -345,3 +345,45 @@ it('treats a slashless destination as a site-relative path', function () {
         ->and($bySource['/old-de']['destination'])->toBe('http://localhost/de/new')
         ->and($bySource['/old-de']['destination_url'])->toBe('http://localhost/de/new');
 });
+
+it('includes hit data on listed redirects when hit logging is enabled', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
+    Redirects::hits()->make()->redirect('r1')->count(7)->lastHitAt(1751450400)->save();
+
+    $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->assertOk()
+        ->assertJsonPath('data.0.hits', 7)
+        ->assertJsonPath('data.0.last_hit_at', fn ($value) => is_string($value) && $value !== '');
+});
+
+it('defaults hits to zero and last hit to null for a redirect with no hit record', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
+
+    $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->assertOk()
+        ->assertJsonPath('data.0.hits', 0)
+        ->assertJsonPath('data.0.last_hit_at', null);
+});
+
+it('shows the hit columns only when hit logging is enabled', function () {
+    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+    $enabled = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('meta.columns'))->pluck('field')->all();
+
+    config(['advanced-seo.redirects.hits.enabled' => false]);
+    $disabled = collect($this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index'))
+        ->json('meta.columns'))->pluck('field')->all();
+
+    expect($enabled)->toContain('hits')->toContain('last_hit_at');
+    expect($disabled)->not->toContain('hits')->not->toContain('last_hit_at');
+});

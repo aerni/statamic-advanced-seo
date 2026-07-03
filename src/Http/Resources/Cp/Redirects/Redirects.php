@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Facades\Site;
@@ -15,6 +16,15 @@ class Redirects extends ResourceCollection
     public $collects = ListedRedirect::class;
 
     protected $columns;
+
+    protected ?Collection $hits = null;
+
+    public function hits(?Collection $hits): static
+    {
+        $this->hits = $hits;
+
+        return $this;
+    }
 
     protected function setColumns(): void
     {
@@ -35,6 +45,16 @@ class Redirects extends ResourceCollection
             Column::make('status')->label(__('Status'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true)
         );
 
+        if (config('advanced-seo.redirects.hits.enabled')) {
+            $columns->push(
+                Column::make('hits')->label(__('advanced-seo::messages.redirect_hits'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true)
+            );
+
+            $columns->push(
+                Column::make('last_hit_at')->label(__('advanced-seo::messages.redirect_last_hit_at'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true)
+            );
+        }
+
         $columns->push(
             Column::make('automatic')->label(__('advanced-seo::messages.redirect_creation'))->sortable(false)->defaultVisibility(false)->visible(false)->listable(true)
         );
@@ -52,7 +72,7 @@ class Redirects extends ResourceCollection
     {
         $this->setColumns();
 
-        return $this->collection;
+        return $this->collection->each->hits($this->hits);
     }
 
     public function with($request)
