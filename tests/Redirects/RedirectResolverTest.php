@@ -141,3 +141,19 @@ it('ignores a malformed regex rule', function () {
 
     expect(RedirectResolver::resolve('/p/1', 'default'))->toBeNull();
 });
+
+it('exposes the matched redirect id on the resolved redirect', function () {
+    Redirects::make()->id('abc')->source('/old')->destination('/new')->site('default')->save();
+
+    $resolved = RedirectResolver::resolve('/old', 'default');
+
+    expect($resolved->id)->toBe('abc');
+});
+
+it('exposes the matched redirect id for a gone redirect', function () {
+    Redirects::make()->id('gone-1')->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+
+    $resolved = RedirectResolver::resolve('/gone', 'default');
+
+    expect($resolved->id)->toBe('gone-1');
+});

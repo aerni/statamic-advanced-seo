@@ -29,7 +29,7 @@ class RedirectResolver
         }
 
         if ($redirect->responseCode() === ResponseCode::Gone) {
-            return new ResolvedRedirect(ResponseCode::Gone, null);
+            return new ResolvedRedirect($redirect->id(), ResponseCode::Gone, null);
         }
 
         if (! $destination = $redirect->destinationUrl()) {
@@ -41,7 +41,7 @@ class RedirectResolver
             $destination = RedirectPatternMatcher::substitute($destination, $captures);
         }
 
-        return new ResolvedRedirect($redirect->responseCode(), $destination, $redirect->forwardQueryString());
+        return new ResolvedRedirect($redirect->id(), $redirect->responseCode(), $destination, $redirect->forwardQueryString());
     }
 
     protected function findRedirect(): ?Redirect
