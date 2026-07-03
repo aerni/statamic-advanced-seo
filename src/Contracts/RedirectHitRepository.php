@@ -16,6 +16,8 @@ interface RedirectHitRepository
 
     public function save(RedirectHit $hit): void;
 
+    public function record(string $redirect): void;
+
     public function delete(RedirectHit $hit): void;
 
     public static function bindings(): array;

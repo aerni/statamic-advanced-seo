@@ -29,6 +29,23 @@ it('can list and delete redirect hits via eloquent', function () {
     expect(Redirects::hits()->all())->toHaveCount(1);
 });
 
+it('records a hit for a new redirect via eloquent', function () {
+    Redirects::hits()->record('abc');
+
+    $hit = Redirects::hits()->find('abc');
+
+    expect($hit->count())->toBe(1)
+        ->and($hit->lastHitAt())->not->toBeNull();
+});
+
+it('increments the count when recording a hit for an existing redirect via eloquent', function () {
+    Redirects::hits()->make()->redirect('abc')->count(4)->save();
+
+    Redirects::hits()->record('abc');
+
+    expect(Redirects::hits()->find('abc')->count())->toBe(5);
+});
+
 it('queries redirect hits by redirect id via eloquent', function () {
     Redirects::hits()->make()->redirect('a')->count(1)->save();
     Redirects::hits()->make()->redirect('b')->count(1)->save();

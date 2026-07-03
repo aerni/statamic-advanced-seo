@@ -47,6 +47,17 @@ class RedirectHitRepository implements Contract
         $hit->model($model->fresh());
     }
 
+    public function record(string $redirect): void
+    {
+        $model = app('statamic.eloquent.redirect_hit.model');
+
+        $model::firstOrCreate(['redirect' => $redirect]);
+
+        $model::whereKey($redirect)->increment('count', 1, [
+            'last_hit_at' => now()->toDateTimeString(),
+        ]);
+    }
+
     public function delete(RedirectHit $hit): void
     {
         $hit->model()->delete();

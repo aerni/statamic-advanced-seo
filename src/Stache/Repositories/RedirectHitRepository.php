@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\RedirectHit;
 use Aerni\AdvancedSeo\Contracts\RedirectHitQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectHitRepository as Contract;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
 
@@ -41,6 +42,19 @@ class RedirectHitRepository implements Contract
     public function save(RedirectHit $hit): void
     {
         $this->store->save($hit);
+    }
+
+    public function record(string $redirect): void
+    {
+        Cache::lock("advanced-seo::redirect-hit:{$redirect}", 10)
+            ->block(5, function () use ($redirect) {
+                $hit = $this->find($redirect) ?? $this->make()->redirect($redirect);
+
+                $hit
+                    ->count($hit->count() + 1)
+                    ->lastHitAt(now()->toDateTimeString())
+                    ->save();
+            });
     }
 
     public function delete(RedirectHit $hit): void
