@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Eloquent;
 use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository as Contract;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -71,16 +72,20 @@ class RedirectErrorRepository implements Contract
         if (! $model::query()->where('url', $url)->where('site', $site)->exists()) {
             $this->ensureCapacityForError();
 
-            $model::create([
-                'id' => Stache::generateId(),
-                'url' => $url,
-                'site' => $site,
-                'count' => 1,
-                'first_seen_at' => $now,
-                'last_seen_at' => $now,
-            ]);
+            try {
+                $model::create([
+                    'id' => Stache::generateId(),
+                    'url' => $url,
+                    'site' => $site,
+                    'count' => 1,
+                    'first_seen_at' => $now,
+                    'last_seen_at' => $now,
+                ]);
 
-            return;
+                return;
+            } catch (UniqueConstraintViolationException) {
+                // A concurrent request created it first; fall through to increment.
+            }
         }
 
         $model::query()
