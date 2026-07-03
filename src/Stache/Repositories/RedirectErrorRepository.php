@@ -31,7 +31,7 @@ class RedirectErrorRepository implements Contract
 
     public function findByUrl(string $url, ?string $site = null): ?RedirectError
     {
-        $site ??= Site::current()->handle();
+        $site ??= Site::default()->handle();
 
         return $this->query()->where('url', $url)->where('site', $site)->first();
     }

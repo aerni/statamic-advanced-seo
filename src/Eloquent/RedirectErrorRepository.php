@@ -24,7 +24,7 @@ class RedirectErrorRepository implements Contract
 
     public function findByUrl(string $url, ?string $site = null): ?RedirectError
     {
-        $site ??= Site::current()->handle();
+        $site ??= Site::default()->handle();
 
         $model = app('statamic.eloquent.redirect_error.model')::query()
             ->where('url', $url)

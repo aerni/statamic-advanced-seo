@@ -33,7 +33,7 @@ it('scopes findByUrl to the site', function () {
     expect(Redirect::errors()->findByUrl('/missing', 'fr')->count())->toBe(5);
 });
 
-it('defaults findByUrl to the current site when no site is given', function () {
+it('defaults findByUrl to the default site when no site is given', function () {
     Redirect::errors()->make()->url('/missing')->site('default')->count(3)->save();
 
     expect(Redirect::errors()->findByUrl('/missing')->count())->toBe(3);
