@@ -59,6 +59,7 @@ class ServiceProvider extends AddonServiceProvider
         Actions\Statamic\GenerateSocialImages::class,
         Actions\Statamic\EnableRedirect::class,
         Actions\Statamic\DisableRedirect::class,
+        Actions\Statamic\ResetRedirectHits::class,
         Actions\Statamic\DeleteRedirect::class,
     ];
 

@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -180,6 +181,7 @@ class RedirectController extends CpController
         $hit = config('advanced-seo.redirects.hits.enabled') ? $redirect->hit() : null;
 
         return Inertia::render('advanced-seo::Redirects/Edit', [
+            'id' => $redirect->id(),
             'title' => __('advanced-seo::messages.redirect_edit_title'),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values()->all(),
@@ -187,6 +189,10 @@ class RedirectController extends CpController
             'enabled' => $redirect->enabled(),
             'submitUrl' => cp_route('advanced-seo.redirects.update', $redirect->id()),
             'testUrl' => $redirect->sourceUrl(),
+            'itemActions' => Action::for($redirect, ['view' => 'form'])
+                ->reject(fn ($action) => in_array($action->handle(), ['enable_redirect', 'disable_redirect']))
+                ->values(),
+            'itemActionUrl' => cp_route('advanced-seo.redirects.actions.run'),
             'hits' => config('advanced-seo.redirects.hits.enabled') ? [
                 'count' => $hit?->count() ?? 0,
                 'last_hit_at' => $hit?->lastHitAtIso(),

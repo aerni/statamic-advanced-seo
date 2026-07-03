@@ -1,10 +1,11 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator, Badge } from '@statamic/cms/ui';
+import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator, Badge, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 import { Head, router } from '@statamic/cms/inertia';
 
 const props = defineProps({
+    id: { type: String, default: null },
     title: { type: String, required: true },
     blueprint: { type: Object, required: true },
     values: { type: Object, required: true },
@@ -12,6 +13,8 @@ const props = defineProps({
     enabled: { type: Boolean, default: true },
     submitUrl: { type: String, required: true },
     testUrl: { type: String, default: null },
+    itemActions: { type: Array, default: () => [] },
+    itemActionUrl: { type: String, default: null },
     hits: { type: Object, default: null },
 });
 
@@ -23,6 +26,28 @@ const errors = ref({});
 const saving = ref(false);
 
 const heading = props.values.source ?? props.title;
+
+const hasItemActions = computed(() => props.itemActions.length > 0);
+
+function actionCompleted(successful, response = {}) {
+    if (successful === false) {
+        Statamic.$toast.error(response.message || __('Action failed'));
+
+        return;
+    }
+
+    if (response.message !== false) {
+        Statamic.$toast.success(response.message || __('Action completed'));
+    }
+
+    if (response.redirect) {
+        router.visit(response.redirect);
+
+        return;
+    }
+
+    router.reload();
+}
 
 const saveText = computed(() => {
     if (enabled.value === props.enabled) {
@@ -66,6 +91,38 @@ onUnmounted(() => saveKeyBinding.destroy());
             <StatusIndicator :status="enabled ? 'published' : 'draft'" />
             {{ heading }}
         </template>
+        <ItemActions
+            v-if="hasItemActions"
+            :item="id"
+            :url="itemActionUrl"
+            :actions="itemActions"
+            @completed="actionCompleted"
+            v-slot="{ actions }"
+        >
+            <Dropdown>
+                <template #trigger>
+                    <Button icon="dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem
+                        v-for="action in actions.filter((action) => !action.dangerous)"
+                        :key="action.handle"
+                        :text="__(action.title)"
+                        :icon="action.icon"
+                        @click="action.run"
+                    />
+                    <DropdownSeparator v-if="actions.some((action) => action.dangerous) && actions.some((action) => !action.dangerous)" />
+                    <DropdownItem
+                        v-for="action in actions.filter((action) => action.dangerous)"
+                        :key="action.handle"
+                        :text="__(action.title)"
+                        :icon="action.icon"
+                        variant="destructive"
+                        @click="action.run"
+                    />
+                </DropdownMenu>
+            </Dropdown>
+        </ItemActions>
         <Button
             v-if="testUrl && props.enabled && Number(values.response_code) !== 410"
             :href="testUrl"

@@ -128,6 +128,47 @@ it('sends null hits on the edit page when hit logging is disabled', function () 
         ->assertInertia(fn ($page) => $page->where('hits', null));
 });
 
+it('exposes the reset hits item action on the edit page when hit logging is enabled', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('itemActionUrl', cp_route('advanced-seo.redirects.actions.run'))
+            ->where('itemActions', fn ($actions) => collect($actions)->contains('handle', 'reset_redirect_hits'))
+        );
+});
+
+it('excludes the enable and disable actions from the edit page dropdown', function () {
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('itemActions', fn ($actions) => collect($actions)
+                ->pluck('handle')
+                ->doesntContain(fn ($handle) => in_array($handle, ['enable_redirect', 'disable_redirect']))
+            )
+        );
+});
+
+it('hides the reset hits item action on the edit page when hit logging is disabled', function () {
+    config(['advanced-seo.redirects.hits.enabled' => false]);
+
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('itemActions', fn ($actions) => ! collect($actions)->contains('handle', 'reset_redirect_hits'))
+        );
+});
+
 it('404s editing a missing redirect', function () {
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', 'missing'))
