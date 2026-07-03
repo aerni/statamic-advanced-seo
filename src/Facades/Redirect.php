@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see RedirectService
  */
-class Redirects extends Facade
+class Redirect extends Facade
 {
     protected static function getFacadeAccessor(): string
     {

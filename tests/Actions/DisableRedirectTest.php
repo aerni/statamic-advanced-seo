@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Actions\Statamic\DisableRedirect;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -13,25 +13,25 @@ beforeEach(function () {
 });
 
 it('is visible only for an enabled redirect', function () {
-    $enabled = Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(true);
-    $disabled = Redirects::make()->source('/b')->destination('/y')->site('default')->enabled(false);
+    $enabled = Redirect::make()->source('/a')->destination('/x')->site('default')->enabled(true);
+    $disabled = Redirect::make()->source('/b')->destination('/y')->site('default')->enabled(false);
 
     expect($this->action->visibleTo($enabled))->toBeTrue()
         ->and($this->action->visibleTo($disabled))->toBeFalse();
 });
 
 it('shows in bulk when at least one selected redirect is enabled', function () {
-    $enabled = Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(true);
-    $disabled = Redirects::make()->source('/b')->destination('/y')->site('default')->enabled(false);
+    $enabled = Redirect::make()->source('/a')->destination('/x')->site('default')->enabled(true);
+    $disabled = Redirect::make()->source('/b')->destination('/y')->site('default')->enabled(false);
 
     expect($this->action->visibleToBulk(collect([$enabled, $disabled])))->toBeTrue()
         ->and($this->action->visibleToBulk(collect([$disabled])))->toBeFalse();
 });
 
 it('disables the redirects', function () {
-    $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
 
     $this->action->run(collect([$redirect]), []);
 
-    expect(Redirects::find($redirect->id())->enabled())->toBeFalse();
+    expect(Redirect::find($redirect->id())->enabled())->toBeFalse();
 });

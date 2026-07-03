@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Statamic\Contracts\Entries\Entry;
@@ -289,7 +289,7 @@ class HandleAutomaticRedirects
      */
     protected function createRedirect(string $source, string $destination, string $site): void
     {
-        $existing = Redirects::query()
+        $existing = RedirectFacade::query()
             ->where('site', $site)
             ->where('source', $source)
             ->first();
@@ -298,7 +298,7 @@ class HandleAutomaticRedirects
             return;
         }
 
-        Redirects::make()
+        RedirectFacade::make()
             ->source($source)
             ->destination($destination)
             ->responseCode(ResponseCode::Permanent)
@@ -316,7 +316,7 @@ class HandleAutomaticRedirects
      */
     protected function repointStaleRedirectDestinations(string $staleDestination, string $destination, string $site): void
     {
-        Redirects::query()
+        RedirectFacade::query()
             ->where('site', $site)
             ->where('destination', $staleDestination)
             ->where('automatic', true)
@@ -332,7 +332,7 @@ class HandleAutomaticRedirects
      */
     protected function deleteShadowingRedirects(string $source, string $site): void
     {
-        Redirects::query()
+        RedirectFacade::query()
             ->where('site', $site)
             ->where('source', $source)
             ->where('automatic', true)
@@ -346,7 +346,7 @@ class HandleAutomaticRedirects
      */
     protected function deleteAutomaticRedirects(string $destination, ?string $site = null): void
     {
-        Redirects::query()
+        RedirectFacade::query()
             ->when($site, fn ($query) => $query->where('site', $site))
             ->where('destination', $destination)
             ->where('automatic', true)

@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
 use Illuminate\Http\Request;
@@ -34,7 +34,7 @@ class RedirectController extends CpController
         $this->authorize('viewAny', Redirect::class);
 
         if ($request->wantsJson()) {
-            $query = Redirects::query()
+            $query = RedirectFacade::query()
                 ->whereIn('site', Site::authorized()->map->handle()->all());
 
             if ($search = request('search')) {
@@ -84,7 +84,7 @@ class RedirectController extends CpController
                 ->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 
-        $hasRedirects = Redirects::query()
+        $hasRedirects = RedirectFacade::query()
             ->whereIn('site', Site::authorized()->map->handle()->all())
             ->first() !== null;
 
@@ -101,7 +101,7 @@ class RedirectController extends CpController
 
     protected function hitsForRedirects(array $redirects): Collection
     {
-        return Redirects::hits()->query()
+        return RedirectFacade::hits()->query()
             ->whereIn('redirect', collect($redirects)->map->id()->all())
             ->get()
             ->keyBy(fn ($hit) => $hit->redirect());
@@ -203,7 +203,7 @@ class RedirectController extends CpController
         $values = $this->validateAndProcess($request, null);
         $values['enabled'] = $request->boolean('enabled', true);
 
-        $redirect = $this->fill(Redirects::make(), $values)->save();
+        $redirect = $this->fill(RedirectFacade::make(), $values)->save();
 
         return ['redirect' => $redirect->editUrl()];
     }

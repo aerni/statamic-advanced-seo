@@ -5,7 +5,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Support\Str;
 
 class RedirectResolver
@@ -51,7 +51,7 @@ class RedirectResolver
 
     protected function findExactMatch(): ?Redirect
     {
-        return Redirects::query()
+        return RedirectFacade::query()
             ->where('source', Str::lower($this->path))
             ->where('site', $this->site)
             ->where('enabled', true)
@@ -60,7 +60,7 @@ class RedirectResolver
 
     protected function findPatternMatch(): ?Redirect
     {
-        return Redirects::query()
+        return RedirectFacade::query()
             ->where('site', $this->site)
             ->where('enabled', true)
             ->get()

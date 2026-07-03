@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\Redirect as RedirectContract;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -40,7 +40,7 @@ it('denies create when user lacks site access', function () {
 });
 
 it('maps abilities to their permissions', function () {
-    $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
+    $redirect = Redirect::make()->source('/old')->destination('/new')->site('default');
 
     $editor = userWith(['edit redirects', 'access default site']);
     $creator = userWith(['create redirects', 'access default site']);
@@ -58,7 +58,7 @@ it('maps abilities to their permissions', function () {
 
 it('grants super users all abilities without explicit permissions', function () {
     $user = tap(User::make()->makeSuper())->save();
-    $redirect = Redirects::make()->source('/old')->destination('/new')->site('default');
+    $redirect = Redirect::make()->source('/old')->destination('/new')->site('default');
 
     expect($user->can('viewAny', RedirectContract::class))->toBeTrue();
     expect($user->can('create', RedirectContract::class))->toBeTrue();
@@ -74,8 +74,8 @@ it('denies edit when user cannot access the redirect site', function () {
 
     $user = userWith(['edit redirects', 'access default site']);
 
-    $defaultRedirect = Redirects::make()->source('/old')->destination('/new')->site('default');
-    $frenchRedirect = Redirects::make()->source('/vieux')->destination('/nouveau')->site('french');
+    $defaultRedirect = Redirect::make()->source('/old')->destination('/new')->site('default');
+    $frenchRedirect = Redirect::make()->source('/vieux')->destination('/nouveau')->site('french');
 
     expect($user->can('edit', $defaultRedirect))->toBeTrue();
     expect($user->can('edit', $frenchRedirect))->toBeFalse();

@@ -9,7 +9,7 @@ use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectDeleted;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
@@ -179,7 +179,7 @@ class Redirect implements ContainsQueryableValues, Contract
 
     public function hit(): ?RedirectHit
     {
-        return Redirects::hits()->find($this->id());
+        return RedirectFacade::hits()->find($this->id());
     }
 
     public function editUrl(): string
@@ -211,9 +211,9 @@ class Redirect implements ContainsQueryableValues, Contract
 
     public function save(): self
     {
-        $isNew = is_null(Redirects::find($this->id()));
+        $isNew = is_null(RedirectFacade::find($this->id()));
 
-        Redirects::save($this);
+        RedirectFacade::save($this);
 
         if ($isNew) {
             RedirectCreated::dispatch($this);
@@ -226,7 +226,7 @@ class Redirect implements ContainsQueryableValues, Contract
 
     public function delete(): bool
     {
-        Redirects::delete($this);
+        RedirectFacade::delete($this);
 
         RedirectDeleted::dispatch($this);
 

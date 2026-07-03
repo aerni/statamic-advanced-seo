@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Jobs;
 
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,6 +21,6 @@ class RecordRedirectHitJob implements ShouldQueue
 
     public function handle(): void
     {
-        Redirects::hits()->record($this->redirect);
+        Redirect::hits()->record($this->redirect);
     }
 }

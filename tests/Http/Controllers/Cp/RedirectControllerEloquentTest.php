@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -20,12 +20,12 @@ it('creates and moves a redirect via eloquent', function () {
         'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'default',
     ])->assertOk();
 
-    $id = Redirects::query()->where('site', 'default')->where('source', '/old')->first()->id();
+    $id = Redirect::query()->where('site', 'default')->where('source', '/old')->first()->id();
 
     $this->actingAs($this->super)->patch(cp_route('advanced-seo.redirects.update', $id), [
         'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'french',
     ])->assertOk();
 
-    expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first())->toBeNull();
-    expect(Redirects::query()->where('site', 'french')->where('source', '/old')->first())->not->toBeNull();
+    expect(Redirect::query()->where('site', 'default')->where('source', '/old')->first())->toBeNull();
+    expect(Redirect::query()->where('site', 'french')->where('source', '/old')->first())->not->toBeNull();
 });

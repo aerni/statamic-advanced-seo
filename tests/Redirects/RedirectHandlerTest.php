@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
 use Illuminate\Support\Facades\Queue;
 use Statamic\Facades\Site;
@@ -16,7 +16,7 @@ beforeEach(function () {
 });
 
 it('redirects a request that would 404 to the matched destination', function () {
-    Redirects::make()->source('/old')->destination('/new')->responseCode(ResponseCode::Permanent)->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->responseCode(ResponseCode::Permanent)->site('default')->save();
 
     $this->get('/old')
         ->assertStatus(301)
@@ -24,31 +24,31 @@ it('redirects a request that would 404 to the matched destination', function () 
 });
 
 it('forwards the query string by default', function () {
-    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
 
     $this->get('/old?ref=abc')->assertRedirect('/new?ref=abc');
 });
 
 it('does not forward the query string when the redirect disables it', function () {
-    Redirects::make()->source('/old')->destination('/new')->site('default')->forwardQueryString(false)->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->forwardQueryString(false)->save();
 
     $this->get('/old?ref=abc')->assertRedirect('/new');
 });
 
 it('merges the query string into a destination that already has one', function () {
-    Redirects::make()->source('/old')->destination('/new?ref=internal')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new?ref=internal')->site('default')->save();
 
     $this->get('/old?utm=x')->assertRedirect('/new?ref=internal&utm=x');
 });
 
 it('appends the query string before a destination fragment', function () {
-    Redirects::make()->source('/old')->destination('/new#section')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new#section')->site('default')->save();
 
     $this->get('/old?ref=abc')->assertRedirect('/new?ref=abc#section');
 });
 
 it('returns 410 for a gone rule', function () {
-    Redirects::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+    Redirect::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
 
     $this->get('/gone')->assertStatus(410);
 });
@@ -58,13 +58,13 @@ it('leaves an unmatched 404 alone', function () {
 });
 
 it('does not redirect a rule that points to its own path', function () {
-    Redirects::make()->source('/old')->destination('/old')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/old')->site('default')->save();
 
     $this->get('/old')->assertNotFound();
 });
 
 it('still redirects to an external url with the same path', function () {
-    Redirects::make()->source('/old')->destination('https://external.test/old')->site('default')->save();
+    Redirect::make()->source('/old')->destination('https://external.test/old')->site('default')->save();
 
     $this->get('/old')->assertRedirect('https://external.test/old');
 });
@@ -72,7 +72,7 @@ it('still redirects to an external url with the same path', function () {
 it('does nothing when the feature is disabled', function () {
     config(['advanced-seo.redirects.enabled' => false]);
 
-    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
 
     $this->get('/old')->assertNotFound();
 });
@@ -83,13 +83,13 @@ it('matches and redirects on a url-prefixed site', function () {
         'fr' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
     ]);
 
-    Redirects::make()->source('/old')->destination('/new')->site('fr')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('fr')->save();
 
     $this->get('/fr/old')->assertRedirect('/fr/new');
 });
 
 it('does not redirect non-GET requests', function () {
-    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
 
     $this->post('/old')->assertNotFound();
 });
@@ -98,7 +98,7 @@ it('records a hit when a redirect fires and hit logging is enabled', function ()
     config(['advanced-seo.redirects.hits.enabled' => true]);
     Queue::fake();
 
-    Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
 
     $this->get('/old')->assertRedirect('/new');
 
@@ -109,7 +109,7 @@ it('records a hit for a gone redirect', function () {
     config(['advanced-seo.redirects.hits.enabled' => true]);
     Queue::fake();
 
-    Redirects::make()->id('g1')->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+    Redirect::make()->id('g1')->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
 
     $this->get('/gone')->assertStatus(410);
 
@@ -120,7 +120,7 @@ it('does not record a hit for a self-referential redirect', function () {
     config(['advanced-seo.redirects.hits.enabled' => true]);
     Queue::fake();
 
-    Redirects::make()->id('s1')->source('/old')->destination('/old')->site('default')->save();
+    Redirect::make()->id('s1')->source('/old')->destination('/old')->site('default')->save();
 
     $this->get('/old');
 
@@ -131,7 +131,7 @@ it('does not record a hit when hit logging is disabled', function () {
     config(['advanced-seo.redirects.hits.enabled' => false]);
     Queue::fake();
 
-    Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->id('r1')->source('/old')->destination('/new')->site('default')->save();
 
     $this->get('/old')->assertRedirect('/new');
 

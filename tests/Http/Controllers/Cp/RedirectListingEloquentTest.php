@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -20,8 +20,8 @@ beforeEach(function () {
 });
 
 it('returns all authorized sites redirects as json for a super user', function () {
-    Redirects::make()->source('/old-en')->destination('/new')->site('default')->save();
-    Redirects::make()->source('/old-fr')->destination('/nouveau')->site('french')->save();
+    Redirect::make()->source('/old-en')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/old-fr')->destination('/nouveau')->site('french')->save();
 
     $response = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -46,7 +46,7 @@ it('returns correct columns in meta', function () {
 });
 
 it('includes site in row data', function () {
-    Redirects::make()->source('/en-page')->destination('/x')->site('default')->save();
+    Redirect::make()->source('/en-page')->destination('/x')->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -57,8 +57,8 @@ it('includes site in row data', function () {
 });
 
 it('searches by source and destination', function () {
-    Redirects::make()->source('/alpha')->destination('/x')->site('default')->save();
-    Redirects::make()->source('/beta')->destination('/y')->site('default')->save();
+    Redirect::make()->source('/alpha')->destination('/x')->site('default')->save();
+    Redirect::make()->source('/beta')->destination('/y')->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index', ['search' => 'alpha']))
@@ -69,7 +69,7 @@ it('searches by source and destination', function () {
 
 it('paginates', function () {
     foreach (range(1, 30) as $i) {
-        Redirects::make()->source("/p{$i}")->destination('/x')->site('default')->save();
+        Redirect::make()->source("/p{$i}")->destination('/x')->site('default')->save();
     }
 
     $response = $this->actingAs($this->super)
@@ -81,8 +81,8 @@ it('paginates', function () {
 });
 
 it('filters by type', function () {
-    Redirects::make()->source('/perm')->destination('/x')->site('default')->responseCode(ResponseCode::Permanent)->save();
-    Redirects::make()->source('/temp')->destination('/y')->site('default')->responseCode(ResponseCode::Temporary)->save();
+    Redirect::make()->source('/perm')->destination('/x')->site('default')->responseCode(ResponseCode::Permanent)->save();
+    Redirect::make()->source('/temp')->destination('/y')->site('default')->responseCode(ResponseCode::Temporary)->save();
 
     $filters = base64_encode(json_encode(['redirect_response_code' => ['response_code' => '302']]));
 
@@ -94,8 +94,8 @@ it('filters by type', function () {
 });
 
 it('filters by status', function () {
-    Redirects::make()->source('/enabled')->destination('/x')->site('default')->enabled(true)->save();
-    Redirects::make()->source('/disabled')->destination('/y')->site('default')->enabled(false)->save();
+    Redirect::make()->source('/enabled')->destination('/x')->site('default')->enabled(true)->save();
+    Redirect::make()->source('/disabled')->destination('/y')->site('default')->enabled(false)->save();
 
     $filters = base64_encode(json_encode(['redirect_status' => ['enabled' => 'false']]));
 
@@ -107,8 +107,8 @@ it('filters by status', function () {
 });
 
 it('filters by site', function () {
-    Redirects::make()->source('/en-page')->destination('/x')->site('default')->save();
-    Redirects::make()->source('/fr-page')->destination('/y')->site('french')->save();
+    Redirect::make()->source('/en-page')->destination('/x')->site('default')->save();
+    Redirect::make()->source('/fr-page')->destination('/y')->site('french')->save();
 
     $filters = base64_encode(json_encode(['redirect_site' => ['site' => 'french']]));
 
@@ -120,8 +120,8 @@ it('filters by site', function () {
 });
 
 it('only returns redirects for sites a non-super user is authorized to view', function () {
-    Redirects::make()->source('/en-page')->destination('/x')->site('default')->save();
-    Redirects::make()->source('/fr-page')->destination('/y')->site('french')->save();
+    Redirect::make()->source('/en-page')->destination('/x')->site('default')->save();
+    Redirect::make()->source('/fr-page')->destination('/y')->site('french')->save();
 
     $role = tap(Role::make('default_viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
     $user = tap(User::make()->assignRole('default_viewer'))->save();
@@ -139,7 +139,7 @@ it('shows an entry destination as an absolute url with destination_is_entry true
 
     $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
 
-    Redirects::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->save();
+    Redirect::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -156,7 +156,7 @@ it('shows a cross-site entry destination using the other site url', function () 
 
     $entry = tap(Entry::make()->collection('pages')->locale('french')->slug('accueil'))->save();
 
-    Redirects::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->save();
+    Redirect::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -168,7 +168,7 @@ it('shows a cross-site entry destination using the other site url', function () 
 });
 
 it('shows a plain path destination as-is but absolutizes destination_url', function () {
-    Redirects::make()->source('/old')->destination('/new-path')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new-path')->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -187,7 +187,7 @@ it('shows a plain path destination as-is but absolutizes destination_url', funct
 it('falls back to the raw destination when an entry destination no longer exists', function () {
     $raw = 'entry::non-existent-id';
 
-    Redirects::make()->source('/old')->destination($raw)->site('default')->save();
+    Redirect::make()->source('/old')->destination($raw)->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -199,7 +199,7 @@ it('falls back to the raw destination when an entry destination no longer exists
 });
 
 it('shows a null destination and null destination_url for a 410 gone redirect', function () {
-    Redirects::make()->source('/gone')->destination(null)->site('default')->responseCode(ResponseCode::Gone)->save();
+    Redirect::make()->source('/gone')->destination(null)->site('default')->responseCode(ResponseCode::Gone)->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -217,8 +217,8 @@ it('assembles destination_url correctly for a site with a path-prefix url', func
         'german' => ['name' => 'German', 'url' => 'http://localhost/de', 'locale' => 'de'],
     ]);
 
-    Redirects::make()->source('/alt')->destination('/new')->site('default')->save();
-    Redirects::make()->source('/alt-de')->destination('/new')->site('german')->save();
+    Redirect::make()->source('/alt')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/alt-de')->destination('/new')->site('german')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -231,7 +231,7 @@ it('assembles destination_url correctly for a site with a path-prefix url', func
 });
 
 it('passes an external destination through unchanged as destination_url', function () {
-    Redirects::make()->source('/old')->destination('https://example.com/x')->site('default')->save();
+    Redirect::make()->source('/old')->destination('https://example.com/x')->site('default')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -247,8 +247,8 @@ it('treats a slashless destination as a site-relative path', function () {
         'german' => ['name' => 'German', 'url' => 'http://localhost/de', 'locale' => 'de'],
     ]);
 
-    Redirects::make()->source('/old-en')->destination('new')->site('default')->save();
-    Redirects::make()->source('/old-de')->destination('new')->site('german')->save();
+    Redirect::make()->source('/old-en')->destination('new')->site('default')->save();
+    Redirect::make()->source('/old-de')->destination('new')->site('german')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
@@ -263,8 +263,8 @@ it('treats a slashless destination as a site-relative path', function () {
 });
 
 it('sorts by status, mapping to the enabled field, via eloquent', function () {
-    Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
-    Redirects::make()->source('/b')->destination('/y')->site('default')->enabled(false)->save();
+    Redirect::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
+    Redirect::make()->source('/b')->destination('/y')->site('default')->enabled(false)->save();
 
     $statuses = collect($this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'status', 'order' => 'asc']))
@@ -276,12 +276,12 @@ it('sorts by status, mapping to the enabled field, via eloquent', function () {
 it('sorts by hits, merging the separate hit store, via eloquent', function () {
     config(['advanced-seo.redirects.hits.enabled' => true]);
 
-    Redirects::make()->id('r1')->source('/a')->destination('/x')->site('default')->save();
-    Redirects::make()->id('r2')->source('/b')->destination('/y')->site('default')->save();
-    Redirects::make()->id('r3')->source('/c')->destination('/z')->site('default')->save();
+    Redirect::make()->id('r1')->source('/a')->destination('/x')->site('default')->save();
+    Redirect::make()->id('r2')->source('/b')->destination('/y')->site('default')->save();
+    Redirect::make()->id('r3')->source('/c')->destination('/z')->site('default')->save();
 
-    Redirects::hits()->make()->redirect('r1')->count(5)->save();
-    Redirects::hits()->make()->redirect('r2')->count(50)->save();
+    Redirect::hits()->make()->redirect('r1')->count(5)->save();
+    Redirect::hits()->make()->redirect('r2')->count(50)->save();
 
     $order = collect($this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'hits', 'order' => 'desc']))

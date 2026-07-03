@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Stache\Stores;
 
 use Aerni\AdvancedSeo\Contracts\RedirectHit;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
@@ -33,7 +33,7 @@ class RedirectHitsStore extends BasicStore
     {
         $data = YAML::file($path)->parse();
 
-        return Redirects::hits()->make()
+        return Redirect::hits()->make()
             ->initialPath($path)
             ->redirect(pathinfo($path, PATHINFO_FILENAME))
             ->count(Arr::get($data, 'count', 0))

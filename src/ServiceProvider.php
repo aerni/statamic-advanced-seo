@@ -163,7 +163,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         Route::bind('redirect', function (string $id) {
             return throw_unless(
-                Facades\Redirects::find($id),
+                Facades\Redirect::find($id),
                 new NotFoundHttpException
             );
         });

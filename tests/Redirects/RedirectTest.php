@@ -2,7 +2,7 @@
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Redirects\Redirect;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -165,7 +165,7 @@ it('resolves an entry destination to the selected localization, not the redirect
 });
 
 it('returns its associated hit record', function () {
-    Redirects::hits()->make()->redirect('r1')->count(5)->save();
+    RedirectFacade::hits()->make()->redirect('r1')->count(5)->save();
 
     $redirect = (new Redirect)->id('r1');
 

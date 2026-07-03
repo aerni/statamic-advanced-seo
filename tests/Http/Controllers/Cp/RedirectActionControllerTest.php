@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -21,7 +21,7 @@ function redirectActionViewer()
 }
 
 it('returns 404 for actions on the free edition', function () {
-    $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->save();
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->save();
 
     useFreeEdition();
 
@@ -34,7 +34,7 @@ it('returns 404 for actions on the free edition', function () {
 });
 
 it('lists the available bulk actions for selected redirects', function () {
-    $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->save();
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->save();
 
     $handles = collect($this->actingAs($this->super)
         ->postJson(cp_route('advanced-seo.redirects.actions.bulk'), ['selections' => [$redirect->id()]])
@@ -44,8 +44,8 @@ it('lists the available bulk actions for selected redirects', function () {
 });
 
 it('deletes the selected redirects', function () {
-    $a = Redirects::make()->source('/a')->destination('/x')->site('default')->save();
-    $b = Redirects::make()->source('/b')->destination('/y')->site('default')->save();
+    $a = Redirect::make()->source('/a')->destination('/x')->site('default')->save();
+    $b = Redirect::make()->source('/b')->destination('/y')->site('default')->save();
 
     $this->actingAs($this->super)
         ->post(cp_route('advanced-seo.redirects.actions.run'), [
@@ -54,11 +54,11 @@ it('deletes the selected redirects', function () {
             'values' => [],
         ])->assertOk();
 
-    expect(Redirects::query()->get())->toHaveCount(0);
+    expect(Redirect::query()->get())->toHaveCount(0);
 });
 
 it('enables the selected redirects', function () {
-    $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(false)->save();
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->enabled(false)->save();
 
     $this->actingAs($this->super)
         ->post(cp_route('advanced-seo.redirects.actions.run'), [
@@ -67,11 +67,11 @@ it('enables the selected redirects', function () {
             'values' => [],
         ])->assertOk();
 
-    expect(Redirects::find($redirect->id())->enabled())->toBeTrue();
+    expect(Redirect::find($redirect->id())->enabled())->toBeTrue();
 });
 
 it('disables the selected redirects', function () {
-    $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->enabled(true)->save();
 
     $this->actingAs($this->super)
         ->post(cp_route('advanced-seo.redirects.actions.run'), [
@@ -80,11 +80,11 @@ it('disables the selected redirects', function () {
             'values' => [],
         ])->assertOk();
 
-    expect(Redirects::find($redirect->id())->enabled())->toBeFalse();
+    expect(Redirect::find($redirect->id())->enabled())->toBeFalse();
 });
 
 it('forbids a viewer from running the delete action', function () {
-    $redirect = Redirects::make()->source('/a')->destination('/x')->site('default')->save();
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->save();
 
     $this->actingAs(redirectActionViewer())
         ->post(cp_route('advanced-seo.redirects.actions.run'), [
@@ -93,5 +93,5 @@ it('forbids a viewer from running the delete action', function () {
             'values' => [],
         ])->assertForbidden();
 
-    expect(Redirects::query()->get())->toHaveCount(1);
+    expect(Redirect::query()->get())->toHaveCount(1);
 });

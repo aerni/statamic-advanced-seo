@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\RedirectHit as Contract;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
@@ -87,14 +87,14 @@ class RedirectHit implements ContainsQueryableValues, Contract
 
     public function save(): self
     {
-        Redirects::hits()->save($this);
+        Redirect::hits()->save($this);
 
         return $this;
     }
 
     public function delete(): bool
     {
-        Redirects::hits()->delete($this);
+        Redirect::hits()->delete($this);
 
         return true;
     }

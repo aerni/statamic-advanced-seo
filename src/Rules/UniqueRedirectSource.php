@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Rules;
 
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Support\Str;
@@ -13,7 +13,7 @@ class UniqueRedirectSource implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $existing = Redirects::query()
+        $existing = Redirect::query()
             ->where('site', $this->site)
             ->where('source', Str::lower((string) $value))
             ->first();

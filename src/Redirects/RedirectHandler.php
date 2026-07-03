@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class RedirectHandler
 
         $site = Site::current();
 
-        $redirect = Redirects::resolve(
+        $redirect = Redirect::resolve(
             path: $site->relativePath($request->url()),
             site: $site->handle()
         );

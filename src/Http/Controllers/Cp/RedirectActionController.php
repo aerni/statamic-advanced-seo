@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -26,6 +26,6 @@ class RedirectActionController extends ActionController
 
     protected function getSelectedItems($items, $context)
     {
-        return $items->map(fn ($id) => Redirects::find($id))->filter();
+        return $items->map(fn ($id) => Redirect::find($id))->filter();
     }
 }

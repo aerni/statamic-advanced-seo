@@ -1,25 +1,25 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\RedirectHit as RedirectHitContract;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
 
 it('can make a redirect hit', function () {
-    expect(Redirects::hits()->make())->toBeInstanceOf(RedirectHitContract::class);
+    expect(Redirect::hits()->make())->toBeInstanceOf(RedirectHitContract::class);
 });
 
 it('returns null when finding a missing redirect hit', function () {
-    expect(Redirects::hits()->find('missing'))->toBeNull();
+    expect(Redirect::hits()->find('missing'))->toBeNull();
 });
 
 it('can save and find a redirect hit', function () {
-    Redirects::hits()->make()->redirect('abc')->count(3)->lastHitAt(1751450400)->save();
+    Redirect::hits()->make()->redirect('abc')->count(3)->lastHitAt(1751450400)->save();
 
     clearStache();
 
-    $found = Redirects::hits()->find('abc');
+    $found = Redirect::hits()->find('abc');
 
     expect($found)->toBeInstanceOf(RedirectHitContract::class)
         ->and($found->redirect())->toBe('abc')
@@ -28,46 +28,46 @@ it('can save and find a redirect hit', function () {
 });
 
 it('can list all redirect hits', function () {
-    Redirects::hits()->make()->redirect('a')->count(1)->save();
-    Redirects::hits()->make()->redirect('b')->count(1)->save();
+    Redirect::hits()->make()->redirect('a')->count(1)->save();
+    Redirect::hits()->make()->redirect('b')->count(1)->save();
 
-    expect(Redirects::hits()->all())->toHaveCount(2);
+    expect(Redirect::hits()->all())->toHaveCount(2);
 });
 
 it('can delete a redirect hit', function () {
-    $hit = Redirects::hits()->make()->redirect('abc')->count(1);
+    $hit = Redirect::hits()->make()->redirect('abc')->count(1);
     $hit->save();
 
     $hit->delete();
 
     clearStache();
 
-    expect(Redirects::hits()->find('abc'))->toBeNull();
+    expect(Redirect::hits()->find('abc'))->toBeNull();
 });
 
 it('records a hit for a new redirect', function () {
-    Redirects::hits()->record('abc');
+    Redirect::hits()->record('abc');
 
-    $hit = Redirects::hits()->find('abc');
+    $hit = Redirect::hits()->find('abc');
 
     expect($hit->count())->toBe(1)
         ->and($hit->lastHitAt())->not->toBeNull();
 });
 
 it('increments the count when recording a hit for an existing redirect', function () {
-    Redirects::hits()->make()->redirect('abc')->count(4)->save();
+    Redirect::hits()->make()->redirect('abc')->count(4)->save();
 
-    Redirects::hits()->record('abc');
+    Redirect::hits()->record('abc');
 
-    expect(Redirects::hits()->find('abc')->count())->toBe(5);
+    expect(Redirect::hits()->find('abc')->count())->toBe(5);
 });
 
 it('queries redirect hits by redirect id', function () {
-    Redirects::hits()->make()->redirect('a')->count(1)->save();
-    Redirects::hits()->make()->redirect('b')->count(1)->save();
-    Redirects::hits()->make()->redirect('c')->count(1)->save();
+    Redirect::hits()->make()->redirect('a')->count(1)->save();
+    Redirect::hits()->make()->redirect('b')->count(1)->save();
+    Redirect::hits()->make()->redirect('c')->count(1)->save();
 
-    $ids = Redirects::hits()->query()
+    $ids = Redirect::hits()->query()
         ->whereIn('redirect', ['a', 'c'])
         ->get()
         ->map(fn ($hit) => $hit->redirect())

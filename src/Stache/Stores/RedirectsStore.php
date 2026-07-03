@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Stache\Stores;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
@@ -34,7 +34,7 @@ class RedirectsStore extends BasicStore
     {
         $data = YAML::file($path)->parse();
 
-        return Redirects::make()
+        return RedirectFacade::make()
             ->initialPath($path)
             ->id(pathinfo($path, PATHINFO_FILENAME))
             ->source(Arr::get($data, 'source'))

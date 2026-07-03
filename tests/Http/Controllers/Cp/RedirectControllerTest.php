@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
@@ -43,7 +43,7 @@ it('returns hasRedirects false when there are no redirects', function () {
 });
 
 it('returns hasRedirects true when at least one redirect exists', function () {
-    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.index'))
@@ -60,7 +60,7 @@ it('forbids a viewer from loading the create form', function () {
 });
 
 it('forbids a viewer from loading the edit form', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.edit', $redirect->id()))->assertForbidden();
 });
@@ -85,7 +85,7 @@ it('renders the create form as an Inertia page', function () {
 });
 
 it('renders the edit form as an Inertia page for an existing redirect', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default')->enabled(false)->forwardQueryString(false))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false)->forwardQueryString(false))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
@@ -105,8 +105,8 @@ it('renders the edit form as an Inertia page for an existing redirect', function
 it('includes hit data on the edit page when hit logging is enabled', function () {
     config(['advanced-seo.redirects.hits.enabled' => true]);
 
-    tap(Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default'))->save();
-    Redirects::hits()->make()->redirect('r1')->count(9)->lastHitAt(1751450400)->save();
+    tap(Redirect::make()->id('r1')->source('/old')->destination('/new')->site('default'))->save();
+    Redirect::hits()->make()->redirect('r1')->count(9)->lastHitAt(1751450400)->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', 'r1'))
@@ -120,7 +120,7 @@ it('includes hit data on the edit page when hit logging is enabled', function ()
 it('sends null hits on the edit page when hit logging is disabled', function () {
     config(['advanced-seo.redirects.hits.enabled' => false]);
 
-    tap(Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default'))->save();
+    tap(Redirect::make()->id('r1')->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', 'r1'))
@@ -145,7 +145,7 @@ it('creates a redirect', function () {
         ])
         ->assertOk();
 
-    $redirect = Redirects::query()->where('site', 'default')->where('source', '/old')->first();
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/old')->first();
     expect($redirect)->not->toBeNull()
         ->and($redirect->destination())->toBe('/new')
         ->and($redirect->responseCode())->toBe(ResponseCode::Permanent);
@@ -162,7 +162,7 @@ it('creates a disabled redirect when enabled is false', function () {
         ])
         ->assertOk();
 
-    $redirect = Redirects::query()->where('site', 'default')->where('source', '/disabled-route')->first();
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/disabled-route')->first();
     expect($redirect)->not->toBeNull()
         ->and($redirect->enabled())->toBeFalse();
 });
@@ -177,7 +177,7 @@ it('defaults enabled to true when omitted from the request', function () {
         ])
         ->assertOk();
 
-    $redirect = Redirects::query()->where('site', 'default')->where('source', '/omitted-enabled')->first();
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/omitted-enabled')->first();
     expect($redirect)->not->toBeNull()
         ->and($redirect->enabled())->toBeTrue();
 });
@@ -189,7 +189,7 @@ it('requires a source', function () {
 });
 
 it('rejects a duplicate source on the same site', function () {
-    Redirects::make()->source('/old')->destination('/x')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/x')->site('default')->save();
 
     $this->actingAs($this->super)
         ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default'])
@@ -220,7 +220,7 @@ it('requires a destination unless the type is gone', function () {
         ->assertValid()
         ->assertOk();
 
-    expect(Redirects::query()->where('site', 'default')->where('source', '/gone')->first())->not->toBeNull();
+    expect(Redirect::query()->where('site', 'default')->where('source', '/gone')->first())->not->toBeNull();
 });
 
 it('persists the forward query string choice', function () {
@@ -228,7 +228,7 @@ it('persists the forward query string choice', function () {
         ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default', 'forward_query_string' => false])
         ->assertOk();
 
-    expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first()->forwardQueryString())->toBeFalse();
+    expect(Redirect::query()->where('site', 'default')->where('source', '/old')->first()->forwardQueryString())->toBeFalse();
 });
 
 it('forbids a viewer from storing a redirect', function () {
@@ -238,25 +238,25 @@ it('forbids a viewer from storing a redirect', function () {
 });
 
 it('updates a redirect', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
             'source' => '/old', 'destination' => '/newer', 'response_code' => 302, 'enabled' => true, 'site' => 'default',
         ])->assertOk();
 
-    expect(Redirects::find($redirect->id())->destination())->toBe('/newer');
+    expect(Redirect::find($redirect->id())->destination())->toBe('/newer');
 });
 
 it('toggles enabled status when updating', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default')->enabled(true))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(true))->save();
 
     $this->actingAs($this->super)
         ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
             'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => false, 'site' => 'default',
         ])->assertOk();
 
-    expect(Redirects::find($redirect->id())->enabled())->toBeFalse();
+    expect(Redirect::find($redirect->id())->enabled())->toBeFalse();
 });
 
 it('moves a redirect when its site changes', function () {
@@ -264,19 +264,19 @@ it('moves a redirect when its site changes', function () {
         'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
         'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
     ]);
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->patch(cp_route('advanced-seo.redirects.update', $redirect->id()), [
             'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'french',
         ])->assertOk();
 
-    expect(Redirects::query()->where('site', 'default')->where('source', '/old')->first())->toBeNull();
-    expect(Redirects::query()->where('site', 'french')->where('source', '/old')->first())->not->toBeNull();
+    expect(Redirect::query()->where('site', 'default')->where('source', '/old')->first())->toBeNull();
+    expect(Redirect::query()->where('site', 'french')->where('source', '/old')->first())->not->toBeNull();
 });
 
 it('forbids a viewer from updating a redirect', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs(redirectViewer())
         ->patchJson(cp_route('advanced-seo.redirects.update', $redirect->id()), [
@@ -285,17 +285,17 @@ it('forbids a viewer from updating a redirect', function () {
 });
 
 it('deletes a redirect', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->delete(cp_route('advanced-seo.redirects.destroy', $redirect->id()))
         ->assertOk();
 
-    expect(Redirects::find($redirect->id()))->toBeNull();
+    expect(Redirect::find($redirect->id()))->toBeNull();
 });
 
 it('forbids a viewer from deleting a redirect', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs(redirectViewer())
         ->deleteJson(cp_route('advanced-seo.redirects.destroy', $redirect->id()))
@@ -303,7 +303,7 @@ it('forbids a viewer from deleting a redirect', function () {
 });
 
 it('includes a non-null testUrl for an exact redirect', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
@@ -314,7 +314,7 @@ it('includes a non-null testUrl for an exact redirect', function () {
 });
 
 it('returns a non-null testUrl for a wildcard redirect', function () {
-    $redirect = tap(Redirects::make()->source('/blog/*')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/blog/*')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
@@ -325,7 +325,7 @@ it('returns a non-null testUrl for a wildcard redirect', function () {
 });
 
 it('returns null testUrl for a regex redirect', function () {
-    $redirect = tap(Redirects::make()->source('#^/x$#')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('#^/x$#')->destination('/new')->site('default'))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))

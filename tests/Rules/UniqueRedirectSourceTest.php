@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Facades\Redirects;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Rules\UniqueRedirectSource;
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\Site;
@@ -23,16 +23,16 @@ it('passes when the source is unused on the site', function () {
 });
 
 it('fails when the source already exists on the site', function () {
-    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
     expect(uniquePasses('/old', 'default'))->toBeFalse();
 });
 
 it('ignores the excepted redirect (its own id) on update', function () {
-    $redirect = tap(Redirects::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
     expect(uniquePasses('/old', 'default', $redirect->id()))->toBeTrue();
 });
 
 it('matches case-insensitively (sources are stored lowercased)', function () {
-    Redirects::make()->source('/old')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
     expect(uniquePasses('/OLD', 'default'))->toBeFalse();
 });
