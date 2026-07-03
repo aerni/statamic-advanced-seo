@@ -379,6 +379,13 @@ return [
 
         'directory' => base_path('content/redirects'),
 
+        'hits' => [
+            'enabled' => true,
+            'directory' => storage_path('statamic/advanced-seo/redirect-hits'),
+        ],
+
+        'queue' => 'default',
+
     ],
 
 ];
