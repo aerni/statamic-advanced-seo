@@ -20,5 +20,7 @@ interface RedirectErrorRepository
 
     public function delete(RedirectError $error): void;
 
+    public function record(string $url, string $site): void;
+
     public static function bindings(): array;
 }

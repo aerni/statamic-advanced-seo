@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository as Contract;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Site;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
@@ -54,6 +55,40 @@ class RedirectErrorRepository implements Contract
     public function delete(RedirectError $error): void
     {
         $this->store->delete($error);
+    }
+
+    public function record(string $url, string $site): void
+    {
+        Cache::lock("advanced-seo::redirect-error:{$site}:{$url}", 10)->block(5, function () use ($url, $site) {
+            $error = $this->findByUrl($url, $site);
+
+            if (! $error) {
+                $this->evictIfAtCapacity();
+
+                $error = $this->make()->url($url)->site($site)->firstSeenAt(now()->timestamp);
+            }
+
+            $error
+                ->count($error->count() + 1)
+                ->lastSeenAt(now()->timestamp)
+                ->save();
+        });
+    }
+
+    protected function evictIfAtCapacity(): void
+    {
+        $max = (int) config('advanced-seo.redirects.errors.max_records', 1000);
+
+        $errors = $this->all();
+
+        if ($errors->count() < $max) {
+            return;
+        }
+
+        $errors
+            ->sort(fn (RedirectError $a, RedirectError $b) => $a->count() <=> $b->count() ?: $a->lastSeenAt() <=> $b->lastSeenAt())
+            ->take($errors->count() - $max + 1)
+            ->each->delete();
     }
 
     public static function bindings(): array

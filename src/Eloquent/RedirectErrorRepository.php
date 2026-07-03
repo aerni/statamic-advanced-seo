@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository as Contract;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 
 class RedirectErrorRepository implements Contract
 {
@@ -59,6 +60,52 @@ class RedirectErrorRepository implements Contract
     public function delete(RedirectError $error): void
     {
         $error->model()->delete();
+    }
+
+    public function record(string $url, string $site): void
+    {
+        $model = app('statamic.eloquent.redirect_error.model');
+
+        $now = now()->timestamp;
+
+        if (! $model::query()->where('url', $url)->where('site', $site)->exists()) {
+            $this->evictIfAtCapacity();
+
+            $model::create([
+                'id' => Stache::generateId(),
+                'url' => $url,
+                'site' => $site,
+                'count' => 0,
+                'first_seen_at' => $now,
+                'last_seen_at' => $now,
+            ]);
+        }
+
+        $model::query()
+            ->where('url', $url)
+            ->where('site', $site)
+            ->increment('count', 1, ['last_seen_at' => $now]);
+    }
+
+    protected function evictIfAtCapacity(): void
+    {
+        $max = (int) config('advanced-seo.redirects.errors.max_records', 1000);
+
+        $model = app('statamic.eloquent.redirect_error.model');
+
+        $count = $model::query()->count();
+
+        if ($count < $max) {
+            return;
+        }
+
+        $ids = $model::query()
+            ->orderBy('count')
+            ->orderBy('last_seen_at')
+            ->limit($count - $max + 1)
+            ->pluck('id');
+
+        $model::query()->whereIn('id', $ids)->delete();
     }
 
     public static function bindings(): array
