@@ -41,10 +41,6 @@ class Redirects extends ResourceCollection
             );
         }
 
-        $columns->push(
-            Column::make('status')->label(__('Status'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
-        );
-
         if (config('advanced-seo.redirects.hits.enabled')) {
             $columns->push(
                 Column::make('hits')->label(__('advanced-seo::messages.redirect_hits'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
@@ -54,6 +50,10 @@ class Redirects extends ResourceCollection
                 Column::make('last_hit_at')->label(__('advanced-seo::messages.redirect_last_hit_at'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
             );
         }
+
+        $columns->push(
+            Column::make('status')->label(__('Status'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
+        );
 
         $columns->push(
             Column::make('automatic')->label(__('advanced-seo::messages.redirect_creation'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true)
