@@ -122,11 +122,13 @@ class ServiceProvider extends AddonServiceProvider
         Statamic::repository(Contracts\SeoSetLocalizationRepository::class, Eloquent\SeoSetLocalizationRepository::class);
         Statamic::repository(Contracts\RedirectRepository::class, Eloquent\RedirectRepository::class);
         Statamic::repository(Contracts\RedirectHitRepository::class, Eloquent\RedirectHitRepository::class);
+        Statamic::repository(Contracts\RedirectErrorRepository::class, Eloquent\RedirectErrorRepository::class);
 
         $this->app->bind('statamic.eloquent.seo_set_config.model', Eloquent\SeoSetConfigModel::class);
         $this->app->bind('statamic.eloquent.seo_set_localization.model', Eloquent\SeoSetLocalizationModel::class);
         $this->app->bind('statamic.eloquent.redirect.model', Eloquent\RedirectModel::class);
         $this->app->bind('statamic.eloquent.redirect_hit.model', Eloquent\RedirectHitModel::class);
+        $this->app->bind('statamic.eloquent.redirect_error.model', Eloquent\RedirectErrorModel::class);
     }
 
     protected function registerFileDriver(): void
@@ -359,6 +361,7 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../database/migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php' => database_path('migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php'),
             __DIR__.'/../database/migrations/2026_06_23_100000_create_redirects_table.php' => database_path('migrations/2026_06_23_100000_create_redirects_table.php'),
             __DIR__.'/../database/migrations/2026_07_02_100000_create_redirect_hits_table.php' => database_path('migrations/2026_07_02_100000_create_redirect_hits_table.php'),
+            __DIR__.'/../database/migrations/2026_07_02_100001_create_redirect_errors_table.php' => database_path('migrations/2026_07_02_100001_create_redirect_errors_table.php'),
         ], 'advanced-seo-migrations');
 
         return $this;

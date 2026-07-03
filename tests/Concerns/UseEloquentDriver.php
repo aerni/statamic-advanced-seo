@@ -53,5 +53,18 @@ trait UseEloquentDriver
             $table->unsignedInteger('last_hit_at')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('redirect_errors', function ($table) {
+            $table->string('id')->primary();
+            $table->string('url');
+            $table->string('site');
+            $table->unsignedInteger('count')->default(0);
+            $table->unsignedInteger('first_seen_at')->nullable();
+            $table->unsignedInteger('last_seen_at')->nullable();
+            $table->timestamps();
+
+            $table->unique(['url', 'site']);
+            $table->index(['count', 'last_seen_at']);
+        });
     }
 }
