@@ -46,5 +46,12 @@ trait UseEloquentDriver
 
             $table->index(['site', 'enabled', 'source']);
         });
+
+        Schema::create('redirect_hits', function ($table) {
+            $table->string('redirect')->primary();
+            $table->unsignedInteger('count')->default(0);
+            $table->timestamp('last_hit_at')->nullable();
+            $table->timestamps();
+        });
     }
 }
