@@ -122,6 +122,8 @@ class RedirectController extends CpController
             'site' => $redirect->site(),
         ])->preProcess();
 
+        $hit = config('advanced-seo.redirects.hits.enabled') ? $redirect->hit() : null;
+
         return Inertia::render('advanced-seo::Redirects/Edit', [
             'title' => __('advanced-seo::messages.redirect_edit_title'),
             'blueprint' => $blueprint->toPublishArray(),
@@ -130,6 +132,10 @@ class RedirectController extends CpController
             'enabled' => $redirect->enabled(),
             'submitUrl' => cp_route('advanced-seo.redirects.update', $redirect->id()),
             'testUrl' => $redirect->sourceUrl(),
+            'hits' => config('advanced-seo.redirects.hits.enabled') ? [
+                'count' => $hit?->count() ?? 0,
+                'last_hit_at' => $hit?->lastHitAtIso(),
+            ] : null,
         ]);
     }
 

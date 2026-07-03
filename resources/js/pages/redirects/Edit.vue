@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator } from '@statamic/cms/ui';
+import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator, Badge } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 import { Head, router } from '@statamic/cms/inertia';
 
@@ -12,6 +12,7 @@ const props = defineProps({
     enabled: { type: Boolean, default: true },
     submitUrl: { type: String, required: true },
     testUrl: { type: String, default: null },
+    hits: { type: Object, default: null },
 });
 
 const container = useTemplateRef('container');
@@ -86,9 +87,17 @@ onUnmounted(() => saveKeyBinding.destroy());
     >
         <PublishTabs>
             <template #actions>
-                <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!">
-                    <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
-                    <Switch v-model="enabled" />
+                <Panel class="px-5! py-3! dark:bg-gray-800!">
+                    <div class="flex items-center justify-between">
+                        <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
+                        <Switch v-model="enabled" />
+                    </div>
+                    <div v-if="hits" class="flex items-center gap-1.5 mt-2 select-none">
+                        <Badge icon="cursor-click" :text="hits.count" :title="__('advanced-seo::messages.redirect_hits')" pill />
+                        <Badge v-if="hits.last_hit_at" icon="time-clock" :title="__('advanced-seo::messages.redirect_last_hit_at')" pill>
+                            <date-time :of="hits.last_hit_at" />
+                        </Badge>
+                    </div>
                 </Panel>
             </template>
         </PublishTabs>

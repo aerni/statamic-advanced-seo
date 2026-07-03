@@ -102,6 +102,32 @@ it('renders the edit form as an Inertia page for an existing redirect', function
         );
 });
 
+it('includes hit data on the edit page when hit logging is enabled', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    tap(Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default'))->save();
+    Redirects::hits()->make()->redirect('r1')->count(9)->lastHitAt(1751450400)->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', 'r1'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('hits.count', 9)
+            ->whereNot('hits.last_hit_at', null)
+        );
+});
+
+it('sends null hits on the edit page when hit logging is disabled', function () {
+    config(['advanced-seo.redirects.hits.enabled' => false]);
+
+    tap(Redirects::make()->id('r1')->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.edit', 'r1'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('hits', null));
+});
+
 it('404s editing a missing redirect', function () {
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', 'missing'))
