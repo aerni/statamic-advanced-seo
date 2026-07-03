@@ -69,16 +69,18 @@ class RedirectErrorRepository implements Contract
         $now = now()->timestamp;
 
         if (! $model::query()->where('url', $url)->where('site', $site)->exists()) {
-            $this->evictIfAtCapacity();
+            $this->ensureCapacityForError();
 
             $model::create([
                 'id' => Stache::generateId(),
                 'url' => $url,
                 'site' => $site,
-                'count' => 0,
+                'count' => 1,
                 'first_seen_at' => $now,
                 'last_seen_at' => $now,
             ]);
+
+            return;
         }
 
         $model::query()
@@ -87,7 +89,7 @@ class RedirectErrorRepository implements Contract
             ->increment('count', 1, ['last_seen_at' => $now]);
     }
 
-    protected function evictIfAtCapacity(): void
+    protected function ensureCapacityForError(): void
     {
         $max = (int) config('advanced-seo.redirects.errors.max_records', 1000);
 

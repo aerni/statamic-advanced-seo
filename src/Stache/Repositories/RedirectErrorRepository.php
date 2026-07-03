@@ -63,7 +63,7 @@ class RedirectErrorRepository implements Contract
             $error = $this->findByUrl($url, $site);
 
             if (! $error) {
-                $this->evictIfAtCapacity();
+                $this->ensureCapacityForError();
 
                 $error = $this->make()->url($url)->site($site)->firstSeenAt(now()->timestamp);
             }
@@ -75,19 +75,21 @@ class RedirectErrorRepository implements Contract
         });
     }
 
-    protected function evictIfAtCapacity(): void
+    protected function ensureCapacityForError(): void
     {
         $max = (int) config('advanced-seo.redirects.errors.max_records', 1000);
 
-        $errors = $this->all();
+        $count = $this->query()->count();
 
-        if ($errors->count() < $max) {
+        if ($count < $max) {
             return;
         }
 
-        $errors
-            ->sort(fn (RedirectError $a, RedirectError $b) => $a->count() <=> $b->count() ?: $a->lastSeenAt() <=> $b->lastSeenAt())
-            ->take($errors->count() - $max + 1)
+        $this->query()
+            ->orderBy('count')
+            ->orderBy('last_seen_at')
+            ->limit($count - $max + 1)
+            ->get()
             ->each->delete();
     }
 
