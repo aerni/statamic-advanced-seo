@@ -92,7 +92,7 @@ onUnmounted(() => saveKeyBinding.destroy());
                         <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
                         <Switch v-model="enabled" />
                     </div>
-                    <div v-if="hits" class="flex items-center gap-1.5 mt-2 select-none">
+                    <div v-if="hits" class="flex items-center gap-1.5 mt-2">
                         <Badge icon="cursor-click" :text="hits.count" :title="__('advanced-seo::messages.redirect_hits')" pill />
                         <Badge v-if="hits.last_hit_at" icon="time-clock" :title="__('advanced-seo::messages.redirect_last_hit_at')" pill>
                             <date-time :of="hits.last_hit_at" />
