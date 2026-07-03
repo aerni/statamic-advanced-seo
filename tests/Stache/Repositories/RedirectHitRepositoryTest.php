@@ -15,7 +15,7 @@ it('returns null when finding a missing redirect hit', function () {
 });
 
 it('can save and find a redirect hit', function () {
-    Redirects::hits()->make()->redirect('abc')->count(3)->lastHitAt('2026-07-02 10:00:00')->save();
+    Redirects::hits()->make()->redirect('abc')->count(3)->lastHitAt(1751450400)->save();
 
     clearStache();
 
@@ -24,7 +24,7 @@ it('can save and find a redirect hit', function () {
     expect($found)->toBeInstanceOf(RedirectHitContract::class)
         ->and($found->redirect())->toBe('abc')
         ->and($found->count())->toBe(3)
-        ->and($found->lastHitAt())->toBe('2026-07-02 10:00:00');
+        ->and($found->lastHitAt())->toBe(1751450400);
 });
 
 it('can list all redirect hits', function () {

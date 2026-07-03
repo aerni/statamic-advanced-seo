@@ -8,7 +8,7 @@ interface RedirectHit
 
     public function count(?int $count = null): int|self;
 
-    public function lastHitAt(?string $lastHitAt = null): string|self|null;
+    public function lastHitAt(?int $lastHitAt = null): int|self|null;
 
     public function id(): string;
 

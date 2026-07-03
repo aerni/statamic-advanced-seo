@@ -52,7 +52,7 @@ class RedirectHitRepository implements Contract
 
                 $hit
                     ->count($hit->count() + 1)
-                    ->lastHitAt(now()->toDateTimeString())
+                    ->lastHitAt(now()->timestamp)
                     ->save();
             });
     }

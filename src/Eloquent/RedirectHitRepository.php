@@ -54,7 +54,7 @@ class RedirectHitRepository implements Contract
         $model::firstOrCreate(['redirect' => $redirect]);
 
         $model::whereKey($redirect)->increment('count', 1, [
-            'last_hit_at' => now()->toDateTimeString(),
+            'last_hit_at' => now()->timestamp,
         ]);
     }
 

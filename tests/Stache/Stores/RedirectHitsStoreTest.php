@@ -39,7 +39,7 @@ it('makes RedirectHit instances from file', function (): void {
 
     $this->files->put($path, <<<'YAML'
 count: 7
-last_hit_at: '2026-07-02 10:00:00'
+last_hit_at: 1751450400
 YAML);
 
     $item = $this->store->makeItemFromFile($path, $this->files->get($path));
@@ -48,5 +48,5 @@ YAML);
         ->and($item->redirect())->toBe('abc')
         ->and($item->id())->toBe('abc')
         ->and($item->count())->toBe(7)
-        ->and($item->lastHitAt())->toBe('2026-07-02 10:00:00');
+        ->and($item->lastHitAt())->toBe(1751450400);
 });

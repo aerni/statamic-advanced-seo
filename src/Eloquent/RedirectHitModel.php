@@ -20,6 +20,7 @@ class RedirectHitModel extends BaseModel
     {
         return [
             'count' => 'integer',
+            'last_hit_at' => 'integer',
         ];
     }
 }

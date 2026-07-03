@@ -18,11 +18,11 @@ it('serializes only its fields to file data', function () {
     $hit = (new RedirectHit)
         ->redirect('abc')
         ->count(5)
-        ->lastHitAt('2026-07-02 10:00:00');
+        ->lastHitAt(1751450400);
 
     expect($hit->fileData())->toBe([
         'count' => 5,
-        'last_hit_at' => '2026-07-02 10:00:00',
+        'last_hit_at' => 1751450400,
     ]);
 });
 

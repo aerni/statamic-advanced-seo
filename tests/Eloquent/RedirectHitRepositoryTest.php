@@ -7,14 +7,14 @@ use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 uses(UseEloquentDriver::class);
 
 it('can save and find a redirect hit via eloquent', function () {
-    Redirects::hits()->make()->redirect('abc')->count(2)->lastHitAt('2026-07-02 10:00:00')->save();
+    Redirects::hits()->make()->redirect('abc')->count(2)->lastHitAt(1751450400)->save();
 
     $found = Redirects::hits()->find('abc');
 
     expect($found)->toBeInstanceOf(RedirectHitContract::class)
         ->and($found->redirect())->toBe('abc')
         ->and($found->count())->toBe(2)
-        ->and($found->lastHitAt())->toBe('2026-07-02 10:00:00');
+        ->and($found->lastHitAt())->toBe(1751450400);
 });
 
 it('can list and delete redirect hits via eloquent', function () {

@@ -23,7 +23,7 @@ class RedirectHit implements ContainsQueryableValues, Contract
 
     protected int $count = 0;
 
-    protected ?string $lastHitAt = null;
+    protected ?int $lastHitAt = null;
 
     public function redirect(?string $redirect = null): string|self
     {
@@ -39,7 +39,7 @@ class RedirectHit implements ContainsQueryableValues, Contract
             ->args(func_get_args());
     }
 
-    public function lastHitAt(?string $lastHitAt = null): string|self|null
+    public function lastHitAt(?int $lastHitAt = null): int|self|null
     {
         return $this
             ->fluentlyGetOrSet('lastHitAt')
