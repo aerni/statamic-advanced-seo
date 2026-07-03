@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void save(\Aerni\AdvancedSeo\Contracts\Redirect $redirect)
  * @method static void delete(\Aerni\AdvancedSeo\Contracts\Redirect $redirect)
  * @method static \Aerni\AdvancedSeo\Contracts\RedirectHitRepository hits()
+ * @method static \Aerni\AdvancedSeo\Contracts\RedirectErrorRepository errors()
  * @method static \Aerni\AdvancedSeo\Redirects\ResolvedRedirect|null resolve(string $path, string $site)
  *
  * @see RedirectService

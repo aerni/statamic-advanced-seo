@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
+use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository;
 use Aerni\AdvancedSeo\Contracts\RedirectHitRepository;
 use Aerni\AdvancedSeo\Contracts\RedirectRepository;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -15,6 +16,11 @@ class RedirectService
     public function hits(): RedirectHitRepository
     {
         return app(RedirectHitRepository::class);
+    }
+
+    public function errors(): RedirectErrorRepository
+    {
+        return app(RedirectErrorRepository::class);
     }
 
     public function resolve(string $path, string $site): ?ResolvedRedirect

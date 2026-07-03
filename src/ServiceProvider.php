@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Cascades\CascadeComposer;
+use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Gates\SeoContentGate;
 use Aerni\AdvancedSeo\GraphQL\Enums\SitemapTypeEnum;
@@ -27,10 +28,12 @@ use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
 use Aerni\AdvancedSeo\Stache\Query\RedirectHitQueryBuilder;
 use Aerni\AdvancedSeo\Stache\Query\RedirectQueryBuilder;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectErrorRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\RedirectHitRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\RedirectRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository;
+use Aerni\AdvancedSeo\Stache\Stores\RedirectErrorsStore;
 use Aerni\AdvancedSeo\Stache\Stores\RedirectHitsStore;
 use Aerni\AdvancedSeo\Stache\Stores\RedirectsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
@@ -104,6 +107,7 @@ class ServiceProvider extends AddonServiceProvider
             SeoSets\SeoSetLocalization::class,
             Redirects\Redirect::class,
             Redirects\RedirectHit::class,
+            Redirects\RedirectError::class,
         ]);
 
         app()->instance('advanced-seo.tokens', collect());
@@ -131,6 +135,7 @@ class ServiceProvider extends AddonServiceProvider
         Statamic::repository(Contracts\SeoSetLocalizationRepository::class, SeoSetLocalizationRepository::class);
         Statamic::repository(Contracts\RedirectRepository::class, RedirectRepository::class);
         Statamic::repository(Contracts\RedirectHitRepository::class, RedirectHitRepository::class);
+        Statamic::repository(Contracts\RedirectErrorRepository::class, RedirectErrorRepository::class);
 
         $this->app->bind(RedirectQueryBuilder::class, fn () => new RedirectQueryBuilder(
             app('stache')->store('redirects')
@@ -138,6 +143,10 @@ class ServiceProvider extends AddonServiceProvider
 
         $this->app->bind(Contracts\RedirectHitQueryBuilder::class, fn () => new RedirectHitQueryBuilder(
             app('stache')->store('redirect-hits')
+        ));
+
+        $this->app->bind(RedirectErrorQueryBuilder::class, fn () => new \Aerni\AdvancedSeo\Stache\Query\RedirectErrorQueryBuilder(
+            app('stache')->store('redirect-errors')
         ));
     }
 
@@ -148,6 +157,7 @@ class ServiceProvider extends AddonServiceProvider
             app(SeoSetLocalizationsStore::class)->directory(config('advanced-seo.directory')),
             app(RedirectsStore::class)->directory(config('advanced-seo.redirects.directory')),
             app(RedirectHitsStore::class)->directory(config('advanced-seo.redirects.hits.directory')),
+            app(RedirectErrorsStore::class)->directory(config('advanced-seo.redirects.errors.directory')),
         ]);
 
         return $this;

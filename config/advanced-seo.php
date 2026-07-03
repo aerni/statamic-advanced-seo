@@ -384,6 +384,13 @@ return [
             'directory' => storage_path('statamic/advanced-seo/redirect-hits'),
         ],
 
+        'errors' => [
+            'enabled' => true,
+            'directory' => storage_path('statamic/advanced-seo/redirect-errors'),
+            'purge_after_days' => 30,
+            'max_records' => 1000,
+        ],
+
         'queue' => 'default',
 
     ],
