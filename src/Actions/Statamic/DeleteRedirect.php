@@ -45,4 +45,13 @@ class DeleteRedirect extends Action
     {
         $items->each->delete();
     }
+
+    public function redirect($items, $values)
+    {
+        if ($this->context['view'] !== 'form') {
+            return;
+        }
+
+        return cp_route('advanced-seo.redirects.index');
+    }
 }

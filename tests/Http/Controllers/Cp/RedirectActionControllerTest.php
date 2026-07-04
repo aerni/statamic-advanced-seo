@@ -57,6 +57,33 @@ it('deletes the selected redirects', function () {
     expect(Redirect::query()->get())->toHaveCount(0);
 });
 
+it('redirects to the index after deleting from the edit view', function () {
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->save();
+
+    $this->actingAs($this->super)
+        ->post(cp_route('advanced-seo.redirects.actions.run'), [
+            'action' => 'delete_redirect',
+            'selections' => [$redirect->id()],
+            'values' => [],
+            'context' => ['view' => 'form'],
+        ])
+        ->assertOk()
+        ->assertJsonPath('redirect', cp_route('advanced-seo.redirects.index'));
+});
+
+it('does not redirect after deleting from the listing', function () {
+    $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->save();
+
+    $this->actingAs($this->super)
+        ->post(cp_route('advanced-seo.redirects.actions.run'), [
+            'action' => 'delete_redirect',
+            'selections' => [$redirect->id()],
+            'values' => [],
+        ])
+        ->assertOk()
+        ->assertJsonMissingPath('redirect');
+});
+
 it('enables the selected redirects', function () {
     $redirect = Redirect::make()->source('/a')->destination('/x')->site('default')->enabled(false)->save();
 
