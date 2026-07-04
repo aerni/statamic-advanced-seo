@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Site;
+use Statamic\Support\Str;
 
 class ListedError extends JsonResource
 {
@@ -33,7 +34,7 @@ class ListedError extends JsonResource
             'site' => $error->site(),
             'site_name' => Site::get($error->site())?->name() ?? $error->site(),
             'status' => $this->status($redirect),
-            'destination' => $redirect?->destinationUrl() ?? $redirect?->destination(),
+            'destination' => $this->destination($redirect),
             'redirect_url' => $redirect?->editUrl(),
             'create_redirect_url' => cp_route('advanced-seo.redirects.create').'?source='.urlencode($error->url()).'&site='.$error->site(),
         ];
@@ -46,5 +47,22 @@ class ListedError extends JsonResource
         }
 
         return $redirect->enabled() ? 'handled' : 'disabled';
+    }
+
+    /**
+     * Resolve an entry destination to its URL, but leave relative paths and
+     * full URLs as they were entered.
+     */
+    protected function destination(?Redirect $redirect): ?string
+    {
+        if (($destination = $redirect?->destination()) === null) {
+            return null;
+        }
+
+        if (Str::startsWith($destination, 'entry::')) {
+            return $redirect->destinationUrl() ?? $destination;
+        }
+
+        return $destination;
     }
 }
