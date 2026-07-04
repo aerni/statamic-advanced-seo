@@ -69,8 +69,12 @@ class ListedError extends JsonResource
             return $destination;
         }
 
+        if (! $url = $entry->absoluteUrl()) {
+            return $destination;
+        }
+
         return $entry->locale() === $redirect->site()
-            ? $entry->url()
-            : $entry->absoluteUrl();
+            ? Site::get($redirect->site())->relativePath($url)
+            : $url;
     }
 }
