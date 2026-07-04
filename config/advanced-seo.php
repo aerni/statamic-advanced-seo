@@ -389,6 +389,24 @@ return [
             'directory' => storage_path('statamic/advanced-seo/redirect-errors'),
             'purge_after_days' => 30,
             'max_records' => 1000,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ignored Paths
+            |--------------------------------------------------------------------------
+            |
+            | Paths matching any of these patterns are never recorded as errors,
+            | keeping bot and scanner noise out of the list. Use an exact path
+            | (/foo), a wildcard (/bar/*), or a regex (#...#), just like a
+            | redirect source.
+            |
+            */
+
+            'ignore' => [
+                '#\.php$#',        // PHP probes: wp-login.php, xmlrpc.php, admin-ajax.php
+                '#^/wp-admin#',    // WordPress admin
+                '#^/\.(env|git)#', // Secrets and repo probes
+            ],
         ],
 
         'queue' => 'default',

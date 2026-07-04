@@ -169,3 +169,15 @@ it('does not record an error when error logging is disabled', function () {
 
     Queue::assertNotPushed(RecordRedirectErrorJob::class);
 });
+
+it('does not record an error for an ignored path', function () {
+    config([
+        'advanced-seo.redirects.errors.enabled' => true,
+        'advanced-seo.redirects.errors.ignore' => ['#\.php$#'],
+    ]);
+    Queue::fake();
+
+    $this->get('/wp-login.php')->assertNotFound();
+
+    Queue::assertNotPushed(RecordRedirectErrorJob::class);
+});

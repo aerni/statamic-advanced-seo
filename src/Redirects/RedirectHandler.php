@@ -78,6 +78,13 @@ class RedirectHandler
 
         $url = Str::lower(RedirectPatternMatcher::normalizePath($site->relativePath($request->url())));
 
+        $ignored = collect(config('advanced-seo.redirects.errors.ignore', []))
+            ->contains(fn (string $pattern) => RedirectPatternMatcher::matches($pattern, $url));
+
+        if ($ignored) {
+            return;
+        }
+
         RecordRedirectErrorJob::dispatch($url, $site->handle());
     }
 

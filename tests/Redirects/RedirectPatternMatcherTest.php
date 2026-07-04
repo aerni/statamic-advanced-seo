@@ -47,6 +47,23 @@ it('keeps regex sources case-sensitive unless the author opts in', function () {
         ->and(RedirectPatternMatcher::match('#^/Section$#i', '/section'))->toBe(['/section']);
 });
 
+it('matches an exact source case-insensitively', function () {
+    expect(RedirectPatternMatcher::matches('/WP-Login.php', '/wp-login.php'))->toBeTrue()
+        ->and(RedirectPatternMatcher::matches('/wp-login.php', '/about'))->toBeFalse();
+});
+
+it('matches a wildcard source within a single segment only', function () {
+    expect(RedirectPatternMatcher::matches('/assets/*', '/assets/logo'))->toBeTrue()
+        ->and(RedirectPatternMatcher::matches('/assets/*', '/assets/img/logo'))->toBeFalse();
+});
+
+it('matches a regex source at any depth', function () {
+    expect(RedirectPatternMatcher::matches('#\.php$#', '/wp-login.php'))->toBeTrue()
+        ->and(RedirectPatternMatcher::matches('#\.php$#', '/nested/path/admin-ajax.php'))->toBeTrue()
+        ->and(RedirectPatternMatcher::matches('#^/wp-admin#', '/wp-admin/options.php'))->toBeTrue()
+        ->and(RedirectPatternMatcher::matches('#^/wp-admin#', '/admin'))->toBeFalse();
+});
+
 it('substitutes capture placeholders into the destination', function () {
     expect(RedirectPatternMatcher::substitute('/news/$1', ['/blog/hello', 'hello']))->toBe('/news/hello');
 });

@@ -18,6 +18,15 @@ class RedirectPatternMatcher
         return $pattern && @preg_match($pattern, $path, $matches) ? $matches : null;
     }
 
+    public static function matches(string $source, string $path): bool
+    {
+        if (SourceType::fromSource($source) === SourceType::Exact) {
+            return Str::lower(static::normalizePath($source)) === Str::lower(static::normalizePath($path));
+        }
+
+        return static::match($source, $path) !== null;
+    }
+
     public static function substitute(string $destination, array $captures): string
     {
         return preg_replace_callback('/\$(\d+)/', fn ($m) => $captures[(int) $m[1]] ?? '', $destination);
