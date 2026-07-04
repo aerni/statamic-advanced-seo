@@ -87,7 +87,7 @@ it('filters by site', function () {
     Redirect::errors()->make()->url('/one')->site('default')->count(1)->save();
     Redirect::errors()->make()->url('/two')->site('fr')->count(1)->save();
 
-    $filters = base64_encode(json_encode(['redirect_error_site' => ['site' => 'fr']]));
+    $filters = base64_encode(json_encode(['redirect_site' => ['site' => 'fr']]));
 
     $response = $this->actingAs($this->user)
         ->getJson(cp_route('advanced-seo.redirects.errors.index', ['filters' => $filters]))
