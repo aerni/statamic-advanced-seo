@@ -28,7 +28,7 @@ class Errors extends ResourceCollection
             Column::make('hits')->label(__('advanced-seo::messages.redirect_hits'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
             Column::make('first_seen_at')->label(__('advanced-seo::messages.redirect_error_first_seen'))->sortable(true)->defaultVisibility(false)->visible(true)->listable(true),
             Column::make('last_seen_at')->label(__('advanced-seo::messages.redirect_error_last_seen'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
-            Column::make('redirect')->label(__('advanced-seo::messages.redirect_error_redirect'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
+            Column::make('redirect')->label(__('advanced-seo::messages.redirect_error_redirect'))->sortable(false)->defaultVisibility(true)->visible(true)->listable(true),
         ])));
 
         $columns->setPreferred('advanced-seo.redirect-errors.columns');

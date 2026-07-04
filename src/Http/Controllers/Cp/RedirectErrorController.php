@@ -7,19 +7,23 @@ use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Errors as ErrorsResource;
 use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Statamic;
-use Statamic\Support\Str;
 
 class RedirectErrorController extends CpController
 {
-    public function index(Request $request)
+    use QueriesFilters;
+
+    public function index(FilteredRequest $request)
     {
         throw_unless(RedirectsFeature::enabled() && config('advanced-seo.redirects.errors.enabled'), new NotFoundHttpException);
 
@@ -30,25 +34,28 @@ class RedirectErrorController extends CpController
         if ($request->wantsJson()) {
             $checker = ErrorHandledChecker::for($sites);
 
-            $errors = RedirectFacade::errors()->query()->whereIn('site', $sites)->get();
+            $query = RedirectFacade::errors()->query()->whereIn('site', $sites);
 
             if ($search = $request->input('search')) {
-                $errors = $errors->filter(fn ($error) => Str::contains(Str::lower($error->url()), Str::lower($search)));
+                $query->where('url', 'LIKE', '%'.$search.'%');
             }
 
-            $errors = $this->sort(
-                $errors,
-                $checker,
-                $request->input('sort', 'url'),
-                $request->input('order', 'asc'),
-            );
+            $activeFilterBadges = $this->queryFilters($query, $request->filters);
+
+            $errors = $query->get();
+
+            if ($status = Arr::get($request->filters, 'redirect_error_status.status')) {
+                $errors = $errors->filter(fn ($error) => $this->status($checker, $error) === $status);
+            }
+
+            $errors = $this->sort($errors, $request->input('sort', 'url'), $request->input('order', 'asc'));
 
             $paginator = $this->paginate($errors, Statamic::cpPerPage($request->input('perPage')));
 
             $resource = new ErrorsResource($paginator);
             $resource->handledChecker = $checker;
 
-            return $resource;
+            return $resource->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 
         $hasErrors = RedirectFacade::errors()->query()->whereIn('site', $sites)->first() !== null;
@@ -56,34 +63,36 @@ class RedirectErrorController extends CpController
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
             'listingUrl' => cp_route('advanced-seo.redirects.errors.index'),
+            'filters' => Scope::filters('redirect-errors'),
             'hasErrors' => $hasErrors,
         ]);
     }
 
     /**
      * Sort the recorded errors in memory. The store is bounded by `max_records`,
-     * and the "redirect" column is derived from redirects rather than stored, so
-     * every column is sorted here rather than through the query builder.
+     * and the status filter is derived from redirects, so the set is processed
+     * here rather than through the query builder.
      */
-    protected function sort(Collection $errors, ErrorHandledChecker $checker, string $field, string $direction): Collection
+    protected function sort(Collection $errors, string $field, string $direction): Collection
     {
         return $errors->sortBy(fn ($error) => match ($field) {
             'hits' => $error->count(),
             'first_seen_at' => $error->firstSeenAt() ?? 0,
             'last_seen_at' => $error->lastSeenAt() ?? 0,
             'site' => $error->site(),
-            'redirect' => $this->statusRank($checker->match($error->url(), $error->site())),
             default => $error->url(),
         }, SORT_REGULAR, $direction === 'desc')->values();
     }
 
-    protected function statusRank(?Redirect $redirect): int
+    protected function status(ErrorHandledChecker $checker, $error): string
     {
+        $redirect = $checker->match($error->url(), $error->site());
+
         if ($redirect === null) {
-            return 0;
+            return 'unhandled';
         }
 
-        return $redirect->enabled() ? 2 : 1;
+        return $redirect->enabled() ? 'handled' : 'disabled';
     }
 
     protected function paginate(Collection $errors, ?int $perPage): LengthAwarePaginator

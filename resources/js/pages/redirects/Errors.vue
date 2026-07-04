@@ -5,6 +5,7 @@ import { Header, Button, Badge, Listing, Icon, Panel, Card, StatusIndicator } fr
 defineProps({
     title: String,
     listingUrl: String,
+    filters: Array,
     hasErrors: Boolean,
 });
 </script>
@@ -17,6 +18,7 @@ defineProps({
     <template v-if="hasErrors">
         <Listing
             :url="listingUrl"
+            :filters="filters"
             :allow-presets="false"
             preferences-prefix="advanced-seo.redirect-errors"
             sort-column="url"

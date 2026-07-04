@@ -46,6 +46,7 @@ return [
     'redirect_error_redirect' => 'Weiterleitung',
     'redirect_error_status_handled' => 'Aktiviert',
     'redirect_error_status_disabled' => 'Deaktiviert',
+    'redirect_error_status_unhandled' => 'Unbehandelt',
     'redirect_error_create_redirect' => 'Weiterleitung erstellen',
     'redirect_errors_empty' => 'Es wurden noch keine Weiterleitungsfehler erfasst.',
 
