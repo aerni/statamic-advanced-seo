@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
-    Route::get('/redirects/errors', [RedirectErrorController::class, 'index'])->name('redirects.errors.index');
+    Route::get('/redirect-errors', [RedirectErrorController::class, 'index'])->name('redirects.errors.index');
     Route::resource('redirects', RedirectController::class)->except('show');
     Route::post('/redirects/actions', [RedirectActionController::class, 'run'])->name('redirects.actions.run');
     Route::post('/redirects/actions/list', [RedirectActionController::class, 'bulkActions'])->name('redirects.actions.bulk');

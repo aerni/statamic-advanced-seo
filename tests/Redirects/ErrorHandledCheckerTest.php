@@ -14,36 +14,48 @@ beforeEach(function () {
     ]);
 });
 
-it('reports an exact match as handled', function () {
-    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
+it('matches an enabled exact redirect', function () {
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $checker = ErrorHandledChecker::for(['default']);
 
-    expect($checker->isHandled('/old', 'default'))->toBeTrue()
-        ->and($checker->isHandled('/other', 'default'))->toBeFalse();
+    expect($checker->match('/old', 'default')?->id())->toBe($redirect->id())
+        ->and($checker->match('/old', 'default')->enabled())->toBeTrue()
+        ->and($checker->match('/other', 'default'))->toBeNull();
 });
 
-it('reports a wildcard match as handled', function () {
-    Redirect::make()->source('/blog/*')->destination('/news/$1')->site('default')->save();
+it('matches an enabled wildcard redirect', function () {
+    $redirect = tap(Redirect::make()->source('/blog/*')->destination('/news/$1')->site('default'))->save();
 
     $checker = ErrorHandledChecker::for(['default']);
 
-    expect($checker->isHandled('/blog/post', 'default'))->toBeTrue();
+    expect($checker->match('/blog/post', 'default')?->id())->toBe($redirect->id());
 });
 
-it('does not treat a disabled redirect as handled', function () {
-    Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false)->save();
+it('still matches a disabled redirect but reports it as disabled', function () {
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false))->save();
 
-    $checker = ErrorHandledChecker::for(['default']);
+    $match = ErrorHandledChecker::for(['default'])->match('/old', 'default');
 
-    expect($checker->isHandled('/old', 'default'))->toBeFalse();
+    expect($match?->id())->toBe($redirect->id())
+        ->and($match->enabled())->toBeFalse();
 });
 
-it('scopes handled checks to the site', function () {
+it('prefers an enabled redirect over a disabled one', function () {
+    tap(Redirect::make()->source('/blog/*')->destination('/disabled')->site('default')->enabled(false))->save();
+    $enabled = tap(Redirect::make()->source('/blog/post')->destination('/enabled')->site('default'))->save();
+
+    $match = ErrorHandledChecker::for(['default'])->match('/blog/post', 'default');
+
+    expect($match?->id())->toBe($enabled->id())
+        ->and($match->enabled())->toBeTrue();
+});
+
+it('scopes matches to the site', function () {
     Redirect::make()->source('/old')->destination('/new')->site('fr')->save();
 
     $checker = ErrorHandledChecker::for(['default', 'fr']);
 
-    expect($checker->isHandled('/old', 'default'))->toBeFalse()
-        ->and($checker->isHandled('/old', 'fr'))->toBeTrue();
+    expect($checker->match('/old', 'default'))->toBeNull()
+        ->and($checker->match('/old', 'fr'))->not->toBeNull();
 });

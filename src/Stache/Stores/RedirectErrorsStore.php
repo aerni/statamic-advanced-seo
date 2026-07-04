@@ -45,6 +45,6 @@ class RedirectErrorsStore extends BasicStore
 
     protected function storeIndexes(): array
     {
-        return ['id', 'url', 'site', 'count', 'last_seen_at'];
+        return ['id', 'url', 'site', 'count', 'first_seen_at', 'last_seen_at'];
     }
 }

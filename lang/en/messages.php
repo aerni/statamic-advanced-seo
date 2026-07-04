@@ -51,8 +51,11 @@ return [
     'redirect_last_hit_at' => 'Last Hit',
     'redirect_errors' => 'Errors',
     'redirect_error_url' => 'Path',
+    'redirect_error_first_seen' => 'First Seen',
     'redirect_error_last_seen' => 'Last Seen',
-    'redirect_error_handled' => 'Handled',
+    'redirect_error_redirect' => 'Redirect',
+    'redirect_error_status_handled' => 'Handled',
+    'redirect_error_status_disabled' => 'Disabled',
     'redirect_error_create_redirect' => 'Create Redirect',
     'redirect_errors_empty' => 'No redirect errors have been recorded yet.',
 

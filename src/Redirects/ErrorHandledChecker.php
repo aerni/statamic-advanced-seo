@@ -10,8 +10,8 @@ use Illuminate\Support\Collection;
 class ErrorHandledChecker
 {
     /**
-     * @param  array<string, array<string, true>>  $exact  site => [lowercased source => true]
-     * @param  array<string, Collection<int, Redirect>>  $patterns  site => enabled non-exact redirects
+     * @param  array<string, array<string, Redirect>>  $exact  site => [source => redirect]
+     * @param  array<string, Collection<int, Redirect>>  $patterns  site => non-exact redirects
      */
     protected function __construct(
         protected array $exact,
@@ -22,7 +22,6 @@ class ErrorHandledChecker
     {
         $redirects = RedirectFacade::query()
             ->whereIn('site', $sites)
-            ->where('enabled', true)
             ->get();
 
         $exact = [];
@@ -30,7 +29,7 @@ class ErrorHandledChecker
 
         foreach ($redirects as $redirect) {
             if ($redirect->sourceType() === SourceType::Exact) {
-                $exact[$redirect->site()][$redirect->source()] = true;
+                $exact[$redirect->site()][$redirect->source()] = $redirect;
             } else {
                 $patterns[$redirect->site()][] = $redirect;
             }
@@ -39,13 +38,24 @@ class ErrorHandledChecker
         return new self($exact, array_map(fn ($group) => collect($group), $patterns));
     }
 
-    public function isHandled(string $url, string $site): bool
+    /**
+     * Return the redirect that covers the given error, preferring an enabled
+     * redirect over a disabled one, or null when nothing matches.
+     */
+    public function match(string $url, string $site): ?Redirect
     {
-        if (isset($this->exact[$site][$url])) {
-            return true;
+        return $this->matchIn($url, $site, enabled: true)
+            ?? $this->matchIn($url, $site, enabled: false);
+    }
+
+    protected function matchIn(string $url, string $site, bool $enabled): ?Redirect
+    {
+        if (($exact = $this->exact[$site][$url] ?? null) && $exact->enabled() === $enabled) {
+            return $exact;
         }
 
         return ($this->patterns[$site] ?? collect())
-            ->contains(fn (Redirect $redirect) => RedirectPatternMatcher::match($redirect->source(), $url) !== null);
+            ->first(fn (Redirect $redirect) => $redirect->enabled() === $enabled
+                && RedirectPatternMatcher::match($redirect->source(), $url) !== null);
     }
 }
