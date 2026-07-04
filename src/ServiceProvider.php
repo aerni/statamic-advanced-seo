@@ -223,6 +223,14 @@ class ServiceProvider extends AddonServiceProvider
                 );
             }
 
+            if ($canViewRedirects && config('advanced-seo.redirects.errors.enabled')) {
+                $navItems->push(
+                    $nav->item(__('advanced-seo::messages.redirect_errors'))
+                        ->route('advanced-seo.redirects.errors.index')
+                        ->icon('alert-warning-exclamation-mark')
+                );
+            }
+
             if ($navItems->isEmpty()) {
                 return;
             }

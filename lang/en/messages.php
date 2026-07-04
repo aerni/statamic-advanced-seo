@@ -49,6 +49,10 @@ return [
     'redirect_manual' => 'Manual',
     'redirect_hits' => 'Hits',
     'redirect_last_hit_at' => 'Last Hit',
+    'redirect_errors' => 'Errors',
+    'redirect_error_url' => 'Path',
+    'redirect_error_last_seen' => 'Last Seen',
+    'redirect_error_handled' => 'Handled',
 
     // UI
     'origins' => 'Origins',
