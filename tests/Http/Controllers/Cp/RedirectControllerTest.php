@@ -84,6 +84,17 @@ it('renders the create form as an Inertia page', function () {
         );
 });
 
+it('prefills the create form from source and site query parameters', function () {
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.create').'?source=/missing&site=default')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('advanced-seo::Redirects/Create')
+            ->where('values.source', '/missing')
+            ->where('values.site', 'default')
+        );
+});
+
 it('renders the edit form as an Inertia page for an existing redirect', function () {
     $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false)->forwardQueryString(false))->save();
 

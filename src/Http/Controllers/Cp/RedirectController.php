@@ -141,7 +141,7 @@ class RedirectController extends CpController
         return [$paginator, $hits];
     }
 
-    public function create(): mixed
+    public function create(Request $request): mixed
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
@@ -149,7 +149,12 @@ class RedirectController extends CpController
 
         $blueprint = RedirectBlueprint::definition();
 
-        $fields = $blueprint->fields()->preProcess();
+        $prefill = array_filter([
+            'source' => $request->input('source'),
+            'site' => $request->input('site'),
+        ], fn ($value) => $value !== null);
+
+        $fields = $blueprint->fields()->addValues($prefill)->preProcess();
 
         return Inertia::render('advanced-seo::Redirects/Create', [
             'title' => __('advanced-seo::messages.redirect_create_title'),
