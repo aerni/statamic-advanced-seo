@@ -49,6 +49,7 @@ return [
     'redirect_manual' => 'Manual',
     'redirect_hits' => 'Hits',
     'redirect_last_hit_at' => 'Last Hit',
+    'redirect_created_at' => 'Created',
     'redirect_errors' => 'Errors',
     'redirect_errors_description' => 'Review 404s that no redirect handles.',
     'redirect_error_url' => 'Path',

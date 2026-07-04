@@ -39,6 +39,7 @@ return [
     'redirect_manual' => 'Manuell',
     'redirect_hits' => 'Aufrufe',
     'redirect_last_hit_at' => 'Letzter Aufruf',
+    'redirect_created_at' => 'Erstellt',
     'redirect_errors' => 'Fehler',
     'redirect_errors_description' => 'Sieh dir 404-Fehler an, die keine Weiterleitung abfängt.',
     'redirect_error_url' => 'Pfad',

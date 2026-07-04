@@ -110,6 +110,7 @@ it('renders the edit form as an Inertia page for an existing redirect', function
             ->where('values.source', '/old')
             ->where('values.destination', '/new')
             ->where('values.forward_query_string', false)
+            ->whereNot('createdAt', null)
         );
 });
 

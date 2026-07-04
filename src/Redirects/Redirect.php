@@ -10,6 +10,7 @@ use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectDeleted;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
+use Illuminate\Support\Carbon;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
@@ -46,6 +47,8 @@ class Redirect implements ContainsQueryableValues, Contract
     protected $automatic = false;
 
     protected $description;
+
+    protected ?int $createdAt = null;
 
     public function id(?string $id = null): string|self
     {
@@ -169,10 +172,27 @@ class Redirect implements ContainsQueryableValues, Contract
             ->args(func_get_args());
     }
 
+    public function createdAt(?int $createdAt = null): int|self|null
+    {
+        return $this
+            ->fluentlyGetOrSet('createdAt')
+            ->args(func_get_args());
+    }
+
+    public function createdAtIso(): ?string
+    {
+        if (! $createdAt = $this->createdAt()) {
+            return null;
+        }
+
+        return Carbon::createFromTimestamp($createdAt, 'UTC')->toIso8601String();
+    }
+
     public function getQueryableValue(string $field)
     {
         return match ($field) {
             'response_code' => $this->responseCode()->value,
+            'created_at' => $this->createdAt(),
             default => $this->{$field}(),
         };
     }
@@ -206,12 +226,17 @@ class Redirect implements ContainsQueryableValues, Contract
             'forward_query_string' => $this->responseCode() === ResponseCode::Gone ? null : $this->forwardQueryString(),
             'automatic' => $this->automatic(),
             'description' => $this->description(),
+            'created_at' => $this->createdAt(),
         ];
     }
 
     public function save(): self
     {
         $isNew = is_null(RedirectFacade::find($this->id()));
+
+        if ($isNew && is_null($this->createdAt)) {
+            $this->createdAt(Carbon::now()->timestamp);
+        }
 
         RedirectFacade::save($this);
 

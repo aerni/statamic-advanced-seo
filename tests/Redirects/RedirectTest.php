@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Redirects\Redirect;
+use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -68,7 +69,35 @@ it('serializes only its fields to file data', function () {
         'forward_query_string' => true,
         'automatic' => true,
         'description' => 'Note',
+        'created_at' => null,
     ]);
+});
+
+it('stamps created_at on first save', function () {
+    Carbon::setTestNow('2026-07-04 12:00:00');
+
+    $redirect = tap((new Redirect)->source('/old')->destination('/new')->site('default'))->save();
+
+    expect($redirect->createdAt())->toBe(Carbon::parse('2026-07-04 12:00:00')->timestamp);
+});
+
+it('preserves an explicitly set created_at on save', function () {
+    Carbon::setTestNow('2026-07-04 12:00:00');
+
+    $imported = Carbon::parse('2020-01-01 00:00:00')->timestamp;
+
+    $redirect = tap((new Redirect)->source('/old')->destination('/new')->site('default')->createdAt($imported))->save();
+
+    expect($redirect->createdAt())->toBe($imported);
+});
+
+it('formats created_at as an iso string and returns null when unset', function () {
+    expect((new Redirect)->createdAtIso())->toBeNull();
+
+    $timestamp = Carbon::parse('2026-07-04 12:00:00')->timestamp;
+
+    expect((new Redirect)->createdAt($timestamp)->createdAtIso())
+        ->toBe(Carbon::createFromTimestamp($timestamp, 'UTC')->toIso8601String());
 });
 
 it('does not persist a destination or query string forwarding for a gone redirect', function () {

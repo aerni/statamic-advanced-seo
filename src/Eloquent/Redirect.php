@@ -23,7 +23,8 @@ class Redirect extends StacheRedirect
             ->enabled($model->enabled)
             ->forwardQueryString($model->forward_query_string ?? true)
             ->automatic($model->automatic ?? false)
-            ->description($model->description);
+            ->description($model->description)
+            ->createdAt($model->created_at?->timestamp);
     }
 
     public function toModel(): Model
@@ -35,7 +36,7 @@ class Redirect extends StacheRedirect
     {
         $model = app('statamic.eloquent.redirect.model');
 
-        return $model::firstOrNew(['id' => $source->id()])->fill([
+        return tap($model::firstOrNew(['id' => $source->id()])->fill([
             'source' => $source->source(),
             'destination' => $source->destination(),
             'response_code' => $source->responseCode(),
@@ -44,7 +45,11 @@ class Redirect extends StacheRedirect
             'forward_query_string' => $source->responseCode() === ResponseCode::Gone ? null : $source->forwardQueryString(),
             'automatic' => $source->automatic(),
             'description' => $source->description(),
-        ]);
+        ]), function (Model $model) use ($source): void {
+            if ($source->createdAt()) {
+                $model->created_at = $source->createdAt();
+            }
+        });
     }
 
     public function model(?Model $model = null): Model|static|null

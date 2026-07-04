@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator, Badge, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@statamic/cms/ui';
+import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 import { Head, router } from '@statamic/cms/inertia';
 
@@ -16,6 +16,7 @@ const props = defineProps({
     itemActions: { type: Array, default: () => [] },
     itemActionUrl: { type: String, default: null },
     hits: { type: Object, default: null },
+    createdAt: { type: String, default: null },
 });
 
 const container = useTemplateRef('container');
@@ -149,12 +150,20 @@ onUnmounted(() => saveKeyBinding.destroy());
                         <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
                         <Switch v-model="enabled" />
                     </div>
-                    <div v-if="hits" class="flex items-center gap-1.5 mt-2">
-                        <Badge icon="cursor-click" :text="hits.count" :title="__('advanced-seo::messages.redirect_hits')" pill />
-                        <Badge v-if="hits.last_hit_at" icon="time-clock" :title="__('advanced-seo::messages.redirect_last_hit_at')" pill>
-                            <date-time :of="hits.last_hit_at" />
-                        </Badge>
-                    </div>
+                    <dl v-if="hits || createdAt" class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-sm">
+                        <template v-if="hits">
+                            <dt class="text-gray-600/90 dark:text-gray-400">{{ __('advanced-seo::messages.redirect_hits') }}</dt>
+                            <dd class="text-right tabular-nums text-gray-925 dark:text-gray-300">{{ hits.count }}</dd>
+                            <template v-if="hits.last_hit_at">
+                                <dt class="text-gray-600/90 dark:text-gray-400">{{ __('advanced-seo::messages.redirect_last_hit_at') }}</dt>
+                                <dd class="text-right text-gray-925 dark:text-gray-300"><date-time :of="hits.last_hit_at" /></dd>
+                            </template>
+                        </template>
+                        <template v-if="createdAt">
+                            <dt class="text-gray-600/90 dark:text-gray-400">{{ __('advanced-seo::messages.redirect_created_at') }}</dt>
+                            <dd class="text-right text-gray-925 dark:text-gray-300"><date-time :of="createdAt" /></dd>
+                        </template>
+                    </dl>
                 </Panel>
             </template>
         </PublishTabs>

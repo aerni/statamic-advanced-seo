@@ -62,6 +62,9 @@ defineProps({
             <template #cell-last_hit_at="{ row: redirect }">
                 <date-time v-if="redirect.last_hit_at" :of="redirect.last_hit_at" />
             </template>
+            <template #cell-created_at="{ row: redirect }">
+                <date-time v-if="redirect.created_at" :of="redirect.created_at" />
+            </template>
             <template #cell-status="{ row: redirect }">
                 <Badge
                     v-if="redirect.status"

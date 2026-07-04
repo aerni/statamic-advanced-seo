@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Contracts\Redirect as RedirectContract;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -29,6 +30,16 @@ it('can save and find a redirect', function () {
         ->and($found->destination())->toBe('/new')
         ->and($found->site())->toBe('default')
         ->and($found->automatic())->toBeTrue();
+});
+
+it('persists created_at through save and find', function () {
+    Carbon::setTestNow('2026-07-04 12:00:00');
+
+    Redirect::make()->id('abc')->source('/old')->destination('/new')->site('default')->save();
+
+    clearStache();
+
+    expect(Redirect::find('abc')->createdAt())->toBe(Carbon::parse('2026-07-04 12:00:00')->timestamp);
 });
 
 it('can list all redirects', function () {

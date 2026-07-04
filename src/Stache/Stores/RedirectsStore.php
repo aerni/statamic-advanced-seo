@@ -44,7 +44,8 @@ class RedirectsStore extends BasicStore
             ->enabled(Arr::get($data, 'enabled', true))
             ->forwardQueryString(Arr::get($data, 'forward_query_string', true))
             ->automatic(Arr::get($data, 'automatic', false))
-            ->description(Arr::get($data, 'description'));
+            ->description(Arr::get($data, 'description'))
+            ->createdAt(Arr::get($data, 'created_at'));
     }
 
     protected function storeIndexes(): array

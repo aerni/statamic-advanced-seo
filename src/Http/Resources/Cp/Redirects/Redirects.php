@@ -52,6 +52,10 @@ class Redirects extends ResourceCollection
         }
 
         $columns->push(
+            Column::make('created_at')->label(__('advanced-seo::messages.redirect_created_at'))->sortable(true)->defaultVisibility(false)->visible(true)->listable(true)
+        );
+
+        $columns->push(
             Column::make('status')->label(__('Status'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
         );
 

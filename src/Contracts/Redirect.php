@@ -27,6 +27,10 @@ interface Redirect
 
     public function description(?string $description = null): string|self|null;
 
+    public function createdAt(?int $createdAt = null): int|self|null;
+
+    public function createdAtIso(): ?string;
+
     public function sourceUrl(): ?string;
 
     public function hit(): ?RedirectHit;

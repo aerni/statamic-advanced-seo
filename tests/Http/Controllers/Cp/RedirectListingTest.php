@@ -45,7 +45,8 @@ it('returns correct columns in meta', function () {
         ->toContain('site')
         ->toContain('status')
         ->toContain('automatic')
-        ->toContain('description');
+        ->toContain('description')
+        ->toContain('created_at');
 });
 
 it('respects the requested column visibility and order', function () {
@@ -88,6 +89,19 @@ it('includes site in row data', function () {
 
     expect($data[0])->toHaveKey('site')
         ->and($data[0]['site'])->toBe('default');
+});
+
+it('exposes created_at in the row data and sorts by it', function () {
+    Redirect::make()->source('/older')->destination('/x')->site('default')->createdAt(1577836800)->save();
+    Redirect::make()->source('/newer')->destination('/y')->site('default')->createdAt(1893456000)->save();
+
+    $data = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'created_at', 'order' => 'desc']))
+        ->json('data');
+
+    expect($data[0]['source'])->toBe('/newer')
+        ->and($data[0]['created_at'])->not->toBeNull()
+        ->and($data[1]['source'])->toBe('/older');
 });
 
 it('searches by source and destination', function () {

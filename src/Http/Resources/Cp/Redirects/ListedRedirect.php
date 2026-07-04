@@ -45,6 +45,7 @@ class ListedRedirect extends JsonResource
             'status' => $redirect->enabled(),
             'hits' => $hit?->count() ?? 0,
             'last_hit_at' => $hit?->lastHitAtIso(),
+            'created_at' => $redirect->createdAtIso(),
             'edit_url' => $redirect->editUrl(),
             'test_url' => $redirect->responseCode() === ResponseCode::Gone ? null : $redirect->sourceUrl(),
             'editable' => User::current()->can('edit', $redirect),
