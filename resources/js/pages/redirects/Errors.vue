@@ -39,6 +39,7 @@ defineProps({
             <Button
                 v-if="error.status === 'unhandled'"
                 size="sm"
+                icon="plus"
                 :href="error.create_redirect_url"
                 :text="__('advanced-seo::messages.redirect_error_create_redirect')"
             />
