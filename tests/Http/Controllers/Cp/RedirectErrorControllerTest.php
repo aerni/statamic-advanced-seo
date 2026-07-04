@@ -32,7 +32,8 @@ it('lists errors with a derived redirect status', function () {
 
     expect($response->json('data.0.redirect_url'))->not->toBeNull()
         ->and($response->json('data.1.redirect_url'))->toBeNull()
-        ->and($response->json('data.1.create_redirect_url'))->toContain('source=%2Funhandled');
+        ->and($response->json('data.1.create_redirect_url'))->toContain('source=%2Funhandled')
+        ->and(collect($response->json('data.0.actions'))->pluck('handle'))->toContain('delete_redirect_error');
 });
 
 it('reports an error covered only by a disabled redirect as disabled', function () {

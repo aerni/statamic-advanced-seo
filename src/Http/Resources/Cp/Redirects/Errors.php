@@ -40,7 +40,7 @@ class Errors extends ResourceCollection
     {
         $this->setColumns();
 
-        return $this->collection->map(fn ($error) => (new ListedError($error))->handledChecker($this->handledChecker));
+        return $this->collection->each->handledChecker($this->handledChecker);
     }
 
     public function with($request)
