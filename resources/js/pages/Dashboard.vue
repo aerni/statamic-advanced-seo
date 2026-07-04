@@ -5,6 +5,7 @@ import { Icon, Badge, Panel, PanelFooter, Card, EmptyStateItem, DocsCallout } fr
 const props = defineProps({
     groups: Array,
     redirects: Object,
+    errors: Object,
     advancedSeo: Object,
 });
 
@@ -37,6 +38,13 @@ useArchitecturalBackground();
                     :icon="redirects.icon"
                     :heading="__('advanced-seo::messages.redirects')"
                     :description="__('advanced-seo::messages.redirects_description')"
+                />
+                <EmptyStateItem
+                    v-if="errors"
+                    :href="errors.url"
+                    :icon="errors.icon"
+                    :heading="__('advanced-seo::messages.redirect_errors')"
+                    :description="__('advanced-seo::messages.redirect_errors_description')"
                 />
             </ul>
         </Card>

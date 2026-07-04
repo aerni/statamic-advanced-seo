@@ -50,6 +50,7 @@ return [
     'redirect_hits' => 'Hits',
     'redirect_last_hit_at' => 'Last Hit',
     'redirect_errors' => 'Errors',
+    'redirect_errors_description' => 'Review 404s that no redirect handles.',
     'redirect_error_url' => 'Path',
     'redirect_error_first_seen' => 'First Seen',
     'redirect_error_last_seen' => 'Last Seen',

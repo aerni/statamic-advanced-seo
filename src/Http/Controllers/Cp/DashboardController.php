@@ -21,11 +21,14 @@ class DashboardController extends CpController
 
         $canViewRedirects = Redirects::enabled() && User::current()->can('viewAny', Redirect::class);
 
+        $canViewErrors = $canViewRedirects && config('advanced-seo.redirects.errors.enabled');
+
         throw_unless($groups->isNotEmpty() || $canViewRedirects, new NotFoundHttpException);
 
         return Inertia::render('advanced-seo::Dashboard', [
             'groups' => $groups,
             'redirects' => $canViewRedirects ? ['url' => cp_route('advanced-seo.redirects.index'), 'icon' => 'moved'] : null,
+            'errors' => $canViewErrors ? ['url' => cp_route('advanced-seo.redirects.errors.index'), 'icon' => 'alert-warning-exclamation-mark'] : null,
         ]);
     }
 }

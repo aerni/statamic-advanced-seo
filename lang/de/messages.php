@@ -40,6 +40,7 @@ return [
     'redirect_hits' => 'Aufrufe',
     'redirect_last_hit_at' => 'Letzter Aufruf',
     'redirect_errors' => 'Fehler',
+    'redirect_errors_description' => 'Sieh dir 404-Fehler an, die keine Weiterleitung abfängt.',
     'redirect_error_url' => 'Pfad',
     'redirect_error_first_seen' => 'Zuerst gesehen',
     'redirect_error_last_seen' => 'Zuletzt gesehen',
