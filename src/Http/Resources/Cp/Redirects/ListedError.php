@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Facades\Action;
 use Statamic\Facades\Site;
 
 class ListedError extends JsonResource
@@ -36,6 +37,7 @@ class ListedError extends JsonResource
             'destination' => $redirect?->destinationUrl() ?? $redirect?->destination(),
             'redirect_url' => $redirect?->editUrl(),
             'create_redirect_url' => cp_route('advanced-seo.redirects.create').'?source='.urlencode($error->url()).'&site='.$error->site(),
+            'actions' => Action::for($error),
         ];
     }
 

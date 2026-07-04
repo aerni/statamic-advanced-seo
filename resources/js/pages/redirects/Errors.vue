@@ -5,6 +5,7 @@ import { Header, Button, Badge, Listing, StatusIndicator } from '@statamic/cms/u
 defineProps({
     title: String,
     listingUrl: String,
+    actionUrl: String,
     filters: Array,
 });
 </script>
@@ -16,6 +17,7 @@ defineProps({
 
     <Listing
         :url="listingUrl"
+        :action-url="actionUrl"
         :filters="filters"
         :allow-presets="false"
         preferences-prefix="advanced-seo.redirect-errors"

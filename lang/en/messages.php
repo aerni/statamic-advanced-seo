@@ -75,6 +75,7 @@ return [
     'action_disable_button' => 'Disable|Disable :count',
     'action_delete_confirmation' => 'Delete this redirect?|Delete these :count redirects?',
     'action_delete_button' => 'Delete|Delete :count',
+    'action_delete_error_confirmation' => 'Delete this error?|Delete these :count errors?',
     'action_reset_hits' => 'Reset Hits',
     'action_reset_hits_confirmation' => 'Reset the hit tracking for this redirect?|Reset the hit tracking for these :count redirects?',
     'action_reset_hits_button' => 'Reset Hits',

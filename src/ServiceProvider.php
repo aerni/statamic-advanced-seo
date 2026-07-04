@@ -64,6 +64,7 @@ class ServiceProvider extends AddonServiceProvider
         Actions\Statamic\DisableRedirect::class,
         Actions\Statamic\ResetRedirectHits::class,
         Actions\Statamic\DeleteRedirect::class,
+        Actions\Statamic\DeleteRedirectError::class,
     ];
 
     protected $policies = [

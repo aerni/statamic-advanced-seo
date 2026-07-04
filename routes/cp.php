@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Http\Controllers\Cp\AiGenerateController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\DashboardController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\RedirectActionController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\RedirectController;
+use Aerni\AdvancedSeo\Http\Controllers\Cp\RedirectErrorActionController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\RedirectErrorController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetConfigController;
 use Aerni\AdvancedSeo\Http\Controllers\Cp\SeoSetIndexController;
@@ -15,6 +16,8 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
     Route::get('/redirect-errors', [RedirectErrorController::class, 'index'])->name('redirects.errors.index');
+    Route::post('/redirect-errors/actions', [RedirectErrorActionController::class, 'run'])->name('redirects.errors.actions.run');
+    Route::post('/redirect-errors/actions/list', [RedirectErrorActionController::class, 'bulkActions'])->name('redirects.errors.actions.bulk');
     Route::resource('redirects', RedirectController::class)->except('show');
     Route::post('/redirects/actions', [RedirectActionController::class, 'run'])->name('redirects.actions.run');
     Route::post('/redirects/actions/list', [RedirectActionController::class, 'bulkActions'])->name('redirects.actions.bulk');

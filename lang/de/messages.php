@@ -72,6 +72,7 @@ return [
     'action_disable_button' => 'Deaktivieren|:count deaktivieren',
     'action_delete_confirmation' => 'Diese Weiterleitung löschen?|Diese :count Weiterleitungen löschen?',
     'action_delete_button' => 'Löschen|:count löschen',
+    'action_delete_error_confirmation' => 'Diesen Fehler löschen?|Diese :count Fehler löschen?',
     'action_reset_hits' => 'Aufrufe zurücksetzen',
     'action_reset_hits_confirmation' => 'Die Aufrufverfolgung für diese Weiterleitung zurücksetzen?|Die Aufrufverfolgung für diese :count Weiterleitungen zurücksetzen?',
     'action_reset_hits_button' => 'Aufrufe zurücksetzen',

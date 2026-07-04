@@ -61,6 +61,7 @@ class RedirectErrorController extends CpController
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
             'listingUrl' => cp_route('advanced-seo.redirects.errors.index'),
+            'actionUrl' => cp_route('advanced-seo.redirects.errors.actions.run'),
             'filters' => Scope::filters('redirect-errors'),
         ]);
     }
