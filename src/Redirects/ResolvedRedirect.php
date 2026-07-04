@@ -10,6 +10,6 @@ class ResolvedRedirect
         public readonly string $id,
         public readonly ResponseCode $responseCode,
         public readonly ?string $destination,
-        public readonly bool $forwardQueryString = true,
+        public readonly bool $preserveQueryString = true,
     ) {}
 }

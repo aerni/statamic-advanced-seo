@@ -48,8 +48,8 @@ defineProps({
             <template #cell-response_code="{ row: redirect }">
                 {{ redirect.response_code_label }}
             </template>
-            <template #cell-forward_query_string="{ row: redirect }">
-                <Icon v-if="redirect.forward_query_string" name="checkmark" class="size-4" />
+            <template #cell-preserve_query_string="{ row: redirect }">
+                <Icon v-if="redirect.preserve_query_string" name="checkmark" class="size-4" />
             </template>
             <template #cell-automatic="{ row: redirect }">
                 {{ redirect.automatic

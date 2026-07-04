@@ -31,7 +31,7 @@ it('forwards the query string by default', function () {
 });
 
 it('does not forward the query string when the redirect disables it', function () {
-    Redirect::make()->source('/old')->destination('/new')->site('default')->forwardQueryString(false)->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->preserveQueryString(false)->save();
 
     $this->get('/old?ref=abc')->assertRedirect('/new');
 });

@@ -19,7 +19,7 @@ class RedirectModel extends BaseModel
     {
         return [
             'enabled' => 'boolean',
-            'forward_query_string' => 'boolean',
+            'preserve_query_string' => 'boolean',
             'automatic' => 'boolean',
             'response_code' => ResponseCode::class,
         ];

@@ -54,7 +54,7 @@ class RedirectHandler
 
         $this->recordHit($redirect);
 
-        $destination = $redirect->forwardQueryString
+        $destination = $redirect->preserveQueryString
             ? $this->appendQueryString($redirect->destination, $request)
             : $redirect->destination;
 

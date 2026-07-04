@@ -32,7 +32,7 @@ class Redirects extends ResourceCollection
             Column::make('source')->label(__('advanced-seo::fields.redirect_source.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
             Column::make('destination')->label(__('advanced-seo::fields.redirect_destination.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
             Column::make('response_code')->label(__('advanced-seo::fields.redirect_response_code.display'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
-            Column::make('forward_query_string')->label(__('advanced-seo::fields.redirect_forward_query_string.display'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true),
+            Column::make('preserve_query_string')->label(__('advanced-seo::fields.redirect_preserve_query_string.display'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true),
         ]);
 
         if (Site::authorized()->count() > 1) {

@@ -96,7 +96,7 @@ it('prefills the create form from source and site query parameters', function ()
 });
 
 it('renders the edit form as an Inertia page for an existing redirect', function () {
-    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false)->forwardQueryString(false))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false)->preserveQueryString(false))->save();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.redirects.edit', $redirect->id()))
@@ -109,7 +109,7 @@ it('renders the edit form as an Inertia page for an existing redirect', function
             ->where('submitUrl', cp_route('advanced-seo.redirects.update', $redirect->id()))
             ->where('values.source', '/old')
             ->where('values.destination', '/new')
-            ->where('values.forward_query_string', false)
+            ->where('values.preserve_query_string', false)
             ->whereNot('createdAt', null)
         );
 });
@@ -278,10 +278,10 @@ it('requires a destination unless the type is gone', function () {
 
 it('persists the forward query string choice', function () {
     $this->actingAs($this->super)
-        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default', 'forward_query_string' => false])
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default', 'preserve_query_string' => false])
         ->assertOk();
 
-    expect(Redirect::query()->where('site', 'default')->where('source', '/old')->first()->forwardQueryString())->toBeFalse();
+    expect(Redirect::query()->where('site', 'default')->where('source', '/old')->first()->preserveQueryString())->toBeFalse();
 });
 
 it('forbids a viewer from storing a redirect', function () {

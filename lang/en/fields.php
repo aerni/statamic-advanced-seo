@@ -439,8 +439,8 @@ return [
         'option_410' => '410 (Gone)',
     ],
 
-    'redirect_forward_query_string' => [
-        'display' => 'Forward Query String',
+    'redirect_preserve_query_string' => [
+        'display' => 'Preserve Query String',
         'instructions' => 'Append it to the destination URL.',
     ],
 

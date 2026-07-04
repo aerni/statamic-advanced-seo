@@ -37,7 +37,7 @@ class ListedRedirect extends JsonResource
             'destination_is_entry' => Str::startsWith($destination ?? '', 'entry::'),
             'response_code' => $redirect->responseCode()->value,
             'response_code_label' => $redirect->responseCode()->label(),
-            'forward_query_string' => $redirect->responseCode() === ResponseCode::Gone ? null : $redirect->forwardQueryString(),
+            'preserve_query_string' => $redirect->responseCode() === ResponseCode::Gone ? null : $redirect->preserveQueryString(),
             'automatic' => $redirect->automatic(),
             'description' => $redirect->description(),
             'site' => $redirect->site(),

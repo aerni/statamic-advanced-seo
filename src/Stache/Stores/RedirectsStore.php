@@ -42,7 +42,7 @@ class RedirectsStore extends BasicStore
             ->responseCode(ResponseCode::tryFrom(Arr::get($data, 'response_code', ResponseCode::Permanent->value)) ?? ResponseCode::Permanent)
             ->site(basename(dirname($path)))
             ->enabled(Arr::get($data, 'enabled', true))
-            ->forwardQueryString(Arr::get($data, 'forward_query_string', true))
+            ->preserveQueryString(Arr::get($data, 'preserve_query_string', true))
             ->automatic(Arr::get($data, 'automatic', false))
             ->description(Arr::get($data, 'description'))
             ->createdAt(Arr::get($data, 'created_at'));

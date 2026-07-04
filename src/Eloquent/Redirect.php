@@ -21,7 +21,7 @@ class Redirect extends StacheRedirect
             ->responseCode($model->response_code)
             ->site($model->site)
             ->enabled($model->enabled)
-            ->forwardQueryString($model->forward_query_string ?? true)
+            ->preserveQueryString($model->preserve_query_string ?? true)
             ->automatic($model->automatic ?? false)
             ->description($model->description)
             ->createdAt($model->created_at?->timestamp);
@@ -42,7 +42,7 @@ class Redirect extends StacheRedirect
             'response_code' => $source->responseCode(),
             'site' => $source->site(),
             'enabled' => $source->enabled(),
-            'forward_query_string' => $source->responseCode() === ResponseCode::Gone ? null : $source->forwardQueryString(),
+            'preserve_query_string' => $source->responseCode() === ResponseCode::Gone ? null : $source->preserveQueryString(),
             'automatic' => $source->automatic(),
             'description' => $source->description(),
         ]), function (Model $model) use ($source): void {

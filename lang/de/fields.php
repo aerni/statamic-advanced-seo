@@ -439,8 +439,8 @@ return [
         'option_410' => '410 (Entfernt)',
     ],
 
-    'redirect_forward_query_string' => [
-        'display' => 'Query-String weiterleiten',
+    'redirect_preserve_query_string' => [
+        'display' => 'Query-String beibehalten',
         'instructions' => 'An die Ziel-URL anhängen.',
     ],
 

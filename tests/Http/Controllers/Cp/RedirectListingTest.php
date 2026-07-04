@@ -41,7 +41,7 @@ it('returns correct columns in meta', function () {
     expect($columnFields)->toContain('source')
         ->toContain('destination')
         ->toContain('response_code')
-        ->toContain('forward_query_string')
+        ->toContain('preserve_query_string')
         ->toContain('site')
         ->toContain('status')
         ->toContain('automatic')
@@ -60,14 +60,14 @@ it('respects the requested column visibility and order', function () {
 });
 
 it('exposes description and query string forwarding in the row data', function () {
-    Redirect::make()->source('/old')->destination('/new')->site('default')->forwardQueryString(false)->description('A note')->save();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->preserveQueryString(false)->description('A note')->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
         ->json('data');
 
     expect($data[0]['description'])->toBe('A note')
-        ->and($data[0]['forward_query_string'])->toBeFalse();
+        ->and($data[0]['preserve_query_string'])->toBeFalse();
 });
 
 it('exposes the automatic flag in the row data', function () {
@@ -410,7 +410,7 @@ it('marks the native columns as sortable', function () {
     expect($columns['status']['sortable'])->toBeTrue()
         ->and($columns['automatic']['sortable'])->toBeTrue()
         ->and($columns['description']['sortable'])->toBeTrue()
-        ->and($columns['forward_query_string']['sortable'])->toBeTrue();
+        ->and($columns['preserve_query_string']['sortable'])->toBeTrue();
 });
 
 it('sorts by status, mapping to the enabled field', function () {

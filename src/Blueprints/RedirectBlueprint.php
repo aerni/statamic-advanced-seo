@@ -101,11 +101,11 @@ class RedirectBlueprint extends BaseBlueprint
                     ],
                 ],
                 [
-                    'handle' => 'forward_query_string',
+                    'handle' => 'preserve_query_string',
                     'field' => [
                         'type' => 'toggle',
-                        'display' => __('advanced-seo::fields.redirect_forward_query_string.display'),
-                        'instructions' => __('advanced-seo::fields.redirect_forward_query_string.instructions'),
+                        'display' => __('advanced-seo::fields.redirect_preserve_query_string.display'),
+                        'instructions' => __('advanced-seo::fields.redirect_preserve_query_string.instructions'),
                         'default' => true,
                         'if' => ['response_code' => 'isnt '.ResponseCode::Gone->value],
                     ],

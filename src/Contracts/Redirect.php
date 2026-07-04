@@ -21,7 +21,7 @@ interface Redirect
 
     public function enabled(?bool $enabled = null): bool|self;
 
-    public function forwardQueryString(?bool $forwardQueryString = null): bool|self;
+    public function preserveQueryString(?bool $preserveQueryString = null): bool|self;
 
     public function automatic(?bool $automatic = null): bool|self;
 

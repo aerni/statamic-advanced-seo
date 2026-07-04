@@ -33,7 +33,7 @@ it('exposes fluent accessors with sensible defaults', function () {
     expect($redirect->responseCode())->toBe(ResponseCode::Permanent)
         ->and($redirect->sourceType())->toBe(SourceType::Exact)
         ->and($redirect->enabled())->toBeTrue()
-        ->and($redirect->forwardQueryString())->toBeTrue()
+        ->and($redirect->preserveQueryString())->toBeTrue()
         ->and($redirect->automatic())->toBeFalse()
         ->and($redirect->site())->toBe('default');
 });
@@ -66,7 +66,7 @@ it('serializes only its fields to file data', function () {
         'destination' => '/new',
         'response_code' => 302,
         'enabled' => false,
-        'forward_query_string' => true,
+        'preserve_query_string' => true,
         'automatic' => true,
         'description' => 'Note',
         'created_at' => null,
@@ -100,7 +100,7 @@ it('formats created_at as an iso string and returns null when unset', function (
         ->toBe(Carbon::createFromTimestamp($timestamp, 'UTC')->toIso8601String());
 });
 
-it('does not persist a destination or query string forwarding for a gone redirect', function () {
+it('does not persist a destination or query string preservation for a gone redirect', function () {
     $redirect = (new Redirect)
         ->id('abc')
         ->source('/old')
@@ -108,7 +108,7 @@ it('does not persist a destination or query string forwarding for a gone redirec
         ->site('default');
 
     expect($redirect->fileData()['destination'])->toBeNull()
-        ->and($redirect->fileData()['forward_query_string'])->toBeNull();
+        ->and($redirect->fileData()['preserve_query_string'])->toBeNull();
 });
 
 it('builds its path from the redirects store directory, site, and id', function () {
