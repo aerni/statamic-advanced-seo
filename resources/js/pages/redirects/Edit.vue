@@ -88,7 +88,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 
     <Header>
         <template #title>
-            <StatusIndicator :status="enabled ? 'published' : 'draft'" />
+            <StatusIndicator :status="props.enabled ? 'published' : 'draft'" />
             {{ heading }}
         </template>
         <ItemActions
