@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
 use Illuminate\Support\Facades\Queue;
 use Statamic\Facades\Site;
@@ -136,4 +137,35 @@ it('does not record a hit when hit logging is disabled', function () {
     $this->get('/old')->assertRedirect('/new');
 
     Queue::assertNotPushed(RecordRedirectHitJob::class);
+});
+
+it('records an error for an unmatched 404 when error logging is enabled', function () {
+    config(['advanced-seo.redirects.errors.enabled' => true]);
+    Queue::fake();
+
+    $this->get('/Missing-Page')->assertNotFound();
+
+    Queue::assertPushed(RecordRedirectErrorJob::class, function ($job) {
+        return $job->url === '/missing-page' && $job->site === 'default';
+    });
+});
+
+it('does not record an error when a redirect matches', function () {
+    config(['advanced-seo.redirects.errors.enabled' => true]);
+    Queue::fake();
+
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
+
+    $this->get('/old')->assertRedirect('/new');
+
+    Queue::assertNotPushed(RecordRedirectErrorJob::class);
+});
+
+it('does not record an error when error logging is disabled', function () {
+    config(['advanced-seo.redirects.errors.enabled' => false]);
+    Queue::fake();
+
+    $this->get('/missing')->assertNotFound();
+
+    Queue::assertNotPushed(RecordRedirectErrorJob::class);
 });

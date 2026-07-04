@@ -5,11 +5,13 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
+use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Uri;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class RedirectHandler
 {
@@ -35,6 +37,8 @@ class RedirectHandler
         );
 
         if (! $redirect) {
+            $this->recordError($request, $site);
+
             return;
         }
 
@@ -64,6 +68,17 @@ class RedirectHandler
         }
 
         RecordRedirectHitJob::dispatch($redirect->id);
+    }
+
+    protected function recordError(Request $request, $site): void
+    {
+        if (! config('advanced-seo.redirects.errors.enabled')) {
+            return;
+        }
+
+        $url = Str::lower(RedirectPatternMatcher::normalizePath($site->relativePath($request->url())));
+
+        RecordRedirectErrorJob::dispatch($url, $site->handle());
     }
 
     protected function redirectsToItself(string $destination, Request $request): bool
