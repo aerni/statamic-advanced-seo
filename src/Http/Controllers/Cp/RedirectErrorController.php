@@ -58,13 +58,10 @@ class RedirectErrorController extends CpController
             return $resource->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 
-        $hasErrors = RedirectFacade::errors()->query()->whereIn('site', $sites)->first() !== null;
-
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
             'listingUrl' => cp_route('advanced-seo.redirects.errors.index'),
             'filters' => Scope::filters('redirect-errors'),
-            'hasErrors' => $hasErrors,
         ]);
     }
 

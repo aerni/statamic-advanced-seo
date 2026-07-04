@@ -48,7 +48,6 @@ return [
     'redirect_error_status_disabled' => 'Deaktiviert',
     'redirect_error_status_unhandled' => 'Unbehandelt',
     'redirect_error_create_redirect' => 'Weiterleitung erstellen',
-    'redirect_errors_empty' => 'Es wurden noch keine Weiterleitungsfehler erfasst.',
 
     // Flash messages
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',

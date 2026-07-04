@@ -58,7 +58,6 @@ return [
     'redirect_error_status_disabled' => 'Disabled',
     'redirect_error_status_unhandled' => 'Unhandled',
     'redirect_error_create_redirect' => 'Create Redirect',
-    'redirect_errors_empty' => 'No redirect errors have been recorded yet.',
 
     // UI
     'origins' => 'Origins',
