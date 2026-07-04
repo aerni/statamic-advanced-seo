@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
 
@@ -51,7 +52,8 @@ class ListedError extends JsonResource
 
     /**
      * Resolve an entry destination to its URL, but leave relative paths and
-     * full URLs as they were entered.
+     * full URLs as they were entered. Entries in the redirect's own site use
+     * a relative URI; entries in another site use the absolute URL.
      */
     protected function destination(?Redirect $redirect): ?string
     {
@@ -59,10 +61,16 @@ class ListedError extends JsonResource
             return null;
         }
 
-        if (Str::startsWith($destination, 'entry::')) {
-            return $redirect->destinationUrl() ?? $destination;
+        if (! Str::startsWith($destination, 'entry::')) {
+            return $destination;
         }
 
-        return $destination;
+        if (! $entry = Entry::find(Str::after($destination, 'entry::'))) {
+            return $destination;
+        }
+
+        return $entry->locale() === $redirect->site()
+            ? $entry->url()
+            : $entry->absoluteUrl();
     }
 }
