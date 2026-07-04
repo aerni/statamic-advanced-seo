@@ -46,6 +46,6 @@ class RedirectSite extends Filter
 
     public function visibleTo($key): bool
     {
-        return $key === 'redirects' && Site::multiEnabled();
+        return $key === 'redirects' && Site::authorized()->count() > 1;
     }
 }

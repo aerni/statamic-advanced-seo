@@ -22,7 +22,7 @@ class Errors extends ResourceCollection
     {
         $columns = new Columns(array_values(array_filter([
             Column::make('url')->label(__('advanced-seo::messages.redirect_error_url'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),
-            Site::multiEnabled()
+            Site::authorized()->count() > 1
                 ? Column::make('site')->label(__('Site'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
                 : null,
             Column::make('hits')->label(__('advanced-seo::messages.redirect_hits'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true),

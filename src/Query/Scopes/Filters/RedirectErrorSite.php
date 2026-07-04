@@ -41,6 +41,6 @@ class RedirectErrorSite extends Filter
 
     public function visibleTo($key): bool
     {
-        return $key === 'redirect-errors' && Site::multiEnabled();
+        return $key === 'redirect-errors' && Site::authorized()->count() > 1;
     }
 }

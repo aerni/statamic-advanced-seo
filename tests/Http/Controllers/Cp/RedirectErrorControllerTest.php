@@ -117,6 +117,27 @@ it('only lists errors for sites the user can access', function () {
     expect($urls)->toContain('/allowed')->not->toContain('/forbidden');
 });
 
+it('shows the site column only when the user can access multiple sites', function () {
+    Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();
+
+    $singleSite = collect($this->actingAs($this->user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index'))
+        ->json('meta.columns'))->pluck('field');
+
+    expect($singleSite)->not->toContain('site');
+
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'fr' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+
+    $multiSite = collect($this->actingAs($this->user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index'))
+        ->json('meta.columns'))->pluck('field');
+
+    expect($multiSite)->toContain('site');
+});
+
 it('404s when error logging is disabled', function () {
     config(['advanced-seo.redirects.errors.enabled' => false]);
 

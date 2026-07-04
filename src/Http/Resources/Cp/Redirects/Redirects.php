@@ -35,7 +35,7 @@ class Redirects extends ResourceCollection
             Column::make('forward_query_string')->label(__('advanced-seo::fields.redirect_forward_query_string.display'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true),
         ]);
 
-        if (Site::multiEnabled()) {
+        if (Site::authorized()->count() > 1) {
             $columns->push(
                 Column::make('site')->label(__('Site'))->sortable(true)->defaultVisibility(true)->visible(true)->listable(true)
             );
