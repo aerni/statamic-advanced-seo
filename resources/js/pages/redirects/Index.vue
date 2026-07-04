@@ -41,9 +41,9 @@ defineProps({
                 <a v-if="redirect.destination_url" :href="redirect.destination_url" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5">
                     <Icon v-if="redirect.destination_is_entry" name="collections" class="shrink-0 size-4" />
                     <Icon v-else name="external-link" class="shrink-0 size-4" />
-                    <span v-text="redirect.destination" />
+                    <span class="truncate max-w-[20rem]" v-text="redirect.destination" />
                 </a>
-                <span v-else v-text="redirect.destination" />
+                <span v-else class="truncate max-w-[20rem] block" v-text="redirect.destination" />
             </template>
             <template #cell-response_code="{ row: redirect }">
                 {{ redirect.response_code_label }}
