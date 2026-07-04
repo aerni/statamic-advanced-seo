@@ -3,14 +3,11 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder as Contract;
-use Illuminate\Support\Collection;
-use Statamic\Query\EloquentQueryBuilder;
 
-class RedirectErrorQueryBuilder extends EloquentQueryBuilder implements Contract
+class RedirectErrorQueryBuilder extends QueryBuilder implements Contract
 {
-    protected function transform($items, $columns = ['*'])
+    protected function toItem($model)
     {
-        return Collection::make($items)
-            ->map(fn ($model) => RedirectError::fromModel($model));
+        return RedirectError::fromModel($model);
     }
 }
