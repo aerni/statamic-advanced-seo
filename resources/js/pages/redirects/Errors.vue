@@ -1,6 +1,6 @@
 <script setup>
 import { Head } from '@statamic/cms/inertia';
-import { Header, Button, Listing, Icon, Panel, Card, StatusIndicator } from '@statamic/cms/ui';
+import { Header, Button, Badge, Listing, Icon, Panel, Card, StatusIndicator } from '@statamic/cms/ui';
 
 defineProps({
     title: String,
@@ -45,11 +45,14 @@ defineProps({
                 <a
                     v-else
                     :href="error.redirect_url"
-                    class="flex items-center gap-1.5"
                     :title="__(`advanced-seo::messages.redirect_error_status_${error.status}`)"
                 >
-                    <StatusIndicator :status="error.status === 'handled' ? 'published' : 'draft'" />
-                    <span v-text="error.destination" />
+                    <Badge color="default">
+                        <span class="flex items-center gap-1.5">
+                            <StatusIndicator :status="error.status === 'handled' ? 'published' : 'draft'" />
+                            <span v-text="error.destination" />
+                        </span>
+                    </Badge>
                 </a>
             </template>
         </Listing>
