@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -35,6 +36,43 @@ it('deletes the selected errors', function () {
         ])->assertOk();
 
     expect(Redirect::errors()->all())->toHaveCount(0);
+});
+
+it('does not delete errors without the delete redirects permission', function () {
+    $role = tap(Role::make('viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    $user = tap(User::make()->assignRole('viewer'))->save();
+
+    $error = tap(Redirect::errors()->make()->url('/a')->site('default'))->save();
+
+    $this->actingAs($user)
+        ->post(cp_route('advanced-seo.redirects.errors.actions.run'), [
+            'action' => 'delete_redirect_error',
+            'selections' => [$error->id()],
+            'values' => [],
+        ]);
+
+    expect(Redirect::errors()->find($error->id()))->not->toBeNull();
+});
+
+it('does not delete errors from sites the user cannot access', function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'fr' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+
+    $role = tap(Role::make('deleter')->addPermission(['access cp', 'view redirects', 'delete redirects', 'access default site']))->save();
+    $user = tap(User::make()->assignRole('deleter'))->save();
+
+    $error = tap(Redirect::errors()->make()->url('/a')->site('fr'))->save();
+
+    $this->actingAs($user)
+        ->post(cp_route('advanced-seo.redirects.errors.actions.run'), [
+            'action' => 'delete_redirect_error',
+            'selections' => [$error->id()],
+            'values' => [],
+        ]);
+
+    expect(Redirect::errors()->find($error->id()))->not->toBeNull();
 });
 
 it('404s for error actions when error logging is disabled', function () {

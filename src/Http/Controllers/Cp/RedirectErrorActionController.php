@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\ActionController;
 
 class RedirectErrorActionController extends ActionController
@@ -26,6 +27,10 @@ class RedirectErrorActionController extends ActionController
 
     protected function getSelectedItems($items, $context)
     {
-        return $items->map(fn ($id) => RedirectFacade::errors()->find($id))->filter();
+        $sites = Site::authorized()->map->handle()->all();
+
+        return $items->map(fn ($id) => RedirectFacade::errors()->find($id))
+            ->filter()
+            ->filter(fn ($error) => in_array($error->site(), $sites));
     }
 }

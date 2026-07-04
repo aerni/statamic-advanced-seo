@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -94,6 +95,26 @@ it('filters by site', function () {
 
     expect($response->json('data'))->toHaveCount(1)
         ->and($response->json('data.0.url'))->toBe('/two');
+});
+
+it('only lists errors for sites the user can access', function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'fr' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+
+    $role = tap(Role::make('limited')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    $user = tap(User::make()->assignRole('limited'))->save();
+
+    Redirect::errors()->make()->url('/allowed')->site('default')->count(1)->save();
+    Redirect::errors()->make()->url('/forbidden')->site('fr')->count(1)->save();
+
+    $urls = collect($this->actingAs($user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertOk()
+        ->json('data'))->pluck('url');
+
+    expect($urls)->toContain('/allowed')->not->toContain('/forbidden');
 });
 
 it('404s when error logging is disabled', function () {
