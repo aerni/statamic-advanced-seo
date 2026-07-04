@@ -26,10 +26,18 @@ it('preloads the default site handle', function () {
     expect(preloadSource()['defaultSite'])->toBe(Site::default()->handle());
 });
 
-it('preloads whether multiple sites are enabled', function () {
+it('marks the field as multisite when the user can access more than one site', function () {
     test()->actingAs(tap(User::make()->makeSuper())->save());
 
     expect(preloadSource()['multisite'])->toBeTrue();
+});
+
+it('does not mark the field as multisite when the user can access a single site', function () {
+    $role = tap(Role::make('editor')->addPermission('access default site'))->save();
+    $user = tap(User::make()->assignRole('editor'))->save();
+    test()->actingAs($user);
+
+    expect(preloadSource()['multisite'])->toBeFalse();
 });
 
 it('preloads authorized sites keyed by handle with their names for a super user', function () {

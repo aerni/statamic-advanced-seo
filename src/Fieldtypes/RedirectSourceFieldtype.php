@@ -14,7 +14,7 @@ class RedirectSourceFieldtype extends Fieldtype
         return [
             'sites' => Site::authorized()->mapWithKeys(fn ($site) => [$site->handle() => $site->name()])->all(),
             'defaultSite' => Site::default()->handle(),
-            'multisite' => Site::multiEnabled(),
+            'multisite' => Site::authorized()->count() > 1,
         ];
     }
 }
