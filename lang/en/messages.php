@@ -53,6 +53,8 @@ return [
     'redirect_error_url' => 'Path',
     'redirect_error_last_seen' => 'Last Seen',
     'redirect_error_handled' => 'Handled',
+    'redirect_error_create_redirect' => 'Create Redirect',
+    'redirect_errors_empty' => 'No redirect errors have been recorded yet.',
 
     // UI
     'origins' => 'Origins',

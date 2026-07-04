@@ -43,6 +43,8 @@ return [
     'redirect_error_url' => 'Pfad',
     'redirect_error_last_seen' => 'Zuletzt gesehen',
     'redirect_error_handled' => 'Behandelt',
+    'redirect_error_create_redirect' => 'Weiterleitung erstellen',
+    'redirect_errors_empty' => 'Es wurden noch keine Weiterleitungsfehler erfasst.',
 
     // Flash messages
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',

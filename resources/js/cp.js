@@ -4,6 +4,7 @@ import Edit from './pages/Edit.vue';
 import RedirectsIndex from './pages/redirects/Index.vue';
 import RedirectsCreate from './pages/redirects/Create.vue';
 import RedirectsEdit from './pages/redirects/Edit.vue';
+import RedirectsErrors from './pages/redirects/Errors.vue';
 import SeoFieldtype from './components/fieldtypes/SeoFieldtype.vue'
 import SeoIndexFieldtype from './components/fieldtypes/SeoIndexFieldtype.vue'
 import SiteOriginsFieldtype from './components/fieldtypes/SiteOriginsFieldtype.vue'
@@ -24,6 +25,7 @@ Statamic.booting(() => {
     Statamic.$inertia.register('advanced-seo::Redirects/Index', RedirectsIndex)
     Statamic.$inertia.register('advanced-seo::Redirects/Create', RedirectsCreate)
     Statamic.$inertia.register('advanced-seo::Redirects/Edit', RedirectsEdit)
+    Statamic.$inertia.register('advanced-seo::Redirects/Errors', RedirectsErrors)
     Statamic.$components.register('seo-fieldtype', SeoFieldtype)
     Statamic.$components.register('seo-fieldtype-index', SeoIndexFieldtype)
     Statamic.$components.register('site_origins-fieldtype', SiteOriginsFieldtype)
