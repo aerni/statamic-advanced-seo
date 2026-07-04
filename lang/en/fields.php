@@ -428,7 +428,7 @@ return [
 
     'redirect_destination' => [
         'display' => 'Destination',
-        'instructions' => 'A path (`/about`), full URL, or entry. Use `$1`, `$2` for captures.',
+        'instructions' => 'A path relative to the source site (`/about`), full URL, or entry. Use `$1`, `$2` for captures.',
     ],
 
     'redirect_response_code' => [

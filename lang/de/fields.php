@@ -428,7 +428,7 @@ return [
 
     'redirect_destination' => [
         'display' => 'Ziel',
-        'instructions' => 'Ein Pfad (`/about`), eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2` für Captures.',
+        'instructions' => 'Ein Pfad relativ zur Quell-Website (`/about`), eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2` für Captures.',
     ],
 
     'redirect_response_code' => [
