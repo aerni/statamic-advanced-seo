@@ -18,9 +18,6 @@ class RedirectBlueprint extends BaseBlueprint
             'main' => [
                 $this->main(),
             ],
-            'sidebar' => [
-                $this->sidebar(),
-            ],
         ];
     }
 
@@ -58,6 +55,32 @@ class RedirectBlueprint extends BaseBlueprint
                 ],
             ],
             [
+                'handle' => 'response_code',
+                'field' => [
+                    'type' => 'select',
+                    'display' => __('advanced-seo::fields.redirect_response_code.display'),
+                    'instructions' => __('advanced-seo::fields.redirect_response_code.instructions'),
+                    'options' => collect(ResponseCode::cases())
+                        ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
+                        ->all(),
+                    'default' => ResponseCode::Permanent->value,
+                    'clearable' => false,
+                    'width' => 50,
+                    'validate' => ['required'],
+                ],
+            ],
+            [
+                'handle' => 'preserve_query_string',
+                'field' => [
+                    'type' => 'toggle',
+                    'display' => __('advanced-seo::fields.redirect_preserve_query_string.display'),
+                    'instructions' => __('advanced-seo::fields.redirect_preserve_query_string.instructions'),
+                    'default' => true,
+                    'width' => 50,
+                    'if' => ['response_code' => 'isnt '.ResponseCode::Gone->value],
+                ],
+            ],
+            [
                 'handle' => 'description',
                 'field' => [
                     'type' => 'textarea',
@@ -80,37 +103,5 @@ class RedirectBlueprint extends BaseBlueprint
         }
 
         return ['fields' => $fields];
-    }
-
-    protected function sidebar(): array
-    {
-        return [
-            'fields' => [
-                [
-                    'handle' => 'response_code',
-                    'field' => [
-                        'type' => 'select',
-                        'display' => __('advanced-seo::fields.redirect_response_code.display'),
-                        'instructions' => __('advanced-seo::fields.redirect_response_code.instructions'),
-                        'options' => collect(ResponseCode::cases())
-                            ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
-                            ->all(),
-                        'default' => ResponseCode::Permanent->value,
-                        'clearable' => false,
-                        'validate' => ['required'],
-                    ],
-                ],
-                [
-                    'handle' => 'preserve_query_string',
-                    'field' => [
-                        'type' => 'toggle',
-                        'display' => __('advanced-seo::fields.redirect_preserve_query_string.display'),
-                        'instructions' => __('advanced-seo::fields.redirect_preserve_query_string.instructions'),
-                        'default' => true,
-                        'if' => ['response_code' => 'isnt '.ResponseCode::Gone->value],
-                    ],
-                ],
-            ],
-        ];
     }
 }
