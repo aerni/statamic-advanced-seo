@@ -35,8 +35,8 @@ class ListedError extends JsonResource
             'site_name' => Site::get($error->site())?->name() ?? $error->site(),
             'status' => $this->status($redirect),
             'destination' => $redirect?->destinationUrl() ?? $redirect?->destination(),
+            'response_code_label' => $redirect?->responseCode()->label(),
             'redirect_url' => $redirect?->editUrl(),
-            'create_redirect_url' => cp_route('advanced-seo.redirects.create').'?source='.urlencode($error->url()).'&site='.$error->site(),
             'actions' => Action::for($error),
         ];
     }

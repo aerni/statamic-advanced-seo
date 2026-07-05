@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
+use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
@@ -14,6 +15,7 @@ use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -58,11 +60,20 @@ class RedirectErrorController extends CpController
             return $resource->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 
+        $canCreate = User::current()->can('create', Redirect::class);
+        $createBlueprint = $canCreate ? RedirectBlueprint::definition() : null;
+        $createFields = $createBlueprint?->fields()->preProcess();
+
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
             'listingUrl' => cp_route('advanced-seo.redirects.errors.index'),
             'actionUrl' => cp_route('advanced-seo.redirects.errors.actions.run'),
             'filters' => Scope::filters('redirect-errors'),
+            'canCreate' => $canCreate,
+            'createUrl' => $canCreate ? cp_route('advanced-seo.redirects.store') : null,
+            'createBlueprint' => $createBlueprint?->toPublishArray(),
+            'createValues' => $createFields?->values()->all(),
+            'createMeta' => $createFields?->meta()->all(),
         ]);
     }
 

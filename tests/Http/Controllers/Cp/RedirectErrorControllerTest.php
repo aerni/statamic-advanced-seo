@@ -1,7 +1,9 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -33,8 +35,20 @@ it('lists errors with a derived redirect status', function () {
 
     expect($response->json('data.0.redirect_url'))->not->toBeNull()
         ->and($response->json('data.1.redirect_url'))->toBeNull()
-        ->and($response->json('data.1.create_redirect_url'))->toContain('source=%2Funhandled')
         ->and(collect($response->json('data.0.actions'))->pluck('handle'))->toContain('delete_redirect_error');
+});
+
+it('labels a gone redirect with its response code when it has no destination', function () {
+    Redirect::errors()->make()->url('/gone')->site('default')->count(1)->save();
+    Redirect::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+
+    $response = $this->actingAs($this->user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertOk();
+
+    $response->assertJsonPath('data.0.status', 'handled')
+        ->assertJsonPath('data.0.destination', null)
+        ->assertJsonPath('data.0.response_code_label', '410 (Gone)');
 });
 
 it('reports an error covered only by a disabled redirect as disabled', function () {
@@ -136,6 +150,40 @@ it('shows the site column only when the user can access multiple sites', functio
         ->json('meta.columns'))->pluck('field');
 
     expect($multiSite)->toContain('site');
+});
+
+it('includes the create form payload for a user who can create redirects', function () {
+    Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+
+    $this->actingAs($this->user)
+        ->get(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('advanced-seo::Redirects/Errors')
+            ->where('canCreate', true)
+            ->where('createUrl', cp_route('advanced-seo.redirects.store'))
+            ->has('createBlueprint')
+            ->has('createMeta')
+            ->has('createValues.destination')
+            ->has('createValues.response_code')
+        );
+});
+
+it('omits the create form payload for a user who cannot create redirects', function () {
+    Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);
+
+    tap(Role::make('viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    $viewer = tap(User::make()->assignRole('viewer'))->save();
+
+    $this->actingAs($viewer)
+        ->get(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('canCreate', false)
+            ->where('createUrl', null)
+            ->where('createBlueprint', null)
+            ->where('createMeta', null)
+        );
 });
 
 it('404s when error logging is disabled', function () {
