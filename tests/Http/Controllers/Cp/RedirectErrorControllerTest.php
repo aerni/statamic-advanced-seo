@@ -117,7 +117,7 @@ it('only lists errors for sites the user can access', function () {
         'fr' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
     ]);
 
-    $role = tap(Role::make('limited')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    $role = tap(Role::make('limited')->addPermission(['access cp', 'manage redirects', 'access default site']))->save();
     $user = tap(User::make()->assignRole('limited'))->save();
 
     Redirect::errors()->make()->url('/allowed')->site('default')->count(1)->save();
@@ -169,21 +169,15 @@ it('includes the create form payload for a user who can create redirects', funct
         );
 });
 
-it('omits the create form payload for a user who cannot create redirects', function () {
+it('forbids the errors index without the manage redirects permission', function () {
     Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);
 
-    tap(Role::make('viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    tap(Role::make('viewer')->addPermission(['access cp', 'access default site']))->save();
     $viewer = tap(User::make()->assignRole('viewer'))->save();
 
     $this->actingAs($viewer)
-        ->get(cp_route('advanced-seo.redirects.errors.index'))
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->where('canCreate', false)
-            ->where('createUrl', null)
-            ->where('createBlueprint', null)
-            ->where('createMeta', null)
-        );
+        ->getJson(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertForbidden();
 });
 
 it('includes the clear payload when the user can clear errors', function () {
@@ -218,7 +212,7 @@ it('only clears errors of sites the user can access', function () {
         'fr' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
     ]);
 
-    tap(Role::make('limited')->addPermission(['access cp', 'view redirects', 'edit redirects', 'delete redirects', 'access default site']))->save();
+    tap(Role::make('limited')->addPermission(['access cp', 'manage redirects', 'access default site']))->save();
     $user = tap(User::make()->assignRole('limited'))->save();
 
     Redirect::errors()->make()->url('/allowed')->site('default')->count(1)->save();
@@ -235,7 +229,7 @@ it('only clears errors of sites the user can access', function () {
 it('forbids clearing without permission', function () {
     Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);
 
-    tap(Role::make('viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    tap(Role::make('viewer')->addPermission(['access cp', 'access default site']))->save();
     $viewer = tap(User::make()->assignRole('viewer'))->save();
 
     Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();

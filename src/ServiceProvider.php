@@ -214,7 +214,7 @@ class ServiceProvider extends AddonServiceProvider
                 ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->url())->icon($group->icon()));
 
             $canViewRedirects = Features\Redirects::enabled()
-                && User::current()->can('viewAny', Contracts\Redirect::class);
+                && User::current()->can('manage', Contracts\Redirect::class);
 
             if ($canViewRedirects) {
                 $navItems->push(
@@ -273,23 +273,10 @@ class ServiceProvider extends AddonServiceProvider
                         ->description(__('advanced-seo::messages.permission_edit_content_description'));
                 });
 
-                Permission::register('view redirects', function ($permission) {
+                Permission::register('manage redirects', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_view_redirects'))
-                        ->description(__('advanced-seo::messages.permission_view_redirects_description'))
-                        ->children([
-                            Permission::make('edit redirects')
-                                ->label(__('advanced-seo::messages.permission_edit_redirects'))
-                                ->description(__('advanced-seo::messages.permission_edit_redirects_description'))
-                                ->children([
-                                    Permission::make('create redirects')
-                                        ->label(__('advanced-seo::messages.permission_create_redirects'))
-                                        ->description(__('advanced-seo::messages.permission_create_redirects_description')),
-                                    Permission::make('delete redirects')
-                                        ->label(__('advanced-seo::messages.permission_delete_redirects'))
-                                        ->description(__('advanced-seo::messages.permission_delete_redirects_description')),
-                                ]),
-                        ]);
+                        ->label(__('advanced-seo::messages.permission_manage_redirects'))
+                        ->description(__('advanced-seo::messages.permission_manage_redirects_description'));
                 });
             });
         });

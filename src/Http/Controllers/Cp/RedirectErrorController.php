@@ -29,7 +29,7 @@ class RedirectErrorController extends CpController
     {
         throw_unless(RedirectsFeature::enabled() && config('advanced-seo.redirects.errors.enabled'), new NotFoundHttpException);
 
-        $this->authorize('viewAny', Redirect::class);
+        $this->authorize('manage', Redirect::class);
 
         $sites = Site::authorized()->map->handle()->all();
 
@@ -60,11 +60,11 @@ class RedirectErrorController extends CpController
             return $resource->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 
-        $canCreate = User::current()->can('create', Redirect::class);
+        $canCreate = User::current()->can('manage', Redirect::class);
         $createBlueprint = $canCreate ? RedirectBlueprint::definition() : null;
         $createFields = $createBlueprint?->fields()->preProcess();
 
-        $canClear = User::current()->can('delete redirects');
+        $canClear = User::current()->can('manage redirects');
 
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
@@ -86,7 +86,7 @@ class RedirectErrorController extends CpController
     {
         throw_unless(RedirectsFeature::enabled() && config('advanced-seo.redirects.errors.enabled'), new NotFoundHttpException);
 
-        abort_unless(User::current()->can('delete redirects'), 403);
+        abort_unless(User::current()->can('manage redirects'), 403);
 
         RedirectFacade::errors()->query()
             ->whereIn('site', Site::authorized()->map->handle()->all())

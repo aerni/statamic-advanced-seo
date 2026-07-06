@@ -25,35 +25,15 @@ class RedirectPolicy
         }
     }
 
-    public function viewAny($user): bool
+    public function manage($user, $redirect = null): bool
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission('view redirects')
-            && $this->userCanAccessSite($user, Site::selected());
-    }
+        $site = $redirect instanceof Redirect
+            ? Site::get($redirect->site())
+            : Site::selected();
 
-    public function create($user): bool
-    {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('create redirects')
-            && $this->userCanAccessSite($user, Site::selected());
-    }
-
-    public function edit($user, Redirect $redirect): bool
-    {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('edit redirects')
-            && $this->userCanAccessSite($user, Site::get($redirect->site()));
-    }
-
-    public function delete($user, Redirect $redirect): bool
-    {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('delete redirects')
-            && $this->userCanAccessSite($user, Site::get($redirect->site()));
+        return $user->hasPermission('manage redirects')
+            && $this->userCanAccessSite($user, $site);
     }
 }

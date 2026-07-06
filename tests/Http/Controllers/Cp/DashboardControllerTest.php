@@ -27,7 +27,7 @@ it('passes groups to the dashboard', function () {
         ->assertInertia(fn ($page) => $page->has('groups'));
 });
 
-it('passes redirects prop when redirects feature is enabled and user can view redirects', function () {
+it('passes redirects prop when redirects feature is enabled and user can manage redirects', function () {
     config(['advanced-seo.redirects.enabled' => true]);
     flushBlink();
 
@@ -73,7 +73,7 @@ it('passes null errors prop when error logging is disabled', function () {
         ->assertInertia(fn ($page) => $page->where('errors', null));
 });
 
-it('passes null redirects prop when user cannot view redirects', function () {
+it('passes null redirects prop when user cannot manage redirects', function () {
     config(['advanced-seo.redirects.enabled' => true]);
     flushBlink();
 
@@ -90,7 +90,7 @@ it('returns 200 for a redirects-only user with no seo set access', function () {
     config(['advanced-seo.redirects.enabled' => true]);
     flushBlink();
 
-    $role = tap(Role::make('redirect_viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    $role = tap(Role::make('redirect_viewer')->addPermission(['access cp', 'manage redirects', 'access default site']))->save();
     $user = tap(User::make()->assignRole('redirect_viewer'))->save();
 
     $this->actingAs($user)

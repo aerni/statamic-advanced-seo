@@ -123,7 +123,7 @@ it('only returns redirects for sites a non-super user is authorized to view', fu
     Redirect::make()->source('/en-page')->destination('/x')->site('default')->save();
     Redirect::make()->source('/fr-page')->destination('/y')->site('french')->save();
 
-    $role = tap(Role::make('default_viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    $role = tap(Role::make('default_viewer')->addPermission(['access cp', 'manage redirects', 'access default site']))->save();
     $user = tap(User::make()->assignRole('default_viewer'))->save();
 
     $data = $this->actingAs($user)

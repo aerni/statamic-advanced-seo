@@ -29,7 +29,7 @@ class DeleteRedirectError extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('delete redirects')
+        return $user->can('manage redirects')
             && $user->can('view', Site::get($item->site()));
     }
 

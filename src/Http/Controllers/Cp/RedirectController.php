@@ -33,7 +33,7 @@ class RedirectController extends CpController
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
-        $this->authorize('viewAny', Redirect::class);
+        $this->authorize('manage', Redirect::class);
 
         if ($request->wantsJson()) {
             $query = RedirectFacade::query()
@@ -95,7 +95,7 @@ class RedirectController extends CpController
             'createUrl' => cp_route('advanced-seo.redirects.create'),
             'listingUrl' => cp_route('advanced-seo.redirects.index'),
             'actionUrl' => cp_route('advanced-seo.redirects.actions.run'),
-            'canCreate' => User::current()->can('create', Redirect::class),
+            'canCreate' => User::current()->can('manage', Redirect::class),
             'filters' => Scope::filters('redirects'),
             'hasRedirects' => $hasRedirects,
         ]);
@@ -146,7 +146,7 @@ class RedirectController extends CpController
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
-        $this->authorize('create', Redirect::class);
+        $this->authorize('manage', Redirect::class);
 
         $blueprint = RedirectBlueprint::definition();
 
@@ -171,7 +171,7 @@ class RedirectController extends CpController
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
-        $this->authorize('edit', $redirect);
+        $this->authorize('manage', $redirect);
 
         $blueprint = RedirectBlueprint::definition();
 
@@ -212,7 +212,7 @@ class RedirectController extends CpController
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
-        $this->authorize('create', Redirect::class);
+        $this->authorize('manage', Redirect::class);
 
         $values = $this->validateAndProcess($request, null);
         $values['enabled'] = $request->boolean('enabled', true);
@@ -228,7 +228,7 @@ class RedirectController extends CpController
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
-        $this->authorize('edit', $redirect);
+        $this->authorize('manage', $redirect);
 
         $values = $this->validateAndProcess($request, $redirect);
         $values['enabled'] = $request->boolean('enabled', true);
@@ -242,7 +242,7 @@ class RedirectController extends CpController
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
-        $this->authorize('delete', $redirect);
+        $this->authorize('manage', $redirect);
 
         $redirect->delete();
 

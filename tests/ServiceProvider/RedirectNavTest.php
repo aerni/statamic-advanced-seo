@@ -39,8 +39,8 @@ function runNavExtensions(array $extensions): NavInstance
     return $nav;
 }
 
-it('adds a Redirects nav item for a user with view redirects permission', function () {
-    $role = tap(Role::make('redirect_viewer')->addPermission(['view redirects', 'access default site']))->save();
+it('adds a Redirects nav item for a user with manage redirects permission', function () {
+    $role = tap(Role::make('redirect_viewer')->addPermission(['manage redirects', 'access default site']))->save();
     $user = tap(User::make()->assignRole('redirect_viewer'))->save();
 
     $this->actingAs($user);
@@ -59,7 +59,7 @@ it('adds a Redirects nav item for a user with view redirects permission', functi
     expect($childNames->contains('Redirects'))->toBeTrue();
 });
 
-it('does not add a Redirects nav item for a user without view redirects permission', function () {
+it('does not add a Redirects nav item for a user without manage redirects permission', function () {
     $user = tap(User::make())->save();
 
     $this->actingAs($user);
@@ -82,7 +82,7 @@ it('does not add a Redirects nav item when the redirects feature is disabled', f
     flushBlink();
     config(['advanced-seo.redirects.enabled' => false]);
 
-    $role = tap(Role::make('redirect_viewer')->addPermission(['view redirects', 'access default site']))->save();
+    $role = tap(Role::make('redirect_viewer')->addPermission(['manage redirects', 'access default site']))->save();
     $user = tap(User::make()->assignRole('redirect_viewer'))->save();
 
     $this->actingAs($user);

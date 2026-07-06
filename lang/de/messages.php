@@ -111,14 +111,8 @@ return [
     'permission_edit_defaults_description' => 'Ermöglicht das Bearbeiten von Sammlungs- und Taxonomie-Standards sowie den Zugriff auf den SEO-Tab bei Einträgen und Begriffen',
     'permission_edit_content' => 'Inhalte bearbeiten',
     'permission_edit_content_description' => 'Gewährt Zugriff auf den SEO-Tab bei Einträgen und Begriffen',
-    'permission_view_redirects' => 'Weiterleitungen anzeigen',
-    'permission_view_redirects_description' => 'Gewährt Zugriff auf die Anzeige von Weiterleitungen. Untergeordnete Berechtigungen ermöglichen das Bearbeiten, Erstellen und Löschen.',
-    'permission_edit_redirects' => 'Weiterleitungen bearbeiten',
-    'permission_create_redirects' => 'Weiterleitungen erstellen',
-    'permission_delete_redirects' => 'Weiterleitungen löschen',
-    'permission_edit_redirects_description' => 'Gewährt die Möglichkeit, bestehende Weiterleitungen zu bearbeiten.',
-    'permission_create_redirects_description' => 'Gewährt die Möglichkeit, neue Weiterleitungen zu erstellen.',
-    'permission_delete_redirects_description' => 'Gewährt die Möglichkeit, Weiterleitungen zu löschen.',
+    'permission_manage_redirects' => 'Weiterleitungen verwalten',
+    'permission_manage_redirects_description' => 'Gewährt vollen Zugriff zum Anzeigen, Erstellen, Bearbeiten und Löschen von Weiterleitungen und deren Fehlern.',
 
     // Pro
     'pro_features' => 'Upgrade auf Pro',

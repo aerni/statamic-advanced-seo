@@ -19,9 +19,16 @@ beforeEach(function () {
 
 function redirectViewer()
 {
-    tap(Role::make('viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    tap(Role::make('viewer')->addPermission(['access cp', 'access default site']))->save();
 
     return tap(User::make()->assignRole('viewer'))->save();
+}
+
+function redirectManager()
+{
+    tap(Role::make('manager')->addPermission(['access cp', 'manage redirects', 'access default site']))->save();
+
+    return tap(User::make()->assignRole('manager'))->save();
 }
 
 it('returns 404 on the free edition', function () {
@@ -52,15 +59,15 @@ it('returns hasRedirects true when at least one redirect exists', function () {
         ->assertInertia(fn ($page) => $page->where('hasRedirects', true));
 });
 
-it('allows a viewer to load the index', function () {
-    $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.index'))->assertOk();
+it('allows a manager to load the index', function () {
+    $this->actingAs(redirectManager())->getJson(cp_route('advanced-seo.redirects.index'))->assertOk();
 });
 
-it('forbids a viewer from loading the create form', function () {
+it('forbids a user without permission from loading the create form', function () {
     $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.create'))->assertForbidden();
 });
 
-it('forbids a viewer from loading the edit form', function () {
+it('forbids a user without permission from loading the edit form', function () {
     $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
     $this->actingAs(redirectViewer())->getJson(cp_route('advanced-seo.redirects.edit', $redirect->id()))->assertForbidden();

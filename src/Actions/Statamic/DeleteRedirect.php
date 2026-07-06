@@ -23,7 +23,7 @@ class DeleteRedirect extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('delete', $item);
+        return $user->can('manage', $item);
     }
 
     public function confirmationText()

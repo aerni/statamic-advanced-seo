@@ -28,7 +28,7 @@ class ResetRedirectHits extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('edit', $item);
+        return $user->can('manage', $item);
     }
 
     public function confirmationText()

@@ -114,14 +114,8 @@ return [
     'permission_edit_defaults_description' => 'Grants ability to edit collection and taxonomy defaults, and access the SEO tab on entries and terms',
     'permission_edit_content' => 'Edit Content',
     'permission_edit_content_description' => 'Grants access to the SEO tab on entries and terms',
-    'permission_view_redirects' => 'View Redirects',
-    'permission_view_redirects_description' => 'Grants access to view redirects. Child permissions grant editing, creating, and deleting.',
-    'permission_edit_redirects' => 'Edit Redirects',
-    'permission_create_redirects' => 'Create Redirects',
-    'permission_delete_redirects' => 'Delete Redirects',
-    'permission_edit_redirects_description' => 'Grants the ability to edit existing redirects.',
-    'permission_create_redirects_description' => 'Grants the ability to create new redirects.',
-    'permission_delete_redirects_description' => 'Grants the ability to delete redirects.',
+    'permission_manage_redirects' => 'Manage Redirects',
+    'permission_manage_redirects_description' => 'Grants full access to view, create, edit, and delete redirects and their errors.',
 
     // Pro
     'pro_features' => 'Upgrade to Pro',

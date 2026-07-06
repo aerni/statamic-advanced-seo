@@ -19,7 +19,7 @@ class DashboardController extends CpController
     {
         $groups = Seo::groups()->filter(fn (SeoSetGroup $group) => User::current()->can('viewAny', [SeoSet::class, $group]));
 
-        $canViewRedirects = Redirects::enabled() && User::current()->can('viewAny', Redirect::class);
+        $canViewRedirects = Redirects::enabled() && User::current()->can('manage', Redirect::class);
 
         $canViewErrors = $canViewRedirects && config('advanced-seo.redirects.errors.enabled');
 

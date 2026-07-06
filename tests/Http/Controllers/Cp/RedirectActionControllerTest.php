@@ -15,7 +15,7 @@ beforeEach(function () {
 
 function redirectActionViewer()
 {
-    tap(Role::make('action_viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    tap(Role::make('action_viewer')->addPermission(['access cp', 'access default site']))->save();
 
     return tap(User::make()->assignRole('action_viewer'))->save();
 }

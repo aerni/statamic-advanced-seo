@@ -49,8 +49,8 @@ class ListedRedirect extends JsonResource
             'created_at' => $redirect->createdAtIso(),
             'edit_url' => $redirect->editUrl(),
             'test_url' => $redirect->responseCode() === ResponseCode::Gone ? null : $redirect->sourceUrl(),
-            'editable' => User::current()->can('edit', $redirect),
-            'deletable' => User::current()->can('delete', $redirect),
+            'editable' => User::current()->can('manage', $redirect),
+            'deletable' => User::current()->can('manage', $redirect),
         ];
     }
 }
