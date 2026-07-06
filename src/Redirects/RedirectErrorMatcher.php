@@ -3,12 +3,11 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Illuminate\Support\Collection;
 
-class ErrorHandledChecker
+class RedirectErrorMatcher
 {
     /**
      * @param  array<string, array<string, Redirect>>  $exact  site => [source => redirect]
@@ -57,38 +56,16 @@ class ErrorHandledChecker
             ?? $this->matchIn($url, $site, enabled: false);
     }
 
-    /**
-     * Map a matched redirect to an error status: handled, disabled, or unhandled.
-     */
-    public static function status(?Redirect $redirect): string
-    {
-        if ($redirect === null) {
-            return 'unhandled';
-        }
-
-        return $redirect->enabled() ? 'handled' : 'disabled';
-    }
-
     protected function matchIn(string $url, string $site, bool $enabled): ?Redirect
     {
         // An exact redirect shadows any pattern, mirroring the resolver.
         if (($exact = $this->exact[$site][$url] ?? null) && $exact->enabled() === $enabled) {
-            return ! $enabled || $this->resolves($exact) ? $exact : null;
+            return ! $enabled || $exact->resolves() ? $exact : null;
         }
 
         return ($this->patterns[$site] ?? collect())
             ->first(fn (Redirect $redirect) => $redirect->enabled() === $enabled
-                && (! $enabled || $this->resolves($redirect))
+                && (! $enabled || $redirect->resolves())
                 && RedirectPatternMatcher::match($redirect->source(), $url) !== null);
-    }
-
-    /**
-     * Whether the redirect would actually produce a response, mirroring the
-     * resolver: a Gone redirect always does, otherwise it needs a destination.
-     */
-    protected function resolves(Redirect $redirect): bool
-    {
-        return $redirect->responseCode() === ResponseCode::Gone
-            || filled($redirect->destinationUrl());
     }
 }

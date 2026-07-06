@@ -208,3 +208,19 @@ it('returns its associated hit record', function () {
 it('returns a null hit record when it has never been hit', function () {
     expect((new Redirect)->id('r2')->hit())->toBeNull();
 });
+
+it('resolves when it is a gone redirect even without a destination', function () {
+    expect((new Redirect)->source('/old')->responseCode(ResponseCode::Gone)->resolves())->toBeTrue();
+});
+
+it('resolves when it has a destination', function () {
+    expect((new Redirect)->source('/old')->destination('https://example.com')->resolves())->toBeTrue();
+});
+
+it('does not resolve without a destination', function () {
+    expect((new Redirect)->source('/old')->resolves())->toBeFalse();
+});
+
+it('does not resolve when the destination entry is missing', function () {
+    expect((new Redirect)->source('/old')->destination('entry::missing')->resolves())->toBeFalse();
+});

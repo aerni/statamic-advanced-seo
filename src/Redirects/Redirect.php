@@ -125,6 +125,15 @@ class Redirect implements ContainsQueryableValues, Contract
         return URL::assemble(Site::get($this->site())->url(), Str::ensureLeft($destination, '/'));
     }
 
+    /**
+     * Whether the redirect produces a response: a Gone redirect always does,
+     * otherwise it needs a resolvable destination.
+     */
+    public function resolves(): bool
+    {
+        return $this->responseCode() === ResponseCode::Gone || filled($this->destinationUrl());
+    }
+
     public function responseCode(?ResponseCode $responseCode = null): ResponseCode|self
     {
         return $this

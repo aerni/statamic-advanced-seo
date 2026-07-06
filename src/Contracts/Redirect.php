@@ -18,6 +18,8 @@ interface Redirect
 
     public function sourceType(): SourceType;
 
+    public function resolves(): bool;
+
     public function site(?string $site = null): string|self;
 
     public function enabled(?bool $enabled = null): bool|self;

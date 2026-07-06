@@ -4,10 +4,11 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
+use Aerni\AdvancedSeo\Enums\RedirectErrorStatus;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Errors as ErrorsResource;
-use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
+use Aerni\AdvancedSeo\Redirects\RedirectErrorMatcher;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -35,7 +36,7 @@ class RedirectErrorController extends CpController
         $sites = Site::authorized()->map->handle()->all();
 
         if ($request->wantsJson()) {
-            $checker = ErrorHandledChecker::for($sites);
+            $matcher = RedirectErrorMatcher::for($sites);
 
             $query = RedirectFacade::errors()->query()->whereIn('site', $sites);
 
@@ -49,7 +50,7 @@ class RedirectErrorController extends CpController
             $errors = $query->get();
 
             if ($status = Arr::get($request->filters, 'redirect_error_status.status')) {
-                $errors = $errors->filter(fn ($error) => ErrorHandledChecker::status($checker->match($error->url(), $error->site())) === $status);
+                $errors = $errors->filter(fn ($error) => RedirectErrorStatus::for($matcher->match($error->url(), $error->site()))->value === $status);
             }
 
             $errors = $this->sort($errors, $request->input('sort', 'url'), $request->input('order', 'asc'));
@@ -57,7 +58,7 @@ class RedirectErrorController extends CpController
             $paginator = $this->paginate($errors, Statamic::cpPerPage($request->input('perPage')));
 
             $resource = new ErrorsResource($paginator);
-            $resource->handledChecker = $checker;
+            $resource->matcher = $matcher;
 
             return $resource->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }

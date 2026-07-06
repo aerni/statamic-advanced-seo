@@ -28,13 +28,15 @@ class RedirectResolver
             return null;
         }
 
+        if (! $redirect->resolves()) {
+            return null;
+        }
+
         if ($redirect->responseCode() === ResponseCode::Gone) {
             return new ResolvedRedirect($redirect->id(), ResponseCode::Gone, null);
         }
 
-        if (! $destination = $redirect->destinationUrl()) {
-            return null;
-        }
+        $destination = $redirect->destinationUrl();
 
         if ($redirect->sourceType() !== SourceType::Exact) {
             $captures = RedirectPatternMatcher::match($redirect->source(), $this->path);

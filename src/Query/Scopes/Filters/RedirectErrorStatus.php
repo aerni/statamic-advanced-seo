@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Query\Scopes\Filters;
 
+use Aerni\AdvancedSeo\Enums\RedirectErrorStatus as Status;
 use Statamic\Query\Scopes\Filter;
 
 class RedirectErrorStatus extends Filter
@@ -19,11 +20,9 @@ class RedirectErrorStatus extends Filter
             'status' => [
                 'display' => __('advanced-seo::messages.redirect_error_redirect'),
                 'type' => 'radio',
-                'options' => [
-                    'handled' => __('advanced-seo::messages.redirect_error_status_handled'),
-                    'disabled' => __('advanced-seo::messages.redirect_error_status_disabled'),
-                    'unhandled' => __('advanced-seo::messages.redirect_error_status_unhandled'),
-                ],
+                'options' => collect(Status::cases())
+                    ->mapWithKeys(fn (Status $status) => [$status->value => $status->label()])
+                    ->all(),
             ],
         ];
     }
@@ -35,7 +34,7 @@ class RedirectErrorStatus extends Filter
 
     public function badge($values): string
     {
-        return __('advanced-seo::messages.redirect_error_redirect').': '.__("advanced-seo::messages.redirect_error_status_{$values['status']}");
+        return __('advanced-seo::messages.redirect_error_redirect').': '.Status::from($values['status'])->label();
     }
 
     public function visibleTo($key): bool

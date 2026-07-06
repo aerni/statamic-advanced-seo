@@ -14,7 +14,7 @@ class Errors extends ResourceCollection
 
     public $collects = ListedError::class;
 
-    public $handledChecker;
+    public $matcher;
 
     protected $columns;
 
@@ -40,7 +40,7 @@ class Errors extends ResourceCollection
     {
         $this->setColumns();
 
-        return $this->collection->each->handledChecker($this->handledChecker);
+        return $this->collection->each->matcher($this->matcher);
     }
 
     public function with($request)

@@ -2,18 +2,19 @@
 
 namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
-use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
+use Aerni\AdvancedSeo\Enums\RedirectErrorStatus;
+use Aerni\AdvancedSeo\Redirects\RedirectErrorMatcher;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
 use Statamic\Facades\Site;
 
 class ListedError extends JsonResource
 {
-    protected ?ErrorHandledChecker $handledChecker = null;
+    protected ?RedirectErrorMatcher $matcher = null;
 
-    public function handledChecker(ErrorHandledChecker $checker): static
+    public function matcher(RedirectErrorMatcher $matcher): static
     {
-        $this->handledChecker = $checker;
+        $this->matcher = $matcher;
 
         return $this;
     }
@@ -22,7 +23,7 @@ class ListedError extends JsonResource
     {
         $error = $this->resource;
 
-        $redirect = $this->handledChecker->match($error->url(), $error->site());
+        $redirect = $this->matcher->match($error->url(), $error->site());
 
         return [
             'id' => $error->id(),
@@ -32,7 +33,7 @@ class ListedError extends JsonResource
             'last_seen_at' => $error->lastSeenAtIso(),
             'site' => $error->site(),
             'site_name' => Site::get($error->site())?->name() ?? $error->site(),
-            'status' => ErrorHandledChecker::status($redirect),
+            'status' => RedirectErrorStatus::for($redirect)->value,
             'destination' => $redirect?->destinationUrl() ?? $redirect?->destination(),
             'response_code_label' => $redirect?->responseCode()->label(),
             'redirect_url' => $redirect?->editUrl(),
