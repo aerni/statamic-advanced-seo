@@ -64,6 +64,8 @@ class RedirectErrorController extends CpController
         $createBlueprint = $canCreate ? RedirectBlueprint::definition() : null;
         $createFields = $createBlueprint?->fields()->preProcess();
 
+        $canClear = User::current()->can('delete redirects');
+
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
             'listingUrl' => cp_route('advanced-seo.redirects.errors.index'),
@@ -74,7 +76,22 @@ class RedirectErrorController extends CpController
             'createBlueprint' => $createBlueprint?->toPublishArray(),
             'createValues' => $createFields?->values()->all(),
             'createMeta' => $createFields?->meta()->all(),
+            'canClear' => $canClear,
+            'clearUrl' => $canClear ? cp_route('advanced-seo.redirects.errors.clear') : null,
+            'hasErrors' => RedirectFacade::errors()->query()->whereIn('site', $sites)->first() !== null,
         ]);
+    }
+
+    public function clear(): void
+    {
+        throw_unless(RedirectsFeature::enabled() && config('advanced-seo.redirects.errors.enabled'), new NotFoundHttpException);
+
+        abort_unless(User::current()->can('delete redirects'), 403);
+
+        RedirectFacade::errors()->query()
+            ->whereIn('site', Site::authorized()->map->handle()->all())
+            ->get()
+            ->each->delete();
     }
 
     /**

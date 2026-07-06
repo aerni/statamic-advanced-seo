@@ -186,6 +186,75 @@ it('omits the create form payload for a user who cannot create redirects', funct
         );
 });
 
+it('includes the clear payload when the user can clear errors', function () {
+    Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+
+    Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();
+
+    $this->actingAs($this->user)
+        ->get(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('canClear', true)
+            ->where('clearUrl', cp_route('advanced-seo.redirects.errors.clear'))
+            ->where('hasErrors', true)
+        );
+});
+
+it('clears all errors', function () {
+    Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();
+    Redirect::errors()->make()->url('/b')->site('default')->count(1)->save();
+
+    $this->actingAs($this->user)
+        ->post(cp_route('advanced-seo.redirects.errors.clear'))
+        ->assertOk();
+
+    expect(Redirect::errors()->query()->get())->toHaveCount(0);
+});
+
+it('only clears errors of sites the user can access', function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'fr' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+
+    tap(Role::make('limited')->addPermission(['access cp', 'view redirects', 'edit redirects', 'delete redirects', 'access default site']))->save();
+    $user = tap(User::make()->assignRole('limited'))->save();
+
+    Redirect::errors()->make()->url('/allowed')->site('default')->count(1)->save();
+    Redirect::errors()->make()->url('/forbidden')->site('fr')->count(1)->save();
+
+    $this->actingAs($user)
+        ->post(cp_route('advanced-seo.redirects.errors.clear'))
+        ->assertOk();
+
+    $urls = Redirect::errors()->query()->get()->map->url();
+    expect($urls)->not->toContain('/allowed')->toContain('/forbidden');
+});
+
+it('forbids clearing without permission', function () {
+    Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);
+
+    tap(Role::make('viewer')->addPermission(['access cp', 'view redirects', 'access default site']))->save();
+    $viewer = tap(User::make()->assignRole('viewer'))->save();
+
+    Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();
+
+    $this->actingAs($viewer)
+        ->post(cp_route('advanced-seo.redirects.errors.clear'))
+        ->assertForbidden();
+
+    expect(Redirect::errors()->query()->get())->toHaveCount(1);
+});
+
+it('404s clearing when error logging is disabled', function () {
+    config(['advanced-seo.redirects.errors.enabled' => false]);
+
+    $this->actingAs($this->user)
+        ->post(cp_route('advanced-seo.redirects.errors.clear'))
+        ->assertNotFound();
+});
+
 it('404s when error logging is disabled', function () {
     config(['advanced-seo.redirects.errors.enabled' => false]);
 

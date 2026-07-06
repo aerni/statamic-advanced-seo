@@ -16,6 +16,7 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
     Route::get('/redirect-errors', [RedirectErrorController::class, 'index'])->name('redirects.errors.index');
+    Route::post('/redirect-errors/clear', [RedirectErrorController::class, 'clear'])->name('redirects.errors.clear');
     Route::post('/redirect-errors/actions', [RedirectErrorActionController::class, 'run'])->name('redirects.errors.actions.run');
     Route::post('/redirect-errors/actions/list', [RedirectErrorActionController::class, 'bulkActions'])->name('redirects.errors.actions.bulk');
     Route::resource('redirects', RedirectController::class)->except('show');

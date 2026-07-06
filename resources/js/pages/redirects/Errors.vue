@@ -1,7 +1,7 @@
 <script setup>
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, getCurrentInstance } from 'vue';
 import { Head } from '@statamic/cms/inertia';
-import { Header, Button, Badge, Listing, StatusIndicator, Stack, PublishContainer, PublishTabs, Panel, Heading, Switch } from '@statamic/cms/ui';
+import { Header, Button, Badge, Listing, StatusIndicator, Stack, PublishContainer, PublishTabs, Panel, Heading, Switch, ConfirmationModal } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 
 const props = defineProps({
@@ -14,6 +14,9 @@ const props = defineProps({
     createBlueprint: { type: Object, default: null },
     createValues: { type: Object, default: null },
     createMeta: { type: Object, default: null },
+    canClear: { type: Boolean, default: false },
+    clearUrl: { type: String, default: null },
+    hasErrors: { type: Boolean, default: false },
 });
 
 const listing = useTemplateRef('listing');
@@ -27,6 +30,23 @@ const errors = ref({});
 const saving = ref(false);
 
 const isCreating = computed(() => creating.value !== null);
+
+const confirmingClear = ref(false);
+const clearing = ref(false);
+
+const { $axios } = getCurrentInstance().appContext.config.globalProperties;
+
+function clearAll() {
+    clearing.value = true;
+
+    $axios.post(props.clearUrl)
+        .then(() => {
+            Statamic.$toast.success(__('advanced-seo::messages.redirect_errors_cleared'));
+            confirmingClear.value = false;
+            listing.value.refresh();
+        })
+        .finally(() => (clearing.value = false));
+}
 
 function openCreate(error) {
     values.value = { ...props.createValues, source: error.url, site: error.site };
@@ -52,7 +72,26 @@ function save() {
 <template>
     <Head :title />
 
-    <Header :title icon="alert-warning-exclamation-mark" />
+    <Header :title icon="alert-warning-exclamation-mark">
+        <Button
+            v-if="canClear && hasErrors"
+            variant="primary"
+            :text="__('advanced-seo::messages.redirect_errors_clear')"
+            @click="confirmingClear = true"
+        />
+    </Header>
+
+    <ConfirmationModal
+        v-if="confirmingClear"
+        :open="confirmingClear"
+        :title="__('advanced-seo::messages.redirect_errors_clear')"
+        :body-text="__('advanced-seo::messages.redirect_errors_clear_confirmation')"
+        :button-text="__('advanced-seo::messages.redirect_errors_clear')"
+        danger
+        :busy="clearing"
+        @confirm="clearAll"
+        @update:open="(open) => { if (! open) confirmingClear = false; }"
+    />
 
     <Listing
         ref="listing"
