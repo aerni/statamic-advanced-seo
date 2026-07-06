@@ -375,18 +375,106 @@ return [
 
     'redirects' => [
 
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Disable to turn off redirect handling and 404 tracking entirely.
+        |
+        */
+
         'enabled' => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Store Directory
+        |--------------------------------------------------------------------------
+        |
+        | The directory where redirects are stored when using the file driver.
+        |
+        */
 
         'directory' => base_path('content/redirects'),
 
+        /*
+        |--------------------------------------------------------------------------
+        | Hits
+        |--------------------------------------------------------------------------
+        |
+        | Track how many times each redirect is used and when it was last hit.
+        |
+        */
+
         'hits' => [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | Disable to stop recording redirect hits.
+            |
+            */
+
             'enabled' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Store Directory
+            |--------------------------------------------------------------------------
+            |
+            | The directory where hit records are stored when using the file driver.
+            |
+            */
+
             'directory' => storage_path('statamic/advanced-seo/redirect-hits'),
+
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Errors
+        |--------------------------------------------------------------------------
+        |
+        | Log 404s that no redirect handles so you can turn them into redirects.
+        |
+        */
+
         'errors' => [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | Disable to stop recording unhandled 404s.
+            |
+            */
+
             'enabled' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Store Directory
+            |--------------------------------------------------------------------------
+            |
+            | The directory where error records are stored when using the file driver.
+            |
+            */
+
             'directory' => storage_path('statamic/advanced-seo/redirect-errors'),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Retention
+            |--------------------------------------------------------------------------
+            |
+            | Errors not seen within this many days are removed by the daily
+            | prune command (seo:prune-redirect-errors).
+            |
+            */
+
             'purge_after_days' => 30,
 
             /*
@@ -420,7 +508,17 @@ return [
                 '#^/wp-admin#',    // WordPress admin
                 '#^/\.(env|git)#', // Secrets and repo probes
             ],
+
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Queue
+        |--------------------------------------------------------------------------
+        |
+        | The queue used for the background hit and error recording jobs.
+        |
+        */
 
         'queue' => 'default',
 
