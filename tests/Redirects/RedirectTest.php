@@ -105,7 +105,9 @@ it('does not persist a destination or query string preservation for a gone redir
     $redirect = (new Redirect)
         ->id('abc')
         ->source('/old')
+        ->destination('/somewhere')
         ->responseCode(ResponseCode::Gone)
+        ->preserveQueryString(true)
         ->site('default');
 
     expect($redirect->fileData()['destination'])->toBeNull()

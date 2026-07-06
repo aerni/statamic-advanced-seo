@@ -222,7 +222,7 @@ class Redirect implements ContainsQueryableValues, Contract
     {
         return [
             'source' => $this->source(),
-            'destination' => $this->destination(),
+            'destination' => $this->responseCode() === ResponseCode::Gone ? null : $this->destination(),
             'response_code' => $this->responseCode()->value,
             'enabled' => $this->enabled(),
             'preserve_query_string' => $this->responseCode() === ResponseCode::Gone ? null : $this->preserveQueryString(),

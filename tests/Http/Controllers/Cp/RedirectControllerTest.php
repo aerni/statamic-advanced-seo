@@ -307,6 +307,19 @@ it('requires a destination unless the type is gone', function () {
     expect(Redirect::query()->where('site', 'default')->where('source', '/gone')->first())->not->toBeNull();
 });
 
+it('drops a stale destination when the type is gone', function () {
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), [
+            'source' => '/gone',
+            'destination' => '/leftover',
+            'response_code' => 410,
+            'site' => 'default',
+        ])
+        ->assertOk();
+
+    expect(Redirect::query()->where('source', '/gone')->first()->fileData()['destination'])->toBeNull();
+});
+
 it('persists the forward query string choice', function () {
     $this->actingAs($this->super)
         ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'default', 'preserve_query_string' => false])

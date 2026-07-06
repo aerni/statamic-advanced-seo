@@ -39,7 +39,7 @@ class Redirect extends StacheRedirect
 
         return tap($model::firstOrNew(['id' => $source->id()])->fill([
             'source' => $source->source(),
-            'destination' => $source->destination(),
+            'destination' => $source->responseCode() === ResponseCode::Gone ? null : $source->destination(),
             'response_code' => $source->responseCode(),
             'site' => $source->site(),
             'enabled' => $source->enabled(),
