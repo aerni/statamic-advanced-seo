@@ -39,6 +39,7 @@ return [
     'redirect_origin_manual' => 'Manuell',
     'redirect_origin_import' => 'Import',
     'redirect_origin_error' => 'Fehler',
+    'redirect_details' => 'Details',
     'redirect_hits' => 'Aufrufe',
     'redirect_last_hit_at' => 'Letzter Aufruf',
     'redirect_created_at' => 'Erstellt',

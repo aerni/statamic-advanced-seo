@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { PublishContainer, PublishTabs, Header, Button, Panel, Heading, Switch, StatusIndicator, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@statamic/cms/ui';
+import { PublishContainer, PublishTabs, Header, Button, Panel, CardPanel, Heading, Switch, StatusIndicator, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 import { Head, router } from '@statamic/cms/inertia';
 
@@ -17,6 +17,7 @@ const props = defineProps({
     itemActionUrl: { type: String, default: null },
     hits: { type: Object, default: null },
     createdAt: { type: String, default: null },
+    origin: { type: String, default: null },
 });
 
 const container = useTemplateRef('container');
@@ -150,7 +151,10 @@ onUnmounted(() => saveKeyBinding.destroy());
                         <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
                         <Switch v-model="enabled" />
                     </div>
-                    <dl v-if="hits || createdAt" class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-sm">
+                </Panel>
+
+                <CardPanel :heading="__('advanced-seo::messages.redirect_details')">
+                    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
                         <template v-if="hits">
                             <dt class="text-gray-600/90 dark:text-gray-400">{{ __('advanced-seo::messages.redirect_hits') }}</dt>
                             <dd class="text-right tabular-nums text-gray-925 dark:text-gray-300">{{ hits.count }}</dd>
@@ -163,8 +167,10 @@ onUnmounted(() => saveKeyBinding.destroy());
                             <dt class="text-gray-600/90 dark:text-gray-400">{{ __('advanced-seo::messages.redirect_created_at') }}</dt>
                             <dd class="text-right text-gray-925 dark:text-gray-300"><date-time :of="createdAt" /></dd>
                         </template>
+                        <dt class="text-gray-600/90 dark:text-gray-400">{{ __('advanced-seo::messages.redirect_origin') }}</dt>
+                        <dd class="text-right text-gray-925 dark:text-gray-300">{{ origin }}</dd>
                     </dl>
-                </Panel>
+                </CardPanel>
             </template>
         </PublishTabs>
     </PublishContainer>

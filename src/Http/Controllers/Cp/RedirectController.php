@@ -194,6 +194,7 @@ class RedirectController extends CpController
             'meta' => $fields->meta()->all(),
             'enabled' => $redirect->enabled(),
             'createdAt' => $redirect->createdAtIso(),
+            'origin' => $redirect->origin()->label(),
             'submitUrl' => cp_route('advanced-seo.redirects.update', $redirect->id()),
             'testUrl' => $redirect->sourceUrl(),
             'itemActions' => Action::for($redirect, ['view' => 'form'])
