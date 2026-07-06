@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Cascades\CascadeComposer;
+use Aerni\AdvancedSeo\Commands\PruneRedirectErrors;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Gates\SeoContentGate;
@@ -38,6 +39,7 @@ use Aerni\AdvancedSeo\Stache\Stores\RedirectHitsStore;
 use Aerni\AdvancedSeo\Stache\Stores\RedirectsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -171,6 +173,18 @@ class ServiceProvider extends AddonServiceProvider
         NotFoundHttpException::renderUsing(fn ($request) => app(Redirects\RedirectHandler::class)($request));
 
         return $this;
+    }
+
+    /**
+     * @param  Schedule  $schedule
+     */
+    protected function schedule($schedule): void
+    {
+        if (! config('advanced-seo.redirects.enabled', true) || ! config('advanced-seo.redirects.errors.enabled', true)) {
+            return;
+        }
+
+        $schedule->command(PruneRedirectErrors::class)->daily();
     }
 
     protected function bootRouteBindings(): self
