@@ -33,6 +33,7 @@ const isCreating = computed(() => creating.value !== null);
 
 const confirmingClear = ref(false);
 const clearing = ref(false);
+const anyErrors = ref(props.hasErrors);
 
 const { $axios } = getCurrentInstance().appContext.config.globalProperties;
 
@@ -43,6 +44,7 @@ function clearAll() {
         .then(() => {
             Statamic.$toast.success(__('advanced-seo::messages.redirect_errors_cleared'));
             confirmingClear.value = false;
+            anyErrors.value = false;
             listing.value.refresh();
         })
         .finally(() => (clearing.value = false));
@@ -74,7 +76,7 @@ function save() {
 
     <Header :title icon="alert-warning-exclamation-mark">
         <Button
-            v-if="canClear && hasErrors"
+            v-if="canClear && anyErrors"
             variant="primary"
             :text="__('advanced-seo::messages.redirect_errors_clear')"
             @click="confirmingClear = true"
