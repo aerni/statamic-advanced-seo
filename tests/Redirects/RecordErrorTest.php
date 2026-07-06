@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Carbon;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -57,4 +58,11 @@ it('records via the queued job', function () {
     (new RecordRedirectErrorJob('/missing', 'default'))->handle();
 
     expect(Redirect::errors()->findByUrl('/missing', 'default')->count())->toBe(1);
+});
+
+it('is unique per site and url to collapse duplicate recordings', function () {
+    $job = new RecordRedirectErrorJob('/missing', 'default');
+
+    expect($job)->toBeInstanceOf(ShouldBeUnique::class)
+        ->and($job->uniqueId())->toBe('default:/missing');
 });
