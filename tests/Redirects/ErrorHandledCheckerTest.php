@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
 use Statamic\Facades\Site;
@@ -58,4 +59,23 @@ it('scopes matches to the site', function () {
 
     expect($checker->match('/old', 'default'))->toBeNull()
         ->and($checker->match('/old', 'fr'))->not->toBeNull();
+});
+
+it('does not treat an enabled redirect with a dead destination as handled', function () {
+    Redirect::make()->source('/old')->destination('entry::missing')->site('default')->save();
+
+    expect(ErrorHandledChecker::for(['default'])->match('/old', 'default'))->toBeNull();
+});
+
+it('treats an enabled gone redirect as handled despite having no destination', function () {
+    $redirect = tap(Redirect::make()->source('/old')->responseCode(ResponseCode::Gone)->site('default'))->save();
+
+    expect(ErrorHandledChecker::for(['default'])->match('/old', 'default')?->id())->toBe($redirect->id());
+});
+
+it('prefers the most specific pattern when several match', function () {
+    tap(Redirect::make()->source('#^/blog/.+#')->destination('/regex')->site('default'))->save();
+    $wildcard = tap(Redirect::make()->source('/blog/*')->destination('/wildcard/$1')->site('default'))->save();
+
+    expect(ErrorHandledChecker::for(['default'])->match('/blog/post', 'default')?->id())->toBe($wildcard->id());
 });

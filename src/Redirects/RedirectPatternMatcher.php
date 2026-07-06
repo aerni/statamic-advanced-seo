@@ -32,6 +32,20 @@ class RedirectPatternMatcher
         return preg_replace_callback('/\$(\d+)/', fn ($m) => $captures[(int) $m[1]] ?? '', $destination);
     }
 
+    /**
+     * Order pattern candidates most-specific first: wildcards before regex,
+     * then fewer wildcards, then more literal characters.
+     *
+     * @return array{int, int, int}
+     */
+    public static function specificity(string $source, bool $isRegex): array
+    {
+        $wildcards = $isRegex ? 0 : substr_count($source, '*');
+        $literalLength = $isRegex ? strlen($source) : strlen(str_replace('*', '', $source));
+
+        return [(int) $isRegex, $wildcards, -$literalLength];
+    }
+
     public static function normalizePath(string $path): string
     {
         $path = parse_url($path, PHP_URL_PATH) ?? $path;
