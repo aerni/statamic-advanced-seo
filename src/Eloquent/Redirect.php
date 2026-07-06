@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Redirects\Redirect as StacheRedirect;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +23,7 @@ class Redirect extends StacheRedirect
             ->site($model->site)
             ->enabled($model->enabled)
             ->preserveQueryString($model->preserve_query_string ?? true)
-            ->automatic($model->automatic ?? false)
+            ->origin($model->origin ?? Origin::Manual)
             ->description($model->description)
             ->createdAt($model->created_at?->timestamp);
     }
@@ -43,7 +44,7 @@ class Redirect extends StacheRedirect
             'site' => $source->site(),
             'enabled' => $source->enabled(),
             'preserve_query_string' => $source->responseCode() === ResponseCode::Gone ? null : $source->preserveQueryString(),
-            'automatic' => $source->automatic(),
+            'origin' => $source->origin(),
             'description' => $source->description(),
         ]), function (Model $model) use ($source): void {
             if ($source->createdAt()) {

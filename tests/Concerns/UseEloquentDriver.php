@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Tests\Concerns;
 
+use Aerni\AdvancedSeo\Enums\Origin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 
@@ -40,7 +41,7 @@ trait UseEloquentDriver
             $table->string('site');
             $table->boolean('enabled')->default(true);
             $table->boolean('preserve_query_string')->nullable()->default(true);
-            $table->boolean('automatic')->default(false);
+            $table->string('origin')->default(Origin::Manual->value);
             $table->text('description')->nullable();
             $table->timestamps();
 

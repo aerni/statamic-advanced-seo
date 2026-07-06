@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
 
@@ -23,7 +24,7 @@ interface Redirect
 
     public function preserveQueryString(?bool $preserveQueryString = null): bool|self;
 
-    public function automatic(?bool $automatic = null): bool|self;
+    public function origin(?Origin $origin = null): Origin|self;
 
     public function description(?string $description = null): string|self|null;
 

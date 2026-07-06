@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Stache\Stores;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Facades\Path;
@@ -43,13 +44,13 @@ class RedirectsStore extends BasicStore
             ->site(basename(dirname($path)))
             ->enabled(Arr::get($data, 'enabled', true))
             ->preserveQueryString(Arr::get($data, 'preserve_query_string', true))
-            ->automatic(Arr::get($data, 'automatic', false))
+            ->origin(Origin::tryFrom(Arr::get($data, 'origin', Origin::Manual->value)) ?? Origin::Manual)
             ->description(Arr::get($data, 'description'))
             ->createdAt(Arr::get($data, 'created_at'));
     }
 
     protected function storeIndexes(): array
     {
-        return ['id', 'site', 'source', 'enabled', 'automatic'];
+        return ['id', 'site', 'source', 'enabled', 'origin'];
     }
 }

@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Facades\Seo;
@@ -303,7 +304,7 @@ class HandleAutomaticRedirects
             ->destination($destination)
             ->responseCode(ResponseCode::Permanent)
             ->site($site)
-            ->automatic(true)
+            ->origin(Origin::Automatic)
             ->save();
     }
 
@@ -319,7 +320,7 @@ class HandleAutomaticRedirects
         RedirectFacade::query()
             ->where('site', $site)
             ->where('destination', $staleDestination)
-            ->where('automatic', true)
+            ->where('origin', Origin::Automatic->value)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->destination($destination)->save());
     }
@@ -335,7 +336,7 @@ class HandleAutomaticRedirects
         RedirectFacade::query()
             ->where('site', $site)
             ->where('source', $source)
-            ->where('automatic', true)
+            ->where('origin', Origin::Automatic->value)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());
     }
@@ -349,7 +350,7 @@ class HandleAutomaticRedirects
         RedirectFacade::query()
             ->when($site, fn ($query) => $query->where('site', $site))
             ->where('destination', $destination)
-            ->where('automatic', true)
+            ->where('origin', Origin::Automatic->value)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());
     }

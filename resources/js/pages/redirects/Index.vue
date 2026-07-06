@@ -51,10 +51,8 @@ defineProps({
             <template #cell-preserve_query_string="{ row: redirect }">
                 <Icon v-if="redirect.preserve_query_string" name="checkmark" class="size-4" />
             </template>
-            <template #cell-automatic="{ row: redirect }">
-                {{ redirect.automatic
-                    ? __('advanced-seo::messages.redirect_automatic')
-                    : __('advanced-seo::messages.redirect_manual') }}
+            <template #cell-origin="{ row: redirect }">
+                {{ redirect.origin_label }}
             </template>
             <template #cell-site="{ row: redirect }">
                 {{ redirect.site_name }}

@@ -60,7 +60,7 @@ class Redirects extends ResourceCollection
         );
 
         $columns->push(
-            Column::make('automatic')->label(__('advanced-seo::messages.redirect_creation'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true)
+            Column::make('origin')->label(__('advanced-seo::messages.redirect_origin'))->sortable(true)->defaultVisibility(false)->visible(false)->listable(true)
         );
 
         $columns->push(

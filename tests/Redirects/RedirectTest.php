@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
@@ -34,7 +35,7 @@ it('exposes fluent accessors with sensible defaults', function () {
         ->and($redirect->sourceType())->toBe(SourceType::Exact)
         ->and($redirect->enabled())->toBeTrue()
         ->and($redirect->preserveQueryString())->toBeTrue()
-        ->and($redirect->automatic())->toBeFalse()
+        ->and($redirect->origin())->toBe(Origin::Manual)
         ->and($redirect->site())->toBe('default');
 });
 
@@ -58,7 +59,7 @@ it('serializes only its fields to file data', function () {
         ->responseCode(ResponseCode::Temporary)
         ->site('french')
         ->enabled(false)
-        ->automatic(true)
+        ->origin(Origin::Automatic)
         ->description('Note');
 
     expect($redirect->fileData())->toBe([
@@ -67,7 +68,7 @@ it('serializes only its fields to file data', function () {
         'response_code' => 302,
         'enabled' => false,
         'preserve_query_string' => true,
-        'automatic' => true,
+        'origin' => 'automatic',
         'description' => 'Note',
         'created_at' => null,
     ]);

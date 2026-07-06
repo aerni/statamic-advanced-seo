@@ -39,7 +39,7 @@ function save() {
     new Pipeline()
         .provide({ container, errors, saving })
         .through([
-            new Request(props.createUrl, 'post', { enabled: enabled.value }),
+            new Request(props.createUrl, 'post', { enabled: enabled.value, origin: 'error' }),
         ])
         .then(() => {
             Statamic.$toast.success(__('Saved'));

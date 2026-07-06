@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\Seo;
@@ -36,7 +37,7 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}")
             ->and($redirect->responseCode())->toBe(ResponseCode::Permanent)
             ->and($redirect->enabled())->toBeTrue()
-            ->and($redirect->automatic())->toBeTrue();
+            ->and($redirect->origin())->toBe(Origin::Automatic);
     });
 
     it('creates a redirect when the date changes the url', function () {
@@ -204,7 +205,7 @@ describe('entry redirects', function () {
     });
 
     it('deletes an automatic redirect shadowed by a newly created entry', function () {
-        Redirect::make()->source('/about')->destination('/elsewhere')->site('default')->automatic(true)->save();
+        Redirect::make()->source('/about')->destination('/elsewhere')->site('default')->origin(Origin::Automatic)->save();
 
         tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
 
@@ -223,7 +224,7 @@ describe('entry redirects', function () {
     });
 
     it('keeps an automatic redirect when the shadowing entry is a draft', function () {
-        Redirect::make()->source('/about')->destination('/elsewhere')->site('default')->automatic(true)->save();
+        Redirect::make()->source('/about')->destination('/elsewhere')->site('default')->origin(Origin::Automatic)->save();
 
         tap(Entry::make()->collection('pages')->locale('default')->slug('about')->published(false))->save();
 
@@ -232,7 +233,7 @@ describe('entry redirects', function () {
 
     it('deletes an automatic redirect pointing to a deleted entry', function () {
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('target'))->save();
-        Redirect::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->automatic(true)->save();
+        Redirect::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->origin(Origin::Automatic)->save();
 
         $entry->delete();
 
@@ -250,7 +251,7 @@ describe('entry redirects', function () {
 
     it('keeps a redirect whose source is the deleted entry url', function () {
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('target'))->save();
-        Redirect::make()->source('/target')->destination('/elsewhere')->site('default')->automatic(true)->save();
+        Redirect::make()->source('/target')->destination('/elsewhere')->site('default')->origin(Origin::Automatic)->save();
 
         $entry->delete();
 
@@ -264,7 +265,7 @@ describe('entry redirects', function () {
         useFreeEdition();
 
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('target'))->save();
-        Redirect::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->automatic(true)->save();
+        Redirect::make()->source('/old')->destination("entry::{$entry->id()}")->site('default')->origin(Origin::Automatic)->save();
 
         $entry->delete();
 
@@ -288,7 +289,7 @@ describe('term redirects', function () {
             ->and($redirect->destination())->toBe('/tags/new')
             ->and($redirect->responseCode())->toBe(ResponseCode::Permanent)
             ->and($redirect->enabled())->toBeTrue()
-            ->and($redirect->automatic())->toBeTrue();
+            ->and($redirect->origin())->toBe(Origin::Automatic);
     });
 
     it('creates nothing when saving without a slug change', function () {
@@ -404,7 +405,7 @@ describe('term redirects', function () {
     });
 
     it('deletes an automatic redirect shadowed by a newly created term', function () {
-        Redirect::make()->source('/tags/about')->destination('/elsewhere')->site('default')->automatic(true)->save();
+        Redirect::make()->source('/tags/about')->destination('/elsewhere')->site('default')->origin(Origin::Automatic)->save();
 
         tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('about')->data(['title' => 'About']))->save();
 
@@ -424,7 +425,7 @@ describe('term redirects', function () {
 
     it('deletes an automatic redirect pointing to a deleted term', function () {
         tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('target')->data(['title' => 'Target']))->save();
-        Redirect::make()->source('/tags/old')->destination('/tags/target')->site('default')->automatic(true)->save();
+        Redirect::make()->source('/tags/old')->destination('/tags/target')->site('default')->origin(Origin::Automatic)->save();
 
         Term::find('tags::target')->delete();
 
@@ -451,8 +452,8 @@ describe('term redirects', function () {
         Term::make()->taxonomy('topics')->inDefaultLocale()->slug('target')->data(['title' => 'Target'])->save();
         Term::find('topics::target')->in('fr')->data(['title' => 'Cible'])->save();
 
-        Redirect::make()->source('/topics/old')->destination('/topics/target')->site('en')->automatic(true)->save();
-        Redirect::make()->source('/topics/old')->destination('/topics/target')->site('fr')->automatic(true)->save();
+        Redirect::make()->source('/topics/old')->destination('/topics/target')->site('en')->origin(Origin::Automatic)->save();
+        Redirect::make()->source('/topics/old')->destination('/topics/target')->site('fr')->origin(Origin::Automatic)->save();
 
         Term::find('topics::target')->delete();
 

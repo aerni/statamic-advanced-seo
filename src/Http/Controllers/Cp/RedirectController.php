@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
@@ -215,7 +216,9 @@ class RedirectController extends CpController
         $values = $this->validateAndProcess($request, null);
         $values['enabled'] = $request->boolean('enabled', true);
 
-        $redirect = $this->fill(RedirectFacade::make(), $values)->save();
+        $origin = $request->input('origin') === Origin::Error->value ? Origin::Error : Origin::Manual;
+
+        $redirect = $this->fill(RedirectFacade::make(), $values)->origin($origin)->save();
 
         return ['redirect' => $redirect->editUrl()];
     }

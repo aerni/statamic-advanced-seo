@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Facades\Collection;
@@ -44,7 +45,7 @@ it('returns correct columns in meta', function () {
         ->toContain('preserve_query_string')
         ->toContain('site')
         ->toContain('status')
-        ->toContain('automatic')
+        ->toContain('origin')
         ->toContain('description')
         ->toContain('created_at');
 });
@@ -70,14 +71,15 @@ it('exposes description and query string forwarding in the row data', function (
         ->and($data[0]['preserve_query_string'])->toBeFalse();
 });
 
-it('exposes the automatic flag in the row data', function () {
-    Redirect::make()->source('/auto')->destination('/x')->site('default')->automatic(true)->save();
+it('exposes the origin in the row data', function () {
+    Redirect::make()->source('/auto')->destination('/x')->site('default')->origin(Origin::Automatic)->save();
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index'))
         ->json('data');
 
-    expect($data[0]['automatic'])->toBeTrue();
+    expect($data[0]['origin'])->toBe('automatic')
+        ->and($data[0]['origin_label'])->toBe('Automatic');
 });
 
 it('includes site in row data', function () {
@@ -154,11 +156,11 @@ it('filters by status', function () {
     expect($data)->toHaveCount(1)->and($data[0]['source'])->toBe('/disabled');
 });
 
-it('filters by creation', function () {
-    Redirect::make()->source('/auto')->destination('/x')->site('default')->automatic(true)->save();
+it('filters by origin', function () {
+    Redirect::make()->source('/auto')->destination('/x')->site('default')->origin(Origin::Automatic)->save();
     Redirect::make()->source('/manual')->destination('/y')->site('default')->save();
 
-    $filters = base64_encode(json_encode(['redirect_creation' => ['creation' => 'automatic']]));
+    $filters = base64_encode(json_encode(['redirect_origin' => ['origin' => 'automatic']]));
 
     $data = $this->actingAs($this->super)
         ->getJson(cp_route('advanced-seo.redirects.index', ['filters' => $filters]))
@@ -408,7 +410,7 @@ it('marks the native columns as sortable', function () {
         ->json('meta.columns'))->keyBy('field');
 
     expect($columns['status']['sortable'])->toBeTrue()
-        ->and($columns['automatic']['sortable'])->toBeTrue()
+        ->and($columns['origin']['sortable'])->toBeTrue()
         ->and($columns['description']['sortable'])->toBeTrue()
         ->and($columns['preserve_query_string']['sortable'])->toBeTrue();
 });

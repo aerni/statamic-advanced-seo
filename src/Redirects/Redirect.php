@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
 use Aerni\AdvancedSeo\Contracts\RedirectHit;
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Enums\SourceType;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
@@ -44,7 +45,7 @@ class Redirect implements ContainsQueryableValues, Contract
 
     protected $preserveQueryString = true;
 
-    protected $automatic = false;
+    protected Origin $origin = Origin::Manual;
 
     protected $description;
 
@@ -158,10 +159,10 @@ class Redirect implements ContainsQueryableValues, Contract
             ->args(func_get_args());
     }
 
-    public function automatic(?bool $automatic = null): bool|self
+    public function origin(?Origin $origin = null): Origin|self
     {
         return $this
-            ->fluentlyGetOrSet('automatic')
+            ->fluentlyGetOrSet('origin')
             ->args(func_get_args());
     }
 
@@ -192,6 +193,7 @@ class Redirect implements ContainsQueryableValues, Contract
     {
         return match ($field) {
             'response_code' => $this->responseCode()->value,
+            'origin' => $this->origin()->value,
             'created_at' => $this->createdAt(),
             default => $this->{$field}(),
         };
@@ -224,7 +226,7 @@ class Redirect implements ContainsQueryableValues, Contract
             'response_code' => $this->responseCode()->value,
             'enabled' => $this->enabled(),
             'preserve_query_string' => $this->responseCode() === ResponseCode::Gone ? null : $this->preserveQueryString(),
-            'automatic' => $this->automatic(),
+            'origin' => $this->origin()->value,
             'description' => $this->description(),
             'created_at' => $this->createdAt(),
         ];

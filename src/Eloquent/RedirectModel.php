@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
+use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Statamic\Eloquent\Database\BaseModel;
 
@@ -20,7 +21,7 @@ class RedirectModel extends BaseModel
         return [
             'enabled' => 'boolean',
             'preserve_query_string' => 'boolean',
-            'automatic' => 'boolean',
+            'origin' => Origin::class,
             'response_code' => ResponseCode::class,
         ];
     }
