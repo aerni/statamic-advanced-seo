@@ -42,6 +42,17 @@ it('evicts the lowest-count error when recording at capacity', function () {
         ->and(Redirect::errors()->findByUrl('/new', 'default'))->not->toBeNull();
 });
 
+it('keeps at least one error when max_records is zero', function () {
+    config(['advanced-seo.redirects.errors.max_records' => 0]);
+
+    Redirect::errors()->record('/a', 'default');
+    Redirect::errors()->record('/b', 'default');
+    Redirect::errors()->record('/c', 'default');
+
+    expect(Redirect::errors()->all())->toHaveCount(1)
+        ->and(Redirect::errors()->findByUrl('/c', 'default'))->not->toBeNull();
+});
+
 it('records via the queued job', function () {
     (new RecordRedirectErrorJob('/missing', 'default'))->handle();
 

@@ -37,7 +37,7 @@ class PruneRedirectErrors extends Command
 
     protected function enforceMaxRecords(): void
     {
-        $max = (int) config('advanced-seo.redirects.errors.max_records', 1000);
+        $max = max(1, (int) config('advanced-seo.redirects.errors.max_records', 1000));
 
         $count = Redirect::errors()->query()->count();
 

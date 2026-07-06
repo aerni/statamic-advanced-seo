@@ -38,6 +38,17 @@ it('records and dedups urls longer than 255 characters via the url hash', functi
         ->and(Redirect::errors()->all())->toHaveCount(2);
 });
 
+it('keeps at least one error when max_records is zero', function () {
+    config(['advanced-seo.redirects.errors.max_records' => 0]);
+
+    Redirect::errors()->record('/a', 'default');
+    Redirect::errors()->record('/b', 'default');
+    Redirect::errors()->record('/c', 'default');
+
+    expect(Redirect::errors()->all())->toHaveCount(1)
+        ->and(Redirect::errors()->findByUrl('/c', 'default'))->not->toBeNull();
+});
+
 it('evicts the lowest-count error via query when recording at capacity', function () {
     config(['advanced-seo.redirects.errors.max_records' => 2]);
 
