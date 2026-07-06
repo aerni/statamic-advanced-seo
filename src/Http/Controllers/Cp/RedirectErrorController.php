@@ -11,6 +11,7 @@ use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
@@ -39,7 +40,8 @@ class RedirectErrorController extends CpController
             $query = RedirectFacade::errors()->query()->whereIn('site', $sites);
 
             if ($search = $request->input('search')) {
-                $query->where('url', 'LIKE', '%'.$search.'%');
+                // Stored urls are lowercased, so lower the needle to match on both drivers.
+                $query->where('url', 'LIKE', '%'.Str::lower($search).'%');
             }
 
             $activeFilterBadges = $this->queryFilters($query, $request->filters);

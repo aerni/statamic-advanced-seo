@@ -77,6 +77,18 @@ it('sorts by path ascending by default', function () {
         ->assertJsonPath('data.2.url', '/charlie');
 });
 
+it('searches urls case-insensitively', function () {
+    Redirect::errors()->make()->url('/wp-admin')->site('default')->count(1)->save();
+    Redirect::errors()->make()->url('/other')->site('default')->count(1)->save();
+
+    $response = $this->actingAs($this->user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index', ['search' => 'WP-ADMIN']))
+        ->assertOk();
+
+    expect($response->json('data'))->toHaveCount(1)
+        ->and($response->json('data.0.url'))->toBe('/wp-admin');
+});
+
 it('filters by redirect status', function () {
     Redirect::errors()->make()->url('/handled')->site('default')->count(1)->save();
     Redirect::errors()->make()->url('/unhandled')->site('default')->count(1)->save();
