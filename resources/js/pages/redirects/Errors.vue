@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, useTemplateRef, getCurrentInstance } from 'vue';
 import { Head } from '@statamic/cms/inertia';
-import { Header, Button, Badge, Listing, StatusIndicator, Stack, PublishContainer, PublishTabs, Panel, Heading, Switch, ConfirmationModal } from '@statamic/cms/ui';
+import { Header, Button, Badge, Listing, StatusIndicator, Stack, PublishContainer, PublishTabs, ConfirmationModal } from '@statamic/cms/ui';
 import { Pipeline, Request } from '@statamic/cms/save-pipeline';
 
 const props = defineProps({
@@ -25,7 +25,6 @@ const container = useTemplateRef('container');
 const creating = ref(null);
 const values = ref({});
 const meta = ref(props.createMeta);
-const enabled = ref(true);
 const errors = ref({});
 const saving = ref(false);
 
@@ -52,7 +51,6 @@ function clearAll() {
 
 function openCreate(error) {
     values.value = { ...props.createValues, source: error.url, site: error.site };
-    enabled.value = true;
     errors.value = {};
     creating.value = { source: error.url, site: error.site };
 }
@@ -61,7 +59,7 @@ function save() {
     new Pipeline()
         .provide({ container, errors, saving })
         .through([
-            new Request(props.createUrl, 'post', { enabled: enabled.value, origin: 'error' }),
+            new Request(props.createUrl, 'post', { enabled: true, origin: 'error' }),
         ])
         .then(() => {
             Statamic.$toast.success(__('Saved'));
@@ -158,14 +156,7 @@ function save() {
             :errors="errors"
             v-model="values"
         >
-            <PublishTabs>
-                <template #actions>
-                    <Panel class="flex justify-between px-5! py-3! dark:bg-gray-800!">
-                        <Heading :text="__('advanced-seo::fields.redirect_enabled.display')" />
-                        <Switch v-model="enabled" />
-                    </Panel>
-                </template>
-            </PublishTabs>
+            <PublishTabs />
         </PublishContainer>
 
         <div class="mt-4 flex justify-end">
