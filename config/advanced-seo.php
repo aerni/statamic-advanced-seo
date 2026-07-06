@@ -388,6 +388,18 @@ return [
             'enabled' => true,
             'directory' => storage_path('statamic/advanced-seo/redirect-errors'),
             'purge_after_days' => 30,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Record Cap
+            |--------------------------------------------------------------------------
+            |
+            | The list keeps the most-hit errors up to this cap, evicting the
+            | lowest-count records first. The cap is best-effort under concurrent
+            | recording and may be briefly exceeded until the next write or prune.
+            |
+            */
+
             'max_records' => 1000,
 
             /*
@@ -398,7 +410,8 @@ return [
             | Paths matching any of these patterns are never recorded as errors,
             | keeping bot and scanner noise out of the list. Use an exact path
             | (/foo), a wildcard (/bar/*), or a regex (#...#), just like a
-            | redirect source.
+            | redirect source. Keep regex patterns simple, they run against
+            | request paths on every unmatched 404.
             |
             */
 
