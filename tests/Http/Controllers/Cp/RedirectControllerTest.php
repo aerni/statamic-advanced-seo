@@ -341,6 +341,19 @@ it('forbids a viewer from storing a redirect', function () {
         ->assertForbidden();
 });
 
+it('forbids storing a redirect for a site the user cannot access', function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+
+    $this->actingAs(redirectManager())
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'french'])
+        ->assertForbidden();
+
+    expect(Redirect::query()->where('site', 'french')->where('source', '/old')->first())->toBeNull();
+});
+
 it('updates a redirect', function () {
     $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
@@ -386,6 +399,21 @@ it('forbids a viewer from updating a redirect', function () {
         ->patchJson(cp_route('advanced-seo.redirects.update', $redirect->id()), [
             'source' => '/old', 'destination' => '/newer', 'response_code' => 301, 'enabled' => true, 'site' => 'default',
         ])->assertForbidden();
+});
+
+it('forbids moving a redirect to a site the user cannot access', function () {
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs(redirectManager())
+        ->patchJson(cp_route('advanced-seo.redirects.update', $redirect->id()), [
+            'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'french',
+        ])->assertForbidden();
+
+    expect(Redirect::find($redirect->id())->site())->toBe('default');
 });
 
 it('deletes a redirect', function () {
