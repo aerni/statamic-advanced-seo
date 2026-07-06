@@ -156,7 +156,7 @@ onUnmounted(() => saveKeyBinding.destroy());
                             <dd class="text-right tabular-nums text-gray-925 dark:text-gray-300">{{ hits.count }}</dd>
                             <template v-if="hits.last_hit_at">
                                 <dt class="text-gray-600/90 dark:text-gray-400">{{ __('advanced-seo::messages.redirect_last_hit_at') }}</dt>
-                                <dd class="text-right text-gray-925 dark:text-gray-300"><date-time :of="hits.last_hit_at" /></dd>
+                                <dd class="text-right text-gray-925 dark:text-gray-300"><date-time :of="hits.last_hit_at" :options="{ relative: true }" /></dd>
                             </template>
                         </template>
                         <template v-if="createdAt">

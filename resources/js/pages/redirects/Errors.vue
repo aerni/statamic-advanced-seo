@@ -75,7 +75,7 @@ function save() {
             <date-time v-if="error.first_seen_at" :of="error.first_seen_at" />
         </template>
         <template #cell-last_seen_at="{ row: error }">
-            <date-time v-if="error.last_seen_at" :of="error.last_seen_at" />
+            <date-time v-if="error.last_seen_at" :of="error.last_seen_at" :options="{ relative: true }" />
         </template>
         <template #cell-redirect="{ row: error }">
             <Button

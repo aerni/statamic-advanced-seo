@@ -58,7 +58,7 @@ defineProps({
                 {{ redirect.site_name }}
             </template>
             <template #cell-last_hit_at="{ row: redirect }">
-                <date-time v-if="redirect.last_hit_at" :of="redirect.last_hit_at" />
+                <date-time v-if="redirect.last_hit_at" :of="redirect.last_hit_at" :options="{ relative: true }" />
             </template>
             <template #cell-created_at="{ row: redirect }">
                 <date-time v-if="redirect.created_at" :of="redirect.created_at" />
