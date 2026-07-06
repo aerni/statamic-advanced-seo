@@ -10,14 +10,15 @@ return new class extends Migration
     {
         Schema::create($this->prefix('redirect_errors'), function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->string('url');
+            $table->text('url');
+            $table->string('url_hash', 32);
             $table->string('site');
             $table->unsignedInteger('count')->default(0);
             $table->unsignedInteger('first_seen_at')->nullable();
             $table->unsignedInteger('last_seen_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['url', 'site']);
+            $table->unique(['url_hash', 'site']);
             $table->index(['count', 'last_seen_at']);
         });
     }

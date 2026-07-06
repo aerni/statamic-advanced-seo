@@ -22,4 +22,11 @@ class RedirectErrorModel extends BaseModel
             'last_seen_at' => 'integer',
         ];
     }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $model): void {
+            $model->url_hash = hash('xxh128', (string) $model->url);
+        });
+    }
 }
