@@ -17,17 +17,17 @@ beforeEach(function () {
 });
 
 it('lists errors with a derived redirect status', function () {
-    Redirect::errors()->make()->url('/handled')->site('default')->count(5)->lastSeenAt(Carbon::parse('2026-07-02 10:00:00')->timestamp)->save();
+    Redirect::errors()->make()->url('/enabled')->site('default')->count(5)->lastSeenAt(Carbon::parse('2026-07-02 10:00:00')->timestamp)->save();
     Redirect::errors()->make()->url('/unhandled')->site('default')->count(2)->lastSeenAt(Carbon::parse('2026-07-02 09:00:00')->timestamp)->save();
-    Redirect::make()->source('/handled')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/enabled')->destination('/new')->site('default')->save();
 
     $response = $this->actingAs($this->user)
         ->getJson(cp_route('advanced-seo.redirects.errors.index').'?sort=hits&order=desc')
         ->assertOk();
 
-    $response->assertJsonPath('data.0.url', '/handled')
+    $response->assertJsonPath('data.0.url', '/enabled')
         ->assertJsonPath('data.0.hits', 5)
-        ->assertJsonPath('data.0.status', 'handled')
+        ->assertJsonPath('data.0.status', 'enabled')
         ->assertJsonPath('data.0.destination', '/new')
         ->assertJsonPath('data.1.url', '/unhandled')
         ->assertJsonPath('data.1.status', 'unhandled')
@@ -46,7 +46,7 @@ it('labels a gone redirect with its response code when it has no destination', f
         ->getJson(cp_route('advanced-seo.redirects.errors.index'))
         ->assertOk();
 
-    $response->assertJsonPath('data.0.status', 'handled')
+    $response->assertJsonPath('data.0.status', 'enabled')
         ->assertJsonPath('data.0.destination', null)
         ->assertJsonPath('data.0.response_code_label', '410 (Gone)');
 });

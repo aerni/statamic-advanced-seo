@@ -52,7 +52,7 @@ return [
     'redirect_error_first_seen' => 'Zuerst gesehen',
     'redirect_error_last_seen' => 'Zuletzt gesehen',
     'redirect_error_redirect' => 'Weiterleitung',
-    'redirect_error_status_handled' => 'Aktiviert',
+    'redirect_error_status_enabled' => 'Aktiviert',
     'redirect_error_status_disabled' => 'Deaktiviert',
     'redirect_error_status_unhandled' => 'Unbehandelt',
     'redirect_error_create_redirect' => 'Weiterleitung erstellen',

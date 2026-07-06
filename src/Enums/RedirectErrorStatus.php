@@ -6,7 +6,7 @@ use Aerni\AdvancedSeo\Contracts\Redirect;
 
 enum RedirectErrorStatus: string
 {
-    case Handled = 'handled';
+    case Enabled = 'enabled';
     case Disabled = 'disabled';
     case Unhandled = 'unhandled';
 
@@ -19,7 +19,7 @@ enum RedirectErrorStatus: string
             return self::Unhandled;
         }
 
-        return $redirect->enabled() ? self::Handled : self::Disabled;
+        return $redirect->enabled() ? self::Enabled : self::Disabled;
     }
 
     public function label(): string

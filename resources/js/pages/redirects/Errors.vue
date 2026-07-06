@@ -131,7 +131,7 @@ function save() {
             >
                 <Badge color="default">
                     <span class="flex items-center gap-1.5">
-                        <StatusIndicator :status="error.status === 'handled' ? 'published' : 'draft'" class="shrink-0" />
+                        <StatusIndicator :status="error.status === 'enabled' ? 'published' : 'draft'" class="shrink-0" />
                         <span class="truncate max-w-[20rem]" v-text="error.destination || error.response_code_label" />
                     </span>
                 </Badge>
