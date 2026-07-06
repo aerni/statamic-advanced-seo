@@ -47,7 +47,7 @@ class RedirectErrorController extends CpController
             $errors = $query->get();
 
             if ($status = Arr::get($request->filters, 'redirect_error_status.status')) {
-                $errors = $errors->filter(fn ($error) => $this->status($checker, $error) === $status);
+                $errors = $errors->filter(fn ($error) => ErrorHandledChecker::status($checker->match($error->url(), $error->site())) === $status);
             }
 
             $errors = $this->sort($errors, $request->input('sort', 'url'), $request->input('order', 'asc'));
@@ -108,17 +108,6 @@ class RedirectErrorController extends CpController
             'site' => $error->site(),
             default => $error->url(),
         }, SORT_REGULAR, $direction === 'desc')->values();
-    }
-
-    protected function status(ErrorHandledChecker $checker, $error): string
-    {
-        $redirect = $checker->match($error->url(), $error->site());
-
-        if ($redirect === null) {
-            return 'unhandled';
-        }
-
-        return $redirect->enabled() ? 'handled' : 'disabled';
     }
 
     protected function paginate(Collection $errors, ?int $perPage): LengthAwarePaginator

@@ -2,7 +2,6 @@
 
 namespace Aerni\AdvancedSeo\Http\Resources\Cp\Redirects;
 
-use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Redirects\ErrorHandledChecker;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
@@ -33,20 +32,11 @@ class ListedError extends JsonResource
             'last_seen_at' => $error->lastSeenAtIso(),
             'site' => $error->site(),
             'site_name' => Site::get($error->site())?->name() ?? $error->site(),
-            'status' => $this->status($redirect),
+            'status' => ErrorHandledChecker::status($redirect),
             'destination' => $redirect?->destinationUrl() ?? $redirect?->destination(),
             'response_code_label' => $redirect?->responseCode()->label(),
             'redirect_url' => $redirect?->editUrl(),
             'actions' => Action::for($error),
         ];
-    }
-
-    protected function status(?Redirect $redirect): string
-    {
-        if ($redirect === null) {
-            return 'unhandled';
-        }
-
-        return $redirect->enabled() ? 'handled' : 'disabled';
     }
 }

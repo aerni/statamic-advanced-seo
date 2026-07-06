@@ -57,6 +57,18 @@ class ErrorHandledChecker
             ?? $this->matchIn($url, $site, enabled: false);
     }
 
+    /**
+     * Map a matched redirect to an error status: handled, disabled, or unhandled.
+     */
+    public static function status(?Redirect $redirect): string
+    {
+        if ($redirect === null) {
+            return 'unhandled';
+        }
+
+        return $redirect->enabled() ? 'handled' : 'disabled';
+    }
+
     protected function matchIn(string $url, string $site, bool $enabled): ?Redirect
     {
         // An exact redirect shadows any pattern, mirroring the resolver.
