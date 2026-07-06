@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Actions\Statamic;
 
+use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Statamic\Actions\Action;
-use Statamic\Facades\Site;
 
 class DeleteRedirectError extends Action
 {
@@ -29,8 +29,7 @@ class DeleteRedirectError extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('manage redirects')
-            && $user->can('view', Site::get($item->site()));
+        return $user->can('manage', Redirect::class);
     }
 
     public function confirmationText()

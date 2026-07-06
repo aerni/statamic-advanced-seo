@@ -109,7 +109,7 @@ return [
 
     // Permissions
     'permission_configure_seo' => 'Configure SEO (Full Access)',
-    'permission_configure_seo_description' => 'Grants all permissions including the ability to edit settings, defaults, and content',
+    'permission_configure_seo_description' => 'Grants all permissions including the ability to configure settings, defaults, content, and redirects',
     'permission_edit_defaults' => 'Edit Defaults',
     'permission_edit_defaults_description' => 'Grants ability to edit collection and taxonomy defaults, and access the SEO tab on entries and terms',
     'permission_edit_content' => 'Edit Content',

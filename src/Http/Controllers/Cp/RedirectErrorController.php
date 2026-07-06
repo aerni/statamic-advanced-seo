@@ -64,7 +64,7 @@ class RedirectErrorController extends CpController
         $createBlueprint = $canCreate ? RedirectBlueprint::definition() : null;
         $createFields = $createBlueprint?->fields()->preProcess();
 
-        $canClear = User::current()->can('manage redirects');
+        $canClear = User::current()->can('manage', Redirect::class);
 
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
@@ -86,7 +86,7 @@ class RedirectErrorController extends CpController
     {
         throw_unless(RedirectsFeature::enabled() && config('advanced-seo.redirects.errors.enabled'), new NotFoundHttpException);
 
-        abort_unless(User::current()->can('manage redirects'), 403);
+        abort_unless(User::current()->can('manage', Redirect::class), 403);
 
         RedirectFacade::errors()->query()
             ->whereIn('site', Site::authorized()->map->handle()->all())

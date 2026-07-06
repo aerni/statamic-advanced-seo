@@ -38,6 +38,22 @@ it('deletes the selected errors', function () {
     expect(Redirect::errors()->all())->toHaveCount(0);
 });
 
+it('deletes errors for a user with the configure seo catch-all permission', function () {
+    tap(Role::make('seo')->addPermission(['access cp', 'configure seo', 'access default site']))->save();
+    $user = tap(User::make()->assignRole('seo'))->save();
+
+    $error = tap(Redirect::errors()->make()->url('/a')->site('default'))->save();
+
+    $this->actingAs($user)
+        ->post(cp_route('advanced-seo.redirects.errors.actions.run'), [
+            'action' => 'delete_redirect_error',
+            'selections' => [$error->id()],
+            'values' => [],
+        ]);
+
+    expect(Redirect::errors()->find($error->id()))->toBeNull();
+});
+
 it('does not delete errors without the manage redirects permission', function () {
     $role = tap(Role::make('viewer')->addPermission(['access cp', 'access default site']))->save();
     $user = tap(User::make()->assignRole('viewer'))->save();

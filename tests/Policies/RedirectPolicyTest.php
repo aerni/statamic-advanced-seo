@@ -31,6 +31,14 @@ it('grants manage to a user with the permission and site access', function () {
         ->and($user->can('manage', $redirect))->toBeTrue();
 });
 
+it('grants manage to a user with the configure seo catch-all permission', function () {
+    $redirect = Redirect::make()->source('/old')->destination('/new')->site('default');
+    $user = userWith(['configure seo', 'access default site']);
+
+    expect($user->can('manage', RedirectContract::class))->toBeTrue()
+        ->and($user->can('manage', $redirect))->toBeTrue();
+});
+
 it('denies manage without the manage redirects permission', function () {
     $redirect = Redirect::make()->source('/old')->destination('/new')->site('default');
     $user = userWith(['access default site']);

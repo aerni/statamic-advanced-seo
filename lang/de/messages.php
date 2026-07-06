@@ -106,7 +106,7 @@ return [
 
     // Permissions
     'permission_configure_seo' => 'SEO konfigurieren (Vollzugriff)',
-    'permission_configure_seo_description' => 'Gewährt alle Berechtigungen, einschliesslich der Möglichkeit, Einstellungen, Standards und Inhalte zu bearbeiten',
+    'permission_configure_seo_description' => 'Gewährt alle Berechtigungen, einschliesslich der Möglichkeit, Einstellungen, Standards, Inhalte und Weiterleitungen zu konfigurieren',
     'permission_edit_defaults' => 'Standards bearbeiten',
     'permission_edit_defaults_description' => 'Ermöglicht das Bearbeiten von Sammlungs- und Taxonomie-Standards sowie den Zugriff auf den SEO-Tab bei Einträgen und Begriffen',
     'permission_edit_content' => 'Inhalte bearbeiten',

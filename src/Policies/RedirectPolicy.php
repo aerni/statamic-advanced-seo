@@ -33,7 +33,7 @@ class RedirectPolicy
             ? Site::get($redirect->site())
             : Site::selected();
 
-        return $user->hasPermission('manage redirects')
+        return ($user->hasPermission('manage redirects') || $user->hasPermission('configure seo'))
             && $this->userCanAccessSite($user, $site);
     }
 }

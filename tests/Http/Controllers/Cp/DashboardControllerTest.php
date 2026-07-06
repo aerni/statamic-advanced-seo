@@ -77,7 +77,7 @@ it('passes null redirects prop when user cannot manage redirects', function () {
     config(['advanced-seo.redirects.enabled' => true]);
     flushBlink();
 
-    $role = tap(Role::make('seo_editor')->addPermission(['access cp', 'configure seo', 'access default site']))->save();
+    $role = tap(Role::make('seo_editor')->addPermission(['access cp', 'edit seo defaults', 'edit pages entries', 'access default site']))->save();
     $user = tap(User::make()->assignRole('seo_editor'))->save();
 
     $this->actingAs($user)
