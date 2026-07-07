@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\ServiceProvider;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Support\Collection;
 use Statamic\CP\Navigation\Nav as NavInstance;
 use Statamic\Facades\CP\Nav;
@@ -9,7 +10,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
 
 beforeEach(function () {
     Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);

@@ -8,6 +8,6 @@ class Redirects extends Feature
 {
     protected static function available(): bool
     {
-        return AdvancedSeo::pro() && config('advanced-seo.redirects.enabled', true);
+        return AdvancedSeo::pro() && config('advanced-seo.redirects.enabled', false);
     }
 }

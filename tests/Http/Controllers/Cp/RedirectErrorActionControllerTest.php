@@ -1,12 +1,13 @@
 <?php
 
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
 
 beforeEach(function () {
     config(['advanced-seo.redirects.errors.enabled' => true]);

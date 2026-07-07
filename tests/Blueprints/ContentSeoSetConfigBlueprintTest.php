@@ -4,11 +4,12 @@ use Aerni\AdvancedSeo\Blueprints\ContentSeoSetConfigBlueprint;
 use Aerni\AdvancedSeo\Context\Context;
 use Aerni\AdvancedSeo\Enums\Scope;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
 
 beforeEach(function () {
     Site::setSites([

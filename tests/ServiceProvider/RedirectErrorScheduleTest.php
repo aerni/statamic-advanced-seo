@@ -1,6 +1,9 @@
 <?php
 
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Console\Scheduling\Schedule;
+
+uses(EnablesRedirects::class);
 
 function scheduledPruneEvent()
 {

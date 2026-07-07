@@ -1,11 +1,12 @@
 <?php
 
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
-uses(UseEloquentDriver::class);
+uses(UseEloquentDriver::class, EnablesRedirects::class);
 
 beforeEach(function () {
     Site::setSites([

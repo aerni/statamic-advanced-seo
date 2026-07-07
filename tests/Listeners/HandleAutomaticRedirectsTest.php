@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades\Collection;
@@ -13,7 +14,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
 
 beforeEach(function () {
     Site::setSites([

@@ -4,11 +4,12 @@ use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Support\Facades\Queue;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
 
 beforeEach(function () {
     Site::setSites([

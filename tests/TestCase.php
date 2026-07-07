@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Tests;
 use Aerni\AdvancedSeo\ServiceProvider;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesAi;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
@@ -57,6 +58,10 @@ abstract class TestCase extends AddonTestCase
             $app['config']->set('advanced-seo.crawling.environments', ['testing']);
         }
 
+        if ($this->usesRedirects()) {
+            $app['config']->set('advanced-seo.redirects.enabled', true);
+        }
+
         if ($this->usesAi()) {
             $app['config']->set('advanced-seo.ai.enabled', true);
             $app['config']->set('ai.default', 'openai');
@@ -106,6 +111,11 @@ abstract class TestCase extends AddonTestCase
     protected function usesSitemap(): bool
     {
         return isset(array_flip(class_uses_recursive(static::class))[EnablesSitemap::class]);
+    }
+
+    protected function usesRedirects(): bool
+    {
+        return isset(array_flip(class_uses_recursive(static::class))[EnablesRedirects::class]);
     }
 
     protected function usesAi(): bool

@@ -3,6 +3,7 @@
 use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Role;
@@ -10,7 +11,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
 
 beforeEach(function () {
     Site::setSites([
