@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\EloquentDriver;
 use Aerni\AdvancedSeo\Features\GraphQL;
+use Aerni\AdvancedSeo\Features\Redirects;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
@@ -64,6 +65,7 @@ class Install extends Command
         foreach ($this->askProFeatures() as $feature) {
             match ($feature) {
                 'sitemap' => $this->setupSitemap(),
+                'redirects' => $this->setupRedirects(),
                 'ai' => $this->setupAi(),
                 'social_images' => $this->setupSocialImages(),
                 'graphql' => $this->setupGraphQl(),
@@ -146,6 +148,11 @@ class Install extends Command
                 'enabled' => Sitemap::enabled(),
             ],
             [
+                'key' => 'redirects',
+                'label' => 'Redirects',
+                'enabled' => Redirects::enabled(),
+            ],
+            [
                 'key' => 'ai',
                 'label' => 'AI Copywriting',
                 'enabled' => Ai::enabled(),
@@ -181,6 +188,12 @@ class Install extends Command
     {
         $this->setConfigValue('sitemap.enabled', 'true');
         info('Sitemaps enabled.');
+    }
+
+    protected function setupRedirects(): void
+    {
+        $this->setConfigValue('redirects.enabled', 'true');
+        info('Redirects enabled.');
     }
 
     protected function setupAi(): void
