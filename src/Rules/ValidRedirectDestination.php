@@ -24,7 +24,7 @@ class ValidRedirectDestination implements ValidationRule
         }
 
         if (Validator::make(['url' => $value], ['url' => 'url:http,https'])->fails()) {
-            $fail(__('advanced-seo::messages.redirect_destination_invalid'))->translate();
+            $fail(__('advanced-seo::validation.redirect_destination_invalid'))->translate();
         }
     }
 }

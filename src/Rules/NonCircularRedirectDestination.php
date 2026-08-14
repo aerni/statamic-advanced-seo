@@ -38,7 +38,7 @@ class NonCircularRedirectDestination implements DataAwareRule, ValidationRule
         $sourcePath = $this->normalizedPath($source);
 
         if ($this->destinationPath($destination) === $sourcePath) {
-            $fail(__('advanced-seo::messages.redirect_destination_circular'))->translate();
+            $fail(__('advanced-seo::validation.redirect_destination_circular'))->translate();
         }
     }
 

@@ -271,26 +271,26 @@ class ServiceProvider extends AddonServiceProvider
             Permission::group('advanced-seo', 'Advanced SEO', function () {
                 Permission::register('configure seo', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_configure_seo'))
-                        ->description(__('advanced-seo::messages.permission_configure_seo_description'));
+                        ->label(__('advanced-seo::permissions.configure_seo'))
+                        ->description(__('advanced-seo::permissions.configure_seo_description'));
                 });
 
                 Permission::register('edit seo defaults', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_edit_defaults'))
-                        ->description(__('advanced-seo::messages.permission_edit_defaults_description'));
+                        ->label(__('advanced-seo::permissions.edit_defaults'))
+                        ->description(__('advanced-seo::permissions.edit_defaults_description'));
                 });
 
                 Permission::register('edit seo content', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_edit_content'))
-                        ->description(__('advanced-seo::messages.permission_edit_content_description'));
+                        ->label(__('advanced-seo::permissions.edit_content'))
+                        ->description(__('advanced-seo::permissions.edit_content_description'));
                 });
 
                 Permission::register('manage redirects', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_manage_redirects'))
-                        ->description(__('advanced-seo::messages.permission_manage_redirects_description'));
+                        ->label(__('advanced-seo::permissions.manage_redirects'))
+                        ->description(__('advanced-seo::permissions.manage_redirects_description'));
                 });
             });
         });

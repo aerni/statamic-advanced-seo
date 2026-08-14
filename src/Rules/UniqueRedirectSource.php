@@ -19,7 +19,7 @@ class UniqueRedirectSource implements ValidationRule
             ->first();
 
         if ($existing && $existing->id() !== $this->exceptId) {
-            $fail(__('advanced-seo::messages.redirect_source_not_unique'))->translate();
+            $fail(__('advanced-seo::validation.redirect_source_not_unique'))->translate();
         }
     }
 }

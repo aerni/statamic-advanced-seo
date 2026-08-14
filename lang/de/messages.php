@@ -17,14 +17,6 @@ return [
     'terms' => 'Begriffe',
     'reset_to_default' => 'Auf Standard zurücksetzen',
 
-    // Validation
-    'redirect_source_invalid' => 'Die Quelle muss mit einem Schrägstrich beginnen oder ein in # eingeschlossener regulärer Ausdruck sein.',
-    'redirect_source_invalid_regex' => 'Die Quelle ist kein gültiger regulärer Ausdruck.',
-    'redirect_source_not_unique' => 'Eine Weiterleitung mit dieser Quelle existiert bereits für diese Website.',
-    'redirect_destination_invalid' => 'Das Ziel muss ein Pfad sein, der mit einem Schrägstrich beginnt (z. B. /about), oder eine vollständige URL inklusive Schema (z. B. https://example.com).',
-    'redirect_destination_unpublished' => 'Das Ziel muss ein veröffentlichter Eintrag sein, sonst würde die Weiterleitung zu einem 404 führen.',
-    'redirect_destination_circular' => 'Das Ziel führt zur selben URL wie die Quelle.',
-
     // Redirects
     'redirects' => 'Weiterleitungen',
     'redirects_description' => 'URL-Weiterleitungen für deine Websites verwalten.',
@@ -124,16 +116,6 @@ return [
     'ai_generate' => 'Mit KI generieren',
     'ai_insufficient_content' => 'Füge mindestens :characters weitere Zeichen hinzu, um mit KI zu generieren.',
     'ai_generation_failed' => 'KI-Generierung fehlgeschlagen. Bitte versuche es erneut.',
-
-    // Permissions
-    'permission_configure_seo' => 'SEO konfigurieren (Vollzugriff)',
-    'permission_configure_seo_description' => 'Gewährt alle Berechtigungen, einschliesslich der Möglichkeit, Einstellungen, Standards, Inhalte und Weiterleitungen zu konfigurieren',
-    'permission_edit_defaults' => 'Standards bearbeiten',
-    'permission_edit_defaults_description' => 'Ermöglicht das Bearbeiten von Sammlungs- und Taxonomie-Standards sowie den Zugriff auf den SEO-Tab bei Einträgen und Begriffen',
-    'permission_edit_content' => 'Inhalte bearbeiten',
-    'permission_edit_content_description' => 'Gewährt Zugriff auf den SEO-Tab bei Einträgen und Begriffen',
-    'permission_manage_redirects' => 'Weiterleitungen verwalten',
-    'permission_manage_redirects_description' => 'Gewährt vollen Zugriff zum Anzeigen, Erstellen, Bearbeiten und Löschen von Weiterleitungen und deren Fehlern.',
 
     // Pro
     'pro_features' => 'Upgrade auf Pro',

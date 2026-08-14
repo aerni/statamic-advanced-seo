@@ -18,7 +18,7 @@ class PublishedRedirectDestination implements ValidationRule
         $entry = Entry::find(Str::after($value, 'entry::'));
 
         if ($entry && ! $entry->published()) {
-            $fail(__('advanced-seo::messages.redirect_destination_unpublished'))->translate();
+            $fail(__('advanced-seo::validation.redirect_destination_unpublished'))->translate();
         }
     }
 }

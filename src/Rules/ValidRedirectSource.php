@@ -11,21 +11,21 @@ class ValidRedirectSource implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || $value === '') {
-            $fail(__('advanced-seo::messages.redirect_source_invalid'))->translate();
+            $fail(__('advanced-seo::validation.redirect_source_invalid'))->translate();
 
             return;
         }
 
         if (SourceType::fromSource($value) === SourceType::Regex) {
             if (@preg_match($value, '') === false) {
-                $fail(__('advanced-seo::messages.redirect_source_invalid_regex'))->translate();
+                $fail(__('advanced-seo::validation.redirect_source_invalid_regex'))->translate();
             }
 
             return;
         }
 
         if (! str_starts_with($value, '/')) {
-            $fail(__('advanced-seo::messages.redirect_source_invalid'))->translate();
+            $fail(__('advanced-seo::validation.redirect_source_invalid'))->translate();
         }
     }
 }
