@@ -16,6 +16,22 @@ beforeEach(function () {
     ]);
 });
 
+it('clears matching errors when an enabled redirect is saved', function () {
+    Redirect::errors()->make()->url('/old')->site('default')->save();
+
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
+
+    expect(Redirect::errors()->findByUrl('/old', 'default'))->toBeNull();
+});
+
+it('leaves errors in place when the saved redirect is disabled', function () {
+    Redirect::errors()->make()->url('/old')->site('default')->save();
+
+    Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false)->save();
+
+    expect(Redirect::errors()->findByUrl('/old', 'default'))->not->toBeNull();
+});
+
 it('deletes an exact error on the same site', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
     $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->saveQuietly();
