@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
+use Statamic\Facades\Site;
 
 class RedirectErrorInbox
 {
@@ -28,6 +29,7 @@ class RedirectErrorInbox
     {
         RedirectFacade::query()
             ->where('enabled', true)
+            ->whereIn('site', Site::all()->map->handle()->all())
             ->get()
             ->each(fn ($redirect) => $this->deleteErrorsHandledBy($redirect));
     }

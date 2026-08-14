@@ -157,6 +157,17 @@ it('returns null from destinationUrl when destination is null', function () {
     expect((new Redirect)->destination(null)->site('default')->destinationUrl())->toBeNull();
 });
 
+it('does not resolve a relative destination for an unknown site unless it is gone', function () {
+    Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
+
+    $redirect = (new Redirect)->source('/old')->destination('/new')->site('unknown');
+    $gone = (new Redirect)->source('/old')->responseCode(ResponseCode::Gone)->site('unknown');
+
+    expect($redirect->destinationUrl())->toBeNull()
+        ->and($redirect->resolves())->toBeFalse()
+        ->and($gone->resolves())->toBeTrue();
+});
+
 it('builds an absolute sourceUrl for an exact redirect using the site absoluteUrl', function () {
     Site::setSites([
         'default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en'],

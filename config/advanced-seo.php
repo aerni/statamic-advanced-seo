@@ -485,9 +485,10 @@ return [
             |
             | The list keeps the most-hit errors up to this cap, evicting the
             | lowest-count records first. Set to an integer, or false to disable
-            | the cap. The Stache driver still needs a numeric cap at the store
-            | level. The cap is best-effort under concurrent recording and may be
-            | briefly exceeded until the next write or prune.
+            | the cap for both drivers. Disabling the cap is only recommended with
+            | Eloquent because the file/Stache driver adds a YAML file for every
+            | recorded 404. The cap is best-effort under concurrent recording and
+            | may be briefly exceeded until the next write or prune.
             |
             */
 

@@ -32,6 +32,12 @@ it('leaves errors in place when the saved redirect is disabled', function () {
     expect(Redirect::errors()->findByUrl('/old', 'default'))->not->toBeNull();
 });
 
+it('saves an enabled relative redirect for an unknown site without failing', function () {
+    $redirect = Redirect::make()->source('/old')->destination('/new')->site('unknown')->save();
+
+    expect($redirect->site())->toBe('unknown');
+});
+
 it('deletes an exact error on the same site', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
     $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->saveQuietly();

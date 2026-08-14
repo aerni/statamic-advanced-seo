@@ -68,3 +68,9 @@ it('deletes errors covered by enabled redirects', function () {
 
     expect(Redirect::errors()->findByUrl('/old', 'default'))->toBeNull();
 });
+
+it('ignores enabled redirects for unknown sites', function () {
+    Redirect::make()->source('/old')->destination('/new')->site('unknown')->saveQuietly();
+
+    $this->artisan('seo:prune-redirect-errors')->assertExitCode(0);
+});

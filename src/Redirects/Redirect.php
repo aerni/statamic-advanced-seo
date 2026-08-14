@@ -114,6 +114,12 @@ class Redirect implements ContainsQueryableValues, Contract
             return null;
         }
 
+        $site = Site::get($this->site());
+
+        if ($site === null) {
+            return null;
+        }
+
         if (Str::startsWith($destination, 'entry::')) {
             return Entry::find(Str::after($destination, 'entry::'))?->absoluteUrl();
         }
@@ -122,7 +128,7 @@ class Redirect implements ContainsQueryableValues, Contract
             return $destination;
         }
 
-        return URL::assemble(Site::get($this->site())->url(), Str::ensureLeft($destination, '/'));
+        return URL::assemble($site->url(), Str::ensureLeft($destination, '/'));
     }
 
     /**
