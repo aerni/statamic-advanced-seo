@@ -7,7 +7,7 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\Ai;
 use Aerni\AdvancedSeo\Features\EloquentDriver;
 use Aerni\AdvancedSeo\Features\GraphQL;
-use Aerni\AdvancedSeo\Features\Redirects;
+use Aerni\AdvancedSeo\Features\RedirectImportExport;
 use Aerni\AdvancedSeo\Features\Sitemap;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\Migrators\AardvarkSeoMigrator;
@@ -150,7 +150,7 @@ class Install extends Command
             [
                 'key' => 'redirects',
                 'label' => 'Redirects',
-                'enabled' => Redirects::enabled(),
+                'enabled' => RedirectImportExport::enabled(),
             ],
             [
                 'key' => 'ai',
@@ -192,7 +192,16 @@ class Install extends Command
 
     protected function setupRedirects(): void
     {
+        note('Setting up Redirects...');
         $this->setConfigValue('redirects.enabled', 'true');
+
+        if (! Composer::isInstalled('spatie/simple-excel')) {
+            spin(
+                callback: fn () => Composer::withoutQueue()->throwOnFailure()->require('spatie/simple-excel'),
+                message: 'Installing spatie/simple-excel...',
+            );
+        }
+
         info('Redirects enabled.');
     }
 

@@ -173,7 +173,6 @@ it('includes the create form payload for a user who can create redirects', funct
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('advanced-seo::Redirects/Errors')
-            ->where('canCreate', true)
             ->where('createUrl', cp_route('advanced-seo.redirects.store'))
             ->has('createBlueprint')
             ->has('createMeta')
@@ -202,7 +201,6 @@ it('includes the clear payload when the user can clear errors', function () {
         ->get(cp_route('advanced-seo.redirects.errors.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->where('canClear', true)
             ->where('clearUrl', cp_route('advanced-seo.redirects.errors.clear'))
             ->where('hasErrors', true)
         );

@@ -9,12 +9,10 @@ const props = defineProps({
     listingUrl: String,
     actionUrl: String,
     filters: Array,
-    canCreate: { type: Boolean, default: false },
     createUrl: { type: String, default: null },
     createBlueprint: { type: Object, default: null },
     createValues: { type: Object, default: null },
     createMeta: { type: Object, default: null },
-    canClear: { type: Boolean, default: false },
     clearUrl: { type: String, default: null },
     hasErrors: { type: Boolean, default: false },
 });
@@ -74,7 +72,7 @@ function save() {
 
     <Header :title icon="alert-warning-exclamation-mark">
         <Button
-            v-if="canClear && anyErrors"
+            v-if="anyErrors"
             variant="primary"
             :text="__('advanced-seo::messages.redirect_errors_clear')"
             @click="confirmingClear = true"
@@ -118,7 +116,7 @@ function save() {
         </template>
         <template #cell-redirect="{ row: error }">
             <Button
-                v-if="error.status === 'unhandled' && canCreate"
+                v-if="error.status === 'unhandled'"
                 size="sm"
                 icon="plus"
                 :text="__('advanced-seo::messages.redirect_error_create_redirect')"

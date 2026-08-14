@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
+use Aerni\AdvancedSeo\Features\RedirectImportExport;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
 use Illuminate\Http\Request;
@@ -95,9 +96,12 @@ class RedirectController extends CpController
             'createUrl' => cp_route('advanced-seo.redirects.create'),
             'listingUrl' => cp_route('advanced-seo.redirects.index'),
             'actionUrl' => cp_route('advanced-seo.redirects.actions.run'),
-            'canCreate' => User::current()->can('manage', Redirect::class),
             'filters' => Scope::filters('redirects'),
             'hasRedirects' => $hasRedirects,
+            'canImportExport' => RedirectImportExport::enabled() && User::current()->can('manage', Redirect::class),
+            'exportCsvUrl' => cp_route('advanced-seo.redirects.export', ['format' => 'csv']),
+            'exportJsonUrl' => cp_route('advanced-seo.redirects.export', ['format' => 'json']),
+            'importUrl' => cp_route('advanced-seo.redirects.import'),
         ]);
     }
 

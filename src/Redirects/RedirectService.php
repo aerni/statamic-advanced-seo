@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository;
 use Aerni\AdvancedSeo\Contracts\RedirectHitRepository;
 use Aerni\AdvancedSeo\Contracts\RedirectRepository;
+use Aerni\AdvancedSeo\Enums\ExportFormat;
 use Illuminate\Support\Traits\ForwardsCalls;
 
 class RedirectService
@@ -21,6 +22,16 @@ class RedirectService
     public function errors(): RedirectErrorRepository
     {
         return app(RedirectErrorRepository::class);
+    }
+
+    public function import(string $path): ImportResult
+    {
+        return app(RedirectImporter::class)->import($path);
+    }
+
+    public function export(ExportFormat $format = ExportFormat::Csv): string
+    {
+        return app(RedirectExporter::class)->export($format);
     }
 
     public function resolve(string $path, string $site): ?ResolvedRedirect

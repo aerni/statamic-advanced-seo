@@ -63,24 +63,19 @@ class RedirectErrorController extends CpController
             return $resource->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
         }
 
-        $canCreate = User::current()->can('manage', Redirect::class);
-        $createBlueprint = $canCreate ? RedirectBlueprint::definition() : null;
-        $createFields = $createBlueprint?->fields()->preProcess();
-
-        $canClear = User::current()->can('manage', Redirect::class);
+        $createBlueprint = RedirectBlueprint::definition();
+        $createFields = $createBlueprint->fields()->preProcess();
 
         return Inertia::render('advanced-seo::Redirects/Errors', [
             'title' => __('advanced-seo::messages.redirect_errors'),
             'listingUrl' => cp_route('advanced-seo.redirects.errors.index'),
             'actionUrl' => cp_route('advanced-seo.redirects.errors.actions.run'),
             'filters' => Scope::filters('redirect-errors'),
-            'canCreate' => $canCreate,
-            'createUrl' => $canCreate ? cp_route('advanced-seo.redirects.store') : null,
-            'createBlueprint' => $createBlueprint?->toPublishArray(),
-            'createValues' => $createFields?->values()->all(),
-            'createMeta' => $createFields?->meta()->all(),
-            'canClear' => $canClear,
-            'clearUrl' => $canClear ? cp_route('advanced-seo.redirects.errors.clear') : null,
+            'createUrl' => cp_route('advanced-seo.redirects.store'),
+            'createBlueprint' => $createBlueprint->toPublishArray(),
+            'createValues' => $createFields->values()->all(),
+            'createMeta' => $createFields->meta()->all(),
+            'clearUrl' => cp_route('advanced-seo.redirects.errors.clear'),
             'hasErrors' => RedirectFacade::errors()->query()->whereIn('site', $sites)->first() !== null,
         ]);
     }

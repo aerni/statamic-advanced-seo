@@ -4,13 +4,14 @@ use Aerni\AdvancedSeo\Enums\Origin;
 use Aerni\AdvancedSeo\Enums\ResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
+use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class, FakesComposerLock::class);
 
 beforeEach(function () {
     Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);
@@ -49,6 +50,28 @@ it('returns hasRedirects false when there are no redirects', function () {
         ->get(cp_route('advanced-seo.redirects.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page->where('hasRedirects', false));
+});
+
+it('passes import/export props when simple-excel is installed', function () {
+    $this->installSimpleExcelPackage();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('canImportExport', true)
+            ->where('exportCsvUrl', cp_route('advanced-seo.redirects.export', ['format' => 'csv']))
+            ->where('exportJsonUrl', cp_route('advanced-seo.redirects.export', ['format' => 'json']))
+            ->where('importUrl', cp_route('advanced-seo.redirects.import')));
+});
+
+it('disables import/export props when simple-excel is missing', function () {
+    $this->uninstallPackages();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('canImportExport', false));
 });
 
 it('returns hasRedirects true when at least one redirect exists', function () {
