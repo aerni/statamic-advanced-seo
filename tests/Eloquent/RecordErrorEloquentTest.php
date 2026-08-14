@@ -49,6 +49,17 @@ it('keeps at least one error when max_records is zero', function () {
         ->and(Redirect::errors()->findByUrl('/c', 'default'))->not->toBeNull();
 });
 
+it('does not evict when max_records is false', function () {
+    config(['advanced-seo.redirects.errors.max_records' => false]);
+
+    Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();
+    Redirect::errors()->make()->url('/b')->site('default')->count(1)->save();
+
+    Redirect::errors()->record('/c', 'default');
+
+    expect(Redirect::errors()->all())->toHaveCount(3);
+});
+
 it('evicts the lowest-count error via query when recording at capacity', function () {
     config(['advanced-seo.redirects.errors.max_records' => 2]);
 

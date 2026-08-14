@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Commands;
 
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Redirects\RedirectErrorInbox;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Statamic\Console\RunsInPlease;
@@ -18,6 +19,7 @@ class PruneRedirectErrors extends Command
     public function handle(): int
     {
         $this->purgeExpiredRecords();
+        $this->deleteHandledRecords();
         $this->enforceMaxRecords();
 
         return self::SUCCESS;
@@ -25,7 +27,11 @@ class PruneRedirectErrors extends Command
 
     protected function purgeExpiredRecords(): void
     {
-        $days = (int) config('advanced-seo.redirects.errors.purge_after_days', 30);
+        $days = Redirect::errors()->purgeAfterDays();
+
+        if ($days === null) {
+            return;
+        }
 
         $cutoff = Carbon::now()->subDays($days)->timestamp;
 
@@ -35,9 +41,18 @@ class PruneRedirectErrors extends Command
             ->each->delete();
     }
 
+    protected function deleteHandledRecords(): void
+    {
+        app(RedirectErrorInbox::class)->deleteHandledErrors();
+    }
+
     protected function enforceMaxRecords(): void
     {
-        $max = max(1, (int) config('advanced-seo.redirects.errors.max_records', 1000));
+        $max = Redirect::errors()->maxRecords();
+
+        if ($max === null) {
+            return;
+        }
 
         $count = Redirect::errors()->query()->count();
 

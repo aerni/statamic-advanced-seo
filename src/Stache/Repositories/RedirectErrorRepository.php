@@ -80,7 +80,11 @@ class RedirectErrorRepository implements Contract
 
     protected function ensureCapacityForError(): void
     {
-        $max = max(1, (int) config('advanced-seo.redirects.errors.max_records', 1000));
+        $max = $this->maxRecords();
+
+        if ($max === null) {
+            return;
+        }
 
         $count = $this->query()->count();
 
