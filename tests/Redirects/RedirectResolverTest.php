@@ -11,7 +11,10 @@ use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 uses(PreventsSavingStacheItemsToDisk::class);
 
 beforeEach(function () {
-    Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);
+    Site::setSites([
+        'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
+        'french' => ['name' => 'French', 'url' => '/fr/', 'locale' => 'fr'],
+    ]);
 });
 
 it('matches an exact rule for the site', function () {
