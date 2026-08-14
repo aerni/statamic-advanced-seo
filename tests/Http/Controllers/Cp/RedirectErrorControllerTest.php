@@ -20,26 +20,26 @@ beforeEach(function () {
 it('lists errors with a derived redirect status', function () {
     Redirect::errors()->make()->url('/enabled')->site('default')->count(5)->lastSeenAt(Carbon::parse('2026-07-02 10:00:00')->timestamp)->save();
     Redirect::errors()->make()->url('/unhandled')->site('default')->count(2)->lastSeenAt(Carbon::parse('2026-07-02 09:00:00')->timestamp)->save();
+    Redirect::errors()->make()->url('/low')->site('default')->count(1)->lastSeenAt(Carbon::parse('2026-07-02 08:00:00')->timestamp)->save();
     Redirect::make()->source('/enabled')->destination('/new')->site('default')->save();
 
     $response = $this->actingAs($this->user)
         ->getJson(cp_route('advanced-seo.redirects.errors.index').'?sort=hits&order=desc')
         ->assertOk();
 
-    $response->assertJsonPath('data.0.url', '/enabled')
-        ->assertJsonPath('data.0.hits', 5)
-        ->assertJsonPath('data.0.status', 'enabled')
-        ->assertJsonPath('data.0.destination', '/new')
-        ->assertJsonPath('data.1.url', '/unhandled')
-        ->assertJsonPath('data.1.status', 'unhandled')
-        ->assertJsonPath('data.1.destination', null);
+    $response->assertJsonPath('data.0.url', '/unhandled')
+        ->assertJsonPath('data.0.hits', 2)
+        ->assertJsonPath('data.0.status', 'unhandled')
+        ->assertJsonPath('data.0.destination', null)
+        ->assertJsonPath('data.1.url', '/low')
+        ->assertJsonPath('data.1.hits', 1);
 
-    expect($response->json('data.0.redirect_url'))->not->toBeNull()
-        ->and($response->json('data.1.redirect_url'))->toBeNull()
+    expect(collect($response->json('data'))->pluck('url'))->not->toContain('/enabled')
+        ->and($response->json('data.0.redirect_url'))->toBeNull()
         ->and(collect($response->json('data.0.actions'))->pluck('handle'))->toContain('delete_redirect_error');
 });
 
-it('labels a gone redirect with its response code when it has no destination', function () {
+it('does not list an error covered by a gone redirect', function () {
     Redirect::errors()->make()->url('/gone')->site('default')->count(1)->save();
     Redirect::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
 
@@ -47,9 +47,7 @@ it('labels a gone redirect with its response code when it has no destination', f
         ->getJson(cp_route('advanced-seo.redirects.errors.index'))
         ->assertOk();
 
-    $response->assertJsonPath('data.0.status', 'enabled')
-        ->assertJsonPath('data.0.destination', null)
-        ->assertJsonPath('data.0.response_code_label', '410 (Gone)');
+    expect($response->json('data'))->toBeEmpty();
 });
 
 it('reports an error covered only by a disabled redirect as disabled', function () {
@@ -90,19 +88,55 @@ it('searches urls case-insensitively', function () {
         ->and($response->json('data.0.url'))->toBe('/wp-admin');
 });
 
-it('filters by redirect status', function () {
-    Redirect::errors()->make()->url('/handled')->site('default')->count(1)->save();
-    Redirect::errors()->make()->url('/unhandled')->site('default')->count(1)->save();
-    Redirect::make()->source('/handled')->destination('/new')->site('default')->save();
-
-    $filters = base64_encode(json_encode(['redirect_error_status' => ['status' => 'unhandled']]));
+it('does not apply the default sort while searching', function () {
+    Redirect::errors()->make()->url('/charlie')->site('default')->count(1)->save();
+    Redirect::errors()->make()->url('/alpha')->site('default')->count(1)->save();
 
     $response = $this->actingAs($this->user)
-        ->getJson(cp_route('advanced-seo.redirects.errors.index', ['filters' => $filters]))
+        ->getJson(cp_route('advanced-seo.redirects.errors.index', ['search' => 'a']))
         ->assertOk();
 
-    expect($response->json('data'))->toHaveCount(1)
-        ->and($response->json('data.0.url'))->toBe('/unhandled');
+    $response->assertJsonPath('data.0.url', '/charlie')
+        ->assertJsonPath('data.1.url', '/alpha');
+});
+
+it('paginates', function () {
+    foreach (range(1, 30) as $i) {
+        Redirect::errors()->make()->url("/p{$i}")->site('default')->count(1)->save();
+    }
+
+    $firstPage = $this->actingAs($this->user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index', ['perPage' => 10]))
+        ->assertOk();
+
+    $secondPage = $this->actingAs($this->user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index', ['perPage' => 10, 'page' => 2]))
+        ->assertOk();
+
+    expect($firstPage->json('data'))->toHaveCount(10)
+        ->and($firstPage->json('meta.total'))->toBe(30)
+        ->and($secondPage->json('data'))->toHaveCount(10)
+        ->and($secondPage->json('data.0.url'))->not->toBe($firstPage->json('data.0.url'));
+});
+
+it('does not list an error after creating an enabled exact redirect', function () {
+    Redirect::errors()->make()->url('/from-error')->site('default')->count(1)->save();
+
+    $this->actingAs($this->user)
+        ->post(cp_route('advanced-seo.redirects.store'), [
+            'source' => '/from-error',
+            'destination' => '/new',
+            'response_code' => 301,
+            'enabled' => true,
+            'site' => 'default',
+            'origin' => 'error',
+        ])
+        ->assertOk();
+
+    $response = $this->getJson(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertOk();
+
+    expect(collect($response->json('data'))->pluck('url'))->not->toContain('/from-error');
 });
 
 it('filters by site', function () {

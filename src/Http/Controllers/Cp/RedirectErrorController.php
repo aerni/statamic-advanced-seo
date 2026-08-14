@@ -4,14 +4,10 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\RedirectErrorStatus;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Errors as ErrorsResource;
 use Aerni\AdvancedSeo\Redirects\RedirectErrorMatcher;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -20,6 +16,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Statamic;
 
@@ -33,35 +30,11 @@ class RedirectErrorController extends CpController
 
         $this->authorize('manage', Redirect::class);
 
-        $sites = Site::authorized()->map->handle()->all();
-
         if ($request->wantsJson()) {
-            $matcher = RedirectErrorMatcher::for($sites);
-
-            $query = RedirectFacade::errors()->query()->whereIn('site', $sites);
-
-            if ($search = $request->input('search')) {
-                // Stored urls are lowercased, so lower the needle to match on both drivers.
-                $query->where('url', 'LIKE', '%'.Str::lower($search).'%');
-            }
-
-            $activeFilterBadges = $this->queryFilters($query, $request->filters);
-
-            $errors = $query->get();
-
-            if ($status = Arr::get($request->filters, 'redirect_error_status.status')) {
-                $errors = $errors->filter(fn ($error) => RedirectErrorStatus::for($matcher->match($error->url(), $error->site()))->value === $status);
-            }
-
-            $errors = $this->sort($errors, $request->input('sort', 'url'), $request->input('order', 'asc'));
-
-            $paginator = $this->paginate($errors, Statamic::cpPerPage($request->input('perPage')));
-
-            $resource = new ErrorsResource($paginator);
-            $resource->matcher = $matcher;
-
-            return $resource->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
+            return $this->json($request);
         }
+
+        $sites = Site::authorized()->map->handle()->all();
 
         $createBlueprint = RedirectBlueprint::definition();
         $createFields = $createBlueprint->fields()->preProcess();
@@ -80,6 +53,53 @@ class RedirectErrorController extends CpController
         ]);
     }
 
+    protected function json(FilteredRequest $request)
+    {
+        $query = $this->indexQuery();
+
+        $activeFilterBadges = $this->queryFilters($query, $request->filters);
+
+        $sortField = OrderBy::column(request('sort'));
+        $sortDirection = request('order', 'asc');
+
+        if ($sortField === 'hits') {
+            $sortField = 'count';
+        }
+
+        if (! $sortField && ! request('search')) {
+            $sortField = 'url';
+            $sortDirection = 'asc';
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $errors = $query->paginate(Statamic::cpPerPage(request('perPage')));
+
+        $resource = new ErrorsResource($errors);
+        $resource->matcher = RedirectErrorMatcher::for(
+            $errors->getCollection()->map->site()->unique()->all()
+        );
+
+        return $resource->additional(['meta' => [
+            'activeFilterBadges' => $activeFilterBadges,
+        ]]);
+    }
+
+    protected function indexQuery()
+    {
+        $query = RedirectFacade::errors()->query()
+            ->whereIn('site', Site::authorized()->map->handle()->all());
+
+        if ($search = request('search')) {
+            // Stored urls are lowercased, so lower the needle to match on both drivers.
+            $query->where('url', 'LIKE', '%'.Str::lower($search).'%');
+        }
+
+        return $query;
+    }
+
     public function clear(): void
     {
         throw_unless(RedirectsFeature::enabled() && config('advanced-seo.redirects.errors.enabled'), new NotFoundHttpException);
@@ -90,36 +110,5 @@ class RedirectErrorController extends CpController
             ->whereIn('site', Site::authorized()->map->handle()->all())
             ->get()
             ->each->delete();
-    }
-
-    /**
-     * Sort the recorded errors in memory. The store is bounded by `max_records`,
-     * and the status filter is derived from redirects, so the set is processed
-     * here rather than through the query builder.
-     */
-    protected function sort(Collection $errors, string $field, string $direction): Collection
-    {
-        return $errors->sortBy(fn ($error) => match ($field) {
-            'hits' => $error->count(),
-            'first_seen_at' => $error->firstSeenAt() ?? 0,
-            'last_seen_at' => $error->lastSeenAt() ?? 0,
-            'site' => $error->site(),
-            default => $error->url(),
-        }, SORT_REGULAR, $direction === 'desc')->values();
-    }
-
-    protected function paginate(Collection $errors, ?int $perPage): LengthAwarePaginator
-    {
-        $perPage = $perPage ?: 50;
-
-        $page = LengthAwarePaginator::resolveCurrentPage();
-
-        return new LengthAwarePaginator(
-            $errors->forPage($page, $perPage)->values(),
-            $errors->count(),
-            $perPage,
-            $page,
-            ['path' => LengthAwarePaginator::resolveCurrentPath()],
-        );
     }
 }
