@@ -22,5 +22,9 @@ interface RedirectErrorRepository
 
     public function record(string $url, string $site): void;
 
+    public function maxRecords(): ?int;
+
+    public function purgeAfterDays(): ?int;
+
     public static function bindings(): array;
 }

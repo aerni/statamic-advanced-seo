@@ -471,7 +471,8 @@ return [
             |--------------------------------------------------------------------------
             |
             | Errors not seen within this many days are removed by the daily
-            | prune command (seo:prune-redirect-errors).
+            | prune command (seo:prune-redirect-errors). Set to an integer, or
+            | false to disable age-based pruning.
             |
             */
 
@@ -483,8 +484,10 @@ return [
             |--------------------------------------------------------------------------
             |
             | The list keeps the most-hit errors up to this cap, evicting the
-            | lowest-count records first. The cap is best-effort under concurrent
-            | recording and may be briefly exceeded until the next write or prune.
+            | lowest-count records first. Set to an integer, or false to disable
+            | the cap. The Stache driver still needs a numeric cap at the store
+            | level. The cap is best-effort under concurrent recording and may be
+            | briefly exceeded until the next write or prune.
             |
             */
 

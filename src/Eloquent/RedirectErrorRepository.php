@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
+use Aerni\AdvancedSeo\Concerns\HasRedirectErrorLimits;
 use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository as Contract;
@@ -12,6 +13,8 @@ use Statamic\Facades\Stache;
 
 class RedirectErrorRepository implements Contract
 {
+    use HasRedirectErrorLimits;
+
     public function make(): RedirectError
     {
         return app(RedirectError::class);

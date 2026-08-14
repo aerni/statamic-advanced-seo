@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Stache\Repositories;
 
+use Aerni\AdvancedSeo\Concerns\HasRedirectErrorLimits;
 use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository as Contract;
@@ -13,6 +14,8 @@ use Statamic\Stache\Stores\Store;
 
 class RedirectErrorRepository implements Contract
 {
+    use HasRedirectErrorLimits;
+
     protected Store $store;
 
     public function __construct(protected Stache $stache)
