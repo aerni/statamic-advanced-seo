@@ -18,7 +18,7 @@ beforeEach(function () {
 
 it('deletes an exact error on the same site', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
-    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->saveQuietly();
 
     app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
 
@@ -28,7 +28,7 @@ it('deletes an exact error on the same site', function () {
 it('does not delete the same path on another site', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
     Redirect::errors()->make()->url('/old')->site('fr')->save();
-    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->saveQuietly();
 
     app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
 
@@ -40,7 +40,7 @@ it('deletes wildcard matches on the same site only', function () {
     Redirect::errors()->make()->url('/blog/a')->site('default')->save();
     Redirect::errors()->make()->url('/blog/a')->site('fr')->save();
     Redirect::errors()->make()->url('/other')->site('default')->save();
-    $redirect = tap(Redirect::make()->source('/blog/*')->destination('/news/$1')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/blog/*')->destination('/news/$1')->site('default'))->saveQuietly();
 
     app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
 
@@ -51,7 +51,7 @@ it('deletes wildcard matches on the same site only', function () {
 
 it('does not delete when the redirect is disabled', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
-    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default')->enabled(false))->saveQuietly();
 
     app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
 
@@ -60,7 +60,7 @@ it('does not delete when the redirect is disabled', function () {
 
 it('does not delete when the destination does not resolve', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
-    $redirect = tap(Redirect::make()->source('/old')->destination('entry::missing')->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->destination('entry::missing')->site('default'))->saveQuietly();
 
     app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
 
@@ -69,7 +69,7 @@ it('does not delete when the destination does not resolve', function () {
 
 it('deletes when the redirect is gone', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
-    $redirect = tap(Redirect::make()->source('/old')->responseCode(ResponseCode::Gone)->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->responseCode(ResponseCode::Gone)->site('default'))->saveQuietly();
 
     app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
 
@@ -79,8 +79,8 @@ it('deletes when the redirect is gone', function () {
 it('deleteHandledErrors removes errors handled by any enabled redirect on their site', function () {
     Redirect::errors()->make()->url('/en')->site('default')->save();
     Redirect::errors()->make()->url('/fr')->site('fr')->save();
-    Redirect::make()->source('/en')->destination('/new')->site('default')->save();
-    Redirect::make()->source('/fr')->destination('/nouveau')->site('fr')->enabled(false)->save();
+    Redirect::make()->source('/en')->destination('/new')->site('default')->saveQuietly();
+    Redirect::make()->source('/fr')->destination('/nouveau')->site('fr')->enabled(false)->saveQuietly();
 
     app(RedirectErrorInbox::class)->deleteHandledErrors();
 

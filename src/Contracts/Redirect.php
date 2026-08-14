@@ -46,5 +46,7 @@ interface Redirect
 
     public function save(): self;
 
+    public function saveQuietly(): self;
+
     public function delete(): bool;
 }
