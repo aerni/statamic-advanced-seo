@@ -42,6 +42,6 @@ class RedirectHitsStore extends BasicStore
 
     protected function storeIndexes(): array
     {
-        return ['id', 'redirect'];
+        return ['id', 'redirect', 'count', 'last_hit_at'];
     }
 }

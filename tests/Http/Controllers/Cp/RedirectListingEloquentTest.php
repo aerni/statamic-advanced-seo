@@ -290,3 +290,19 @@ it('sorts by hits, merging the separate hit store, via eloquent', function () {
 
     expect($order)->toBe(['r2', 'r1', 'r3']);
 });
+
+it('paginates correctly when sorting by hits via eloquent', function () {
+    config(['advanced-seo.redirects.hits.enabled' => true]);
+
+    foreach (range(1, 5) as $i) {
+        Redirect::make()->id("r{$i}")->source("/{$i}")->destination('/x')->site('default')->save();
+        Redirect::hits()->make()->redirect("r{$i}")->count($i)->save();
+    }
+
+    $response = $this->actingAs($this->super)
+        ->getJson(cp_route('advanced-seo.redirects.index', ['sort' => 'hits', 'order' => 'desc', 'perPage' => 2]))
+        ->assertOk();
+
+    expect(collect($response->json('data'))->pluck('id')->all())->toBe(['r5', 'r4'])
+        ->and($response->json('meta.total'))->toBe(5);
+});

@@ -65,6 +65,7 @@ class RedirectHit implements ContainsQueryableValues, Contract
     {
         return match ($field) {
             'redirect' => $this->redirect(),
+            'last_hit_at' => $this->lastHitAt(),
             default => $this->{$field}(),
         };
     }
