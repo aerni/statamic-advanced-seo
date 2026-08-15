@@ -72,16 +72,6 @@ it('dispatches RedirectCreated only on the first save', function () {
     Event::assertDispatched(RedirectSaved::class, 2);
 });
 
-it('saves quietly without dispatching save events', function () {
-    Event::fake([RedirectCreated::class, RedirectSaved::class]);
-
-    Redirect::make()->id('abc')->source('/old')->destination('/new')->site('default')->saveQuietly();
-
-    expect(Redirect::find('abc'))->toBeInstanceOf(RedirectContract::class);
-    Event::assertNotDispatched(RedirectCreated::class);
-    Event::assertNotDispatched(RedirectSaved::class);
-});
-
 it('queries redirects by site', function () {
     Redirect::make()->id('a')->source('/a')->destination('/x')->site('default')->save();
     Redirect::make()->id('b')->source('/b')->destination('/y')->site('fr')->save();

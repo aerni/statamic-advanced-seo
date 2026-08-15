@@ -1,8 +1,11 @@
 <?php
 
+use Aerni\AdvancedSeo\Events\RedirectCreated;
+use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
@@ -61,8 +64,10 @@ it('does not cap records when max_records is false', function () {
 });
 
 it('deletes errors covered by enabled redirects', function () {
+    Event::fake([RedirectCreated::class, RedirectSaved::class]);
+
     Redirect::errors()->make()->url('/old')->site('default')->count(1)->lastSeenAt(now()->timestamp)->save();
-    Redirect::make()->source('/old')->destination('/new')->site('default')->saveQuietly();
+    Redirect::make()->source('/old')->destination('/new')->site('default')->save();
 
     $this->artisan('seo:prune-redirect-errors')->assertExitCode(0);
 
@@ -70,7 +75,9 @@ it('deletes errors covered by enabled redirects', function () {
 });
 
 it('ignores enabled redirects for unknown sites', function () {
-    Redirect::make()->source('/old')->destination('/new')->site('unknown')->saveQuietly();
+    Event::fake([RedirectCreated::class, RedirectSaved::class]);
+
+    Redirect::make()->source('/old')->destination('/new')->site('unknown')->save();
 
     $this->artisan('seo:prune-redirect-errors')->assertExitCode(0);
 });

@@ -266,19 +266,6 @@ class Redirect implements ContainsQueryableValues, Contract
         return $this;
     }
 
-    public function saveQuietly(): self
-    {
-        $isNew = is_null(RedirectFacade::find($this->id()));
-
-        if ($isNew && is_null($this->createdAt)) {
-            $this->createdAt(Carbon::now()->timestamp);
-        }
-
-        RedirectFacade::save($this);
-
-        return $this;
-    }
-
     public function delete(): bool
     {
         RedirectFacade::delete($this);
