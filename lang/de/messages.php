@@ -71,6 +71,7 @@ return [
     'redirect_error_create_redirect' => 'Weiterleitung erstellen',
 
     // Flash messages
+    'redirect_created' => 'Weiterleitung erstellt',
     'seo_set_localization_saved' => 'SEO-Standards gespeichert',
     'seo_set_localization_deleted' => 'SEO-Standards gelöscht',
     'seo_set_config_saved' => 'SEO-Konfiguration gespeichert',

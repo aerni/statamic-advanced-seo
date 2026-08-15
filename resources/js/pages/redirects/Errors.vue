@@ -60,7 +60,7 @@ function save() {
             new Request(props.createUrl, 'post', { enabled: true, origin: 'error' }),
         ])
         .then(() => {
-            Statamic.$toast.success(__('Saved'));
+            Statamic.$toast.success(__('advanced-seo::messages.redirect_created'));
             creating.value = null;
             listing.value.refresh();
         });
@@ -158,7 +158,7 @@ function save() {
         </PublishContainer>
 
         <div class="mt-4 flex justify-end">
-            <Button variant="primary" :text="__('Save')" :disabled="saving" @click="save" />
+            <Button variant="primary" :text="__('advanced-seo::messages.redirect_error_create_redirect')" :disabled="saving" @click="save" />
         </div>
     </Stack>
 </template>
