@@ -7,10 +7,17 @@ use Aerni\AdvancedSeo\Contracts\SeoSetConfig as SeoSetConfigContract;
 use Aerni\AdvancedSeo\Contracts\SeoSetConfigRepository as SeoSetConfigRepositoryContract;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalization as SeoSetLocalizationContract;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalizationRepository as SeoSetLocalizationRepositoryContract;
+use Aerni\AdvancedSeo\Eloquent\Redirect as EloquentRedirect;
+use Aerni\AdvancedSeo\Eloquent\RedirectError as EloquentRedirectError;
+use Aerni\AdvancedSeo\Eloquent\RedirectErrorModel;
+use Aerni\AdvancedSeo\Eloquent\RedirectHit as EloquentRedirectHit;
+use Aerni\AdvancedSeo\Eloquent\RedirectHitModel;
+use Aerni\AdvancedSeo\Eloquent\RedirectModel;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfig as EloquentSeoSetConfig;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalization as EloquentSeoSetLocalization;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalizationModel;
+use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository as StacheSeoSetConfigRepository;
@@ -119,18 +126,30 @@ class SwitchToEloquent extends Command
         app()->bind(SeoSetLocalizationContract::class, EloquentSeoSetLocalization::class);
         app()->bind('statamic.eloquent.seo_set_config.model', SeoSetConfigModel::class);
         app()->bind('statamic.eloquent.seo_set_localization.model', SeoSetLocalizationModel::class);
+        app()->bind('statamic.eloquent.redirect.model', RedirectModel::class);
+        app()->bind('statamic.eloquent.redirect_hit.model', RedirectHitModel::class);
+        app()->bind('statamic.eloquent.redirect_error.model', RedirectErrorModel::class);
 
         $this->importConfigs();
         $this->importLocalizations();
+        $this->importRedirects();
+        $this->importRedirectHits();
+        $this->importRedirectErrors();
 
         info('Successfully switched to the Eloquent driver.');
     }
 
     protected function importConfigs(): void
     {
+        $steps = SeoConfig::all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
         progress(
             label: 'Importing configs...',
-            steps: SeoConfig::all(),
+            steps: $steps,
             callback: fn ($config) => EloquentSeoSetConfig::makeModelFromContract($config)->save(),
         );
 
@@ -139,12 +158,69 @@ class SwitchToEloquent extends Command
 
     protected function importLocalizations(): void
     {
+        $steps = SeoLocalization::all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
         progress(
             label: 'Importing localizations...',
-            steps: SeoLocalization::all(),
+            steps: $steps,
             callback: fn ($localization) => EloquentSeoSetLocalization::makeModelFromContract($localization)->save(),
         );
 
         info('Imported localizations.');
+    }
+
+    protected function importRedirects(): void
+    {
+        $steps = Redirect::all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
+        progress(
+            label: 'Importing redirects...',
+            steps: $steps,
+            callback: fn ($redirect) => EloquentRedirect::makeModelFromContract($redirect)->save(),
+        );
+
+        info('Imported redirects.');
+    }
+
+    protected function importRedirectHits(): void
+    {
+        $steps = Redirect::hits()->all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
+        progress(
+            label: 'Importing redirect hits...',
+            steps: $steps,
+            callback: fn ($hit) => EloquentRedirectHit::makeModelFromContract($hit)->save(),
+        );
+
+        info('Imported redirect hits.');
+    }
+
+    protected function importRedirectErrors(): void
+    {
+        $steps = Redirect::errors()->all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
+        progress(
+            label: 'Importing redirect errors...',
+            steps: $steps,
+            callback: fn ($error) => EloquentRedirectError::makeModelFromContract($error)->save(),
+        );
+
+        info('Imported redirect errors.');
     }
 }
