@@ -18,6 +18,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Entry as EntryFacade;
 
 /**
  * Creates and maintains redirects automatically as entry and term URLs change.
@@ -95,6 +96,10 @@ class HandleAutomaticRedirects
         }
 
         if ($originalPath === $currentPath) {
+            return;
+        }
+
+        if ($this->sourceIsOwnedByPublishedEntry($originalPath, $entry->locale())) {
             return;
         }
 
@@ -269,6 +274,19 @@ class HandleAutomaticRedirects
     protected function blinkKey(Entry $entry): string
     {
         return "advanced-seo::automatic-redirect::{$entry->id()}";
+    }
+
+    /**
+     * A source still owned by a published entry must remain routable and
+     * must not be claimed by an automatic redirect.
+     */
+    protected function sourceIsOwnedByPublishedEntry(string $source, string $site): bool
+    {
+        return EntryFacade::query()
+            ->where('site', $site)
+            ->where('uri', $source)
+            ->whereStatus('published')
+            ->exists();
     }
 
     /**

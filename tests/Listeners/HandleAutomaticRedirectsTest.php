@@ -125,6 +125,15 @@ describe('entry redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
+    it('creates nothing when another published entry still owns the old url', function () {
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('shared'))->save();
+        tap(Entry::make()->collection('pages')->locale('default')->slug('shared'))->save();
+
+        $entry->slug('moved')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
     it('creates nothing for a new entry', function () {
         tap(Entry::make()->collection('pages')->locale('default')->slug('fresh'))->save();
 
