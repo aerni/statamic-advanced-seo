@@ -16,6 +16,8 @@ use Statamic\Facades\Site;
 
 class RedirectImporter
 {
+    public function __construct(protected RedirectDestinationEntries $destinationEntries) {}
+
     /**
      * Import redirects from a CSV or JSON file, choosing the parser by extension.
      * A structurally invalid file throws a ValidationException; per-row failures
@@ -25,7 +27,11 @@ class RedirectImporter
      */
     public function import(string $path): ImportResult
     {
-        [$redirects, $errors] = $this->prepareRows($this->parse($path))
+        $rows = $this->parse($path);
+
+        $this->destinationEntries->preload($this->destinationEntryIds($rows));
+
+        [$redirects, $errors] = $this->prepareRows($rows)
             ->partition(fn ($result) => $result instanceof Redirect);
 
         // All or nothing: if any row is invalid, import none of them.
@@ -36,6 +42,23 @@ class RedirectImporter
         $redirects->each->save();
 
         return new ImportResult(imported: $redirects->count(), errors: []);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $rows
+     * @return Collection<int, string>
+     */
+    protected function destinationEntryIds(array $rows): Collection
+    {
+        return collect($rows)
+            ->reject(fn (array $row) => (int) ($row['response_code'] ?? ResponseCode::Permanent->value) === ResponseCode::Gone->value)
+            ->pluck('destination')
+            ->filter(fn ($destination) => is_string($destination))
+            ->map(fn (string $destination) => trim($destination))
+            ->filter(fn (string $destination) => Str::startsWith($destination, 'entry::'))
+            ->map(fn (string $destination) => Str::after($destination, 'entry::'))
+            ->unique()
+            ->values();
     }
 
     /**
@@ -173,6 +196,7 @@ class RedirectImporter
         $fields = RedirectBlueprint::definition()->fields()->addValues($values);
 
         $fields->validator()->withReplacements(['id' => $existing?->id(), 'site' => $site])->validate();
+        $this->validateDestinationExists(Arr::get($values, 'destination'));
 
         $values = $fields->process()->values()->all();
 
@@ -185,6 +209,18 @@ class RedirectImporter
             ->description($this->string($row, 'description'))
             ->site($site)
             ->origin(Origin::Import);
+    }
+
+    protected function validateDestinationExists(?string $destination): void
+    {
+        if (! Str::startsWith($destination, 'entry::')) {
+            return;
+        }
+
+        throw_unless(
+            $this->destinationEntries->find(Str::after($destination, 'entry::')),
+            ValidationException::withMessages(['destination' => __('advanced-seo::validation.redirect_destination_missing')]),
+        );
     }
 
     /**

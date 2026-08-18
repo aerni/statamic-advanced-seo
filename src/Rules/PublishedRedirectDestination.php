@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Rules;
 
+use Aerni\AdvancedSeo\Redirects\RedirectDestinationEntries;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Statamic\Facades\Entry;
 use Statamic\Support\Str;
 
 class PublishedRedirectDestination implements ValidationRule
@@ -15,7 +15,7 @@ class PublishedRedirectDestination implements ValidationRule
             return;
         }
 
-        $entry = Entry::find(Str::after($value, 'entry::'));
+        $entry = app(RedirectDestinationEntries::class)->find(Str::after($value, 'entry::'));
 
         if ($entry && ! $entry->published()) {
             $fail(__('advanced-seo::validation.redirect_destination_unpublished'))->translate();

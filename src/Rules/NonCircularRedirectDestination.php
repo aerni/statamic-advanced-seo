@@ -3,11 +3,11 @@
 namespace Aerni\AdvancedSeo\Rules;
 
 use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Redirects\RedirectDestinationEntries;
 use Aerni\AdvancedSeo\Redirects\RedirectPatternMatcher;
 use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -53,7 +53,7 @@ class NonCircularRedirectDestination implements DataAwareRule, ValidationRule
         }
 
         $url = match (true) {
-            Str::startsWith($destination, 'entry::') => Entry::find(Str::after($destination, 'entry::'))?->absoluteUrl(),
+            Str::startsWith($destination, 'entry::') => app(RedirectDestinationEntries::class)->find(Str::after($destination, 'entry::'))?->absoluteUrl(),
             Str::startsWith($destination, ['http://', 'https://']) => $destination,
             default => null,
         };

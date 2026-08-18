@@ -16,7 +16,6 @@ use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
-use Statamic\Facades\Entry;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -121,7 +120,7 @@ class Redirect implements ContainsQueryableValues, Contract
         }
 
         if (Str::startsWith($destination, 'entry::')) {
-            return Entry::find(Str::after($destination, 'entry::'))?->absoluteUrl();
+            return app(RedirectDestinationEntries::class)->find(Str::after($destination, 'entry::'))?->absoluteUrl();
         }
 
         if (Str::startsWith($destination, ['http://', 'https://'])) {

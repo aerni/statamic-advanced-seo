@@ -8,7 +8,9 @@ use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -115,6 +117,35 @@ it('imports nothing when any row is invalid', function () {
     expect($result->errors[0]->row)->toBe(1);
     expect($result->successful())->toBeFalse();
     expect(Redirect::query()->count())->toBe(0);
+});
+
+it('imports nothing when a destination entry does not exist', function () {
+    $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('about')->published(true))->save();
+
+    $result = Redirect::import(importFile("source,destination,site\n/valid,entry::{$entry->id()},default\n/missing,entry::nonexistent-id,default", 'import.csv'));
+
+    expect($result->imported)->toBe(0);
+    expect($result->errors)->toHaveCount(1);
+    expect($result->errors[0]->row)->toBe(2);
+    expect($result->errors[0]->source)->toBe('/missing');
+    expect($result->errors[0]->message)->toBe(__('advanced-seo::validation.redirect_destination_missing'));
+    expect(Redirect::query()->count())->toBe(0);
+});
+
+it('bulk loads destination entries once', function () {
+    $about = tap(Entry::make()->collection('pages')->locale('default')->slug('about')->published(true))->save();
+    $contact = tap(Entry::make()->collection('pages')->locale('default')->slug('contact')->published(true))->save();
+
+    $repository = Mockery::mock(app(EntryRepository::class));
+    $repository->shouldReceive('query')->once()->passthru();
+    $repository->shouldNotReceive('find');
+    app()->instance(EntryRepository::class, $repository);
+    Entry::clearResolvedInstance(EntryRepository::class);
+
+    $result = Redirect::import(importFile("source,destination,site\n/old-about,entry::{$about->id()},default\n/about-again,entry::{$about->id()},default\n/old-contact,entry::{$contact->id()},default", 'import.csv'));
+
+    expect($result->errors)->toBe([]);
+    expect($result->imported)->toBe(3);
 });
 
 it('errors a row with a blank site on multi-site', function () {
