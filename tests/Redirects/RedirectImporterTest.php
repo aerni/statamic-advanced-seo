@@ -1,7 +1,7 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Redirects\ImportError;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
@@ -42,7 +42,7 @@ it('creates redirects from a csv', function () {
     expect($redirect->destination())->toBe('/new');
     expect($redirect->responseCode()->value)->toBe(301);
     expect($redirect->enabled())->toBeTrue();
-    expect($redirect->origin())->toBe(Origin::Import);
+    expect($redirect->origin())->toBe(RedirectOrigin::Import);
 });
 
 it('creates redirects from json with native types', function () {
@@ -75,7 +75,7 @@ it('creates a gone redirect from a csv with an empty destination', function () {
 });
 
 it('updates an existing redirect matched by source and site', function () {
-    Redirect::make()->id('existing')->source('/old')->destination('/original')->site('default')->origin(Origin::Manual)->save();
+    Redirect::make()->id('existing')->source('/old')->destination('/original')->site('default')->origin(RedirectOrigin::Manual)->save();
 
     $result = Redirect::import(importFile("source,destination,site\n/old,/updated,default", 'import.csv'));
 
@@ -83,11 +83,11 @@ it('updates an existing redirect matched by source and site', function () {
 
     $redirect = Redirect::find('existing');
     expect($redirect->destination())->toBe('/updated');
-    expect($redirect->origin())->toBe(Origin::Import);
+    expect($redirect->origin())->toBe(RedirectOrigin::Import);
 });
 
 it('overwrites the full redirect, resetting absent optional columns to their defaults', function () {
-    Redirect::make()->id('existing')->source('/old')->destination('/original')->responseCode(ResponseCode::Temporary)->preserveQueryString(false)->enabled(false)->description('Legacy')->site('default')->save();
+    Redirect::make()->id('existing')->source('/old')->destination('/original')->responseCode(RedirectResponseCode::Temporary)->preserveQueryString(false)->enabled(false)->description('Legacy')->site('default')->save();
 
     Redirect::import(importFile("source,destination,site\n/old,/updated,default", 'import.csv'));
 

@@ -1,7 +1,7 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\ExportFormat;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectExportFormat;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
@@ -28,10 +28,10 @@ function parseCsv(string $content): array
 }
 
 it('exports redirects as csv', function () {
-    Redirect::make()->id('one')->source('/old')->destination('/new')->responseCode(ResponseCode::Permanent)->enabled(true)->preserveQueryString(true)->site('default')->save();
-    Redirect::make()->id('two')->source('/gone')->responseCode(ResponseCode::Gone)->enabled(false)->site('default')->save();
+    Redirect::make()->id('one')->source('/old')->destination('/new')->responseCode(RedirectResponseCode::Permanent)->enabled(true)->preserveQueryString(true)->site('default')->save();
+    Redirect::make()->id('two')->source('/gone')->responseCode(RedirectResponseCode::Gone)->enabled(false)->site('default')->save();
 
-    $rows = parseCsv(Redirect::export(ExportFormat::Csv));
+    $rows = parseCsv(Redirect::export(RedirectExportFormat::Csv));
 
     expect($rows)->toHaveCount(2);
     expect($rows[0]['source'])->toBe('/old');
@@ -47,10 +47,10 @@ it('exports redirects as csv', function () {
 });
 
 it('exports redirects as json with native types', function () {
-    Redirect::make()->id('one')->source('/old')->destination('/new')->responseCode(ResponseCode::Permanent)->enabled(true)->preserveQueryString(false)->site('default')->save();
-    Redirect::make()->id('two')->source('/gone')->responseCode(ResponseCode::Gone)->enabled(true)->site('default')->save();
+    Redirect::make()->id('one')->source('/old')->destination('/new')->responseCode(RedirectResponseCode::Permanent)->enabled(true)->preserveQueryString(false)->site('default')->save();
+    Redirect::make()->id('two')->source('/gone')->responseCode(RedirectResponseCode::Gone)->enabled(true)->site('default')->save();
 
-    $rows = json_decode(Redirect::export(ExportFormat::Json), true);
+    $rows = json_decode(Redirect::export(RedirectExportFormat::Json), true);
 
     expect($rows)->toHaveCount(2);
     expect($rows[0]['source'])->toBe('/old');
@@ -65,7 +65,7 @@ it('exports redirects as json with native types', function () {
 it('always includes the site column', function () {
     Redirect::make()->source('/old')->destination('/new')->site('default')->save();
 
-    $rows = parseCsv(Redirect::export(ExportFormat::Csv));
+    $rows = parseCsv(Redirect::export(RedirectExportFormat::Csv));
 
     expect($rows[0]['site'])->toBe('default');
 });

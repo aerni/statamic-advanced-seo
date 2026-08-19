@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Enums;
 
-enum ExportFormat: string
+enum RedirectExportFormat: string
 {
     case Csv = 'csv';
     case Json = 'json';

@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectHitJob;
@@ -18,7 +18,7 @@ beforeEach(function () {
 });
 
 it('redirects a request that would 404 to the matched destination', function () {
-    Redirect::make()->source('/old')->destination('/new')->responseCode(ResponseCode::Permanent)->site('default')->save();
+    Redirect::make()->source('/old')->destination('/new')->responseCode(RedirectResponseCode::Permanent)->site('default')->save();
 
     $this->get('/old')
         ->assertStatus(301)
@@ -50,7 +50,7 @@ it('appends the query string before a destination fragment', function () {
 });
 
 it('returns 410 for a gone rule', function () {
-    Redirect::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+    Redirect::make()->source('/gone')->responseCode(RedirectResponseCode::Gone)->site('default')->save();
 
     $this->get('/gone')->assertStatus(410);
 });
@@ -111,7 +111,7 @@ it('records a hit for a gone redirect', function () {
     config(['advanced-seo.redirects.hits.enabled' => true]);
     Queue::fake();
 
-    Redirect::make()->id('g1')->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+    Redirect::make()->id('g1')->source('/gone')->responseCode(RedirectResponseCode::Gone)->site('default')->save();
 
     $this->get('/gone')->assertStatus(410);
 

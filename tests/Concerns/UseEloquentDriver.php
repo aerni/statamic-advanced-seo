@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Tests\Concerns;
 
-use Aerni\AdvancedSeo\Enums\Origin;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 
@@ -41,7 +41,7 @@ trait UseEloquentDriver
             $table->string('site');
             $table->boolean('enabled')->default(true);
             $table->boolean('preserve_query_string')->nullable()->default(true);
-            $table->string('origin')->default(Origin::Manual->value);
+            $table->string('origin')->default(RedirectOrigin::Manual->value);
             $table->text('description')->nullable();
             $table->timestamps();
 

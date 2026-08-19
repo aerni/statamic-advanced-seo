@@ -2,17 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Statamic\Support\Str;
 
 class RedirectPatternMatcher
 {
     public static function match(string $source, string $path): ?array
     {
-        $pattern = match (SourceType::fromSource($source)) {
-            SourceType::Regex => $source,
-            SourceType::Wildcard => static::wildcardToRegex($source),
-            SourceType::Exact => null,
+        $pattern = match (RedirectSourceType::fromSource($source)) {
+            RedirectSourceType::Regex => $source,
+            RedirectSourceType::Wildcard => static::wildcardToRegex($source),
+            RedirectSourceType::Exact => null,
         };
 
         return $pattern && @preg_match($pattern, $path, $matches) ? $matches : null;
@@ -20,7 +20,7 @@ class RedirectPatternMatcher
 
     public static function matches(string $source, string $path): bool
     {
-        if (SourceType::fromSource($source) === SourceType::Exact) {
+        if (RedirectSourceType::fromSource($source) === RedirectSourceType::Exact) {
             return Str::lower(static::normalizePath($source)) === Str::lower(static::normalizePath($path));
         }
 

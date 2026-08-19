@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\Redirect as RedirectContract;
-use Aerni\AdvancedSeo\Enums\Origin;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect;
@@ -20,7 +20,7 @@ it('returns null when finding a missing redirect', function () {
 });
 
 it('can save and find a redirect', function () {
-    Redirect::make()->id('abc')->source('/old')->destination('/new')->site('default')->origin(Origin::Automatic)->save();
+    Redirect::make()->id('abc')->source('/old')->destination('/new')->site('default')->origin(RedirectOrigin::Automatic)->save();
 
     clearStache();
 
@@ -30,7 +30,7 @@ it('can save and find a redirect', function () {
         ->and($found->source())->toBe('/old')
         ->and($found->destination())->toBe('/new')
         ->and($found->site())->toBe('default')
-        ->and($found->origin())->toBe(Origin::Automatic);
+        ->and($found->origin())->toBe(RedirectOrigin::Automatic);
 });
 
 it('persists created_at through save and find', function () {

@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Redirects\Redirect as StacheRedirect;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +23,7 @@ class Redirect extends StacheRedirect
             ->site($model->site)
             ->enabled($model->enabled)
             ->preserveQueryString($model->preserve_query_string ?? true)
-            ->origin($model->origin ?? Origin::Manual)
+            ->origin($model->origin ?? RedirectOrigin::Manual)
             ->description($model->description)
             ->createdAt($model->created_at?->timestamp);
     }
@@ -39,11 +39,11 @@ class Redirect extends StacheRedirect
 
         return tap($model::firstOrNew(['id' => $source->id()])->fill([
             'source' => $source->source(),
-            'destination' => $source->responseCode() === ResponseCode::Gone ? null : $source->destination(),
+            'destination' => $source->responseCode() === RedirectResponseCode::Gone ? null : $source->destination(),
             'response_code' => $source->responseCode(),
             'site' => $source->site(),
             'enabled' => $source->enabled(),
-            'preserve_query_string' => $source->responseCode() === ResponseCode::Gone ? null : $source->preserveQueryString(),
+            'preserve_query_string' => $source->responseCode() === RedirectResponseCode::Gone ? null : $source->preserveQueryString(),
             'origin' => $source->origin(),
             'description' => $source->description(),
         ]), function (Model $model) use ($source): void {

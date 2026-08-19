@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Support\Carbon;
@@ -48,7 +48,7 @@ it('lists errors with a derived redirect status', function () {
 
 it('does not list an error covered by a gone redirect', function () {
     Redirect::errors()->make()->url('/gone')->site('default')->count(1)->save();
-    Redirect::make()->source('/gone')->responseCode(ResponseCode::Gone)->site('default')->save();
+    Redirect::make()->source('/gone')->responseCode(RedirectResponseCode::Gone)->site('default')->save();
 
     $response = $this->actingAs($this->user)
         ->getJson(cp_route('advanced-seo.redirects.errors.index'))

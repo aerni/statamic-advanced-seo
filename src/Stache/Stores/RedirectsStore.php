@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Stache\Stores;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
@@ -40,11 +40,11 @@ class RedirectsStore extends BasicStore
             ->id(pathinfo($path, PATHINFO_FILENAME))
             ->source(Arr::get($data, 'source'))
             ->destination(Arr::get($data, 'destination'))
-            ->responseCode(ResponseCode::tryFrom(Arr::get($data, 'response_code', ResponseCode::Permanent->value)) ?? ResponseCode::Permanent)
+            ->responseCode(RedirectResponseCode::tryFrom(Arr::get($data, 'response_code', RedirectResponseCode::Permanent->value)) ?? RedirectResponseCode::Permanent)
             ->site(basename(dirname($path)))
             ->enabled(Arr::get($data, 'enabled', true))
             ->preserveQueryString(Arr::get($data, 'preserve_query_string', true))
-            ->origin(Origin::tryFrom(Arr::get($data, 'origin', Origin::Manual->value)) ?? Origin::Manual)
+            ->origin(RedirectOrigin::tryFrom(Arr::get($data, 'origin', RedirectOrigin::Manual->value)) ?? RedirectOrigin::Manual)
             ->description(Arr::get($data, 'description'))
             ->createdAt(Arr::get($data, 'created_at'));
     }

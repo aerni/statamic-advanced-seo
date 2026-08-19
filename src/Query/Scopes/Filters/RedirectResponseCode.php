@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Query\Scopes\Filters;
 
 use Statamic\Query\Scopes\Filter;
 
-class ResponseCode extends Filter
+class RedirectResponseCode extends Filter
 {
     protected static $handle = 'redirect_response_code';
 

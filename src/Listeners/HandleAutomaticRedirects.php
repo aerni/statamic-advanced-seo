@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
@@ -320,9 +320,9 @@ class HandleAutomaticRedirects
         RedirectFacade::make()
             ->source($source)
             ->destination($destination)
-            ->responseCode(ResponseCode::Permanent)
+            ->responseCode(RedirectResponseCode::Permanent)
             ->site($site)
-            ->origin(Origin::Automatic)
+            ->origin(RedirectOrigin::Automatic)
             ->save();
     }
 
@@ -338,7 +338,7 @@ class HandleAutomaticRedirects
         RedirectFacade::query()
             ->where('site', $site)
             ->where('destination', $staleDestination)
-            ->where('origin', Origin::Automatic->value)
+            ->where('origin', RedirectOrigin::Automatic->value)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->destination($destination)->save());
     }
@@ -354,7 +354,7 @@ class HandleAutomaticRedirects
         RedirectFacade::query()
             ->where('site', $site)
             ->where('source', $source)
-            ->where('origin', Origin::Automatic->value)
+            ->where('origin', RedirectOrigin::Automatic->value)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());
     }
@@ -368,7 +368,7 @@ class HandleAutomaticRedirects
         RedirectFacade::query()
             ->when($site, fn ($query) => $query->where('site', $site))
             ->where('destination', $destination)
-            ->where('origin', Origin::Automatic->value)
+            ->where('origin', RedirectOrigin::Automatic->value)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());
     }

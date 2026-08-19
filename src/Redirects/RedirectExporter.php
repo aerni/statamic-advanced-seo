@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\ExportFormat;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectExportFormat;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Illuminate\Support\Collection;
 use Spatie\SimpleExcel\SimpleExcelWriter;
@@ -15,11 +15,11 @@ class RedirectExporter
     /**
      * Export the redirects the current user is authorized to see as a CSV or JSON string.
      */
-    public function export(ExportFormat $format = ExportFormat::Csv): string
+    public function export(RedirectExportFormat $format = RedirectExportFormat::Csv): string
     {
         return match ($format) {
-            ExportFormat::Csv => $this->toCsv(),
-            ExportFormat::Json => $this->toJson(),
+            RedirectExportFormat::Csv => $this->toCsv(),
+            RedirectExportFormat::Json => $this->toJson(),
         };
     }
 
@@ -59,7 +59,7 @@ class RedirectExporter
             ->whereIn('site', Site::authorized()->map->handle()->all())
             ->get()
             ->map(function (Redirect $redirect): array {
-                $isGone = $redirect->responseCode() === ResponseCode::Gone;
+                $isGone = $redirect->responseCode() === RedirectResponseCode::Gone;
 
                 return [
                     'source' => $redirect->source(),

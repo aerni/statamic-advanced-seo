@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Enums;
 
-enum Origin: string
+enum RedirectOrigin: string
 {
     case Automatic = 'automatic';
     case Manual = 'manual';

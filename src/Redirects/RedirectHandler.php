@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
@@ -42,7 +42,7 @@ class RedirectHandler
             return;
         }
 
-        if ($redirect->responseCode === ResponseCode::Gone) {
+        if ($redirect->responseCode === RedirectResponseCode::Gone) {
             $this->recordHit($redirect);
 
             abort(410);

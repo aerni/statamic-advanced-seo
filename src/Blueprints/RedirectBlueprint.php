@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Statamic\Facades\Site;
 
 class RedirectBlueprint extends BaseBlueprint
@@ -51,7 +51,7 @@ class RedirectBlueprint extends BaseBlueprint
                         'new \\Aerni\\AdvancedSeo\\Rules\\PublishedRedirectDestination()',
                         'new \\Aerni\\AdvancedSeo\\Rules\\NonCircularRedirectDestination()',
                     ],
-                    'if' => ['response_code' => 'isnt '.ResponseCode::Gone->value],
+                    'if' => ['response_code' => 'isnt '.RedirectResponseCode::Gone->value],
                 ],
             ],
             [
@@ -60,10 +60,10 @@ class RedirectBlueprint extends BaseBlueprint
                     'type' => 'select',
                     'display' => __('advanced-seo::fields.redirect_response_code.display'),
                     'instructions' => __('advanced-seo::fields.redirect_response_code.instructions'),
-                    'options' => collect(ResponseCode::cases())
+                    'options' => collect(RedirectResponseCode::cases())
                         ->mapWithKeys(fn ($type) => [$type->value => $type->label()])
                         ->all(),
-                    'default' => ResponseCode::Permanent->value,
+                    'default' => RedirectResponseCode::Permanent->value,
                     'clearable' => false,
                     'width' => 50,
                     'validate' => ['required'],
@@ -77,7 +77,7 @@ class RedirectBlueprint extends BaseBlueprint
                     'instructions' => __('advanced-seo::fields.redirect_preserve_query_string.instructions'),
                     'default' => true,
                     'width' => 50,
-                    'if' => ['response_code' => 'isnt '.ResponseCode::Gone->value],
+                    'if' => ['response_code' => 'isnt '.RedirectResponseCode::Gone->value],
                 ],
             ],
             [

@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect;
@@ -94,7 +94,7 @@ it('does not delete when the destination does not resolve', function () {
 
 it('deletes when the redirect is gone', function () {
     Redirect::errors()->make()->url('/old')->site('default')->save();
-    $redirect = Redirect::make()->source('/old')->responseCode(ResponseCode::Gone)->site('default');
+    $redirect = Redirect::make()->source('/old')->responseCode(RedirectResponseCode::Gone)->site('default');
 
     app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
 

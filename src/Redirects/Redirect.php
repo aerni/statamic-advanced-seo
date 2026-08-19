@@ -4,9 +4,9 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
 use Aerni\AdvancedSeo\Contracts\RedirectHit;
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectDeleted;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
@@ -36,7 +36,7 @@ class Redirect implements ContainsQueryableValues, Contract
 
     protected $destination;
 
-    protected ResponseCode $responseCode = ResponseCode::Permanent;
+    protected RedirectResponseCode $responseCode = RedirectResponseCode::Permanent;
 
     protected $site;
 
@@ -44,7 +44,7 @@ class Redirect implements ContainsQueryableValues, Contract
 
     protected $preserveQueryString = true;
 
-    protected Origin $origin = Origin::Manual;
+    protected RedirectOrigin $origin = RedirectOrigin::Manual;
 
     protected $description;
 
@@ -67,7 +67,7 @@ class Redirect implements ContainsQueryableValues, Contract
                     return $source;
                 }
 
-                if (SourceType::fromSource($source) === SourceType::Regex) {
+                if (RedirectSourceType::fromSource($source) === RedirectSourceType::Regex) {
                     return $source;
                 }
 
@@ -87,13 +87,13 @@ class Redirect implements ContainsQueryableValues, Contract
     {
         $sourceType = $this->sourceType();
 
-        if ($sourceType === SourceType::Regex) {
+        if ($sourceType === RedirectSourceType::Regex) {
             return null;
         }
 
         $source = $this->source();
 
-        if ($sourceType === SourceType::Wildcard) {
+        if ($sourceType === RedirectSourceType::Wildcard) {
             $index = 0;
             $source = preg_replace_callback('/\*/', function () use (&$index) {
                 $index++;
@@ -136,19 +136,19 @@ class Redirect implements ContainsQueryableValues, Contract
      */
     public function resolves(): bool
     {
-        return $this->responseCode() === ResponseCode::Gone || filled($this->destinationUrl());
+        return $this->responseCode() === RedirectResponseCode::Gone || filled($this->destinationUrl());
     }
 
-    public function responseCode(?ResponseCode $responseCode = null): ResponseCode|self
+    public function responseCode(?RedirectResponseCode $responseCode = null): RedirectResponseCode|self
     {
         return $this
             ->fluentlyGetOrSet('responseCode')
             ->args(func_get_args());
     }
 
-    public function sourceType(): SourceType
+    public function sourceType(): RedirectSourceType
     {
-        return SourceType::fromSource($this->source() ?? '');
+        return RedirectSourceType::fromSource($this->source() ?? '');
     }
 
     public function site(?string $site = null): string|self
@@ -173,7 +173,7 @@ class Redirect implements ContainsQueryableValues, Contract
             ->args(func_get_args());
     }
 
-    public function origin(?Origin $origin = null): Origin|self
+    public function origin(?RedirectOrigin $origin = null): RedirectOrigin|self
     {
         return $this
             ->fluentlyGetOrSet('origin')
@@ -236,10 +236,10 @@ class Redirect implements ContainsQueryableValues, Contract
     {
         return [
             'source' => $this->source(),
-            'destination' => $this->responseCode() === ResponseCode::Gone ? null : $this->destination(),
+            'destination' => $this->responseCode() === RedirectResponseCode::Gone ? null : $this->destination(),
             'response_code' => $this->responseCode()->value,
             'enabled' => $this->enabled(),
-            'preserve_query_string' => $this->responseCode() === ResponseCode::Gone ? null : $this->preserveQueryString(),
+            'preserve_query_string' => $this->responseCode() === RedirectResponseCode::Gone ? null : $this->preserveQueryString(),
             'origin' => $this->origin()->value,
             'description' => $this->description(),
             'created_at' => $this->createdAt(),

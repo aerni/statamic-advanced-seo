@@ -4,8 +4,8 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -51,7 +51,7 @@ class RedirectImporter
     protected function destinationEntryIds(array $rows): Collection
     {
         return collect($rows)
-            ->reject(fn (array $row) => (int) ($row['response_code'] ?? ResponseCode::Permanent->value) === ResponseCode::Gone->value)
+            ->reject(fn (array $row) => (int) ($row['response_code'] ?? RedirectResponseCode::Permanent->value) === RedirectResponseCode::Gone->value)
             ->pluck('destination')
             ->filter(fn ($destination) => is_string($destination))
             ->map(fn (string $destination) => trim($destination))
@@ -174,10 +174,10 @@ class RedirectImporter
             ->first();
 
         // Import fully overwrites the redirect, so absent columns reset to the field's default rather than keeping the existing value.
-        $responseCode = $this->int($row, 'response_code', ResponseCode::Permanent->value);
+        $responseCode = $this->int($row, 'response_code', RedirectResponseCode::Permanent->value);
 
         throw_if(
-            ResponseCode::tryFrom($responseCode) === null,
+            RedirectResponseCode::tryFrom($responseCode) === null,
             ValidationException::withMessages(['response_code' => __('advanced-seo::messages.redirect_import_invalid_response_code', ['code' => $responseCode])]),
         );
 
@@ -189,7 +189,7 @@ class RedirectImporter
         ];
 
         // Gone redirects have no destination; omit the key so the blueprint's `sometimes` rule skips it, matching the publish form.
-        if ($responseCode !== ResponseCode::Gone->value) {
+        if ($responseCode !== RedirectResponseCode::Gone->value) {
             $values['destination'] = $this->string($row, 'destination');
         }
 
@@ -203,12 +203,12 @@ class RedirectImporter
         return ($existing ?? RedirectFacade::make())
             ->source(Arr::get($values, 'source'))
             ->destination(Arr::get($values, 'destination'))
-            ->responseCode(ResponseCode::from(Arr::get($values, 'response_code') ?? ResponseCode::Permanent->value))
+            ->responseCode(RedirectResponseCode::from(Arr::get($values, 'response_code') ?? RedirectResponseCode::Permanent->value))
             ->preserveQueryString(Arr::get($values, 'preserve_query_string'))
             ->enabled($this->bool($row, 'enabled', true))
             ->description($this->string($row, 'description'))
             ->site($site)
-            ->origin(Origin::Import);
+            ->origin(RedirectOrigin::Import);
     }
 
     protected function validateDestinationExists(?string $destination): void

@@ -4,7 +4,7 @@ namespace Aerni\AdvancedSeo\Enums;
 
 use Statamic\Support\Str;
 
-enum SourceType: string
+enum RedirectSourceType: string
 {
     case Exact = 'exact';
     case Wildcard = 'wildcard';

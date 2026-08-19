@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Rules;
 
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -16,7 +16,7 @@ class ValidRedirectSource implements ValidationRule
             return;
         }
 
-        if (SourceType::fromSource($value) === SourceType::Regex) {
+        if (RedirectSourceType::fromSource($value) === RedirectSourceType::Regex) {
             if (@preg_match($value, '') === false) {
                 $fail(__('advanced-seo::validation.redirect_source_invalid_regex'))->translate();
             }

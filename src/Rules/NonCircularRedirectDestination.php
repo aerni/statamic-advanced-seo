@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Rules;
 
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Redirects\RedirectDestinationEntries;
 use Aerni\AdvancedSeo\Redirects\RedirectPatternMatcher;
 use Closure;
@@ -31,7 +31,7 @@ class NonCircularRedirectDestination implements DataAwareRule, ValidationRule
             return;
         }
 
-        if (SourceType::fromSource($source) !== SourceType::Exact) {
+        if (RedirectSourceType::fromSource($source) !== RedirectSourceType::Exact) {
             return;
         }
 

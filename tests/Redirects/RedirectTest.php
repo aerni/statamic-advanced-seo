@@ -1,8 +1,8 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Redirects\Redirect;
 use Illuminate\Support\Carbon;
@@ -31,11 +31,11 @@ it('exposes fluent accessors with sensible defaults', function () {
         ->destination('/new')
         ->site('default');
 
-    expect($redirect->responseCode())->toBe(ResponseCode::Permanent)
-        ->and($redirect->sourceType())->toBe(SourceType::Exact)
+    expect($redirect->responseCode())->toBe(RedirectResponseCode::Permanent)
+        ->and($redirect->sourceType())->toBe(RedirectSourceType::Exact)
         ->and($redirect->enabled())->toBeTrue()
         ->and($redirect->preserveQueryString())->toBeTrue()
-        ->and($redirect->origin())->toBe(Origin::Manual)
+        ->and($redirect->origin())->toBe(RedirectOrigin::Manual)
         ->and($redirect->site())->toBe('default');
 });
 
@@ -56,10 +56,10 @@ it('serializes only its fields to file data', function () {
         ->id('abc')
         ->source('/old')
         ->destination('/new')
-        ->responseCode(ResponseCode::Temporary)
+        ->responseCode(RedirectResponseCode::Temporary)
         ->site('french')
         ->enabled(false)
-        ->origin(Origin::Automatic)
+        ->origin(RedirectOrigin::Automatic)
         ->description('Note');
 
     expect($redirect->fileData())->toBe([
@@ -106,7 +106,7 @@ it('does not persist a destination or query string preservation for a gone redir
         ->id('abc')
         ->source('/old')
         ->destination('/somewhere')
-        ->responseCode(ResponseCode::Gone)
+        ->responseCode(RedirectResponseCode::Gone)
         ->preserveQueryString(true)
         ->site('default');
 
@@ -161,7 +161,7 @@ it('does not resolve a relative destination for an unknown site unless it is gon
     Site::setSites(['default' => ['name' => 'English', 'url' => 'http://localhost', 'locale' => 'en']]);
 
     $redirect = (new Redirect)->source('/old')->destination('/new')->site('unknown');
-    $gone = (new Redirect)->source('/old')->responseCode(ResponseCode::Gone)->site('unknown');
+    $gone = (new Redirect)->source('/old')->responseCode(RedirectResponseCode::Gone)->site('unknown');
 
     expect($redirect->destinationUrl())->toBeNull()
         ->and($redirect->resolves())->toBeFalse()
@@ -221,7 +221,7 @@ it('returns a null hit record when it has never been hit', function () {
 });
 
 it('resolves when it is a gone redirect even without a destination', function () {
-    expect((new Redirect)->source('/old')->responseCode(ResponseCode::Gone)->resolves())->toBeTrue();
+    expect((new Redirect)->source('/old')->responseCode(RedirectResponseCode::Gone)->resolves())->toBeTrue();
 });
 
 it('resolves when it has a destination', function () {

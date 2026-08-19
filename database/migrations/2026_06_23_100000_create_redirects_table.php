@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\Origin;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Eloquent\Database\BaseMigration as Migration;
@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('site');
             $table->boolean('enabled')->default(true);
             $table->boolean('preserve_query_string')->nullable()->default(true);
-            $table->string('origin')->default(Origin::Manual->value);
+            $table->string('origin')->default(RedirectOrigin::Manual->value);
             $table->text('description')->nullable();
             $table->timestamps();
 

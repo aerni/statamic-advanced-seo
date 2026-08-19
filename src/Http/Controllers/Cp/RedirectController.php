@@ -4,8 +4,8 @@ namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
 
 use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Features\RedirectImportExport;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
@@ -185,7 +185,7 @@ class RedirectController extends CpController
         $values = $this->validateAndProcess($request, null);
         $values['enabled'] = $request->boolean('enabled', true);
 
-        $origin = $request->input('origin') === Origin::Error->value ? Origin::Error : Origin::Manual;
+        $origin = $request->input('origin') === RedirectOrigin::Error->value ? RedirectOrigin::Error : RedirectOrigin::Manual;
 
         $redirect = $this->fill(RedirectFacade::make(), $values)->origin($origin)->save();
 
@@ -238,7 +238,7 @@ class RedirectController extends CpController
         return $redirect
             ->source(Arr::get($values, 'source'))
             ->destination(Arr::get($values, 'destination'))
-            ->responseCode(ResponseCode::from(Arr::get($values, 'response_code') ?? ResponseCode::Permanent->value))
+            ->responseCode(RedirectResponseCode::from(Arr::get($values, 'response_code') ?? RedirectResponseCode::Permanent->value))
             ->enabled(Arr::get($values, 'enabled') ?? true)
             ->preserveQueryString((bool) Arr::get($values, 'preserve_query_string', true))
             ->description(Arr::get($values, 'description'))

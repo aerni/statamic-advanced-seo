@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Redirects\RedirectPatternMatcher;
 use Statamic\Facades\Site;
@@ -42,7 +42,7 @@ class HandleRedirectStaticCache
     {
         $site = Site::get($redirect->site());
 
-        if ($redirect->sourceType() === SourceType::Exact) {
+        if ($redirect->sourceType() === RedirectSourceType::Exact) {
             return [$redirect->sourceUrl()];
         }
 

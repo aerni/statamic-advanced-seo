@@ -2,9 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Contracts;
 
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 
 interface Redirect
 {
@@ -14,9 +14,9 @@ interface Redirect
 
     public function destination(?string $destination = null): string|self|null;
 
-    public function responseCode(?ResponseCode $responseCode = null): ResponseCode|self;
+    public function responseCode(?RedirectResponseCode $responseCode = null): RedirectResponseCode|self;
 
-    public function sourceType(): SourceType;
+    public function sourceType(): RedirectSourceType;
 
     public function resolves(): bool;
 
@@ -26,7 +26,7 @@ interface Redirect
 
     public function preserveQueryString(?bool $preserveQueryString = null): bool|self;
 
-    public function origin(?Origin $origin = null): Origin|self;
+    public function origin(?RedirectOrigin $origin = null): RedirectOrigin|self;
 
     public function description(?string $description = null): string|self|null;
 

@@ -3,8 +3,8 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Support\Str;
 
@@ -32,13 +32,13 @@ class RedirectResolver
             return null;
         }
 
-        if ($redirect->responseCode() === ResponseCode::Gone) {
-            return new ResolvedRedirect($redirect->id(), ResponseCode::Gone, null);
+        if ($redirect->responseCode() === RedirectResponseCode::Gone) {
+            return new ResolvedRedirect($redirect->id(), RedirectResponseCode::Gone, null);
         }
 
         $destination = $redirect->destinationUrl();
 
-        if ($redirect->sourceType() !== SourceType::Exact) {
+        if ($redirect->sourceType() !== RedirectSourceType::Exact) {
             $captures = RedirectPatternMatcher::match($redirect->source(), $this->path);
             $destination = RedirectPatternMatcher::substitute($destination, $captures);
         }
@@ -68,7 +68,7 @@ class RedirectResolver
             ->get()
             ->sortBy(fn (Redirect $redirect) => RedirectPatternMatcher::specificity(
                 $redirect->source(),
-                $redirect->sourceType() === SourceType::Regex,
+                $redirect->sourceType() === RedirectSourceType::Regex,
             ))
             ->first(fn (Redirect $redirect) => RedirectPatternMatcher::match($redirect->source(), $this->path) !== null);
     }

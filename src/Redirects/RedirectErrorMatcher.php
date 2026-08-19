@@ -3,7 +3,7 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
-use Aerni\AdvancedSeo\Enums\SourceType;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Illuminate\Support\Collection;
 
@@ -28,7 +28,7 @@ class RedirectErrorMatcher
         $patterns = [];
 
         foreach ($redirects as $redirect) {
-            if ($redirect->sourceType() === SourceType::Exact) {
+            if ($redirect->sourceType() === RedirectSourceType::Exact) {
                 $exact[$redirect->site()][$redirect->source()] = $redirect;
             } else {
                 $patterns[$redirect->site()][] = $redirect;
@@ -38,7 +38,7 @@ class RedirectErrorMatcher
         $patterns = array_map(
             fn ($group) => collect($group)->sortBy(fn (Redirect $redirect) => RedirectPatternMatcher::specificity(
                 $redirect->source(),
-                $redirect->sourceType() === SourceType::Regex,
+                $redirect->sourceType() === RedirectSourceType::Regex,
             ))->values(),
             $patterns
         );

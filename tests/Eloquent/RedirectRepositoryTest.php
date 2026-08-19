@@ -1,7 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Contracts\Redirect as RedirectContract;
-use Aerni\AdvancedSeo\Enums\Origin;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Illuminate\Support\Carbon;
@@ -9,14 +9,14 @@ use Illuminate\Support\Carbon;
 uses(UseEloquentDriver::class);
 
 it('can save and find a redirect via eloquent', function () {
-    Redirect::make()->id('abc')->source('/old')->destination('/new')->site('default')->origin(Origin::Automatic)->save();
+    Redirect::make()->id('abc')->source('/old')->destination('/new')->site('default')->origin(RedirectOrigin::Automatic)->save();
 
     $found = Redirect::find('abc');
 
     expect($found)->toBeInstanceOf(RedirectContract::class)
         ->and($found->source())->toBe('/old')
         ->and($found->site())->toBe('default')
-        ->and($found->origin())->toBe(Origin::Automatic);
+        ->and($found->origin())->toBe(RedirectOrigin::Automatic);
 });
 
 it('can list and delete redirects via eloquent', function () {

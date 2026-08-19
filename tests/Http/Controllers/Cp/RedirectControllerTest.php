@@ -1,7 +1,7 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\Origin;
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
@@ -234,8 +234,8 @@ it('creates a redirect', function () {
     $redirect = Redirect::query()->where('site', 'default')->where('source', '/old')->first();
     expect($redirect)->not->toBeNull()
         ->and($redirect->destination())->toBe('/new')
-        ->and($redirect->responseCode())->toBe(ResponseCode::Permanent)
-        ->and($redirect->origin())->toBe(Origin::Manual);
+        ->and($redirect->responseCode())->toBe(RedirectResponseCode::Permanent)
+        ->and($redirect->origin())->toBe(RedirectOrigin::Manual);
 });
 
 it('records the error origin when created from an error', function () {
@@ -249,7 +249,7 @@ it('records the error origin when created from an error', function () {
         ])
         ->assertOk();
 
-    expect(Redirect::query()->where('source', '/old')->first()->origin())->toBe(Origin::Error);
+    expect(Redirect::query()->where('source', '/old')->first()->origin())->toBe(RedirectOrigin::Error);
 });
 
 it('does not let the request set a non-error origin', function () {
@@ -263,7 +263,7 @@ it('does not let the request set a non-error origin', function () {
         ])
         ->assertOk();
 
-    expect(Redirect::query()->where('source', '/old')->first()->origin())->toBe(Origin::Manual);
+    expect(Redirect::query()->where('source', '/old')->first()->origin())->toBe(RedirectOrigin::Manual);
 });
 
 it('creates a disabled redirect when enabled is false', function () {

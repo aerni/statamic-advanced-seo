@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Query\Scopes\Filters;
 
-use Aerni\AdvancedSeo\Enums\Origin;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin as RedirectOriginEnum;
 use Statamic\Query\Scopes\Filter;
 
 class RedirectOrigin extends Filter
@@ -20,8 +20,8 @@ class RedirectOrigin extends Filter
             'origin' => [
                 'display' => __('advanced-seo::messages.redirect_origin'),
                 'type' => 'radio',
-                'options' => collect(Origin::cases())
-                    ->mapWithKeys(fn (Origin $origin) => [$origin->value => $origin->label()])
+                'options' => collect(RedirectOriginEnum::cases())
+                    ->mapWithKeys(fn (RedirectOriginEnum $origin) => [$origin->value => $origin->label()])
                     ->all(),
             ],
         ];
@@ -29,12 +29,12 @@ class RedirectOrigin extends Filter
 
     public function apply($query, $values): void
     {
-        $query->where('origin', Origin::from($values['origin'])->value);
+        $query->where('origin', RedirectOriginEnum::from($values['origin'])->value);
     }
 
     public function badge($values): string
     {
-        return __('advanced-seo::messages.redirect_origin').': '.Origin::from($values['origin'])->label();
+        return __('advanced-seo::messages.redirect_origin').': '.RedirectOriginEnum::from($values['origin'])->label();
     }
 
     public function visibleTo($key): bool

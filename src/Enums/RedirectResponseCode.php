@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Enums;
 
-enum ResponseCode: int
+enum RedirectResponseCode: int
 {
     case Permanent = 301;
     case Temporary = 302;

@@ -1,6 +1,6 @@
 <?php
 
-use Aerni\AdvancedSeo\Enums\ResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Redirects\RedirectErrorMatcher;
 use Statamic\Facades\Site;
@@ -68,7 +68,7 @@ it('does not treat an enabled redirect with a dead destination as handled', func
 });
 
 it('treats an enabled gone redirect as handled despite having no destination', function () {
-    $redirect = tap(Redirect::make()->source('/old')->responseCode(ResponseCode::Gone)->site('default'))->save();
+    $redirect = tap(Redirect::make()->source('/old')->responseCode(RedirectResponseCode::Gone)->site('default'))->save();
 
     expect(RedirectErrorMatcher::for(['default'])->match('/old', 'default')?->id())->toBe($redirect->id());
 });
