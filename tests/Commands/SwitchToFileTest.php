@@ -1,5 +1,7 @@
 <?php
 
+use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
+use Aerni\AdvancedSeo\Eloquent\SeoSetLocalizationModel;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\SeoConfig;
 use Aerni\AdvancedSeo\Facades\SeoLocalization;
@@ -61,6 +63,36 @@ it('exports all stores to files', function () {
         ->and($error->count())->toBe(3)
         ->and($error->firstSeenAt())->toBe(1751450400)
         ->and($error->lastSeenAt())->toBe(1751450500);
+});
+
+it('exports registered sets and skips configs whose seo set no longer exists', function () {
+    SeoConfig::make()->seoSet('collections::pages')->save();
+
+    SeoSetConfigModel::query()->create([
+        'type' => 'site',
+        'handle' => 'general',
+        'data' => [],
+    ]);
+    SeoSetConfigModel::query()->create([
+        'type' => 'collections',
+        'handle' => 'deleted',
+        'data' => ['enabled' => true],
+    ]);
+    SeoSetLocalizationModel::query()->create([
+        'type' => 'site',
+        'handle' => 'general',
+        'locale' => 'default',
+        'data' => ['seo_title' => 'Legacy'],
+    ]);
+
+    $this->artisan('seo:switch-to-file')
+        ->expectsConfirmation('Do you want to export existing data to flat-files?', 'yes')
+        ->assertSuccessful();
+
+    expect(Stache::store('seo-set-configs')->getItem('collections::pages'))->not->toBeNull()
+        ->and(Stache::store('seo-set-configs')->getItem('site::general'))->toBeNull()
+        ->and(Stache::store('seo-set-configs')->getItem('collections::deleted'))->toBeNull()
+        ->and(Stache::store('seo-set-localizations')->getItem('site::general::default'))->toBeNull();
 });
 
 it('exports successfully when stores are empty', function () {

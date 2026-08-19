@@ -14,6 +14,7 @@ use Aerni\AdvancedSeo\Eloquent\SeoSetConfig as EloquentSeoSetConfig;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalization as EloquentSeoSetLocalization;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalizationModel;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository as StacheSeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository as StacheSeoSetLocalizationRepository;
 use Facades\Statamic\Console\Processes\Composer;
@@ -95,7 +96,8 @@ class SwitchToFile extends Command
 
     protected function exportConfigs(): void
     {
-        $steps = SeoSetConfigModel::all();
+        $steps = SeoSetConfigModel::all()
+            ->filter(fn ($model) => Seo::find("{$model->type}::{$model->handle}"));
 
         if ($steps->isEmpty()) {
             return;
@@ -104,7 +106,7 @@ class SwitchToFile extends Command
         progress(
             label: 'Exporting configs...',
             steps: $steps,
-            callback: fn ($model) => EloquentSeoSetConfig::fromModel($model)->save(),
+            callback: fn ($model) => Stache::store('seo-set-configs')->save(EloquentSeoSetConfig::fromModel($model)),
         );
 
         info('Exported configs.');
@@ -112,7 +114,8 @@ class SwitchToFile extends Command
 
     protected function exportLocalizations(): void
     {
-        $steps = SeoSetLocalizationModel::all();
+        $steps = SeoSetLocalizationModel::all()
+            ->filter(fn ($model) => Seo::find("{$model->type}::{$model->handle}"));
 
         if ($steps->isEmpty()) {
             return;
@@ -121,7 +124,7 @@ class SwitchToFile extends Command
         progress(
             label: 'Exporting localizations...',
             steps: $steps,
-            callback: fn ($model) => EloquentSeoSetLocalization::fromModel($model)->save(),
+            callback: fn ($model) => Stache::store('seo-set-localizations')->save(EloquentSeoSetLocalization::fromModel($model)),
         );
 
         info('Exported localizations.');
