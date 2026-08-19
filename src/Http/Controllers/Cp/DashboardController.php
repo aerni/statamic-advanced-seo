@@ -28,7 +28,7 @@ class DashboardController extends CpController
         return Inertia::render('advanced-seo::Dashboard', [
             'groups' => $groups,
             'redirects' => $canViewRedirects ? ['url' => cp_route('advanced-seo.redirects.index'), 'icon' => 'moved'] : null,
-            'errors' => $canViewErrors ? ['url' => cp_route('advanced-seo.redirects.errors.index'), 'icon' => 'alert-warning-exclamation-mark'] : null,
+            'redirectErrors' => $canViewErrors ? ['url' => cp_route('advanced-seo.redirects.errors.index'), 'icon' => 'alert-warning-exclamation-mark'] : null,
         ]);
     }
 }

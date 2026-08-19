@@ -50,7 +50,17 @@ it('passes null redirects prop when redirects feature is disabled', function () 
         ->assertInertia(fn ($page) => $page->where('redirects', null));
 });
 
-it('passes errors prop when redirects and error logging are enabled', function () {
+it('does not share a reserved Inertia errors page prop', function () {
+    config(['advanced-seo.redirects.enabled' => true, 'advanced-seo.redirects.errors.enabled' => true]);
+    flushBlink();
+
+    $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('errors', []));
+});
+
+it('passes redirectErrors prop when redirects and error logging are enabled', function () {
     config(['advanced-seo.redirects.enabled' => true, 'advanced-seo.redirects.errors.enabled' => true]);
     flushBlink();
 
@@ -58,19 +68,19 @@ it('passes errors prop when redirects and error logging are enabled', function (
         ->get(cp_route('advanced-seo.dashboard'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->where('errors.url', cp_route('advanced-seo.redirects.errors.index'))
-            ->where('errors.icon', 'alert-warning-exclamation-mark')
+            ->where('redirectErrors.url', cp_route('advanced-seo.redirects.errors.index'))
+            ->where('redirectErrors.icon', 'alert-warning-exclamation-mark')
         );
 });
 
-it('passes null errors prop when error logging is disabled', function () {
+it('passes null redirectErrors prop when error logging is disabled', function () {
     config(['advanced-seo.redirects.enabled' => true, 'advanced-seo.redirects.errors.enabled' => false]);
     flushBlink();
 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.dashboard'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('errors', null));
+        ->assertInertia(fn ($page) => $page->where('redirectErrors', null));
 });
 
 it('passes null redirects prop when user cannot manage redirects', function () {
