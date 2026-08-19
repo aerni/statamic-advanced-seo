@@ -13,7 +13,6 @@ use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Query\OrderBy;
@@ -104,7 +103,7 @@ class RedirectErrorController extends CpController
     {
         throw_unless(RedirectsFeature::enabled() && config('advanced-seo.redirects.errors.enabled'), new NotFoundHttpException);
 
-        abort_unless(User::current()->can('manage', Redirect::class), 403);
+        $this->authorize('manage', Redirect::class);
 
         RedirectFacade::errors()->query()
             ->whereIn('site', Site::authorized()->map->handle()->all())

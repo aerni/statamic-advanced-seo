@@ -287,7 +287,7 @@ it('forbids clearing without permission', function () {
     Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();
 
     $this->actingAs($viewer)
-        ->post(cp_route('advanced-seo.redirects.errors.clear'))
+        ->postJson(cp_route('advanced-seo.redirects.errors.clear'))
         ->assertForbidden();
 
     expect(Redirect::errors()->query()->get())->toHaveCount(1);
