@@ -222,6 +222,21 @@ it('includes the create form payload for a user who can create redirects', funct
         );
 });
 
+it('makes the site of the source field read-only on the create form', function () {
+    Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+
+    $this->actingAs($this->user)
+        ->get(cp_route('advanced-seo.redirects.errors.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('createBlueprint', function ($blueprint) {
+                $source = collect(data_get($blueprint, 'tabs.0.sections.0.fields'))->firstWhere('handle', 'source');
+
+                return data_get($source, 'site_read_only') === true;
+            })
+        );
+});
+
 it('forbids the errors index without the manage redirects permission', function () {
     Site::setSites(['default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en']]);
 

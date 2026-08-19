@@ -35,7 +35,7 @@ class RedirectErrorController extends CpController
 
         $sites = Site::authorized()->map->handle()->all();
 
-        $createBlueprint = RedirectBlueprint::definition();
+        $createBlueprint = RedirectBlueprint::definition()->ensureFieldHasConfig('source', ['site_read_only' => true]);
         $createFields = $createBlueprint->fields()->preProcess();
 
         return Inertia::render('advanced-seo::Redirects/Errors', [

@@ -20,6 +20,8 @@ const selectedSite = computed({
     set: (value) => publishContext?.setFieldValue?.('site', value),
 });
 
+const siteIsReadOnly = computed(() => isReadOnly.value || props.config.site_read_only);
+
 function onInput(typed) {
     if (!typed) {
         return update(typed);
@@ -36,7 +38,7 @@ function onInput(typed) {
 <template>
     <div class="flex gap-2">
         <div v-if="meta.multisite" class="w-fit">
-            <Select :options="siteOptions" v-model="selectedSite" :read-only="isReadOnly" />
+            <Select :options="siteOptions" v-model="selectedSite" :read-only="siteIsReadOnly" />
         </div>
         <div class="flex-1">
             <Input
