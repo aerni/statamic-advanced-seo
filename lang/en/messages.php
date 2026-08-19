@@ -6,9 +6,11 @@ return [
     'site' => 'Site',
     'site_description' => 'Configure site-wide settings.',
     'collections' => 'Collections',
-    'collections_description' => 'Configure collections and define default values used by entries.',
+    'collections_description' => 'Configure default values for collection entries.',
     'taxonomies' => 'Taxonomies',
-    'taxonomies_description' => 'Configure taxonomies and define default values used by terms.',
+    'taxonomies_description' => 'Configure default values for taxonomy terms.',
+    'dashboard_content_defaults' => 'Content Defaults',
+    'dashboard_redirects' => 'Redirects',
 
     // Content type labels
     'entry' => 'Entry',
@@ -29,7 +31,7 @@ return [
 
     // Redirects
     'redirects' => 'Redirects',
-    'redirects_description' => 'Manage URL redirects for your sites.',
+    'redirects_description' => 'Manage redirects for your sites.',
     'redirect_create_title' => 'Create Redirect',
     'redirect_create_description' => 'Get started by creating your first redirect.',
     'redirect_edit_title' => 'Edit Redirect',
@@ -67,7 +69,7 @@ return [
     'redirect_last_hit_at' => 'Last Hit',
     'redirect_created_at' => 'Created',
     'redirect_errors' => 'Errors',
-    'redirect_errors_description' => 'Review 404s that no redirect handles.',
+    'redirect_errors_description' => 'Find broken URLs and create redirects from them.',
     'redirect_errors_clear' => 'Clear All',
     'redirect_errors_clear_confirmation' => 'Are you sure you want to clear all recorded errors? This cannot be undone.',
     'redirect_errors_cleared' => 'Errors cleared.',

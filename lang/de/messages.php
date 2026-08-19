@@ -4,11 +4,13 @@ return [
 
     // Navigation
     'site' => 'Website',
-    'site_description' => 'Website-weite Einstellungen konfigurieren.',
+    'site_description' => 'Websiteweite Einstellungen konfigurieren.',
     'collections' => 'Sammlungen',
     'collections_description' => 'Sammlungen konfigurieren und Standardwerte für Einträge festlegen.',
     'taxonomies' => 'Taxonomien',
     'taxonomies_description' => 'Taxonomien konfigurieren und Standardwerte für Begriffe festlegen.',
+    'dashboard_content_defaults' => 'Inhalts-Standards',
+    'dashboard_redirects' => 'Weiterleitungen',
 
     // Content type labels
     'entry' => 'Eintrag',
@@ -19,7 +21,7 @@ return [
 
     // Redirects
     'redirects' => 'Weiterleitungen',
-    'redirects_description' => 'URL-Weiterleitungen für deine Websites verwalten.',
+    'redirects_description' => 'Weiterleitungen für deine Websites verwalten.',
     'redirect_create_title' => 'Weiterleitung erstellen',
     'redirect_create_description' => 'Lege deine erste Weiterleitung an, um loszulegen.',
     'redirect_edit_title' => 'Weiterleitung bearbeiten',
@@ -57,7 +59,7 @@ return [
     'redirect_last_hit_at' => 'Letzter Aufruf',
     'redirect_created_at' => 'Erstellt',
     'redirect_errors' => 'Fehler',
-    'redirect_errors_description' => 'Sieh dir 404-Fehler an, die keine Weiterleitung abfängt.',
+    'redirect_errors_description' => 'Finde fehlerhafte URLs und erstelle Weiterleitungen dafür.',
     'redirect_errors_clear' => 'Alle löschen',
     'redirect_errors_clear_confirmation' => 'Möchtest du wirklich alle erfassten Fehler löschen? Dies kann nicht rückgängig gemacht werden.',
     'redirect_errors_cleared' => 'Fehler gelöscht.',

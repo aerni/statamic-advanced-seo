@@ -47,7 +47,9 @@ it('passes null redirects prop when redirects feature is disabled', function () 
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.dashboard'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('redirects', null));
+        ->assertInertia(fn ($page) => $page
+            ->where('redirects', null)
+        );
 });
 
 it('does not share a reserved Inertia errors page prop', function () {
@@ -80,7 +82,9 @@ it('passes null redirectErrors prop when error logging is disabled', function ()
     $this->actingAs($this->super)
         ->get(cp_route('advanced-seo.dashboard'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('redirectErrors', null));
+        ->assertInertia(fn ($page) => $page
+            ->where('redirectErrors', null)
+        );
 });
 
 it('passes null redirects prop when user cannot manage redirects', function () {
@@ -93,7 +97,9 @@ it('passes null redirects prop when user cannot manage redirects', function () {
     $this->actingAs($user)
         ->get(cp_route('advanced-seo.dashboard'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('redirects', null));
+        ->assertInertia(fn ($page) => $page
+            ->where('redirects', null)
+        );
 });
 
 it('returns 200 for a redirects-only user with no seo set access', function () {
