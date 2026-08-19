@@ -182,7 +182,7 @@ class ServiceProvider extends AddonServiceProvider
      */
     protected function schedule($schedule): void
     {
-        if (! config('advanced-seo.redirects.enabled', true) || ! config('advanced-seo.redirects.errors.enabled', true)) {
+        if (! Features\Redirects::enabled() || ! config('advanced-seo.redirects.errors.enabled', true)) {
             return;
         }
 
