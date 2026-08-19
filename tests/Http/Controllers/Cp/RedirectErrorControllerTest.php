@@ -17,6 +17,13 @@ beforeEach(function () {
     $this->user = User::make()->makeSuper()->save();
 });
 
+it('uses sibling error routes', function () {
+    expect(cp_route('advanced-seo.redirects.errors.index'))->toEndWith('/cp/advanced-seo/errors')
+        ->and(cp_route('advanced-seo.redirects.errors.clear'))->toEndWith('/cp/advanced-seo/errors/clear')
+        ->and(cp_route('advanced-seo.redirects.errors.actions.run'))->toEndWith('/cp/advanced-seo/errors/actions')
+        ->and(cp_route('advanced-seo.redirects.errors.actions.bulk'))->toEndWith('/cp/advanced-seo/errors/actions/list');
+});
+
 it('lists errors with a derived redirect status', function () {
     Redirect::errors()->make()->url('/enabled')->site('default')->count(5)->lastSeenAt(Carbon::parse('2026-07-02 10:00:00')->timestamp)->save();
     Redirect::errors()->make()->url('/unhandled')->site('default')->count(2)->lastSeenAt(Carbon::parse('2026-07-02 09:00:00')->timestamp)->save();

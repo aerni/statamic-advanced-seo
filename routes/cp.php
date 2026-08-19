@@ -19,10 +19,10 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
 
     Route::post('/ai/generate', AiGenerateController::class)->name('ai.generate');
 
-    Route::get('/redirect-errors', [RedirectErrorController::class, 'index'])->name('redirects.errors.index');
-    Route::post('/redirect-errors/clear', [RedirectErrorController::class, 'clear'])->name('redirects.errors.clear');
-    Route::post('/redirect-errors/actions', [RedirectErrorActionController::class, 'run'])->name('redirects.errors.actions.run');
-    Route::post('/redirect-errors/actions/list', [RedirectErrorActionController::class, 'bulkActions'])->name('redirects.errors.actions.bulk');
+    Route::get('/errors', [RedirectErrorController::class, 'index'])->name('redirects.errors.index');
+    Route::post('/errors/clear', [RedirectErrorController::class, 'clear'])->name('redirects.errors.clear');
+    Route::post('/errors/actions', [RedirectErrorActionController::class, 'run'])->name('redirects.errors.actions.run');
+    Route::post('/errors/actions/list', [RedirectErrorActionController::class, 'bulkActions'])->name('redirects.errors.actions.bulk');
 
     Route::post('/redirects/import', RedirectImportController::class)->name('redirects.import');
     Route::get('/redirects/export/{format}', RedirectExportController::class)->name('redirects.export')->where('format', 'csv|json');
