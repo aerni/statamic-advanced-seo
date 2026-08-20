@@ -25,6 +25,7 @@ Everything you need for production-ready on-page SEO, no license required.
 Everything in Free, plus the tools to handle complex sites and advanced workflows. Requires a license from the [Statamic Marketplace](https://statamic.com/addons/aerni/advanced-seo).
 
 - Sitemaps
+- Redirects and 404 error tracking
 - Multi-site support
 - AI-powered copywriting
 - Social images generator
