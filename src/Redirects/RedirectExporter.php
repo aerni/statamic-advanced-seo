@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
+use Aerni\AdvancedSeo\Contracts\RedirectQueryBuilder;
 use Aerni\AdvancedSeo\Enums\RedirectExportFormat;
 use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
@@ -15,21 +16,21 @@ class RedirectExporter
     /**
      * Export the redirects the current user is authorized to see as a CSV or JSON string.
      */
-    public function export(RedirectExportFormat $format = RedirectExportFormat::Csv): string
+    public function export(RedirectExportFormat $format = RedirectExportFormat::Csv, ?RedirectQueryBuilder $query = null): string
     {
         return match ($format) {
-            RedirectExportFormat::Csv => $this->toCsv(),
-            RedirectExportFormat::Json => $this->toJson(),
+            RedirectExportFormat::Csv => $this->toCsv($query),
+            RedirectExportFormat::Json => $this->toJson($query),
         };
     }
 
-    protected function toCsv(): string
+    protected function toCsv(?RedirectQueryBuilder $query): string
     {
         $path = tempnam(sys_get_temp_dir(), 'redirects-export-').'.csv';
 
         $writer = SimpleExcelWriter::createWithoutBom($path);
 
-        $this->rows()
+        $this->rows($query)
             ->map(fn (array $row) => array_map(
                 fn ($value) => is_bool($value) ? ($value ? 'true' : 'false') : $value,
                 $row,
@@ -45,17 +46,17 @@ class RedirectExporter
         return $contents;
     }
 
-    protected function toJson(): string
+    protected function toJson(?RedirectQueryBuilder $query): string
     {
-        return $this->rows()->toPrettyJson(JSON_UNESCAPED_SLASHES);
+        return $this->rows($query)->toPrettyJson(JSON_UNESCAPED_SLASHES);
     }
 
     /**
      * @return Collection<int, array<string, string|int|bool|null>>
      */
-    protected function rows(): Collection
+    protected function rows(?RedirectQueryBuilder $query): Collection
     {
-        return RedirectFacade::query()
+        return ($query ?? RedirectFacade::query())
             ->whereIn('site', Site::authorized()->map->handle()->all())
             ->get()
             ->map(function (Redirect $redirect): array {

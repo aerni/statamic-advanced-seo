@@ -44,6 +44,80 @@ it('downloads a json export', function () {
         ->assertHeader('Content-Type', 'application/json');
 });
 
+it('exports only redirects matching the current filters', function () {
+    Site::setSites([
+        'default' => ['name' => 'English', 'url' => '/', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => '/de/', 'locale' => 'de'],
+    ]);
+
+    Redirect::make()->source('/english')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/german')->destination('/neu')->site('german')->save();
+
+    $filters = base64_encode(json_encode(['redirect_site' => ['site' => 'default']]));
+
+    $response = $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.export', ['format' => 'csv', 'filters' => $filters]))
+        ->assertOk();
+
+    expect($response->streamedContent())
+        ->toContain('/english')
+        ->not->toContain('/german');
+});
+
+it('exports only redirects matching the current search', function () {
+    Redirect::make()->source('/matching')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/another')->destination('/target')->site('default')->save();
+
+    $response = $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.export', ['format' => 'csv', 'search' => 'matching']))
+        ->assertOk();
+
+    expect($response->streamedContent())
+        ->toContain('/matching')
+        ->not->toContain('/another');
+});
+
+it('exports all redirects using the current sort order', function (string $order, array $expectedSources) {
+    Redirect::make()->source('/beta')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/alpha')->destination('/target')->site('default')->save();
+
+    $response = $this->actingAs($this->super)
+        ->get(cp_route('advanced-seo.redirects.export', [
+            'format' => 'json',
+            'sort' => 'source',
+            'order' => $order,
+        ]))
+        ->assertOk();
+
+    expect(collect(json_decode($response->streamedContent(), true))->pluck('source')->all())
+        ->toBe($expectedSources);
+})->with([
+    'ascending' => ['asc', ['/alpha', '/beta']],
+    'descending' => ['desc', ['/beta', '/alpha']],
+]);
+
+it('intersects current filters with the sites the user is authorized to access', function () {
+    Site::setSites([
+        'default' => ['name' => 'English', 'url' => '/', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => '/de/', 'locale' => 'de'],
+    ]);
+
+    Redirect::make()->source('/english')->destination('/new')->site('default')->save();
+    Redirect::make()->source('/german')->destination('/neu')->site('german')->save();
+
+    tap(Role::make('english_editor')->addPermission(['access cp', 'manage redirects', 'access default site']))->save();
+    $editor = tap(User::make()->assignRole('english_editor'))->save();
+    $filters = base64_encode(json_encode(['redirect_site' => ['site' => 'german']]));
+
+    $response = $this->actingAs($editor)
+        ->get(cp_route('advanced-seo.redirects.export', ['format' => 'csv', 'filters' => $filters]))
+        ->assertOk();
+
+    expect($response->streamedContent())
+        ->not->toContain('/english')
+        ->not->toContain('/german');
+});
+
 it('404s on an unknown format', function () {
     $this->actingAs($this->super)->get('/cp/advanced-seo/redirects/export/xml')->assertNotFound();
 });

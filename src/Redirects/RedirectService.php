@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository;
 use Aerni\AdvancedSeo\Contracts\RedirectHitRepository;
+use Aerni\AdvancedSeo\Contracts\RedirectQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectRepository;
 use Aerni\AdvancedSeo\Enums\RedirectExportFormat;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -29,9 +30,9 @@ class RedirectService
         return app(RedirectImporter::class)->import($path);
     }
 
-    public function export(RedirectExportFormat $format = RedirectExportFormat::Csv): string
+    public function export(RedirectExportFormat $format = RedirectExportFormat::Csv, ?RedirectQueryBuilder $query = null): string
     {
-        return app(RedirectExporter::class)->export($format);
+        return app(RedirectExporter::class)->export($format, $query);
     }
 
     public function resolve(string $path, string $site): ?ResolvedRedirect

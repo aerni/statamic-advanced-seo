@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Aerni\AdvancedSeo\Contracts\RedirectErrorRepository errors()
  * @method static \Aerni\AdvancedSeo\Redirects\ResolvedRedirect|null resolve(string $path, string $site)
  * @method static \Aerni\AdvancedSeo\Redirects\ImportResult import(string $path)
- * @method static string export(\Aerni\AdvancedSeo\Enums\RedirectExportFormat $format = \Aerni\AdvancedSeo\Enums\RedirectExportFormat::Csv)
+ * @method static string export(\Aerni\AdvancedSeo\Enums\RedirectExportFormat $format = \Aerni\AdvancedSeo\Enums\RedirectExportFormat::Csv, ?\Aerni\AdvancedSeo\Contracts\RedirectQueryBuilder $query = null)
  *
  * @see RedirectService
  */
