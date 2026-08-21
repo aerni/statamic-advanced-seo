@@ -90,7 +90,7 @@ class RedirectImporter
         throw_if(
             $missingHeaders->isNotEmpty(),
             ValidationException::withMessages([
-                'file' => trans_choice('advanced-seo::messages.redirect_import_missing_columns', $missingHeaders->count(), [
+                'file' => trans_choice('advanced-seo::validation.redirect_import_missing_columns', $missingHeaders->count(), [
                     'columns' => $missingHeaders->implode(', '),
                 ]),
             ]),
@@ -112,7 +112,7 @@ class RedirectImporter
 
         throw_unless(
             $isListOfObjects,
-            ValidationException::withMessages(['file' => __('advanced-seo::messages.redirect_import_invalid_json')]),
+            ValidationException::withMessages(['file' => __('advanced-seo::validation.redirect_import_invalid_json')]),
         );
 
         return $rows;
@@ -138,7 +138,7 @@ class RedirectImporter
 
                 throw_if(
                     in_array($key, $seen, true),
-                    ValidationException::withMessages(['source' => __('advanced-seo::messages.redirect_import_duplicate')]),
+                    ValidationException::withMessages(['source' => __('advanced-seo::validation.redirect_import_duplicate')]),
                 );
 
                 $seen[] = $key;
@@ -179,7 +179,7 @@ class RedirectImporter
 
         throw_if(
             RedirectResponseCode::tryFrom($responseCode) === null,
-            ValidationException::withMessages(['response_code' => __('advanced-seo::messages.redirect_import_invalid_response_code', ['code' => $responseCode])]),
+            ValidationException::withMessages(['response_code' => __('advanced-seo::validation.redirect_import_invalid_response_code', ['code' => $responseCode])]),
         );
 
         $values = [
@@ -237,7 +237,7 @@ class RedirectImporter
     {
         if (! $this->present($row, 'site')) {
             if (Site::multiEnabled()) {
-                throw ValidationException::withMessages(['site' => __('advanced-seo::messages.redirect_import_missing_site')]);
+                throw ValidationException::withMessages(['site' => __('advanced-seo::validation.redirect_import_missing_site')]);
             }
 
             return Site::selected()->handle();
@@ -246,7 +246,7 @@ class RedirectImporter
         $handle = trim((string) $row['site']);
 
         if (! Site::authorized()->map->handle()->contains($handle)) {
-            throw ValidationException::withMessages(['site' => __('advanced-seo::messages.redirect_import_invalid_site', ['site' => $handle])]);
+            throw ValidationException::withMessages(['site' => __('advanced-seo::validation.redirect_import_invalid_site', ['site' => $handle])]);
         }
 
         return $handle;

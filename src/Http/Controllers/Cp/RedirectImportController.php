@@ -52,7 +52,7 @@ class RedirectImportController extends CpController
 
         if (! $validToken) {
             throw ValidationException::withMessages([
-                'file.0' => __('advanced-seo::messages.redirect_import_invalid_file'),
+                'file.0' => __('advanced-seo::validation.redirect_import_invalid_file'),
             ]);
         }
 
@@ -68,7 +68,7 @@ class RedirectImportController extends CpController
 
         if (! $validPath) {
             throw ValidationException::withMessages([
-                'file.0' => __('advanced-seo::messages.redirect_import_invalid_file'),
+                'file.0' => __('advanced-seo::validation.redirect_import_invalid_file'),
             ]);
         }
 
