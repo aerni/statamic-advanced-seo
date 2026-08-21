@@ -4,16 +4,24 @@ namespace Aerni\AdvancedSeo\Commands;
 
 use Aerni\AdvancedSeo\Contracts\SeoSetConfigRepository as SeoSetConfigRepositoryContract;
 use Aerni\AdvancedSeo\Contracts\SeoSetLocalizationRepository as SeoSetLocalizationRepositoryContract;
+use Aerni\AdvancedSeo\Eloquent\Redirect as EloquentRedirect;
+use Aerni\AdvancedSeo\Eloquent\RedirectError as EloquentRedirectError;
+use Aerni\AdvancedSeo\Eloquent\RedirectErrorModel;
+use Aerni\AdvancedSeo\Eloquent\RedirectHit as EloquentRedirectHit;
+use Aerni\AdvancedSeo\Eloquent\RedirectHitModel;
+use Aerni\AdvancedSeo\Eloquent\RedirectModel;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfig as EloquentSeoSetConfig;
 use Aerni\AdvancedSeo\Eloquent\SeoSetConfigModel;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalization as EloquentSeoSetLocalization;
 use Aerni\AdvancedSeo\Eloquent\SeoSetLocalizationModel;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository as StacheSeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository as StacheSeoSetLocalizationRepository;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Stache;
 use Statamic\Statamic;
 
 use function Laravel\Prompts\confirm;
@@ -79,16 +87,26 @@ class SwitchToFile extends Command
 
         $this->exportConfigs();
         $this->exportLocalizations();
+        $this->exportRedirects();
+        $this->exportRedirectHits();
+        $this->exportRedirectErrors();
 
         info('Successfully switched to the file driver.');
     }
 
     protected function exportConfigs(): void
     {
+        $steps = SeoSetConfigModel::all()
+            ->filter(fn ($model) => Seo::find("{$model->type}::{$model->handle}"));
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
         progress(
             label: 'Exporting configs...',
-            steps: SeoSetConfigModel::all(),
-            callback: fn ($model) => EloquentSeoSetConfig::fromModel($model)->save(),
+            steps: $steps,
+            callback: fn ($model) => Stache::store('seo-set-configs')->save(EloquentSeoSetConfig::fromModel($model)),
         );
 
         info('Exported configs.');
@@ -96,12 +114,70 @@ class SwitchToFile extends Command
 
     protected function exportLocalizations(): void
     {
+        $steps = SeoSetLocalizationModel::all()
+            ->filter(fn ($model) => Seo::find("{$model->type}::{$model->handle}"));
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
         progress(
             label: 'Exporting localizations...',
-            steps: SeoSetLocalizationModel::all(),
-            callback: fn ($model) => EloquentSeoSetLocalization::fromModel($model)->save(),
+            steps: $steps,
+            callback: fn ($model) => Stache::store('seo-set-localizations')->save(EloquentSeoSetLocalization::fromModel($model)),
         );
 
         info('Exported localizations.');
+    }
+
+    protected function exportRedirects(): void
+    {
+        $steps = RedirectModel::all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
+        progress(
+            label: 'Exporting redirects...',
+            steps: $steps,
+            callback: fn ($model) => Stache::store('redirects')->save(EloquentRedirect::fromModel($model)),
+        );
+
+        info('Exported redirects.');
+    }
+
+    protected function exportRedirectHits(): void
+    {
+        $steps = RedirectHitModel::all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
+        progress(
+            label: 'Exporting redirect hits...',
+            steps: $steps,
+            callback: fn ($model) => Stache::store('redirect-hits')->save(EloquentRedirectHit::fromModel($model)),
+        );
+
+        info('Exported redirect hits.');
+    }
+
+    protected function exportRedirectErrors(): void
+    {
+        $steps = RedirectErrorModel::all();
+
+        if ($steps->isEmpty()) {
+            return;
+        }
+
+        progress(
+            label: 'Exporting redirect errors...',
+            steps: $steps,
+            callback: fn ($model) => Stache::store('redirect-errors')->save(EloquentRedirectError::fromModel($model)),
+        );
+
+        info('Exported redirect errors.');
     }
 }

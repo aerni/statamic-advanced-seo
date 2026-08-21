@@ -1,0 +1,66 @@
+<?php
+
+namespace Aerni\AdvancedSeo\Eloquent;
+
+use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
+use Aerni\AdvancedSeo\Redirects\Redirect as StacheRedirect;
+use Illuminate\Database\Eloquent\Model;
+
+class Redirect extends StacheRedirect
+{
+    protected ?Model $model = null;
+
+    public static function fromModel(Model $model): Contract
+    {
+        return (new static)
+            ->model($model)
+            ->id($model->id)
+            ->source($model->source)
+            ->destination($model->destination)
+            ->responseCode($model->response_code)
+            ->site($model->site)
+            ->enabled($model->enabled)
+            ->preserveQueryString($model->preserve_query_string ?? true)
+            ->origin($model->origin ?? RedirectOrigin::Manual)
+            ->description($model->description)
+            ->createdAt($model->created_at?->timestamp);
+    }
+
+    public function toModel(): Model
+    {
+        return self::makeModelFromContract($this);
+    }
+
+    public static function makeModelFromContract(Contract $source): Model
+    {
+        $model = app('statamic.eloquent.redirect.model');
+
+        return tap($model::firstOrNew(['id' => $source->id()])->fill([
+            'source' => $source->source(),
+            'destination' => $source->responseCode() === RedirectResponseCode::Gone ? null : $source->destination(),
+            'response_code' => $source->responseCode(),
+            'site' => $source->site(),
+            'enabled' => $source->enabled(),
+            'preserve_query_string' => $source->responseCode() === RedirectResponseCode::Gone ? null : $source->preserveQueryString(),
+            'origin' => $source->origin(),
+            'description' => $source->description(),
+        ]), function (Model $model) use ($source): void {
+            if ($source->createdAt()) {
+                $model->created_at = $source->createdAt();
+            }
+        });
+    }
+
+    public function model(?Model $model = null): Model|static|null
+    {
+        if (func_num_args() === 0) {
+            return $this->model;
+        }
+
+        $this->model = $model;
+
+        return $this;
+    }
+}

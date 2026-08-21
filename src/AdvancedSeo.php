@@ -32,6 +32,7 @@ class AdvancedSeo
 
         return [
             ['title' => __('advanced-seo::messages.pro_feature_sitemaps'), 'icon' => 'hierarchy', 'url' => "$docs/usage/sitemaps"],
+            ['title' => __('advanced-seo::messages.pro_feature_redirects'), 'icon' => 'moved', 'url' => "$docs/usage/redirects"],
             ['title' => __('advanced-seo::messages.pro_feature_multi_site'), 'icon' => 'earth'],
             ['title' => __('advanced-seo::messages.pro_feature_ai'), 'icon' => 'ai-spark', 'url' => "$docs/usage/on-page-seo#ai-content-generation"],
             ['title' => __('advanced-seo::messages.pro_feature_social_images'), 'icon' => 'media-image-picture-gallery', 'url' => "$docs/usage/social-images-generator"],

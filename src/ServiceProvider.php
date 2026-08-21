@@ -3,6 +3,8 @@
 namespace Aerni\AdvancedSeo;
 
 use Aerni\AdvancedSeo\Cascades\CascadeComposer;
+use Aerni\AdvancedSeo\Commands\PruneRedirectErrors;
+use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Gates\SeoContentGate;
 use Aerni\AdvancedSeo\GraphQL\Enums\SitemapTypeEnum;
@@ -23,12 +25,22 @@ use Aerni\AdvancedSeo\GraphQL\Types\SitemapUrlType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
+use Aerni\AdvancedSeo\Redirects\RedirectDestinationEntries;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Aerni\AdvancedSeo\SeoSets\SeoSetGroup;
+use Aerni\AdvancedSeo\Stache\Query\RedirectHitQueryBuilder;
+use Aerni\AdvancedSeo\Stache\Query\RedirectQueryBuilder;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectErrorRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectHitRepository;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetConfigRepository;
 use Aerni\AdvancedSeo\Stache\Repositories\SeoSetLocalizationRepository;
+use Aerni\AdvancedSeo\Stache\Stores\RedirectErrorsStore;
+use Aerni\AdvancedSeo\Stache\Stores\RedirectHitsStore;
+use Aerni\AdvancedSeo\Stache\Stores\RedirectsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetConfigsStore;
 use Aerni\AdvancedSeo\Stache\Stores\SeoSetLocalizationsStore;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -51,10 +63,16 @@ class ServiceProvider extends AddonServiceProvider
 {
     protected $actions = [
         Actions\Statamic\GenerateSocialImages::class,
+        Actions\Statamic\EnableRedirect::class,
+        Actions\Statamic\DisableRedirect::class,
+        Actions\Statamic\ResetRedirectHits::class,
+        Actions\Statamic\DeleteRedirect::class,
+        Actions\Statamic\DeleteRedirectError::class,
     ];
 
     protected $policies = [
         SeoSet::class => Policies\SeoSetPolicy::class,
+        Contracts\Redirect::class => Policies\RedirectPolicy::class,
     ];
 
     protected $vite = [
@@ -69,6 +87,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this
             ->bootStacheStore()
+            ->bootRedirects()
             ->bootRouteBindings()
             ->bootNav()
             ->bootPermissions()
@@ -90,10 +109,14 @@ class ServiceProvider extends AddonServiceProvider
             SeoSet::class,
             SeoSets\SeoSetConfig::class,
             SeoSets\SeoSetLocalization::class,
+            Redirects\Redirect::class,
+            Redirects\RedirectHit::class,
+            Redirects\RedirectError::class,
         ]);
 
         app()->instance('advanced-seo.tokens', collect());
         app()->instance('advanced-seo.sitemaps', collect());
+        $this->app->scoped(RedirectDestinationEntries::class);
 
         Features\EloquentDriver::enabled() ? $this->registerEloquentDriver() : $this->registerFileDriver();
     }
@@ -102,15 +125,36 @@ class ServiceProvider extends AddonServiceProvider
     {
         Statamic::repository(Contracts\SeoSetConfigRepository::class, Eloquent\SeoSetConfigRepository::class);
         Statamic::repository(Contracts\SeoSetLocalizationRepository::class, Eloquent\SeoSetLocalizationRepository::class);
+        Statamic::repository(Contracts\RedirectRepository::class, Eloquent\RedirectRepository::class);
+        Statamic::repository(Contracts\RedirectHitRepository::class, Eloquent\RedirectHitRepository::class);
+        Statamic::repository(Contracts\RedirectErrorRepository::class, Eloquent\RedirectErrorRepository::class);
 
         $this->app->bind('statamic.eloquent.seo_set_config.model', Eloquent\SeoSetConfigModel::class);
         $this->app->bind('statamic.eloquent.seo_set_localization.model', Eloquent\SeoSetLocalizationModel::class);
+        $this->app->bind('statamic.eloquent.redirect.model', Eloquent\RedirectModel::class);
+        $this->app->bind('statamic.eloquent.redirect_hit.model', Eloquent\RedirectHitModel::class);
+        $this->app->bind('statamic.eloquent.redirect_error.model', Eloquent\RedirectErrorModel::class);
     }
 
     protected function registerFileDriver(): void
     {
         Statamic::repository(Contracts\SeoSetConfigRepository::class, SeoSetConfigRepository::class);
         Statamic::repository(Contracts\SeoSetLocalizationRepository::class, SeoSetLocalizationRepository::class);
+        Statamic::repository(Contracts\RedirectRepository::class, RedirectRepository::class);
+        Statamic::repository(Contracts\RedirectHitRepository::class, RedirectHitRepository::class);
+        Statamic::repository(Contracts\RedirectErrorRepository::class, RedirectErrorRepository::class);
+
+        $this->app->bind(RedirectQueryBuilder::class, fn () => new RedirectQueryBuilder(
+            app('stache')->store('redirects')
+        ));
+
+        $this->app->bind(Contracts\RedirectHitQueryBuilder::class, fn () => new RedirectHitQueryBuilder(
+            app('stache')->store('redirect-hits')
+        ));
+
+        $this->app->bind(RedirectErrorQueryBuilder::class, fn () => new \Aerni\AdvancedSeo\Stache\Query\RedirectErrorQueryBuilder(
+            app('stache')->store('redirect-errors')
+        ));
     }
 
     protected function bootStacheStore(): self
@@ -118,13 +162,44 @@ class ServiceProvider extends AddonServiceProvider
         Stache::registerStores([
             app(SeoSetConfigsStore::class)->directory(config('advanced-seo.directory')),
             app(SeoSetLocalizationsStore::class)->directory(config('advanced-seo.directory')),
+            app(RedirectsStore::class)->directory(config('advanced-seo.redirects.directory')),
+            app(RedirectHitsStore::class)->directory(config('advanced-seo.redirects.hits.directory')),
+            app(RedirectErrorsStore::class)->directory(config('advanced-seo.redirects.errors.directory')),
         ]);
 
         return $this;
     }
 
+    protected function bootRedirects(): self
+    {
+        if (Features\Redirects::enabled()) {
+            NotFoundHttpException::renderUsing(fn ($request) => app(Redirects\RedirectHandler::class)($request));
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param  Schedule  $schedule
+     */
+    protected function schedule($schedule): void
+    {
+        if (! Features\Redirects::enabled() || ! config('advanced-seo.redirects.errors.enabled', true)) {
+            return;
+        }
+
+        $schedule->command(PruneRedirectErrors::class)->daily();
+    }
+
     protected function bootRouteBindings(): self
     {
+        Route::bind('seoRedirect', function (string $id) {
+            return throw_unless(
+                Facades\Redirect::find($id),
+                new NotFoundHttpException
+            );
+        });
+
         Route::bind('seoSetGroup', function (string $type) {
             return throw_unless(
                 Seo::groups()->first(fn (SeoSetGroup $group) => $group->type() === $type),
@@ -154,7 +229,26 @@ class ServiceProvider extends AddonServiceProvider
         Nav::extend(function ($nav) {
             $navItems = Seo::groups()
                 ->filter(fn (SeoSetGroup $group) => User::current()->can('viewAny', [SeoSet::class, $group]))
-                ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->url()));
+                ->map(fn (SeoSetGroup $group) => $nav->item($group->title())->url($group->url())->icon($group->icon()));
+
+            $canViewRedirects = Features\Redirects::enabled()
+                && User::current()->can('manage', Contracts\Redirect::class);
+
+            if ($canViewRedirects) {
+                $navItems->push(
+                    $nav->item(__('advanced-seo::messages.redirects'))
+                        ->route('advanced-seo.redirects.index')
+                        ->icon('moved')
+                );
+            }
+
+            if ($canViewRedirects && config('advanced-seo.redirects.errors.enabled')) {
+                $navItems->push(
+                    $nav->item(__('advanced-seo::messages.redirect_errors'))
+                        ->route('advanced-seo.redirects.errors.index')
+                        ->icon('alert-warning-exclamation-mark')
+                );
+            }
 
             if ($navItems->isEmpty()) {
                 return;
@@ -181,20 +275,26 @@ class ServiceProvider extends AddonServiceProvider
             Permission::group('advanced-seo', 'Advanced SEO', function () {
                 Permission::register('configure seo', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_configure_seo'))
-                        ->description(__('advanced-seo::messages.permission_configure_seo_description'));
+                        ->label(__('advanced-seo::permissions.configure_seo'))
+                        ->description(__('advanced-seo::permissions.configure_seo_description'));
                 });
 
                 Permission::register('edit seo defaults', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_edit_defaults'))
-                        ->description(__('advanced-seo::messages.permission_edit_defaults_description'));
+                        ->label(__('advanced-seo::permissions.edit_defaults'))
+                        ->description(__('advanced-seo::permissions.edit_defaults_description'));
                 });
 
                 Permission::register('edit seo content', function ($permission) {
                     $permission
-                        ->label(__('advanced-seo::messages.permission_edit_content'))
-                        ->description(__('advanced-seo::messages.permission_edit_content_description'));
+                        ->label(__('advanced-seo::permissions.edit_content'))
+                        ->description(__('advanced-seo::permissions.edit_content_description'));
+                });
+
+                Permission::register('manage redirects', function ($permission) {
+                    $permission
+                        ->label(__('advanced-seo::permissions.manage_redirects'))
+                        ->description(__('advanced-seo::permissions.manage_redirects_description'));
                 });
             });
         });
@@ -209,6 +309,9 @@ class ServiceProvider extends AddonServiceProvider
             Git::listen(Events\SeoSetConfigDeleted::class);
             Git::listen(Events\SeoSetLocalizationSaved::class);
             Git::listen(Events\SeoSetLocalizationDeleted::class);
+            Git::listen(Events\RedirectCreated::class);
+            Git::listen(Events\RedirectSaved::class);
+            Git::listen(Events\RedirectDeleted::class);
         }
 
         return $this;
@@ -270,6 +373,9 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../database/migrations/2026_01_13_100000_create_seo_set_configs_table.php' => database_path('migrations/2026_01_13_100000_create_seo_set_configs_table.php'),
             __DIR__.'/../database/migrations/2026_01_13_100001_create_seo_set_localizations_table.php' => database_path('migrations/2026_01_13_100001_create_seo_set_localizations_table.php'),
             __DIR__.'/../database/migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php' => database_path('migrations/2026_01_13_100002_migrate_seo_defaults_to_new_tables.php'),
+            __DIR__.'/../database/migrations/2026_06_23_100000_create_redirects_table.php' => database_path('migrations/2026_06_23_100000_create_redirects_table.php'),
+            __DIR__.'/../database/migrations/2026_07_02_100000_create_redirect_hits_table.php' => database_path('migrations/2026_07_02_100000_create_redirect_hits_table.php'),
+            __DIR__.'/../database/migrations/2026_07_02_100001_create_redirect_errors_table.php' => database_path('migrations/2026_07_02_100001_create_redirect_errors_table.php'),
         ], 'advanced-seo-migrations');
 
         return $this;

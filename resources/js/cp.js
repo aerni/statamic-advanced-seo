@@ -1,6 +1,10 @@
 import Dashboard from './pages/Dashboard.vue';
 import Index from './pages/Index.vue';
 import Edit from './pages/Edit.vue';
+import RedirectsIndex from './pages/redirects/Index.vue';
+import RedirectsCreate from './pages/redirects/Create.vue';
+import RedirectsEdit from './pages/redirects/Edit.vue';
+import RedirectsErrors from './pages/redirects/Errors.vue';
 import SeoFieldtype from './components/fieldtypes/SeoFieldtype.vue'
 import SeoIndexFieldtype from './components/fieldtypes/SeoIndexFieldtype.vue'
 import SiteOriginsFieldtype from './components/fieldtypes/SiteOriginsFieldtype.vue'
@@ -8,6 +12,7 @@ import SearchPreviewFieldtype from './components/fieldtypes/SearchPreviewFieldty
 import SocialPreviewFieldtype from './components/fieldtypes/SocialPreviewFieldtype.vue'
 import TokenInputFieldtype from './components/fieldtypes/TokenInputFieldtype.vue'
 import AlertFieldtype from './components/fieldtypes/AlertFieldtype.vue'
+import RedirectSourceFieldtype from './components/fieldtypes/RedirectSourceFieldtype.vue'
 import { add } from './utils/normalizers.js'
 
 Statamic.booting(() => {
@@ -17,6 +22,10 @@ Statamic.booting(() => {
     Statamic.$inertia.register('advanced-seo::Collections/Edit', Edit)
     Statamic.$inertia.register('advanced-seo::Taxonomies/Index', Index)
     Statamic.$inertia.register('advanced-seo::Taxonomies/Edit', Edit)
+    Statamic.$inertia.register('advanced-seo::Redirects/Index', RedirectsIndex)
+    Statamic.$inertia.register('advanced-seo::Redirects/Create', RedirectsCreate)
+    Statamic.$inertia.register('advanced-seo::Redirects/Edit', RedirectsEdit)
+    Statamic.$inertia.register('advanced-seo::Redirects/Errors', RedirectsErrors)
     Statamic.$components.register('seo-fieldtype', SeoFieldtype)
     Statamic.$components.register('seo-fieldtype-index', SeoIndexFieldtype)
     Statamic.$components.register('site_origins-fieldtype', SiteOriginsFieldtype)
@@ -24,5 +33,6 @@ Statamic.booting(() => {
     Statamic.$components.register('social_preview-fieldtype', SocialPreviewFieldtype)
     Statamic.$components.register('token_input-fieldtype', TokenInputFieldtype)
     Statamic.$components.register('alert-fieldtype', AlertFieldtype)
+    Statamic.$components.register('redirect_source-fieldtype', RedirectSourceFieldtype)
     Statamic.$advancedSeo = { normalizers: { add } }
 })

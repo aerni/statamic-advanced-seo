@@ -368,6 +368,15 @@ return [
         'instructions' => 'Aktiviert die Sitemap für diesen :type.',
     ],
 
+    'config_section_redirects' => [
+        'display' => 'Weiterleitungen',
+    ],
+
+    'config_redirects' => [
+        'display' => 'Weiterleitungen aktivieren',
+        'instructions' => 'Erstellt automatisch Weiterleitungen, wenn sich URLs in diesem :type ändern.',
+    ],
+
     'config_section_social_images' => [
         'display' => 'Social-Media-Bilder',
     ],
@@ -401,6 +410,48 @@ return [
         'display' => 'Copywriting-Anweisungen',
         'instructions' => 'Allgemeine Anweisungen für die Erstellung von Titeln und Beschreibungen über alle Sammlungen und Taxonomien hinweg.',
         'placeholder' => 'Beispiel: Verwende einen freundlichen, umgangssprachlichen Ton. Sage immer „nachhaltig" statt „umweltfreundlich".',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect Fields
+    |--------------------------------------------------------------------------
+    |
+    | Used by RedirectBlueprint.
+    |
+    */
+
+    'redirect_source' => [
+        'display' => 'Quelle',
+        'instructions' => 'Der Pfad, von dem weitergeleitet wird: ein exakter Pfad (`/old`), ein Platzhalter (`/blog/*`) oder eine Regex (`#…#`).',
+    ],
+
+    'redirect_destination' => [
+        'display' => 'Ziel',
+        'instructions' => 'Ein Pfad relativ zur Quell-Website (`/about`), eine vollständige URL oder ein Eintrag. Verwende `$1`, `$2` für Captures.',
+    ],
+
+    'redirect_response_code' => [
+        'display' => 'Antwortcode',
+        'instructions' => 'Der HTTP-Status, mit dem geantwortet wird.',
+        'option_301' => '301 (Dauerhaft)',
+        'option_302' => '302 (Temporär)',
+        'option_410' => '410 (Entfernt)',
+    ],
+
+    'redirect_preserve_query_string' => [
+        'display' => 'Query-String beibehalten',
+        'instructions' => 'An die Ziel-URL anhängen.',
+    ],
+
+    'redirect_description' => [
+        'display' => 'Beschreibung',
+        'instructions' => 'Eine optionale Notiz zur eigenen Referenz.',
+    ],
+
+    'redirect_enabled' => [
+        'display' => 'Aktiviert',
+        'instructions' => 'Deaktivieren, um die Weiterleitung zu behalten, ohne dass sie aktiv ist.',
     ],
 
 ];

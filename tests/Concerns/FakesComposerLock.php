@@ -19,6 +19,11 @@ trait FakesComposerLock
         $this->fakeComposerLock('composer.screenshot.lock');
     }
 
+    protected function installSimpleExcelPackage(): void
+    {
+        $this->fakeComposerLock('composer.simple-excel.lock');
+    }
+
     protected function uninstallPackages(): void
     {
         $this->fakeComposerLock('composer.empty.lock');

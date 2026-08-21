@@ -1,0 +1,262 @@
+<?php
+
+namespace Aerni\AdvancedSeo\Http\Controllers\Cp;
+
+use Aerni\AdvancedSeo\Blueprints\RedirectBlueprint;
+use Aerni\AdvancedSeo\Contracts\Redirect;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
+use Aerni\AdvancedSeo\Features\RedirectImportExport;
+use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
+use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
+use Statamic\Facades\Scope;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Query\OrderBy;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Sites\Site as StatamicSite;
+use Statamic\Statamic;
+
+class RedirectController extends CpController
+{
+    use QueriesFilters;
+
+    public function index(FilteredRequest $request)
+    {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
+        $this->authorize('manage', Redirect::class);
+
+        if ($request->wantsJson()) {
+            $query = RedirectFacade::query()
+                ->whereIn('site', Site::authorized()->map->handle()->all());
+
+            if ($search = request('search')) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('source', 'LIKE', '%'.$search.'%')
+                        ->orWhere('destination', 'LIKE', '%'.$search.'%');
+                });
+            }
+
+            $activeFilterBadges = $this->queryFilters($query, $request->filters);
+
+            $sortField = OrderBy::column(request('sort'));
+            $sortDirection = request('order', 'asc');
+
+            if ($sortField === 'status') {
+                $sortField = 'enabled';
+            }
+
+            $hitsEnabled = config('advanced-seo.redirects.hits.enabled');
+            $hitSortColumn = in_array($sortField, ['hits', 'last_hit_at'], true);
+
+            if ($hitSortColumn && ! $hitsEnabled) {
+                $sortField = null;
+            }
+
+            if (! $sortField && ! request('search')) {
+                $sortField = 'source';
+                $sortDirection = 'asc';
+            }
+
+            $perPage = Statamic::cpPerPage(request('perPage'));
+
+            if ($sortField) {
+                $query->orderBy($sortField, $sortDirection);
+            }
+
+            $redirects = $query->paginate($perPage);
+
+            $hits = $hitsEnabled ? $this->hitsForRedirects($redirects->items()) : null;
+
+            return (new RedirectsResource($redirects))
+                ->hits($hits)
+                ->additional(['meta' => ['activeFilterBadges' => $activeFilterBadges]]);
+        }
+
+        $hasRedirects = RedirectFacade::query()
+            ->whereIn('site', Site::authorized()->map->handle()->all())
+            ->first() !== null;
+
+        return Inertia::render('advanced-seo::Redirects/Index', [
+            'title' => __('advanced-seo::messages.redirects'),
+            'createUrl' => cp_route('advanced-seo.redirects.create'),
+            'listingUrl' => cp_route('advanced-seo.redirects.index'),
+            'actionUrl' => cp_route('advanced-seo.redirects.actions.run'),
+            'filters' => Scope::filters('redirects'),
+            'hasRedirects' => $hasRedirects,
+            'canImportExport' => RedirectImportExport::enabled() && User::current()->can('manage', Redirect::class),
+            'exportCsvUrl' => cp_route('advanced-seo.redirects.export', ['format' => 'csv']),
+            'exportJsonUrl' => cp_route('advanced-seo.redirects.export', ['format' => 'json']),
+            'importUrl' => cp_route('advanced-seo.redirects.import'),
+        ]);
+    }
+
+    protected function hitsForRedirects(array $redirects): Collection
+    {
+        return RedirectFacade::hits()->query()
+            ->whereIn('redirect', collect($redirects)->map->id()->all())
+            ->get()
+            ->keyBy(fn ($hit) => $hit->redirect());
+    }
+
+    public function create(Request $request): mixed
+    {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
+        $this->authorize('manage', Redirect::class);
+
+        $blueprint = RedirectBlueprint::definition();
+
+        $prefill = array_filter([
+            'source' => $request->input('source'),
+            'site' => $request->input('site'),
+        ], fn ($value) => $value !== null);
+
+        $fields = $blueprint->fields()->addValues($prefill)->preProcess();
+
+        return Inertia::render('advanced-seo::Redirects/Create', [
+            'title' => __('advanced-seo::messages.redirect_create_title'),
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta()->all(),
+            'enabled' => true,
+            'submitUrl' => cp_route('advanced-seo.redirects.store'),
+        ]);
+    }
+
+    public function edit(Redirect $redirect): mixed
+    {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
+        $this->authorize('manage', $redirect);
+
+        $blueprint = RedirectBlueprint::definition();
+
+        $fields = $blueprint->fields()->addValues([
+            'source' => $redirect->source(),
+            'destination' => $redirect->destination(),
+            'response_code' => $redirect->responseCode()->value,
+            'preserve_query_string' => $redirect->preserveQueryString(),
+            'description' => $redirect->description(),
+            'site' => $redirect->site(),
+        ])->preProcess();
+
+        $hit = config('advanced-seo.redirects.hits.enabled') ? $redirect->hit() : null;
+
+        return Inertia::render('advanced-seo::Redirects/Edit', [
+            'id' => $redirect->id(),
+            'title' => __('advanced-seo::messages.redirect_edit_title'),
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta()->all(),
+            'enabled' => $redirect->enabled(),
+            'createdAt' => $redirect->createdAtIso(),
+            'origin' => $redirect->origin()->label(),
+            'submitUrl' => cp_route('advanced-seo.redirects.update', $redirect->id()),
+            'testUrl' => $redirect->sourceUrl(),
+            'itemActions' => Action::for($redirect, ['view' => 'form'])
+                ->reject(fn ($action) => in_array($action->handle(), ['enable_redirect', 'disable_redirect']))
+                ->values(),
+            'itemActionUrl' => cp_route('advanced-seo.redirects.actions.run'),
+            'hits' => config('advanced-seo.redirects.hits.enabled') ? [
+                'count' => $hit?->count() ?? 0,
+                'last_hit_at' => $hit?->lastHitAtIso(),
+            ] : null,
+        ]);
+    }
+
+    public function store(Request $request): array
+    {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
+        $site = $this->resolveSite($request);
+
+        $this->authorize('manage', RedirectFacade::make()->site($site->handle()));
+
+        $values = $this->validateAndProcess($request, null, $site->handle());
+        $values['enabled'] = $request->boolean('enabled', true);
+
+        $origin = $request->input('origin') === RedirectOrigin::Error->value ? RedirectOrigin::Error : RedirectOrigin::Manual;
+
+        $redirect = $this->fill(RedirectFacade::make(), $values)->origin($origin)->save();
+
+        return ['redirect' => $redirect->editUrl()];
+    }
+
+    public function update(Request $request, Redirect $redirect): array
+    {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
+        $this->authorize('manage', $redirect);
+
+        $site = $this->resolveSite($request, $redirect);
+
+        $this->authorize('manage', RedirectFacade::make()->site($site->handle()));
+
+        $values = $this->validateAndProcess($request, $redirect, $site->handle());
+        $values['enabled'] = $request->boolean('enabled', true);
+
+        $this->fill($redirect, $values)->save();
+
+        return ['redirect' => $redirect->editUrl()];
+    }
+
+    public function destroy(Redirect $redirect)
+    {
+        throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
+
+        $this->authorize('manage', $redirect);
+
+        $redirect->delete();
+
+        return response('', 200);
+    }
+
+    protected function validateAndProcess(Request $request, ?Redirect $redirect, string $site): array
+    {
+        $fields = RedirectBlueprint::definition()->fields()->addValues($request->all());
+
+        $fields->validator()->withReplacements([
+            'id' => $redirect?->id(),
+            'site' => $site,
+        ])->validate();
+
+        return $fields->process()->values()->put('site', $site)->all();
+    }
+
+    protected function resolveSite(Request $request, ?Redirect $redirect = null): StatamicSite
+    {
+        $handle = $request->input('site', $redirect?->site() ?? Site::selected()->handle());
+
+        if (! $site = Site::get($handle)) {
+            throw ValidationException::withMessages([
+                'site' => __('advanced-seo::validation.redirect_site_invalid'),
+            ]);
+        }
+
+        return $site;
+    }
+
+    protected function fill(Redirect $redirect, array $values): Redirect
+    {
+        return $redirect
+            ->source(Arr::get($values, 'source'))
+            ->destination(Arr::get($values, 'destination'))
+            ->responseCode(RedirectResponseCode::from(Arr::get($values, 'response_code') ?? RedirectResponseCode::Permanent->value))
+            ->enabled(Arr::get($values, 'enabled') ?? true)
+            ->preserveQueryString((bool) Arr::get($values, 'preserve_query_string', true))
+            ->description(Arr::get($values, 'description'))
+            ->site($values['site']);
+    }
+}

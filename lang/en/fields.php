@@ -368,6 +368,15 @@ return [
         'instructions' => 'Enables the sitemap for this :type.',
     ],
 
+    'config_section_redirects' => [
+        'display' => 'Redirects',
+    ],
+
+    'config_redirects' => [
+        'display' => 'Enable Redirects',
+        'instructions' => 'Automatically creates redirects when URLs in this :type change.',
+    ],
+
     'config_section_social_images' => [
         'display' => 'Social Images',
     ],
@@ -401,6 +410,48 @@ return [
         'display' => 'Copywriting Instructions',
         'instructions' => 'General instructions for generating titles and descriptions across all collections and taxonomies.',
         'placeholder' => 'Example: Use a friendly, conversational tone. Always say "sustainable" instead of "eco-friendly".',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect Fields
+    |--------------------------------------------------------------------------
+    |
+    | Used by RedirectBlueprint.
+    |
+    */
+
+    'redirect_source' => [
+        'display' => 'Source',
+        'instructions' => 'The path to redirect from. Use an exact path (`/old`), a wildcard (`/blog/*`), or a regex (`#…#`).',
+    ],
+
+    'redirect_destination' => [
+        'display' => 'Destination',
+        'instructions' => 'A path relative to the source site (`/about`), full URL, or entry. Use `$1`, `$2` for captures.',
+    ],
+
+    'redirect_response_code' => [
+        'display' => 'Response Code',
+        'instructions' => 'The HTTP status to respond with.',
+        'option_301' => '301 (Permanent)',
+        'option_302' => '302 (Temporary)',
+        'option_410' => '410 (Gone)',
+    ],
+
+    'redirect_preserve_query_string' => [
+        'display' => 'Preserve Query String',
+        'instructions' => 'Append it to the destination URL.',
+    ],
+
+    'redirect_description' => [
+        'display' => 'Description',
+        'instructions' => 'An optional note for your own reference.',
+    ],
+
+    'redirect_enabled' => [
+        'display' => 'Enabled',
+        'instructions' => 'Disable to keep the redirect without it being active.',
     ],
 
 ];
