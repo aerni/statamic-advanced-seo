@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Contracts\Redirect as RedirectContract;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 
 uses(UseEloquentDriver::class);
@@ -29,6 +30,27 @@ it('can list and delete redirects via eloquent', function () {
     $b->delete();
 
     expect(Redirect::all())->toHaveCount(1);
+});
+
+it('enforces unique normalized sources per site at the database level', function () {
+    Redirect::make()->id('a')->source('/old')->destination('/first')->site('default')->save();
+
+    expect(fn () => Redirect::make()->id('b')->source('/old/')->destination('/second')->site('default')->save())
+        ->toThrow(QueryException::class);
+});
+
+it('allows the same source on different sites at the database level', function () {
+    Redirect::make()->id('a')->source('/old')->destination('/first')->site('default')->save();
+    Redirect::make()->id('b')->source('/old')->destination('/second')->site('french')->save();
+
+    expect(Redirect::all())->toHaveCount(2);
+});
+
+it('allows case-distinct regex sources at the database level', function () {
+    Redirect::make()->id('a')->source('#^/Blog$#')->destination('/first')->site('default')->save();
+    Redirect::make()->id('b')->source('#^/blog$#')->destination('/second')->site('default')->save();
+
+    expect(Redirect::all())->toHaveCount(2);
 });
 
 it('queries redirects by site', function () {

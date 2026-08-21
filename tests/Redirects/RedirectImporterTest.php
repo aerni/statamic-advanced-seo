@@ -86,6 +86,17 @@ it('updates an existing redirect matched by source and site', function () {
     expect($redirect->origin())->toBe(RedirectOrigin::Import);
 });
 
+it('keeps case-distinct regex sources separate', function () {
+    Redirect::make()->id('existing')->source('#^/Blog$#')->destination('/original')->site('default')->save();
+
+    $result = Redirect::import(importFile("source,destination,site\n#^/blog$#,/imported,default", 'import.csv'));
+
+    expect($result->imported)->toBe(1)
+        ->and(Redirect::all())->toHaveCount(2)
+        ->and(Redirect::find('existing')->source())->toBe('#^/Blog$#')
+        ->and(Redirect::find('existing')->destination())->toBe('/original');
+});
+
 it('overwrites the full redirect, resetting absent optional columns to their defaults', function () {
     Redirect::make()->id('existing')->source('/old')->destination('/original')->responseCode(RedirectResponseCode::Temporary)->preserveQueryString(false)->enabled(false)->description('Legacy')->site('default')->save();
 

@@ -12,6 +12,7 @@ return new class extends Migration
         Schema::create($this->prefix('redirects'), function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('source');
+            $table->string('source_hash', 32);
             $table->text('destination')->nullable();
             $table->integer('response_code')->default(301);
             $table->string('site');
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['site', 'enabled', 'source']);
+            $table->unique(['source_hash', 'site']);
         });
     }
 

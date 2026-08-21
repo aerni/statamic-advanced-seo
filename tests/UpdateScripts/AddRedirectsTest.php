@@ -1,6 +1,8 @@
 <?php
 
 use Aerni\AdvancedSeo\UpdateScripts\AddRedirects;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 
@@ -100,7 +102,28 @@ it('publishes and runs migrations for the eloquent driver', function () {
     expect($this->publishedMigrations->every(fn (string $migration) => File::exists($migration)))->toBeTrue()
         ->and(Schema::hasTable('redirects'))->toBeTrue()
         ->and(Schema::hasTable('redirect_hits'))->toBeTrue()
-        ->and(Schema::hasTable('redirect_errors'))->toBeTrue();
+        ->and(Schema::hasTable('redirect_errors'))->toBeTrue()
+        ->and(Schema::hasColumn('redirects', 'source_hash'))->toBeTrue();
+});
+
+it('enforces unique source hashes per site in the redirects migration', function () {
+    $createRedirects = require __DIR__.'/../../database/migrations/2026_06_23_100000_create_redirects_table.php';
+
+    $createRedirects->up();
+
+    DB::table('redirects')->insert([
+        'id' => 'redirect-one',
+        'source' => '/old',
+        'source_hash' => hash('xxh128', '/old'),
+        'site' => 'default',
+    ]);
+
+    expect(fn () => DB::table('redirects')->insert([
+        'id' => 'redirect-two',
+        'source' => '/old',
+        'source_hash' => hash('xxh128', '/old'),
+        'site' => 'default',
+    ]))->toThrow(QueryException::class);
 });
 
 it('runs eloquent migrations when the redirects configuration already exists', function () {

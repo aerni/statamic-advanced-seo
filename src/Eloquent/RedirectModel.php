@@ -25,4 +25,11 @@ class RedirectModel extends BaseModel
             'response_code' => RedirectResponseCode::class,
         ];
     }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $model): void {
+            $model->source_hash = hash('xxh128', (string) $model->source);
+        });
+    }
 }
