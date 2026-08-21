@@ -378,6 +378,15 @@ it('forbids storing a redirect for a site the user cannot access', function () {
     expect(Redirect::query()->where('site', 'french')->where('source', '/old')->first())->toBeNull();
 });
 
+it('rejects storing a redirect for an unknown site', function () {
+    $this->actingAs($this->super)
+        ->postJson(cp_route('advanced-seo.redirects.store'), ['source' => '/old', 'destination' => '/new', 'response_code' => 301, 'site' => 'missing'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('site');
+
+    expect(Redirect::query()->where('site', 'missing')->first())->toBeNull();
+});
+
 it('updates a redirect', function () {
     $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
 
@@ -436,6 +445,19 @@ it('forbids moving a redirect to a site the user cannot access', function () {
         ->patchJson(cp_route('advanced-seo.redirects.update', $redirect->id()), [
             'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'french',
         ])->assertForbidden();
+
+    expect(Redirect::find($redirect->id())->site())->toBe('default');
+});
+
+it('rejects moving a redirect to an unknown site', function () {
+    $redirect = tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+
+    $this->actingAs($this->super)
+        ->patchJson(cp_route('advanced-seo.redirects.update', $redirect->id()), [
+            'source' => '/old', 'destination' => '/new', 'response_code' => 301, 'enabled' => true, 'site' => 'missing',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('site');
 
     expect(Redirect::find($redirect->id())->site())->toBe('default');
 });

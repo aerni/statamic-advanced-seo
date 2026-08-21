@@ -13,6 +13,7 @@ use Aerni\AdvancedSeo\Http\Resources\Cp\Redirects\Redirects as RedirectsResource
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Action;
@@ -23,6 +24,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Query\OrderBy;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Sites\Site as StatamicSite;
 use Statamic\Statamic;
 
 class RedirectController extends CpController
@@ -178,11 +180,11 @@ class RedirectController extends CpController
     {
         throw_unless(RedirectsFeature::enabled(), new NotFoundHttpException);
 
-        $site = Site::get($request->input('site')) ?? Site::selected();
+        $site = $this->resolveSite($request);
 
         $this->authorize('manage', RedirectFacade::make()->site($site->handle()));
 
-        $values = $this->validateAndProcess($request, null);
+        $values = $this->validateAndProcess($request, null, $site->handle());
         $values['enabled'] = $request->boolean('enabled', true);
 
         $origin = $request->input('origin') === RedirectOrigin::Error->value ? RedirectOrigin::Error : RedirectOrigin::Manual;
@@ -198,11 +200,11 @@ class RedirectController extends CpController
 
         $this->authorize('manage', $redirect);
 
-        $site = Site::get($request->input('site')) ?? Site::get($redirect->site());
+        $site = $this->resolveSite($request, $redirect);
 
         $this->authorize('manage', RedirectFacade::make()->site($site->handle()));
 
-        $values = $this->validateAndProcess($request, $redirect);
+        $values = $this->validateAndProcess($request, $redirect, $site->handle());
         $values['enabled'] = $request->boolean('enabled', true);
 
         $this->fill($redirect, $values)->save();
@@ -221,16 +223,29 @@ class RedirectController extends CpController
         return response('', 200);
     }
 
-    protected function validateAndProcess(Request $request, ?Redirect $redirect): array
+    protected function validateAndProcess(Request $request, ?Redirect $redirect, string $site): array
     {
         $fields = RedirectBlueprint::definition()->fields()->addValues($request->all());
 
         $fields->validator()->withReplacements([
             'id' => $redirect?->id(),
-            'site' => $request->input('site', Site::default()->handle()),
+            'site' => $site,
         ])->validate();
 
-        return $fields->process()->values()->all();
+        return $fields->process()->values()->put('site', $site)->all();
+    }
+
+    protected function resolveSite(Request $request, ?Redirect $redirect = null): StatamicSite
+    {
+        $handle = $request->input('site', $redirect?->site() ?? Site::selected()->handle());
+
+        if (! $site = Site::get($handle)) {
+            throw ValidationException::withMessages([
+                'site' => __('advanced-seo::validation.redirect_site_invalid'),
+            ]);
+        }
+
+        return $site;
     }
 
     protected function fill(Redirect $redirect, array $values): Redirect
@@ -242,6 +257,6 @@ class RedirectController extends CpController
             ->enabled(Arr::get($values, 'enabled') ?? true)
             ->preserveQueryString((bool) Arr::get($values, 'preserve_query_string', true))
             ->description(Arr::get($values, 'description'))
-            ->site(Arr::get($values, 'site', Site::selected()->handle()));
+            ->site($values['site']);
     }
 }
