@@ -27,6 +27,14 @@ it('passes for an entry reference', function () {
     expect(destinationFormatPasses('entry::123'))->toBeTrue();
 });
 
+it('fails for an asset reference', function () {
+    expect(destinationFormatPasses('asset::assets::document.pdf'))->toBeFalse();
+});
+
+it('fails for a first child reference', function () {
+    expect(destinationFormatPasses('@child'))->toBeFalse();
+});
+
 it('passes for a relative path with capture placeholders', function () {
     expect(destinationFormatPasses('/p/$1'))->toBeTrue();
 });

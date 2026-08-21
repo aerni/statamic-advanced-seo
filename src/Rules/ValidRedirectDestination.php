@@ -15,7 +15,7 @@ class ValidRedirectDestination implements ValidationRule
             return;
         }
 
-        if (Str::startsWith($value, ['entry::', 'asset::']) || $value === '@child') {
+        if (Str::startsWith($value, 'entry::')) {
             return;
         }
 
