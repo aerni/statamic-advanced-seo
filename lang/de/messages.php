@@ -47,6 +47,7 @@ return [
     'redirect_import_invalid_response_code' => 'Ungültiger Antwortcode „:code". Verwende 301, 302 oder 410.',
     'redirect_import_duplicate' => 'Doppelte source in der Datei.',
     'redirect_import_invalid_json' => 'Das JSON muss ein nicht-leeres Array von Weiterleitungsobjekten sein.',
+    'redirect_import_invalid_file' => 'Wähle einen gültigen CSV- oder JSON-Upload aus.',
     'redirect_import_missing_site' => 'Eine Site ist erforderlich.',
     'redirect_import_invalid_site' => 'Unbekannte oder nicht autorisierte Site „:site".',
     'redirect_import_failed' => 'Korrigiere :count Weiterleitung und versuche es erneut.|Korrigiere :count Weiterleitungen und versuche es erneut.',
