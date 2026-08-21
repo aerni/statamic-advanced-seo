@@ -1,0 +1,163 @@
+    /*
+    |--------------------------------------------------------------------------
+    | Redirects (Requires Pro)
+    |--------------------------------------------------------------------------
+    |
+    | Configure the redirects feature to your liking.
+    |
+    */
+
+    'redirects' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enabled
+        |--------------------------------------------------------------------------
+        |
+        | Disable to turn off redirect handling and 404 tracking entirely.
+        |
+        */
+
+        'enabled' => false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Store Directory
+        |--------------------------------------------------------------------------
+        |
+        | The directory where redirects are stored when using the file driver.
+        |
+        */
+
+        'directory' => base_path('content/redirects'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Hits
+        |--------------------------------------------------------------------------
+        |
+        | Track how many times each redirect is used and when it was last hit.
+        |
+        */
+
+        'hits' => [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | Disable to stop recording redirect hits.
+            |
+            */
+
+            'enabled' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Store Directory
+            |--------------------------------------------------------------------------
+            |
+            | The directory where hit records are stored when using the file driver.
+            |
+            */
+
+            'directory' => storage_path('statamic/advanced-seo/redirect-hits'),
+
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Errors
+        |--------------------------------------------------------------------------
+        |
+        | Log 404s that no redirect handles so you can turn them into redirects.
+        |
+        */
+
+        'errors' => [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | Disable to stop recording unhandled 404s.
+            |
+            */
+
+            'enabled' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Store Directory
+            |--------------------------------------------------------------------------
+            |
+            | The directory where error records are stored when using the file driver.
+            |
+            */
+
+            'directory' => storage_path('statamic/advanced-seo/redirect-errors'),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Retention
+            |--------------------------------------------------------------------------
+            |
+            | Errors not seen within this many days are removed by the daily
+            | prune command (seo:prune-redirect-errors). Set to an integer, or
+            | false to disable age-based pruning.
+            |
+            */
+
+            'purge_after_days' => 30,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Record Cap
+            |--------------------------------------------------------------------------
+            |
+            | The list keeps the most-hit errors up to this cap, evicting the
+            | lowest-count records first. Set to an integer, or false to disable
+            | the cap for both drivers. Disabling the cap is only recommended with
+            | Eloquent because the file/Stache driver adds a YAML file for every
+            | recorded 404. The cap is best-effort under concurrent recording and
+            | may be briefly exceeded until the next write or prune.
+            |
+            */
+
+            'max_records' => 1000,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ignored Paths
+            |--------------------------------------------------------------------------
+            |
+            | Paths matching any of these patterns are never recorded as errors,
+            | keeping bot and scanner noise out of the list. Use an exact path
+            | (/foo), a wildcard (/bar/*), or a regex (#...#), just like a
+            | redirect source. Keep regex patterns simple, they run against
+            | request paths on every unmatched 404.
+            |
+            */
+
+            'ignore' => [
+                '#\.php$#',        // PHP probes: wp-login.php, xmlrpc.php, admin-ajax.php
+                '#^/wp-admin#',    // WordPress admin
+                '#^/\.(env|git)#', // Secrets and repo probes
+            ],
+
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Queue
+        |--------------------------------------------------------------------------
+        |
+        | The queue used for the background hit and error recording jobs.
+        |
+        */
+
+        'queue' => 'default',
+
+    ],
