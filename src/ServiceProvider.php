@@ -172,7 +172,9 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootRedirects(): self
     {
-        NotFoundHttpException::renderUsing(fn ($request) => app(Redirects\RedirectHandler::class)($request));
+        if (Features\Redirects::enabled()) {
+            NotFoundHttpException::renderUsing(fn ($request) => app(Redirects\RedirectHandler::class)($request));
+        }
 
         return $this;
     }
