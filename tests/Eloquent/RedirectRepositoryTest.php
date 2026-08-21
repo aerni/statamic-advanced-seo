@@ -2,6 +2,7 @@
 
 use Aerni\AdvancedSeo\Contracts\Redirect as RedirectContract;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Illuminate\Database\QueryException;
@@ -51,6 +52,22 @@ it('allows case-distinct regex sources at the database level', function () {
     Redirect::make()->id('b')->source('#^/blog$#')->destination('/second')->site('default')->save();
 
     expect(Redirect::all())->toHaveCount(2);
+});
+
+it('stores the inferred source type at the database level', function () {
+    Redirect::make()->id('exact')->source('/exact')->destination('/new')->site('default')->save();
+    Redirect::make()->id('wildcard')->source('/wildcard/*')->destination('/new')->site('default')->save();
+    Redirect::make()->id('regex')->source('#^/regex/(.*)$#')->destination('/new')->site('default')->save();
+
+    $sourceTypes = app('statamic.eloquent.redirect.model')::query()
+        ->pluck('source_type', 'id')
+        ->all();
+
+    expect($sourceTypes)->toBe([
+        'exact' => RedirectSourceType::Exact->value,
+        'wildcard' => RedirectSourceType::Wildcard->value,
+        'regex' => RedirectSourceType::Regex->value,
+    ]);
 });
 
 it('queries redirects by site', function () {

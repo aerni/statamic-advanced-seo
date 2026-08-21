@@ -35,8 +35,9 @@ trait UseEloquentDriver
 
         Schema::create('redirects', function ($table) {
             $table->string('id')->primary();
-            $table->string('source');
+            $table->text('source');
             $table->string('source_hash', 32);
+            $table->string('source_type');
             $table->text('destination')->nullable();
             $table->integer('response_code')->default(301);
             $table->string('site');
@@ -46,7 +47,7 @@ trait UseEloquentDriver
             $table->text('description')->nullable();
             $table->timestamps();
 
-            $table->index(['site', 'enabled', 'source']);
+            $table->index(['site', 'enabled', 'source_type']);
             $table->unique(['source_hash', 'site']);
         });
 

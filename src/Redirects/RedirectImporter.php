@@ -169,10 +169,9 @@ class RedirectImporter
         $normalizedSource = RedirectFacade::make()->source($source)->source();
 
         $existing = RedirectFacade::query()
-            ->where('source', $normalizedSource)
+            ->whereSource($normalizedSource)
             ->where('site', $site)
-            ->get()
-            ->first(fn (Redirect $redirect) => $redirect->source() === $normalizedSource);
+            ->first();
 
         // Import fully overwrites the redirect, so absent columns reset to the field's default rather than keeping the existing value.
         $responseCode = $this->int($row, 'response_code', RedirectResponseCode::Permanent->value);

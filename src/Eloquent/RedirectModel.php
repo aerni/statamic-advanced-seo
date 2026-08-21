@@ -2,8 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
+use Aerni\AdvancedSeo\Actions\GenerateRedirectSourceHash;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Statamic\Eloquent\Database\BaseModel;
 
 class RedirectModel extends BaseModel
@@ -29,7 +31,8 @@ class RedirectModel extends BaseModel
     protected static function booted(): void
     {
         static::saving(function (self $model): void {
-            $model->source_hash = hash('xxh128', (string) $model->source);
+            $model->source_hash = GenerateRedirectSourceHash::handle((string) $model->source);
+            $model->source_type = RedirectSourceType::fromSource((string) $model->source)->value;
         });
     }
 }

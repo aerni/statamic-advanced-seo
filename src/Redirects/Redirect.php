@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
+use Aerni\AdvancedSeo\Actions\GenerateRedirectSourceHash;
 use Aerni\AdvancedSeo\Contracts\Redirect as Contract;
 use Aerni\AdvancedSeo\Contracts\RedirectHit;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
@@ -207,6 +208,8 @@ class Redirect implements ContainsQueryableValues, Contract
     {
         return match ($field) {
             'response_code' => $this->responseCode()->value,
+            'source_hash' => GenerateRedirectSourceHash::handle($this->source()),
+            'source_type' => $this->sourceType()->value,
             'origin' => $this->origin()->value,
             'created_at' => $this->createdAt(),
             default => $this->{$field}(),

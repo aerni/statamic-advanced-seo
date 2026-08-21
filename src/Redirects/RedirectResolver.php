@@ -6,7 +6,6 @@ use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
-use Statamic\Support\Str;
 
 class RedirectResolver
 {
@@ -54,7 +53,7 @@ class RedirectResolver
     protected function findExactMatch(): ?Redirect
     {
         return RedirectFacade::query()
-            ->where('source', Str::lower($this->path))
+            ->whereSource($this->path)
             ->where('site', $this->site)
             ->where('enabled', true)
             ->first();
@@ -65,6 +64,7 @@ class RedirectResolver
         return RedirectFacade::query()
             ->where('site', $this->site)
             ->where('enabled', true)
+            ->whereIn('source_type', [RedirectSourceType::Wildcard->value, RedirectSourceType::Regex->value])
             ->get()
             ->sortBy(fn (Redirect $redirect) => RedirectPatternMatcher::specificity(
                 $redirect->source(),

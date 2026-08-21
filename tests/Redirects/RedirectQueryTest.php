@@ -1,9 +1,35 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
+
+it('queries redirects by source through the indexed source lookup', function () {
+    $source = '/'.str_repeat('long-source-', 30);
+
+    Redirect::make()->id('match')->source($source)->destination('/new')->site('default')->save();
+    Redirect::make()->id('other')->source('/other')->destination('/new')->site('default')->save();
+
+    expect(Redirect::query()->whereSource("{$source}/")->first()->id())->toBe('match');
+});
+
+it('queries redirects by their inferred source type', function () {
+    Redirect::make()->id('exact')->source('/exact')->destination('/new')->site('default')->save();
+    Redirect::make()->id('wildcard')->source('/wildcard/*')->destination('/new')->site('default')->save();
+    Redirect::make()->id('regex')->source('#^/regex/(.*)$#')->destination('/new')->site('default')->save();
+
+    $ids = Redirect::query()
+        ->whereIn('source_type', [RedirectSourceType::Wildcard->value, RedirectSourceType::Regex->value])
+        ->get()
+        ->map->id()
+        ->sort()
+        ->values()
+        ->all();
+
+    expect($ids)->toBe(['regex', 'wildcard']);
+});
 
 it('orders redirects by hit count', function () {
     Redirect::make()->id('r1')->source('/a')->destination('/x')->site('default')->save();

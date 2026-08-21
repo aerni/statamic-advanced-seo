@@ -2,10 +2,13 @@
 
 namespace Aerni\AdvancedSeo\Eloquent;
 
+use Aerni\AdvancedSeo\Concerns\QueriesRedirectSources;
 use Aerni\AdvancedSeo\Contracts\RedirectQueryBuilder as Contract;
 
 class RedirectQueryBuilder extends QueryBuilder implements Contract
 {
+    use QueriesRedirectSources;
+
     protected function toItem($model)
     {
         return Redirect::fromModel($model);

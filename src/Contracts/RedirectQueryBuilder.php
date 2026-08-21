@@ -6,5 +6,5 @@ use Statamic\Contracts\Query\Builder;
 
 interface RedirectQueryBuilder extends Builder
 {
-    //
+    public function whereSource(string $source): static;
 }

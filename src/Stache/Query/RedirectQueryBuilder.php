@@ -2,11 +2,14 @@
 
 namespace Aerni\AdvancedSeo\Stache\Query;
 
+use Aerni\AdvancedSeo\Concerns\QueriesRedirectSources;
 use Aerni\AdvancedSeo\Contracts\RedirectQueryBuilder as Contract;
 use Statamic\Facades\Stache;
 
 class RedirectQueryBuilder extends Builder implements Contract
 {
+    use QueriesRedirectSources;
+
     protected function getOrderKeyValuesByIndex()
     {
         return collect($this->orderBys)->mapWithKeys(function ($orderBy) {

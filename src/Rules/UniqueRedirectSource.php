@@ -20,9 +20,8 @@ class UniqueRedirectSource implements ValidationRule
 
         $existing = Redirect::query()
             ->where('site', $this->site)
-            ->where('source', $source)
-            ->get()
-            ->first(fn ($redirect) => $redirect->source() === $source);
+            ->whereSource($source)
+            ->first();
 
         if ($existing && $existing->id() !== $this->exceptId) {
             $fail(__('advanced-seo::validation.redirect_source_not_unique'))->translate();

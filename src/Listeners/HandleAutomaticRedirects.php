@@ -310,7 +310,7 @@ class HandleAutomaticRedirects
     {
         $existing = RedirectFacade::query()
             ->where('site', $site)
-            ->where('source', $source)
+            ->whereSource($source)
             ->first();
 
         if ($existing) {
@@ -353,7 +353,7 @@ class HandleAutomaticRedirects
     {
         RedirectFacade::query()
             ->where('site', $site)
-            ->where('source', $source)
+            ->whereSource($source)
             ->where('origin', RedirectOrigin::Automatic->value)
             ->get()
             ->each(fn (Redirect $redirect) => $redirect->delete());

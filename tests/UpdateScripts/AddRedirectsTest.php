@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Enums\RedirectSourceType;
 use Aerni\AdvancedSeo\UpdateScripts\AddRedirects;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -103,7 +104,8 @@ it('publishes and runs migrations for the eloquent driver', function () {
         ->and(Schema::hasTable('redirects'))->toBeTrue()
         ->and(Schema::hasTable('redirect_hits'))->toBeTrue()
         ->and(Schema::hasTable('redirect_errors'))->toBeTrue()
-        ->and(Schema::hasColumn('redirects', 'source_hash'))->toBeTrue();
+        ->and(Schema::hasColumn('redirects', 'source_hash'))->toBeTrue()
+        ->and(Schema::hasColumn('redirects', 'source_type'))->toBeTrue();
 });
 
 it('enforces unique source hashes per site in the redirects migration', function () {
@@ -115,6 +117,7 @@ it('enforces unique source hashes per site in the redirects migration', function
         'id' => 'redirect-one',
         'source' => '/old',
         'source_hash' => hash('xxh128', '/old'),
+        'source_type' => RedirectSourceType::Exact->value,
         'site' => 'default',
     ]);
 
@@ -122,8 +125,17 @@ it('enforces unique source hashes per site in the redirects migration', function
         'id' => 'redirect-two',
         'source' => '/old',
         'source_hash' => hash('xxh128', '/old'),
+        'source_type' => RedirectSourceType::Exact->value,
         'site' => 'default',
     ]))->toThrow(QueryException::class);
+});
+
+it('stores redirect sources as text', function () {
+    $createRedirects = require __DIR__.'/../../database/migrations/2026_06_23_100000_create_redirects_table.php';
+
+    $createRedirects->up();
+
+    expect(Schema::getColumnType('redirects', 'source'))->toBe('text');
 });
 
 it('runs eloquent migrations when the redirects configuration already exists', function () {

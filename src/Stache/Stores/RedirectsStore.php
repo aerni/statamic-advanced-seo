@@ -51,6 +51,6 @@ class RedirectsStore extends BasicStore
 
     protected function storeIndexes(): array
     {
-        return ['id', 'site', 'source', 'enabled', 'origin'];
+        return ['id', 'site', 'source', 'source_hash', 'source_type', 'enabled', 'origin'];
     }
 }
