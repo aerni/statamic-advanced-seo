@@ -191,7 +191,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function bootRouteBindings(): self
     {
-        Route::bind('redirect', function (string $id) {
+        Route::bind('seoRedirect', function (string $id) {
             return throw_unless(
                 Facades\Redirect::find($id),
                 new NotFoundHttpException

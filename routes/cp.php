@@ -28,7 +28,7 @@ Route::prefix('advanced-seo')->name('advanced-seo.')->group(function () {
     Route::get('/redirects/export/{format}', RedirectExportController::class)->name('redirects.export')->where('format', 'csv|json');
     Route::post('/redirects/actions', [RedirectActionController::class, 'run'])->name('redirects.actions.run');
     Route::post('/redirects/actions/list', [RedirectActionController::class, 'bulkActions'])->name('redirects.actions.bulk');
-    Route::resource('redirects', RedirectController::class)->except('show');
+    Route::resource('redirects', RedirectController::class)->parameters(['redirects' => 'seoRedirect'])->except('show');
 
     Route::get('/{seoSetGroup}', SeoSetIndexController::class)->name('sets.index');
     Route::get('/{seoSetGroup}/{seoSet}/config', [SeoSetConfigController::class, 'edit'])->name('sets.config.edit');
