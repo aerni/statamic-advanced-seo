@@ -1,9 +1,9 @@
 <script setup>
-import { Head, router, toggleArchitecturalBackground } from '@statamic/cms/inertia';
+import { Head, router, toggleArchitecturalBackground, useArchitecturalBackground } from '@statamic/cms/inertia';
 import { Icon, EmptyStateMenu, EmptyStateItem } from '@statamic/cms/ui';
 import Listing from '../../components/redirects/Listing.vue';
 import ImportRedirectsModal from '../../components/redirects/ImportRedirectsModal.vue';
-import { ref, useTemplateRef, watch } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 const props = defineProps({
     title: String,
@@ -21,11 +21,16 @@ const props = defineProps({
 const showImportModal = ref(false);
 const listing = useTemplateRef('listing');
 
-watch(() => props.hasRedirects, (hasRedirects) => toggleArchitecturalBackground(!hasRedirects), { immediate: true });
+if (!props.hasRedirects) {
+    useArchitecturalBackground();
+}
 
 function onImported() {
     listing.value?.refresh();
-    router.reload({ only: ['hasRedirects'] });
+    router.reload({
+        only: ['hasRedirects'],
+        onSuccess: () => toggleArchitecturalBackground(false),
+    });
 }
 </script>
 
