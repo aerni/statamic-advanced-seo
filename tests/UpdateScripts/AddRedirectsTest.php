@@ -53,7 +53,7 @@ it('adds the complete redirects configuration to the published config', function
             'max_records' => 1000,
             'ignore' => [
                 '#\\.php$#',
-                '#^/wp-admin#',
+                '#/wp-(admin|includes|content)(/|$)#',
                 '#^/\\.(env|git)#',
             ],
         ],

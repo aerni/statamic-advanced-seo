@@ -182,3 +182,12 @@ it('does not record an error for an ignored path', function () {
 
     Queue::assertNotPushed(RecordRedirectErrorJob::class);
 });
+
+it('does not record an error for nested wordpress probes', function () {
+    config(['advanced-seo.redirects.errors.enabled' => true]);
+    Queue::fake();
+
+    $this->get('/blog/wp-includes/wlwmanifest.xml')->assertNotFound();
+
+    Queue::assertNotPushed(RecordRedirectErrorJob::class);
+});

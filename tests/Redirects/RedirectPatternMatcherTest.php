@@ -60,8 +60,9 @@ it('matches a wildcard source within a single segment only', function () {
 it('matches a regex source at any depth', function () {
     expect(RedirectPatternMatcher::matches('#\.php$#', '/wp-login.php'))->toBeTrue()
         ->and(RedirectPatternMatcher::matches('#\.php$#', '/nested/path/admin-ajax.php'))->toBeTrue()
-        ->and(RedirectPatternMatcher::matches('#^/wp-admin#', '/wp-admin/options.php'))->toBeTrue()
-        ->and(RedirectPatternMatcher::matches('#^/wp-admin#', '/admin'))->toBeFalse();
+        ->and(RedirectPatternMatcher::matches('#/wp-(admin|includes|content)(/|$)#', '/wp-admin/options.php'))->toBeTrue()
+        ->and(RedirectPatternMatcher::matches('#/wp-(admin|includes|content)(/|$)#', '/blog/wp-includes/wlwmanifest.xml'))->toBeTrue()
+        ->and(RedirectPatternMatcher::matches('#/wp-(admin|includes|content)(/|$)#', '/admin'))->toBeFalse();
 });
 
 it('substitutes capture placeholders into the destination', function () {

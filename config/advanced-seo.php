@@ -508,9 +508,9 @@ return [
             */
 
             'ignore' => [
-                '#\.php$#',        // PHP probes: wp-login.php, xmlrpc.php, admin-ajax.php
-                '#^/wp-admin#',    // WordPress admin
-                '#^/\.(env|git)#', // Secrets and repo probes
+                '#\.php$#',                              // PHP probes: wp-login.php, xmlrpc.php, admin-ajax.php
+                '#/wp-(admin|includes|content)(/|$)#',   // WordPress probes at any depth
+                '#^/\.(env|git)#',                       // Secrets and repo probes
             ],
 
         ],
