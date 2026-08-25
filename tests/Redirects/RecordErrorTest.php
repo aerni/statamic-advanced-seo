@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
@@ -63,6 +64,17 @@ it('does not evict when max_records is false', function () {
     Redirect::errors()->record('/c', 'default');
 
     expect(Redirect::errors()->all())->toHaveCount(3);
+});
+
+it('records different urls behind the same global lock', function () {
+    Cache::spy();
+
+    Redirect::errors()->record('/one', 'default');
+    Redirect::errors()->record('/two', 'default');
+
+    Cache::shouldHaveReceived('lock')
+        ->with('advanced-seo::redirect-error', 10)
+        ->twice();
 });
 
 it('records via the queued job', function () {
