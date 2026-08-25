@@ -60,9 +60,15 @@ class RedirectErrorRepository implements Contract
         $this->store->delete($error);
     }
 
+    /**
+     * Concurrent writers race on the Stache path index: one process can delete a
+     * file while another writes a stale index that still lists it (or the reverse),
+     * leaving ghost or orphan error records. One global lock prevents that; locking
+     * per url is not enough because different urls still create and evict in parallel.
+     */
     public function record(string $url, string $site): void
     {
-        Cache::lock("advanced-seo::redirect-error:{$site}:{$url}", 10)->block(5, function () use ($url, $site) {
+        Cache::lock('advanced-seo::redirect-error', 10)->block(5, function () use ($url, $site) {
             $error = $this->findByUrl($url, $site);
 
             if (! $error) {
