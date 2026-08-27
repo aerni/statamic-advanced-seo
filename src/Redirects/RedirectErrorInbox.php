@@ -10,30 +10,38 @@ class RedirectErrorInbox
 {
     public function deleteErrorsHandledBy(Redirect $redirect): void
     {
-        if (! $redirect->enabled()) {
-            return;
-        }
+        RedirectFacade::errors()->deleteByIds($this->errorsHandledBy($redirect));
+    }
 
-        if (! $redirect->resolves()) {
-            return;
-        }
-
-        $ids = RedirectFacade::errors()->query()
-            ->where('site', $redirect->site())
+    public function deleteHandledErrors(): void
+    {
+        $ids = RedirectFacade::query()
+            ->where('enabled', true)
+            ->whereIn('site', Site::all()->map->handle()->all())
             ->get()
-            ->filter(fn ($error) => RedirectPatternMatcher::matches($redirect->source(), $error->url()))
-            ->map->id()
+            ->flatMap(fn ($redirect) => $this->errorsHandledBy($redirect))
+            ->unique()
+            ->values()
             ->all();
 
         RedirectFacade::errors()->deleteByIds($ids);
     }
 
-    public function deleteHandledErrors(): void
+    protected function errorsHandledBy(Redirect $redirect): array
     {
-        RedirectFacade::query()
-            ->where('enabled', true)
-            ->whereIn('site', Site::all()->map->handle()->all())
+        if (! $redirect->enabled()) {
+            return [];
+        }
+
+        if (! $redirect->resolves()) {
+            return [];
+        }
+
+        return RedirectFacade::errors()->query()
+            ->where('site', $redirect->site())
             ->get()
-            ->each(fn ($redirect) => $this->deleteErrorsHandledBy($redirect));
+            ->filter(fn ($error) => RedirectPatternMatcher::matches($redirect->source(), $error->url()))
+            ->map->id()
+            ->all();
     }
 }
