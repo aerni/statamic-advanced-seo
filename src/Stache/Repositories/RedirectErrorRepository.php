@@ -57,7 +57,7 @@ class RedirectErrorRepository implements Contract
 
     public function delete(RedirectError $error): void
     {
-        $this->store->delete($error);
+        $this->lock(fn () => $this->store->delete($error));
     }
 
     public function deleteBySites(array $sites): void
