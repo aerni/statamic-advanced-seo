@@ -136,7 +136,7 @@ class RedirectErrorRepository implements Contract
 
     protected function lock(callable $callback): mixed
     {
-        return Cache::lock('advanced-seo::redirect-error', 10)->block(5, $callback);
+        return Cache::lock('advanced-seo::redirect-error', 60)->block(5, $callback);
     }
 
     public static function bindings(): array
