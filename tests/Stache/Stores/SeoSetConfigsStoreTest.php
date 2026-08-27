@@ -45,14 +45,10 @@ it('filters yaml files one level deep', function (): void {
     $this->files->put(tempPath('collections/ignored.txt'), '');
     $this->files->put(tempPath('collections/en/ignored.yaml'), '');
 
-    $this->files->ensureDirectoryExists(tempPath('taxonomies'));
-    $this->files->put(tempPath('taxonomies/categories.yaml'), '');
-
     $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
     expect($files->keys()->all())->toMatchArray([
         tempPath('collections/articles.yaml'),
-        tempPath('taxonomies/categories.yaml'),
     ]);
 
     /* Sanity check. Make sure the files are there but were not included. */
@@ -66,6 +62,20 @@ it('filters out unknown types', function (): void {
     $this->files->ensureDirectoryExists(tempPath('unknown'));
     $this->files->put(tempPath('collections/articles.yaml'), '');
     $this->files->put(tempPath('unknown/articles.yaml'), '');
+
+    $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+    expect($files->keys()->all())->toMatchArray([
+        tempPath('collections/articles.yaml'),
+    ]);
+});
+
+it('filters out orphaned collection and taxonomy yaml', function (): void {
+    $this->files->ensureDirectoryExists(tempPath('collections'));
+    $this->files->ensureDirectoryExists(tempPath('taxonomies'));
+    $this->files->put(tempPath('collections/articles.yaml'), '');
+    $this->files->put(tempPath('collections/deleted.yaml'), '');
+    $this->files->put(tempPath('taxonomies/categories.yaml'), '');
 
     $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 

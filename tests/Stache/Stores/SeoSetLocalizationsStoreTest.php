@@ -75,6 +75,20 @@ it('filters out unknown types', function (): void {
     ]);
 });
 
+it('filters out orphaned collection and taxonomy yaml', function (): void {
+    $this->files->ensureDirectoryExists(tempPath('collections/english'));
+    $this->files->ensureDirectoryExists(tempPath('taxonomies/english'));
+    $this->files->put(tempPath('collections/english/articles.yaml'), '');
+    $this->files->put(tempPath('collections/english/deleted.yaml'), '');
+    $this->files->put(tempPath('taxonomies/english/categories.yaml'), '');
+
+    $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+    expect($files->keys()->all())->toMatchArray([
+        tempPath('collections/english/articles.yaml'),
+    ]);
+});
+
 it('filters out old site set handles', function (): void {
     $this->files->ensureDirectoryExists(tempPath('site/english'));
     $this->files->put(tempPath('site/english/defaults.yaml'), '');
