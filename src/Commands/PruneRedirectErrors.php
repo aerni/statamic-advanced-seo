@@ -35,10 +35,13 @@ class PruneRedirectErrors extends Command
 
         $cutoff = Carbon::now()->subDays($days)->timestamp;
 
-        Redirect::errors()->query()
+        $ids = Redirect::errors()->query()
             ->where('last_seen_at', '<', $cutoff)
             ->get()
-            ->each->delete();
+            ->map->id()
+            ->all();
+
+        Redirect::errors()->deleteByIds($ids);
     }
 
     protected function deleteHandledRecords(): void
@@ -60,11 +63,14 @@ class PruneRedirectErrors extends Command
             return;
         }
 
-        Redirect::errors()->query()
+        $ids = Redirect::errors()->query()
             ->orderBy('count')
             ->orderBy('last_seen_at')
             ->limit($count - $max)
             ->get()
-            ->each->delete();
+            ->map->id()
+            ->all();
+
+        Redirect::errors()->deleteByIds($ids);
     }
 }

@@ -105,9 +105,8 @@ class RedirectErrorController extends CpController
 
         $this->authorize('manage', Redirect::class);
 
-        RedirectFacade::errors()->query()
-            ->whereIn('site', Site::authorized()->map->handle()->all())
-            ->get()
-            ->each->delete();
+        RedirectFacade::errors()->deleteBySites(
+            Site::authorized()->map->handle()->all()
+        );
     }
 }

@@ -73,7 +73,7 @@ it('records different urls behind the same global lock', function () {
     Redirect::errors()->record('/two', 'default');
 
     Cache::shouldHaveReceived('lock')
-        ->with('advanced-seo::redirect-error', 10)
+        ->with('advanced-seo::redirect-error', 60)
         ->twice();
 });
 

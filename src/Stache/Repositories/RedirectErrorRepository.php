@@ -6,17 +6,17 @@ use Aerni\AdvancedSeo\Concerns\HasRedirectErrorLimits;
 use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorQueryBuilder;
 use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository as Contract;
+use Aerni\AdvancedSeo\Stache\Stores\RedirectErrorsStore;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Site;
 use Statamic\Stache\Stache;
-use Statamic\Stache\Stores\Store;
 
 class RedirectErrorRepository implements Contract
 {
     use HasRedirectErrorLimits;
 
-    protected Store $store;
+    protected RedirectErrorsStore $store;
 
     public function __construct(protected Stache $stache)
     {
@@ -57,7 +57,24 @@ class RedirectErrorRepository implements Contract
 
     public function delete(RedirectError $error): void
     {
-        $this->store->delete($error);
+        $this->lock(fn () => $this->store->delete($error));
+    }
+
+    public function deleteBySites(array $sites): void
+    {
+        $this->lock(function () use ($sites) {
+            $keys = $this->store->index('site')->load()->items()
+                ->filter(fn ($site) => in_array($site, $sites, true))
+                ->keys()
+                ->all();
+
+            $this->store->deleteKeys($keys);
+        });
+    }
+
+    public function deleteByIds(array $ids): void
+    {
+        $this->lock(fn () => $this->store->deleteKeys($ids));
     }
 
     /**
@@ -68,11 +85,11 @@ class RedirectErrorRepository implements Contract
      */
     public function record(string $url, string $site): void
     {
-        Cache::lock('advanced-seo::redirect-error', 10)->block(5, function () use ($url, $site) {
+        $this->lock(function () use ($url, $site) {
             $error = $this->findByUrl($url, $site);
 
             if (! $error) {
-                $this->ensureCapacityForError();
+                $this->makeRoomForNewRecord();
 
                 $error = $this->make()->url($url)->site($site)->firstSeenAt(now()->timestamp);
             }
@@ -84,7 +101,11 @@ class RedirectErrorRepository implements Contract
         });
     }
 
-    protected function ensureCapacityForError(): void
+    /**
+     * Evict lowest-value errors when at the record cap so a new one can be stored.
+     * Must be called while holding the redirect-error lock.
+     */
+    protected function makeRoomForNewRecord(): void
     {
         $max = $this->maxRecords();
 
@@ -98,12 +119,24 @@ class RedirectErrorRepository implements Contract
             return;
         }
 
-        $this->query()
+        $ids = $this->query()
             ->orderBy('count')
             ->orderBy('last_seen_at')
             ->limit($count - $max + 1)
             ->get()
-            ->each->delete();
+            ->map->id()
+            ->all();
+
+        /**
+         * Already holding the lock from record(). Call the store directly —
+         * deleteByIds() would try to acquire the same lock again and deadlock.
+         */
+        $this->store->deleteKeys($ids);
+    }
+
+    protected function lock(callable $callback): mixed
+    {
+        return Cache::lock('advanced-seo::redirect-error', 60)->block(5, $callback);
     }
 
     public static function bindings(): array

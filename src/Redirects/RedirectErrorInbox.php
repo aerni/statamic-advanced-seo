@@ -10,27 +10,38 @@ class RedirectErrorInbox
 {
     public function deleteErrorsHandledBy(Redirect $redirect): void
     {
-        if (! $redirect->enabled()) {
-            return;
-        }
-
-        if (! $redirect->resolves()) {
-            return;
-        }
-
-        RedirectFacade::errors()->query()
-            ->where('site', $redirect->site())
-            ->get()
-            ->filter(fn ($error) => RedirectPatternMatcher::matches($redirect->source(), $error->url()))
-            ->each->delete();
+        RedirectFacade::errors()->deleteByIds($this->errorsHandledBy($redirect));
     }
 
     public function deleteHandledErrors(): void
     {
-        RedirectFacade::query()
+        $ids = RedirectFacade::query()
             ->where('enabled', true)
             ->whereIn('site', Site::all()->map->handle()->all())
             ->get()
-            ->each(fn ($redirect) => $this->deleteErrorsHandledBy($redirect));
+            ->flatMap(fn ($redirect) => $this->errorsHandledBy($redirect))
+            ->unique()
+            ->values()
+            ->all();
+
+        RedirectFacade::errors()->deleteByIds($ids);
+    }
+
+    protected function errorsHandledBy(Redirect $redirect): array
+    {
+        if (! $redirect->enabled()) {
+            return [];
+        }
+
+        if (! $redirect->resolves()) {
+            return [];
+        }
+
+        return RedirectFacade::errors()->query()
+            ->where('site', $redirect->site())
+            ->get()
+            ->filter(fn ($error) => RedirectPatternMatcher::matches($redirect->source(), $error->url()))
+            ->map->id()
+            ->all();
     }
 }
