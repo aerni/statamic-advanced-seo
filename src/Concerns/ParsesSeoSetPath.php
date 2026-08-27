@@ -2,6 +2,8 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
+use Aerni\AdvancedSeo\Facades\Seo;
+
 trait ParsesSeoSetPath
 {
     protected function parseRelativePath(string $relativePath): array
@@ -16,7 +18,6 @@ trait ParsesSeoSetPath
     {
         ['type' => $type, 'handle' => $handle] = $this->parseRelativePath($relativePath);
 
-        return in_array($type, ['site', 'collections', 'taxonomies'])
-            && ($type !== 'site' || $handle === 'defaults');
+        return Seo::find("{$type}::{$handle}") !== null;
     }
 }
