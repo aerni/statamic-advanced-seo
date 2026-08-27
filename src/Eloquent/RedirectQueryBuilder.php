@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Eloquent;
 
 use Aerni\AdvancedSeo\Concerns\QueriesRedirectSources;
+use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Contracts\RedirectQueryBuilder as Contract;
 
 class RedirectQueryBuilder extends QueryBuilder implements Contract
@@ -11,7 +12,7 @@ class RedirectQueryBuilder extends QueryBuilder implements Contract
 
     protected function toItem($model)
     {
-        return Redirect::fromModel($model);
+        return app(Redirect::class)::fromModel($model);
     }
 
     public function orderBy($column, $direction = 'asc')
