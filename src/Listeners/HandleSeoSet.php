@@ -3,10 +3,13 @@
 namespace Aerni\AdvancedSeo\Listeners;
 
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Facades\SeoConfig;
+use Aerni\AdvancedSeo\Facades\SeoLocalization;
 use Statamic\Events\CollectionDeleted;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\TaxonomyDeleted;
 use Statamic\Events\TaxonomySaved;
+use Statamic\Facades\Blink;
 
 class HandleSeoSet
 {
@@ -43,6 +46,14 @@ class HandleSeoSet
 
     protected function deleteSeoSet(string $id): void
     {
-        Seo::find($id)?->delete();
+        SeoLocalization::whereSeoSet($id)->each(
+            fn ($localization) => SeoLocalization::delete($localization)
+        );
+
+        if ($config = SeoConfig::find($id)) {
+            SeoConfig::delete($config);
+        }
+
+        Blink::flushStartingWith("advanced-seo::{$id}::");
     }
 }
