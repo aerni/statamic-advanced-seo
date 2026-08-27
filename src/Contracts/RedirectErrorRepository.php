@@ -20,6 +20,10 @@ interface RedirectErrorRepository
 
     public function delete(RedirectError $error): void;
 
+    public function deleteBySites(array $sites): void;
+
+    public function deleteByIds(array $ids): void;
+
     public function record(string $url, string $site): void;
 
     public function maxRecords(): ?int;

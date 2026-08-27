@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Actions\Statamic;
 
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Contracts\RedirectError;
+use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Actions\Action;
 
 class DeleteRedirectError extends Action
@@ -44,6 +45,8 @@ class DeleteRedirectError extends Action
 
     public function run($items, $values)
     {
-        $items->each->delete();
+        $ids = $items->map->id()->all();
+
+        RedirectFacade::errors()->deleteByIds($ids);
     }
 }

@@ -22,7 +22,7 @@ class RedirectErrorRepository implements Contract
 
     public function find(string $id): ?RedirectError
     {
-        $model = app('statamic.eloquent.redirect_error.model')::query()->find($id);
+        $model = $this->model()::query()->find($id);
 
         return $model ? app(RedirectError::class)::fromModel($model) : null;
     }
@@ -31,7 +31,7 @@ class RedirectErrorRepository implements Contract
     {
         $site ??= Site::default()->handle();
 
-        $model = app('statamic.eloquent.redirect_error.model')::query()
+        $model = $this->model()::query()
             ->where('url', $url)
             ->where('site', $site)
             ->first();
@@ -41,14 +41,13 @@ class RedirectErrorRepository implements Contract
 
     public function all(): Collection
     {
-        return app('statamic.eloquent.redirect_error.model')::all()
-            ->map(fn ($model) => app(RedirectError::class)::fromModel($model));
+        return $this->query()->get();
     }
 
     public function query(): RedirectErrorQueryBuilder
     {
         return app(RedirectErrorQueryBuilder::class, [
-            'builder' => app('statamic.eloquent.redirect_error.model')::query(),
+            'builder' => $this->model()::query(),
         ]);
     }
 
@@ -66,14 +65,24 @@ class RedirectErrorRepository implements Contract
         $error->model()->delete();
     }
 
+    public function deleteBySites(array $sites): void
+    {
+        $this->model()::query()->whereIn('site', $sites)->delete();
+    }
+
+    public function deleteByIds(array $ids): void
+    {
+        $this->model()::query()->whereIn('id', $ids)->delete();
+    }
+
     public function record(string $url, string $site): void
     {
-        $model = app('statamic.eloquent.redirect_error.model');
+        $model = $this->model();
 
         $now = now()->timestamp;
 
         if (! $model::query()->where('url', $url)->where('site', $site)->exists()) {
-            $this->ensureCapacityForError();
+            $this->makeRoomForNewRecord();
 
             try {
                 $model::create([
@@ -97,7 +106,10 @@ class RedirectErrorRepository implements Contract
             ->increment('count', 1, ['last_seen_at' => $now]);
     }
 
-    protected function ensureCapacityForError(): void
+    /**
+     * Evict lowest-value errors when at the record cap so a new one can be stored.
+     */
+    protected function makeRoomForNewRecord(): void
     {
         $max = $this->maxRecords();
 
@@ -105,7 +117,7 @@ class RedirectErrorRepository implements Contract
             return;
         }
 
-        $model = app('statamic.eloquent.redirect_error.model');
+        $model = $this->model();
 
         $count = $model::query()->count();
 
@@ -117,9 +129,15 @@ class RedirectErrorRepository implements Contract
             ->orderBy('count')
             ->orderBy('last_seen_at')
             ->limit($count - $max + 1)
-            ->pluck('id');
+            ->pluck('id')
+            ->all();
 
-        $model::query()->whereIn('id', $ids)->delete();
+        $this->deleteByIds($ids);
+    }
+
+    protected function model(): string
+    {
+        return app('statamic.eloquent.redirect_error.model')::class;
     }
 
     public static function bindings(): array

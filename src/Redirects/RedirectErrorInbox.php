@@ -18,11 +18,14 @@ class RedirectErrorInbox
             return;
         }
 
-        RedirectFacade::errors()->query()
+        $ids = RedirectFacade::errors()->query()
             ->where('site', $redirect->site())
             ->get()
             ->filter(fn ($error) => RedirectPatternMatcher::matches($redirect->source(), $error->url()))
-            ->each->delete();
+            ->map->id()
+            ->all();
+
+        RedirectFacade::errors()->deleteByIds($ids);
     }
 
     public function deleteHandledErrors(): void

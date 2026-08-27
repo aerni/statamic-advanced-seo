@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Stache\Stores;
 
 use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
@@ -41,6 +42,23 @@ class RedirectErrorsStore extends BasicStore
             ->count(Arr::get($data, 'count', 0))
             ->firstSeenAt(Arr::get($data, 'first_seen_at'))
             ->lastSeenAt(Arr::get($data, 'last_seen_at'));
+    }
+
+    public function deleteKeys(array $keys): void
+    {
+        if ($keys === []) {
+            return;
+        }
+
+        $files = collect($keys)
+            ->map(fn ($key) => $this->getPath($key))
+            ->filter()
+            ->values()
+            ->all();
+
+        File::delete($files);
+
+        $this->clear();
     }
 
     protected function storeIndexes(): array
