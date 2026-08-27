@@ -72,7 +72,9 @@ class RedirectErrorRepository implements Contract
 
     public function deleteByIds(array $ids): void
     {
-        $this->model()::query()->whereIn('id', $ids)->delete();
+        foreach (array_chunk($ids, 500) as $chunk) {
+            $this->model()::query()->whereIn('id', $chunk)->delete();
+        }
     }
 
     public function record(string $url, string $site): void

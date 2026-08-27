@@ -52,6 +52,19 @@ it('no-ops when deleteByIds receives an empty id list via eloquent', function ()
     expect(Redirect::errors()->all())->toHaveCount(1);
 });
 
+it('bulk deletes more ids than one whereIn chunk via eloquent', function () {
+    $ids = collect(range(1, 501))->map(function ($i) {
+        $error = Redirect::errors()->make()->url("/missing-{$i}")->site('default')->count(1);
+        $error->save();
+
+        return $error->id();
+    })->all();
+
+    Redirect::errors()->deleteByIds($ids);
+
+    expect(Redirect::errors()->all())->toHaveCount(0);
+});
+
 it('saves and finds an error via eloquent', function () {
     Redirect::errors()->make()->url('/missing')->site('default')->count(2)->save();
 
