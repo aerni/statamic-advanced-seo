@@ -320,13 +320,23 @@ class Install extends Command
             );
         }
 
+        if (! confirm(
+            label: 'Would you like to switch to Eloquent and migrate your existing SEO data now?',
+            default: false,
+            hint: 'You can do this later with `php artisan seo:switch-to-eloquent`.',
+        )) {
+            info('Eloquent Driver installed. The file driver remains active.');
+
+            return;
+        }
+
         $success = spin(
             callback: fn () => $this->runArtisanCommand('seo:switch-to-eloquent --no-interaction'),
             message: 'Switching to Eloquent driver...',
         );
 
         $success
-            ? info('Eloquent Driver configured.')
+            ? info('Switched to the Eloquent driver and migrated existing SEO data successfully.')
             : warning('Failed to switch to Eloquent driver. Run `php artisan seo:switch-to-eloquent` manually.');
     }
 
