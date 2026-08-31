@@ -50,8 +50,12 @@ class RedirectErrorMatcher
      * Return the redirect that covers the given error, preferring an enabled
      * redirect over a disabled one, or null when nothing matches.
      */
-    public function match(string $url, string $site): ?Redirect
+    public function match(?string $url, string $site): ?Redirect
     {
+        if (! is_string($url) || $url === '') {
+            return null;
+        }
+
         return $this->matchIn($url, $site, enabled: true)
             ?? $this->matchIn($url, $site, enabled: false);
     }

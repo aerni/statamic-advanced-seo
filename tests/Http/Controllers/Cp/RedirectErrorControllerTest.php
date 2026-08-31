@@ -69,6 +69,21 @@ it('reports an error covered only by a disabled redirect as disabled', function 
     expect($response->json('data.0.redirect_url'))->not->toBeNull();
 });
 
+it('does not 500 when an error has a missing url', function () {
+    Redirect::errors()->make()->site('default')->count(1)->save();
+    Redirect::errors()->make()->url('/valid')->site('default')->count(1)->save();
+
+    $response = $this->actingAs($this->user)
+        ->getJson(cp_route('advanced-seo.redirects.errors.index').'?sort=url&order=asc')
+        ->assertOk();
+
+    $data = collect($response->json('data'));
+
+    expect($data->pluck('url'))->toContain(null)->toContain('/valid')
+        ->and($data->firstWhere('url', null)['status'])->toBe('unhandled')
+        ->and($data->firstWhere('url', null)['destination'])->toBeNull();
+});
+
 it('sorts by path ascending by default', function () {
     Redirect::errors()->make()->url('/charlie')->site('default')->count(1)->save();
     Redirect::errors()->make()->url('/alpha')->site('default')->count(1)->save();

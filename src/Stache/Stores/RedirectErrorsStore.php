@@ -33,15 +33,21 @@ class RedirectErrorsStore extends BasicStore
     public function makeItemFromFile($path, $contents): RedirectError
     {
         $data = YAML::file($path)->parse();
+        $url = Arr::get($data, 'url');
 
-        return Redirect::errors()->make()
+        $error = Redirect::errors()->make()
             ->initialPath($path)
             ->id(pathinfo($path, PATHINFO_FILENAME))
-            ->url(Arr::get($data, 'url'))
             ->site(Arr::get($data, 'site'))
             ->count(Arr::get($data, 'count', 0))
             ->firstSeenAt(Arr::get($data, 'first_seen_at'))
             ->lastSeenAt(Arr::get($data, 'last_seen_at'));
+
+        if (is_string($url) && $url !== '') {
+            $error->url($url);
+        }
+
+        return $error;
     }
 
     public function deleteKeys(array $keys): void

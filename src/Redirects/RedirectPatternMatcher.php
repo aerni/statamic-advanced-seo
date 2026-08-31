@@ -18,8 +18,12 @@ class RedirectPatternMatcher
         return $pattern && @preg_match($pattern, $path, $matches) ? $matches : null;
     }
 
-    public static function matches(string $source, string $path): bool
+    public static function matches(string $source, ?string $path): bool
     {
+        if (! is_string($path) || $path === '') {
+            return false;
+        }
+
         if (RedirectSourceType::fromSource($source) === RedirectSourceType::Exact) {
             return Str::lower(static::normalizePath($source)) === Str::lower(static::normalizePath($path));
         }

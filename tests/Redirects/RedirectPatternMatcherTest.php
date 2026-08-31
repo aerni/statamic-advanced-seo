@@ -47,6 +47,13 @@ it('keeps regex sources case-sensitive unless the author opts in', function () {
         ->and(RedirectPatternMatcher::match('#^/Section$#i', '/section'))->toBe(['/section']);
 });
 
+it('does not match a missing or empty path', function () {
+    expect(RedirectPatternMatcher::matches('/old', null))->toBeFalse()
+        ->and(RedirectPatternMatcher::matches('/old', ''))->toBeFalse()
+        ->and(RedirectPatternMatcher::matches('/*', null))->toBeFalse()
+        ->and(RedirectPatternMatcher::matches('/*', ''))->toBeFalse();
+});
+
 it('matches an exact source case-insensitively', function () {
     expect(RedirectPatternMatcher::matches('/WP-Login.php', '/wp-login.php'))->toBeTrue()
         ->and(RedirectPatternMatcher::matches('/wp-login.php', '/about'))->toBeFalse();

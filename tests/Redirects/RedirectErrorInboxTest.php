@@ -101,6 +101,15 @@ it('deletes when the redirect is gone', function () {
     expect(Redirect::errors()->findByUrl('/old', 'default'))->toBeNull();
 });
 
+it('does not treat an error with a missing url as handled', function () {
+    Redirect::errors()->make()->site('default')->save();
+    $redirect = Redirect::make()->source('/*')->destination('/new')->site('default');
+
+    app(RedirectErrorInbox::class)->deleteErrorsHandledBy($redirect);
+
+    expect(Redirect::errors()->query()->count())->toBe(1);
+});
+
 it('deleteHandledErrors removes errors handled by any enabled redirect on their site', function () {
     Event::fake([RedirectCreated::class, RedirectSaved::class]);
 

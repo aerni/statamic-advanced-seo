@@ -22,12 +22,15 @@ class ListedError extends JsonResource
     public function toArray($request)
     {
         $error = $this->resource;
+        $url = $error->url();
 
-        $redirect = $this->matcher->match($error->url(), $error->site());
+        $redirect = is_string($url) && $url !== ''
+            ? $this->matcher->match($url, $error->site())
+            : null;
 
         return [
             'id' => $error->id(),
-            'url' => $error->url(),
+            'url' => $url,
             'hits' => $error->count(),
             'first_seen_at' => $error->firstSeenAtIso(),
             'last_seen_at' => $error->lastSeenAtIso(),

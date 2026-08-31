@@ -40,7 +40,12 @@ class RedirectErrorInbox
         return RedirectFacade::errors()->query()
             ->where('site', $redirect->site())
             ->get()
-            ->filter(fn ($error) => RedirectPatternMatcher::matches($redirect->source(), $error->url()))
+            ->filter(function ($error) use ($redirect) {
+                $url = $error->url();
+
+                return is_string($url) && $url !== ''
+                    && RedirectPatternMatcher::matches($redirect->source(), $url);
+            })
             ->map->id()
             ->all();
     }

@@ -73,6 +73,16 @@ it('treats an enabled gone redirect as handled despite having no destination', f
     expect(RedirectErrorMatcher::for(['default'])->match('/old', 'default')?->id())->toBe($redirect->id());
 });
 
+it('does not match a missing or empty url', function () {
+    tap(Redirect::make()->source('/old')->destination('/new')->site('default'))->save();
+    tap(Redirect::make()->source('/*')->destination('/catch')->site('default'))->save();
+
+    $matcher = RedirectErrorMatcher::for(['default']);
+
+    expect($matcher->match(null, 'default'))->toBeNull()
+        ->and($matcher->match('', 'default'))->toBeNull();
+});
+
 it('prefers the most specific pattern when several match', function () {
     tap(Redirect::make()->source('#^/blog/.+#')->destination('/regex')->site('default'))->save();
     $wildcard = tap(Redirect::make()->source('/blog/*')->destination('/wildcard/$1')->site('default'))->save();
