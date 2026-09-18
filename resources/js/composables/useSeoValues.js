@@ -69,18 +69,12 @@ export function useSeoValues() {
     }
 
     /**
-     * Resolve a seo field value, using the cascade default
-     * for reactive resolution when the field is in inherited state.
-     */
-    function resolveDefault(handle) {
-        const def = getFieldMeta(handle)?.defaultValue;
-        return typeof def === 'string' && def !== '' ? resolveAntlers(def) : '';
-    }
-
-    /**
      * Resolve a seo field value with circular reference protection.
      * Circular references return undefined so they fall through
      * to raw Antlers in the preview, matching unknown-handle behavior.
+     *
+     * For wrapped seo fields, value.value is already the right string:
+     * origin default when synced, local default after reset, or a custom value.
      */
     function resolve(handle) {
         if (resolving.has(handle)) return;
@@ -91,14 +85,13 @@ export function useSeoValues() {
             const value = getFieldRawValue(handle);
             const field = getField(handle);
 
-            switch (value?.source) {
-                case 'default':
-                    return resolveDefault(handle);
-                case 'custom':
-                    return resolveAntlers(value.value)?.trim();
-                default:
-                    return normalize(field.type, value, getFieldMeta(handle));
+            if (value?.source === 'default' || value?.source === 'custom') {
+                return typeof value.value === 'string' && value.value !== ''
+                    ? resolveAntlers(value.value)?.trim()
+                    : '';
             }
+
+            return normalize(field.type, value, getFieldMeta(handle));
         } finally {
             resolving.delete(handle);
         }

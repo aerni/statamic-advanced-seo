@@ -332,6 +332,55 @@ it('preprocesses @default using local default for synced text field', function (
         ->toBe(['source' => 'default', 'value' => 'French description']);
 });
 
+// --- origin / sync: token_input fields ---
+//
+// token_input is not a text-category field, so synced localizations follow
+// the origin-swap path used by toggles. The CP field and frontend cascade
+// both show the origin default; search preview must use the same value
+// (originDefaultValue / preprocessed value), not the local cascade default.
+
+it('augments @default using origin cascade for synced token_input field', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_description' => '@default']);
+
+    Seo::find('collections::pages')->in('english')->set('seo_description', 'English description')->save();
+    Seo::find('collections::pages')->in('french')->set('seo_description', 'French description')->save();
+
+    $field = makeSeoField('seo_description');
+    $field->setParent($french);
+
+    expect($field->fieldtype()->augment('@default'))->toBe('English description');
+});
+
+it('preprocesses @default using origin default for synced token_input field', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_description' => '@default']);
+
+    Seo::find('collections::pages')->in('english')->set('seo_description', 'English description')->save();
+    Seo::find('collections::pages')->in('french')->set('seo_description', 'French description')->save();
+
+    $field = makeSeoField('seo_description');
+    $field->setParent($french);
+
+    expect($field->fieldtype()->preProcess('@default'))
+        ->toBe(['source' => 'default', 'value' => 'English description']);
+});
+
+it('preloads local and origin defaults for synced token_input fields', function () {
+    [, $french] = makeTwoSiteHomeEntries(originData: ['seo_description' => '@default']);
+
+    Seo::find('collections::pages')->in('english')->set('seo_description', 'English description')->save();
+    Seo::find('collections::pages')->in('french')->set('seo_description', 'French description')->save();
+
+    $field = makeSeoField('seo_description');
+    $field->setParent($french);
+    $field->setValue($field->fieldtype()->preProcess('@default'));
+
+    $result = $field->fieldtype()->preload();
+
+    expect($result['isTextBasedField'])->toBeFalse()
+        ->and($result['defaultValue'])->toBe('French description')
+        ->and($result['originDefaultValue'])->toBe('English description');
+});
+
 // --- origin / sync: matching cascades ---
 //
 // When origin and local cascades resolve to the same value, the origin-swap
