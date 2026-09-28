@@ -42,11 +42,10 @@ class TokenParser
         $this->parsing[] = $field->handle();
 
         try {
-            $variables = Token::for($parent)->valueTokens()
-                ->map->value()
-                ->merge($this->cascade($parent)->data())
+            $variables = $this->cascade($parent)->data()
                 ->merge($parent->toAugmentedArray())
                 ->map($this->toPlainText(...))
+                ->merge(Token::for($parent)->values($data))
                 ->all();
 
             return Antlers::parse($data, $variables);
