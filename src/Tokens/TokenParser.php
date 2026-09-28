@@ -42,7 +42,9 @@ class TokenParser
         $this->parsing[] = $field->handle();
 
         try {
-            $variables = $this->cascade($parent)->data()
+            $variables = Token::for($parent)->valueTokens()
+                ->map->value()
+                ->merge($this->cascade($parent)->data())
                 ->merge($parent->toAugmentedArray())
                 ->map($this->toPlainText(...))
                 ->all();

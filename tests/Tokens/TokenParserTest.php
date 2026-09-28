@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Tokens\TokenParser;
+use Aerni\AdvancedSeo\Tokens\ValueToken;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -10,6 +11,19 @@ use Statamic\Fields\Field;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
+
+class ParserTestValueToken extends ValueToken
+{
+    public function handle(): string
+    {
+        return 'parser_test';
+    }
+
+    public function value(): string
+    {
+        return 'Parser Test Value';
+    }
+}
 
 beforeEach(function () {
     Blink::flush();
@@ -126,6 +140,17 @@ it('resolves multiple tokens in a single string', function () {
     $result = $this->parser->parse('{{ title }} - {{ title }}', $field);
 
     expect($result)->toBe('My Page - My Page');
+});
+
+it('resolves custom value tokens', function () {
+    config(['advanced-seo.tokens' => [ParserTestValueToken::class]]);
+
+    $entry = makeEntry();
+    $field = makeField(parent: $entry);
+
+    $result = $this->parser->parse('{{ parser_test }}', $field);
+
+    expect($result)->toBe('Parser Test Value');
 });
 
 it('leaves unresolvable tokens as empty strings', function () {
