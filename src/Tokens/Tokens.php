@@ -14,6 +14,14 @@ use Statamic\Fields\Field;
 
 class Tokens
 {
+    /**
+     * Handles whose value() is running. Static because each parent gets its
+     * own Tokens instance, while value() can re-enter through another one.
+     *
+     * @var array<int, string>
+     */
+    protected static array $evaluating = [];
+
     public function __construct(protected readonly mixed $parent) {}
 
     public function all(): Collection
@@ -41,6 +49,41 @@ class Tokens
             ->reject(fn (ValueToken $token) => $fieldTokens->has($token->handle()))
             ->map(fn (ValueToken $token) => $token->withParent($this->parent))
             ->sortBy(fn (ValueToken $token) => $token->display());
+    }
+
+    /**
+     * Values for the value tokens referenced in an Antlers string.
+     */
+    public function values(string $template): Collection
+    {
+        preg_match_all('/\{\{\s*([A-Za-z0-9_\-]+)/', $template, $matches);
+
+        $handles = array_unique($matches[1] ?? []);
+
+        if ($handles === []) {
+            return collect();
+        }
+
+        return $this->valueTokens()
+            ->only($handles)
+            ->map(fn (ValueToken $token) => $this->value($token));
+    }
+
+    protected function value(ValueToken $token): ?string
+    {
+        $handle = $token->handle();
+
+        if (in_array($handle, static::$evaluating)) {
+            return null;
+        }
+
+        static::$evaluating[] = $handle;
+
+        try {
+            return $token->value();
+        } finally {
+            array_pop(static::$evaluating);
+        }
     }
 
     protected function blueprints(): Collection
