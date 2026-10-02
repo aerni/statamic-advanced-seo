@@ -12,6 +12,8 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
+use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
+use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
@@ -19,18 +21,23 @@ use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Stache;
 
 /**
  * Creates and maintains redirects automatically as entry and term URLs change.
  *
  * Capture is keyed on the slug, and for dated collections the date, the only
  * pre-save state the flat-file driver reliably exposes (getOriginal() returns
- * the new value for other fields on the Stache driver). URL changes from any
- * other source are out of scope and left to the editor to redirect manually:
+ * the new value for other fields on the Stache driver). A tree move never
+ * saves the entry, so the previous URI is read from storage
+ * (CollectionTreeEntriesMovedOrRemoved still sees it; CollectionTreeSaved
+ * runs after Statamic has written the new one).
+ *
+ * URL changes from any other source are out of scope and left to the editor
+ * to redirect manually:
  *
  * - a route token that reads a non-slug field, since the old value can't be
  *   recovered on the flat-file driver;
- * - a structural tree move, which changes the URI without saving the entry;
  * - a parent slug rename, which changes every descendant's URL without saving
  *   the descendants;
  * - a collection route or mount change, which changes every entry's URL at once.
@@ -66,47 +73,53 @@ class HandleAutomaticRedirects
             return;
         }
 
-        Blink::put($this->blinkKey($entry), $entry->site()->relativePath($originalUrl));
+        Blink::put($this->entryBlinkKey($entry), $entry->site()->relativePath($originalUrl));
     }
 
     /**
-     * Once the save went through, free the entry's URL from any shadowing
-     * redirect and, if the URL changed, create the redirect from the old one.
+     * Once the save went through, delete any automatic redirect that uses the
+     * entry's URL and, if the URL changed, create the redirect from the old one.
      */
     public function handleEntrySaved(EntrySaved $event): void
     {
-        $entry = $event->entry;
+        $this->handleEntryRedirect($event->entry, Blink::pull($this->entryBlinkKey($event->entry)));
+    }
 
-        // Only a live entry owns its URL, so a draft's shadowing redirect must
-        // stay (its URL still 404s) and no redirect is created from it.
-        if (! $this->shouldHandle($entry) || $entry->status() !== 'published') {
+    /**
+     * The tree is already the new shape, but stored URIs still describe the
+     * previous one. Stash those paths and create the redirects once Statamic
+     * has rewritten them on CollectionTreeSaved.
+     */
+    public function handleCollectionTreeEntriesMovedOrRemoved(CollectionTreeEntriesMovedOrRemoved $event): void
+    {
+        if (! RedirectsFeature::enabled()) {
             return;
         }
 
-        if (! $url = $entry->absoluteUrlWithoutRedirect()) {
+        $this->stashOriginalPaths($event->moved);
+    }
+
+    /**
+     * Runs after Statamic's UpdateStructuredEntryUris listener, which is
+     * registered earlier. Forget the URI caches anyway so a stale Blink
+     * value from before the move can't hide the new path.
+     */
+    public function handleCollectionTreeSaved(CollectionTreeSaved $event): void
+    {
+        if (! RedirectsFeature::enabled()) {
             return;
         }
 
-        $currentPath = $entry->site()->relativePath($url);
-
-        $this->deleteShadowingRedirects($currentPath, $entry->locale());
-
-        if (! $originalPath = Blink::pull($this->blinkKey($entry))) {
+        if (! $paths = Blink::pull($this->treeBlinkKey())) {
             return;
         }
 
-        if ($originalPath === $currentPath) {
-            return;
+        Blink::store('entry-uris')->flush();
+        Blink::store('structure-uris')->flush();
+
+        foreach ($paths as $id => $originalPath) {
+            $this->handleEntryRedirect(EntryFacade::find($id), $originalPath);
         }
-
-        if ($this->sourceIsOwnedByPublishedEntry($originalPath, $entry->locale())) {
-            return;
-        }
-
-        $destination = "entry::{$entry->id()}";
-
-        $this->createRedirect($originalPath, $destination, $entry->locale());
-        $this->repointStaleRedirectDestinations($originalPath, $destination, $entry->locale());
     }
 
     /**
@@ -120,7 +133,7 @@ class HandleAutomaticRedirects
             return;
         }
 
-        $this->deleteAutomaticRedirects("entry::{$event->entry->id()}");
+        $this->deleteAutomaticRedirectsTo("entry::{$event->entry->id()}");
     }
 
     /**
@@ -145,9 +158,9 @@ class HandleAutomaticRedirects
 
         $currentPaths = $this->pathsPerSite($term);
 
-        // A term owns its URL in every site, so drop any auto-created redirect shadowing it.
+        // A term owns its URL in every site, so delete any automatic redirect that uses it.
         foreach ($currentPaths as $site => $currentPath) {
-            $this->deleteShadowingRedirects($currentPath, $site);
+            $this->deleteAutomaticRedirectsFrom($currentPath, $site);
         }
 
         $originalSlug = $term->getOriginal('slug');
@@ -185,7 +198,7 @@ class HandleAutomaticRedirects
         }
 
         foreach ($this->pathsPerSite($event->term) as $site => $path) {
-            $this->deleteAutomaticRedirects($path, $site);
+            $this->deleteAutomaticRedirectsTo($path, $site);
         }
     }
 
@@ -271,9 +284,115 @@ class HandleAutomaticRedirects
         return $url;
     }
 
-    protected function blinkKey(Entry $entry): string
+    protected function entryBlinkKey(Entry $entry): string
     {
         return "advanced-seo::automatic-redirect::{$entry->id()}";
+    }
+
+    protected function treeBlinkKey(): string
+    {
+        return 'advanced-seo::automatic-redirect-tree';
+    }
+
+    /**
+     * Stash the original site-relative paths of the moved entries.
+     *
+     * @param  array<int, string>  $ids
+     */
+    protected function stashOriginalPaths(array $ids): void
+    {
+        $paths = [];
+
+        foreach ($ids as $id) {
+            if (! $entry = EntryFacade::find($id)) {
+                continue;
+            }
+
+            if (! $this->shouldHandle($entry)) {
+                continue;
+            }
+
+            if (! $path = $this->originalPath($entry)) {
+                continue;
+            }
+
+            $paths[$entry->id()] = $path;
+        }
+
+        Blink::put($this->treeBlinkKey(), $paths);
+    }
+
+    /**
+     * Original site-relative path, read from storage rather than computed.
+     *
+     * By the time a tree move is observable, the in-memory
+     * entry already resolves to the new URL (and a fresh request has an empty
+     * Blink cache, so uri() cannot be trusted to return the old one). The
+     * Stache URI index and the Eloquent uri column are still the previous
+     * value until Statamic rewrites them after the save.
+     */
+    protected function originalPath(Entry $entry): ?string
+    {
+        $initialPath = $entry->initialPath();
+
+        // Flat-file entries keep the previous URI in the Stache index.
+        if ($initialPath) {
+            $uri = Stache::store('entries')
+                ->store($entry->collectionHandle())
+                ->index('uri')
+                ->get($entry->id());
+        }
+
+        // Eloquent entries keep it on the uri column. A custom file entry
+        // may also define model(), so only read it when there is no file path.
+        if (! $initialPath && method_exists($entry, 'model')) {
+            $uri = $entry->model()?->getAttribute('uri');
+        }
+
+        return is_string($uri) && $uri !== '' ? $uri : null;
+    }
+
+    protected function handleEntryRedirect(Entry $entry, ?string $originalPath = null): void
+    {
+        if (! $this->shouldHandle($entry)) {
+            return;
+        }
+
+        if (! $currentPath = $this->currentPath($entry)) {
+            return;
+        }
+
+        $this->deleteAutomaticRedirectsFrom($currentPath, $entry->locale());
+
+        if ($originalPath !== null) {
+            $this->createRedirectFromOriginalPath($entry, $originalPath, $currentPath);
+        }
+    }
+
+    protected function currentPath(Entry $entry): ?string
+    {
+        // A URI blinked before this change would hide the new path.
+        Blink::store('entry-uris')->forget($entry->id());
+
+        $url = $entry->absoluteUrlWithoutRedirect();
+
+        return $url ? $entry->site()->relativePath($url) : null;
+    }
+
+    protected function createRedirectFromOriginalPath(Entry $entry, string $originalPath, string $currentPath): void
+    {
+        if ($originalPath === $currentPath) {
+            return;
+        }
+
+        if ($this->sourceIsOwnedByPublishedEntry($originalPath, $entry->locale())) {
+            return;
+        }
+
+        $destination = "entry::{$entry->id()}";
+
+        $this->createRedirect($originalPath, $destination, $entry->locale());
+        $this->repointStaleRedirectDestinations($originalPath, $destination, $entry->locale());
     }
 
     /**
@@ -344,12 +463,11 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * An auto-created redirect whose source is now a live page shadows it and
-     * would misfire (e.g. after renaming back, or once a new entry claims the
-     * URL). Only auto-created redirects are removed; manual ones are the
-     * editor's to keep.
+     * Delete auto-created redirects whose source is this URL. The URL now
+     * belongs to a live page, so the redirect would send the request away.
+     * Manual redirects are the editor's to keep.
      */
-    protected function deleteShadowingRedirects(string $source, string $site): void
+    protected function deleteAutomaticRedirectsFrom(string $source, string $site): void
     {
         RedirectFacade::query()
             ->where('site', $site)
@@ -363,7 +481,7 @@ class HandleAutomaticRedirects
      * Delete the auto-created redirects that point at a given destination,
      * used to clear redirects left dangling by a deleted entry or term.
      */
-    protected function deleteAutomaticRedirects(string $destination, ?string $site = null): void
+    protected function deleteAutomaticRedirectsTo(string $destination, ?string $site = null): void
     {
         RedirectFacade::query()
             ->when($site, fn ($query) => $query->where('site', $site))

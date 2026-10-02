@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Tests;
 
 use Aerni\AdvancedSeo\ServiceProvider;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesAi;
+use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesGraphQL;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesSitemap;
@@ -11,6 +12,7 @@ use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Laravel\Ai\AiServiceProvider;
 use Statamic\Addons\Manifest;
+use Statamic\Eloquent\Entries\UuidEntryModel;
 use Statamic\Facades\Blink;
 use Statamic\GraphQL\TypeRegistrar;
 use Statamic\Testing\AddonTestCase;
@@ -67,6 +69,30 @@ abstract class TestCase extends AddonTestCase
             $app['config']->set('ai.default', 'openai');
             $app['config']->set('ai.providers.openai', ['driver' => 'openai', 'key' => 'test-key']);
         }
+
+        if ($this->usesEloquentEntries()) {
+            $app['config']->set('database.default', 'sqlite');
+            $app['config']->set('database.connections.sqlite', [
+                'driver' => 'sqlite',
+                'database' => ':memory:',
+                'prefix' => '',
+                'foreign_key_constraints' => true,
+            ]);
+
+            $eloquent = require __DIR__.'/../vendor/statamic/eloquent-driver/config/eloquent-driver.php';
+            $eloquent['entries']['driver'] = 'eloquent';
+            $eloquent['entries']['model'] = UuidEntryModel::class;
+            $app['config']->set('statamic.eloquent-driver', $eloquent);
+        }
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        if (! $this->usesEloquentEntries()) {
+            return;
+        }
+
+        $this->loadMigrationsFrom(__DIR__.'/../vendor/statamic/eloquent-driver/database/migrations/entries/2024_03_07_100000_create_entries_table_with_string_ids.php');
     }
 
     protected function setUp(): void
@@ -123,11 +149,17 @@ abstract class TestCase extends AddonTestCase
         return isset(array_flip(class_uses_recursive(static::class))[EnablesAi::class]);
     }
 
+    protected function usesEloquentEntries(): bool
+    {
+        return isset(array_flip(class_uses_recursive(static::class))[EnablesEloquentEntries::class]);
+    }
+
     protected function getPackageProviders($app)
     {
         return array_merge(
             parent::getPackageProviders($app),
             $this->usesAi() ? [AiServiceProvider::class] : [],
+            $this->usesEloquentEntries() ? [\Statamic\Eloquent\ServiceProvider::class] : [],
         );
     }
 }

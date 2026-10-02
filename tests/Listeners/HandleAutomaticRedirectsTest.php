@@ -283,6 +283,309 @@ describe('entry redirects', function () {
     });
 });
 
+describe('structure redirects', function () {
+    beforeEach(function () {
+        Collection::make('pages')
+            ->routes('/{parent_uri}/{slug}')
+            ->sites(['default'])
+            ->structureContents(['root' => true])
+            ->save();
+    });
+
+    it('creates a redirect when an entry moves in the tree', function () {
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/about/team')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$team->id()}")
+            ->and($redirect->responseCode())->toBe(RedirectResponseCode::Permanent)
+            ->and($redirect->origin())->toBe(RedirectOrigin::Automatic)
+            ->and(Redirect::query()->where('site', 'default')->get())->toHaveCount(1);
+    });
+
+    it('creates redirects for descendants when their parent moves', function () {
+        [$home, $about, $team, $bio] = structuredPages(withBio: true);
+        $services = tap(Entry::make()->collection('pages')->locale('default')->slug('services'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $services->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id(), 'children' => [
+                    ['entry' => $bio->id()],
+                ]],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $services->id(), 'children' => [
+                ['entry' => $about->id(), 'children' => [
+                    ['entry' => $team->id(), 'children' => [
+                        ['entry' => $bio->id()],
+                    ]],
+                ]],
+            ]],
+        ]);
+
+        $redirects = redirectMap();
+
+        expect($redirects)->toHaveCount(3)
+            ->and($redirects->get('/about'))->toBe("entry::{$about->id()}")
+            ->and($redirects->get('/about/team'))->toBe("entry::{$team->id()}")
+            ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
+    });
+
+    it('creates nothing when siblings are reordered', function () {
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $team->id()],
+            ['entry' => $about->id()],
+        ]);
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('deletes an automatic redirect that would shadow the entry after moving it back', function () {
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        $sources = Redirect::query()->where('site', 'default')->get()->map->source();
+
+        expect($sources->all())->toBe(['/team']);
+    });
+
+    it('leaves a manual redirect for the old url untouched when an entry moves', function () {
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        Redirect::make()->source('/about/team')->destination('/custom')->site('default')->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/about/team')->first();
+
+        expect($redirect->destination())->toBe('/custom')
+            ->and(Redirect::query()->where('site', 'default')->get())->toHaveCount(1);
+    });
+
+    it('creates nothing when a scheduled entry moves', function () {
+        Collection::find('pages')->dated(true)->futureDateBehavior('private')->save();
+
+        [$home, $about] = structuredPages();
+        $scheduled = tap(Entry::make()->collection('pages')->locale('default')->slug('later')->date('2999-01-01'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $scheduled->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $scheduled->id()],
+        ]);
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('redirects from the physical url when the entry has a redirect field', function () {
+        [$home, $about, $team] = structuredPages();
+
+        $team->set('redirect', '/elsewhere')->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/about/team')->first();
+        $team = Entry::find($team->id());
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$team->id()}")
+            ->and($redirect->destinationUrl())->toBe($team->absoluteUrl())
+            ->and($team->absoluteUrlWithoutRedirect())->not->toBe($team->absoluteUrl());
+    });
+
+    it('creates nothing when a draft entry moves', function () {
+        [$home, $about] = structuredPages();
+        $draft = tap(Entry::make()->collection('pages')->locale('default')->slug('draft')->published(false))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $draft->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $draft->id()],
+        ]);
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing when the collection toggle is off', function () {
+        Seo::find('collections::pages')->config()->set('redirects', false)->save();
+
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing on the free edition', function () {
+        useFreeEdition();
+
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates a prefix-stripped redirect in the moved entry site', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::find('pages')->sites(['en', 'fr'])->save();
+
+        $home = tap(Entry::make()->collection('pages')->locale('fr')->slug('home'))->save();
+        $about = tap(Entry::make()->collection('pages')->locale('fr')->slug('a-propos'))->save();
+        $team = tap(Entry::make()->collection('pages')->locale('fr')->slug('equipe'))->save();
+
+        Collection::find('pages')->structure()->in('fr')->tree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ])->save();
+
+        Redirect::query()->get()->each->delete();
+
+        Collection::find('pages')->structure()->in('fr')->tree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ])->save();
+
+        $redirect = Redirect::query()->where('site', 'fr')->where('source', '/a-propos/equipe')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$team->id()}")
+            ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
+    });
+});
+
 describe('term redirects', function () {
     beforeEach(function () {
         Taxonomy::make('tags')->sites(['default'])->saveQuietly();
@@ -471,3 +774,34 @@ describe('term redirects', function () {
             ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
     });
 });
+
+function structuredPages(bool $withBio = false): array
+{
+    $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
+    $about = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
+    $team = tap(Entry::make()->collection('pages')->locale('default')->slug('team'))->save();
+
+    $pages = [$home, $about, $team];
+
+    if ($withBio) {
+        $pages[] = tap(Entry::make()->collection('pages')->locale('default')->slug('bio'))->save();
+    }
+
+    return $pages;
+}
+
+function saveTree(array $tree): void
+{
+    Collection::find('pages')->structure()->in('default')->tree($tree)->save();
+}
+
+function forgetRedirects(): void
+{
+    Redirect::query()->get()->each->delete();
+}
+
+function redirectMap()
+{
+    return Redirect::query()->where('site', 'default')->get()
+        ->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+}
