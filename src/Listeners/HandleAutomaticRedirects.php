@@ -8,6 +8,7 @@ use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
+use Aerni\AdvancedSeo\Redirects\EntryUrlValues;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\GetDateFromPath;
@@ -19,27 +20,29 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Stache;
+use Statamic\Facades\YAML;
 
 /**
  * Creates and maintains redirects automatically as entry and term URLs change.
  *
- * Capture is keyed on the slug, and for dated collections the date, the only
- * pre-save state the flat-file driver reliably exposes (getOriginal() returns
- * the new value for other fields on the Stache driver). A tree move never
+ * Capture is keyed on the slug, the date, and any other route token that reads
+ * an entry field. On the flat-file driver that field's previous value is read
+ * from the file, because getOriginal() already returns the new value. The
+ * Eloquent driver keeps getOriginal() reliable. A tree move never
  * saves the entry, so the previous URI is read from storage
  * (CollectionTreeEntriesMovedOrRemoved still sees it; CollectionTreeSaved
- * runs after Statamic has written the new one). A parent slug or date change
- * does not save the descendants, so their previous URIs are stashed on the parent
- * save and their stored URIs are rewritten before the redirects are created.
+ * runs after Statamic has written the new one). A parent slug, date, or route
+ * token change does not save the descendants, so their previous URIs are
+ * stashed on the parent save and their stored URIs are rewritten before the
+ * redirects are created.
  *
  * URL changes from any other source are out of scope and left to the editor
  * to redirect manually:
  *
- * - a route token that reads a non-slug field, since the old value can't be
- *   recovered on the flat-file driver;
  * - a collection route or mount change, which changes every entry's URL at once.
  */
 class HandleAutomaticRedirects
@@ -214,45 +217,84 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * The entry's slug and date from before this save. The Stache driver
-     * overwrites the initial file path on save, so its pre-save values live in
-     * that path; getOriginal() is unreliable there because the Stache re-syncs
-     * on fetch. The Eloquent driver has no file path but keeps getOriginal()
-     * reliable, and it already stores the date in the same "Y-m-d-Hi" format.
+     * Route tokens that read an entry field, ignoring slug, date, and the
+     * structure tokens Statamic fills in itself.
+     * Null when the route has none.
      *
-     * @return array{0: ?string, 1: ?string}
+     * @return array<int, string>|null
      */
-    protected function originalSlugAndDate(Entry $entry): array
+    protected function routeFieldTokens(Entry $entry): ?array
     {
-        if ($initialPath = $entry->initialPath()) {
-            return [(new GetSlugFromPath)($initialPath), (new GetDateFromPath)($initialPath)];
+        if (! $route = $entry->route()) {
+            return null;
         }
 
-        return [$entry->getOriginal('slug'), $entry->getOriginal('date')];
+        $route = preg_replace('/(?<!{){\s*([a-zA-Z0-9_\-]+)\s*}(?!})/', '{{ $1 }}', $route);
+
+        $tokens = collect(Antlers::identifiers($route))
+            ->reject(fn (string $token) => in_array($token, [
+                'slug', 'date', 'year', 'month', 'day',
+                'parent_uri', 'mount', 'depth', 'is_root', 'id', 'published',
+            ]))
+            ->values()
+            ->all();
+
+        return $tokens === [] ? null : $tokens;
     }
 
     /**
-     * The pre-save slug and date when either differs from the entry now.
-     * Null when this save does not move a URL.
-     *
-     * @return array{0: string, 1: ?string}|null
+     * Slug, date, and entry data from before this save.
+     * Null when the entry has never been saved.
      */
-    protected function changedSlugAndDate(Entry $entry): ?array
+    protected function originalValues(Entry $entry): ?EntryUrlValues
     {
-        [$originalSlug, $originalDate] = $this->originalSlugAndDate($entry);
+        // Flat file: the previous slug and date are still in the filename.
+        // getOriginal() has already been replaced with the new values.
+        if ($path = $entry->initialPath()) {
+            return new EntryUrlValues(
+                slug: (new GetSlugFromPath)($path),
+                date: (new GetDateFromPath)($path),
+                data: $this->routeFieldValues($entry),
+            );
+        }
 
-        if (! $originalSlug) {
+        // No file and no previous slug: the entry has never been saved.
+        if (! $slug = $entry->getOriginal('slug')) {
             return null;
         }
 
-        $slugChanged = $originalSlug !== $entry->slug();
-        $dateChanged = $originalDate && $originalDate !== $this->currentDate($entry, $originalDate);
+        // Eloquent: there is no file, so getOriginal() is still the pre-save slug, date, and data.
+        return new EntryUrlValues(
+            slug: $slug,
+            date: $entry->getOriginal('date'),
+            data: $this->routeFieldValues($entry),
+        );
+    }
 
-        if (! $slugChanged && ! $dateChanged) {
+    /**
+     * Route-field values from the file, or from getOriginal() when there is no file.
+     * Null when the route has no field tokens, so the file is left unread.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function routeFieldValues(Entry $entry): ?array
+    {
+        if (! $tokens = $this->routeFieldTokens($entry)) {
             return null;
         }
 
-        return [$originalSlug, $originalDate];
+        // Flat file reads the file. Eloquent reads getOriginal().
+        $source = ($path = $entry->initialPath())
+            ? YAML::file($path)->parse()
+            : $entry->getOriginal();
+
+        $data = [];
+
+        foreach ($tokens as $token) {
+            $data[$token] = $source[$token] ?? null;
+        }
+
+        return $data;
     }
 
     /**
@@ -269,29 +311,76 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * Let the routing compute the URL the entry had before this save by
-     * temporarily restoring the original slug and date. The cached uri
-     * has to be flushed for the swapped values to take effect.
+     * Previous values that differ from the entry now.
+     * Null when this save does not move a URL.
      */
-    protected function originalUrl(Entry $entry, string $originalSlug, ?string $originalDate): ?string
+    protected function changedValues(Entry $entry): ?EntryUrlValues
     {
-        $newSlug = $entry->slug();
-        $newDate = $entry->date();
+        if (! $original = $this->originalValues($entry)) {
+            return null;
+        }
 
-        $entry->slug($originalSlug);
+        return $original->diff($this->currentValues($entry, $original));
+    }
 
-        if ($originalDate) {
-            $entry->date($originalDate);
+    /**
+     * The entry's slug, date, and route-field data as they are now.
+     * The date uses the original value's precision so the two can be compared.
+     */
+    protected function currentValues(Entry $entry, EntryUrlValues $original): EntryUrlValues
+    {
+        $data = null;
+
+        foreach (array_keys($original->data ?? []) as $token) {
+            $data[$token] = $entry->get($token);
+        }
+
+        return new EntryUrlValues(
+            slug: $entry->slug(),
+            date: $original->date ? $this->currentDate($entry, $original->date) : null,
+            data: $data,
+        );
+    }
+
+    /**
+     * Let the routing compute the URL the entry had before this save by
+     * temporarily restoring the previous slug, date, and route fields. The
+     * cached uri has to be flushed for the swapped values to take effect.
+     */
+    protected function originalUrl(Entry $entry, EntryUrlValues $values): ?string
+    {
+        $slug = $entry->slug();
+        $date = $entry->date();
+        $data = collect($values->data ?? [])
+            ->map(fn (mixed $value, string $token) => $entry->get($token))
+            ->all();
+
+        if ($values->slug !== null) {
+            $entry->slug($values->slug);
+        }
+
+        if ($values->date !== null) {
+            $entry->date($values->date);
+        }
+
+        foreach ($values->data ?? [] as $token => $value) {
+            $entry->set($token, $value);
         }
 
         Blink::store('entry-uris')->forget($entry->id());
 
         $url = $entry->absoluteUrlWithoutRedirect();
 
-        $entry->slug($newSlug);
+        if ($values->slug !== null) {
+            $entry->slug($slug);
+        }
 
-        if ($originalDate) {
-            $entry->date($newDate);
+        if ($values->date !== null) {
+            $entry->date($date);
+        }
+
+        foreach ($data as $token => $value) {
+            $entry->set($token, $value);
         }
 
         Blink::store('entry-uris')->forget($entry->id());
@@ -310,8 +399,8 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * Stash this entry's original URL when its slug or date changed and the
-     * entry itself should get a redirect.
+     * Stash this entry's original URL when its slug, date, or a route field
+     * changed and the entry itself should get a redirect.
      */
     protected function stashEntry(Entry $entry): void
     {
@@ -319,13 +408,11 @@ class HandleAutomaticRedirects
             return;
         }
 
-        if (! $changed = $this->changedSlugAndDate($entry)) {
+        if (! $changed = $this->changedValues($entry)) {
             return;
         }
 
-        [$originalSlug, $originalDate] = $changed;
-
-        if (! $originalUrl = $this->originalUrl($entry, $originalSlug, $originalDate)) {
+        if (! $originalUrl = $this->originalUrl($entry, $changed)) {
             return;
         }
 
@@ -333,8 +420,8 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * A parent slug or date change moves every descendant. Stash the path
-     * still stored for each published one.
+     * A parent slug, date, or route field change moves every descendant.
+     * Stash the path still stored for each published one.
      */
     protected function stashDescendants(Entry $entry): void
     {
@@ -344,7 +431,7 @@ class HandleAutomaticRedirects
             return;
         }
 
-        if (! $this->changedSlugAndDate($entry)) {
+        if (! $this->changedValues($entry)) {
             return;
         }
 

@@ -55,6 +55,27 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
     });
 
+    it('creates a redirect when a route token field changes the url', function () {
+        Collection::find('pages')->routes('/{category}/{slug}')->save();
+
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('category', 'news'))->save();
+
+        $entry->set('category', 'updates')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/news/post')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
+    it('creates nothing when a field changes that is not in the route', function () {
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('category', 'news'))->save();
+
+        $entry->set('category', 'updates')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
     // The Eloquent driver leaves initialPath() null but keeps getOriginal()
     // reliable. An entry with a synced original and no initial path reproduces
     // that condition without standing up the whole Eloquent entries driver.
@@ -86,6 +107,22 @@ describe('entry redirects', function () {
 
         expect($redirect)->not->toBeNull()
             ->and($redirect->destination())->toBe('entry::xyz');
+    });
+
+    it('captures the old route token url via getOriginal when there is no initial path', function () {
+        Collection::find('pages')->routes('/{category}/{slug}')->save();
+
+        $entry = Entry::make()->id('abc')->collection('pages')->locale('default')->slug('post')->set('category', 'news')->published(true);
+        $entry->syncOriginal();
+        $entry->set('category', 'updates');
+
+        event(new EntrySaving($entry));
+        event(new EntrySaved($entry));
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/news/post')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe('entry::abc');
     });
 
     it('creates a prefix-stripped redirect in the entry site on a multisite collection', function () {
@@ -399,6 +436,31 @@ describe('structure redirects', function () {
         expect($redirects->get('/2024/about'))->toBe("entry::{$about->id()}")
             ->and($redirects->get('/2024/2024/about/team'))->toBe("entry::{$team->id()}")
             ->and(Stache::store('entries')->store('pages')->index('uri')->get($team->id()))->toBe('/2024/2025/about/team');
+    });
+
+    it('creates redirects for descendants when a parent route token changes the url', function () {
+        Collection::find('pages')->routes('/{parent_uri}/{category}/{slug}')->save();
+
+        $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home')->set('category', 'home'))->save();
+        $about = tap(Entry::make()->collection('pages')->locale('default')->slug('about')->set('category', 'news'))->save();
+        $team = tap(Entry::make()->collection('pages')->locale('default')->slug('team')->set('category', 'people'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $about->set('category', 'updates')->save();
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/news/about'))->toBe("entry::{$about->id()}")
+            ->and($redirects->get('/news/about/people/team'))->toBe("entry::{$team->id()}")
+            ->and(Stache::store('entries')->store('pages')->index('uri')->get($team->id()))->toBe('/updates/about/people/team');
     });
 
     it('creates redirects for grandchildren when a parent slug changes', function () {
