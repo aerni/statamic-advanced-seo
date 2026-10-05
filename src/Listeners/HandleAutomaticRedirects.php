@@ -31,58 +31,37 @@ use Statamic\Facades\Stache;
  * the new value for other fields on the Stache driver). A tree move never
  * saves the entry, so the previous URI is read from storage
  * (CollectionTreeEntriesMovedOrRemoved still sees it; CollectionTreeSaved
- * runs after Statamic has written the new one).
+ * runs after Statamic has written the new one). A parent slug or date change
+ * does not save the descendants, so their previous URIs are stashed on the parent
+ * save and their stored URIs are rewritten before the redirects are created.
  *
  * URL changes from any other source are out of scope and left to the editor
  * to redirect manually:
  *
  * - a route token that reads a non-slug field, since the old value can't be
  *   recovered on the flat-file driver;
- * - a parent slug rename, which changes every descendant's URL without saving
- *   the descendants;
  * - a collection route or mount change, which changes every entry's URL at once.
  */
 class HandleAutomaticRedirects
 {
     /**
-     * Capture the entry's original URL before the save overwrites the
-     * initial path, and stash it for handleEntrySaved.
+     * Stash the original paths before the save overwrites them, so
+     * handleEntrySaved can create the redirects.
      */
     public function handleEntrySaving(EntrySaving $event): void
     {
-        $entry = $event->entry;
-
-        if (! $this->shouldHandle($entry)) {
-            return;
-        }
-
-        [$originalSlug, $originalDate] = $this->originalSlugAndDate($entry);
-
-        if (! $originalSlug) {
-            return;
-        }
-
-        $slugChanged = $originalSlug !== $entry->slug();
-        $dateChanged = $originalDate && $originalDate !== $this->currentDate($entry, $originalDate);
-
-        if (! $slugChanged && ! $dateChanged) {
-            return;
-        }
-
-        if (! $originalUrl = $this->originalUrl($entry, $originalSlug, $originalDate)) {
-            return;
-        }
-
-        Blink::put($this->entryBlinkKey($entry), $entry->site()->relativePath($originalUrl));
+        $this->stashEntry($event->entry);
+        $this->stashDescendants($event->entry);
     }
 
     /**
-     * Once the save went through, delete any automatic redirect that uses the
-     * entry's URL and, if the URL changed, create the redirect from the old one.
+     * Once the save went through, redirect the entry and its descendants
+     * from the paths stashed above.
      */
     public function handleEntrySaved(EntrySaved $event): void
     {
-        $this->handleEntryRedirect($event->entry, Blink::pull($this->entryBlinkKey($event->entry)));
+        $this->redirectEntry($event->entry);
+        $this->redirectDescendants($event->entry);
     }
 
     /**
@@ -96,7 +75,7 @@ class HandleAutomaticRedirects
             return;
         }
 
-        $this->stashOriginalPaths($event->moved);
+        $this->stashOriginalPaths($event->moved, $this->treeBlinkKey());
     }
 
     /**
@@ -118,7 +97,7 @@ class HandleAutomaticRedirects
         Blink::store('structure-uris')->flush();
 
         foreach ($paths as $id => $originalPath) {
-            $this->handleEntryRedirect(EntryFacade::find($id), $originalPath);
+            $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
         }
     }
 
@@ -202,15 +181,12 @@ class HandleAutomaticRedirects
         }
     }
 
-    protected function shouldHandle(Entry|Term $item): bool
+    /**
+     * The feature flag and the collection or taxonomy toggle.
+     */
+    protected function redirectsEnabled(Entry|Term $item): bool
     {
         if (! RedirectsFeature::enabled()) {
-            return false;
-        }
-
-        // Only a live item owns its URL; draft, scheduled and expired entries
-        // aren't publicly reachable. Terms are always published.
-        if ($item->status() !== 'published') {
             return false;
         }
 
@@ -220,6 +196,21 @@ class HandleAutomaticRedirects
         };
 
         return (bool) Seo::find($handle)?->config()->value('redirects');
+    }
+
+    /**
+     * Whether this item itself gets a redirect. Descendants are checked on
+     * their own, so a false result here does not stop the rest of the save.
+     */
+    protected function shouldHandle(Entry|Term $item): bool
+    {
+        if (! $this->redirectsEnabled($item)) {
+            return false;
+        }
+
+        // Only a live item owns its URL; draft, scheduled and expired entries
+        // aren't publicly reachable. Terms are always published.
+        return $item->status() === 'published';
     }
 
     /**
@@ -238,6 +229,30 @@ class HandleAutomaticRedirects
         }
 
         return [$entry->getOriginal('slug'), $entry->getOriginal('date')];
+    }
+
+    /**
+     * The pre-save slug and date when either differs from the entry now.
+     * Null when this save does not move a URL.
+     *
+     * @return array{0: string, 1: ?string}|null
+     */
+    protected function changedSlugAndDate(Entry $entry): ?array
+    {
+        [$originalSlug, $originalDate] = $this->originalSlugAndDate($entry);
+
+        if (! $originalSlug) {
+            return null;
+        }
+
+        $slugChanged = $originalSlug !== $entry->slug();
+        $dateChanged = $originalDate && $originalDate !== $this->currentDate($entry, $originalDate);
+
+        if (! $slugChanged && ! $dateChanged) {
+            return null;
+        }
+
+        return [$originalSlug, $originalDate];
     }
 
     /**
@@ -289,17 +304,100 @@ class HandleAutomaticRedirects
         return "advanced-seo::automatic-redirect::{$entry->id()}";
     }
 
+    protected function descendantBlinkKey(Entry $entry): string
+    {
+        return "advanced-seo::automatic-redirect-descendants::{$entry->id()}";
+    }
+
+    /**
+     * Stash this entry's original URL when its slug or date changed and the
+     * entry itself should get a redirect.
+     */
+    protected function stashEntry(Entry $entry): void
+    {
+        if (! $this->shouldHandle($entry)) {
+            return;
+        }
+
+        if (! $changed = $this->changedSlugAndDate($entry)) {
+            return;
+        }
+
+        [$originalSlug, $originalDate] = $changed;
+
+        if (! $originalUrl = $this->originalUrl($entry, $originalSlug, $originalDate)) {
+            return;
+        }
+
+        Blink::put($this->entryBlinkKey($entry), $entry->site()->relativePath($originalUrl));
+    }
+
+    /**
+     * A parent slug or date change moves every descendant. Stash the path
+     * still stored for each published one.
+     */
+    protected function stashDescendants(Entry $entry): void
+    {
+        $page = $entry->page();
+
+        if (! $page) {
+            return;
+        }
+
+        if (! $this->changedSlugAndDate($entry)) {
+            return;
+        }
+
+        $this->stashOriginalPaths(
+            $page->flattenedPages()->map->id()->all(),
+            $this->descendantBlinkKey($entry),
+        );
+    }
+
+    /**
+     * Redirect the entry from the path stashed on save.
+     */
+    protected function redirectEntry(Entry $entry): void
+    {
+        $this->processEntryRedirect($entry, Blink::pull($this->entryBlinkKey($entry)));
+    }
+
+    /**
+     * Statamic does not rewrite descendant URIs on this save, so do that
+     * before redirecting from the paths stashed above.
+     */
+    protected function redirectDescendants(Entry $entry): void
+    {
+        if (! $paths = Blink::pull($this->descendantBlinkKey($entry))) {
+            return;
+        }
+
+        Blink::store('entry-uris')->flush();
+        Blink::store('structure-uris')->flush();
+        Blink::store('structure-entries')->flush();
+        Blink::store('structure-entries')->put($entry->id(), $entry);
+
+        $entry->collection()->updateEntryUris(array_keys($paths));
+
+        Blink::store('entry-uris')->flush();
+        Blink::store('structure-uris')->flush();
+
+        foreach ($paths as $id => $originalPath) {
+            $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
+        }
+    }
+
     protected function treeBlinkKey(): string
     {
         return 'advanced-seo::automatic-redirect-tree';
     }
 
     /**
-     * Stash the original site-relative paths of the moved entries.
+     * Stash the site-relative path still stored for each published entry.
      *
      * @param  array<int, string>  $ids
      */
-    protected function stashOriginalPaths(array $ids): void
+    protected function stashOriginalPaths(array $ids, string $blinkKey): void
     {
         $paths = [];
 
@@ -319,7 +417,7 @@ class HandleAutomaticRedirects
             $paths[$entry->id()] = $path;
         }
 
-        Blink::put($this->treeBlinkKey(), $paths);
+        Blink::put($blinkKey, $paths);
     }
 
     /**
@@ -352,7 +450,11 @@ class HandleAutomaticRedirects
         return is_string($uri) && $uri !== '' ? $uri : null;
     }
 
-    protected function handleEntryRedirect(Entry $entry, ?string $originalPath = null): void
+    /**
+     * Delete automatic redirects that use the entry's current URL, and when
+     * an original path was stashed, create the redirect from it.
+     */
+    protected function processEntryRedirect(Entry $entry, ?string $originalPath = null): void
     {
         if (! $this->shouldHandle($entry)) {
             return;

@@ -10,6 +10,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -352,6 +353,154 @@ describe('structure redirects', function () {
             ->and($redirects->get('/about'))->toBe("entry::{$about->id()}")
             ->and($redirects->get('/about/team'))->toBe("entry::{$team->id()}")
             ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
+    });
+
+    it('creates redirects for descendants when a parent slug changes', function () {
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $about->slug('company')->save();
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/about'))->toBe("entry::{$about->id()}")
+            ->and($redirects->get('/about/team'))->toBe("entry::{$team->id()}")
+            ->and(Stache::store('entries')->store('pages')->index('uri')->get($team->id()))->toBe('/company/team');
+    });
+
+    it('creates redirects for descendants when a parent date changes the url', function () {
+        Collection::find('pages')->dated(true)->routes('/{year}/{parent_uri}/{slug}')->save();
+
+        $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home')->date('2024-01-01'))->save();
+        $about = tap(Entry::make()->collection('pages')->locale('default')->slug('about')->date('2024-01-15'))->save();
+        $team = tap(Entry::make()->collection('pages')->locale('default')->slug('team')->date('2024-06-01'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $about->date('2025-06-20')->save();
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/2024/about'))->toBe("entry::{$about->id()}")
+            ->and($redirects->get('/2024/2024/about/team'))->toBe("entry::{$team->id()}")
+            ->and(Stache::store('entries')->store('pages')->index('uri')->get($team->id()))->toBe('/2024/2025/about/team');
+    });
+
+    it('creates redirects for grandchildren when a parent slug changes', function () {
+        [$home, $about, $team, $bio] = structuredPages(withBio: true);
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id(), 'children' => [
+                    ['entry' => $bio->id()],
+                ]],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $about->slug('company')->save();
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/about/team'))->toBe("entry::{$team->id()}")
+            ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
+    });
+
+    it('redirects published descendants when an unpublished parent slug changes', function () {
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        $about->published(false)->save();
+        forgetRedirects();
+
+        $about->slug('company')->save();
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/about'))->toBeNull()
+            ->and($redirects->get('/about/team'))->toBe("entry::{$team->id()}");
+    });
+
+    it('skips a draft descendant when a parent slug changes', function () {
+        [$home, $about] = structuredPages();
+        $draft = tap(Entry::make()->collection('pages')->locale('default')->slug('draft')->published(false))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $draft->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $about->slug('company')->save();
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/about'))->toBe("entry::{$about->id()}")
+            ->and($redirects->has('/about/draft'))->toBeFalse();
+    });
+
+    it('creates nothing for descendants when the collection toggle is off and a parent slug changes', function () {
+        Seo::find('collections::pages')->config()->set('redirects', false)->save();
+
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $about->slug('company')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing for descendants on the free edition when a parent slug changes', function () {
+        useFreeEdition();
+
+        [$home, $about, $team] = structuredPages();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $about->slug('company')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
     it('creates nothing when siblings are reordered', function () {

@@ -86,6 +86,27 @@ it('creates redirects for eloquent descendants when their parent moves', functio
         ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
 });
 
+it('creates a redirect for an eloquent descendant when a parent slug changes', function () {
+    [$home, $about, $team] = eloquentStructuredPages();
+
+    eloquentSaveTree([
+        ['entry' => $home->id()],
+        ['entry' => $about->id(), 'children' => [
+            ['entry' => $team->id()],
+        ]],
+    ]);
+
+    eloquentForgetRedirects();
+
+    Entry::find($about->id())->slug('company')->save();
+
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/about/team')->first();
+
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->destination())->toBe("entry::{$team->id()}")
+        ->and(Entry::find($team->id())->model()->fresh()->getAttribute('uri'))->toBe('/company/team');
+});
+
 function eloquentStructuredPages(bool $withBio = false): array
 {
     $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
