@@ -372,19 +372,33 @@ class HandleAutomaticRedirects
             return;
         }
 
+        // TODO: Drop this call once Statamic rewrites child URIs on the parent save.
+        $this->rewriteDescendantUris($entry, array_keys($paths));
+
+        foreach ($paths as $id => $originalPath) {
+            $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
+        }
+    }
+
+    /**
+     * TODO: Statamic should have rewritten these URIs in updateChildPageUris()
+     * before EntrySaved. It doesn't: Entry::save() syncOriginal()s the
+     * cached entry, so shouldUpdateUris() is false. Drop this method once
+     * that bug is fixed. Creating the redirects stays.
+     *
+     * @param  array<int, string>  $ids
+     */
+    protected function rewriteDescendantUris(Entry $entry, array $ids): void
+    {
         Blink::store('entry-uris')->flush();
         Blink::store('structure-uris')->flush();
         Blink::store('structure-entries')->flush();
         Blink::store('structure-entries')->put($entry->id(), $entry);
 
-        $entry->collection()->updateEntryUris(array_keys($paths));
+        $entry->collection()->updateEntryUris($ids);
 
         Blink::store('entry-uris')->flush();
         Blink::store('structure-uris')->flush();
-
-        foreach ($paths as $id => $originalPath) {
-            $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
-        }
     }
 
     protected function treeBlinkKey(): string
