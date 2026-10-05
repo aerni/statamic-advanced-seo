@@ -217,29 +217,59 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * Route tokens that read an entry field, ignoring slug, date, and the
-     * structure tokens Statamic fills in itself.
-     * Null when the route has none.
-     *
-     * @return array<int, string>|null
+     * Stash this entry's original URL when its slug, date, or a route field
+     * changed and the entry itself should get a redirect.
      */
-    protected function routeFieldTokens(Entry $entry): ?array
+    protected function stashEntry(Entry $entry): void
     {
-        if (! $route = $entry->route()) {
+        if (! $this->shouldHandle($entry)) {
+            return;
+        }
+
+        if (! $changed = $this->changedValues($entry)) {
+            return;
+        }
+
+        if (! $originalUrl = $this->originalUrl($entry, $changed)) {
+            return;
+        }
+
+        Blink::put($this->entryBlinkKey($entry), $entry->site()->relativePath($originalUrl));
+    }
+
+    /**
+     * A parent slug, date, or route field change moves every descendant.
+     * Stash the path still stored for each published one.
+     */
+    protected function stashDescendants(Entry $entry): void
+    {
+        $page = $entry->page();
+
+        if (! $page) {
+            return;
+        }
+
+        if (! $this->changedValues($entry)) {
+            return;
+        }
+
+        $this->stashOriginalPaths(
+            $page->flattenedPages()->map->id()->all(),
+            $this->descendantBlinkKey($entry),
+        );
+    }
+
+    /**
+     * Previous values that differ from the entry now.
+     * Null when this save does not move a URL.
+     */
+    protected function changedValues(Entry $entry): ?EntryUrlValues
+    {
+        if (! $original = $this->originalValues($entry)) {
             return null;
         }
 
-        $route = preg_replace('/(?<!{){\s*([a-zA-Z0-9_\-]+)\s*}(?!})/', '{{ $1 }}', $route);
-
-        $tokens = collect(Antlers::identifiers($route))
-            ->reject(fn (string $token) => in_array($token, [
-                'slug', 'date', 'year', 'month', 'day',
-                'parent_uri', 'mount', 'depth', 'is_root', 'id', 'published',
-            ]))
-            ->values()
-            ->all();
-
-        return $tokens === [] ? null : $tokens;
+        return $original->diff($this->currentValues($entry, $original));
     }
 
     /**
@@ -298,29 +328,29 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * The current date formatted at the original date's precision,
-     * so the two can be compared as strings.
+     * Route tokens that read an entry field, ignoring slug, date, and the
+     * structure tokens Statamic fills in itself.
+     * Null when the route has none.
+     *
+     * @return array<int, string>|null
      */
-    protected function currentDate(Entry $entry, string $originalDate): ?string
+    protected function routeFieldTokens(Entry $entry): ?array
     {
-        return $entry->date()?->format(match (strlen($originalDate)) {
-            15 => 'Y-m-d-Hi',
-            17 => 'Y-m-d-His',
-            default => 'Y-m-d',
-        });
-    }
-
-    /**
-     * Previous values that differ from the entry now.
-     * Null when this save does not move a URL.
-     */
-    protected function changedValues(Entry $entry): ?EntryUrlValues
-    {
-        if (! $original = $this->originalValues($entry)) {
+        if (! $route = $entry->route()) {
             return null;
         }
 
-        return $original->diff($this->currentValues($entry, $original));
+        $route = preg_replace('/(?<!{){\s*([a-zA-Z0-9_\-]+)\s*}(?!})/', '{{ $1 }}', $route);
+
+        $tokens = collect(Antlers::identifiers($route))
+            ->reject(fn (string $token) => in_array($token, [
+                'slug', 'date', 'year', 'month', 'day',
+                'parent_uri', 'mount', 'depth', 'is_root', 'id', 'published',
+            ]))
+            ->values()
+            ->all();
+
+        return $tokens === [] ? null : $tokens;
     }
 
     /**
@@ -340,6 +370,19 @@ class HandleAutomaticRedirects
             date: $original->date ? $this->currentDate($entry, $original->date) : null,
             data: $data,
         );
+    }
+
+    /**
+     * The current date formatted at the original date's precision,
+     * so the two can be compared as strings.
+     */
+    protected function currentDate(Entry $entry, string $originalDate): ?string
+    {
+        return $entry->date()?->format(match (strlen($originalDate)) {
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+            default => 'Y-m-d',
+        });
     }
 
     /**
@@ -396,49 +439,6 @@ class HandleAutomaticRedirects
     protected function descendantBlinkKey(Entry $entry): string
     {
         return "advanced-seo::automatic-redirect-descendants::{$entry->id()}";
-    }
-
-    /**
-     * Stash this entry's original URL when its slug, date, or a route field
-     * changed and the entry itself should get a redirect.
-     */
-    protected function stashEntry(Entry $entry): void
-    {
-        if (! $this->shouldHandle($entry)) {
-            return;
-        }
-
-        if (! $changed = $this->changedValues($entry)) {
-            return;
-        }
-
-        if (! $originalUrl = $this->originalUrl($entry, $changed)) {
-            return;
-        }
-
-        Blink::put($this->entryBlinkKey($entry), $entry->site()->relativePath($originalUrl));
-    }
-
-    /**
-     * A parent slug, date, or route field change moves every descendant.
-     * Stash the path still stored for each published one.
-     */
-    protected function stashDescendants(Entry $entry): void
-    {
-        $page = $entry->page();
-
-        if (! $page) {
-            return;
-        }
-
-        if (! $this->changedValues($entry)) {
-            return;
-        }
-
-        $this->stashOriginalPaths(
-            $page->flattenedPages()->map->id()->all(),
-            $this->descendantBlinkKey($entry),
-        );
     }
 
     /**
