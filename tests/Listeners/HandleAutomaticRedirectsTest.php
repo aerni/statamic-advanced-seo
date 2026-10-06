@@ -897,10 +897,55 @@ describe('term redirects', function () {
         // French overrides its own slug, so a base-slug change won't affect its URL.
         Term::find('topics::old')->in('fr')->data(['title' => 'Vieux'])->slug('vieux')->save();
 
+        Redirect::query()->get()->each->delete();
+
         Term::find('topics::old')->in('en')->slug('new')->save();
 
         expect(Redirect::query()->where('site', 'en')->where('source', '/topics/old')->first())->not->toBeNull()
             ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
+    });
+
+    it('creates a redirect when a localization slug is overridden', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
+
+        Term::find('topics::old')->in('fr')->slug('vieux')->save();
+
+        $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/old')->first();
+
+        expect($fr)->not->toBeNull()
+            ->and($fr->destination())->toBe('/topics/vieux')
+            ->and($fr->origin())->toBe(RedirectOrigin::Automatic)
+            ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
+    });
+
+    it('creates a redirect when an overridden localization slug changes', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
+        Term::find('topics::old')->in('fr')->data(['title' => 'Vieux'])->slug('vieux')->save();
+
+        Redirect::query()->get()->each->delete();
+
+        Term::find('topics::old')->in('fr')->slug('ancien')->save();
+
+        $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+
+        expect($fr)->not->toBeNull()
+            ->and($fr->destination())->toBe('/topics/ancien')
+            ->and($fr->origin())->toBe(RedirectOrigin::Automatic)
+            ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
     });
 
     it('deletes redirects that would shadow the new term url', function () {

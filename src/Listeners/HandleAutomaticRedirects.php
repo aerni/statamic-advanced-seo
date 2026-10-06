@@ -20,6 +20,7 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
+use Statamic\Events\TermSaving;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry as EntryFacade;
@@ -119,54 +120,21 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * Terms can rely on getOriginal('slug') at TermSaved (unlike entries,
-     * they aren't re-fetched and re-synced mid-save), so no saving-side
-     * capture is needed. Terms carry no date and can't be an entry::
-     * destination, so the redirect points at the new path.
-     *
-     * A base-slug change flows to every localization that inherits it, so a
-     * redirect is created per site. Localizations with their own overridden
-     * slug are unaffected and drop out (old URL equals new URL). An
-     * independently changed localization slug is not detectable and is a
-     * documented limitation.
+     * A localization's overridden slug lives in that site's data, which
+     * getOriginal() does not track. Stash the previous overrides while the
+     * file or Eloquent model still has them.
+     */
+    public function handleTermSaving(TermSaving $event): void
+    {
+        $this->stashTerm($event->term);
+    }
+
+    /**
+     * Once the save went through, redirect each site whose URL changed.
      */
     public function handleTermSaved(TermSaved $event): void
     {
-        $term = $event->term;
-
-        if (! $this->shouldHandle($term)) {
-            return;
-        }
-
-        $currentPaths = $this->pathsPerSite($term);
-
-        // A term owns its URL in every site, so delete any automatic redirect that uses it.
-        foreach ($currentPaths as $site => $currentPath) {
-            $this->deleteAutomaticRedirectsFrom($currentPath, $site);
-        }
-
-        $originalSlug = $term->getOriginal('slug');
-        $newSlug = $term->slug();
-
-        // Skip new terms (no original) and unchanged slugs.
-        if (! $originalSlug || $originalSlug === $newSlug) {
-            return;
-        }
-
-        $term->slug($originalSlug);
-        $originalPaths = $this->pathsPerSite($term);
-        $term->slug($newSlug);
-
-        foreach ($currentPaths as $site => $currentPath) {
-            $originalPath = $originalPaths[$site] ?? null;
-
-            if (! $originalPath || $originalPath === $currentPath) {
-                continue;
-            }
-
-            $this->createRedirect($originalPath, $currentPath, $site);
-            $this->repointStaleRedirectDestinations($originalPath, $currentPath, $site);
-        }
+        $this->redirectTerm($event->term);
     }
 
     /**
@@ -609,6 +577,152 @@ class HandleAutomaticRedirects
             ->where('uri', $source)
             ->whereStatus('published')
             ->exists();
+    }
+
+    /**
+     * Stash localization slug overrides that differ from the term now.
+     * A null slug means that site inherited the base slug.
+     */
+    protected function stashTerm(Term $term): void
+    {
+        if (! $this->shouldHandle($term)) {
+            return;
+        }
+
+        if (! $original = $this->originalLocalizationSlugs($term)) {
+            return;
+        }
+
+        $changed = [];
+
+        foreach ($original as $site => $slug) {
+            if ($term->in($site)->get('slug') === $slug) {
+                continue;
+            }
+
+            $changed[$site] = $slug;
+        }
+
+        if ($changed === []) {
+            return;
+        }
+
+        Blink::put($this->termBlinkKey($term), $changed);
+    }
+
+    /**
+     * Localization slug overrides from before this save, keyed by site.
+     * Null when the term has never been saved. A null slug means that site
+     * inherited the base slug.
+     *
+     * @return array<string, string|null>|null
+     */
+    protected function originalLocalizationSlugs(Term $term): ?array
+    {
+        $data = null;
+
+        // Flat file: the previous overrides are still in the file.
+        if ($path = $term->initialPath()) {
+            $data = YAML::file($path)->parse();
+        }
+
+        // No file and no previous slug: the term has never been saved.
+        if ($data === null && ! $term->getOriginal('slug')) {
+            return null;
+        }
+
+        // Eloquent: there is no file, so the model is still the pre-save row.
+        if ($data === null && method_exists($term, 'model')) {
+            $data = $term->model()?->getAttribute('data');
+        }
+
+        if (! is_array($data)) {
+            return null;
+        }
+
+        $localizations = $data['localizations'] ?? [];
+        $slugs = [];
+
+        foreach ($term->taxonomy()->sites() as $site) {
+            if ($site === $term->defaultLocale()) {
+                continue;
+            }
+
+            $slugs[$site] = $localizations[$site]['slug'] ?? null;
+        }
+
+        return $slugs;
+    }
+
+    protected function termBlinkKey(Term $term): string
+    {
+        return "advanced-seo::automatic-redirect-term::{$term->id()}";
+    }
+
+    /**
+     * The base slug is still on getOriginal() at TermSaved. Localization
+     * overrides were stashed on TermSaving. Terms carry no date and can't be
+     * an entry:: destination, so the redirect points at the new path.
+     *
+     * A base-slug change flows to every localization that inherits it, so a
+     * redirect is created per site. A localization whose own slug changed is
+     * redirected on its own. An unchanged override drops out (old URL equals
+     * new URL).
+     */
+    protected function redirectTerm(Term $term): void
+    {
+        if (! $this->shouldHandle($term)) {
+            return;
+        }
+
+        $currentPaths = $this->pathsPerSite($term);
+
+        // A term owns its URL in every site, so delete any automatic redirect that uses it.
+        foreach ($currentPaths as $site => $currentPath) {
+            $this->deleteAutomaticRedirectsFrom($currentPath, $site);
+        }
+
+        $originalSlug = $term->getOriginal('slug');
+        $newSlug = $term->slug();
+        $originalSlugs = Blink::pull($this->termBlinkKey($term)) ?? [];
+        $baseSlugChanged = $originalSlug && $originalSlug !== $newSlug;
+
+        // Skip new terms and saves that move no URL.
+        if (! $baseSlugChanged && $originalSlugs === []) {
+            return;
+        }
+
+        if ($baseSlugChanged) {
+            $term->slug($originalSlug);
+        }
+
+        $currentSlugs = [];
+
+        foreach ($originalSlugs as $site => $slug) {
+            $currentSlugs[$site] = $term->in($site)->get('slug');
+            $term->in($site)->set('slug', $slug);
+        }
+
+        $originalPaths = $this->pathsPerSite($term);
+
+        if ($baseSlugChanged) {
+            $term->slug($newSlug);
+        }
+
+        foreach ($currentSlugs as $site => $slug) {
+            $term->in($site)->set('slug', $slug);
+        }
+
+        foreach ($currentPaths as $site => $currentPath) {
+            $originalPath = $originalPaths[$site] ?? null;
+
+            if (! $originalPath || $originalPath === $currentPath) {
+                continue;
+            }
+
+            $this->createRedirect($originalPath, $currentPath, $site);
+            $this->repointStaleRedirectDestinations($originalPath, $currentPath, $site);
+        }
     }
 
     /**
