@@ -125,7 +125,9 @@ class AutomaticRedirects
             return;
         }
 
-        if (! $changed = $this->changedValues($entry)) {
+        $changed = $this->changedValues($entry);
+
+        if ($changed->isEmpty()) {
             return;
         }
 
@@ -201,22 +203,21 @@ class AutomaticRedirects
 
     /**
      * Previous values that differ from the entry now.
-     * Null when this save does not move a URL.
+     * Empty when this save does not move a URL.
      */
-    private function changedValues(Entry $entry): ?EntryUrlValues
+    private function changedValues(Entry $entry): EntryUrlValues
     {
-        if (! $original = $this->originalValues($entry)) {
-            return null;
-        }
+        $original = $this->originalValues($entry);
+        $current = $this->currentValues($entry, $original);
 
-        return $original->diff($this->currentValues($entry, $original));
+        return $original->diff($current);
     }
 
     /**
      * Slug, date, and entry data from before this save.
-     * Null when the entry has never been saved.
+     * Empty when the entry has never been saved.
      */
-    private function originalValues(Entry $entry): ?EntryUrlValues
+    private function originalValues(Entry $entry): EntryUrlValues
     {
         // Flat file: the previous slug and date are still in the filename.
         // getOriginal() has already been replaced with the new values.
@@ -228,17 +229,17 @@ class AutomaticRedirects
             );
         }
 
-        // No file and no previous slug: the entry has never been saved.
-        if (! $slug = $entry->getOriginal('slug')) {
-            return null;
+        // Eloquent: there is no file, so getOriginal() is still the pre-save slug, date, and data.
+        if ($slug = $entry->getOriginal('slug')) {
+            return new EntryUrlValues(
+                slug: $slug,
+                date: $entry->getOriginal('date'),
+                data: $this->routeFieldValues($entry),
+            );
         }
 
-        // Eloquent: there is no file, so getOriginal() is still the pre-save slug, date, and data.
-        return new EntryUrlValues(
-            slug: $slug,
-            date: $entry->getOriginal('date'),
-            data: $this->routeFieldValues($entry),
-        );
+        // No file and no previous slug: the entry has never been saved.
+        return new EntryUrlValues;
     }
 
     /**
@@ -374,7 +375,7 @@ class AutomaticRedirects
             return;
         }
 
-        if (! $this->changedValues($entry)) {
+        if ($this->changedValues($entry)->isEmpty()) {
             return;
         }
 
@@ -405,7 +406,7 @@ class AutomaticRedirects
     {
         $changed = $this->changedValues($entry);
 
-        if (! $changed?->data && ! $changed?->date) {
+        if (! $changed->data && ! $changed->date) {
             return;
         }
 

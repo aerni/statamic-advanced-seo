@@ -19,9 +19,9 @@ readonly class EntryUrlValues
 
     /**
      * Values on this object that differ from the given ones.
-     * Null when nothing differs. Unchanged slug, date, and data stay null.
+     * Unchanged slug, date, and data stay null.
      */
-    public function diff(EntryUrlValues $values): ?self
+    public function diff(EntryUrlValues $values): self
     {
         $slug = $this->slug !== $values->slug ? $this->slug : null;
         $date = $this->date !== null && $this->date !== $values->date ? $this->date : null;
@@ -34,10 +34,14 @@ readonly class EntryUrlValues
             }
         }
 
-        if ($slug === null && $date === null && $data === null) {
-            return null;
-        }
-
         return new self($slug, $date, $data);
+    }
+
+    /**
+     * True when every value is null.
+     */
+    public function isEmpty(): bool
+    {
+        return array_all(get_object_vars($this), fn (mixed $value) => $value === null);
     }
 }
