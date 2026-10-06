@@ -181,6 +181,17 @@ it('creates a redirect for an eloquent descendant when a parent slug changes', f
         ->and(Entry::find($team->id())->model()->fresh()->getAttribute('uri'))->toBe('/company/team');
 });
 
+it('creates nothing when an eloquent draft entry is published and its slug changes in the same save', function () {
+    Collection::make('articles')->routes('/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('articles')->locale('default')->slug('old')->published(false))->save();
+
+    $entry->slug('new')->published(true)->save();
+
+    expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+});
+
 function eloquentStructuredPages(bool $withBio = false): array
 {
     $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();

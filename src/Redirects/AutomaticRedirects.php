@@ -8,6 +8,7 @@ use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
+use Carbon\Carbon;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\GetDateFromPath;
@@ -107,11 +108,15 @@ class AutomaticRedirects
 
     /**
      * Stash this entry's original URL when its slug, date, or a route field
-     * changed and the entry itself should get a redirect.
+     * changed, it is live now, and it was live before this save.
      */
     private function stashEntry(Entry $entry): void
     {
         if (! $this->isRedirectable($entry)) {
+            return;
+        }
+
+        if (! $this->wasLive($entry)) {
             return;
         }
 
@@ -124,6 +129,69 @@ class AutomaticRedirects
         }
 
         $this->entries[$entry->id()] = $entry->site()->relativePath($originalUrl);
+    }
+
+    /**
+     * The entry was publicly reachable before this save. The status on the
+     * entry itself is already the new one.
+     */
+    private function wasLive(Entry $entry): bool
+    {
+        $path = $entry->initialPath();
+
+        // Flat file: the previous published flag is still in the file, and the
+        // date is still in the filename. getOriginal() has already been replaced.
+        if ($path) {
+            $published = YAML::file($path)->parse()['published'] ?? true;
+            $date = $this->parseDate((new GetDateFromPath)($path));
+        }
+
+        // Eloquent: there is no file, so getOriginal() is still the pre-save values.
+        if (! $path) {
+            $published = $entry->getOriginal('published');
+            $date = $this->parseDate($entry->getOriginal('date'));
+        }
+
+        if (! $published) {
+            return false;
+        }
+
+        $collection = $entry->collection();
+
+        // A dated collection can hide a published entry when its date is private.
+        if ($collection->dated() && $collection->futureDateBehavior() === 'private' && $date?->isFuture()) {
+            return false;
+        }
+
+        if ($collection->dated() && $collection->pastDateBehavior() === 'private' && $date?->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Parse a stored date string into a Carbon at the precision it was stored.
+     */
+    private function parseDate(?string $date): ?Carbon
+    {
+        if (! $date) {
+            return null;
+        }
+
+        $format = match (strlen($date)) {
+            10 => 'Y-m-d',
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+        };
+
+        $parsed = Carbon::createFromFormat($format, $date);
+
+        return match ($format) {
+            'Y-m-d' => $parsed->startOfDay(),
+            'Y-m-d-Hi' => $parsed->startOfMinute(),
+            'Y-m-d-His' => $parsed,
+        };
     }
 
     /**

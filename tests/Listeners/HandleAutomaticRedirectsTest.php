@@ -209,6 +209,34 @@ describe('entry redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
+    it('creates nothing when a draft entry is published and its slug changes in the same save', function () {
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('old')->published(false))->save();
+
+        $entry->slug('new')->published(true)->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing when a scheduled entry is published and its slug changes in the same save', function () {
+        Collection::make('posts')->dated(true)->futureDateBehavior('private')->routes('/blog/{slug}')->sites(['default'])->saveQuietly();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('old')->date('2999-01-01'))->save();
+
+        $entry->slug('new')->date('2024-01-15')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing when an expired entry is published and its slug changes in the same save', function () {
+        Collection::make('posts')->dated(true)->pastDateBehavior('private')->routes('/blog/{slug}')->sites(['default'])->saveQuietly();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('old')->date('2020-01-01'))->save();
+
+        $entry->slug('new')->date('2024-06-20')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
     it('creates nothing when a scheduled entry slug changes', function () {
         Collection::make('posts')->dated(true)->futureDateBehavior('private')->routes('/blog/{slug}')->sites(['default'])->saveQuietly();
 
