@@ -50,6 +50,7 @@ class AutomaticRedirects
         if ($event instanceof EntrySaving) {
             $this->stashEntry($event->entry);
             $this->stashChildPages($event->entry);
+            $this->stashEntryLocalizations($event->entry);
         }
 
         if ($event instanceof TermSaving) {
@@ -86,9 +87,9 @@ class AutomaticRedirects
     }
 
     /**
-     * Redirects are enabled and this item is published. Child pages are
-     * checked on their own, so a false result here does not stop the rest
-     * of the save.
+     * Redirects are enabled and this item is published. Child pages and
+     * localizations are checked on their own, so a false result here does
+     * not stop the rest of the save.
      */
     private function isRedirectable(Entry|Term $item): bool
     {
@@ -369,13 +370,23 @@ class AutomaticRedirects
      */
     private function stashChildPages(Entry $entry): void
     {
-        $page = $entry->page();
-
-        if (! $page) {
+        if (! $entry->page()) {
             return;
         }
 
         if (! $this->changedValues($entry)) {
+            return;
+        }
+
+        $this->stashChildPagePaths($entry);
+    }
+
+    /**
+     * Stash the stored path of each published child page.
+     */
+    private function stashChildPagePaths(Entry $entry): void
+    {
+        if (! $page = $entry->page()) {
             return;
         }
 
@@ -385,17 +396,58 @@ class AutomaticRedirects
     }
 
     /**
+     * An origin route field is inherited by localizations that do not set it.
+     * Entry::descendants() is that origin chain. Stash each live localization's
+     * stored path, and its published child pages, before this save rewrites them.
+     */
+    private function stashEntryLocalizations(Entry $entry): void
+    {
+        $changed = $this->changedValues($entry);
+
+        if (! $changed?->data) {
+            return;
+        }
+
+        foreach ($entry->descendants() as $localization) {
+            if (! $this->inheritsChangedValues($localization, $changed)) {
+                continue;
+            }
+
+            $this->entries += $this->stashOriginalPaths([$localization]);
+
+            $this->stashChildPagePaths($localization);
+        }
+    }
+
+    /**
+     * True when a changed route field is absent on the localization, so it
+     * uses the origin's value.
+     */
+    private function inheritsChangedValues(Entry $localization, EntryUrlValues $changed): bool
+    {
+        return array_any(
+            array_keys($changed->data ?? []),
+            fn (string $token) => ! $localization->has($token),
+        );
+    }
+
+    /**
      * Stash the site-relative path still stored for each published entry.
+     * An id is looked up. An entry is used as given.
      *
-     * @param  array<int, string>  $ids
+     * @param  array<int, Entry|string>  $entries
      * @return array<string, string>
      */
-    private function stashOriginalPaths(array $ids): array
+    private function stashOriginalPaths(array $entries): array
     {
         $paths = [];
 
-        foreach ($ids as $id) {
-            if (! $entry = EntryFacade::find($id)) {
+        foreach ($entries as $entry) {
+            if (is_string($entry)) {
+                $entry = EntryFacade::find($entry);
+            }
+
+            if (! $entry) {
                 continue;
             }
 
