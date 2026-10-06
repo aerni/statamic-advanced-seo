@@ -408,7 +408,7 @@ describe('structure redirects', function () {
             ->and(Redirect::query()->where('site', 'default')->get())->toHaveCount(1);
     });
 
-    it('creates redirects for descendants when their parent moves', function () {
+    it('creates redirects for child pages when their parent moves', function () {
         [$home, $about, $team, $bio] = structuredPages(withBio: true);
         $services = tap(Entry::make()->collection('pages')->locale('default')->slug('services'))->save();
 
@@ -443,7 +443,7 @@ describe('structure redirects', function () {
             ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
     });
 
-    it('creates redirects for descendants when a parent slug changes', function () {
+    it('creates redirects for child pages when a parent slug changes', function () {
         [$home, $about, $team] = structuredPages();
 
         saveTree([
@@ -464,7 +464,7 @@ describe('structure redirects', function () {
             ->and(Stache::store('entries')->store('pages')->index('uri')->get($team->id()))->toBe('/company/team');
     });
 
-    it('creates redirects for descendants when a parent date changes the url', function () {
+    it('creates redirects for child pages when a parent date changes the url', function () {
         Collection::find('pages')->dated(true)->routes('/{year}/{parent_uri}/{slug}')->save();
 
         $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home')->date('2024-01-01'))->save();
@@ -489,7 +489,7 @@ describe('structure redirects', function () {
             ->and(Stache::store('entries')->store('pages')->index('uri')->get($team->id()))->toBe('/2024/2025/about/team');
     });
 
-    it('creates redirects for descendants when a parent route token changes the url', function () {
+    it('creates redirects for child pages when a parent route token changes the url', function () {
         Collection::find('pages')->routes('/{parent_uri}/{category}/{slug}')->save();
 
         $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home')->set('category', 'home'))->save();
@@ -536,7 +536,7 @@ describe('structure redirects', function () {
             ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
     });
 
-    it('redirects published descendants when an unpublished parent slug changes', function () {
+    it('redirects published child pages when an unpublished parent slug changes', function () {
         [$home, $about, $team] = structuredPages();
 
         saveTree([
@@ -557,7 +557,7 @@ describe('structure redirects', function () {
             ->and($redirects->get('/about/team'))->toBe("entry::{$team->id()}");
     });
 
-    it('skips a draft descendant when a parent slug changes', function () {
+    it('skips a draft child page when a parent slug changes', function () {
         [$home, $about] = structuredPages();
         $draft = tap(Entry::make()->collection('pages')->locale('default')->slug('draft')->published(false))->save();
 
@@ -578,7 +578,7 @@ describe('structure redirects', function () {
             ->and($redirects->has('/about/draft'))->toBeFalse();
     });
 
-    it('creates nothing for descendants when the collection toggle is off and a parent slug changes', function () {
+    it('creates nothing for child pages when the collection toggle is off and a parent slug changes', function () {
         Seo::find('collections::pages')->config()->set('redirects', false)->save();
 
         [$home, $about, $team] = structuredPages();
@@ -597,7 +597,7 @@ describe('structure redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
-    it('creates nothing for descendants on the free edition when a parent slug changes', function () {
+    it('creates nothing for child pages on the free edition when a parent slug changes', function () {
         useFreeEdition();
 
         [$home, $about, $team] = structuredPages();

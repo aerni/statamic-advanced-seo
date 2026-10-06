@@ -124,7 +124,7 @@ it('creates a redirect when an eloquent entry moves in the tree', function () {
         ->and($redirect->destination())->toBe("entry::{$team->id()}");
 });
 
-it('creates redirects for eloquent descendants when their parent moves', function () {
+it('creates redirects for eloquent child pages when their parent moves', function () {
     [$home, $about, $team, $bio] = eloquentStructuredPages(withBio: true);
     $services = tap(Entry::make()->collection('pages')->locale('default')->slug('services'))->save();
 
@@ -160,7 +160,7 @@ it('creates redirects for eloquent descendants when their parent moves', functio
         ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
 });
 
-it('creates a redirect for an eloquent descendant when a parent slug changes', function () {
+it('creates a redirect for an eloquent child page when a parent slug changes', function () {
     [$home, $about, $team] = eloquentStructuredPages();
 
     eloquentSaveTree([

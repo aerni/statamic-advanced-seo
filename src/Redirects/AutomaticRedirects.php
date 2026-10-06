@@ -32,8 +32,12 @@ class AutomaticRedirects
     /** @var array<string, string> */
     private array $entries = [];
 
-    /** @var array<string, array<string, string>> */
-    private array $entryDescendants = [];
+    /**
+     * Stored paths of structure child pages, keyed by the parent entry id.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private array $childPages = [];
 
     /** @var array<string, string> */
     private array $movedEntries = [];
@@ -45,7 +49,7 @@ class AutomaticRedirects
     {
         if ($event instanceof EntrySaving) {
             $this->stashEntry($event->entry);
-            $this->stashEntryDescendants($event->entry);
+            $this->stashChildPages($event->entry);
         }
 
         if ($event instanceof TermSaving) {
@@ -61,7 +65,7 @@ class AutomaticRedirects
     {
         if ($event instanceof EntrySaved) {
             $this->redirectEntry($event->entry);
-            $this->redirectEntryDescendants($event->entry);
+            $this->redirectChildPages($event->entry);
         }
 
         if ($event instanceof TermSaved) {
@@ -82,7 +86,7 @@ class AutomaticRedirects
     }
 
     /**
-     * Redirects are enabled and this item is published. Descendants are
+     * Redirects are enabled and this item is published. Child pages are
      * checked on their own, so a false result here does not stop the rest
      * of the save.
      */
@@ -360,10 +364,10 @@ class AutomaticRedirects
     }
 
     /**
-     * A parent slug, date, or route field change moves every descendant.
+     * A parent slug, date, or route field change moves every child page.
      * Stash the path still stored for each published one.
      */
-    private function stashEntryDescendants(Entry $entry): void
+    private function stashChildPages(Entry $entry): void
     {
         $page = $entry->page();
 
@@ -375,7 +379,7 @@ class AutomaticRedirects
             return;
         }
 
-        $this->entryDescendants[$entry->id()] = $this->stashOriginalPaths(
+        $this->childPages[$entry->id()] = $this->stashOriginalPaths(
             $page->flattenedPages()->map->id()->all(),
         );
     }
@@ -543,21 +547,21 @@ class AutomaticRedirects
     }
 
     /**
-     * Statamic does not rewrite descendant URIs on this save, so do that
+     * Statamic does not rewrite child page URIs on this save, so do that
      * before redirecting from the paths stashed above.
      */
-    private function redirectEntryDescendants(Entry $entry): void
+    private function redirectChildPages(Entry $entry): void
     {
-        $paths = $this->entryDescendants[$entry->id()] ?? null;
+        $paths = $this->childPages[$entry->id()] ?? null;
 
-        unset($this->entryDescendants[$entry->id()]);
+        unset($this->childPages[$entry->id()]);
 
         if (! $paths) {
             return;
         }
 
         // TODO: Drop this call once Statamic rewrites child URIs on the parent save.
-        $this->rewriteDescendantUris($entry, array_keys($paths));
+        $this->rewriteChildPageUris($entry, array_keys($paths));
 
         foreach ($paths as $id => $originalPath) {
             $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
@@ -572,7 +576,7 @@ class AutomaticRedirects
      *
      * @param  array<int, string>  $ids
      */
-    private function rewriteDescendantUris(Entry $entry, array $ids): void
+    private function rewriteChildPageUris(Entry $entry, array $ids): void
     {
         Blink::store('entry-uris')->flush();
         Blink::store('structure-uris')->flush();
