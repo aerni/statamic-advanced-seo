@@ -5,9 +5,13 @@ use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
+use Statamic\Eloquent\Taxonomies\Term as EloquentTerm;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class, EnablesEloquentEntries::class, EnablesRedirects::class, RefreshDatabase::class);
@@ -22,6 +26,76 @@ beforeEach(function () {
         ->sites(['default'])
         ->structureContents(['root' => true])
         ->save();
+});
+
+it('creates a redirect when an eloquent entry slug changes', function () {
+    Collection::make('articles')->routes('/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('articles')->locale('default')->slug('old'))->save();
+
+    expect($entry)->toBeInstanceOf(EloquentEntry::class);
+
+    $entry->slug('new')->save();
+
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/old')->first();
+
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
+it('creates a redirect when an eloquent entry date changes the url', function () {
+    Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date('2024-01-15'))->save();
+
+    $entry->date('2025-06-20')->save();
+
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/2024/post')->first();
+
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
+it('creates a redirect when an eloquent entry route field changes the url', function () {
+    Collection::make('posts')->routes('/{category}/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->set('category', 'news'))->save();
+
+    $entry->set('category', 'updates')->save();
+
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/news/post')->first();
+
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
+it('creates a redirect when an eloquent term localization slug changes', function () {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
+
+    expect(Term::find('topics::old'))->toBeInstanceOf(EloquentTerm::class);
+
+    Term::find('topics::old')->in('fr')->slug('vieux')->save();
+
+    eloquentForgetRedirects();
+
+    Term::find('topics::old')->in('fr')->slug('ancien')->save();
+
+    $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+
+    expect($fr)->not->toBeNull()
+        ->and($fr->destination())->toBe('/topics/ancien')
+        ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
 });
 
 it('creates a redirect when an eloquent entry moves in the tree', function () {

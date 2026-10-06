@@ -82,6 +82,7 @@ abstract class TestCase extends AddonTestCase
             $eloquent = require __DIR__.'/../vendor/statamic/eloquent-driver/config/eloquent-driver.php';
             $eloquent['entries']['driver'] = 'eloquent';
             $eloquent['entries']['model'] = UuidEntryModel::class;
+            $eloquent['terms']['driver'] = 'eloquent';
             $app['config']->set('statamic.eloquent-driver', $eloquent);
         }
     }
@@ -93,6 +94,7 @@ abstract class TestCase extends AddonTestCase
         }
 
         $this->loadMigrationsFrom(__DIR__.'/../vendor/statamic/eloquent-driver/database/migrations/entries/2024_03_07_100000_create_entries_table_with_string_ids.php');
+        $this->loadMigrationsFrom(__DIR__.'/../vendor/statamic/eloquent-driver/database/migrations/2024_03_07_100000_create_terms_table.php');
     }
 
     protected function setUp(): void

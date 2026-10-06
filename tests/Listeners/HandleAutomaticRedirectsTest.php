@@ -145,6 +145,29 @@ describe('entry redirects', function () {
             ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
     });
 
+    it('creates a redirect when a timed date changes the day', function () {
+        Collection::make('posts')->dated(true)->routes('/blog/{year}/{month}/{day}/{slug}')->sites(['default'])->saveQuietly();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date('2024-01-15-1430'))->save();
+
+        $entry->date('2024-06-20-0900')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/2024/01/15/post')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
+    it('creates nothing when only the time changes', function () {
+        Collection::make('posts')->dated(true)->routes('/blog/{year}/{month}/{day}/{slug}')->sites(['default'])->saveQuietly();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date('2024-01-15-1430'))->save();
+
+        $entry->date('2024-01-15-1500')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
     it('creates nothing when the date changes but the url stays the same', function () {
         Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
 
@@ -945,6 +968,28 @@ describe('term redirects', function () {
         expect($fr)->not->toBeNull()
             ->and($fr->destination())->toBe('/topics/ancien')
             ->and($fr->origin())->toBe(RedirectOrigin::Automatic)
+            ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
+    });
+
+    it('creates a redirect when an overridden localization slug is cleared', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
+        Term::find('topics::old')->in('fr')->data(['title' => 'Vieux'])->slug('vieux')->save();
+
+        Redirect::query()->get()->each->delete();
+
+        Term::find('topics::old')->in('fr')->set('slug', null)->save();
+
+        $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+
+        expect($fr)->not->toBeNull()
+            ->and($fr->destination())->toBe('/topics/old')
             ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
     });
 
