@@ -170,10 +170,11 @@ class HandleAutomaticRedirects
     }
 
     /**
-     * Whether this item itself gets a redirect. Descendants are checked on
-     * their own, so a false result here does not stop the rest of the save.
+     * Redirects are enabled and this item is published. Descendants are
+     * checked on their own, so a false result here does not stop the rest
+     * of the save.
      */
-    protected function shouldHandle(Entry|Term $item): bool
+    protected function isRedirectable(Entry|Term $item): bool
     {
         if (! $this->redirectsEnabled($item)) {
             return false;
@@ -190,7 +191,7 @@ class HandleAutomaticRedirects
      */
     protected function stashEntry(Entry $entry): void
     {
-        if (! $this->shouldHandle($entry)) {
+        if (! $this->isRedirectable($entry)) {
             return;
         }
 
@@ -475,7 +476,7 @@ class HandleAutomaticRedirects
                 continue;
             }
 
-            if (! $this->shouldHandle($entry)) {
+            if (! $this->isRedirectable($entry)) {
                 continue;
             }
 
@@ -525,7 +526,7 @@ class HandleAutomaticRedirects
      */
     protected function processEntryRedirect(Entry $entry, ?string $originalPath = null): void
     {
-        if (! $this->shouldHandle($entry)) {
+        if (! $this->isRedirectable($entry)) {
             return;
         }
 
@@ -533,11 +534,18 @@ class HandleAutomaticRedirects
             return;
         }
 
-        $this->deleteAutomaticRedirectsFrom($currentPath, $entry->locale());
+        $this->deleteAutomaticRedirectOnLiveUrl($currentPath, $entry->locale());
 
-        if ($originalPath !== null) {
-            $this->createRedirectFromOriginalPath($entry, $originalPath, $currentPath);
+        if (! $originalPath || $originalPath === $currentPath) {
+            return;
         }
+
+        if ($this->sourceIsOwnedByPublishedEntry($originalPath, $entry->locale())) {
+            return;
+        }
+
+        $this->createRedirect($originalPath, "entry::{$entry->id()}", $entry->locale());
+        $this->repointStaleRedirectDestinations($originalPath, "entry::{$entry->id()}", $entry->locale());
     }
 
     protected function currentPath(Entry $entry): ?string
@@ -548,22 +556,6 @@ class HandleAutomaticRedirects
         $url = $entry->absoluteUrlWithoutRedirect();
 
         return $url ? $entry->site()->relativePath($url) : null;
-    }
-
-    protected function createRedirectFromOriginalPath(Entry $entry, string $originalPath, string $currentPath): void
-    {
-        if ($originalPath === $currentPath) {
-            return;
-        }
-
-        if ($this->sourceIsOwnedByPublishedEntry($originalPath, $entry->locale())) {
-            return;
-        }
-
-        $destination = "entry::{$entry->id()}";
-
-        $this->createRedirect($originalPath, $destination, $entry->locale());
-        $this->repointStaleRedirectDestinations($originalPath, $destination, $entry->locale());
     }
 
     /**
@@ -585,7 +577,7 @@ class HandleAutomaticRedirects
      */
     protected function stashTerm(Term $term): void
     {
-        if (! $this->shouldHandle($term)) {
+        if (! $this->isRedirectable($term)) {
             return;
         }
 
@@ -671,7 +663,7 @@ class HandleAutomaticRedirects
      */
     protected function redirectTerm(Term $term): void
     {
-        if (! $this->shouldHandle($term)) {
+        if (! $this->isRedirectable($term)) {
             return;
         }
 
@@ -679,7 +671,7 @@ class HandleAutomaticRedirects
 
         // A term owns its URL in every site, so delete any automatic redirect that uses it.
         foreach ($currentPaths as $site => $currentPath) {
-            $this->deleteAutomaticRedirectsFrom($currentPath, $site);
+            $this->deleteAutomaticRedirectOnLiveUrl($currentPath, $site);
         }
 
         $originalSlug = $term->getOriginal('slug');
@@ -784,7 +776,7 @@ class HandleAutomaticRedirects
      * belongs to a live page, so the redirect would send the request away.
      * Manual redirects are the editor's to keep.
      */
-    protected function deleteAutomaticRedirectsFrom(string $source, string $site): void
+    protected function deleteAutomaticRedirectOnLiveUrl(string $source, string $site): void
     {
         RedirectFacade::query()
             ->where('site', $site)
