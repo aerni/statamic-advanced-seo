@@ -396,39 +396,85 @@ class AutomaticRedirects
     }
 
     /**
-     * An origin route field is inherited by localizations that do not set it.
-     * Entry::descendants() is that origin chain. Stash each live localization's
-     * stored path, and its published child pages, before this save rewrites them.
+     * An origin route field or date is inherited by localizations that do not
+     * set it. Entry::descendants() is that origin chain. Stash each live
+     * localization's stored path, and its published child pages, before this
+     * save rewrites them.
      */
     private function stashEntryLocalizations(Entry $entry): void
     {
         $changed = $this->changedValues($entry);
 
-        if (! $changed?->data) {
+        if (! $changed?->data && ! $changed?->date) {
             return;
         }
 
         foreach ($entry->descendants() as $localization) {
-            if (! $this->inheritsChangedValues($localization, $changed)) {
+            if (! $this->inheritsChangedValues($entry, $localization, $changed)) {
                 continue;
             }
 
             $this->entries += $this->stashOriginalPaths([$localization]);
 
             $this->stashChildPagePaths($localization);
+
+            // Eloquent copies the origin date onto the localization. Clear that
+            // copy so the save that follows writes the new date into the URI.
+            // The old path was already read above.
+            if ($changed->date && ! $localization->initialPath() && $localization->hasExplicitDate()) {
+                $localization->date(null);
+            }
         }
     }
 
     /**
-     * True when a changed route field is absent on the localization, so it
-     * uses the origin's value.
+     * True when a changed route field or date is absent on the localization,
+     * so it uses the origin's value.
      */
-    private function inheritsChangedValues(Entry $localization, EntryUrlValues $changed): bool
+    private function inheritsChangedValues(Entry $origin, Entry $localization, EntryUrlValues $changed): bool
     {
-        return array_any(
-            array_keys($changed->data ?? []),
-            fn (string $token) => ! $localization->has($token),
-        );
+        $inheritsDate = $changed->date && $this->inheritsDate($origin, $localization);
+
+        $inheritsField = collect($changed->data)
+            ->keys()
+            ->contains(fn (string $token) => ! $localization->has($token));
+
+        return $inheritsDate || $inheritsField;
+    }
+
+    /**
+     * The localization's date follows the origin. A localized date on an
+     * entry between them breaks the chain.
+     */
+    private function inheritsDate(Entry $origin, Entry $localization): bool
+    {
+        $entry = $localization;
+
+        while ($entry->id() !== $origin->id()) {
+            if (! $entry->hasOrigin() || $this->hasLocalizedDate($entry)) {
+                return false;
+            }
+
+            $entry = $entry->origin();
+        }
+
+        return true;
+    }
+
+    /**
+     * True when this entry stores a date of its own.
+     */
+    private function hasLocalizedDate(Entry $entry): bool
+    {
+        // Flat file: an inherited date is absent from the filename.
+        if ($entry->initialPath()) {
+            return $entry->hasExplicitDate();
+        }
+
+        // Eloquent: the origin date is copied onto the row unless date is
+        // one of the localized fields. A custom file entry may also define
+        // model(), so only read it when there is no file path.
+        return collect($entry->model()->getAttribute('__localized_fields'))->contains('date');
     }
 
     /**
@@ -489,7 +535,7 @@ class AutomaticRedirects
         // Eloquent entries keep it on the uri column. A custom file entry
         // may also define model(), so only read it when there is no file path.
         if (! $initialPath && method_exists($entry, 'model')) {
-            $uri = $entry->model()?->getAttribute('uri');
+            $uri = $entry->model()->getAttribute('uri');
         }
 
         return is_string($uri) && $uri !== '' ? $uri : null;
@@ -549,7 +595,7 @@ class AutomaticRedirects
 
         // Eloquent: there is no file, so the model is still the pre-save row.
         if ($data === null && method_exists($term, 'model')) {
-            $data = $term->model()?->getAttribute('data');
+            $data = $term->model()->getAttribute('data');
         }
 
         if (! is_array($data)) {

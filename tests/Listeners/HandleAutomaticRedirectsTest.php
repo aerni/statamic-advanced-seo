@@ -314,6 +314,84 @@ describe('entry redirects', function () {
             ->and($redirects->get('/news/a-propos/equipe'))->toBe("entry::{$teamFr->id()}");
     });
 
+    it('creates a redirect when an inherited localization date changes the url', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->dated(true)->routes('/{year}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        forgetRedirects();
+
+        $en->date('2025-06-20')->save();
+
+        $origin = Redirect::query()->where('site', 'en')->where('source', '/2024/post')->first();
+        $localization = Redirect::query()->where('site', 'fr')->where('source', '/2024/article')->first();
+
+        expect($origin?->destination())->toBe("entry::{$en->id()}")
+            ->and($localization)->not->toBeNull()
+            ->and($localization->destination())->toBe("entry::{$fr->id()}");
+    });
+
+    it('creates nothing for a localization that has its own date', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->dated(true)->routes('/{year}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15'))->save();
+        tap($en->makeLocalization('fr')->slug('article')->date('2019-05-05'))->save();
+
+        forgetRedirects();
+
+        $en->date('2025-06-20')->save();
+
+        expect(Redirect::query()->where('site', 'en')->where('source', '/2024/post')->first())->not->toBeNull()
+            ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
+    });
+
+    it('creates a redirect for a localized child page when an inherited date changes the url', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('guides')
+            ->dated(true)
+            ->routes('/{year}/{parent_uri}/{slug}')
+            ->sites(['en', 'fr'])
+            ->structureContents(['root' => false])
+            ->saveQuietly();
+
+        $about = tap(Entry::make()->collection('guides')->locale('en')->slug('about')->date('2024-01-15'))->save();
+        $team = tap(Entry::make()->collection('guides')->locale('en')->slug('team')->date('2024-06-01'))->save();
+
+        Collection::find('guides')->structure()->in('en')->tree([
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ])->save();
+
+        $aboutFr = tap($about->makeLocalization('fr')->slug('a-propos'))->save();
+        $teamFr = tap($team->makeLocalization('fr')->slug('equipe'))->save();
+
+        forgetRedirects();
+
+        $about->date('2025-06-20')->save();
+
+        $redirects = Redirect::query()->where('site', 'fr')->get()
+            ->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+        expect($redirects->get('/2024/a-propos'))->toBe("entry::{$aboutFr->id()}")
+            ->and($redirects->get('/2024/2024/a-propos/equipe'))->toBe("entry::{$teamFr->id()}");
+    });
+
     it('creates nothing when a scheduled entry slug changes', function () {
         Collection::make('posts')->dated(true)->futureDateBehavior('private')->routes('/blog/{slug}')->sites(['default'])->saveQuietly();
 

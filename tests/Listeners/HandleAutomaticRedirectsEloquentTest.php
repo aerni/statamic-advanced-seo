@@ -219,6 +219,33 @@ it('creates a redirect when an eloquent inherited localization route field chang
         ->and($localization->destination())->toBe("entry::{$fr->id()}");
 });
 
+it('creates a redirect when an eloquent inherited localization date changes the url', function () {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Collection::make('articles')->dated(true)->routes('/{year}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15'))->save();
+    $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+    expect($en)->toBeInstanceOf(EloquentEntry::class)
+        ->and($fr)->toBeInstanceOf(EloquentEntry::class);
+
+    eloquentForgetRedirects();
+
+    $en->date('2025-06-20')->save();
+
+    $origin = Redirect::query()->where('site', 'en')->where('source', '/2024/post')->first();
+    $localization = Redirect::query()->where('site', 'fr')->where('source', '/2024/article')->first();
+
+    expect($origin?->destination())->toBe("entry::{$en->id()}")
+        ->and($localization)->not->toBeNull()
+        ->and($localization->destination())->toBe("entry::{$fr->id()}");
+});
+
 function eloquentStructuredPages(bool $withBio = false): array
 {
     $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
