@@ -1,9 +1,10 @@
 <?php
 
+use Aerni\AdvancedSeo\Eloquent\Redirect as EloquentRedirect;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
 use Statamic\Eloquent\Taxonomies\Term as EloquentTerm;
 use Statamic\Facades\Blink;
@@ -14,7 +15,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
-uses(PreventsSavingStacheItemsToDisk::class, EnablesEloquentEntries::class, EnablesRedirects::class, RefreshDatabase::class);
+uses(PreventsSavingStacheItemsToDisk::class, EnablesEloquentEntries::class, EnablesRedirects::class, UseEloquentDriver::class);
 
 beforeEach(function () {
     Site::setSites([
@@ -40,7 +41,7 @@ it('creates a redirect when an eloquent entry slug changes', function () {
 
     $redirect = Redirect::query()->where('site', 'default')->where('source', '/old')->first();
 
-    expect($redirect)->not->toBeNull()
+    expect($redirect)->toBeInstanceOf(EloquentRedirect::class)
         ->and($redirect->destination())->toBe("entry::{$entry->id()}");
 });
 
