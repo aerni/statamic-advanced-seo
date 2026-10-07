@@ -203,7 +203,8 @@ class AutomaticRedirects
 
     /**
      * Previous values that differ from the entry now.
-     * Empty when this save does not move a URL.
+     * Route fields include tokens used by a localization route.
+     * Empty when none of those values changed.
      */
     private function changedValues(Entry $entry): EntryUrlValues
     {
@@ -244,13 +245,21 @@ class AutomaticRedirects
 
     /**
      * Route-field values from the file, or from getOriginal() when there is no file.
-     * Null when the route has no field tokens, so the file is left unread.
+     * Tokens come from this entry's route and from localization routes, which
+     * can use a field this route does not. Null when nothing uses a field
+     * token, so the file is left unread.
      *
      * @return array<string, mixed>|null
      */
     private function routeFieldValues(Entry $entry): ?array
     {
-        if (! $tokens = $this->routeFieldTokens($entry)) {
+        $tokens = collect([$entry])
+            ->merge($entry->descendants())
+            ->flatMap(fn (Entry $candidate) => $this->routeFieldTokens($candidate))
+            ->unique()
+            ->values();
+
+        if ($tokens->isEmpty()) {
             return null;
         }
 
@@ -259,13 +268,9 @@ class AutomaticRedirects
             ? YAML::file($path)->parse()
             : $entry->getOriginal();
 
-        $data = [];
-
-        foreach ($tokens as $token) {
-            $data[$token] = $source[$token] ?? null;
-        }
-
-        return $data;
+        return $tokens
+            ->mapWithKeys(fn (string $token) => [$token => $source[$token] ?? null])
+            ->all();
     }
 
     /**
@@ -398,7 +403,8 @@ class AutomaticRedirects
 
     /**
      * An origin route field or date is inherited by localizations that do not
-     * set it. Entry::descendants() is that origin chain. Stash each live
+     * set it. A localization route may use a field the origin route does not.
+     * Entry::descendants() is that origin chain. Stash each live
      * localization's stored path, and its published child pages, before this
      * save rewrites them.
      */
@@ -430,7 +436,8 @@ class AutomaticRedirects
 
     /**
      * True when a changed route field or date is absent on the localization,
-     * so it uses the origin's value.
+     * so it uses the origin's value. A route field only counts when this
+     * localization's route uses it.
      */
     private function inheritsChangedValues(Entry $origin, Entry $localization, EntryUrlValues $changed): bool
     {
@@ -438,6 +445,7 @@ class AutomaticRedirects
 
         $inheritsField = collect($changed->data)
             ->keys()
+            ->intersect($this->routeFieldTokens($localization))
             ->contains(fn (string $token) => ! $localization->has($token));
 
         return $inheritsDate || $inheritsField;

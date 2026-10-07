@@ -219,6 +219,35 @@ it('creates a redirect when an eloquent inherited localization route field chang
         ->and($localization->destination())->toBe("entry::{$fr->id()}");
 });
 
+it('creates a redirect when an eloquent localization route uses a field the origin route does not', function () {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Collection::make('articles')->routes([
+        'en' => '/{slug}',
+        'fr' => '/{category}/{slug}',
+    ])->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+    $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+    expect($en)->toBeInstanceOf(EloquentEntry::class)
+        ->and($fr)->toBeInstanceOf(EloquentEntry::class);
+
+    eloquentForgetRedirects();
+
+    $en->set('category', 'updates')->save();
+
+    $localization = Redirect::query()->where('site', 'fr')->where('source', '/news/article')->first();
+
+    expect(Redirect::query()->where('site', 'en')->get())->toHaveCount(0)
+        ->and($localization)->not->toBeNull()
+        ->and($localization->destination())->toBe("entry::{$fr->id()}");
+});
+
 it('creates a redirect when an eloquent inherited localization date changes the url', function () {
     Site::setSites([
         'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],

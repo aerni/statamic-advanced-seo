@@ -279,6 +279,53 @@ describe('entry redirects', function () {
             ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
     });
 
+    it('creates a redirect when a localization route uses a field the origin route does not', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->routes([
+            'en' => '/{slug}',
+            'fr' => '/{category}/{slug}',
+        ])->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        forgetRedirects();
+
+        $en->set('category', 'updates')->save();
+
+        $localization = Redirect::query()->where('site', 'fr')->where('source', '/news/article')->first();
+
+        expect(Redirect::query()->where('site', 'en')->get())->toHaveCount(0)
+            ->and($localization)->not->toBeNull()
+            ->and($localization->destination())->toBe("entry::{$fr->id()}");
+    });
+
+    it('creates nothing when a localization overrides a field that only its route uses', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->routes([
+            'en' => '/{slug}',
+            'fr' => '/{category}/{slug}',
+        ])->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+        tap($en->makeLocalization('fr')->slug('article')->set('category', 'actualites'))->save();
+
+        forgetRedirects();
+
+        $en->set('category', 'updates')->save();
+
+        expect(Redirect::query()->where('site', 'en')->get())->toHaveCount(0)
+            ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
+    });
+
     it('creates a redirect for a localized child page when an inherited route field changes', function () {
         Site::setSites([
             'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
