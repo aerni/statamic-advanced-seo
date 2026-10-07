@@ -73,6 +73,20 @@ it('creates a redirect when an eloquent entry route field changes the url', func
         ->and($redirect->destination())->toBe("entry::{$entry->id()}");
 });
 
+it('creates a redirect when an eloquent route token of zero is cleared', function () {
+    Collection::make('posts')->routes('/{floor}/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->set('floor', 0))->save();
+
+    $entry->set('floor', null)->save();
+
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/0/post')->first();
+
+    expect($redirect)->toBeInstanceOf(EloquentRedirect::class)
+        ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
 it('creates a redirect when an eloquent term localization slug changes', function () {
     Site::setSites([
         'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],

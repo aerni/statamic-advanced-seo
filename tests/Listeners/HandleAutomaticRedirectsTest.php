@@ -71,6 +71,29 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
     });
 
+    it('creates a redirect when a route token of zero is cleared', function () {
+        Collection::find('pages')->routes('/{floor}/{slug}')->save();
+
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('floor', 0))->save();
+
+        $entry->set('floor', null)->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/0/post')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
+    it('creates nothing when a route token of zero is saved again as a string', function () {
+        Collection::find('pages')->routes('/{floor}/{slug}')->save();
+
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('floor', 0))->save();
+
+        $entry->set('floor', '0')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
     it('creates nothing when a field changes that is not in the route', function () {
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('category', 'news'))->save();
 

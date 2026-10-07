@@ -29,12 +29,25 @@ readonly class EntryUrlValues
         $data = null;
 
         foreach ($this->data ?? [] as $token => $value) {
-            if ($value != ($values->data[$token] ?? null)) {
+            if ($this->urlText($value) !== $this->urlText($values->data[$token] ?? null)) {
                 $data[$token] = $value;
             }
         }
 
         return new self($slug, $date, $data);
+    }
+
+    /**
+     * Printed route-token text. Compare this instead of the stored value:
+     * 0 and "0" are the same segment, and clearing a 0 removes that segment.
+     */
+    private function urlText(mixed $value): string
+    {
+        if ($value === null || $value === false || $value === '') {
+            return '';
+        }
+
+        return is_scalar($value) ? (string) $value : '';
     }
 
     /**
