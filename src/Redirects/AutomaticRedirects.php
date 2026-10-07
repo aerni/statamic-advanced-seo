@@ -9,6 +9,8 @@ use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\GetDateFromPath;
@@ -28,6 +30,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Term as TermFacade;
 use Statamic\Facades\YAML;
 use Statamic\Structures\CollectionTree;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class AutomaticRedirects
 {
@@ -718,7 +721,8 @@ class AutomaticRedirects
      * A base-slug change flows to every localization that inherits it, so a
      * redirect is created per site. A localization whose own slug changed is
      * redirected on its own. An unchanged override drops out (old URL equals
-     * new URL).
+     * new URL). A collection adds another path when Statamic would serve the
+     * term there: the collection is mounted, and the term view exists.
      */
     private function redirectTerm(Term $term): void
     {
@@ -726,11 +730,11 @@ class AutomaticRedirects
             return;
         }
 
-        $currentPaths = $this->pathsPerSite($term);
+        $currentPaths = $this->termSitePaths($term);
 
         // A term owns its URL in every site, so delete any automatic redirect that uses it.
-        foreach ($currentPaths as $site => $currentPath) {
-            $this->deleteAutomaticRedirectOnLiveUrl($currentPath, $site);
+        foreach ($currentPaths as $current) {
+            $this->deleteAutomaticRedirectOnLiveUrl($current['path'], $current['site']);
         }
 
         $originalSlug = $term->getOriginal('slug');
@@ -757,7 +761,7 @@ class AutomaticRedirects
             $term->in($site)->set('slug', $slug);
         }
 
-        $originalPaths = $this->pathsPerSite($term);
+        $originalPaths = $this->termSitePaths($term);
 
         if ($baseSlugChanged) {
             $term->slug($newSlug);
@@ -767,33 +771,79 @@ class AutomaticRedirects
             $term->in($site)->set('slug', $slug);
         }
 
-        foreach ($currentPaths as $site => $currentPath) {
-            $originalPath = $originalPaths[$site] ?? null;
+        foreach ($currentPaths as $key => $current) {
+            $original = $originalPaths[$key] ?? null;
 
-            if (! $originalPath || $originalPath === $currentPath) {
+            if (! $original || $original['path'] === $current['path']) {
                 continue;
             }
 
-            if ($this->sourceIsOwnedByPublishedContent($originalPath, $site)) {
+            if ($this->sourceIsOwnedByPublishedContent($original['path'], $current['site'])) {
                 continue;
             }
 
-            $this->createRedirect($originalPath, $currentPath, $site);
-            $this->repointStaleRedirectDestinations($originalPath, $currentPath, $site);
+            $this->createRedirect($original['path'], $current['path'], $current['site']);
+            $this->repointStaleRedirectDestinations($original['path'], $current['path'], $current['site']);
         }
     }
 
     /**
-     * The site-relative path of the term in each of its localizations, in the
-     * term's current state.
+     * Site and path pairs for every localization of the term, keyed by site and
+     * collection so the old and new paths match. A site's canonical path comes
+     * before the collection paths Statamic would serve for that site.
      *
-     * @return array<string, string>
+     * @return array<string, array{site: string, collection: ?string, path: string}>
      */
-    private function pathsPerSite(Term $term): array
+    private function termSitePaths(Term $term): array
     {
-        return $term->taxonomy()->sites()
-            ->mapWithKeys(fn ($site) => [$site => $term->in($site)->uri()])
+        return $term->localizations()
+            ->flatMap(fn (LocalizedTerm $localized) => $this->termSitePath($localized))
+            ->keyBy(fn (array $path) => $path['collection']
+                ? "{$path['site']}.{$path['collection']}"
+                : $path['site'])
             ->all();
+    }
+
+    /**
+     * Site and path pairs for one localization.
+     *
+     * @return Collection<int, array{site: string, collection: ?string, path: string}>
+     */
+    private function termSitePath(LocalizedTerm $localized): Collection
+    {
+        return $localized->taxonomy()->collections()
+            ->map(fn (StatamicCollection $collection) => [
+                'site' => $localized->locale(),
+                'collection' => $collection->handle(),
+                'path' => $this->collectionTermPath($localized, $collection),
+            ])
+            ->prepend([
+                'site' => $localized->locale(),
+                'collection' => null,
+                'path' => $localized->uri(),
+            ])
+            ->filter(fn (array $path) => $path['path'])
+            ->unique('path')
+            ->values();
+    }
+
+    /**
+     * The collection term URL, when Statamic would serve that page.
+     * The collection is attached to a copy so the term being saved is left alone.
+     */
+    private function collectionTermPath(LocalizedTerm $localized, StatamicCollection $collection): ?string
+    {
+        if (! $collection->uri($localized->locale())) {
+            return null;
+        }
+
+        $scoped = (clone $localized)->collection($collection);
+
+        if (! view()->exists($scoped->template())) {
+            return null;
+        }
+
+        return $scoped->uri();
     }
 
     /**
@@ -970,8 +1020,8 @@ class AutomaticRedirects
             return;
         }
 
-        foreach ($this->pathsPerSite($term) as $site => $path) {
-            $this->deleteAutomaticRedirectsTo($path, $site);
+        foreach ($this->termSitePaths($term) as $current) {
+            $this->deleteAutomaticRedirectsTo($current['path'], $current['site']);
         }
     }
 

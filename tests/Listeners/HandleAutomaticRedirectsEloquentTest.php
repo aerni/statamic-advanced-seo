@@ -5,6 +5,7 @@ use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
+use Illuminate\Support\Facades\File;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
 use Statamic\Eloquent\Taxonomies\Term as EloquentTerm;
 use Statamic\Facades\Blink;
@@ -85,6 +86,33 @@ it('creates a redirect when an eloquent route token of zero is cleared', functio
 
     expect($redirect)->toBeInstanceOf(EloquentRedirect::class)
         ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
+it('creates a redirect when an eloquent term slug changes under a mounted collection', function () {
+    Collection::make('sections')->routes('/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $blog = tap(Entry::make()->collection('sections')->locale('default')->slug('blog'))->save();
+    Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+    Collection::make('posts')->routes('/posts/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $path = resource_path('views/posts/tags/show.antlers.html');
+    File::ensureDirectoryExists(dirname($path));
+    File::put($path, '');
+
+    try {
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+
+        $term->slug('new')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/tags/old')->first();
+
+        expect($redirect)->toBeInstanceOf(EloquentRedirect::class)
+            ->and($redirect->destination())->toBe('/blog/tags/new');
+    } finally {
+        File::delete($path);
+    }
 });
 
 it('creates a redirect when an eloquent term localization slug changes', function () {

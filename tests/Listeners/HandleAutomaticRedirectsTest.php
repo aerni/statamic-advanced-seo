@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
@@ -1176,6 +1177,159 @@ describe('term redirects', function () {
             ->and($redirect->origin())->toBe(RedirectOrigin::Automatic);
     });
 
+    it('creates a redirect for each collection the term is served under', function () {
+        Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        $news = tap(Entry::make()->collection('pages')->locale('default')->slug('news'))->save();
+
+        Collection::make('posts')->routes('/posts/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Collection::make('articles')->routes('/articles/{slug}')->mount($news->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show', 'articles.tags.show'], function () {
+            $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+
+            $term->slug('new')->save();
+
+            $scoped = Term::find('tags::new')->in('default');
+
+            $redirects = Redirect::query()->where('site', 'default')->get()
+                ->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+            expect($scoped->collection(Collection::find('posts'))->uri())->toBe('/blog/tags/new')
+                ->and($scoped->collection(Collection::find('articles'))->uri())->toBe('/news/tags/new')
+                ->and($redirects)->toHaveCount(3)
+                ->and($redirects->get('/tags/old'))->toBe('/tags/new')
+                ->and($redirects->get('/blog/tags/old'))->toBe('/blog/tags/new')
+                ->and($redirects->get('/news/tags/old'))->toBe('/news/tags/new');
+        });
+    });
+
+    it('creates nothing for an unmounted collection even when the term view exists', function () {
+        Collection::make('blog')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['blog.tags.show'], function () {
+            $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+
+            $term->slug('new')->save();
+
+            expect(Redirect::query()->where('site', 'default')->where('source', '/blog/tags/old')->get())->toHaveCount(0)
+                ->and(Redirect::query()->where('site', 'default')->where('source', '/tags/old')->first())->not->toBeNull();
+        });
+    });
+
+    it('creates nothing for a mounted collection when the term view is missing', function () {
+        Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        Collection::make('posts')->routes('/posts/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+
+        $term->slug('new')->save();
+
+        expect(Redirect::query()->where('site', 'default')->where('source', '/blog/tags/old')->get())->toHaveCount(0)
+            ->and(Redirect::query()->where('site', 'default')->where('source', '/tags/old')->first())->not->toBeNull();
+    });
+
+    it('creates a collection redirect when the term uses its own template', function () {
+        Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        Collection::make('posts')->routes('/posts/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['custom.term'], function () {
+            $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old', 'template' => 'custom.term']))->save();
+
+            $term->slug('new')->save();
+
+            $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/tags/old')->first();
+
+            expect($redirect)->not->toBeNull()
+                ->and($redirect->destination())->toBe('/blog/tags/new');
+        });
+    });
+
+    it('creates one redirect when the collection mount is the site root', function () {
+        Collection::make('pages')->routes('/')->sites(['default'])->saveQuietly();
+        $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
+
+        Collection::make('posts')->routes('/posts/{slug}')->mount($home->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () {
+            $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+
+            $term->slug('new')->save();
+
+            $redirects = Redirect::query()->where('site', 'default')->get();
+
+            expect($redirects)->toHaveCount(1)
+                ->and($redirects->first()->source())->toBe('/tags/old')
+                ->and($redirects->first()->destination())->toBe('/tags/new');
+        });
+    });
+
+    it('skips a collection url still owned by a published entry', function () {
+        Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/posts/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Collection::make('stories')->routes('/blog/tags/{slug}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () {
+            tap(Entry::make()->collection('stories')->locale('default')->slug('old'))->save();
+            $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+
+            $term->slug('new')->save();
+
+            $redirects = Redirect::query()->where('site', 'default')->get()
+                ->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+            expect($redirects)->toHaveCount(1)
+                ->and($redirects->get('/tags/old'))->toBe('/tags/new')
+                ->and($redirects->has('/blog/tags/old'))->toBeFalse();
+        });
+    });
+
+    it('repoints collection scoped term redirects to the newest url', function () {
+        Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        Collection::make('posts')->routes('/posts/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () {
+            $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('a')->data(['title' => 'A']))->save();
+
+            $term->slug('b')->save();
+            $term->slug('c')->save();
+
+            $redirects = Redirect::query()->where('site', 'default')->get()
+                ->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+            expect($redirects->get('/blog/tags/a'))->toBe('/blog/tags/c')
+                ->and($redirects->get('/blog/tags/b'))->toBe('/blog/tags/c');
+        });
+    });
+
+    it('deletes a collection scoped automatic redirect when the term is deleted', function () {
+        Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        Collection::make('posts')->routes('/posts/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () {
+            tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('target')->data(['title' => 'Target']))->save();
+            Redirect::make()->source('/blog/tags/old')->destination('/blog/tags/target')->site('default')->origin(RedirectOrigin::Automatic)->save();
+
+            Term::find('tags::target')->delete();
+
+            expect(Redirect::query()->where('site', 'default')->where('source', '/blog/tags/old')->get())->toHaveCount(0);
+        });
+    });
+
     it('creates nothing when saving without a slug change', function () {
         $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
 
@@ -1412,6 +1566,24 @@ describe('term redirects', function () {
             ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
     });
 });
+
+function withTermViews(array $templates, callable $callback): void
+{
+    $paths = collect($templates)->map(function (string $template) {
+        $path = resource_path('views/'.str_replace('.', '/', $template).'.antlers.html');
+
+        File::ensureDirectoryExists(dirname($path));
+        File::put($path, '');
+
+        return $path;
+    });
+
+    try {
+        $callback();
+    } finally {
+        $paths->each(fn (string $path) => File::delete($path));
+    }
+}
 
 function structuredPages(bool $withBio = false): array
 {
