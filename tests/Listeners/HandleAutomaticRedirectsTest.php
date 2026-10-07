@@ -5,8 +5,11 @@ use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -1013,6 +1016,62 @@ describe('structure redirects', function () {
         ]);
 
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates redirects for both trees when one save happens during the other', function () {
+        [$home, $about, $team] = structuredPages();
+
+        Collection::make('notes')
+            ->routes('/{parent_uri}/{slug}')
+            ->sites(['default'])
+            ->structureContents(['root' => false])
+            ->saveQuietly();
+
+        Blink::flush();
+
+        $alpha = tap(Entry::make()->collection('notes')->locale('default')->slug('alpha'))->save();
+        $beta = tap(Entry::make()->collection('notes')->locale('default')->slug('beta'))->save();
+
+        Collection::find('notes')->structure()->in('default')->tree([
+            ['entry' => $alpha->id(), 'children' => [
+                ['entry' => $beta->id()],
+            ]],
+        ])->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $team->id()],
+            ]],
+        ]);
+
+        forgetRedirects();
+
+        $nested = false;
+
+        Event::listen(CollectionTreeEntriesMovedOrRemoved::class, function () use (&$nested, $alpha, $beta) {
+            if ($nested) {
+                return;
+            }
+
+            $nested = true;
+
+            Collection::find('notes')->structure()->in('default')->tree([
+                ['entry' => $alpha->id()],
+                ['entry' => $beta->id()],
+            ])->save();
+        });
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $team->id()],
+        ]);
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/about/team'))->toBe("entry::{$team->id()}")
+            ->and($redirects->get('/alpha/beta'))->toBe("entry::{$beta->id()}");
     });
 
     it('creates a prefix-stripped redirect in the moved entry site', function () {

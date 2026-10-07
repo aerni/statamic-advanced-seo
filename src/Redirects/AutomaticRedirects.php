@@ -26,6 +26,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
+use Statamic\Structures\CollectionTree;
 
 class AutomaticRedirects
 {
@@ -39,7 +40,11 @@ class AutomaticRedirects
      */
     private array $childPages = [];
 
-    /** @var array<string, string> */
+    /**
+     * Stored paths of moved entries, keyed by collection and site.
+     *
+     * @var array<string, array<string, string>>
+     */
     private array $movedEntries = [];
 
     /** @var array<string, array<string, string|null>> */
@@ -74,7 +79,7 @@ class AutomaticRedirects
         }
 
         if ($event instanceof CollectionTreeSaved) {
-            $this->redirectMovedEntries();
+            $this->redirectMovedEntries($event->tree);
         }
     }
 
@@ -638,7 +643,11 @@ class AutomaticRedirects
             return;
         }
 
-        $this->movedEntries = $this->stashOriginalPaths($ids);
+        if (! $entry = EntryFacade::query()->whereIn('id', $ids)->first()) {
+            return;
+        }
+
+        $this->movedEntries[$entry->collectionHandle().'::'.$entry->locale()] = $this->stashOriginalPaths($ids);
     }
 
     /**
@@ -783,17 +792,18 @@ class AutomaticRedirects
      * registered earlier. Forget the URI caches anyway so a stale Blink
      * value from before the move can't hide the new path.
      */
-    private function redirectMovedEntries(): void
+    private function redirectMovedEntries(CollectionTree $tree): void
     {
         if (! RedirectsFeature::enabled()) {
             return;
         }
 
-        $paths = $this->movedEntries;
+        $key = $tree->handle().'::'.$tree->locale();
+        $paths = $this->movedEntries[$key] ?? [];
 
-        $this->movedEntries = [];
+        unset($this->movedEntries[$key]);
 
-        if (! $paths) {
+        if (empty($paths)) {
             return;
         }
 
