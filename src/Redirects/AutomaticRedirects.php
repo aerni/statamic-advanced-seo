@@ -681,7 +681,11 @@ class AutomaticRedirects
         $this->rewriteChildPageUris($entry, array_keys($paths));
 
         foreach ($paths as $id => $originalPath) {
-            $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
+            if (! $child = EntryFacade::find($id)) {
+                continue;
+            }
+
+            $this->processEntryRedirect($child, $originalPath);
         }
     }
 
@@ -816,7 +820,11 @@ class AutomaticRedirects
         Blink::store('structure-uris')->flush();
 
         foreach ($paths as $id => $originalPath) {
-            $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
+            if (! $entry = EntryFacade::find($id)) {
+                continue;
+            }
+
+            $this->processEntryRedirect($entry, $originalPath);
         }
     }
 
