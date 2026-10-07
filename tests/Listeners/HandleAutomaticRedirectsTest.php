@@ -198,6 +198,19 @@ describe('entry redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
+    it('creates nothing when a published term still owns the old url', function () {
+        Collection::find('pages')->routes('/tags/{slug}')->saveQuietly();
+        Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('shared')->data(['title' => 'Shared']))->save();
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('shared'))->save();
+
+        $entry->slug('moved')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
     it('creates nothing for a new entry', function () {
         tap(Entry::make()->collection('pages')->locale('default')->slug('fresh'))->save();
 
@@ -1112,6 +1125,18 @@ describe('structure redirects', function () {
 describe('term redirects', function () {
     beforeEach(function () {
         Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+    });
+
+    it('creates nothing when a published entry still owns the old url', function () {
+        Collection::make('pages')->routes('/tags/{slug}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        tap(Entry::make()->collection('pages')->locale('default')->slug('shared'))->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('shared')->data(['title' => 'Shared']))->save();
+
+        $term->slug('moved')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
     it('creates a permanent redirect when a term slug changes', function () {

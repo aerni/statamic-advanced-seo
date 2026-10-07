@@ -25,6 +25,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Stache;
+use Statamic\Facades\Term as TermFacade;
 use Statamic\Facades\YAML;
 use Statamic\Structures\CollectionTree;
 
@@ -769,6 +770,10 @@ class AutomaticRedirects
                 continue;
             }
 
+            if ($this->sourceIsOwnedByPublishedContent($originalPath, $site)) {
+                continue;
+            }
+
             $this->createRedirect($originalPath, $currentPath, $site);
             $this->repointStaleRedirectDestinations($originalPath, $currentPath, $site);
         }
@@ -835,7 +840,7 @@ class AutomaticRedirects
             return;
         }
 
-        if ($this->sourceIsOwnedByPublishedEntry($originalPath, $entry->locale())) {
+        if ($this->sourceIsOwnedByPublishedContent($originalPath, $entry->locale())) {
             return;
         }
 
@@ -869,9 +874,15 @@ class AutomaticRedirects
     }
 
     /**
-     * A source still owned by a published entry must remain routable and
+     * A source still owned by published content must remain routable and
      * must not be claimed by an automatic redirect.
      */
+    private function sourceIsOwnedByPublishedContent(string $source, string $site): bool
+    {
+        return $this->sourceIsOwnedByPublishedEntry($source, $site)
+            || $this->sourceIsOwnedByPublishedTerm($source, $site);
+    }
+
     private function sourceIsOwnedByPublishedEntry(string $source, string $site): bool
     {
         return EntryFacade::query()
@@ -879,6 +890,11 @@ class AutomaticRedirects
             ->where('uri', $source)
             ->whereStatus('published')
             ->exists();
+    }
+
+    private function sourceIsOwnedByPublishedTerm(string $source, string $site): bool
+    {
+        return TermFacade::findByUri($source, $site)?->status() === 'published';
     }
 
     /**
