@@ -220,9 +220,14 @@ class AutomaticRedirects
     {
         $path = $entry->initialPath();
 
+        // Flat file with no path. There is no datetime column, so use getOriginal().
+        if (! $path && ! method_exists($entry, 'model')) {
+            return $entry->getOriginal('date');
+        }
+
         // Eloquent: there is no file, so getOriginal() is still the pre-save date.
         if (! $path) {
-            return $entry->getOriginal('date');
+            return $this->eloquentOriginalDate($entry);
         }
 
         // Flat file: the previous date is still in the filename. A localization
@@ -233,6 +238,22 @@ class AutomaticRedirects
         }
 
         return $entry->hasOrigin() ? $this->originalDate($entry->origin()) : null;
+    }
+
+    /**
+     * The Eloquent date stored before this save. getOriginal('date') only keeps
+     * the minute, so a value with seconds is read from the column.
+     */
+    private function eloquentOriginalDate(Entry $entry): ?string
+    {
+        $stored = $entry->model()->getOriginal('date');
+        $date = $stored ? Carbon::parse($stored) : null;
+
+        if ($date && ($date->second || $entry->hasSeconds())) {
+            return $date->format('Y-m-d-His');
+        }
+
+        return $entry->getOriginal('date');
     }
 
     /**

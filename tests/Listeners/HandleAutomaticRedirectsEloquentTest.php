@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\File;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
 use Statamic\Eloquent\Taxonomies\Term as EloquentTerm;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -55,6 +56,42 @@ it('creates a redirect when an eloquent entry date changes the url', function ()
     $entry->date('2025-06-20')->save();
 
     $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/2024/post')->first();
+
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
+it('creates a redirect when an eloquent entry date changes by seconds', function () {
+    Collection::make('posts')
+        ->dated(true)
+        ->routes('/{{ date format="Y-m-d-H-i-s" }}/{{ slug }}')
+        ->sites(['default'])
+        ->saveQuietly();
+
+    Blueprint::make('collections.posts::post')->setContents([
+        'tabs' => [
+            'main' => [
+                'sections' => [[
+                    'fields' => [[
+                        'handle' => 'date',
+                        'field' => [
+                            'type' => 'date',
+                            'time_enabled' => true,
+                            'time_seconds_enabled' => true,
+                        ],
+                    ]],
+                ]],
+            ],
+        ],
+    ])->save();
+
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date('2024-01-15-103045'))->save();
+
+    $entry->date('2024-01-15-103050')->save();
+
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/2024-01-15-10-30-45/post')->first();
 
     expect($redirect)->not->toBeNull()
         ->and($redirect->destination())->toBe("entry::{$entry->id()}");
