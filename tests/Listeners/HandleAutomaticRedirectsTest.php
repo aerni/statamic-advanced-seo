@@ -95,6 +95,19 @@ describe('entry redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
+    it('creates a redirect when the first value of an array route field changes', function () {
+        Collection::find('pages')->routes('/{{ categories | first }}/{{ slug }}')->save();
+
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('categories', ['news']))->save();
+
+        $entry->set('categories', ['updates'])->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/news/post')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
     it('creates nothing when a field changes that is not in the route', function () {
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('category', 'news'))->save();
 

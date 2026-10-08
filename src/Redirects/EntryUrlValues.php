@@ -40,9 +40,16 @@ readonly class EntryUrlValues
     /**
      * Printed route-token text. Compare this instead of the stored value:
      * 0 and "0" are the same segment, and clearing a 0 removes that segment.
+     * An array is compared value by value, so 0 and "0" still match inside it.
      */
     private function urlText(mixed $value): string
     {
+        if (is_array($value)) {
+            return collect($value)
+                ->map(fn (mixed $item) => $this->urlText($item))
+                ->implode("\0");
+        }
+
         if ($value === null || $value === false || $value === '') {
             return '';
         }
