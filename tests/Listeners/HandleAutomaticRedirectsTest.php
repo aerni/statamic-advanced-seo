@@ -465,6 +465,47 @@ describe('entry redirects', function () {
             ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
     });
 
+    it('creates a redirect when a localization replaces its inherited date', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->dated(true)->routes('/{year}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        forgetRedirects();
+
+        $fr->date('2025-06-20')->save();
+
+        $redirect = Redirect::query()->where('site', 'fr')->where('source', '/2024/article')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$fr->id()}")
+            ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing for a localization when the inherited date was never public', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->dated(true)->futureDateBehavior('private')->routes('/{year}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2999-01-01'))->save();
+        tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        forgetRedirects();
+
+        $en->date('2024-06-20')->save();
+
+        expect(Redirect::query()->where('site', 'en')->get())->toHaveCount(0)
+            ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
+    });
+
     it('creates a redirect for a localized child page when an inherited date changes the url', function () {
         Site::setSites([
             'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],

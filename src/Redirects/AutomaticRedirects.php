@@ -153,24 +153,11 @@ class AutomaticRedirects
      */
     private function wasLive(Entry $entry): bool
     {
-        $path = $entry->initialPath();
-
-        // Flat file: the previous published flag is still in the file, and the
-        // date is still in the filename. getOriginal() has already been replaced.
-        if ($path) {
-            $published = YAML::file($path)->parse()['published'] ?? true;
-            $date = $this->parseDate((new GetDateFromPath)($path));
-        }
-
-        // Eloquent: there is no file, so getOriginal() is still the pre-save values.
-        if (! $path) {
-            $published = $entry->getOriginal('published');
-            $date = $this->parseDate($entry->getOriginal('date'));
-        }
-
-        if (! $published) {
+        if (! $this->wasPublished($entry)) {
             return false;
         }
+
+        $date = $this->parseDate($this->originalDate($entry));
 
         $collection = $entry->collection();
 
@@ -184,6 +171,22 @@ class AutomaticRedirects
         }
 
         return true;
+    }
+
+    /**
+     * Whether the entry was published before this save. The flag on the entry
+     * itself is already the new one.
+     */
+    private function wasPublished(Entry $entry): bool
+    {
+        // Flat file: the previous published flag is still in the file.
+        // getOriginal() has already been replaced.
+        if ($path = $entry->initialPath()) {
+            return (bool) (YAML::file($path)->parse()['published'] ?? true);
+        }
+
+        // Eloquent: there is no file, so getOriginal() is still the pre-save value.
+        return (bool) $entry->getOriginal('published');
     }
 
     /**
@@ -211,6 +214,28 @@ class AutomaticRedirects
     }
 
     /**
+     * The date stored before this save.
+     */
+    private function originalDate(Entry $entry): ?string
+    {
+        $path = $entry->initialPath();
+
+        // Eloquent: there is no file, so getOriginal() is still the pre-save date.
+        if (! $path) {
+            return $entry->getOriginal('date');
+        }
+
+        // Flat file: the previous date is still in the filename. A localization
+        // that inherits its date has none, so the origin's stored date is used.
+        // getOriginal() has already been replaced.
+        if ($date = (new GetDateFromPath)($path)) {
+            return $date;
+        }
+
+        return $entry->hasOrigin() ? $this->originalDate($entry->origin()) : null;
+    }
+
+    /**
      * Previous values that differ from the entry now.
      * Route fields include tokens used by a localization route.
      * Empty when none of those values changed.
@@ -234,7 +259,7 @@ class AutomaticRedirects
         if ($path = $entry->initialPath()) {
             return new EntryUrlValues(
                 slug: (new GetSlugFromPath)($path),
-                date: (new GetDateFromPath)($path),
+                date: $this->originalDate($entry),
                 data: $this->routeFieldValues($entry),
             );
         }
@@ -243,7 +268,7 @@ class AutomaticRedirects
         if ($slug = $entry->getOriginal('slug')) {
             return new EntryUrlValues(
                 slug: $slug,
-                date: $entry->getOriginal('date'),
+                date: $this->originalDate($entry),
                 data: $this->routeFieldValues($entry),
             );
         }
@@ -432,7 +457,9 @@ class AutomaticRedirects
                 continue;
             }
 
-            $this->entries += $this->stashOriginalPaths([$localization]);
+            if ($this->wasLive($localization)) {
+                $this->entries += $this->stashOriginalPaths([$localization]);
+            }
 
             $this->stashChildPagePaths($localization);
 
