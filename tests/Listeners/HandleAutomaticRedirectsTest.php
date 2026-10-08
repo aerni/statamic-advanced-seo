@@ -267,6 +267,25 @@ describe('entry redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
+    it('creates a redirect when an automatic title changes the url', function () {
+        Collection::make('pages')->routes('/{title}')->titleFormats(['default' => '{{ name }}'])->sites(['default'])->saveQuietly();
+
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->data([
+            'title' => 'Hello',
+            'name' => 'Hello',
+        ]))->save();
+
+        forgetRedirects();
+
+        $entry->set('name', 'World')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/hello')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}")
+            ->and(Entry::find($entry->id())->get('title'))->toBe('World');
+    });
+
     it('creates nothing when an expired entry is published and its slug changes in the same save', function () {
         Collection::make('posts')->dated(true)->pastDateBehavior('private')->routes('/blog/{slug}')->sites(['default'])->saveQuietly();
 
