@@ -283,6 +283,20 @@ class AutomaticRedirects
     }
 
     /**
+     * True when the route field was stored on the entry before this save.
+     * An absent field inherits. A stored null does not.
+     */
+    private function routeFieldWasStored(Entry $entry, string $token): bool
+    {
+        // Flat file reads the file. Eloquent reads getOriginal().
+        $source = ($path = $entry->initialPath())
+            ? YAML::file($path)->parse()
+            : $entry->getOriginal();
+
+        return array_key_exists($token, $source);
+    }
+
+    /**
      * Route tokens that read an entry field, ignoring slug, date, and the
      * structure tokens Statamic fills in itself.
      * Null when the route has none.
@@ -334,45 +348,33 @@ class AutomaticRedirects
     }
 
     /**
-     * Let the routing compute the URL the entry had before this save by
-     * temporarily restoring the previous slug, date, and route fields. The
-     * cached uri has to be flushed for the swapped values to take effect.
+     * Let the routing compute the URL the entry had before this save.
+     * The previous slug, date, and route fields are applied to a copy so the
+     * entry Statamic is about to save is left untouched. A route field that
+     * was not stored is removed, because setting null would stop inheritance.
+     * The cached uri has to be flushed: the copy shares the entry id.
      */
     private function originalUrl(Entry $entry, EntryUrlValues $values): ?string
     {
-        $slug = $entry->slug();
-        $date = $entry->date();
-        $data = collect($values->data ?? [])
-            ->map(fn (mixed $value, string $token) => $entry->get($token))
-            ->all();
+        $copy = clone $entry;
 
         if ($values->slug !== null) {
-            $entry->slug($values->slug);
+            $copy->slug($values->slug);
         }
 
         if ($values->date !== null) {
-            $entry->date($values->date);
+            $copy->date($values->date);
         }
 
         foreach ($values->data ?? [] as $token => $value) {
-            $entry->set($token, $value);
+            $this->routeFieldWasStored($entry, $token)
+                ? $copy->set($token, $value)
+                : $copy->remove($token);
         }
 
-        Blink::store('entry-uris')->forget($entry->id());
+        Blink::store('entry-uris')->forget($copy->id());
 
-        $url = $entry->absoluteUrlWithoutRedirect();
-
-        if ($values->slug !== null) {
-            $entry->slug($slug);
-        }
-
-        if ($values->date !== null) {
-            $entry->date($date);
-        }
-
-        foreach ($data as $token => $value) {
-            $entry->set($token, $value);
-        }
+        $url = $copy->absoluteUrlWithoutRedirect();
 
         Blink::store('entry-uris')->forget($entry->id());
 

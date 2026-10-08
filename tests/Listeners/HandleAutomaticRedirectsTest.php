@@ -319,6 +319,28 @@ describe('entry redirects', function () {
             ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
     });
 
+    it('keeps a cleared localization route field absent', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->routes('/{category}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article')->set('category', 'actualites'))->save();
+
+        forgetRedirects();
+
+        $fr->remove('category')->save();
+
+        $redirect = Redirect::query()->where('site', 'fr')->where('source', '/actualites/article')->first();
+
+        expect(Entry::find($fr->id())->has('category'))->toBeFalse()
+            ->and($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$fr->id()}");
+    });
+
     it('creates a redirect when a localization route uses a field the origin route does not', function () {
         Site::setSites([
             'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
