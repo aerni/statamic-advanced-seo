@@ -360,6 +360,52 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$fr->id()}");
     });
 
+    it('creates a redirect when a localization stops storing null and inherits', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->routes('/{category}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article')->set('category', null))->save();
+
+        forgetRedirects();
+
+        $fr->remove('category')->save();
+
+        $redirect = Redirect::query()->where('site', 'fr')->where('source', '/article')->first();
+
+        expect(Entry::find($fr->id())->has('category'))->toBeFalse()
+            ->and($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$fr->id()}");
+    });
+
+    it('creates a redirect when a localization stores null over an inherited route field', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->routes('/{category}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        forgetRedirects();
+
+        $fr->set('category', null)->save();
+
+        $redirect = Redirect::query()->where('site', 'fr')->where('source', '/news/article')->first();
+        $saved = Entry::find($fr->id());
+
+        expect($saved->has('category'))->toBeTrue()
+            ->and($saved->get('category'))->toBeNull()
+            ->and($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$fr->id()}");
+    });
+
     it('creates a redirect when a localization route uses a field the origin route does not', function () {
         Site::setSites([
             'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
