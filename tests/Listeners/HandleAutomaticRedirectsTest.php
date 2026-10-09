@@ -1318,6 +1318,17 @@ describe('term redirects', function () {
             ->and($redirect->origin())->toBe(RedirectOrigin::Automatic);
     });
 
+    it('creates a redirect when a term slug of zero changes', function () {
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('0')->data(['title' => 'Zero']))->save();
+
+        $term->slug('new')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/tags/0')->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe('/tags/new');
+    });
+
     it('creates a redirect for each collection the term is served under', function () {
         Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
         $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();

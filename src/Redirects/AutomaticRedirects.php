@@ -827,7 +827,7 @@ class AutomaticRedirects
 
         unset($this->terms[$term->id()]);
 
-        $baseSlugChanged = $originalSlug && $originalSlug !== $newSlug;
+        $baseSlugChanged = filled($originalSlug) && $originalSlug !== $newSlug;
 
         // Skip new terms and saves that move no URL.
         if (! $baseSlugChanged && $originalSlugs === []) {
