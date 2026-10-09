@@ -149,6 +149,24 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
     });
 
+    it('creates a redirect when a dated entry without a filename date gets an explicit date', function () {
+        Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post'))->save();
+
+        $year = $entry->date()->format('Y');
+
+        expect(basename($entry->initialPath()))->toBe('post.md');
+
+        $entry->date('2019-03-04')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', "/blog/{$year}/post")->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
     it('creates a redirect when a route token field changes the url', function () {
         Collection::find('pages')->routes('/{category}/{slug}')->save();
 

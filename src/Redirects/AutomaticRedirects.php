@@ -242,7 +242,39 @@ class AutomaticRedirects
             return $date;
         }
 
-        return $entry->hasOrigin() ? $this->originalDate($entry->origin()) : null;
+        if ($entry->hasOrigin()) {
+            return $this->originalDate($entry->origin());
+        }
+
+        // A dated entry with no date in the filename is still public at its modified time.
+        if ($entry->collection()->dated()) {
+            return $this->lastModifiedDate($entry);
+        }
+
+        return null;
+    }
+
+    /**
+     * The public date when the filename has none. Statamic uses the file's modified time.
+     */
+    private function lastModifiedDate(Entry $entry): string
+    {
+        // The date being saved is already on the entry. A copy with no date
+        // resolves the modified time the way the public URL did.
+        $copy = clone $entry;
+        $copy->date(null);
+
+        $format = 'Y-m-d';
+
+        if ($copy->hasTime()) {
+            $format .= '-Hi';
+        }
+
+        if ($copy->hasSeconds()) {
+            $format .= 's';
+        }
+
+        return $copy->date()->copy()->setTimezone(config('app.timezone'))->format($format);
     }
 
     /**
