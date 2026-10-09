@@ -466,7 +466,8 @@ class AutomaticRedirects
                 : $this->inheritedRouteValue($entry, $token);
         }
 
-        $date = $original->date ? $entry->date()?->format(match (strlen($original->date)) {
+        // Formatting the UTC date directly can show the day before the one in the filename.
+        $date = $original->date ? $entry->date()?->copy()->setTimezone(config('app.timezone'))->format(match (strlen($original->date)) {
             15 => 'Y-m-d-Hi',
             17 => 'Y-m-d-His',
             default => 'Y-m-d',

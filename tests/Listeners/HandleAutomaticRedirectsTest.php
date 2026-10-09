@@ -11,6 +11,7 @@ use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -147,6 +148,46 @@ describe('entry redirects', function () {
 
         expect($redirect)->not->toBeNull()
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
+    it('creates a redirect when the control panel moves a date across the utc day', function () {
+        $timezone = config('app.timezone');
+
+        try {
+            config(['app.timezone' => 'Europe/Zurich']);
+
+            Collection::make('journal')->dated(true)->routes('/blog/{year}/{month}/{day}/{slug}')->sites(['default'])->saveQuietly();
+
+            Blueprint::make('collections.journal::journal')->setContents([
+                'tabs' => [
+                    'main' => [
+                        'sections' => [[
+                            'fields' => [[
+                                'handle' => 'date',
+                                'field' => [
+                                    'type' => 'date',
+                                    'required' => true,
+                                ],
+                            ]],
+                        ]],
+                    ],
+                ],
+            ])->save();
+
+            Blink::flush();
+
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date('2024-01-15'))->save();
+
+            // The control panel augments the date field, which returns a UTC Carbon.
+            $entry->date($entry->blueprint()->field('date')->fieldtype()->augment('2024-01-16'))->save();
+
+            $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/2024/01/15/post')->first();
+
+            expect($redirect)->not->toBeNull()
+                ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+        } finally {
+            config(['app.timezone' => $timezone]);
+        }
     });
 
     it('creates a redirect when a dated entry without a filename date gets an explicit date', function () {
