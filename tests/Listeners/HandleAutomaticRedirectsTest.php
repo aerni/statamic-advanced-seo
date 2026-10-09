@@ -62,6 +62,66 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
     });
 
+    it('creates nothing when the collection has no route', function () {
+        Collection::make('notes')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('notes')->locale('default')->slug('old'))->save();
+
+        $entry->slug('new')->save();
+
+        expect(Redirect::query()->get())->toHaveCount(0);
+    });
+
+    it('creates a redirect only for the localization whose site has a route', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->routes([
+            'fr' => '/{category}/{slug}',
+        ])->sites(['en', 'fr'])->saveQuietly();
+        Blink::flush();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        forgetRedirects();
+
+        $en->set('category', 'updates')->save();
+
+        $localization = Redirect::query()->where('site', 'fr')->where('source', '/news/article')->first();
+
+        expect(Redirect::query()->where('site', 'en')->get())->toHaveCount(0)
+            ->and($localization)->not->toBeNull()
+            ->and($localization->destination())->toBe("entry::{$fr->id()}");
+    });
+
+    it('creates nothing for a localization whose site has no route', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->routes([
+            'en' => '/{category}/{slug}',
+        ])->sites(['en', 'fr'])->saveQuietly();
+        Blink::flush();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->set('category', 'news'))->save();
+        tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        forgetRedirects();
+
+        $en->set('category', 'updates')->save();
+
+        $origin = Redirect::query()->where('site', 'en')->where('source', '/news/post')->first();
+
+        expect($origin?->destination())->toBe("entry::{$en->id()}")
+            ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
+    });
+
     it('creates a permanent redirect pointing at the entry when the slug changes', function () {
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('old'))->save();
 
@@ -1320,6 +1380,21 @@ describe('structure redirects', function () {
 describe('term redirects', function () {
     beforeEach(function () {
         Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+
+        // Existing tests expect the canonical term URL. Statamic only serves it
+        // when the term view exists, so the default templates are present here.
+        foreach (['tags.show', 'topics.show'] as $template) {
+            $path = resource_path('views/'.str_replace('.', '/', $template).'.antlers.html');
+
+            File::ensureDirectoryExists(dirname($path));
+            File::put($path, '');
+        }
+    });
+
+    afterEach(function () {
+        foreach (['tags.show', 'topics.show'] as $template) {
+            File::delete(resource_path('views/'.str_replace('.', '/', $template).'.antlers.html'));
+        }
     });
 
     it('creates nothing when a published entry still owns the old url', function () {
@@ -1332,6 +1407,73 @@ describe('term redirects', function () {
         $term->slug('moved')->save();
 
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates nothing when the term view is missing', function () {
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data([
+            'title' => 'Old',
+            'template' => 'tags.missing',
+        ]))->save();
+
+        $term->slug('new')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+
+    it('creates a redirect only for the localization whose term view exists', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+
+        withTermViews(['topics.fr'], function () {
+            Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data([
+                'title' => 'Old',
+                'template' => 'topics.missing',
+            ])->save();
+
+            Term::find('topics::old')->in('fr')->data([
+                'title' => 'Vieux',
+                'template' => 'topics.fr',
+            ])->save();
+
+            Redirect::query()->get()->each->delete();
+
+            Term::find('topics::old')->in('en')->slug('new')->save();
+
+            $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/old')->first();
+
+            expect(Redirect::query()->where('site', 'en')->get())->toHaveCount(0)
+                ->and($fr)->not->toBeNull()
+                ->and($fr->destination())->toBe('/topics/new');
+        });
+    });
+
+    it('creates nothing for a localization whose term view is missing', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
+
+        Term::find('topics::old')->in('fr')->data([
+            'title' => 'Vieux',
+            'template' => 'topics.missing',
+        ])->save();
+
+        Redirect::query()->get()->each->delete();
+
+        Term::find('topics::old')->in('en')->slug('new')->save();
+
+        $en = Redirect::query()->where('site', 'en')->where('source', '/topics/old')->first();
+
+        expect($en?->destination())->toBe('/topics/new')
+            ->and(Redirect::query()->where('site', 'fr')->get())->toHaveCount(0);
     });
 
     it('creates a permanent redirect when a term slug changes', function () {

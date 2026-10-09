@@ -96,9 +96,9 @@ class AutomaticRedirects
     }
 
     /**
-     * Redirects are enabled and this item is published. Child pages and
-     * localizations are checked on their own, so a false result here does
-     * not stop the rest of the save.
+     * Redirects are enabled and this item is published. An entry also needs
+     * a route for its site. Child pages and localizations are checked on
+     * their own, so a false result here does not stop the rest of the save.
      */
     private function isRedirectable(Entry|Term $item): bool
     {
@@ -112,6 +112,11 @@ class AutomaticRedirects
         };
 
         if (! Seo::find($handle)?->config()->value('redirects')) {
+            return false;
+        }
+
+        // No route on this site means no public URL. A localization uses its own.
+        if ($item instanceof Entry && ! $item->route()) {
             return false;
         }
 
@@ -806,8 +811,10 @@ class AutomaticRedirects
      * A base-slug change flows to every localization that inherits it, so a
      * redirect is created per site. A localization whose own slug changed is
      * redirected on its own. An unchanged override drops out (old URL equals
-     * new URL). A collection adds another path when Statamic would serve the
-     * term there: the collection is mounted, and the term view exists.
+     * new URL). A path is included when Statamic would serve that page. The
+     * canonical URL needs the term view, checked per localization because a
+     * site can set its own template. A collection adds its path when it is
+     * mounted and that view exists.
      *
      * TODO: Statamic PR #15192 (draft) adds configurable term routes. A term
      * URL is only the slug today, so this only watches slug changes. Once
@@ -911,7 +918,8 @@ class AutomaticRedirects
             ->prepend([
                 'site' => $localized->locale(),
                 'collection' => null,
-                'path' => $localized->uri(),
+                // This localization is public only when its term view exists.
+                'path' => view()->exists($localized->template()) ? $localized->uri() : null,
             ])
             ->filter(fn (array $path) => $path['path'])
             ->unique('path')

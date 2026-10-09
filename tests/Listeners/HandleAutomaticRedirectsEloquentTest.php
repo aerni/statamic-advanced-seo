@@ -178,21 +178,29 @@ it('creates a redirect when an eloquent term localization slug changes', functio
     Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
     Blink::flush();
 
-    Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
+    $path = resource_path('views/topics/show.antlers.html');
+    File::ensureDirectoryExists(dirname($path));
+    File::put($path, '');
 
-    expect(Term::find('topics::old'))->toBeInstanceOf(EloquentTerm::class);
+    try {
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
 
-    Term::find('topics::old')->in('fr')->slug('vieux')->save();
+        expect(Term::find('topics::old'))->toBeInstanceOf(EloquentTerm::class);
 
-    eloquentForgetRedirects();
+        Term::find('topics::old')->in('fr')->slug('vieux')->save();
 
-    Term::find('topics::old')->in('fr')->slug('ancien')->save();
+        eloquentForgetRedirects();
 
-    $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+        Term::find('topics::old')->in('fr')->slug('ancien')->save();
 
-    expect($fr)->not->toBeNull()
-        ->and($fr->destination())->toBe('/topics/ancien')
-        ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
+        $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+
+        expect($fr)->not->toBeNull()
+            ->and($fr->destination())->toBe('/topics/ancien')
+            ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
+    } finally {
+        File::delete($path);
+    }
 });
 
 it('creates a redirect when an eloquent term localization slug changes and the base slug is zero', function () {
@@ -204,18 +212,26 @@ it('creates a redirect when an eloquent term localization slug changes and the b
     Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
     Blink::flush();
 
-    Term::make()->taxonomy('topics')->inDefaultLocale()->slug('0')->data(['title' => 'Zero'])->save();
+    $path = resource_path('views/topics/show.antlers.html');
+    File::ensureDirectoryExists(dirname($path));
+    File::put($path, '');
 
-    Term::find('topics::0')->in('fr')->slug('vieux')->save();
+    try {
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('0')->data(['title' => 'Zero'])->save();
 
-    eloquentForgetRedirects();
+        Term::find('topics::0')->in('fr')->slug('vieux')->save();
 
-    Term::find('topics::0')->in('fr')->slug('ancien')->save();
+        eloquentForgetRedirects();
 
-    $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+        Term::find('topics::0')->in('fr')->slug('ancien')->save();
 
-    expect($fr)->not->toBeNull()
-        ->and($fr->destination())->toBe('/topics/ancien');
+        $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+
+        expect($fr)->not->toBeNull()
+            ->and($fr->destination())->toBe('/topics/ancien');
+    } finally {
+        File::delete($path);
+    }
 });
 
 it('creates a redirect when an eloquent entry moves in the tree', function () {
