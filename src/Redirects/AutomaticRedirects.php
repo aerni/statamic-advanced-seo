@@ -60,6 +60,9 @@ class AutomaticRedirects
             $this->stashEntry($event->entry);
             $this->stashChildPages($event->entry);
             $this->stashEntryLocalizations($event->entry);
+
+            // The next save() of this entry in this process has to read its own values.
+            Blink::forget($this->changedBlinkKey($event->entry));
         }
 
         if ($event instanceof TermSaving) {
@@ -300,10 +303,21 @@ class AutomaticRedirects
      */
     private function changedValues(Entry $entry): EntryUrlValues
     {
-        $original = $this->originalValues($entry);
-        $current = $this->currentValues($entry, $original);
+        // The entry, its child pages, and its localizations each ask during this save.
+        return Blink::once($this->changedBlinkKey($entry), function () use ($entry) {
+            $original = $this->originalValues($entry);
+            $current = $this->currentValues($entry, $original);
 
-        return $original->diff($current);
+            return $original->diff($current);
+        });
+    }
+
+    /**
+     * Blink key for the changed values of one entry save.
+     */
+    private function changedBlinkKey(Entry $entry): string
+    {
+        return "advanced-seo::automatic-redirects::changed::{$entry->id()}::{$entry->locale()}";
     }
 
     /**
@@ -546,7 +560,7 @@ class AutomaticRedirects
         }
 
         foreach ($entry->descendants() as $localization) {
-            if (! $this->inheritsChangedValues($entry, $localization, $changed)) {
+            if (! $this->inheritsChangedValues($entry, $localization)) {
                 continue;
             }
 
@@ -570,8 +584,10 @@ class AutomaticRedirects
      * so it uses the origin's value. A route field only counts when this
      * localization's route uses it.
      */
-    private function inheritsChangedValues(Entry $origin, Entry $localization, EntryUrlValues $changed): bool
+    private function inheritsChangedValues(Entry $origin, Entry $localization): bool
     {
+        $changed = $this->changedValues($origin);
+
         $inheritsDate = $changed->date && $this->inheritsDate($origin, $localization);
 
         $inheritsField = collect($changed->data)
