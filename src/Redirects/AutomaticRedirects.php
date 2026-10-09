@@ -278,17 +278,13 @@ class AutomaticRedirects
         // Flat file: the previous slug and date are still in the filename.
         // getOriginal() has already been replaced with the new values.
         if ($path = $entry->initialPath()) {
-            return new EntryUrlValues(
-                slug: (new GetSlugFromPath)($path),
-                date: $this->originalDate($entry),
-                data: $this->routeFieldValues($entry),
-            );
-        }
+            $slug = (new GetSlugFromPath)($path);
 
-        // Eloquent: there is no file, so getOriginal() is still the pre-save slug, date, and data.
-        $slug = $entry->getOriginal('slug');
+            // A collection without slugs names the file after the id. That is no slug.
+            if (! $entry->collection()->requiresSlugs() && $slug === $entry->id()) {
+                $slug = null;
+            }
 
-        if (filled($slug)) {
             return new EntryUrlValues(
                 slug: $slug,
                 date: $this->originalDate($entry),
@@ -296,8 +292,17 @@ class AutomaticRedirects
             );
         }
 
-        // No file and no previous slug: the entry has never been saved.
-        return new EntryUrlValues;
+        // First save. getOriginal() is still empty, and an Eloquent entry has no
+        // model yet. An empty result means this save changed nothing.
+        if (! array_key_exists('slug', $entry->getOriginal())) {
+            return new EntryUrlValues;
+        }
+
+        return new EntryUrlValues(
+            slug: $entry->getOriginal('slug'),
+            date: $this->originalDate($entry),
+            data: $this->routeFieldValues($entry),
+        );
     }
 
     /**

@@ -32,6 +32,36 @@ describe('entry redirects', function () {
         Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
     });
 
+    it('creates a redirect when a slugless entry route field changes', function () {
+        Collection::make('notes')->requiresSlugs(false)->routes('/{section}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('notes')->locale('default')->set('section', 'news'))->save();
+
+        $entry->set('section', 'updates')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/news')->first();
+
+        expect($entry->slug())->toBeNull()
+            ->and($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}")
+            ->and(Redirect::query()->where('source', '/'.$entry->id())->get())->toHaveCount(0);
+    });
+
+    it('creates a redirect from the id when a slugless entry route uses the id', function () {
+        Collection::make('notes')->requiresSlugs(false)->routes('/{id}/{section}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('notes')->locale('default')->set('section', 'news'))->save();
+
+        $entry->set('section', 'updates')->save();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', "/{$entry->id()}/news")->first();
+
+        expect($redirect)->not->toBeNull()
+            ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+    });
+
     it('creates a permanent redirect pointing at the entry when the slug changes', function () {
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('old'))->save();
 

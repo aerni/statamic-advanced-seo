@@ -31,6 +31,23 @@ beforeEach(function () {
         ->save();
 });
 
+it('creates a redirect when an eloquent slugless entry route field changes', function () {
+    Collection::make('notes')->requiresSlugs(false)->routes('/{section}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('notes')->locale('default')->set('section', 'news'))->save();
+
+    expect($entry)->toBeInstanceOf(EloquentEntry::class)
+        ->and($entry->slug())->toBeNull();
+
+    $entry->set('section', 'updates')->save();
+
+    $redirect = Redirect::query()->where('site', 'default')->where('source', '/news')->first();
+
+    expect($redirect)->not->toBeNull()
+        ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
 it('creates a redirect when an eloquent entry slug changes', function () {
     Collection::make('articles')->routes('/{slug}')->sites(['default'])->saveQuietly();
     Blink::flush();
