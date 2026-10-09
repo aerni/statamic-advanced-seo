@@ -178,6 +178,29 @@ it('creates a redirect when an eloquent term localization slug changes', functio
         ->and(Redirect::query()->where('site', 'en')->get())->toHaveCount(0);
 });
 
+it('creates a redirect when an eloquent term localization slug changes and the base slug is zero', function () {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Taxonomy::make('topics')->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    Term::make()->taxonomy('topics')->inDefaultLocale()->slug('0')->data(['title' => 'Zero'])->save();
+
+    Term::find('topics::0')->in('fr')->slug('vieux')->save();
+
+    eloquentForgetRedirects();
+
+    Term::find('topics::0')->in('fr')->slug('ancien')->save();
+
+    $fr = Redirect::query()->where('site', 'fr')->where('source', '/topics/vieux')->first();
+
+    expect($fr)->not->toBeNull()
+        ->and($fr->destination())->toBe('/topics/ancien');
+});
+
 it('creates a redirect when an eloquent entry moves in the tree', function () {
     [$home, $about, $team] = eloquentStructuredPages();
 

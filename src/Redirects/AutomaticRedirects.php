@@ -286,7 +286,9 @@ class AutomaticRedirects
         }
 
         // Eloquent: there is no file, so getOriginal() is still the pre-save slug, date, and data.
-        if ($slug = $entry->getOriginal('slug')) {
+        $slug = $entry->getOriginal('slug');
+
+        if (filled($slug)) {
             return new EntryUrlValues(
                 slug: $slug,
                 date: $this->originalDate($entry),
@@ -685,7 +687,7 @@ class AutomaticRedirects
         }
 
         // No file and no previous slug: the term has never been saved.
-        if ($data === null && ! $term->getOriginal('slug')) {
+        if ($data === null && ! filled($term->getOriginal('slug'))) {
             return null;
         }
 
