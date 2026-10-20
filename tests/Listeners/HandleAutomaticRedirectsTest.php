@@ -1494,6 +1494,26 @@ describe('mount redirects', function () {
             ->and($redirects->get('/blog/world'))->toBe("entry::{$world->id()}");
     });
 
+    it('redirects each mounted term to its new path', function () {
+        Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () use ($blog) {
+            tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('news')->data(['title' => 'News']))->save();
+
+            forgetRedirects();
+
+            $blog->slug('journal')->save();
+
+            expect(redirectMap()->get('/blog/tags/news'))->toBe('/journal/tags/news')
+                ->and(redirectMap()->has('/tags/news'))->toBeFalse();
+        });
+    });
+
     it('follows a later entry slug change after the mount redirect', function () {
         $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
 

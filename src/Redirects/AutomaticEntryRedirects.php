@@ -8,12 +8,16 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Stache;
+use Statamic\Facades\Term as TermFacade;
+use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Structures\CollectionTree;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class AutomaticEntryRedirects
 {
@@ -32,6 +36,13 @@ class AutomaticEntryRedirects
      * @var array<string, array<string, string>>
      */
     private array $affectedEntries = [];
+
+    /**
+     * Old collection term paths, keyed the same way as $affectedEntries.
+     *
+     * @var array<string, list<array{term: string, site: string, collection: string, path: string}>>
+     */
+    private array $affectedCollectionTerms = [];
 
     public function __construct(
         private EntryUrlChange $urls,
@@ -84,10 +95,11 @@ class AutomaticEntryRedirects
     {
         $key = "{$tree->handle()}::{$tree->locale()}";
         $paths = $this->affectedEntries[$key] ?? [];
+        $terms = $this->affectedCollectionTerms[$key] ?? [];
 
-        unset($this->affectedEntries[$key]);
+        unset($this->affectedEntries[$key], $this->affectedCollectionTerms[$key]);
 
-        if ($paths === []) {
+        if ($paths === [] && $terms === []) {
             return;
         }
 
@@ -97,7 +109,7 @@ class AutomaticEntryRedirects
         // The moved pages were already rewritten. Entries mounted on them were not.
         $this->rewriteCollections($this->idsByCollection($paths, $tree->handle()));
 
-        $this->redirectAffected($paths);
+        $this->redirectAffected($paths, $terms);
     }
 
     /**
@@ -374,30 +386,33 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Forget the entries affected by this save, then redirect them.
+     * Forget the entries and terms affected by this save, then redirect them.
      */
     private function redirectMovedBySave(Entry $entry): void
     {
         $paths = $this->affectedEntries[$entry->id()] ?? [];
+        $terms = $this->affectedCollectionTerms[$entry->id()] ?? [];
 
-        unset($this->affectedEntries[$entry->id()]);
+        unset($this->affectedEntries[$entry->id()], $this->affectedCollectionTerms[$entry->id()]);
 
-        if ($paths === []) {
+        if ($paths === [] && $terms === []) {
             return;
         }
 
-        $idsByCollection = $this->idsByCollection($paths);
-        $ownIds = $idsByCollection[$entry->collectionHandle()] ?? [];
+        if ($paths !== []) {
+            $idsByCollection = $this->idsByCollection($paths);
+            $ownIds = $idsByCollection[$entry->collectionHandle()] ?? [];
 
-        unset($idsByCollection[$entry->collectionHandle()]);
+            unset($idsByCollection[$entry->collectionHandle()]);
 
-        if ($ownIds !== []) {
-            $this->rewriteChildPageUris($entry, $ownIds);
+            if ($ownIds !== []) {
+                $this->rewriteChildPageUris($entry, $ownIds);
+            }
+
+            $this->rewriteCollections($idsByCollection);
         }
 
-        $this->rewriteCollections($idsByCollection);
-
-        $this->redirectAffected($paths);
+        $this->redirectAffected($paths, $terms);
     }
 
     /**
@@ -510,7 +525,7 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Store each entry's old path, plus the entries mounted on it.
+     * Store each entry's old path, plus the entries and terms mounted on it.
      * Paths already stored for this save are left as they are.
      *
      * @param  array<int, Entry|string>  $entries
@@ -529,23 +544,26 @@ class AutomaticEntryRedirects
             }
 
             $paths += $this->mountedEntryPaths($entry);
+            $this->stashAffectedCollectionTerms($key, $entry);
         }
 
         $this->affectedEntries[$key] = ($this->affectedEntries[$key] ?? []) + $paths;
     }
 
     /**
-     * Store the entries mounted on this page, not the page itself.
+     * Store the entries and terms mounted on this page, not the page itself.
      */
     private function stashAffectedMounts(string $key, Entry $mount): void
     {
         $this->affectedEntries[$key] = ($this->affectedEntries[$key] ?? []) + $this->mountedEntryPaths($mount);
+        $this->stashAffectedCollectionTerms($key, $mount);
     }
 
     /**
      * @param  array<string, string>  $paths
+     * @param  list<array{term: string, site: string, collection: string, path: string}>  $terms
      */
-    private function redirectAffected(array $paths): void
+    private function redirectAffected(array $paths, array $terms): void
     {
         if (! RedirectsFeature::enabled()) {
             return;
@@ -553,6 +571,10 @@ class AutomaticEntryRedirects
 
         foreach ($paths as $id => $originalPath) {
             $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
+        }
+
+        foreach ($terms as $term) {
+            $this->redirectAffectedCollectionTerm($term);
         }
     }
 
@@ -583,9 +605,99 @@ class AutomaticEntryRedirects
         return $paths;
     }
 
-    private function redirectsEnabled(StatamicCollection $collection): bool
+    /**
+     * Old collection term paths for the collections mounted on this page.
+     * A later stash in this save replaces the earlier path.
+     */
+    private function stashAffectedCollectionTerms(string $key, Entry $mount): void
     {
-        return (bool) Seo::find("collections::{$collection->handle()}")?->config()->value('redirects');
+        $collections = $this->mountedCollections($mount);
+
+        if ($collections->isEmpty()) {
+            return;
+        }
+
+        $this->affectedCollectionTerms[$key] = collect($this->affectedCollectionTerms[$key] ?? [])
+            ->concat($collections->flatMap(fn (StatamicCollection $collection) => $this->affectedCollectionTermPaths($mount, $collection)))
+            ->keyBy(fn (array $term) => "{$term['site']}|{$term['collection']}|{$term['term']}")
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array{term: string, site: string, collection: string, path: string}  $stashed
+     */
+    private function redirectAffectedCollectionTerm(array $stashed): void
+    {
+        $localization = TermFacade::find($stashed['term'])->in($stashed['site']);
+        $collection = CollectionFacade::findByHandle($stashed['collection']);
+
+        $currentPath = $this->collectionTermPath($localization, $collection);
+
+        if (! $currentPath || $currentPath === $stashed['path']) {
+            return;
+        }
+
+        $this->redirects->deleteBySource($currentPath, $stashed['site']);
+        $this->redirects->create($stashed['path'], $currentPath, $stashed['site']);
+    }
+
+    /**
+     * The collection term URL. The collection is attached to a copy so the term is left alone.
+     */
+    private function collectionTermPath(LocalizedTerm $localized, StatamicCollection $collection): ?string
+    {
+        if (! $collection->uri($localized->locale())) {
+            return null;
+        }
+
+        return (clone $localized)->collection($collection)->uri();
+    }
+
+    /**
+     * Statamic serves a collection term only when its scoped view exists.
+     */
+    private function mountedTermIsServed(LocalizedTerm $localized, StatamicCollection $collection): bool
+    {
+        return view()->exists((clone $localized)->collection($collection)->template());
+    }
+
+    /**
+     * Old collection term paths. The mount entry already resolves to the new
+     * URL, so the old path is built from the URI still stored for it.
+     *
+     * @return Collection<int, array{term: string, site: string, collection: string, path: string}>
+     */
+    private function affectedCollectionTermPaths(Entry $mount, StatamicCollection $collection): Collection
+    {
+        $mountPath = $this->originalPath($mount);
+
+        if (! $mountPath) {
+            return collect();
+        }
+
+        return $collection->taxonomies()
+            ->filter(fn (Taxonomy $taxonomy) => $this->redirectsEnabled($taxonomy))
+            ->flatMap(function (Taxonomy $taxonomy) use ($collection, $mount, $mountPath) {
+                $suffix = '/'.str_replace('_', '-', $taxonomy->handle());
+
+                return $taxonomy->queryTerms()->get()
+                    ->map(fn ($term) => $term->in($mount->locale()))
+                    ->filter(fn (?LocalizedTerm $localized) => $localized && $this->mountedTermIsServed($localized, $collection))
+                    ->map(fn (LocalizedTerm $localized) => [
+                        'term' => $localized->id(),
+                        'site' => $mount->locale(),
+                        'collection' => $collection->handle(),
+                        'path' => URL::tidy(url: $mountPath.$suffix.'/'.$localized->slug(), withTrailingSlash: false),
+                    ]);
+            });
+    }
+
+    private function redirectsEnabled(StatamicCollection|Taxonomy $model): bool
+    {
+        $type = $model instanceof StatamicCollection ? 'collections' : 'taxonomies';
+
+        return (bool) Seo::find("{$type}::{$model->handle()}")?->config()->value('redirects');
     }
 
     /**
