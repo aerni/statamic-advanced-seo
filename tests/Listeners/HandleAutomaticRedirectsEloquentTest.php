@@ -459,6 +459,29 @@ it('creates a redirect when an eloquent inherited localization date changes the 
         ->and($localization->destination())->toBe("entry::{$fr->id()}");
 });
 
+it('creates an entry redirect when an eloquent mount slug changes', function () {
+    Collection::make('sections')->routes('/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $blog = tap(Entry::make()->collection('sections')->locale('default')->slug('blog'))->save();
+
+    Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+    eloquentForgetRedirects();
+
+    $blog->slug('journal')->save();
+
+    $post = Entry::find($post->id());
+
+    expect($blog)->toBeInstanceOf(EloquentEntry::class)
+        ->and($post)->toBeInstanceOf(EloquentEntry::class)
+        ->and(Redirect::query()->where('site', 'default')->where('source', '/blog/hello')->first()?->destination())->toBe("entry::{$post->id()}")
+        ->and(Redirect::resolve('/blog/hello', 'default')->destination)->toBe($post->absoluteUrl());
+});
+
 function eloquentStructuredPages(bool $withBio = false): array
 {
     $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();

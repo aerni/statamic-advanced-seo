@@ -5,8 +5,11 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
@@ -23,7 +26,7 @@ class AutomaticEntryRedirects
     private array $entries = [];
 
     /**
-     * Old paths of entries whose URL changed with a parent or a tree.
+     * Old paths of entries whose URL changed with a parent, mount, or tree.
      * Keyed by the saved entry id, or by the collection and site handles, such as "pages::german".
      *
      * @var array<string, array<string, string>>
@@ -40,6 +43,7 @@ class AutomaticEntryRedirects
         $this->stashMovedByOwnChange($entry);
         $this->stashMovedByParent($entry);
         $this->stashMovedByOrigin($entry);
+        $this->stashMovedByMount($entry);
 
         // The next save() of this entry in this process has to read its own values.
         $this->urls->forget($entry);
@@ -48,7 +52,7 @@ class AutomaticEntryRedirects
     /**
      * The tree is already the new shape, but stored URIs still describe the
      * previous one. Stash those paths and create the redirects once Statamic
-     * has rewritten them on CollectionTreeSaved.
+     * has rewritten the moved pages on CollectionTreeSaved.
      *
      * @param  array<int, string>  $ids
      */
@@ -62,7 +66,7 @@ class AutomaticEntryRedirects
             return;
         }
 
-        $this->affectedEntries["{$entry->collectionHandle()}::{$entry->locale()}"] = $this->stashOriginalPaths($ids);
+        $this->stashAffectedEntries("{$entry->collectionHandle()}::{$entry->locale()}", $ids);
     }
 
     public function create(Entry $entry): void
@@ -83,20 +87,17 @@ class AutomaticEntryRedirects
 
         unset($this->affectedEntries[$key]);
 
-        if (empty($paths)) {
+        if ($paths === []) {
             return;
         }
 
         Blink::store('entry-uris')->flush();
         Blink::store('structure-uris')->flush();
 
-        foreach ($paths as $id => $originalPath) {
-            if (! $entry = EntryFacade::find($id)) {
-                continue;
-            }
+        // The moved pages were already rewritten. Entries mounted on them were not.
+        $this->rewriteCollections($this->idsByCollection($paths, $tree->handle()));
 
-            $this->processEntryRedirect($entry, $originalPath);
-        }
+        $this->redirectAffected($paths);
     }
 
     /**
@@ -232,8 +233,8 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * A parent slug, date, or route field change moves every child page.
-     * Stash the path still stored for each published one.
+     * A parent slug, date, or route field change moves every child page,
+     * and every entry mounted on one of those pages.
      */
     private function stashMovedByParent(Entry $entry): void
     {
@@ -249,7 +250,7 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Stash the stored path of each published child page.
+     * Stash the stored path of each published child page and of the entries mounted on it.
      */
     private function stashChildPagePaths(Entry $entry): void
     {
@@ -257,9 +258,7 @@ class AutomaticEntryRedirects
             return;
         }
 
-        $this->affectedEntries[$entry->id()] = $this->stashOriginalPaths(
-            $page->flattenedPages()->map->id()->all(),
-        );
+        $this->stashAffectedEntries($entry->id(), $page->flattenedPages()->map->id()->all());
     }
 
     /**
@@ -284,6 +283,7 @@ class AutomaticEntryRedirects
 
             if ($this->wasLive($localization)) {
                 $this->entries += $this->stashOriginalPaths([$localization]);
+                $this->stashAffectedMounts($localization->id(), $localization);
             }
 
             $this->stashChildPagePaths($localization);
@@ -374,36 +374,81 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Statamic does not rewrite child page URIs on this save, so do that
-     * before redirecting from the paths stashed above.
+     * Forget the entries affected by this save, then redirect them.
      */
     private function redirectMovedBySave(Entry $entry): void
     {
-        $paths = $this->affectedEntries[$entry->id()] ?? null;
+        $paths = $this->affectedEntries[$entry->id()] ?? [];
 
         unset($this->affectedEntries[$entry->id()]);
 
-        if (! $paths) {
+        if ($paths === []) {
             return;
         }
 
-        // TODO: Drop this call once Statamic rewrites child URIs on the parent save.
-        $this->rewriteChildPageUris($entry, array_keys($paths));
+        $idsByCollection = $this->idsByCollection($paths);
+        $ownIds = $idsByCollection[$entry->collectionHandle()] ?? [];
 
-        foreach ($paths as $id => $originalPath) {
-            if (! $child = EntryFacade::find($id)) {
-                continue;
-            }
+        unset($idsByCollection[$entry->collectionHandle()]);
 
-            $this->processEntryRedirect($child, $originalPath);
+        if ($ownIds !== []) {
+            $this->rewriteChildPageUris($entry, $ownIds);
         }
+
+        $this->rewriteCollections($idsByCollection);
+
+        $this->redirectAffected($paths);
     }
 
     /**
-     * TODO: Statamic should have rewritten these URIs in updateChildPageUris()
-     * before EntrySaved. It doesn't: Entry::save() syncOriginal()s the
-     * cached entry, so shouldUpdateUris() is false. Drop this method once
-     * that bug is fixed. Creating the redirects stays.
+     * @param  array<string, string>  $paths
+     * @return array<string, array<int, string>>
+     */
+    private function idsByCollection(array $paths, ?string $exceptCollection = null): array
+    {
+        $idsByCollection = [];
+
+        foreach (array_keys($paths) as $id) {
+            $related = EntryFacade::find($id);
+
+            if ($related->collectionHandle() === $exceptCollection) {
+                continue;
+            }
+
+            $idsByCollection[$related->collectionHandle()][] = $id;
+        }
+
+        return $idsByCollection;
+    }
+
+    /**
+     * Statamic rewrites the collection mounted on the saved entry, and the
+     * pages in a tree that moved. Entries mounted on a child of that page, or
+     * on a page that moved, stay on the old URI. The old URL would keep
+     * serving them, so the redirect would never run.
+     *
+     * @param  array<string, array<int, string>>  $idsByCollection
+     */
+    private function rewriteCollections(array $idsByCollection): void
+    {
+        if ($idsByCollection === []) {
+            return;
+        }
+
+        Blink::store('entry-uris')->flush();
+        Blink::store('structure-uris')->flush();
+        Blink::store('collection-mounts')->flush();
+
+        foreach ($idsByCollection as $handle => $ids) {
+            CollectionFacade::findByHandle($handle)->updateEntryUris($ids);
+        }
+
+        Blink::store('entry-uris')->flush();
+    }
+
+    /**
+     * A localization's children and Eloquent entries keep the cached parent URI.
+     * Put this parent in that cache so the rewrite uses the URI from this save.
      *
      * @param  array<int, string>  $ids
      */
@@ -426,11 +471,11 @@ class AutomaticEntryRedirects
      */
     private function processEntryRedirect(Entry $entry, ?string $originalPath = null): void
     {
-        if (! $this->isRedirectable($entry)) {
+        if (! $currentPath = $this->currentPath($entry)) {
             return;
         }
 
-        if (! $currentPath = $this->currentPath($entry)) {
+        if (! $this->isRedirectable($entry)) {
             return;
         }
 
@@ -441,6 +486,118 @@ class AutomaticEntryRedirects
         }
 
         $this->redirects->create($originalPath, "entry::{$entry->id()}", $entry->locale());
+    }
+
+    /**
+     * The page was live and its slug, date, or a route field changed. A collection
+     * mounted on it moves with the page, even when this page's own collection creates no redirect.
+     */
+    private function stashMovedByMount(Entry $entry): void
+    {
+        if (! RedirectsFeature::enabled()) {
+            return;
+        }
+
+        if (! $this->wasLive($entry)) {
+            return;
+        }
+
+        if ($this->urls->changedValues($entry)->isEmpty()) {
+            return;
+        }
+
+        $this->stashAffectedMounts($entry->id(), $entry);
+    }
+
+    /**
+     * Store each entry's old path, plus the entries mounted on it.
+     * Paths already stored for this save are left as they are.
+     *
+     * @param  array<int, Entry|string>  $entries
+     */
+    private function stashAffectedEntries(string $key, array $entries): void
+    {
+        $paths = $this->stashOriginalPaths($entries);
+
+        foreach ($entries as $entry) {
+            if (is_string($entry)) {
+                $entry = EntryFacade::find($entry);
+            }
+
+            if (! $entry) {
+                continue;
+            }
+
+            $paths += $this->mountedEntryPaths($entry);
+        }
+
+        $this->affectedEntries[$key] = ($this->affectedEntries[$key] ?? []) + $paths;
+    }
+
+    /**
+     * Store the entries mounted on this page, not the page itself.
+     */
+    private function stashAffectedMounts(string $key, Entry $mount): void
+    {
+        $this->affectedEntries[$key] = ($this->affectedEntries[$key] ?? []) + $this->mountedEntryPaths($mount);
+    }
+
+    /**
+     * @param  array<string, string>  $paths
+     */
+    private function redirectAffected(array $paths): void
+    {
+        if (! RedirectsFeature::enabled()) {
+            return;
+        }
+
+        foreach ($paths as $id => $originalPath) {
+            $this->processEntryRedirect(EntryFacade::find($id), $originalPath);
+        }
+    }
+
+    /**
+     * Old paths of published entries in collections mounted on this page.
+     *
+     * @return array<string, string>
+     */
+    private function mountedEntryPaths(Entry $mount): array
+    {
+        $paths = [];
+
+        foreach ($this->mountedCollections($mount) as $collection) {
+            if (! $this->redirectsEnabled($collection)) {
+                continue;
+            }
+
+            $ids = EntryFacade::query()
+                ->where('collection', $collection->handle())
+                ->where('site', $mount->locale())
+                ->get()
+                ->map->id()
+                ->all();
+
+            $paths += $this->stashOriginalPaths($ids);
+        }
+
+        return $paths;
+    }
+
+    private function redirectsEnabled(StatamicCollection $collection): bool
+    {
+        return (bool) Seo::find("collections::{$collection->handle()}")?->config()->value('redirects');
+    }
+
+    /**
+     * Every collection mounted on this entry or its origin.
+     */
+    private function mountedCollections(Entry $entry): Collection
+    {
+        $ids = collect([$entry->id(), $entry->origin()?->id()])->filter();
+
+        return CollectionFacade::all()
+            ->filter(fn ($collection) => $ids->contains($collection->mount()?->id()))
+            ->values();
     }
 
     private function currentPath(Entry $entry): ?string

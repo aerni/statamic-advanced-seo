@@ -1436,6 +1436,254 @@ describe('structure redirects', function () {
     });
 });
 
+describe('mount redirects', function () {
+    beforeEach(function () {
+        Collection::make('pages')->routes('/{slug}')->sites(['default'])->saveQuietly();
+    });
+
+    it('redirects mounted urls wherever the mount sits in the route', function (string $route, string $old, string $new) {
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')
+            ->dated(true)
+            ->routes($route)
+            ->mount($blog->id())
+            ->sites(['default'])
+            ->saveQuietly();
+
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello')->date('2024-01-15'))->save();
+
+        expect($post->uri())->toBe($old);
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+
+        Blink::flush();
+
+        $post = Entry::find($post->id());
+
+        expect($post->uri())->toBe($new)
+            ->and(redirectMap()->get($old))->toBe("entry::{$post->id()}")
+            ->and(Redirect::resolve($old, 'default')->destination)->toBe($post->absoluteUrl());
+    })->with([
+        'at the start' => ['/{mount}/{slug}', '/blog/hello', '/journal/hello'],
+        'in the middle' => ['/{date}/{mount}/{slug}', '/2024-01-15-000000/blog/hello', '/2024-01-15-000000/journal/hello'],
+        'at the end' => ['/{slug}/{mount}', '/hello/blog', '/hello/journal'],
+        'after a dated path' => ['/{year}/{month}/{day}/{mount}/{slug}', '/2024/01/15/blog/hello', '/2024/01/15/journal/hello'],
+    ]);
+
+    it('creates one redirect per mounted entry', function () {
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $hello = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+        $world = tap(Entry::make()->collection('posts')->locale('default')->slug('world'))->save();
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+
+        $redirects = redirectMap();
+
+        expect($redirects->get('/blog/hello'))->toBe("entry::{$hello->id()}")
+            ->and($redirects->get('/blog/world'))->toBe("entry::{$world->id()}");
+    });
+
+    it('follows a later entry slug change after the mount redirect', function () {
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+        $post->slug('hi')->save();
+
+        $post = Entry::find($post->id());
+
+        expect(Redirect::resolve('/blog/hello', 'default')->destination)->toBe($post->absoluteUrl())
+            ->and(Redirect::resolve('/journal/hello', 'default')->destination)->toBe($post->absoluteUrl());
+    });
+
+    it('points an earlier mount redirect straight at the newest uri', function () {
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+        $blog->slug('news')->save();
+
+        $post = Entry::find($post->id());
+
+        expect(redirectMap()->get('/blog/hello'))->toBe("entry::{$post->id()}")
+            ->and(redirectMap()->get('/journal/hello'))->toBe("entry::{$post->id()}")
+            ->and(Redirect::resolve('/blog/hello', 'default')->destination)->toBe($post->absoluteUrl())
+            ->and(Redirect::resolve('/journal/hello', 'default')->destination)->toBe($post->absoluteUrl());
+    });
+
+    it('replaces a multi-segment mount uri', function () {
+        Collection::find('pages')->routes('/{parent_uri}/{slug}')->structureContents(['root' => true])->save();
+
+        $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
+        $company = tap(Entry::make()->collection('pages')->locale('default')->slug('company'))->save();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $company->id(), 'children' => [
+                ['entry' => $blog->id()],
+            ]],
+        ]);
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+
+        $post = Entry::find($post->id());
+
+        expect($post->uri())->toBe('/company/journal/hello')
+            ->and(redirectMap()->get('/company/blog/hello'))->toBe("entry::{$post->id()}")
+            ->and(Redirect::resolve('/company/blog/hello', 'default')->destination)->toBe($post->absoluteUrl());
+    });
+
+    it('redirects mounted entries when a parent slug change moves the mount page', function () {
+        Collection::find('pages')->routes('/{parent_uri}/{slug}')->structureContents(['root' => true])->save();
+
+        $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
+        $about = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $blog->id()],
+            ]],
+        ]);
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+        forgetRedirects();
+
+        $about->slug('company')->save();
+
+        $post = Entry::find($post->id());
+        $redirects = redirectMap();
+
+        expect($redirects->get('/about'))->toBe("entry::{$about->id()}")
+            ->and($redirects->get('/about/blog'))->toBe("entry::{$blog->id()}")
+            ->and($redirects->get('/about/blog/hello'))->toBe("entry::{$post->id()}")
+            ->and(Redirect::resolve('/about/blog/hello', 'default')->destination)->toBe($post->absoluteUrl());
+    });
+
+    it('redirects mounted entries when the mount page moves in the tree', function () {
+        Collection::find('pages')->routes('/{parent_uri}/{slug}')->structureContents(['root' => true])->save();
+
+        $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
+        $about = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $blog->id()],
+        ]);
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $blog->id()],
+            ]],
+        ]);
+
+        $post = Entry::find($post->id());
+
+        expect(Redirect::query()->where('site', 'default')->where('source', '/blog')->first()?->destination())->toBe("entry::{$blog->id()}")
+            ->and(redirectMap()->get('/blog/hello'))->toBe("entry::{$post->id()}")
+            ->and(Redirect::resolve('/blog/hello', 'default')->destination)->toBe($post->absoluteUrl());
+    });
+
+    it('redirects mounted entries when the mount page collection has redirects disabled', function () {
+        Seo::find('collections::pages')->config()->set('redirects', false)->save();
+
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+
+        $post = Entry::find($post->id());
+
+        expect(Redirect::query()->where('site', 'default')->where('source', '/blog')->get())->toHaveCount(0)
+            ->and(redirectMap()->get('/blog/hello'))->toBe("entry::{$post->id()}")
+            ->and(Redirect::resolve('/blog/hello', 'default')->destination)->toBe($post->absoluteUrl());
+    });
+
+    it('creates no mounted entry redirect when the mounted collection has redirects disabled', function () {
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+        Seo::find('collections::posts')->config()->set('redirects', false)->save();
+
+        tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+
+        expect(redirectMap()->get('/blog'))->toBe("entry::{$blog->id()}")
+            ->and(Redirect::resolve('/blog/hello', 'default'))->toBeNull();
+    });
+
+    it('creates nothing on the free edition', function () {
+        useFreeEdition();
+
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+    });
+});
+
 describe('term redirects', function () {
     beforeEach(function () {
         Taxonomy::make('tags')->sites(['default'])->saveQuietly();
