@@ -23,7 +23,7 @@ class AutomaticRedirects
         match (true) {
             $event instanceof EntrySaving => $this->entries->stash($event->entry),
             $event instanceof TermSaving => $this->terms->stash($event->term),
-            $event instanceof CollectionTreeEntriesMovedOrRemoved => $this->entries->stashMoved($event->moved),
+            $event instanceof CollectionTreeEntriesMovedOrRemoved => $this->entries->stashMovedByTree($event->moved),
         };
     }
 
@@ -32,7 +32,7 @@ class AutomaticRedirects
         match (true) {
             $event instanceof EntrySaved => $this->entries->create($event->entry),
             $event instanceof TermSaved => $this->terms->create($event->term),
-            $event instanceof CollectionTreeSaved => $this->entries->createMoved($event->tree),
+            $event instanceof CollectionTreeSaved => $this->entries->createMovedByTree($event->tree),
         };
     }
 

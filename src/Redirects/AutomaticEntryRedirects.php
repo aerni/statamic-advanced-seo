@@ -14,22 +14,21 @@ use Statamic\Structures\CollectionTree;
 
 class AutomaticEntryRedirects
 {
-    /** @var array<string, string> */
+    /**
+     * Old path of each entry being saved, keyed by its id.
+     * A localization stays here until its own save runs.
+     *
+     * @var array<string, string>
+     */
     private array $entries = [];
 
     /**
-     * Stored paths of structure child pages, keyed by the parent entry id.
+     * Old paths of entries whose URL changed with a parent or a tree.
+     * Keyed by the saved entry id, or by the collection and site handles, such as "pages::german".
      *
      * @var array<string, array<string, string>>
      */
-    private array $childPages = [];
-
-    /**
-     * Stored paths of moved entries, keyed by collection and site.
-     *
-     * @var array<string, array<string, string>>
-     */
-    private array $movedEntries = [];
+    private array $affectedEntries = [];
 
     public function __construct(
         private EntryUrlChange $urls,
@@ -38,9 +37,9 @@ class AutomaticEntryRedirects
 
     public function stash(Entry $entry): void
     {
-        $this->stashEntry($entry);
-        $this->stashChildPages($entry);
-        $this->stashEntryLocalizations($entry);
+        $this->stashMovedByOwnChange($entry);
+        $this->stashMovedByParent($entry);
+        $this->stashMovedByOrigin($entry);
 
         // The next save() of this entry in this process has to read its own values.
         $this->urls->forget($entry);
@@ -53,7 +52,7 @@ class AutomaticEntryRedirects
      *
      * @param  array<int, string>  $ids
      */
-    public function stashMoved(array $ids): void
+    public function stashMovedByTree(array $ids): void
     {
         if (! RedirectsFeature::enabled()) {
             return;
@@ -63,13 +62,13 @@ class AutomaticEntryRedirects
             return;
         }
 
-        $this->movedEntries[$entry->collectionHandle().'::'.$entry->locale()] = $this->stashOriginalPaths($ids);
+        $this->affectedEntries["{$entry->collectionHandle()}::{$entry->locale()}"] = $this->stashOriginalPaths($ids);
     }
 
     public function create(Entry $entry): void
     {
         $this->redirectEntry($entry);
-        $this->redirectChildPages($entry);
+        $this->redirectMovedBySave($entry);
     }
 
     /**
@@ -77,12 +76,12 @@ class AutomaticEntryRedirects
      * registered earlier. Forget the URI caches anyway so a stale Blink
      * value from before the move can't hide the new path.
      */
-    public function createMoved(CollectionTree $tree): void
+    public function createMovedByTree(CollectionTree $tree): void
     {
-        $key = $tree->handle().'::'.$tree->locale();
-        $paths = $this->movedEntries[$key] ?? [];
+        $key = "{$tree->handle()}::{$tree->locale()}";
+        $paths = $this->affectedEntries[$key] ?? [];
 
-        unset($this->movedEntries[$key]);
+        unset($this->affectedEntries[$key]);
 
         if (empty($paths)) {
             return;
@@ -143,7 +142,7 @@ class AutomaticEntryRedirects
      * Stash this entry's original URL when its slug, date, or a route field
      * changed, it is live now, and it was live before this save.
      */
-    private function stashEntry(Entry $entry): void
+    private function stashMovedByOwnChange(Entry $entry): void
     {
         if (! $this->isRedirectable($entry)) {
             return;
@@ -236,7 +235,7 @@ class AutomaticEntryRedirects
      * A parent slug, date, or route field change moves every child page.
      * Stash the path still stored for each published one.
      */
-    private function stashChildPages(Entry $entry): void
+    private function stashMovedByParent(Entry $entry): void
     {
         if (! $entry->page()) {
             return;
@@ -258,7 +257,7 @@ class AutomaticEntryRedirects
             return;
         }
 
-        $this->childPages[$entry->id()] = $this->stashOriginalPaths(
+        $this->affectedEntries[$entry->id()] = $this->stashOriginalPaths(
             $page->flattenedPages()->map->id()->all(),
         );
     }
@@ -270,7 +269,7 @@ class AutomaticEntryRedirects
      * localization's stored path, and its published child pages, before this
      * save rewrites them.
      */
-    private function stashEntryLocalizations(Entry $entry): void
+    private function stashMovedByOrigin(Entry $entry): void
     {
         $changed = $this->urls->changedValues($entry);
 
@@ -378,11 +377,11 @@ class AutomaticEntryRedirects
      * Statamic does not rewrite child page URIs on this save, so do that
      * before redirecting from the paths stashed above.
      */
-    private function redirectChildPages(Entry $entry): void
+    private function redirectMovedBySave(Entry $entry): void
     {
-        $paths = $this->childPages[$entry->id()] ?? null;
+        $paths = $this->affectedEntries[$entry->id()] ?? null;
 
-        unset($this->childPages[$entry->id()]);
+        unset($this->affectedEntries[$entry->id()]);
 
         if (! $paths) {
             return;
