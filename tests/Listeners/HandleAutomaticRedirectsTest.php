@@ -210,6 +210,52 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
     });
 
+    it('creates a redirect from the fallback date when a control panel save changes the date', function () {
+        $this->travelTo('2026-06-20 12:00:00');
+        config(['statamic.system.track_last_update' => true]);
+
+        Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->set('updated_at', strtotime('2024-01-15 12:00:00')))->save();
+
+        expect(basename($entry->initialPath()))->toBe('post.md')
+            ->and($entry->uri())->toBe('/blog/2024/post');
+
+        Blink::flush();
+        $entry = Entry::find($entry->id());
+        $entry->date('2025-03-04')->set('title', 'Updated')->updateLastModified()->save();
+        Blink::flush();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/2024/post')->first();
+
+        expect(Entry::findByUri('/blog/2025/post', 'default')?->id())->toBe($entry->id())
+            ->and(Redirect::query()->get())->toHaveCount(1)
+            ->and($redirect?->destination())->toBe("entry::{$entry->id()}")
+            ->and(Redirect::resolve('/blog/2024/post', 'default')?->destination)->toBe($entry->absoluteUrl());
+    });
+
+    it('creates nothing when a control panel save keeps the fallback date', function () {
+        $this->travelTo('2026-06-20 12:00:00');
+        config(['statamic.system.track_last_update' => true]);
+
+        Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->set('updated_at', strtotime('2024-01-15 12:00:00')))->save();
+
+        expect(basename($entry->initialPath()))->toBe('post.md')
+            ->and($entry->uri())->toBe('/blog/2024/post');
+
+        Blink::flush();
+        $entry = Entry::find($entry->id());
+        $entry->date('2024-01-15')->set('title', 'Updated')->updateLastModified()->save();
+        Blink::flush();
+
+        expect(Entry::findByUri('/blog/2024/post', 'default')?->id())->toBe($entry->id())
+            ->and(Redirect::query()->get())->toHaveCount(0);
+    });
+
     it('creates a redirect when a route token field changes the url', function () {
         Collection::find('pages')->routes('/{category}/{slug}')->save();
 

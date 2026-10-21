@@ -290,13 +290,14 @@ class EntryUrlChange
     }
 
     /**
-     * The public date when the filename has none. Statamic uses the file's modified time.
+     * The public date when the filename has none. Statamic uses the last modified time.
      */
     private function lastModifiedDate(Entry $entry): string
     {
-        // The date being saved is already on the entry. A copy with no date
-        // resolves the modified time the way the public URL did.
+        // Both the date and updated_at may already have changed on the entry.
+        // Restore the stored data before resolving the fallback date.
         $copy = clone $entry;
+        $copy->data($this->originalData($entry));
         $copy->date(null);
 
         $format = 'Y-m-d';
