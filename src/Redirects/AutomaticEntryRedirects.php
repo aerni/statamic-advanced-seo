@@ -262,7 +262,7 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Stash the stored path of each published child page and of the entries mounted on it.
+     * Stash stored paths for URI rewrites; redirect eligibility is checked after the save.
      */
     private function stashChildPagePaths(Entry $entry): void
     {
@@ -310,7 +310,7 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Stash the site-relative path still stored for each published entry.
+     * Stash the site-relative path still stored for each existing entry.
      * An id is looked up. An entry is used as given.
      *
      * @param  array<int, Entry|string>  $entries
@@ -326,10 +326,6 @@ class AutomaticEntryRedirects
             }
 
             if (! $entry) {
-                continue;
-            }
-
-            if (! $this->isRedirectable($entry)) {
                 continue;
             }
 
@@ -456,9 +452,9 @@ class AutomaticEntryRedirects
 
         foreach ($idsByCollection as $handle => $ids) {
             CollectionFacade::findByHandle($handle)->updateEntryUris($ids);
+            Blink::store('entry-uris')->flush();
+            Blink::store('collection-mounts')->flush();
         }
-
-        Blink::store('entry-uris')->flush();
     }
 
     /**
@@ -528,7 +524,8 @@ class AutomaticEntryRedirects
      */
     private function stashAffectedEntries(string $key, array $entries): void
     {
-        $paths = $this->stashOriginalPaths($entries);
+        $this->stashAffectedEntryPaths($key, $entries);
+        $visited = [];
 
         foreach ($entries as $entry) {
             if (is_string($entry)) {
@@ -539,20 +536,53 @@ class AutomaticEntryRedirects
                 continue;
             }
 
-            $paths += $this->mountedEntryPaths($entry);
-            $this->stashAffectedCollectionTerms($key, $entry);
+            $this->stashAffectedMounts($key, $entry, $visited);
         }
-
-        $this->affectedEntries[$key] = ($this->affectedEntries[$key] ?? []) + $paths;
     }
 
     /**
-     * Store the entries and terms mounted on this page, not the page itself.
+     * Keep the first stored path for each affected entry.
+     *
+     * @param  array<int, Entry|string>  $entries
      */
-    private function stashAffectedMounts(string $key, Entry $mount): void
+    private function stashAffectedEntryPaths(string $key, array $entries): void
     {
-        $this->affectedEntries[$key] = ($this->affectedEntries[$key] ?? []) + $this->mountedEntryPaths($mount);
-        $this->stashAffectedCollectionTerms($key, $mount);
+        foreach ($this->stashOriginalPaths($entries) as $id => $path) {
+            data_fill($this->affectedEntries, [$key, $id], $path);
+        }
+    }
+
+    /**
+     * Follow mounted collections once per entry, including mounts on another mounted entry.
+     *
+     * @param  array<string, true>  $visited
+     */
+    private function stashAffectedMounts(string $key, Entry $mount, array &$visited = []): void
+    {
+        if (isset($visited[$mount->id()])) {
+            return;
+        }
+
+        $visited[$mount->id()] = true;
+        $collections = $this->mountedCollections($mount);
+
+        if ($collections->isEmpty()) {
+            return;
+        }
+
+        $this->stashAffectedCollectionTerms($key, $mount, $collections);
+
+        $entries = EntryFacade::query()
+            ->whereIn('collection', $collections->map->handle()->all())
+            ->where('site', $mount->locale())
+            ->get()
+            ->all();
+
+        $this->stashAffectedEntryPaths($key, $entries);
+
+        foreach ($entries as $entry) {
+            $this->stashAffectedMounts($key, $entry, $visited);
+        }
     }
 
     /**
@@ -575,44 +605,13 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Old paths of published entries in collections mounted on this page.
-     *
-     * @return array<string, string>
-     */
-    private function mountedEntryPaths(Entry $mount): array
-    {
-        $paths = [];
-
-        foreach ($this->mountedCollections($mount) as $collection) {
-            if (! $this->redirectsEnabled($collection)) {
-                continue;
-            }
-
-            $ids = EntryFacade::query()
-                ->where('collection', $collection->handle())
-                ->where('site', $mount->locale())
-                ->get()
-                ->map->id()
-                ->all();
-
-            $paths += $this->stashOriginalPaths($ids);
-        }
-
-        return $paths;
-    }
-
-    /**
      * Old collection term paths for the collections mounted on this page.
      * A later stash in this save replaces the earlier path.
+     *
+     * @param  Collection<int, StatamicCollection>  $collections
      */
-    private function stashAffectedCollectionTerms(string $key, Entry $mount): void
+    private function stashAffectedCollectionTerms(string $key, Entry $mount, Collection $collections): void
     {
-        $collections = $this->mountedCollections($mount);
-
-        if ($collections->isEmpty()) {
-            return;
-        }
-
         $this->affectedCollectionTerms[$key] = collect($this->affectedCollectionTerms[$key] ?? [])
             ->concat($collections->flatMap(fn (StatamicCollection $collection) => $this->affectedCollectionTermPaths($mount, $collection)))
             ->keyBy(fn (array $term) => "{$term['site']}|{$term['collection']}|{$term['term']}")

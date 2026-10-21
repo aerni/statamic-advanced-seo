@@ -490,6 +490,37 @@ it('creates an entry redirect when an eloquent mount slug changes', function (bo
     'draft mount' => [false],
 ]);
 
+it('creates redirects through nested eloquent collection mounts', function () {
+    Collection::make('sections')->routes('/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $blog = tap(Entry::make()->collection('sections')->locale('default')->slug('blog'))->save();
+    Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+    Collection::make('articles')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+    $article = tap(Entry::make()->collection('articles')->locale('default')->slug('story'))->save();
+    Collection::make('replies')->routes('/{mount}/{slug}')->mount($post->id())->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $reply = tap(Entry::make()->collection('replies')->locale('default')->slug('one'))->save();
+
+    eloquentForgetRedirects();
+
+    $blog->slug('journal')->save();
+
+    Blink::flush();
+
+    expect($reply)->toBeInstanceOf(EloquentEntry::class)
+        ->and(Entry::findByUri('/journal/hello', 'default')?->id())->toBe($post->id())
+        ->and(Entry::findByUri('/journal/hello/one', 'default')?->id())->toBe($reply->id())
+        ->and(Entry::findByUri('/journal/story', 'default')?->id())->toBe($article->id())
+        ->and(Redirect::query()->where('site', 'default')->where('source', '/blog/hello/one')->first()?->destination())->toBe("entry::{$reply->id()}")
+        ->and(Redirect::query()->where('site', 'default')->where('source', '/blog/story')->first()?->destination())->toBe("entry::{$article->id()}")
+        ->and(Redirect::resolve('/blog/hello/one', 'default')?->destination)->toBe($reply->absoluteUrl());
+});
+
 it('keeps a stored localized date while capturing an inherited route field change', function () {
     Site::setSites([
         'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],

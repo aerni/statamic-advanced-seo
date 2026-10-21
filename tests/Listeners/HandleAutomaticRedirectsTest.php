@@ -1778,6 +1778,86 @@ describe('mount redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
+    it('redirects entries and terms through nested collection mounts', function (bool $postPublished, bool $postRedirectsEnabled) {
+        Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Collection::make('articles')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello')->published($postPublished))->save();
+        $article = tap(Entry::make()->collection('articles')->locale('default')->slug('story'))->save();
+        Collection::make('replies')->routes('/{mount}/{slug}')->mount($post->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Seo::find('collections::posts')->config()->set('redirects', $postRedirectsEnabled)->save();
+        Blink::flush();
+
+        $reply = tap(Entry::make()->collection('replies')->locale('default')->slug('one'))->save();
+
+        withTermViews(['replies.tags.show'], function () use ($blog, $post, $article, $reply, $postPublished, $postRedirectsEnabled) {
+            tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('news')->data(['title' => 'News']))->save();
+
+            forgetRedirects();
+
+            $blog->slug('journal')->save();
+
+            Blink::flush();
+
+            $redirects = redirectMap();
+
+            expect(Entry::findByUri('/journal/hello', 'default')?->id())->toBe($post->id())
+                ->and(Entry::findByUri('/journal/hello/one', 'default')?->id())->toBe($reply->id())
+                ->and(Entry::findByUri('/journal/story', 'default')?->id())->toBe($article->id())
+                ->and($redirects->get('/blog/hello'))->toBe($postPublished && $postRedirectsEnabled ? "entry::{$post->id()}" : null)
+                ->and($redirects->get('/blog/hello/one'))->toBe("entry::{$reply->id()}")
+                ->and($redirects->get('/blog/story'))->toBe("entry::{$article->id()}")
+                ->and($redirects->get('/blog/hello/tags/news'))->toBe('/journal/hello/tags/news')
+                ->and(Redirect::resolve('/blog/hello/one', 'default')?->destination)->toBe($reply->absoluteUrl());
+        });
+    })->with([
+        'published intermediate mount' => [true, true],
+        'draft intermediate mount' => [false, true],
+        'intermediate collection with redirects disabled' => [true, false],
+    ]);
+
+    it('redirects nested mounts when their root moves in the tree', function () {
+        Collection::find('pages')->routes('/{parent_uri}/{slug}')->structureContents(['root' => true])->save();
+
+        $home = tap(Entry::make()->collection('pages')->locale('default')->slug('home'))->save();
+        $about = tap(Entry::make()->collection('pages')->locale('default')->slug('about'))->save();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id()],
+            ['entry' => $blog->id()],
+        ]);
+
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+        Collection::make('replies')->routes('/{mount}/{slug}')->mount($post->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $reply = tap(Entry::make()->collection('replies')->locale('default')->slug('one'))->save();
+
+        forgetRedirects();
+
+        saveTree([
+            ['entry' => $home->id()],
+            ['entry' => $about->id(), 'children' => [
+                ['entry' => $blog->id()],
+            ]],
+        ]);
+
+        Blink::flush();
+
+        expect(Entry::findByUri('/about/blog/hello/one', 'default')?->id())->toBe($reply->id())
+            ->and(redirectMap()->get('/blog/hello/one'))->toBe("entry::{$reply->id()}")
+            ->and(Redirect::resolve('/blog/hello/one', 'default')?->destination)->toBe($reply->absoluteUrl());
+    });
+
     it('creates a mounted entry redirect through multiple localization origins', function () {
         Site::setSites([
             'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
