@@ -671,14 +671,12 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Every collection mounted on this entry or one of its localization origins.
+     * Every collection whose mount resolves to this entry on its site.
      */
     private function mountedCollections(Entry $entry): Collection
     {
-        $ids = $entry->ancestors()->map->id()->push($entry->id());
-
         return CollectionFacade::all()
-            ->filter(fn ($collection) => $ids->contains($collection->mount()?->id()))
+            ->filter(fn (StatamicCollection $collection) => $collection->mount()?->in($entry->locale())?->id() === $entry->id())
             ->values();
     }
 

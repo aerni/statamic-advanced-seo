@@ -560,6 +560,56 @@ it('redirects published eloquent content when a draft mount inherits an origin r
     }
 });
 
+it('redirects eloquent content when a translated mount resolves to the edited site', function (string $site, string $oldMountPath, string $destination) {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+        'de' => ['name' => 'DE', 'url' => 'https://example.com/de', 'locale' => 'de'],
+        'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Taxonomy::make('tags')->sites(['en', 'de', 'fr'])->saveQuietly();
+    Collection::make('sections')->routes('/{slug}')->sites(['en', 'de', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    $en = tap(Entry::make()->collection('sections')->locale('en')->slug('blog'))->save();
+    $de = tap($en->makeLocalization('de')->slug('journal-de'))->save();
+    tap($en->makeLocalization('fr')->slug('journal-fr'))->save();
+    Collection::make('posts')->routes('/{mount}/{slug}')->mount($de->id())->taxonomies(['tags'])->sites(['en', 'de', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    $post = tap(Entry::make()->collection('posts')->locale($site)->slug('hello'))->save();
+
+    expect(Entry::findByUri($oldMountPath.'/hello', $site)?->id())->toBe($post->id());
+
+    $path = resource_path('views/posts/tags/show.antlers.html');
+    File::ensureDirectoryExists(dirname($path));
+    File::put($path, '');
+
+    try {
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('design')->data(['title' => 'Design']))->save();
+
+        eloquentForgetRedirects();
+
+        Entry::find($en->id())->in($site)->slug('updates')->save();
+
+        Blink::flush();
+
+        $redirects = Redirect::query()->where('site', $site)->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+        expect($redirects->get($oldMountPath.'/hello'))->toBe("entry::{$post->id()}")
+            ->and(Entry::findByUri('/updates/hello', $site)?->id())->toBe($post->id())
+            ->and(Redirect::resolve($oldMountPath.'/hello', $site)?->destination)->toBe($destination)
+            ->and($redirects->get($oldMountPath.'/tags/design'))->toBe('/updates/tags/design')
+            ->and(Collection::find('posts')->uri('de'))->toBe('/journal-de')
+            ->and(Redirect::query()->where('site', 'de')->get())->toHaveCount(0);
+    } finally {
+        File::delete($path);
+    }
+})->with([
+    'origin site' => ['en', '/blog', 'https://example.com/updates/hello'],
+    'sibling translation' => ['fr', '/journal-fr', 'https://example.com/fr/updates/hello'],
+]);
+
 it('creates redirects through nested eloquent collection mounts', function () {
     Collection::make('sections')->routes('/{slug}')->sites(['default'])->saveQuietly();
     Blink::flush();
