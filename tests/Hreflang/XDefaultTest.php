@@ -106,7 +106,7 @@ it('falls back to the default site when the saved x-default site does not exist'
         ->and(sitemapHreflangUrl($french->in('english')))->toBe('https://example.com/over-ons');
 });
 
-it('uses the term default locale when the configured site is not in the cluster', function () {
+it('uses the term default locale when the configured site is not among the alternates', function () {
     xDefaultSite('english');
 
     Taxonomy::make('tags')->sites(['dutch', 'german'])->saveQuietly();

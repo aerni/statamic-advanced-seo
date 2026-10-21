@@ -14,24 +14,24 @@ class ResolveXDefault
     use AsAction;
 
     /**
-     * The x-default member of a cluster.
+     * The x-default alternate.
      *
      * Entries and terms use the configured site, then their original localization.
      * Taxonomy index sites use the configured site, then the first site.
      */
-    public function handle(Collection $cluster): Entry|Term|string|null
+    public function handle(Collection $alternates): Entry|Term|string|null
     {
-        $first = $cluster->first();
+        $first = $alternates->first();
 
         return match (true) {
-            $first instanceof Entry, $first instanceof Term => $this->localization($cluster, $first),
-            default => $this->forSites($cluster),
+            $first instanceof Entry, $first instanceof Term => $this->localization($alternates, $first),
+            default => $this->forSites($alternates),
         };
     }
 
     /**
-     * Uses the configured site when that localization is in the cluster.
-     * Otherwise uses the original localization when it is in the cluster.
+     * Uses the configured site when that localization is among the alternates.
+     * Otherwise uses the original localization when it is among the alternates.
      */
     protected function localization(Collection $localizations, Entry|Term $model): Entry|Term|null
     {
