@@ -227,8 +227,8 @@ class EntryUrlChange
     }
 
     /**
-     * Route tokens that read an entry field, ignoring slug, date, and the
-     * structure tokens Statamic fills in itself.
+     * Route tokens that read an entry field. Statamic fills in slug and
+     * structure tokens itself, and date tokens only on dated entries.
      * Null when the route has none.
      *
      * @return array<int, string>|null
@@ -245,9 +245,9 @@ class EntryUrlChange
 
         $tokens = collect(Antlers::identifiers($route))
             ->reject(fn (string $token) => in_array($token, [
-                'slug', 'date', 'year', 'month', 'day',
-                'parent_uri', 'mount', 'depth', 'is_root', 'id', 'published',
+                'slug', 'parent_uri', 'mount', 'depth', 'is_root', 'id', 'published',
             ]))
+            ->reject(fn (string $token) => $entry->hasDate() && in_array($token, ['date', 'year', 'month', 'day']))
             ->values()
             ->all();
 

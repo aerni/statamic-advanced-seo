@@ -223,6 +223,35 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
     });
 
+    it('creates a redirect when a stored date-related route field changes in a non-dated collection', function (string $field, string $oldValue, string $newValue) {
+        Collection::make('archive')->routes('/{'.$field.'}/{slug}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('archive')->locale('default')->slug('post')->set($field, $oldValue))->save();
+
+        expect($entry->uri())->toBe("/{$oldValue}/post");
+
+        Blink::flush();
+        $entry = Entry::find($entry->id());
+
+        expect($entry->get($field))->toBe($oldValue);
+
+        $entry->set($field, $newValue)->save();
+        Blink::flush();
+
+        $redirect = Redirect::query()->where('site', 'default')->where('source', "/{$oldValue}/post")->first();
+
+        expect(Entry::findByUri("/{$newValue}/post", 'default')?->id())->toBe($entry->id())
+            ->and(Redirect::query()->get())->toHaveCount(1)
+            ->and($redirect?->destination())->toBe("entry::{$entry->id()}")
+            ->and(Redirect::resolve("/{$oldValue}/post", 'default')?->destination)->toBe($entry->absoluteUrl());
+    })->with([
+        'year' => ['year', '2024', '2025'],
+        'month' => ['month', '01', '06'],
+        'day' => ['day', '15', '20'],
+        'date' => ['date', '2024-01-15', '2025-06-20'],
+    ]);
+
     it('creates redirects from each previous route field value on consecutive saves', function () {
         Collection::make('pages')->routes('/{category}/{slug}')->sites(['default'])->saveQuietly();
         Blink::flush();
