@@ -129,6 +129,27 @@ it('creates a redirect when an eloquent entry route field changes the url', func
         ->and($redirect->destination())->toBe("entry::{$entry->id()}");
 });
 
+it('creates eloquent redirects from each previous route field value on consecutive saves', function () {
+    Collection::make('posts')->routes('/{category}/{slug}')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->set('category', 'news'))->save();
+
+    $entry->set('category', 'updates')->set('title', 'Updated')->save();
+    $entry->set('category', 'archive')->set('title', 'Archived')->save();
+
+    $first = Redirect::query()->where('site', 'default')->where('source', '/news/post')->first();
+    $second = Redirect::query()->where('site', 'default')->where('source', '/updates/post')->first();
+    $saved = Entry::find($entry->id());
+
+    expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(2)
+        ->and($first?->destination())->toBe("entry::{$entry->id()}")
+        ->and($second?->destination())->toBe("entry::{$entry->id()}")
+        ->and($saved->get('category'))->toBe('archive')
+        ->and($saved->get('title'))->toBe('Archived')
+        ->and($saved->uri())->toBe('/archive/post');
+});
+
 it('creates a redirect when an eloquent route token of zero is cleared', function () {
     Collection::make('posts')->routes('/{floor}/{slug}')->sites(['default'])->saveQuietly();
     Blink::flush();

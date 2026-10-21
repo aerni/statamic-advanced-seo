@@ -223,6 +223,27 @@ describe('entry redirects', function () {
             ->and($redirect->destination())->toBe("entry::{$entry->id()}");
     });
 
+    it('creates redirects from each previous route field value on consecutive saves', function () {
+        Collection::make('pages')->routes('/{category}/{slug}')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('post')->set('category', 'news'))->save();
+
+        $entry->set('category', 'updates')->set('title', 'Updated')->save();
+        $entry->set('category', 'archive')->set('title', 'Archived')->save();
+
+        $first = Redirect::query()->where('site', 'default')->where('source', '/news/post')->first();
+        $second = Redirect::query()->where('site', 'default')->where('source', '/updates/post')->first();
+        $saved = Entry::find($entry->id());
+
+        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(2)
+            ->and($first?->destination())->toBe("entry::{$entry->id()}")
+            ->and($second?->destination())->toBe("entry::{$entry->id()}")
+            ->and($saved->get('category'))->toBe('archive')
+            ->and($saved->get('title'))->toBe('Archived')
+            ->and($saved->uri())->toBe('/archive/post');
+    });
+
     it('creates a redirect when a route token of zero is cleared', function () {
         Collection::find('pages')->routes('/{floor}/{slug}')->save();
 

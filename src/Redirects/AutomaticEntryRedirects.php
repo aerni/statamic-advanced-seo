@@ -16,7 +16,6 @@ use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Term as TermFacade;
 use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
 use Statamic\Structures\CollectionTree;
 use Statamic\Taxonomies\LocalizedTerm;
 
@@ -213,14 +212,7 @@ class AutomaticEntryRedirects
      */
     private function wasPublished(Entry $entry): bool
     {
-        // Flat file: the previous published flag is still in the file.
-        // getOriginal() has already been replaced.
-        if ($path = $entry->initialPath()) {
-            return (bool) (YAML::file($path)->parse()['published'] ?? true);
-        }
-
-        // Eloquent: there is no file, so getOriginal() is still the pre-save value.
-        return (bool) $entry->getOriginal('published');
+        return (bool) ($this->urls->originalData($entry)['published'] ?? (bool) $entry->initialPath());
     }
 
     /**

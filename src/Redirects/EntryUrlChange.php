@@ -31,6 +31,21 @@ class EntryUrlChange
     public function forget(Entry $entry): void
     {
         Blink::forget($this->changedBlinkKey($entry));
+        Blink::forget($this->dataBlinkKey($entry));
+    }
+
+    /**
+     * Stache: the file still contains the old data; getOriginal() has already
+     * been replaced. Eloquent: there is no file, so getOriginal() still contains
+     * the pre-save data. Reuse the snapshot until this entry's save has been stashed.
+     *
+     * @return array<string, mixed>
+     */
+    public function originalData(Entry $entry): array
+    {
+        return Blink::once($this->dataBlinkKey($entry), fn () => ($path = $entry->initialPath())
+            ? YAML::file($path)->parse()
+            : $entry->getOriginal());
     }
 
     /**
@@ -71,9 +86,9 @@ class EntryUrlChange
 
     /**
      * Let the routing compute the URL the entry had before this save.
-     * The previous slug, date, and route fields are applied to a copy so the
-     * entry Statamic is about to save is left untouched. A route field that
-     * was not stored is removed, because setting null would stop inheritance.
+     * The previous slug, date, and stored data are applied to a copy so the
+     * entry Statamic is about to save is left untouched. Restoring the data
+     * also preserves absent fields, which inherit rather than store null.
      * The cached uri has to be flushed: the copy shares the entry id.
      */
     public function originalUrl(Entry $entry, EntryUrlValues $values): ?string
@@ -88,11 +103,7 @@ class EntryUrlChange
             $copy->date($values->date);
         }
 
-        foreach ($values->data ?? [] as $token => $value) {
-            $this->routeFieldWasStored($entry, $token)
-                ? $copy->set($token, $value)
-                : $copy->remove($token);
-        }
+        $copy->data($this->originalData($entry));
 
         Blink::store('entry-uris')->forget($copy->id());
 
@@ -128,6 +139,11 @@ class EntryUrlChange
     private function changedBlinkKey(Entry $entry): string
     {
         return "advanced-seo::automatic-redirects::changed::{$entry->id()}::{$entry->locale()}";
+    }
+
+    private function dataBlinkKey(Entry $entry): string
+    {
+        return "advanced-seo::automatic-redirects::data::{$entry->id()}::{$entry->locale()}";
     }
 
     /**
@@ -186,10 +202,7 @@ class EntryUrlChange
             return null;
         }
 
-        // Flat file reads the file. Eloquent reads getOriginal().
-        $source = ($path = $entry->initialPath())
-            ? YAML::file($path)->parse()
-            : $entry->getOriginal();
+        $source = $this->originalData($entry);
 
         // A stored null is its own value. An absent field inherits, so compare
         // the origin value instead of collapsing both to null.
@@ -211,20 +224,6 @@ class EntryUrlChange
     private function inheritedRouteValue(Entry $entry, string $token): mixed
     {
         return $entry->hasOrigin() ? $entry->origin()->value($token) : null;
-    }
-
-    /**
-     * True when the route field was stored on the entry before this save.
-     * An absent field inherits. A stored null does not.
-     */
-    private function routeFieldWasStored(Entry $entry, string $token): bool
-    {
-        // Flat file reads the file. Eloquent reads getOriginal().
-        $source = ($path = $entry->initialPath())
-            ? YAML::file($path)->parse()
-            : $entry->getOriginal();
-
-        return array_key_exists($token, $source);
     }
 
     /**
