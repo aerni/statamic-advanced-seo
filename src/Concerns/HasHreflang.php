@@ -96,7 +96,7 @@ trait HasHreflang
             'locale' => Helpers::parseLocale(Site::get($site)->locale()),
         ]);
 
-        if ($xDefaultSite = ResolveXDefault::run($sites)) {
+        if ($xDefaultSite = ResolveXDefault::run($sites, $taxonomy)) {
             $hreflang->push([
                 'url' => $resolveUrl($xDefaultSite),
                 'locale' => 'x-default',

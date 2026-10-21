@@ -84,7 +84,7 @@ return [
     'origins_instructions' => 'Werte von ausgewählten Quellen übernehmen.',
     'hreflang' => 'Hreflang',
     'hreflang_x_default' => 'x-default',
-    'hreflang_x_default_instructions' => 'Die Website für die hreflang-x-default-URL. Wenn dort keine indexierbare URL existiert, verwenden Seiten und Begriffe ihre ursprüngliche Lokalisierung. Taxonomie-Indexseiten verwenden die erste Website.',
+    'hreflang_x_default_instructions' => 'Die Website für die hreflang-x-default-URL. Wenn dort keine indexierbare URL existiert, verwenden Seiten, Begriffe und Taxonomie-Indexseiten ihre ursprüngliche Lokalisierung.',
     'origins_circular_dependency' => 'Zirkuläre Abhängigkeiten zwischen Website-Quellen sind nicht erlaubt.',
     'configure_title' => ':title konfigurieren',
     'no_items_for_site' => 'Keine :title für die ausgewählte Website konfiguriert.',

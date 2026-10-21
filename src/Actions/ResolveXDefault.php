@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Concerns\AsAction;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 
@@ -16,16 +17,16 @@ class ResolveXDefault
     /**
      * The x-default alternate.
      *
-     * Entries and terms use the configured site, then their original localization.
-     * Taxonomy index sites use the configured site, then the first site.
+     * Entries, terms, and taxonomy indexes use the configured site, then their
+     * original localization. A taxonomy index's original site is its first site.
      */
-    public function handle(Collection $alternates): Entry|Term|string|null
+    public function handle(Collection $alternates, ?Taxonomy $taxonomy = null): Entry|Term|string|null
     {
         $first = $alternates->first();
 
         return match (true) {
             $first instanceof Entry, $first instanceof Term => $this->localization($alternates, $first),
-            default => $this->forSites($alternates),
+            default => $this->forSites($alternates, $taxonomy),
         };
     }
 
@@ -47,10 +48,10 @@ class ResolveXDefault
     }
 
     /**
-     * Uses the configured site when it is one of the given sites.
-     * Otherwise uses the first site.
+     * Uses the configured site when it is among the alternates.
+     * Otherwise uses the taxonomy's first site when it is among the alternates.
      */
-    protected function forSites(Collection $sites): ?string
+    protected function forSites(Collection $sites, ?Taxonomy $taxonomy): ?string
     {
         $site = $this->site();
 
@@ -58,7 +59,13 @@ class ResolveXDefault
             return $site;
         }
 
-        return $sites->first();
+        $original = $taxonomy?->sites()->first();
+
+        if (is_string($original) && $sites->contains($original)) {
+            return $original;
+        }
+
+        return null;
     }
 
     protected function site(): string

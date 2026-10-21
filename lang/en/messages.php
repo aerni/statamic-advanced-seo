@@ -86,7 +86,7 @@ return [
     'origins_instructions' => 'Choose to inherit values from selected origins.',
     'hreflang' => 'Hreflang',
     'hreflang_x_default' => 'x-default',
-    'hreflang_x_default_instructions' => 'The site used for the hreflang x-default URL. When it has no indexable URL, pages and terms fall back to their original localization, and taxonomy indexes fall back to their first site.',
+    'hreflang_x_default_instructions' => 'The site used for the hreflang x-default URL. When it has no indexable URL, pages, terms, and taxonomy indexes fall back to their original localization.',
     'origins_circular_dependency' => 'Circular site origin dependencies are not allowed.',
     'configure_title' => 'Configure :title',
     'no_items_for_site' => 'No :title configured for the selected site.',

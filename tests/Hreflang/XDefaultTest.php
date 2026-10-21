@@ -133,7 +133,7 @@ it('uses the configured site for a taxonomy index', function () {
         ->and(taxonomySitemapHreflangUrl('dutch'))->toBe('https://example.com/en/tags');
 });
 
-it('uses the first taxonomy site when the configured site is not available', function () {
+it('uses the taxonomy first site when the configured site is not among the alternates', function () {
     xDefaultSite('english');
     Site::setCurrent('german');
 
@@ -143,6 +143,20 @@ it('uses the first taxonomy site when the configured site is not available', fun
 
     expect(hreflangUrl($cascade))->toBe('https://example.com/de/tags')
         ->and(taxonomySitemapHreflangUrl('french'))->toBe('https://example.com/de/tags');
+});
+
+it('omits x-default for a taxonomy index when its first site is not indexable', function () {
+    xDefaultSite('english');
+    Site::setCurrent('german');
+
+    Taxonomy::make('tags')->sites(['dutch', 'german', 'french'])->saveQuietly();
+    Seo::find('site::defaults')->in('dutch')->set('noindex', true)->save();
+    flushBlink();
+
+    $cascade = taxonomyCascade(Taxonomy::find('tags'));
+
+    expect(hreflangLocales($cascade))->toContain('de')->toContain('fr')->not->toContain('x-default')
+        ->and(taxonomySitemapHreflangLocales('french'))->toContain('de')->toContain('fr')->not->toContain('x-default');
 });
 
 function xDefaultSite(string $site): void
@@ -218,6 +232,18 @@ function taxonomyCascade(object $taxonomy): ContextViewCascade
 
 function taxonomySitemapHreflangUrl(string $site): ?string
 {
+    $alternate = collect(taxonomySitemapAlternates($site))->firstWhere('hreflang', 'x-default');
+
+    return $alternate['href'] ?? null;
+}
+
+function taxonomySitemapHreflangLocales(string $site): array
+{
+    return collect(taxonomySitemapAlternates($site))->pluck('hreflang')->all();
+}
+
+function taxonomySitemapAlternates(string $site): ?array
+{
     View::addLocation(__DIR__.'/../__fixtures__/views');
 
     $sitemap = Sitemap::index($site)->sitemaps()
@@ -226,5 +252,5 @@ function taxonomySitemapHreflangUrl(string $site): ?string
     $url = new TaxonomySitemapUrl(Taxonomy::find('tags'), $site);
     $url->sitemap($sitemap);
 
-    return collect($url->alternates())->firstWhere('hreflang', 'x-default')['href'] ?? null;
+    return $url->alternates();
 }
