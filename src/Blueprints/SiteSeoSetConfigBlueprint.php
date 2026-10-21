@@ -2,8 +2,10 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
 use Aerni\AdvancedSeo\Features\MultiSite;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 
 class SiteSeoSetConfigBlueprint extends BaseBlueprint
 {
@@ -52,7 +54,7 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                         'type' => 'select',
                         'display' => __('advanced-seo::messages.hreflang_x_default'),
                         'instructions' => __('advanced-seo::messages.hreflang_x_default_instructions'),
-                        'options' => Site::all()->mapWithKeys(fn ($site) => [$site->handle() => $site->name()])->all(),
+                        'options' => $this->hreflangSites(),
                         'default' => Site::default()->handle(),
                         'clearable' => false,
                         'searchable' => true,
@@ -63,5 +65,14 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                 ],
             ],
         ];
+    }
+
+    protected function hreflangSites(): array
+    {
+        $sites = User::current() && ($set = $this->context?->seoSet())
+            ? GetAuthorizedSites::handle($set)
+            : Site::all();
+
+        return $sites->mapWithKeys(fn ($site) => [$site->handle() => $site->name()])->all();
     }
 }
