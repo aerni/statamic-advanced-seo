@@ -511,6 +511,55 @@ it('creates an entry redirect when an eloquent mount slug changes', function (bo
     'draft mount' => [false],
 ]);
 
+it('redirects published eloquent content when a draft mount inherits an origin route field change', function () {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Taxonomy::make('tags')->sites(['en', 'fr'])->saveQuietly();
+    Collection::make('sections')->routes('/{category}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    $en = tap(Entry::make()->collection('sections')->locale('en')->slug('blog')->set('category', 'news'))->save();
+    $fr = tap($en->makeLocalization('fr')->slug('journal')->published(false))->save();
+    Collection::make('posts')->routes('/{mount}/{slug}')->mount($en->id())->taxonomies(['tags'])->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    $post = tap(Entry::make()->collection('posts')->locale('fr')->slug('bonjour'))->save();
+    tap(Entry::make()->collection('posts')->locale('fr')->slug('draft')->published(false))->save();
+
+    expect($fr->status())->toBe('draft')
+        ->and(Entry::find($fr->id())->has('category'))->toBeFalse()
+        ->and(Entry::findByUri('/news/journal/bonjour', 'fr')?->id())->toBe($post->id());
+
+    $path = resource_path('views/posts/tags/show.antlers.html');
+    File::ensureDirectoryExists(dirname($path));
+    File::put($path, '');
+
+    try {
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('design')->data(['title' => 'Design']))->save();
+
+        eloquentForgetRedirects();
+
+        $en->set('category', 'updates')->save();
+
+        Blink::flush();
+
+        $redirects = Redirect::query()->where('site', 'fr')->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+        expect($redirects->get('/news/journal/bonjour'))->toBe("entry::{$post->id()}")
+            ->and(Entry::findByUri('/updates/journal/bonjour', 'fr')?->id())->toBe($post->id())
+            ->and(Redirect::resolve('/news/journal/bonjour', 'fr')?->destination)->toBe('https://example.com/fr/updates/journal/bonjour')
+            ->and($redirects->get('/news/journal/tags/design'))->toBe('/updates/journal/tags/design')
+            ->and($redirects->has('/news/journal'))->toBeFalse()
+            ->and($redirects->has('/news/journal/draft'))->toBeFalse()
+            ->and(Entry::find($fr->id())->status())->toBe('draft');
+    } finally {
+        File::delete($path);
+    }
+});
+
 it('creates redirects through nested eloquent collection mounts', function () {
     Collection::make('sections')->routes('/{slug}')->sites(['default'])->saveQuietly();
     Blink::flush();

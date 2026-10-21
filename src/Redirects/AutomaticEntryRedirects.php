@@ -271,9 +271,9 @@ class AutomaticEntryRedirects
     /**
      * An origin route field or date is inherited by localizations that do not
      * set it. A localization route may use a field the origin route does not.
-     * Entry::descendants() is that origin chain. Stash each live
-     * localization's stored path, and its published child pages, before this
-     * save rewrites them.
+     * Entry::descendants() is that origin chain. Stash each live localization's
+     * stored path before this save rewrites it. Child pages and mounted content
+     * are checked independently of the localization's publication state.
      */
     private function stashMovedByOrigin(Entry $entry): void
     {
@@ -290,9 +290,9 @@ class AutomaticEntryRedirects
 
             if ($this->wasLive($localization)) {
                 $this->entries += $this->stashOriginalPaths([$localization]);
-                $this->stashAffectedMounts($localization->id(), $localization);
             }
 
+            $this->stashAffectedMounts($localization->id(), $localization);
             $this->stashChildPagePaths($localization);
 
             // Eloquent copies the origin date onto the localization. Clear that
