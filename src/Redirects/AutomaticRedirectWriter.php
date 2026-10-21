@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
+use Aerni\AdvancedSeo\Concerns\ResolvesTermUrls;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
@@ -11,6 +12,8 @@ use Statamic\Facades\Term as TermFacade;
 
 class AutomaticRedirectWriter
 {
+    use ResolvesTermUrls;
+
     /**
      * Delete auto-created redirects whose source is this URL. The URL now
      * belongs to a live page, so the redirect would send the request away.
@@ -102,15 +105,7 @@ class AutomaticRedirectWriter
             return false;
         }
 
-        if ($term->status() !== 'published') {
-            return false;
-        }
-
-        if (! view()->exists($term->template())) {
-            return false;
-        }
-
-        return ! $term->collection() || $term->taxonomy()->collections()->contains($term->collection());
+        return $this->termIsPublic($term);
     }
 
     /**

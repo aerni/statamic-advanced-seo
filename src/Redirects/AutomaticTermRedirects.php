@@ -2,16 +2,17 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
+use Aerni\AdvancedSeo\Concerns\ResolvesTermUrls;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\YAML;
 use Statamic\Taxonomies\LocalizedTerm;
 
 class AutomaticTermRedirects
 {
+    use ResolvesTermUrls;
+
     /** @var array<string, array<string, string|null>> */
     private array $terms = [];
 
@@ -213,49 +214,10 @@ class AutomaticTermRedirects
     private function termSitePaths(Term $term): array
     {
         return $term->localizations()
-            ->flatMap(fn (LocalizedTerm $localized) => $this->termSitePath($localized))
+            ->flatMap(fn (LocalizedTerm $localized) => $this->termPathsForSite($localized))
             ->keyBy(fn (array $path) => $path['collection']
                 ? "{$path['site']}.{$path['collection']}"
                 : $path['site'])
             ->all();
-    }
-
-    /**
-     * Site and path pairs for one localization.
-     *
-     * @return Collection<int, array{site: string, collection: ?string, path: string}>
-     */
-    private function termSitePath(LocalizedTerm $localized): Collection
-    {
-        return $localized->taxonomy()->collections()
-            ->map(fn (StatamicCollection $collection) => [
-                'site' => $localized->locale(),
-                'collection' => $collection->handle(),
-                'path' => $this->collectionTermPath($localized, $collection),
-            ])
-            ->prepend([
-                'site' => $localized->locale(),
-                'collection' => null,
-                // This localization is public only when its term view exists.
-                'path' => view()->exists($localized->template()) ? $localized->uri() : null,
-            ])
-            ->filter(fn (array $path) => $path['path'])
-            ->unique('path')
-            ->values();
-    }
-
-    /**
-     * The collection term URL, when Statamic would serve that page.
-     * The collection is attached to a copy so the term being saved is left alone.
-     */
-    private function collectionTermPath(LocalizedTerm $localized, StatamicCollection $collection): ?string
-    {
-        $scoped = (clone $localized)->collection($collection);
-
-        if (! view()->exists($scoped->template())) {
-            return null;
-        }
-
-        return $scoped->uri();
     }
 }

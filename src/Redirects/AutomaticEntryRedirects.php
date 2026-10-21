@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
+use Aerni\AdvancedSeo\Concerns\ResolvesTermUrls;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Carbon\Carbon;
@@ -21,6 +22,8 @@ use Statamic\Taxonomies\LocalizedTerm;
 
 class AutomaticEntryRedirects
 {
+    use ResolvesTermUrls;
+
     /**
      * Old path of each entry being saved, keyed by its id.
      * A localization stays here until its own save runs.
@@ -638,26 +641,6 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * The collection term URL. The collection is attached to a copy so the term is left alone.
-     */
-    private function collectionTermPath(LocalizedTerm $localized, StatamicCollection $collection): ?string
-    {
-        if (! $collection->uri($localized->locale())) {
-            return null;
-        }
-
-        return (clone $localized)->collection($collection)->uri();
-    }
-
-    /**
-     * Statamic serves a collection term only when its scoped view exists.
-     */
-    private function mountedTermIsServed(LocalizedTerm $localized, StatamicCollection $collection): bool
-    {
-        return view()->exists((clone $localized)->collection($collection)->template());
-    }
-
-    /**
      * Old collection term paths. The mount entry already resolves to the new
      * URL, so the old path is built from the URI still stored for it.
      *
@@ -678,7 +661,7 @@ class AutomaticEntryRedirects
 
                 return $taxonomy->queryTerms()->get()
                     ->map(fn ($term) => $term->in($mount->locale()))
-                    ->filter(fn (?LocalizedTerm $localized) => $localized && $this->mountedTermIsServed($localized, $collection))
+                    ->filter(fn (?LocalizedTerm $localized) => $localized && $this->collectionTermPath($localized, $collection) !== null)
                     ->map(fn (LocalizedTerm $localized) => [
                         'term' => $localized->id(),
                         'site' => $mount->locale(),
