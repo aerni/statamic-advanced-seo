@@ -13,6 +13,7 @@ import SocialPreviewFieldtype from './components/fieldtypes/SocialPreviewFieldty
 import TokenInputFieldtype from './components/fieldtypes/TokenInputFieldtype.vue'
 import AlertFieldtype from './components/fieldtypes/AlertFieldtype.vue'
 import RedirectSourceFieldtype from './components/fieldtypes/RedirectSourceFieldtype.vue'
+import HreflangXDefaultFieldtype from './components/fieldtypes/HreflangXDefaultFieldtype.vue'
 import { add } from './utils/normalizers.js'
 
 Statamic.booting(() => {
@@ -34,5 +35,6 @@ Statamic.booting(() => {
     Statamic.$components.register('token_input-fieldtype', TokenInputFieldtype)
     Statamic.$components.register('alert-fieldtype', AlertFieldtype)
     Statamic.$components.register('redirect_source-fieldtype', RedirectSourceFieldtype)
+    Statamic.$components.register('hreflang_x_default-fieldtype', HreflangXDefaultFieldtype)
     Statamic.$advancedSeo = { normalizers: { add } }
 })
