@@ -744,6 +744,52 @@ describe('entry redirects', function () {
             ->and($localization->destination())->toBe("entry::{$fr->id()}");
     });
 
+    it('creates redirects when inherited localization date and route fields change together', function () {
+        $this->travelTo('2026-01-01 12:00:00');
+
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+
+        Collection::make('articles')->dated(true)->routes('/{year}/{category}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+        Blueprint::make('collections.articles::article')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [[
+                        'fields' => [
+                            ['handle' => 'category', 'field' => ['type' => 'text', 'localizable' => true]],
+                            ['handle' => 'date', 'field' => ['type' => 'date', 'localizable' => true]],
+                        ],
+                    ]],
+                ],
+            ],
+        ])->save();
+        Blink::flush();
+
+        $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15')->set('category', 'news'))->save();
+        $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+        expect($fr->uri())->toBe('/2024/news/article');
+
+        forgetRedirects();
+        Blink::flush();
+
+        $en = Entry::find($en->id());
+        $en->date('2025-06-20')->set('category', 'updates')->save();
+
+        Blink::flush();
+
+        expect(Entry::findByUri('/2025/updates/article', 'fr')?->id())->toBe($fr->id());
+
+        $redirects = Redirect::query()->get()->mapWithKeys(fn ($redirect) => [$redirect->site().$redirect->source() => $redirect->destination()]);
+
+        expect($redirects)->toHaveCount(2)
+            ->and($redirects->get('en/2024/news/post'))->toBe("entry::{$en->id()}")
+            ->and($redirects->get('fr/2024/news/article'))->toBe("entry::{$fr->id()}")
+            ->and(Redirect::resolve('/2024/news/article', 'fr')?->destination)->toBe('https://example.com/fr/2025/updates/article');
+    });
+
     it('creates nothing for a localization that has its own date', function () {
         Site::setSites([
             'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],

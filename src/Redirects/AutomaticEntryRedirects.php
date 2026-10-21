@@ -155,7 +155,8 @@ class AutomaticEntryRedirects
 
     /**
      * Stash this entry's original URL when its slug, date, or a route field
-     * changed, it is live now, and it was live before this save.
+     * changed, it is live now, and it was live before this save. Keep a path
+     * already captured by the origin before it changed inherited values.
      */
     private function stashMovedByOwnChange(Entry $entry): void
     {
@@ -177,7 +178,7 @@ class AutomaticEntryRedirects
             return;
         }
 
-        $this->entries[$entry->id()] = $entry->site()->relativePath($originalUrl);
+        $this->entries[$entry->id()] ??= $entry->site()->relativePath($originalUrl);
     }
 
     /**
