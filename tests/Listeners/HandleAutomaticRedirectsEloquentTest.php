@@ -460,11 +460,11 @@ it('creates a redirect when an eloquent inherited localization date changes the 
         ->and($localization->destination())->toBe("entry::{$fr->id()}");
 });
 
-it('creates an entry redirect when an eloquent mount slug changes', function () {
+it('creates an entry redirect when an eloquent mount slug changes', function (bool $mountPublished) {
     Collection::make('sections')->routes('/{slug}')->sites(['default'])->saveQuietly();
     Blink::flush();
 
-    $blog = tap(Entry::make()->collection('sections')->locale('default')->slug('blog'))->save();
+    $blog = tap(Entry::make()->collection('sections')->locale('default')->slug('blog')->published($mountPublished))->save();
 
     Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
     Blink::flush();
@@ -475,13 +475,20 @@ it('creates an entry redirect when an eloquent mount slug changes', function () 
 
     $blog->slug('journal')->save();
 
+    Blink::flush();
+
     $post = Entry::find($post->id());
 
     expect($blog)->toBeInstanceOf(EloquentEntry::class)
         ->and($post)->toBeInstanceOf(EloquentEntry::class)
+        ->and(Entry::findByUri('/journal/hello', 'default')?->id())->toBe($post->id())
+        ->and(Redirect::query()->where('site', 'default')->where('source', '/blog')->exists())->toBe($mountPublished)
         ->and(Redirect::query()->where('site', 'default')->where('source', '/blog/hello')->first()?->destination())->toBe("entry::{$post->id()}")
         ->and(Redirect::resolve('/blog/hello', 'default')->destination)->toBe($post->absoluteUrl());
-});
+})->with([
+    'published mount' => [true],
+    'draft mount' => [false],
+]);
 
 it('keeps a stored localized date while capturing an inherited route field change', function () {
     Site::setSites([

@@ -504,16 +504,12 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * The page was live and its slug, date, or a route field changed. A collection
-     * mounted on it moves with the page, even when this page's own collection creates no redirect.
+     * A collection mounted on this page moves when its slug, date, or a route
+     * field changes. Mounted content is checked independently of the page's publication state.
      */
     private function stashMovedByMount(Entry $entry): void
     {
         if (! RedirectsFeature::enabled()) {
-            return;
-        }
-
-        if (! $this->wasLive($entry)) {
             return;
         }
 

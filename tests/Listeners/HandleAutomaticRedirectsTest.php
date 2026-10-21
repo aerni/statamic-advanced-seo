@@ -1539,15 +1539,41 @@ describe('mount redirects', function () {
             ->and($redirects->get('/blog/world'))->toBe("entry::{$world->id()}");
     });
 
-    it('redirects each mounted term to its new path', function () {
+    it('redirects published entries mounted on a draft page', function () {
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog')->published(false))->save();
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+        tap(Entry::make()->collection('posts')->locale('default')->slug('draft')->published(false))->save();
+
+        expect($post->status())->toBe('published')
+            ->and(Entry::findByUri('/blog/hello', 'default')?->id())->toBe($post->id());
+
+        forgetRedirects();
+
+        $blog->slug('journal')->save();
+
+        Blink::flush();
+
+        $redirects = redirectMap();
+
+        expect(Entry::findByUri('/journal/hello', 'default')?->id())->toBe($post->id())
+            ->and($redirects->get('/blog/hello'))->toBe("entry::{$post->id()}")
+            ->and($redirects->has('/blog'))->toBeFalse()
+            ->and($redirects->has('/blog/draft'))->toBeFalse()
+            ->and(Redirect::resolve('/blog/hello', 'default')?->destination)->toBe($post->absoluteUrl());
+    });
+
+    it('redirects each mounted term to its new path', function (bool $mountPublished) {
         Taxonomy::make('tags')->sites(['default'])->saveQuietly();
 
-        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog')->published($mountPublished))->save();
 
         Collection::make('posts')->routes('/{mount}/{slug}')->mount($blog->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
         Blink::flush();
 
-        withTermViews(['posts.tags.show'], function () use ($blog) {
+        withTermViews(['posts.tags.show'], function () use ($blog, $mountPublished) {
             tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('news')->data(['title' => 'News']))->save();
 
             forgetRedirects();
@@ -1555,9 +1581,13 @@ describe('mount redirects', function () {
             $blog->slug('journal')->save();
 
             expect(redirectMap()->get('/blog/tags/news'))->toBe('/journal/tags/news')
-                ->and(redirectMap()->has('/tags/news'))->toBeFalse();
+                ->and(redirectMap()->has('/tags/news'))->toBeFalse()
+                ->and(redirectMap()->has('/blog'))->toBe($mountPublished);
         });
-    });
+    })->with([
+        'published mount' => [true],
+        'draft mount' => [false],
+    ]);
 
     it('follows a later entry slug change after the mount redirect', function () {
         $blog = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
