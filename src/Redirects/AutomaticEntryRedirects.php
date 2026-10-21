@@ -701,11 +701,11 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Every collection mounted on this entry or its origin.
+     * Every collection mounted on this entry or one of its localization origins.
      */
     private function mountedCollections(Entry $entry): Collection
     {
-        $ids = collect([$entry->id(), $entry->origin()?->id()])->filter();
+        $ids = $entry->ancestors()->map->id()->push($entry->id());
 
         return CollectionFacade::all()
             ->filter(fn ($collection) => $ids->contains($collection->mount()?->id()))

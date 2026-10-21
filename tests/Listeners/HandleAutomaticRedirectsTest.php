@@ -1702,6 +1702,34 @@ describe('mount redirects', function () {
 
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
+
+    it('creates a mounted entry redirect through multiple localization origins', function () {
+        Site::setSites([
+            'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+            'de' => ['name' => 'DE', 'url' => 'https://example.com/de', 'locale' => 'de'],
+            'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+        Collection::make('sections')->routes('/{slug}')->sites(['en', 'de', 'fr'])->saveQuietly();
+        $en = tap(Entry::make()->collection('sections')->locale('en')->slug('blog'))->save();
+        $de = tap($en->makeLocalization('de')->slug('journal-de'))->save();
+        $fr = tap($de->makeLocalization('fr')->slug('journal-fr'))->save();
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($en->id())->sites(['en', 'de', 'fr'])->saveQuietly();
+        Blink::flush();
+
+        $post = tap(Entry::make()->collection('posts')->locale('fr')->slug('hello'))->save();
+
+        expect($post->uri())->toBe('/journal-fr/hello');
+
+        forgetRedirects();
+
+        $fr->slug('actualites')->save();
+
+        Blink::flush();
+
+        expect(Entry::findByUri('/actualites/hello', 'fr')?->id())->toBe($post->id())
+            ->and(Redirect::query()->where('site', 'fr')->where('source', '/journal-fr/hello')->first()?->destination())->toBe("entry::{$post->id()}")
+            ->and(Redirect::resolve('/journal-fr/hello', 'fr')?->destination)->toBe($post->absoluteUrl());
+    });
 });
 
 describe('term redirects', function () {
