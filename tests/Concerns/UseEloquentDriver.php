@@ -12,6 +12,8 @@ trait UseEloquentDriver
 
     protected function defineDatabaseMigrations(): void
     {
+        parent::defineDatabaseMigrations();
+
         Schema::create('seo_set_configs', function ($table) {
             $table->id();
             $table->string('type');

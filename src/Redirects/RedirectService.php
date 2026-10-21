@@ -25,6 +25,11 @@ class RedirectService
         return app(RedirectErrorRepository::class);
     }
 
+    public function automatic(): AutomaticRedirects
+    {
+        return app(AutomaticRedirects::class);
+    }
+
     public function import(string $path): ImportResult
     {
         return app(RedirectImporter::class)->import($path);
