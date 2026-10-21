@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Concerns\AsAction;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -10,34 +11,47 @@ use Statamic\Facades\Site;
 
 class ResolveXDefault
 {
+    use AsAction;
+
     /**
-     * The x-default localization for an entry or term cluster.
+     * The x-default for a cluster.
      *
+     * Pass an entry or term to resolve its localization. Pass only site handles
+     * for a taxonomy index, which has no original localization.
+     */
+    public function handle(Collection $cluster, Entry|Term|null $model = null): Entry|Term|string|null
+    {
+        if ($model) {
+            return $this->localization($cluster, $model);
+        }
+
+        return $this->forSites($cluster);
+    }
+
+    /**
      * Uses the configured site when that localization is in the cluster.
      * Otherwise uses the original localization when it is in the cluster.
      */
-    public static function localization(Collection $localizations, Entry|Term $model): Entry|Term|null
+    protected function localization(Collection $localizations, Entry|Term $model): Entry|Term|null
     {
-        $site = static::site();
+        $site = $this->site();
 
         if ($match = $localizations->first(fn (Entry|Term $localization) => $localization->locale() === $site)) {
             return $match;
         }
 
-        $root = static::root($model);
+        $root = $this->root($model);
 
         return $localizations->first(fn (Entry|Term $localization) => $localization->locale() === $root->locale());
     }
 
     /**
-     * The x-default site for a taxonomy index cluster.
-     *
      * Uses the configured site when it is one of the given sites.
-     * Otherwise uses the first site. Taxonomy indexes have no original localization.
+     * Otherwise uses the first site.
      */
-    public static function forSites(Collection $sites): ?string
+    protected function forSites(Collection $sites): ?string
     {
-        $site = static::site();
+        $site = $this->site();
 
         if ($sites->contains($site)) {
             return $site;
@@ -46,7 +60,7 @@ class ResolveXDefault
         return $sites->first();
     }
 
-    public static function site(): string
+    protected function site(): string
     {
         $configured = Seo::find('site::defaults')?->config()->value('hreflang_x_default');
 
@@ -61,7 +75,7 @@ class ResolveXDefault
      * Entries walk their localization origin. Terms have no root entry;
      * their original localization is the taxonomy's default locale.
      */
-    protected static function root(Entry|Term $model): Entry|Term
+    protected function root(Entry|Term $model): Entry|Term
     {
         if (method_exists($model, 'root')) {
             return $model->root();

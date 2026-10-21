@@ -43,7 +43,7 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             ];
         });
 
-        if ($xDefaultSite = ResolveXDefault::forSites($sites)) {
+        if ($xDefaultSite = ResolveXDefault::run($sites)) {
             // Set the site so we can get the localized absolute URL for the x-default.
             Site::setCurrent($xDefaultSite);
 

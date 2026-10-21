@@ -37,7 +37,7 @@ trait HasHreflang
             return null;
         }
 
-        $xDefault = ResolveXDefault::localization($localizations, $model);
+        $xDefault = ResolveXDefault::run($localizations, $model);
 
         $hreflang = $localizations->map(fn ($localization) => [
             'url' => $localization->absoluteUrl(),
@@ -96,7 +96,7 @@ trait HasHreflang
             'locale' => Helpers::parseLocale(Site::get($site)->locale()),
         ]);
 
-        if ($xDefaultSite = ResolveXDefault::forSites($sites)) {
+        if ($xDefaultSite = ResolveXDefault::run($sites)) {
             $hreflang->push([
                 'url' => $resolveUrl($xDefaultSite),
                 'locale' => 'x-default',

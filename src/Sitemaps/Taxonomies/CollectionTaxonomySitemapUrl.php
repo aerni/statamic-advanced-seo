@@ -38,7 +38,7 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
             'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
         ]);
 
-        if ($xDefaultSite = ResolveXDefault::forSites($sites)) {
+        if ($xDefaultSite = ResolveXDefault::run($sites)) {
             $hreflang->push([
                 'href' => $this->collectionTaxonomyUrl($this->taxonomy, $xDefaultSite),
                 'hreflang' => 'x-default',
