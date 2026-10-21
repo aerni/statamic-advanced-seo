@@ -58,8 +58,8 @@ class AutomaticTermRedirects
      * redirected on its own. An unchanged override drops out (old URL equals
      * new URL). A path is included when Statamic would serve that page. The
      * canonical URL needs the term view, checked per localization because a
-     * site can set its own template. A collection adds its path when it is
-     * mounted and that view exists.
+     * site can set its own template. A collection adds its path when its
+     * scoped view exists.
      *
      * TODO: Statamic PR #15192 (draft) adds configurable term routes. A term
      * URL is only the slug today, so this only watches slug changes. Once
@@ -250,10 +250,6 @@ class AutomaticTermRedirects
      */
     private function collectionTermPath(LocalizedTerm $localized, StatamicCollection $collection): ?string
     {
-        if (! $collection->uri($localized->locale())) {
-            return null;
-        }
-
         $scoped = (clone $localized)->collection($collection);
 
         if (! view()->exists($scoped->template())) {

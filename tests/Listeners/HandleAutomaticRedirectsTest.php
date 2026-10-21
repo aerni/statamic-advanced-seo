@@ -1929,7 +1929,7 @@ describe('term redirects', function () {
         });
     });
 
-    it('creates nothing for an unmounted collection even when the term view exists', function () {
+    it('redirects the public term url of an unmounted collection', function () {
         Collection::make('blog')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
         Blink::flush();
 
@@ -1938,7 +1938,7 @@ describe('term redirects', function () {
 
             $term->slug('new')->save();
 
-            expect(Redirect::query()->where('site', 'default')->where('source', '/blog/tags/old')->get())->toHaveCount(0)
+            expect(Redirect::query()->where('site', 'default')->where('source', '/blog/tags/old')->first()?->destination())->toBe('/blog/tags/new')
                 ->and(Redirect::query()->where('site', 'default')->where('source', '/tags/old')->first())->not->toBeNull();
         });
     });
