@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
+use Aerni\AdvancedSeo\Actions\ResolveXDefault;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Facades\Cache;
@@ -42,17 +43,17 @@ class TaxonomySitemapUrl extends BaseSitemapUrl
             ];
         });
 
-        $originSite = $this->taxonomy->sites()->first();
+        if ($xDefaultSite = ResolveXDefault::forSites($sites)) {
+            // Set the site so we can get the localized absolute URL for the x-default.
+            Site::setCurrent($xDefaultSite);
 
-        $xDefaultSite = $sites->contains($originSite) ? $originSite : $this->site;
+            $hreflang->push([
+                'href' => $this->taxonomy->absoluteUrl(),
+                'hreflang' => 'x-default',
+            ]);
+        }
 
-        // Set the site so we can get the localized absolute URL for the x-default.
-        Site::setCurrent($xDefaultSite);
-
-        return $hreflang->push([
-            'href' => $this->taxonomy->absoluteUrl(),
-            'hreflang' => 'x-default',
-        ])->values()->all();
+        return $hreflang->values()->all();
     }
 
     public function lastmod(): string

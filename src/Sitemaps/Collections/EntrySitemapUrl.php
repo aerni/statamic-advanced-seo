@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Collections;
 
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Actions\ResolveXDefault;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
@@ -29,28 +30,30 @@ class EntrySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $hreflang = $sites
+        $localizations = $sites
             ->map(fn ($locale) => $this->entry->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
             ->filter(IncludeInSitemap::run(...));
 
-        if ($hreflang->count() < 2) {
+        if ($localizations->count() < 2) {
             return null;
         }
 
-        $hreflang->transform(fn ($model) => [
+        $xDefault = ResolveXDefault::localization($localizations, $this->entry);
+
+        $hreflang = $localizations->map(fn ($model) => [
             'href' => $model->absoluteUrl(),
             'hreflang' => Helpers::parseLocale($model->site()->locale()),
         ]);
 
-        $origin = $this->entry->origin() ?? $this->entry;
+        if ($xDefault) {
+            $hreflang->push([
+                'href' => $xDefault->absoluteUrl(),
+                'hreflang' => 'x-default',
+            ]);
+        }
 
-        $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->entry;
-
-        return $hreflang->push([
-            'href' => $xDefault->absoluteUrl(),
-            'hreflang' => 'x-default',
-        ])->values()->all();
+        return $hreflang->values()->all();
     }
 
     public function lastmod(): string

@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
+use Aerni\AdvancedSeo\Actions\ResolveXDefault;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Illuminate\Support\Collection;
@@ -37,14 +38,14 @@ class CollectionTaxonomySitemapUrl extends BaseSitemapUrl
             'hreflang' => Helpers::parseLocale(Site::get($site)->locale()),
         ]);
 
-        $originSite = $this->taxonomy->sites()->first();
+        if ($xDefaultSite = ResolveXDefault::forSites($sites)) {
+            $hreflang->push([
+                'href' => $this->collectionTaxonomyUrl($this->taxonomy, $xDefaultSite),
+                'hreflang' => 'x-default',
+            ]);
+        }
 
-        $xDefaultSite = $sites->contains($originSite) ? $originSite : $this->site;
-
-        return $hreflang->push([
-            'href' => $this->collectionTaxonomyUrl($this->taxonomy, $xDefaultSite),
-            'hreflang' => 'x-default',
-        ])->values()->all();
+        return $hreflang->values()->all();
     }
 
     public function lastmod(): string
