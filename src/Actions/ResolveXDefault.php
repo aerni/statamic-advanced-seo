@@ -14,18 +14,19 @@ class ResolveXDefault
     use AsAction;
 
     /**
-     * The x-default for a cluster.
+     * The x-default member of a cluster.
      *
-     * Pass an entry or term to resolve its localization. Pass only site handles
-     * for a taxonomy index, which has no original localization.
+     * Entries and terms use the configured site, then their original localization.
+     * Taxonomy index sites use the configured site, then the first site.
      */
-    public function handle(Collection $cluster, Entry|Term|null $model = null): Entry|Term|string|null
+    public function handle(Collection $cluster): Entry|Term|string|null
     {
-        if ($model) {
-            return $this->localization($cluster, $model);
-        }
+        $first = $cluster->first();
 
-        return $this->forSites($cluster);
+        return match (true) {
+            $first instanceof Entry, $first instanceof Term => $this->localization($cluster, $first),
+            default => $this->forSites($cluster),
+        };
     }
 
     /**

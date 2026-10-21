@@ -37,7 +37,7 @@ trait HasHreflang
             return null;
         }
 
-        $xDefault = ResolveXDefault::run($localizations, $model);
+        $xDefault = ResolveXDefault::run($localizations);
 
         $hreflang = $localizations->map(fn ($localization) => [
             'url' => $localization->absoluteUrl(),

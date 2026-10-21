@@ -39,7 +39,7 @@ class EntrySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $xDefault = ResolveXDefault::run($localizations, $this->entry);
+        $xDefault = ResolveXDefault::run($localizations);
 
         $hreflang = $localizations->map(fn ($model) => [
             'href' => $model->absoluteUrl(),

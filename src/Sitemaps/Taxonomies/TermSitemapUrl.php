@@ -32,7 +32,7 @@ class TermSitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $xDefault = ResolveXDefault::run($terms, $this->term);
+        $xDefault = ResolveXDefault::run($terms);
 
         $hreflang = $terms->map(fn ($term) => [
             'href' => $term->absoluteUrl(),
