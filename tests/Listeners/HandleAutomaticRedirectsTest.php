@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Aerni\AdvancedSeo\Redirects\AutomaticRedirectWriter;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
@@ -18,6 +19,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
@@ -384,17 +386,60 @@ describe('entry redirects', function () {
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
-    it('creates nothing when a published term still owns the old url', function () {
-        Collection::find('pages')->routes('/tags/{slug}')->saveQuietly();
+    it('creates nothing when a public term still owns the old url', function (string $route, string $template) {
+        Collection::find('pages')->routes($route)->saveQuietly();
         Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+        Collection::make('blog')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
         Blink::flush();
 
         tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('shared')->data(['title' => 'Shared']))->save();
         $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('shared'))->save();
 
-        $entry->slug('moved')->save();
+        withTermViews([$template], function () use ($entry) {
+            $entry->slug('moved')->save();
 
-        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+            expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+        });
+    })->with([
+        'canonical term' => ['/tags/{slug}', 'tags.show'],
+        'collection-scoped term' => ['/blog/tags/{slug}', 'blog.tags.show'],
+    ]);
+
+    it('creates a redirect when a matching term is not publicly served', function (string $route, array $templates) {
+        Collection::find('pages')->routes($route)->saveQuietly();
+        Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+        Collection::make('blog')->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('shared')->data(['title' => 'Shared']))->save();
+        $entry = tap(Entry::make()->collection('pages')->locale('default')->slug('shared'))->save();
+        $oldPath = $entry->uri();
+
+        withTermViews($templates, function () use ($entry, $oldPath) {
+            $entry->slug('moved')->save();
+
+            expect(Redirect::query()->where('site', 'default')->where('source', $oldPath)->first()?->destination())->toBe("entry::{$entry->id()}");
+        });
+    })->with([
+        'missing term template' => ['/tags/{slug}', []],
+        'unrelated collection with a template' => ['/blog/tags/{slug}', ['blog.tags.show']],
+    ]);
+
+    it('creates a redirect when a matching term is unpublished', function () {
+        $term = Mockery::mock(LocalizedTerm::class);
+        $term->shouldReceive('status')->andReturn('draft');
+        $term->shouldReceive('template')->andReturn('tags.show');
+        $term->shouldReceive('collection')->andReturnNull();
+
+        Term::partialMock()->shouldReceive('findByUri')
+            ->with('/tags/shared', 'default')
+            ->andReturn($term);
+
+        withTermViews(['tags.show'], function () {
+            app(AutomaticRedirectWriter::class)->create('/tags/shared', '/moved', 'default');
+
+            expect(Redirect::query()->where('site', 'default')->where('source', '/tags/shared')->first()?->destination())->toBe('/moved');
+        });
     });
 
     it('creates nothing for a new entry', function () {

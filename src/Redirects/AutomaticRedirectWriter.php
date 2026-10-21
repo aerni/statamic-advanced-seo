@@ -91,9 +91,26 @@ class AutomaticRedirectWriter
             ->exists();
     }
 
+    /**
+     * Only a published term that Statamic can serve owns its URL.
+     */
     private function sourceIsOwnedByPublishedTerm(string $source, string $site): bool
     {
-        return TermFacade::findByUri($source, $site)?->status() === 'published';
+        $term = TermFacade::findByUri($source, $site);
+
+        if (! $term) {
+            return false;
+        }
+
+        if ($term->status() !== 'published') {
+            return false;
+        }
+
+        if (! view()->exists($term->template())) {
+            return false;
+        }
+
+        return ! $term->collection() || $term->taxonomy()->collections()->contains($term->collection());
     }
 
     /**
