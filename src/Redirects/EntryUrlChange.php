@@ -333,7 +333,7 @@ class EntryUrlChange
      * The localization's date follows the origin. A localized date on an
      * entry between them breaks the chain.
      */
-    private function inheritsDate(Entry $origin, Entry $localization): bool
+    public function inheritsDate(Entry $origin, Entry $localization): bool
     {
         $entry = $localization;
 

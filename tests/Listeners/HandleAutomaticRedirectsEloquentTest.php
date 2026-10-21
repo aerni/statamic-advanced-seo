@@ -8,6 +8,7 @@ use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Illuminate\Support\Facades\File;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
 use Statamic\Eloquent\Taxonomies\Term as EloquentTerm;
+use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -480,6 +481,35 @@ it('creates an entry redirect when an eloquent mount slug changes', function () 
         ->and($post)->toBeInstanceOf(EloquentEntry::class)
         ->and(Redirect::query()->where('site', 'default')->where('source', '/blog/hello')->first()?->destination())->toBe("entry::{$post->id()}")
         ->and(Redirect::resolve('/blog/hello', 'default')->destination)->toBe($post->absoluteUrl());
+});
+
+it('keeps a stored localized date while capturing an inherited route field change', function () {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+
+    Collection::make('articles')->dated(true)->routes('/{year}/{category}/{slug}')->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+
+    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15')->set('category', 'news'))->save();
+    $fr = tap($en->makeLocalization('fr')->slug('article'))->save();
+
+    // Seed an existing override, independently of how the driver creates date overrides.
+    $fr->model()->update([
+        'date' => '2023-01-15',
+        'data' => array_merge($fr->model()->getAttribute('data'), ['__localized_fields' => ['date']]),
+    ]);
+    Blink::flush();
+
+    $fr = $en->descendants()->get('fr');
+
+    expect($fr->date()->format('Y-m-d'))->toBe('2023-01-15');
+
+    $en->date('2025-01-15')->set('category', 'updates');
+    event(new EntrySaving($en));
+
+    expect($fr->date()->format('Y-m-d'))->toBe('2023-01-15');
 });
 
 function eloquentStructuredPages(bool $withBio = false): array

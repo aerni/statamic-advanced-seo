@@ -303,7 +303,7 @@ class AutomaticEntryRedirects
             // Eloquent copies the origin date onto the localization. Clear that
             // copy so the save that follows writes the new date into the URI.
             // The old path was already read above.
-            if ($changed->date && ! $localization->initialPath() && $localization->hasExplicitDate()) {
+            if ($changed->date && ! $localization->initialPath() && $this->urls->inheritsDate($entry, $localization)) {
                 $localization->date(null);
             }
         }
