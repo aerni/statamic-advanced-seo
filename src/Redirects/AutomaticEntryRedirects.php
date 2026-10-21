@@ -67,7 +67,7 @@ class AutomaticEntryRedirects
      * previous one. Stash those paths and create the redirects once Statamic
      * has rewritten the moved pages on CollectionTreeSaved.
      *
-     * @param  array<int, string>  $ids
+     * @param  array<int, int|string>  $ids
      */
     public function stashMovedByTree(array $ids): void
     {
@@ -308,7 +308,7 @@ class AutomaticEntryRedirects
      * Stash the site-relative path still stored for each existing entry.
      * An id is looked up. An entry is used as given.
      *
-     * @param  array<int, Entry|string>  $entries
+     * @param  array<int, Entry|int|string>  $entries
      * @return array<string, string>
      */
     private function stashOriginalPaths(array $entries): array
@@ -316,7 +316,7 @@ class AutomaticEntryRedirects
         $paths = [];
 
         foreach ($entries as $entry) {
-            if (is_string($entry)) {
+            if (! $entry instanceof Entry) {
                 $entry = EntryFacade::find($entry);
             }
 
@@ -515,7 +515,7 @@ class AutomaticEntryRedirects
      * Store each entry's old path, plus the entries and terms mounted on it.
      * Paths already stored for this save are left as they are.
      *
-     * @param  array<int, Entry|string>  $entries
+     * @param  array<int, Entry|int|string>  $entries
      */
     private function stashAffectedEntries(string $key, array $entries): void
     {
@@ -523,7 +523,7 @@ class AutomaticEntryRedirects
         $visited = [];
 
         foreach ($entries as $entry) {
-            if (is_string($entry)) {
+            if (! $entry instanceof Entry) {
                 $entry = EntryFacade::find($entry);
             }
 
@@ -538,7 +538,7 @@ class AutomaticEntryRedirects
     /**
      * Keep the first stored path for each affected entry.
      *
-     * @param  array<int, Entry|string>  $entries
+     * @param  array<int, Entry|int|string>  $entries
      */
     private function stashAffectedEntryPaths(string $key, array $entries): void
     {

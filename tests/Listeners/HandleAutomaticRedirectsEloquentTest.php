@@ -7,7 +7,10 @@ use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
+use Statamic\Eloquent\Entries\EntryModel;
+use Statamic\Eloquent\Entries\UuidEntryModel;
 use Statamic\Eloquent\Taxonomies\Term as EloquentTerm;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blink;
@@ -359,10 +362,12 @@ it('creates a redirect when an eloquent term localization slug changes and the b
     }
 });
 
-it('creates a redirect when an eloquent entry moves in the tree', function () {
+it('creates a redirect when an eloquent entry moves in the tree', function (string $model, string $idType) {
+    eloquentUseEntryModel($model);
     [$home, $about, $team] = eloquentStructuredPages();
 
-    expect($team)->toBeInstanceOf(EloquentEntry::class);
+    expect($team)->toBeInstanceOf(EloquentEntry::class)
+        ->and(get_debug_type($team->id()))->toBe($idType);
 
     eloquentSaveTree([
         ['entry' => $home->id()],
@@ -382,8 +387,13 @@ it('creates a redirect when an eloquent entry moves in the tree', function () {
     $redirect = Redirect::query()->where('site', 'default')->where('source', '/about/team')->first();
 
     expect($redirect)->not->toBeNull()
-        ->and($redirect->destination())->toBe("entry::{$team->id()}");
-});
+        ->and($redirect->destination())->toBe("entry::{$team->id()}")
+        ->and(Entry::findByUri('/team', 'default')?->id())->toBe($team->id())
+        ->and(Redirect::resolve('/about/team', 'default')?->destination)->toBe($team->absoluteUrl());
+})->with([
+    'integer IDs' => [EntryModel::class, 'int'],
+    'UUIDs' => [UuidEntryModel::class, 'string'],
+]);
 
 it('creates redirects for eloquent child pages when their parent moves', function () {
     [$home, $about, $team, $bio] = eloquentStructuredPages(withBio: true);
@@ -421,8 +431,11 @@ it('creates redirects for eloquent child pages when their parent moves', functio
         ->and($redirects->get('/about/team/bio'))->toBe("entry::{$bio->id()}");
 });
 
-it('creates a redirect for an eloquent child page when a parent slug changes', function () {
+it('creates a redirect for an eloquent child page when a parent slug changes', function (string $model, string $idType) {
+    eloquentUseEntryModel($model);
     [$home, $about, $team] = eloquentStructuredPages();
+
+    expect(get_debug_type($team->id()))->toBe($idType);
 
     eloquentSaveTree([
         ['entry' => $home->id()],
@@ -439,8 +452,13 @@ it('creates a redirect for an eloquent child page when a parent slug changes', f
 
     expect($redirect)->not->toBeNull()
         ->and($redirect->destination())->toBe("entry::{$team->id()}")
-        ->and(Entry::find($team->id())->model()->fresh()->getAttribute('uri'))->toBe('/company/team');
-});
+        ->and(Entry::find($team->id())->model()->fresh()->getAttribute('uri'))->toBe('/company/team')
+        ->and(Entry::findByUri('/company/team', 'default')?->id())->toBe($team->id())
+        ->and(Redirect::resolve('/about/team', 'default')?->destination)->toBe($team->absoluteUrl());
+})->with([
+    'integer IDs' => [EntryModel::class, 'int'],
+    'UUIDs' => [UuidEntryModel::class, 'string'],
+]);
 
 it('creates nothing when an eloquent draft entry is published and its slug changes in the same save', function () {
     Collection::make('articles')->routes('/{slug}')->sites(['default'])->saveQuietly();
@@ -772,6 +790,21 @@ it('keeps a stored localized date while capturing an inherited route field chang
 
     expect($fr->date()->format('Y-m-d'))->toBe('2023-01-15');
 });
+
+/** @param class-string<EntryModel> $model */
+function eloquentUseEntryModel(string $model): void
+{
+    config(['statamic.eloquent-driver.entries.model' => $model]);
+
+    if ($model !== EntryModel::class) {
+        return;
+    }
+
+    Schema::drop('entries');
+
+    $migration = require __DIR__.'/../../vendor/statamic/eloquent-driver/database/migrations/entries/2024_03_07_100000_create_entries_table.php';
+    $migration->up();
+}
 
 function eloquentStructuredPages(bool $withBio = false): array
 {
