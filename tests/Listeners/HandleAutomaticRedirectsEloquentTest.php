@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Eloquent\Redirect as EloquentRedirect;
+use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
@@ -188,6 +189,70 @@ it('creates a redirect when an eloquent term slug changes under a mounted collec
             ->and($redirect->destination())->toBe('/blog/tags/new');
     } finally {
         File::delete($path);
+    }
+});
+
+it('redirects canonical and collection urls when an eloquent term loaded through its collection url is renamed', function () {
+    Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+    Collection::make('posts')->routes('/posts/{slug}')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $paths = [resource_path('views/tags/show.antlers.html'), resource_path('views/posts/tags/show.antlers.html')];
+
+    foreach ($paths as $path) {
+        File::ensureDirectoryExists(dirname($path));
+        File::put($path, '');
+    }
+
+    try {
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+        $term = Term::findByUri('/posts/tags/old', 'default');
+
+        expect($term->collection()->handle())->toBe('posts');
+
+        $term->slug('new')->save();
+
+        $redirects = Redirect::query()->where('site', 'default')->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+        expect($redirects->get('/tags/old'))->toBe('/tags/new')
+            ->and($redirects->get('/posts/tags/old'))->toBe('/posts/tags/new')
+            ->and($term->collection()->handle())->toBe('posts');
+    } finally {
+        foreach ($paths as $path) {
+            File::delete($path);
+        }
+    }
+});
+
+it('deletes canonical and collection redirects when an eloquent term loaded through its collection url is deleted', function () {
+    Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+    Collection::make('posts')->routes('/posts/{slug}')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $paths = [resource_path('views/tags/show.antlers.html'), resource_path('views/posts/tags/show.antlers.html')];
+
+    foreach ($paths as $path) {
+        File::ensureDirectoryExists(dirname($path));
+        File::put($path, '');
+    }
+
+    try {
+        tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('target')->data(['title' => 'Target']))->save();
+        Redirect::make()->source('/tags/old')->destination('/tags/target')->site('default')->origin(RedirectOrigin::Automatic)->save();
+        Redirect::make()->source('/posts/tags/old')->destination('/posts/tags/target')->site('default')->origin(RedirectOrigin::Automatic)->save();
+        $manual = tap(Redirect::make()->source('/manual')->destination('/tags/target')->site('default')->origin(RedirectOrigin::Manual))->save();
+
+        Term::findByUri('/posts/tags/target', 'default')->delete();
+
+        $redirects = Redirect::query()->where('site', 'default')->get();
+
+        expect($redirects)->toHaveCount(1)
+            ->and($redirects->first()->id())->toBe($manual->id())
+            ->and($redirects->first()->destination())->toBe('/tags/target');
+    } finally {
+        foreach ($paths as $path) {
+            File::delete($path);
+        }
     }
 });
 

@@ -105,7 +105,11 @@ class AutomaticRedirectWriter
             return false;
         }
 
-        return $this->termIsPublic($term);
+        if (! $this->termIsPublic($term)) {
+            return false;
+        }
+
+        return $term->uri() === $source;
     }
 
     /**

@@ -11,6 +11,8 @@ trait ResolvesTermUrls
     /** @return Collection<int, array{site: string, collection: ?string, path: string}> */
     protected function termPathsForSite(LocalizedTerm $term): Collection
     {
+        $term = (clone $term)->collection(null);
+
         return $term->taxonomy()->collections()
             ->map(fn (StatamicCollection $collection) => [
                 'site' => $term->locale(),

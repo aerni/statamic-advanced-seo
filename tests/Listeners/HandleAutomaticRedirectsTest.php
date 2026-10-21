@@ -2152,6 +2152,48 @@ describe('term redirects', function () {
         });
     });
 
+    it('redirects canonical and collection urls when a term loaded through its collection url is renamed', function () {
+        Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+        Collection::make('posts')->routes('/posts/{slug}')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () {
+            tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('old')->data(['title' => 'Old']))->save();
+            $term = Term::findByUri('/posts/tags/old', 'default');
+
+            expect($term->collection()->handle())->toBe('posts');
+
+            $term->slug('new')->save();
+
+            $redirects = Redirect::query()->where('site', 'default')->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+            expect($redirects->get('/tags/old'))->toBe('/tags/new')
+                ->and($redirects->get('/posts/tags/old'))->toBe('/posts/tags/new')
+                ->and($term->collection()->handle())->toBe('posts');
+        });
+    });
+
+    it('deletes canonical and collection redirects when a term loaded through its collection url is deleted', function () {
+        Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+        Collection::make('posts')->routes('/posts/{slug}')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () {
+            tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('target')->data(['title' => 'Target']))->save();
+            Redirect::make()->source('/tags/old')->destination('/tags/target')->site('default')->origin(RedirectOrigin::Automatic)->save();
+            Redirect::make()->source('/posts/tags/old')->destination('/posts/tags/target')->site('default')->origin(RedirectOrigin::Automatic)->save();
+            $manual = tap(Redirect::make()->source('/manual')->destination('/tags/target')->site('default')->origin(RedirectOrigin::Manual))->save();
+
+            Term::findByUri('/posts/tags/target', 'default')->delete();
+
+            $redirects = Redirect::query()->where('site', 'default')->get();
+
+            expect($redirects)->toHaveCount(1)
+                ->and($redirects->first()->id())->toBe($manual->id())
+                ->and($redirects->first()->destination())->toBe('/tags/target');
+        });
+    });
+
     it('redirects the public term url of an unmounted collection', function () {
         Collection::make('blog')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
         Blink::flush();
