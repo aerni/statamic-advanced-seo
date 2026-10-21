@@ -2194,6 +2194,32 @@ describe('term redirects', function () {
         });
     });
 
+    it('deletes canonical and collection automatic redirects when a term with a missing template is deleted', function () {
+        Collection::make('posts')->routes('/posts/{slug}')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withTermViews(['posts.tags.show'], function () {
+            $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('design')->data(['title' => 'Design']))->save();
+            $term->slug('branding')->save();
+
+            $redirects = Redirect::query()->where('site', 'default')->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+            expect($redirects->get('/tags/design'))->toBe('/tags/branding')
+                ->and($redirects->get('/posts/tags/design'))->toBe('/posts/tags/branding');
+
+            $manual = tap(Redirect::make()->source('/manual')->destination('/tags/branding')->site('default')->origin(RedirectOrigin::Manual))->save();
+            $term->template('missing')->save();
+
+            $term->delete();
+
+            $remaining = Redirect::query()->where('site', 'default')->get();
+
+            expect($remaining)->toHaveCount(1)
+                ->and($remaining->first()->id())->toBe($manual->id())
+                ->and($remaining->first()->destination())->toBe('/tags/branding');
+        });
+    });
+
     it('redirects the public term url of an unmounted collection', function () {
         Collection::make('blog')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
         Blink::flush();

@@ -130,6 +130,7 @@ class AutomaticTermRedirects
      * A deleted term leaves the auto-created redirects that pointed at it with
      * a dead destination, so remove them. Those redirects point at a path
      * rather than an entry reference, so match on the term's URL per site.
+     * Cleanup still applies when the term's view no longer exists.
      * Manual redirects and redirects whose source is the now-gone URL are left alone.
      */
     public function delete(Term $term): void
@@ -138,7 +139,7 @@ class AutomaticTermRedirects
             return;
         }
 
-        foreach ($this->termSitePaths($term) as $current) {
+        foreach ($this->termSitePaths($term, onlyPublicUrls: false) as $current) {
             $this->redirects->deleteByDestination($current['path'], $current['site']);
         }
     }
@@ -207,14 +208,15 @@ class AutomaticTermRedirects
     /**
      * Site and path pairs for every localization of the term, keyed by site and
      * collection so the old and new paths match. A site's canonical path comes
-     * before the collection paths Statamic would serve for that site.
+     * before its collection paths. Creation includes only public paths; deletion
+     * also includes paths whose views no longer exist.
      *
      * @return array<string, array{site: string, collection: ?string, path: string}>
      */
-    private function termSitePaths(Term $term): array
+    private function termSitePaths(Term $term, bool $onlyPublicUrls = true): array
     {
         return $term->localizations()
-            ->flatMap(fn (LocalizedTerm $localized) => $this->termPathsForSite($localized))
+            ->flatMap(fn (LocalizedTerm $localized) => $this->termPathsForSite($localized, $onlyPublicUrls))
             ->keyBy(fn (array $path) => $path['collection']
                 ? "{$path['site']}.{$path['collection']}"
                 : $path['site'])

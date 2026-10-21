@@ -9,20 +9,16 @@ use Statamic\Taxonomies\LocalizedTerm;
 trait ResolvesTermUrls
 {
     /** @return Collection<int, array{site: string, collection: ?string, path: string}> */
-    protected function termPathsForSite(LocalizedTerm $term): Collection
+    protected function termPathsForSite(LocalizedTerm $term, bool $onlyPublicUrls = true): Collection
     {
-        $term = (clone $term)->collection(null);
-
         return $term->taxonomy()->collections()
-            ->map(fn (StatamicCollection $collection) => [
-                'site' => $term->locale(),
-                'collection' => $collection->handle(),
-                'path' => $this->collectionTermPath($term, $collection),
-            ])
-            ->prepend([
-                'site' => $term->locale(),
-                'collection' => null,
-                'path' => $this->termIsPublic($term) ? $term->uri() : null,
+            ->map(fn (StatamicCollection $collection) => (clone $term)->collection($collection))
+            ->prepend((clone $term)->collection(null))
+            ->filter(fn (LocalizedTerm $localized) => ! $onlyPublicUrls || $this->termIsPublic($localized))
+            ->map(fn (LocalizedTerm $localized) => [
+                'site' => $localized->locale(),
+                'collection' => $localized->collection()?->handle(),
+                'path' => $localized->uri(),
             ])
             ->filter(fn (array $path) => $path['path'] !== null)
             ->unique('path')

@@ -256,6 +256,44 @@ it('deletes canonical and collection redirects when an eloquent term loaded thro
     }
 });
 
+it('deletes canonical and collection automatic redirects when an eloquent term with a missing template is deleted', function () {
+    Taxonomy::make('tags')->sites(['default'])->saveQuietly();
+    Collection::make('posts')->routes('/posts/{slug}')->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $paths = [resource_path('views/tags/show.antlers.html'), resource_path('views/posts/tags/show.antlers.html')];
+
+    foreach ($paths as $path) {
+        File::ensureDirectoryExists(dirname($path));
+        File::put($path, '');
+    }
+
+    try {
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('design')->data(['title' => 'Design']))->save();
+        $term->slug('branding')->save();
+
+        $redirects = Redirect::query()->where('site', 'default')->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
+
+        expect($redirects->get('/tags/design'))->toBe('/tags/branding')
+            ->and($redirects->get('/posts/tags/design'))->toBe('/posts/tags/branding');
+
+        $manual = tap(Redirect::make()->source('/manual')->destination('/tags/branding')->site('default')->origin(RedirectOrigin::Manual))->save();
+        $term->template('missing')->save();
+
+        $term->delete();
+
+        $remaining = Redirect::query()->where('site', 'default')->get();
+
+        expect($remaining)->toHaveCount(1)
+            ->and($remaining->first()->id())->toBe($manual->id())
+            ->and($remaining->first()->destination())->toBe('/tags/branding');
+    } finally {
+        foreach ($paths as $path) {
+            File::delete($path);
+        }
+    }
+});
+
 it('creates a redirect when an eloquent term localization slug changes', function () {
     Site::setSites([
         'en' => ['name' => 'EN', 'url' => 'https://example.com', 'locale' => 'en'],
