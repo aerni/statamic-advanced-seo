@@ -515,13 +515,18 @@ describe('entry redirects', function () {
     });
 
     it('creates nothing when an expired entry is published and its slug changes in the same save', function () {
+        $this->travelTo('2024-01-01 12:00:00');
+
         Collection::make('posts')->dated(true)->pastDateBehavior('private')->routes('/blog/{slug}')->sites(['default'])->saveQuietly();
 
         $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('old')->date('2020-01-01'))->save();
 
+        expect($entry->status())->toBe('expired');
+
         $entry->slug('new')->date('2024-06-20')->save();
 
-        expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
+        expect($entry->status())->toBe('published')
+            ->and(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
     });
 
     it('creates a redirect when an inherited localization route field changes', function () {
