@@ -26,7 +26,13 @@ class TokenService
 
     public function normalize(Value $value): ?string
     {
-        return $this->registry->normalizers()->get($value->fieldtype()?->handle())?->normalize($value);
+        $fieldtype = $value->fieldtype()?->handle();
+
+        if ($fieldtype === 'hidden' && $value->handle() === 'title') {
+            $fieldtype = 'text';
+        }
+
+        return $this->registry->normalizers()->get($fieldtype)?->normalize($value);
     }
 
     public function parse(?string $data, Field $field): ?string

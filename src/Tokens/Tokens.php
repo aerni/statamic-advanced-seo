@@ -111,14 +111,24 @@ class Tokens
     }
 
     /**
-     * Get the blueprint fields that have a registered token normalizer.
+     * Blueprint fields that can be inserted as tokens.
+     *
+     * A hidden field is included only when its handle is `title`. Statamic
+     * switches that field to `hidden` when a collection generates titles, but
+     * the value is still the entry title. Other hidden fields stay out.
      */
     protected function tokenizableFields(Blueprint $blueprint): Collection
     {
         $normalizers = TokenFacade::normalizers();
 
         return $blueprint->fields()->all()
-            ->filter(fn (Field $field) => $normalizers->has($field->type()));
+            ->filter(function (Field $field) use ($normalizers) {
+                if ($field->handle() === 'title' && $field->type() === 'hidden') {
+                    return true;
+                }
+
+                return $normalizers->has($field->type());
+            });
     }
 
     /**
