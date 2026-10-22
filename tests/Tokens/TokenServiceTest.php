@@ -4,6 +4,7 @@ use Aerni\AdvancedSeo\Tokens\Tokens;
 use Aerni\AdvancedSeo\Tokens\TokenService;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -72,6 +73,39 @@ it('parses token strings via the parser', function () {
         ->locale('english')
         ->slug('test')
         ->data(['title' => 'Hello World']);
+
+    $entry->saveQuietly();
+
+    $field = new Field('seo_title', ['type' => 'token_input']);
+    $field->setParent($entry);
+
+    expect($this->service->parse('{{ title }}', $field))->toBe('Hello World');
+});
+
+it('parses hidden field tokens as plain text', function () {
+    Blueprint::make('collections.pages::page')->setContents([
+        'tabs' => [
+            'main' => [
+                'sections' => [[
+                    'fields' => [[
+                        'handle' => 'title',
+                        'field' => [
+                            'type' => 'hidden',
+                            'display' => 'Title',
+                        ],
+                    ]],
+                ]],
+            ],
+        ],
+    ])->save();
+
+    Blink::flush();
+
+    $entry = Entry::make()
+        ->collection('pages')
+        ->locale('english')
+        ->slug('test')
+        ->data(['title' => '<strong>Hello World</strong>']);
 
     $entry->saveQuietly();
 

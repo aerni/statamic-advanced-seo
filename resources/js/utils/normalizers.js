@@ -49,6 +49,7 @@ function normalizeUsers(value, meta) {
 }
 
 add('text', normalizeText);
+add('hidden', normalizeText);
 add('textarea', normalizeTextarea);
 add('markdown', normalizeMarkdown);
 add('bard', normalizeBard);

@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Tokens\Tokens;
 use Aerni\AdvancedSeo\Tokens\ValueToken;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
@@ -36,6 +37,64 @@ it('returns field tokens for a collection', function () {
     // Should contain the title field (text type) and the seo fields.
     expect($fieldTokens)->each->toBeInstanceOf(FieldToken::class)
         ->and($fieldTokens->has('title'))->toBeTrue();
+});
+
+it('includes a hidden title field and ignores other hidden fields', function () {
+    Collection::make('pages')->sites(['english'])->saveQuietly();
+
+    Blueprint::make('collections.pages::page')->setContents([
+        'tabs' => [
+            'main' => [
+                'sections' => [[
+                    'fields' => [
+                        [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'hidden',
+                                'display' => 'Title',
+                            ],
+                        ],
+                        [
+                            'handle' => 'sync_id',
+                            'field' => [
+                                'type' => 'hidden',
+                                'display' => 'Sync ID',
+                            ],
+                        ],
+                        [
+                            'handle' => 'excerpt',
+                            'field' => [
+                                'type' => 'text',
+                                'display' => 'Excerpt',
+                            ],
+                        ],
+                    ],
+                ]],
+            ],
+        ],
+    ])->save();
+
+    Blink::flush();
+
+    $tokens = new Tokens(Collection::findByHandle('pages'));
+
+    expect($tokens->fieldTokens()->has('title'))->toBeTrue()
+        ->and($tokens->fieldTokens()->has('excerpt'))->toBeTrue()
+        ->and($tokens->fieldTokens()->has('sync_id'))->toBeFalse();
+});
+
+it('includes the generated title field when a collection auto-generates titles', function () {
+    Collection::make('pages')
+        ->sites(['english'])
+        ->titleFormats(['english' => '{{ name }}'])
+        ->saveQuietly();
+
+    Blink::flush();
+
+    $collection = Collection::findByHandle('pages');
+
+    expect($collection->entryBlueprint()->field('title')->type())->toBe('hidden')
+        ->and((new Tokens($collection))->fieldTokens()->has('title'))->toBeTrue();
 });
 
 it('includes seo fields in the field tokens', function () {
