@@ -44,7 +44,7 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
     protected function hreflang(): array
     {
         return [
-            'display' => __('advanced-seo::messages.hreflang'),
+            'display' => __('advanced-seo::messages.alternates'),
             'fields' => [
                 [
                     'handle' => 'hreflang_x_default',
