@@ -1,13 +1,14 @@
 <script setup>
 import { Fieldtype } from '@statamic/cms';
-import { Combobox, Icon } from '@statamic/cms/ui';
+import { Icon, Select } from '@statamic/cms/ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { expose, isReadOnly, update } = Fieldtype.use(emit, props);
+const { expose, update } = Fieldtype.use(emit, props);
 
 defineExpose(expose);
 
+// A locked site must not replace the current value. The select still emits that choice, because it ignores option.disabled.
 function onUpdate(next) {
     const option = (props.meta.options ?? []).find((option) => option.value === next);
 
@@ -20,17 +21,15 @@ function onUpdate(next) {
 </script>
 
 <template>
-    <Combobox
-        :id="id"
+    <Select
+        class="w-full"
+        :options="meta.options"
         :clearable="false"
         :model-value="value"
-        :options="meta.options"
-        :read-only="isReadOnly"
-        :searchable="config.searchable"
         @update:model-value="onUpdate"
     >
         <template #option="option">
-            <span class="flex w-full min-w-0 items-center gap-2">
+            <span class="flex items-center w-full min-w-0 gap-2">
                 <Icon
                     v-if="option.disabled"
                     name="padlock-locked"
@@ -52,5 +51,5 @@ function onUpdate(next) {
                 @click.stop.prevent
             />
         </template>
-    </Combobox>
+    </Select>
 </template>
