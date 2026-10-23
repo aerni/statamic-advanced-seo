@@ -1,2 +1,13 @@
 @import "@statamic/cms/tailwind.css";
 @source "../js";
+
+/* Statamic clips expanded publish sections so they can animate closed.
+   Lift the clip, and stack this panel above the next one, only while the
+   token menu is open. */
+.publish-section-collapsible--expanded .publish-section-collapsible__inner:has(.suggestion-active) {
+    overflow: visible;
+}
+
+[data-ui-panel]:has(.suggestion-active) {
+    z-index: var(--z-index-above);
+}
