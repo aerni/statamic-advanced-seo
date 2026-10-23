@@ -39,21 +39,17 @@ class EntrySitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $xDefault = ResolveXDefault::run($localizations);
-
-        $hreflang = $localizations->map(fn ($model) => [
-            'href' => $model->absoluteUrl(),
-            'hreflang' => Helpers::parseLocale($model->site()->locale()),
-        ]);
-
-        if ($xDefault) {
-            $hreflang->push([
+        return $localizations
+            ->map(fn ($model) => [
+                'href' => $model->absoluteUrl(),
+                'hreflang' => Helpers::parseLocale($model->site()->locale()),
+            ])
+            ->when(ResolveXDefault::run($localizations), fn ($hreflang, $xDefault) => $hreflang->push([
                 'href' => $xDefault->absoluteUrl(),
                 'hreflang' => 'x-default',
-            ]);
-        }
-
-        return $hreflang->values()->all();
+            ]))
+            ->values()
+            ->all();
     }
 
     public function lastmod(): string

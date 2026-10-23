@@ -30,21 +30,17 @@ class CollectionTermSitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $xDefault = ResolveXDefault::run($terms);
-
-        $hreflang = $terms->map(fn ($term) => [
-            'href' => $term->absoluteUrl(),
-            'hreflang' => Helpers::parseLocale($term->site()->locale()),
-        ]);
-
-        if ($xDefault) {
-            $hreflang->push([
+        return $terms
+            ->map(fn ($term) => [
+                'href' => $term->absoluteUrl(),
+                'hreflang' => Helpers::parseLocale($term->site()->locale()),
+            ])
+            ->when(ResolveXDefault::run($terms), fn ($hreflang, $xDefault) => $hreflang->push([
                 'href' => $xDefault->absoluteUrl(),
                 'hreflang' => 'x-default',
-            ]);
-        }
-
-        return $hreflang->values()->all();
+            ]))
+            ->values()
+            ->all();
     }
 
     public function lastmod(): string
