@@ -37,21 +37,17 @@ trait HasHreflang
             return null;
         }
 
-        $xDefault = ResolveXDefault::run($localizations);
-
-        $hreflang = $localizations->map(fn ($localization) => [
-            'url' => $localization->absoluteUrl(),
-            'locale' => Helpers::parseLocale($localization->site()->locale()),
-        ]);
-
-        if ($xDefault) {
-            $hreflang->push([
+        return $localizations
+            ->map(fn ($localization) => [
+                'url' => $localization->absoluteUrl(),
+                'locale' => Helpers::parseLocale($localization->site()->locale()),
+            ])
+            ->when(ResolveXDefault::run($localizations), fn ($hreflang, $xDefault) => $hreflang->push([
                 'url' => $xDefault->absoluteUrl(),
                 'locale' => 'x-default',
-            ]);
-        }
-
-        return $hreflang->values()->all();
+            ]))
+            ->values()
+            ->all();
     }
 
     protected function taxonomyHreflang(Taxonomy $taxonomy): ?array
@@ -91,19 +87,17 @@ trait HasHreflang
             return null;
         }
 
-        $hreflang = $sites->map(fn ($site) => [
-            'url' => $resolveUrl($site),
-            'locale' => Helpers::parseLocale(Site::get($site)->locale()),
-        ]);
-
-        if ($xDefaultSite = ResolveXDefault::run($sites, $taxonomy)) {
-            $hreflang->push([
+        return $sites
+            ->map(fn ($site) => [
+                'url' => $resolveUrl($site),
+                'locale' => Helpers::parseLocale(Site::get($site)->locale()),
+            ])
+            ->when(ResolveXDefault::run($sites, $taxonomy), fn ($hreflang, $xDefaultSite) => $hreflang->push([
                 'url' => $resolveUrl($xDefaultSite),
                 'locale' => 'x-default',
-            ]);
-        }
-
-        return $hreflang->values()->all();
+            ]))
+            ->values()
+            ->all();
     }
 
     // TODO: Should be able to remove this once https://github.com/statamic/cms/pull/10439 is merged.
