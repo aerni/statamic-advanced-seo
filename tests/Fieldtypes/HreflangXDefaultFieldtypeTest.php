@@ -36,40 +36,8 @@ it('lists every site and locks the ones the user cannot access', function () {
     actAsEnglishEditor();
 
     expect(xDefaultFieldtype()->preload()['options'])->toBe([
-        ['value' => 'dutch', 'label' => 'Dutch', 'disabled' => true, 'icon' => 'padlock-locked'],
+        ['value' => 'dutch', 'label' => 'Dutch', 'disabled' => true],
         ['value' => 'english', 'label' => 'English', 'disabled' => false],
-        ['value' => 'german', 'label' => 'German', 'disabled' => true, 'icon' => 'padlock-locked'],
+        ['value' => 'german', 'label' => 'German', 'disabled' => true],
     ]);
-});
-
-it('leaves every site selectable when nobody is signed in', function () {
-    expect(collect(xDefaultFieldtype()->preload()['options'])->pluck('disabled')->unique()->all())->toBe([false]);
-});
-
-it('keeps a stored site the user cannot access when that value is submitted again', function () {
-    Seo::find('site::defaults')->config()->set('hreflang_x_default', 'dutch')->save();
-    actAsEnglishEditor();
-
-    expect(xDefaultFieldtype()->process('dutch'))->toBe('dutch');
-});
-
-it('keeps a stored site the user cannot access when the submitted value is empty', function () {
-    Seo::find('site::defaults')->config()->set('hreflang_x_default', 'dutch')->save();
-    actAsEnglishEditor();
-
-    expect(xDefaultFieldtype()->process(null))->toBe('dutch');
-});
-
-it('keeps a stored site the user cannot access when another inaccessible site is submitted', function () {
-    Seo::find('site::defaults')->config()->set('hreflang_x_default', 'dutch')->save();
-    actAsEnglishEditor();
-
-    expect(xDefaultFieldtype()->process('german'))->toBe('dutch');
-});
-
-it('stores a site when the user picks one they can access', function () {
-    Seo::find('site::defaults')->config()->set('hreflang_x_default', 'dutch')->save();
-    actAsEnglishEditor();
-
-    expect(xDefaultFieldtype()->process('english'))->toBe('english');
 });

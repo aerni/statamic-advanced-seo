@@ -20,8 +20,7 @@ it('adds the x-default site field on a multisite install', function () {
     expect($field)->not->toBeNull()
         ->and($field->type())->toBe('hreflang_x_default')
         ->and($field->get('default'))->toBe('dutch')
-        ->and($field->get('validate'))->toBe(['required'])
-        ->and($field->get('searchable'))->toBeTrue();
+        ->and($field->get('validate'))->toBe(['required']);
 });
 
 it('omits the x-default site field on a single site install', function () {

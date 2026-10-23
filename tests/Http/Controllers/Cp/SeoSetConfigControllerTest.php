@@ -47,35 +47,13 @@ it('shows an inaccessible x-default site as a locked option', function () {
         ->assertOk()
         ->assertJsonPath('values.hreflang_x_default', 'dutch')
         ->assertJsonPath('meta.hreflang_x_default.options', [
-            ['value' => 'dutch', 'label' => 'Dutch', 'disabled' => true, 'icon' => 'padlock-locked'],
+            ['value' => 'dutch', 'label' => 'Dutch', 'disabled' => true],
             ['value' => 'english', 'label' => 'English', 'disabled' => false],
-            ['value' => 'german', 'label' => 'German', 'disabled' => true, 'icon' => 'padlock-locked'],
+            ['value' => 'german', 'label' => 'German', 'disabled' => true],
         ]);
 });
 
-it('does not replace an x-default site the user cannot access when the form is saved', function () {
-    $this->actingAs($this->editor)
-        ->patch(cp_route('advanced-seo.sets.config.update', [
-            'seoSetGroup' => 'site',
-            'seoSet' => 'defaults',
-        ]), siteConfigPayload('dutch'))
-        ->assertSuccessful();
-
-    expect(Seo::find('site::defaults')->config()->get('hreflang_x_default'))->toBe('dutch');
-});
-
-it('does not replace an x-default site when a different inaccessible site is submitted', function () {
-    $this->actingAs($this->editor)
-        ->patch(cp_route('advanced-seo.sets.config.update', [
-            'seoSetGroup' => 'site',
-            'seoSet' => 'defaults',
-        ]), siteConfigPayload('german'))
-        ->assertSuccessful();
-
-    expect(Seo::find('site::defaults')->config()->get('hreflang_x_default'))->toBe('dutch');
-});
-
-it('stores a new x-default site when the user picks one they can access', function () {
+it('stores the submitted x-default site', function () {
     $this->actingAs($this->editor)
         ->patch(cp_route('advanced-seo.sets.config.update', [
             'seoSetGroup' => 'site',

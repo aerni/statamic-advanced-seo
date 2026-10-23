@@ -28,6 +28,14 @@ function onUpdate(next) {
         :model-value="value"
         @update:model-value="onUpdate"
     >
+        <template #selected-option="{ option }">
+            <Icon
+                v-if="option.disabled"
+                name="padlock-locked"
+                class="size-3.5 shrink-0"
+            />
+            <span class="block truncate">{{ __(option.label) }}</span>
+        </template>
         <template #option="option">
             <span class="flex items-center w-full min-w-0 gap-2">
                 <Icon

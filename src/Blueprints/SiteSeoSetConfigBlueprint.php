@@ -53,7 +53,6 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                         'display' => __('advanced-seo::messages.hreflang_x_default'),
                         'instructions' => __('advanced-seo::messages.hreflang_x_default_instructions'),
                         'default' => Site::default()->handle(),
-                        'searchable' => true,
                         'validate' => ['required'],
                         'feature' => MultiSite::class,
                     ],
