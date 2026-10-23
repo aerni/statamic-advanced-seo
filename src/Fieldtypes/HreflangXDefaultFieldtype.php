@@ -2,7 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Fieldtypes;
 
-use Aerni\AdvancedSeo\Actions\GetAuthorizedSites;
+use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 
 class HreflangXDefaultFieldtype extends Fieldtype
@@ -12,7 +12,7 @@ class HreflangXDefaultFieldtype extends Fieldtype
     public function preload(): array
     {
         $set = $this->field->parent();
-        $authorizedSites = GetAuthorizedSites::handle($set)->map->handle();
+        $authorizedSites = Site::authorized()->map->handle();
 
         return [
             'options' => $set->sites()

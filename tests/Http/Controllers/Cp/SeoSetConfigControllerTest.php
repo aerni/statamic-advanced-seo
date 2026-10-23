@@ -38,7 +38,10 @@ function siteConfigPayload(string $site): array
     ];
 }
 
-it('shows an inaccessible x-default site as a locked option', function () {
+it('shows an inaccessible x-default site as a locked option', function (string $edition) {
+    config(['statamic.editions.addons.aerni/advanced-seo' => $edition]);
+    flushBlink();
+
     $this->actingAs($this->editor)
         ->getJson(cp_route('advanced-seo.sets.config.edit', [
             'seoSetGroup' => 'site',
@@ -51,7 +54,7 @@ it('shows an inaccessible x-default site as a locked option', function () {
             ['value' => 'english', 'label' => 'English', 'disabled' => false],
             ['value' => 'german', 'label' => 'German', 'disabled' => true],
         ]);
-});
+})->with(['free', 'pro']);
 
 it('stores the submitted x-default site', function () {
     $this->actingAs($this->editor)
@@ -63,3 +66,17 @@ it('stores the submitted x-default site', function () {
 
     expect(Seo::find('site::defaults')->config()->get('hreflang_x_default'))->toBe('english');
 });
+
+it('preserves a saved x-default site the editor cannot access', function (string $edition) {
+    config(['statamic.editions.addons.aerni/advanced-seo' => $edition]);
+    flushBlink();
+
+    $this->actingAs($this->editor)
+        ->patch(cp_route('advanced-seo.sets.config.update', [
+            'seoSetGroup' => 'site',
+            'seoSet' => 'defaults',
+        ]), siteConfigPayload('dutch'))
+        ->assertSuccessful();
+
+    expect(Seo::find('site::defaults')->config()->get('hreflang_x_default'))->toBe('dutch');
+})->with(['free', 'pro']);
