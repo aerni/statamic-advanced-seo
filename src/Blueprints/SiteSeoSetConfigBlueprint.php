@@ -2,7 +2,9 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Features\Hreflang;
 use Aerni\AdvancedSeo\Features\MultiSite;
+use Statamic\Facades\Site;
 
 class SiteSeoSetConfigBlueprint extends BaseBlueprint
 {
@@ -16,6 +18,7 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
         return [
             'main' => [
                 $this->origins(),
+                $this->hreflang(),
             ],
         ];
     }
@@ -33,6 +36,26 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                         'instructions' => __('advanced-seo::messages.origins_instructions'),
                         'default' => [],
                         'feature' => MultiSite::class,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function hreflang(): array
+    {
+        return [
+            'display' => __('advanced-seo::messages.hreflang'),
+            'fields' => [
+                [
+                    'handle' => 'hreflang_x_default',
+                    'field' => [
+                        'type' => 'hreflang_x_default',
+                        'display' => __('advanced-seo::messages.hreflang_x_default'),
+                        'instructions' => __('advanced-seo::messages.hreflang_x_default_instructions'),
+                        'default' => Site::default()->handle(),
+                        'validate' => ['required'],
+                        'feature' => Hreflang::class,
                     ],
                 ],
             ],

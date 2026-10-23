@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Actions\ResolveXDefault;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
@@ -31,19 +32,17 @@ class TermSitemapUrl extends BaseSitemapUrl
             return null;
         }
 
-        $hreflang = $terms->map(fn ($term) => [
-            'href' => $term->absoluteUrl(),
-            'hreflang' => Helpers::parseLocale($term->site()->locale()),
-        ]);
-
-        $origin = $this->term->origin();
-
-        $xDefault = IncludeInSitemap::run($origin) ? $origin : $this->term;
-
-        return $hreflang->push([
-            'href' => $xDefault->absoluteUrl(),
-            'hreflang' => 'x-default',
-        ])->values()->all();
+        return $terms
+            ->map(fn ($term) => [
+                'href' => $term->absoluteUrl(),
+                'hreflang' => Helpers::parseLocale($term->site()->locale()),
+            ])
+            ->when(ResolveXDefault::run($terms), fn ($hreflang, $xDefault) => $hreflang->push([
+                'href' => $xDefault->absoluteUrl(),
+                'hreflang' => 'x-default',
+            ]))
+            ->values()
+            ->all();
     }
 
     public function lastmod(): string

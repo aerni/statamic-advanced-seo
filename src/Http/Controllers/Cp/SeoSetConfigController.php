@@ -42,6 +42,7 @@ class SeoSetConfigController extends CpController
         throw_unless($config->blueprint()->fields()->all()->isNotEmpty(), new NotFoundHttpException);
 
         $values = PublishForm::make($config->blueprint())
+            ->parent($seoSet)
             ->submit($request->all());
 
         if ($seoSet->type() !== 'site') {

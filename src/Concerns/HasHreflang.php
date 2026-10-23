@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
+use Aerni\AdvancedSeo\Actions\ResolveXDefault;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
@@ -27,28 +28,26 @@ trait HasHreflang
             return null;
         }
 
-        $hreflang = $sites
+        $localizations = $sites
             ->map(fn ($locale) => $model->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
             ->filter($this->shouldIncludeHreflang(...));
 
-        if ($hreflang->count() < 2) {
+        if ($localizations->count() < 2) {
             return null;
         }
 
-        $hreflang->transform(fn ($model) => [
-            'url' => $model->absoluteUrl(),
-            'locale' => Helpers::parseLocale($model->site()->locale()),
-        ]);
-
-        $origin = $model->origin() ?? $model;
-
-        $xDefault = $this->shouldIncludeHreflang($origin) ? $origin : $model;
-
-        return $hreflang->push([
-            'url' => $xDefault->absoluteUrl(),
-            'locale' => 'x-default',
-        ])->values()->all();
+        return $localizations
+            ->map(fn ($localization) => [
+                'url' => $localization->absoluteUrl(),
+                'locale' => Helpers::parseLocale($localization->site()->locale()),
+            ])
+            ->when(ResolveXDefault::run($localizations), fn ($hreflang, $xDefault) => $hreflang->push([
+                'url' => $xDefault->absoluteUrl(),
+                'locale' => 'x-default',
+            ]))
+            ->values()
+            ->all();
     }
 
     protected function taxonomyHreflang(Taxonomy $taxonomy): ?array
@@ -88,18 +87,17 @@ trait HasHreflang
             return null;
         }
 
-        $hreflang = $sites->map(fn ($site) => [
-            'url' => $resolveUrl($site),
-            'locale' => Helpers::parseLocale(Site::get($site)->locale()),
-        ]);
-
-        $originSite = $taxonomy->sites()->first();
-        $xDefaultSite = $sites->contains($originSite) ? $originSite : $initialSite;
-
-        return $hreflang->push([
-            'url' => $resolveUrl($xDefaultSite),
-            'locale' => 'x-default',
-        ])->values()->all();
+        return $sites
+            ->map(fn ($site) => [
+                'url' => $resolveUrl($site),
+                'locale' => Helpers::parseLocale(Site::get($site)->locale()),
+            ])
+            ->when(ResolveXDefault::run($sites, $taxonomy), fn ($hreflang, $xDefaultSite) => $hreflang->push([
+                'url' => $resolveUrl($xDefaultSite),
+                'locale' => 'x-default',
+            ]))
+            ->values()
+            ->all();
     }
 
     // TODO: Should be able to remove this once https://github.com/statamic/cms/pull/10439 is merged.

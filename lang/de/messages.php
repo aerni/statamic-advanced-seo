@@ -82,6 +82,9 @@ return [
     // UI
     'origins' => 'Quellen',
     'origins_instructions' => 'Werte von ausgewählten Quellen übernehmen.',
+    'hreflang' => 'Hreflang',
+    'hreflang_x_default' => 'x-default',
+    'hreflang_x_default_instructions' => 'Website für das x-default wählen.',
     'origins_circular_dependency' => 'Zirkuläre Abhängigkeiten zwischen Website-Quellen sind nicht erlaubt.',
     'configure_title' => ':title konfigurieren',
     'no_items_for_site' => 'Keine :title für die ausgewählte Website konfiguriert.',
