@@ -84,7 +84,7 @@ return [
     // UI
     'origins' => 'Origins',
     'origins_instructions' => 'Choose to inherit values from selected origins.',
-    'alternates' => 'Alternates',
+    'hreflang' => 'Hreflang',
     'hreflang_x_default' => 'x-default',
     'hreflang_x_default_instructions' => 'Choose the site used as the x-default.',
     'origins_circular_dependency' => 'Circular site origin dependencies are not allowed.',
