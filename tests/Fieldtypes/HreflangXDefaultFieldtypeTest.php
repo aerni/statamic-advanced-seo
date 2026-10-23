@@ -41,3 +41,14 @@ it('lists every site and locks the ones the user cannot access', function () {
         ['value' => 'german', 'label' => 'German', 'disabled' => true],
     ]);
 });
+
+it('lists every site and locks the ones the user cannot access on the free edition', function () {
+    useFreeEdition();
+    actAsEnglishEditor();
+
+    expect(xDefaultFieldtype()->preload()['options'])->toBe([
+        ['value' => 'dutch', 'label' => 'Dutch', 'disabled' => true],
+        ['value' => 'english', 'label' => 'English', 'disabled' => false],
+        ['value' => 'german', 'label' => 'German', 'disabled' => true],
+    ]);
+});

@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Actions;
 
+use Aerni\AdvancedSeo\Features\Hreflang;
 use Aerni\AdvancedSeo\Features\MultiSite;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
 use Illuminate\Support\Collection;
@@ -11,7 +12,7 @@ class GetAuthorizedSites
 {
     public static function handle(SeoSet $set): Collection
     {
-        if (! MultiSite::enabled()) {
+        if (! MultiSite::enabled() && ! Hreflang::enabled()) {
             return collect([Site::default()]);
         }
 

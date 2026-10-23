@@ -34,11 +34,11 @@ it('omits the x-default site field on a single site install', function () {
     expect($fields->has('hreflang_x_default'))->toBeFalse();
 });
 
-it('omits the x-default site field on the free edition', function () {
+it('adds the x-default site field on the free edition', function () {
     useFreeEdition();
     flushBlink();
 
     $fields = SiteSeoSetConfigBlueprint::resolve(Seo::find('site::defaults')->config())->fields()->all();
 
-    expect($fields->has('hreflang_x_default'))->toBeFalse();
+    expect($fields->has('hreflang_x_default'))->toBeTrue();
 });

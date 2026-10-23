@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Blueprints;
 
+use Aerni\AdvancedSeo\Features\Hreflang;
 use Aerni\AdvancedSeo\Features\MultiSite;
 use Statamic\Facades\Site;
 
@@ -54,7 +55,7 @@ class SiteSeoSetConfigBlueprint extends BaseBlueprint
                         'instructions' => __('advanced-seo::messages.hreflang_x_default_instructions'),
                         'default' => Site::default()->handle(),
                         'validate' => ['required'],
-                        'feature' => MultiSite::class,
+                        'feature' => Hreflang::class,
                     ],
                 ],
             ],
