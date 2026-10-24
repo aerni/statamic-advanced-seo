@@ -21,6 +21,8 @@ use Statamic\Tags\Context;
 uses(EnablesSitemap::class);
 
 beforeEach(function () {
+    View::addLocation(__DIR__.'/../__fixtures__/views');
+
     Site::setSites([
         'dutch' => ['name' => 'Dutch', 'url' => 'https://example.com', 'locale' => 'nl'],
         'english' => ['name' => 'English', 'url' => 'https://example.com/en', 'locale' => 'en'],
