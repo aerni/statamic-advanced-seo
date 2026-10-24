@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TermSitemapUrl;
+use Illuminate\Support\Facades\View;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
@@ -49,6 +50,8 @@ it('returns a formatted lastmod date', function () {
 });
 
 it('returns alternates for multisite terms', function () {
+    View::addLocation(__DIR__.'/../../__fixtures__/views');
+
     $term = Term::query()->where('slug', 'php')->first();
 
     $url = new TermSitemapUrl($term);

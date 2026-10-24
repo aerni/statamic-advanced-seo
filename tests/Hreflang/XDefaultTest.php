@@ -115,6 +115,7 @@ it('uses the term default locale when the configured site is not among the alter
     $term->save();
     $german = $term->in('german')->slug('php')->data(['title' => 'PHP']);
     $german->save();
+    View::addLocation(__DIR__.'/../__fixtures__/views');
 
     expect(hreflangUrl($term))->toBe('https://example.com/tags/php')
         ->and(hreflangUrl($german))->toBe('https://example.com/tags/php')
