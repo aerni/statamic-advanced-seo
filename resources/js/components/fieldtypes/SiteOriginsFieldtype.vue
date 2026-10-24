@@ -1,10 +1,12 @@
 <script setup>
 import { Fieldtype } from '@statamic/cms';
-import { Heading, Select } from '@statamic/cms/ui';
+import { Heading, Icon } from '@statamic/cms/ui';
+import LockedSiteSelect from '../ui/LockedSiteSelect.vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
 const { expose, update } = Fieldtype.use(emit, props);
+
 defineExpose(expose);
 
 function originOptions(site) {
@@ -24,9 +26,18 @@ function originOptions(site) {
     findDependents(site.handle);
 
     return props.value
-        .filter((s) => !s.readonly || s.handle === site.origin)
-        .map((s) => ({ value: s.handle, label: __(s.label) }))
-        .filter((s) => !circularSites.has(s.value));
+        .filter((s) => !circularSites.has(s.handle))
+        .map((s) => ({
+            value: s.handle,
+            label: __(s.label),
+            disabled: s.readonly,
+        }));
+}
+
+function updateOrigin(site, newOrigin) {
+    update(props.value.map((row) => (
+        row.handle === site.handle ? { ...row, origin: newOrigin } : row
+    )));
 }
 </script>
 
@@ -48,22 +59,23 @@ function originOptions(site) {
         </thead>
         <tbody>
             <tr v-for="site in props.value" :key="site.handle">
-                <td class="grid-cell" :class="{ 'text-gray-500': site.readonly }">
-                    <Heading :text="__(site.label)" :icon="site.readonly ? 'padlock-locked' : null" />
+                <td class="grid-cell">
+                    <span class="inline-flex items-center gap-2 text-gray-700 dark:text-white">
+                        <Heading :text="__(site.label)" />
+                        <Icon
+                            v-if="site.readonly"
+                            name="padlock-locked"
+                            class="size-3.5 shrink-0 opacity-50"
+                        />
+                    </span>
                 </td>
                 <td class="grid-cell">
-                    <Select
-                        class="w-full"
+                    <LockedSiteSelect
                         :options="originOptions(site)"
                         :clearable="!site.readonly"
                         :disabled="site.readonly"
                         :model-value="site.origin"
-                        @update:model-value="(newOrigin) => {
-                            const updatedValue = props.value.map(s =>
-                                s.handle === site.handle ? { ...s, origin: newOrigin } : s
-                            );
-                            update(updatedValue);
-                        }"
+                        @update:model-value="(newOrigin) => updateOrigin(site, newOrigin)"
                     />
                 </td>
             </tr>
