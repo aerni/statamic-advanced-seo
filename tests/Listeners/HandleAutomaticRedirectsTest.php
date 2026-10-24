@@ -2141,6 +2141,81 @@ describe('term redirects', function () {
         }
     });
 
+    it('uses site-specific views for canonical and collection term redirects without frontend middleware', function (bool $sharedFallback) {
+        Site::setSites([
+            'english' => ['url' => 'https://example.com', 'locale' => 'en'],
+            'german' => ['url' => 'https://example.com/de', 'locale' => 'de'],
+        ]);
+        Site::setCurrent('english');
+        Taxonomy::make('topics')->sites(['english', 'german'])->termTemplate('redirects.term')->saveQuietly();
+        Collection::make('blog')->routes('/blog/{slug}')->sites(['english', 'german'])->taxonomies(['topics'])->saveQuietly();
+        flushBlink();
+
+        $templates = ['english.redirects.term', 'english.blog.redirects.term'];
+
+        if ($sharedFallback) {
+            $templates = [...$templates, 'redirects.term', 'blog.redirects.term'];
+        }
+
+        withTermViews($templates, function () use ($sharedFallback) {
+            Term::make()->taxonomy('topics')->inDefaultLocale()->slug('old')->data(['title' => 'Old'])->save();
+            Term::find('topics::old')->in('german')->data(['title' => 'Alt'])->save();
+            forgetRedirects();
+
+            Term::find('topics::old')->in('english')->slug('new')->save();
+
+            $expected = [
+                '/topics/old' => '/topics/new',
+                '/blog/topics/old' => '/blog/topics/new',
+            ];
+            $english = Redirect::query()->where('site', 'english')->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()])->all();
+            $german = Redirect::query()->where('site', 'german')->get()->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()])->all();
+
+            expect($english)->toBe($expected)
+                ->and($german)->toBe($sharedFallback ? $expected : []);
+        });
+    })->with([
+        'site-only views' => false,
+        'shared fallbacks' => true,
+    ]);
+
+    it('does not borrow another site view when checking term URL ownership', function () {
+        Site::setSites([
+            'english' => ['url' => 'https://example.com', 'locale' => 'en'],
+            'german' => ['url' => 'https://example.de', 'locale' => 'de'],
+        ]);
+        Taxonomy::make('topics')->sites(['english', 'german'])->termTemplate('redirects.term')->saveQuietly();
+        view()->addLocation(resource_path('views/english'));
+        Site::setCurrent('german');
+        flushBlink();
+
+        withTermViews(['english.redirects.term'], function () {
+            Term::make()->taxonomy('topics')->inDefaultLocale()->slug('public')->data(['title' => 'Public'])->save();
+
+            app(AutomaticRedirectWriter::class)->create('/topics/public', '/elsewhere', 'german');
+
+            $redirect = Redirect::query()->where('site', 'german')->where('source', '/topics/public')->first();
+
+            expect($redirect?->destination())->toBe('/elsewhere');
+        });
+    });
+
+    it('protects a public term URL with a site-only view from automatic redirects', function () {
+        Site::setSites([
+            'english' => ['url' => 'https://example.com', 'locale' => 'en'],
+        ]);
+        Taxonomy::make('topics')->sites(['english'])->termTemplate('redirects.term')->saveQuietly();
+        flushBlink();
+
+        withTermViews(['english.redirects.term'], function () {
+            Term::make()->taxonomy('topics')->inDefaultLocale()->slug('public')->data(['title' => 'Public'])->save();
+
+            app(AutomaticRedirectWriter::class)->create('/topics/public', '/elsewhere', 'english');
+
+            expect(Redirect::query()->where('site', 'english')->get())->toHaveCount(0);
+        });
+    });
+
     it('creates nothing when a published entry still owns the old url', function () {
         Collection::make('pages')->routes('/tags/{slug}')->sites(['default'])->saveQuietly();
         Blink::flush();
