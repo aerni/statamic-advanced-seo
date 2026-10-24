@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Concerns;
 
+use Aerni\AdvancedSeo\Actions\ViewExistsForSite;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -45,7 +46,7 @@ trait ResolvesTermUrls
             return false;
         }
 
-        if (! view()->exists($term->template())) {
+        if (! ViewExistsForSite::run($term->template(), $term->locale())) {
             return false;
         }
 
