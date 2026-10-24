@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
+use Aerni\AdvancedSeo\Actions\ViewExistsForSite;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemap;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -62,11 +63,8 @@ class TaxonomySitemap extends BaseSitemap
 
     public function taxonomies(): Collection
     {
-        if (! view()->exists($this->model->template())) {
-            return collect();
-        }
-
         return $this->model->sites()
+            ->filter(fn ($site) => ViewExistsForSite::run($this->model->template(), $site))
             ->filter(fn ($site) => IncludeInSitemap::run($this->model, $site))
             ->mapWithKeys(fn ($site) => [$site => $this->model]);
     }
@@ -77,7 +75,7 @@ class TaxonomySitemap extends BaseSitemap
             ->queryTerms()
             ->where($this->includeInSitemapQuery(...))
             ->get()
-            ->filter(fn ($term) => view()->exists($term->template()))
+            ->filter(fn ($term) => ViewExistsForSite::run($term->template(), $term->locale()))
             ->filter(IncludeInSitemap::run(...));
     }
 
@@ -86,7 +84,6 @@ class TaxonomySitemap extends BaseSitemap
         return Blink::once($this->cacheKey().'.collection-taxonomies', function () {
             return $this->model->collections()
                 ->map(fn ($collection) => $this->freshTaxonomy()->collection($collection)) // Need to get a fresh instance of the Taxonomy, else we'll override the previously set collection.
-                ->filter(fn ($taxonomy) => view()->exists($taxonomy->template()))
                 ->flatMap(function ($taxonomy) {
                     // Only allow sites that have been set on both the taxonomy and the collection
                     return $taxonomy->sites()
@@ -94,6 +91,7 @@ class TaxonomySitemap extends BaseSitemap
                         ->duplicates()
                         ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
                 })
+                ->filter(fn ($item) => ViewExistsForSite::run($item['taxonomy']->template(), $item['site']))
                 ->filter(fn ($item) => IncludeInSitemap::run($item['taxonomy'], $item['site']));
         });
     }
@@ -107,7 +105,7 @@ class TaxonomySitemap extends BaseSitemap
                 ->flatMap(function ($collection) use ($terms) {
                     return $terms->map(fn ($term) => $term->fresh()->collection($collection)); // Need to get a fresh instance of the Term, else we'll override the previously set collection.
                 })
-                ->filter(fn ($term) => view()->exists($term->template()))
+                ->filter(fn ($term) => ViewExistsForSite::run($term->template(), $term->locale()))
                 ->filter(function ($term) {
                     // Only allow sites that have been set on both the taxonomy and the collection
                     return $term->taxonomy()->sites()

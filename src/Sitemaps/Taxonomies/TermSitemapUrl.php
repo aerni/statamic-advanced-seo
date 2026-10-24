@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Sitemaps\Taxonomies;
 
 use Aerni\AdvancedSeo\Actions\IncludeInSitemap;
 use Aerni\AdvancedSeo\Actions\ResolveXDefault;
+use Aerni\AdvancedSeo\Actions\ViewExistsForSite;
 use Aerni\AdvancedSeo\Sitemaps\BaseSitemapUrl;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Taxonomies\Term;
@@ -26,6 +27,7 @@ class TermSitemapUrl extends BaseSitemapUrl
 
         $terms = $this->term->term()
             ->localizations()
+            ->filter(fn ($term) => ViewExistsForSite::run($term->template(), $term->locale()))
             ->filter(IncludeInSitemap::run(...));
 
         if ($terms->count() < 2) {

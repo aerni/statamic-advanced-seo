@@ -2,6 +2,9 @@
 
 use Aerni\AdvancedSeo\Cascades\ContentCascade;
 use Aerni\AdvancedSeo\Facades\Seo;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -10,6 +13,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Fields\LabeledValue;
+use Statamic\Http\Middleware\AddViewPaths;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
@@ -556,6 +560,7 @@ it('leaves token-free custom site schema unchanged', function () {
 });
 
 it('restricts collection term hreflang and x-default to the collection sites', function (string $xDefaultSite, array $collectionSites, array $expected) {
+    View::addLocation(__DIR__.'/../__fixtures__/views');
     config(['advanced-seo.crawling.environments' => ['testing']]);
     Site::setSites([
         'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
@@ -588,3 +593,106 @@ it('restricts collection term hreflang and x-default to the collection sites', f
     ]],
     'only one collection site' => ['german', ['german'], []],
 ]);
+
+describe('taxonomy view availability', function () {
+    beforeEach(function () {
+        config(['advanced-seo.crawling.environments' => ['testing']]);
+        Site::setSites([
+            'english' => ['url' => 'https://example.com', 'locale' => 'en'],
+            'german' => ['url' => 'https://example.com/de', 'locale' => 'de'],
+            'french' => ['url' => 'https://example.com/fr', 'locale' => 'fr'],
+        ]);
+        Site::setCurrent('english');
+        Collection::make('blog')->routes('/blog/{slug}')->sites(['english', 'german', 'french'])->taxonomies(['tags'])->saveQuietly();
+        Taxonomy::make('tags')->sites(['english', 'german', 'french'])->saveQuietly();
+        Seo::find('site::defaults')->config()->set('hreflang_x_default', 'german')->save();
+        flushBlink();
+
+        $this->originalViewFinder = view()->getFinder();
+        $this->viewDirectory = tempPath('head-taxonomy-views-'.Str::uuid());
+        $finder = clone $this->originalViewFinder;
+        $finder->setPaths([$this->viewDirectory]);
+        $finder->flush();
+        view()->setFinder($finder);
+
+        foreach (['english', 'french'] as $site) {
+            foreach (['tags/show', 'blog/tags/show'] as $template) {
+                $path = $this->viewDirectory.'/'.$site.'/'.$template.'.antlers.html';
+                File::ensureDirectoryExists(dirname($path));
+                File::put($path, 'Taxonomy view');
+            }
+        }
+
+        $this->term = Term::make()->taxonomy('tags')->inDefaultLocale()->slug('php')->data(['title' => 'PHP']);
+        $this->term->save();
+        $this->term->in('german')->data(['title' => 'PHP'])->save();
+        $this->term->in('french')->data(['title' => 'PHP'])->save();
+    });
+
+    afterEach(function () {
+        view()->setFinder($this->originalViewFinder);
+        File::deleteDirectory($this->viewDirectory);
+    });
+
+    it('uses only sites with resolvable views for head hreflang and x-default', function (string $requestSite, bool $sharedFallback, bool $collectionScoped) {
+        Site::setCurrent($requestSite);
+
+        if ($sharedFallback) {
+            File::copyDirectory($this->viewDirectory.'/english', $this->viewDirectory);
+        }
+
+        app(AddViewPaths::class)->handle(request(), function () use ($requestSite, $sharedFallback, $collectionScoped) {
+            $term = $this->term->in($requestSite);
+
+            if ($collectionScoped) {
+                $term->collection(Collection::find('blog'));
+            }
+
+            $path = $collectionScoped ? 'blog/tags/php' : 'tags/php';
+            $cascade = ContentCascade::from($term);
+            $expected = [
+                'en' => 'https://example.com/'.$path,
+                'fr' => 'https://example.com/fr/'.$path,
+                'x-default' => 'https://example.com/'.$path,
+            ];
+
+            if ($sharedFallback) {
+                $expected = [
+                    'en' => 'https://example.com/'.$path,
+                    'de' => 'https://example.com/de/'.$path,
+                    'fr' => 'https://example.com/fr/'.$path,
+                    'x-default' => 'https://example.com/de/'.$path,
+                ];
+            }
+
+            expect(collect($cascade->hreflang())->pluck('url', 'locale')->all())->toBe($expected);
+
+            return response('ok');
+        });
+    })->with([
+        'English request, site-only views' => ['english', false],
+        'German request, site-only views' => ['german', false],
+        'English request, shared fallbacks' => ['english', true],
+        'German request, shared fallbacks' => ['german', true],
+    ])->with([
+        'term' => false,
+        'collection term' => true,
+    ]);
+
+    it('omits head hreflang when only one site has a resolvable view', function (bool $collectionScoped) {
+        File::deleteDirectory($this->viewDirectory.'/french');
+        $requestSite = 'english';
+        $term = $this->term->in($requestSite);
+
+        if ($collectionScoped) {
+            $term->collection(Collection::find('blog'));
+        }
+
+        $cascade = ContentCascade::from($term);
+
+        expect($cascade->hreflang())->toBeNull();
+    })->with([
+        'term' => false,
+        'collection term' => true,
+    ]);
+});

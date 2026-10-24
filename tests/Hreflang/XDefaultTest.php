@@ -21,6 +21,8 @@ use Statamic\Tags\Context;
 uses(EnablesSitemap::class);
 
 beforeEach(function () {
+    View::addLocation(__DIR__.'/../__fixtures__/views');
+
     Site::setSites([
         'dutch' => ['name' => 'Dutch', 'url' => 'https://example.com', 'locale' => 'nl'],
         'english' => ['name' => 'English', 'url' => 'https://example.com/en', 'locale' => 'en'],
@@ -115,6 +117,7 @@ it('uses the term default locale when the configured site is not among the alter
     $term->save();
     $german = $term->in('german')->slug('php')->data(['title' => 'PHP']);
     $german->save();
+    View::addLocation(__DIR__.'/../__fixtures__/views');
 
     expect(hreflangUrl($term))->toBe('https://example.com/tags/php')
         ->and(hreflangUrl($german))->toBe('https://example.com/tags/php')

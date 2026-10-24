@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Concerns;
 
 use Aerni\AdvancedSeo\Actions\ResolveXDefault;
+use Aerni\AdvancedSeo\Actions\ViewExistsForSite;
 use Aerni\AdvancedSeo\Support\Helpers;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
@@ -33,7 +34,10 @@ trait HasHreflang
         $localizations = $sites
             ->map(fn ($locale) => $model->in($locale))
             ->filter() // A model might not exist in a site. So we need to remove it to prevent calling methods on null
-            ->filter($this->shouldIncludeHreflang(...));
+            ->filter($this->shouldIncludeHreflang(...))
+            ->when($model instanceof LocalizedTerm, fn ($localizations) => $localizations
+                ->filter(fn ($localization) => ViewExistsForSite::run($localization->template(), $localization->locale()))
+            );
 
         if ($localizations->count() < 2) {
             return null;
@@ -85,7 +89,8 @@ trait HasHreflang
 
         $sites = $taxonomy->sites()
             ->when($taxonomy->collection(), fn ($sites, $collection) => $sites->intersect($collection->sites()))
-            ->filter($this->isIndexableSite(...));
+            ->filter($this->isIndexableSite(...))
+            ->filter(fn ($site) => ViewExistsForSite::run($taxonomy->template(), $site));
 
         if ($sites->count() < 2) {
             return null;
