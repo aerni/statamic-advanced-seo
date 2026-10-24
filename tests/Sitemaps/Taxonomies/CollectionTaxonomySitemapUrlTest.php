@@ -1,5 +1,6 @@
 <?php
 
+use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\Sitemap;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\CollectionTaxonomySitemapUrl;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
@@ -81,6 +82,45 @@ it('returns null alternates for single site collection taxonomies', function () 
     $taxonomy = Taxonomy::find('categories')->collection(Collection::find('posts'));
 
     $url = new CollectionTaxonomySitemapUrl($taxonomy, 'english');
+    $url->sitemap($sitemap);
+
+    expect($url->alternates())->toBeNull();
+});
+
+it('includes cross-domain alternates while keeping URL listings on their own domain', function (string $site, string $localUrl, string $foreignUrl) {
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => 'https://example.de', 'locale' => 'de'],
+    ]);
+    Site::setCurrent($site);
+    View::addLocation(__DIR__.'/../../__fixtures__/views');
+    Seo::find('site::defaults')->config()->set('hreflang_x_default', 'german')->save();
+    flushBlink();
+
+    $sitemap = Sitemap::index($site)->sitemaps()
+        ->first(fn ($sitemap) => $sitemap instanceof TaxonomySitemap && $sitemap->handle() === 'tags');
+    $url = $sitemap->urls()->first(fn ($url) => $url instanceof CollectionTaxonomySitemapUrl);
+
+    expect($sitemap->collectionTaxonomies()->pluck('site')->sort()->values()->all())->toBe(['english', 'german'])
+        ->and($sitemap->urls()->map->loc()->all())->toContain($localUrl)->not->toContain($foreignUrl)
+        ->and(collect($url->alternates())->pluck('href', 'hreflang')->all())->toBe([
+            'en' => 'https://example.com/blog/tags',
+            'de' => 'https://example.de/blog/tags',
+            'x-default' => 'https://example.de/blog/tags',
+        ]);
+})->with([
+    'english sitemap' => ['english', 'https://example.com/blog/tags', 'https://example.de/blog/tags'],
+    'german sitemap' => ['german', 'https://example.de/blog/tags', 'https://example.com/blog/tags'],
+]);
+
+it('omits alternates when the taxonomy index template is missing', function () {
+    View::addLocation(__DIR__.'/../../__fixtures__/views');
+    Taxonomy::find('tags')->template('missing-template')->saveQuietly();
+    flushBlink();
+
+    $sitemap = Sitemap::index('english')->sitemaps()
+        ->first(fn ($sitemap) => $sitemap instanceof TaxonomySitemap && $sitemap->handle() === 'tags');
+    $url = new CollectionTaxonomySitemapUrl(Taxonomy::find('tags')->collection(Collection::find('blog')), 'english');
     $url->sitemap($sitemap);
 
     expect($url->alternates())->toBeNull();

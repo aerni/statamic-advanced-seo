@@ -36,6 +36,7 @@ class TaxonomySitemap extends BaseSitemap
     protected function taxonomyUrls(): Collection
     {
         return $this->taxonomies()
+            ->filter(fn ($taxonomy, $site) => $this->sites()->contains($site))
             ->map(fn ($taxonomy, $site) => new TaxonomySitemapUrl($taxonomy, $site))
             ->values();
     }
@@ -48,12 +49,15 @@ class TaxonomySitemap extends BaseSitemap
     protected function collectionTaxonomyUrls(): Collection
     {
         return $this->collectionTaxonomies()
+            ->filter(fn ($item) => $this->sites()->contains($item['site']))
             ->map(fn ($item) => new CollectionTaxonomySitemapUrl($item['taxonomy'], $item['site']));
     }
 
     protected function collectionTermUrls(): Collection
     {
-        return $this->collectionTerms()->mapInto(CollectionTermSitemapUrl::class);
+        return $this->collectionTerms()
+            ->filter(fn ($term) => $this->sites()->contains($term->locale()))
+            ->mapInto(CollectionTermSitemapUrl::class);
     }
 
     public function taxonomies(): Collection
@@ -63,7 +67,6 @@ class TaxonomySitemap extends BaseSitemap
         }
 
         return $this->model->sites()
-            ->intersect($this->sites())
             ->filter(fn ($site) => IncludeInSitemap::run($this->model, $site))
             ->mapWithKeys(fn ($site) => [$site => $this->model]);
     }
@@ -89,7 +92,6 @@ class TaxonomySitemap extends BaseSitemap
                     return $taxonomy->sites()
                         ->merge($taxonomy->collection()->sites())
                         ->duplicates()
-                        ->intersect($this->sites())
                         ->map(fn ($site) => ['taxonomy' => $taxonomy, 'site' => $site]);
                 })
                 ->filter(fn ($item) => IncludeInSitemap::run($item['taxonomy'], $item['site']));
@@ -106,7 +108,6 @@ class TaxonomySitemap extends BaseSitemap
                     return $terms->map(fn ($term) => $term->fresh()->collection($collection)); // Need to get a fresh instance of the Term, else we'll override the previously set collection.
                 })
                 ->filter(fn ($term) => view()->exists($term->template()))
-                ->filter(fn ($term) => $this->sites()->contains($term->locale()))
                 ->filter(function ($term) {
                     // Only allow sites that have been set on both the taxonomy and the collection
                     return $term->taxonomy()->sites()
