@@ -1,6 +1,7 @@
 <?php
 
 use Aerni\AdvancedSeo\Cascades\ContextViewCascade;
+use Aerni\AdvancedSeo\Facades\Seo;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -221,3 +222,40 @@ it('resolves tokens in custom site schema against the view context', function ()
 
     expect($cascade->siteSchema())->toBe('{"name": "Custom Page", "url": "https://example.com/custom", "publisher": "Acme Inc", "slogan": "We build things"}');
 });
+
+it('restricts collection taxonomy hreflang and x-default to the collection sites', function (string $xDefaultSite, array $collectionSites, array $expected) {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => 'https://example.com/de', 'locale' => 'de'],
+        'french' => ['name' => 'French', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+    Site::setCurrent('german');
+    $collection = Collection::make('blog')->routes('/blog/{slug}')->sites($collectionSites)->taxonomies(['tags']);
+    $collection->saveQuietly();
+    $taxonomy = Taxonomy::find('tags')->sites(['english', 'german', 'french']);
+    $taxonomy->saveQuietly();
+    $taxonomy->collection($collection);
+    Seo::find('site::defaults')->config()->set('hreflang_x_default', $xDefaultSite)->save();
+    flushBlink();
+
+    $cascade = ContextViewCascade::from(new Context(collect([
+        'page' => $taxonomy,
+        'title' => 'Tags',
+        'current_url' => 'https://example.com/de/blog/tags',
+        'site' => Site::get('german'),
+    ])));
+
+    expect(collect($cascade->hreflang())->pluck('url', 'locale')->all())->toBe($expected);
+})->with([
+    'configured site and origin outside collection' => ['english', ['german', 'french'], [
+        'de' => 'https://example.com/de/blog/tags',
+        'fr' => 'https://example.com/fr/blog/tags',
+    ]],
+    'configured site inside collection' => ['french', ['german', 'french'], [
+        'de' => 'https://example.com/de/blog/tags',
+        'fr' => 'https://example.com/fr/blog/tags',
+        'x-default' => 'https://example.com/fr/blog/tags',
+    ]],
+    'only one collection site' => ['german', ['german'], []],
+]);

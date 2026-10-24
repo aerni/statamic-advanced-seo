@@ -20,9 +20,11 @@ trait HasHreflang
             return null;
         }
 
-        $sites = $model instanceof Entry
-            ? $model->sites()
-            : $model->taxonomy()->sites();
+        $sites = match (true) {
+            $model instanceof Entry => $model->sites(),
+            $model instanceof LocalizedTerm && $model->collection() => $model->taxonomy()->sites()->intersect($model->collection()->sites()),
+            default => $model->taxonomy()->sites(),
+        };
 
         if ($sites->count() < 2) {
             return null;
@@ -81,7 +83,9 @@ trait HasHreflang
             return null;
         }
 
-        $sites = $taxonomy->sites()->filter($this->isIndexableSite(...));
+        $sites = $taxonomy->sites()
+            ->when($taxonomy->collection(), fn ($sites, $collection) => $sites->intersect($collection->sites()))
+            ->filter($this->isIndexableSite(...));
 
         if ($sites->count() < 2) {
             return null;

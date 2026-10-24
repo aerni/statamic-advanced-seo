@@ -7,6 +7,8 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Fields\LabeledValue;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -552,3 +554,37 @@ it('leaves token-free custom site schema unchanged', function () {
 
     expect($cascade->siteSchema())->toBe('{"@type": "Organization"}');
 });
+
+it('restricts collection term hreflang and x-default to the collection sites', function (string $xDefaultSite, array $collectionSites, array $expected) {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+    Site::setSites([
+        'english' => ['name' => 'English', 'url' => 'https://example.com', 'locale' => 'en'],
+        'german' => ['name' => 'German', 'url' => 'https://example.com/de', 'locale' => 'de'],
+        'french' => ['name' => 'French', 'url' => 'https://example.com/fr', 'locale' => 'fr'],
+    ]);
+    Site::setCurrent('german');
+    $collection = Collection::make('blog')->routes('/blog/{slug}')->sites($collectionSites)->taxonomies(['tags']);
+    $collection->saveQuietly();
+    Taxonomy::make('tags')->sites(['english', 'german', 'french'])->saveQuietly();
+    $term = Term::make()->taxonomy('tags')->inDefaultLocale()->slug('news')->data(['title' => 'News']);
+    $term->save();
+    $term->in('german')->data(['title' => 'News'])->save();
+    $term->in('french')->data(['title' => 'News'])->save();
+    Seo::find('site::defaults')->config()->set('hreflang_x_default', $xDefaultSite)->save();
+    flushBlink();
+
+    $cascade = ContentCascade::from($term->in('german')->collection($collection));
+
+    expect(collect($cascade->hreflang())->pluck('url', 'locale')->all())->toBe($expected);
+})->with([
+    'configured site and origin outside collection' => ['english', ['german', 'french'], [
+        'de' => 'https://example.com/de/blog/tags/news',
+        'fr' => 'https://example.com/fr/blog/tags/news',
+    ]],
+    'configured site inside collection' => ['french', ['german', 'french'], [
+        'de' => 'https://example.com/de/blog/tags/news',
+        'fr' => 'https://example.com/fr/blog/tags/news',
+        'x-default' => 'https://example.com/fr/blog/tags/news',
+    ]],
+    'only one collection site' => ['german', ['german'], []],
+]);
