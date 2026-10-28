@@ -58,14 +58,10 @@ class EntryUrlChange
             return $this->eloquentOriginalDate($entry);
         }
 
-        if (! $originalPath = $entry->initialPath()) {
-            return null;
-        }
-
         // Flat file: the previous date is still in the filename. A localization
         // that inherits its date has none, so the origin's stored date is used.
         // getOriginal() has already been replaced.
-        if ($date = (new GetDateFromPath)($originalPath)) {
+        if ($date = (new GetDateFromPath)($entry->initialPath())) {
             return $date;
         }
 
