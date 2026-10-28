@@ -154,8 +154,8 @@ class AutomaticEntryRedirects
     }
 
     /**
-     * Stash this entry's original URL when its slug, date, or a route field
-     * changed, it is live now, and it was live before this save. Keep a path
+     * Stash the previous URL when the entry is live now and was live before.
+     * After saving, the URL comparison decides whether it moved. Keep a path
      * already captured by the origin before it changed inherited values.
      */
     private function stashMovedByOwnChange(Entry $entry): void
@@ -169,10 +169,6 @@ class AutomaticEntryRedirects
         }
 
         $changed = $this->urls->changedValues($entry);
-
-        if ($changed->isEmpty()) {
-            return;
-        }
 
         if (! $originalUrl = $this->urls->originalUrl($entry, $changed)) {
             return;

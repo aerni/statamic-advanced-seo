@@ -25,7 +25,19 @@ class EntryUrlChange
             $original = $this->originalValues($entry);
             $current = $this->currentValues($entry, $original);
 
-            return $original->diff($current);
+            $changed = $original->diff($current);
+
+            // Statamic rewrites dependent URIs when the date snapshot changes,
+            // even if both dates format identically during a repeated DST hour.
+            if ($original->date !== null && $changed->date === null && $this->isEloquentEntry($entry) && $entry->isDirty('date')) {
+                return new EntryUrlValues(
+                    slug: $changed->slug,
+                    date: $original->date,
+                    data: $changed->data,
+                );
+            }
+
+            return $changed;
         });
     }
 
@@ -78,8 +90,9 @@ class EntryUrlChange
     }
 
     /**
-     * Eloquent keeps the previous URI in its model. For file entries, let
-     * routing compute the URL the entry had before this save.
+     * Eloquent keeps the previous URI in its model. Read it even when date
+     * values format identically during a repeated DST hour. For file entries,
+     * let routing compute the URL when its route values changed.
      * The previous slug, date, and stored data are applied to a copy so the
      * entry Statamic is about to save is left untouched. Restoring the data
      * also preserves absent fields, which inherit rather than store null.
@@ -89,6 +102,10 @@ class EntryUrlChange
     {
         if ($this->isEloquentEntry($entry)) {
             return $this->eloquentOriginalUrl($entry);
+        }
+
+        if ($values->isEmpty()) {
+            return null;
         }
 
         $copy = clone $entry;
