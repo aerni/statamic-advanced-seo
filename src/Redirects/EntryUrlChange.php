@@ -54,16 +54,13 @@ class EntryUrlChange
      */
     public function originalDate(Entry $entry): ?string
     {
-        $path = $entry->initialPath();
-
-        // Flat file with no path. There is no datetime column, so use getOriginal().
-        if (! $path && ! method_exists($entry, 'model')) {
-            return $entry->getOriginal('date');
+        if ($this->isEloquentEntry($entry)) {
+            return $this->eloquentOriginalDate($entry);
         }
 
-        // Eloquent: there is no file, so getOriginal() is still the pre-save date.
-        if (! $path) {
-            return $this->eloquentOriginalDate($entry);
+        // Flat file with no path. There is no datetime column, so use getOriginal().
+        if (! $path = $entry->initialPath()) {
+            return $entry->getOriginal('date');
         }
 
         // Flat file: the previous date is still in the filename. A localization
@@ -95,16 +92,8 @@ class EntryUrlChange
      */
     public function originalUrl(Entry $entry, EntryUrlValues $values): ?string
     {
-        if (! $entry->initialPath() && method_exists($entry, 'model')) {
-            $uri = $entry->model()?->getOriginal('uri');
-
-            if (! is_string($uri) || $uri === '') {
-                return null;
-            }
-
-            return str_starts_with($uri, '/')
-                ? URL::tidy($entry->site()->absoluteUrl().'/'.$uri)
-                : $uri;
+        if ($this->isEloquentEntry($entry)) {
+            return $this->eloquentOriginalUrl($entry);
         }
 
         $copy = clone $entry;
@@ -331,6 +320,27 @@ class EntryUrlChange
         }
 
         return $copy->date()->copy()->setTimezone(config('app.timezone'))->format($format);
+    }
+
+    /**
+     * A file path takes precedence because custom file entries may also expose model().
+     */
+    private function isEloquentEntry(Entry $entry): bool
+    {
+        return ! $entry->initialPath() && method_exists($entry, 'model');
+    }
+
+    private function eloquentOriginalUrl(Entry $entry): ?string
+    {
+        $uri = $entry->model()?->getOriginal('uri');
+
+        if (! is_string($uri) || $uri === '') {
+            return null;
+        }
+
+        return str_starts_with($uri, '/')
+            ? URL::tidy($entry->site()->absoluteUrl().'/'.$uri)
+            : $uri;
     }
 
     /**
