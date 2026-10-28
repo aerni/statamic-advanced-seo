@@ -334,7 +334,7 @@ class EntryUrlChange
     {
         $uri = $entry->model()?->getOriginal('uri');
 
-        if (! is_string($uri) || $uri === '') {
+        if (! $uri) {
             return null;
         }
 

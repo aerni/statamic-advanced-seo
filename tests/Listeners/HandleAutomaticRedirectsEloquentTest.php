@@ -71,6 +71,20 @@ it('creates a redirect when an eloquent entry slug changes', function () {
         ->and($redirect->destination())->toBe("entry::{$entry->id()}");
 });
 
+it('creates no redirect when an eloquent entry had no previous url', function () {
+    Collection::make('articles')->sites(['default'])->saveQuietly();
+    Blink::flush();
+
+    $entry = tap(Entry::make()->collection('articles')->locale('default')->slug('old'))->save();
+    Collection::find('articles')->routes('/articles/{slug}')->saveQuietly();
+    Blink::flush();
+
+    $entry->slug('new')->save();
+
+    expect($entry->uri())->toBe('/articles/new')
+        ->and(Redirect::query()->get())->toHaveCount(0);
+});
+
 it('creates a redirect when an eloquent entry date changes the url', function () {
     Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
     Blink::flush();
