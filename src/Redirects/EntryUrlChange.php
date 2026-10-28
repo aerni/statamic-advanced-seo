@@ -78,8 +78,8 @@ class EntryUrlChange
     }
 
     /**
-     * Eloquent stores the previous URI, including its date's timezone.
-     * For file entries, let routing compute the URL before this save.
+     * Eloquent keeps the previous URI in its model. For file entries, let
+     * routing compute the URL the entry had before this save.
      * The previous slug, date, and stored data are applied to a copy so the
      * entry Statamic is about to save is left untouched. Restoring the data
      * also preserves absent fields, which inherit rather than store null.
@@ -254,8 +254,7 @@ class EntryUrlChange
 
     /**
      * The entry's slug, date, and route-field data as they are now.
-     * The date uses the original value's precision and timezone. File dates
-     * use the application timezone; Eloquent snapshots keep the entry's timezone.
+     * The date uses the original value's precision so the two can be compared.
      */
     private function currentValues(Entry $entry, EntryUrlValues $original): EntryUrlValues
     {
@@ -274,13 +273,8 @@ class EntryUrlChange
                 : $this->inheritedRouteValue($entry, $token);
         }
 
-        $currentDate = $entry->date()?->copy();
-
-        if ($entry->initialPath()) {
-            $currentDate?->setTimezone(config('app.timezone'));
-        }
-
-        $date = $original->date ? $currentDate?->format(match (strlen($original->date)) {
+        // Formatting the UTC date directly can show the day before the one in the filename.
+        $date = $original->date ? $entry->date()?->copy()->setTimezone(config('app.timezone'))->format(match (strlen($original->date)) {
             15 => 'Y-m-d-Hi',
             17 => 'Y-m-d-His',
             default => 'Y-m-d',
@@ -344,16 +338,14 @@ class EntryUrlChange
      */
     private function eloquentOriginalDate(Entry $entry): ?string
     {
-        $original = $entry->getOriginal('date');
         $stored = $entry->model()->getOriginal('date');
         $date = $stored ? Carbon::parse($stored) : null;
 
-        if ($original && $date && ($date->second || $entry->hasSeconds())) {
-            // Keep the snapshot's timezone; the model cast may use another one.
-            return $original.$date->format('s');
+        if ($date && ($date->second || $entry->hasSeconds())) {
+            return $date->format('Y-m-d-His');
         }
 
-        return $original;
+        return $entry->getOriginal('date');
     }
 
     /**
