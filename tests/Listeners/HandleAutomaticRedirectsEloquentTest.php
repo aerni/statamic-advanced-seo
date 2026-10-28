@@ -3,9 +3,11 @@
 use Aerni\AdvancedSeo\Eloquent\Redirect as EloquentRedirect;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Redirects\EntryUrlChange;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
@@ -117,6 +119,103 @@ it('creates a redirect when an eloquent entry date changes by seconds', function
 
     expect($redirect)->not->toBeNull()
         ->and($redirect->destination())->toBe("entry::{$entry->id()}");
+});
+
+describe('non-UTC entry dates', function () {
+    beforeEach(function () {
+        $this->originalPhpTimezone = date_default_timezone_get();
+        $this->travelTo(Carbon::parse('2024-02-01 12:00:00', 'UTC'));
+
+        Collection::make('posts')->dated(true)->routes('/{{ date format="Y-m-d-H-i-s" }}/{{ slug }}')->sites(['default'])->saveQuietly();
+
+        Blueprint::make('collections.posts::post')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [[
+                        'fields' => [[
+                            'handle' => 'date',
+                            'field' => [
+                                'type' => 'date',
+                                'time_enabled' => true,
+                                'time_seconds_enabled' => true,
+                            ],
+                        ]],
+                    ]],
+                ],
+            ],
+        ])->save();
+
+        Blink::flush();
+    });
+
+    afterEach(function () {
+        date_default_timezone_set($this->originalPhpTimezone);
+    });
+
+    it('creates no redirect when a non-UTC date is unchanged', function (string $timezone, bool $carbonDate) {
+        config(['app.timezone' => $timezone]);
+        date_default_timezone_set($timezone);
+
+        $date = $carbonDate ? Carbon::parse('2024-01-15 00:30:45', $timezone) : '2024-01-15-003045';
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date($date))->save();
+
+        $entry->set('title', 'Updated')->save();
+
+        expect($entry->uri())->toBe('/2024-01-15-00-30-45/post')
+            ->and(Redirect::query()->get())->toHaveCount(0);
+    })->with(['Europe/Zurich', 'America/New_York'])->with([
+        'Carbon date' => true,
+        'string date' => false,
+    ]);
+
+    it('redirects the original non-UTC URL when the slug changes', function (string $timezone, bool $carbonDate, string $siteUrl, string $destination) {
+        config(['app.timezone' => $timezone]);
+        date_default_timezone_set($timezone);
+        Site::setSites(['default' => ['name' => 'Default', 'url' => $siteUrl, 'locale' => 'en']]);
+
+        $date = $carbonDate ? Carbon::parse('2024-01-15 00:30:45', $timezone) : '2024-01-15-003045';
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('old')->date($date))->save();
+
+        $entry->slug('new')->save();
+
+        expect(Redirect::query()->get())->toHaveCount(1)
+            ->and(Redirect::resolve('/2024-01-15-00-30-45/old', 'default')?->destination)->toBe($destination);
+    })->with(['Europe/Zurich', 'America/New_York'])->with([
+        'Carbon date' => true,
+        'string date' => false,
+    ])->with([
+        'root site' => ['/', 'http://localhost/2024-01-15-00-30-45/new'],
+        'prefixed site' => ['https://example.com/fr', 'https://example.com/fr/2024-01-15-00-30-45/new'],
+    ]);
+
+    it('redirects the original non-UTC URL when the date changes', function (string $timezone, bool $carbonDate) {
+        config(['app.timezone' => $timezone]);
+        date_default_timezone_set($timezone);
+
+        $date = $carbonDate ? Carbon::parse('2024-01-15 00:30:45', $timezone) : '2024-01-15-003045';
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date($date))->save();
+
+        $entry->date($carbonDate ? Carbon::parse('2024-01-16 01:15:50', $timezone) : '2024-01-16-011550')->save();
+
+        expect(Redirect::query()->get())->toHaveCount(1)
+            ->and(Redirect::resolve('/2024-01-15-00-30-45/post', 'default')?->destination)->toBe('http://localhost/2024-01-16-01-15-50/post');
+    })->with(['Europe/Zurich', 'America/New_York'])->with([
+        'Carbon date' => true,
+        'string date' => false,
+    ]);
+
+    it('keeps a reloaded non-UTC date unchanged at second precision', function (string $timezone) {
+        config(['app.timezone' => $timezone]);
+        date_default_timezone_set($timezone);
+
+        $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date(Carbon::parse('2024-01-15 00:30:45', $timezone)))->save();
+        Blink::flush();
+        $entry = Entry::find($entry->id());
+
+        $entry->set('title', 'Updated');
+
+        expect(app(EntryUrlChange::class)->changedValues($entry)->isEmpty())->toBeTrue();
+    })->with(['Europe/Zurich', 'America/New_York']);
 });
 
 it('creates a redirect when an eloquent entry route field changes the url', function () {

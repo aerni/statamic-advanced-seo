@@ -8,6 +8,7 @@ use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
+use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 
 class EntryUrlChange
@@ -85,7 +86,8 @@ class EntryUrlChange
     }
 
     /**
-     * Let the routing compute the URL the entry had before this save.
+     * Eloquent stores the previous URI, including its date's timezone.
+     * For file entries, let routing compute the URL before this save.
      * The previous slug, date, and stored data are applied to a copy so the
      * entry Statamic is about to save is left untouched. Restoring the data
      * also preserves absent fields, which inherit rather than store null.
@@ -93,6 +95,18 @@ class EntryUrlChange
      */
     public function originalUrl(Entry $entry, EntryUrlValues $values): ?string
     {
+        if (! $entry->initialPath() && method_exists($entry, 'model')) {
+            $uri = $entry->model()?->getOriginal('uri');
+
+            if (! is_string($uri) || $uri === '') {
+                return null;
+            }
+
+            return str_starts_with($uri, '/')
+                ? URL::tidy($entry->site()->absoluteUrl().'/'.$uri)
+                : $uri;
+        }
+
         $copy = clone $entry;
 
         if ($values->slug !== null) {
@@ -256,7 +270,8 @@ class EntryUrlChange
 
     /**
      * The entry's slug, date, and route-field data as they are now.
-     * The date uses the original value's precision so the two can be compared.
+     * The date uses the original value's precision and timezone. File dates
+     * use the application timezone; Eloquent snapshots keep the entry's timezone.
      */
     private function currentValues(Entry $entry, EntryUrlValues $original): EntryUrlValues
     {
@@ -275,8 +290,13 @@ class EntryUrlChange
                 : $this->inheritedRouteValue($entry, $token);
         }
 
-        // Formatting the UTC date directly can show the day before the one in the filename.
-        $date = $original->date ? $entry->date()?->copy()->setTimezone(config('app.timezone'))->format(match (strlen($original->date)) {
+        $currentDate = $entry->date()?->copy();
+
+        if ($entry->initialPath()) {
+            $currentDate?->setTimezone(config('app.timezone'));
+        }
+
+        $date = $original->date ? $currentDate?->format(match (strlen($original->date)) {
             15 => 'Y-m-d-Hi',
             17 => 'Y-m-d-His',
             default => 'Y-m-d',
@@ -319,14 +339,16 @@ class EntryUrlChange
      */
     private function eloquentOriginalDate(Entry $entry): ?string
     {
+        $original = $entry->getOriginal('date');
         $stored = $entry->model()->getOriginal('date');
         $date = $stored ? Carbon::parse($stored) : null;
 
-        if ($date && ($date->second || $entry->hasSeconds())) {
-            return $date->format('Y-m-d-His');
+        if ($original && $date && ($date->second || $entry->hasSeconds())) {
+            // Keep the snapshot's timezone; the model cast may use another one.
+            return $original.$date->format('s');
         }
 
-        return $entry->getOriginal('date');
+        return $original;
     }
 
     /**
