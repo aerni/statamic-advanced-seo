@@ -239,6 +239,198 @@ describe('entry redirects', function () {
         'three different timezones' => ['Europe/Zurich', 'America/New_York', 'UTC', '2024-01-15T05:30:00Z', '/2024-01-15-05-30/post', '/2024-01-15-06-30/post'],
     ]);
 
+    describe('Stache dates around the repeated DST hour', function () {
+        beforeEach(function () {
+            $this->originalPhpTimezone = date_default_timezone_get();
+            config(['app.timezone' => 'Europe/Zurich', 'statamic.system.display_timezone' => 'UTC']);
+            date_default_timezone_set('Europe/Zurich');
+            $this->travelTo(Carbon::parse('2024-10-28 12:00:00', 'Europe/Zurich'));
+            Collection::make('journal')->dated(true)->routes('/{{ date format="Y-m-d-H-i-s" }}/{{ slug }}')->sites(['default'])->saveQuietly();
+            Blueprint::make('collections.journal::journal')->setContents([
+                'tabs' => [
+                    'main' => [
+                        'sections' => [[
+                            'fields' => [[
+                                'handle' => 'date',
+                                'field' => [
+                                    'type' => 'date',
+                                    'time_enabled' => true,
+                                    'time_seconds_enabled' => true,
+                                ],
+                            ]],
+                        ]],
+                    ],
+                ],
+            ])->save();
+            Blink::flush();
+        });
+
+        afterEach(function () {
+            date_default_timezone_set($this->originalPhpTimezone);
+        });
+
+        it('redirects between repeated local times despite an unchanged filename', function (string $initial, string $updated, string $oldPath, string $newPath, string $siteUrl, string $baseUrl) {
+            Site::setSites(['default' => ['name' => 'Default', 'url' => $siteUrl, 'locale' => 'en']]);
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse($initial)))->save();
+            $filename = $entry->initialPath();
+
+            $entry->date(Carbon::parse($updated))->save();
+
+            expect($entry->initialPath())->toBe($filename)
+                ->and($entry->uri())->toBe($newPath)
+                ->and(Redirect::resolve($oldPath, 'default')?->destination)->toBe($baseUrl.$newPath);
+        })->with([
+            'later occurrence' => ['2024-10-27T00:30:45Z', '2024-10-27T01:30:45Z', '/2024-10-27-00-30-45/post', '/2024-10-27-01-30-45/post'],
+            'earlier occurrence' => ['2024-10-27T01:30:45Z', '2024-10-27T00:30:45Z', '/2024-10-27-01-30-45/post', '/2024-10-27-00-30-45/post'],
+        ])->with([
+            'root site' => ['/', 'http://localhost'],
+            'prefixed site' => ['https://example.com/fr', 'https://example.com/fr'],
+        ]);
+
+        it('uses the indexed URL when a repeated-hour date and slug both change', function () {
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('old')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
+
+            $entry->date(Carbon::parse('2024-10-27T01:30:45Z'))->slug('new')->save();
+
+            expect(Redirect::resolve('/2024-10-27-00-30-45/old', 'default')?->destination)->toBe('http://localhost/2024-10-27-01-30-45/new');
+        });
+
+        it('uses the indexed URL when the old date was in the repeated hour', function () {
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
+
+            $entry->date(Carbon::parse('2024-10-28T00:30:45Z'))->save();
+
+            expect(Redirect::resolve('/2024-10-27-00-30-45/post', 'default')?->destination)->toBe('http://localhost/2024-10-28-00-30-45/post');
+        });
+
+        it('does not recreate a removed redirect on an unchanged later save', function () {
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
+            $entry->date(Carbon::parse('2024-10-27T01:30:45Z'))->save();
+            forgetRedirects();
+
+            $entry->set('title', 'Updated')->save();
+
+            expect(Redirect::query()->get())->toHaveCount(0);
+        });
+
+        it('creates no redirect when a repeated-hour date stays unchanged', function (string $timestamp) {
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse($timestamp)))->save();
+
+            $entry->set('title', 'Updated')->save();
+
+            expect(Redirect::query()->get())->toHaveCount(0);
+        })->with(['2024-10-27T00:30:45Z', '2024-10-27T01:30:45Z']);
+
+        it('redirects inherited localized dates between repeated local times', function () {
+            Site::setSites([
+                'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
+                'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
+            ]);
+            Collection::find('journal')->sites(['en', 'fr'])->saveQuietly();
+            Blink::flush();
+            $en = tap(Entry::make()->collection('journal')->locale('en')->slug('post')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
+            $en->makeLocalization('fr')->slug('article')->save();
+
+            $en->date(Carbon::parse('2024-10-27T01:30:45Z'))->save();
+
+            expect(Redirect::resolve('/2024-10-27-00-30-45/post', 'en')?->destination)->toBe('http://localhost/2024-10-27-01-30-45/post')
+                ->and(Redirect::resolve('/2024-10-27-00-30-45/article', 'fr')?->destination)->toBe('http://localhost/fr/2024-10-27-01-30-45/article');
+        });
+
+        it('refreshes inherited publication dates on consecutive origin saves', function () {
+            $this->travelTo(Carbon::parse('2026-10-28 12:00:00', 'Europe/Zurich'));
+            Site::setSites([
+                'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
+                'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
+            ]);
+            Collection::find('journal')->routes('/{year}/{slug}')->futureDateBehavior('private')->sites(['en', 'fr'])->saveQuietly();
+            Blink::flush();
+            $en = tap(Entry::make()->collection('journal')->locale('en')->slug('post')->date('2999-06-20-120000'))->save();
+            $en->makeLocalization('fr')->slug('article')->save();
+            forgetRedirects();
+
+            $en->date('2024-06-20-120000')->save();
+
+            expect(Redirect::query()->get())->toHaveCount(0);
+
+            $en->date('2025-06-20-120000')->save();
+
+            expect(Redirect::resolve('/2024/article', 'fr')?->destination)->toBe('http://localhost/fr/2025/article');
+        });
+
+        it('redirects mounted content when its mount moves between repeated local times', function () {
+            $mount = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
+            Collection::make('articles')->routes('/{mount}/{slug}')->mount($mount->id())->sites(['default'])->saveQuietly();
+            Blink::flush();
+            Entry::make()->collection('articles')->locale('default')->slug('hello')->save();
+
+            $mount->date(Carbon::parse('2024-10-27T01:30:45Z'))->save();
+
+            expect(Redirect::resolve('/2024-10-27-00-30-45/post/hello', 'default')?->destination)->toBe('http://localhost/2024-10-27-01-30-45/post/hello');
+        });
+
+        it('redirects structured child pages when their parent moves between repeated local times', function () {
+            Collection::find('journal')->routes('/{{ parent_uri }}/{{ date format="Y-m-d-H-i-s" }}/{{ slug }}')->structureContents(['root' => true])->saveQuietly();
+            Blink::flush();
+            $home = tap(Entry::make()->collection('journal')->locale('default')->slug('home')->date('2024-01-01'))->save();
+            $parent = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse('2024-10-27T01:30:45Z')))->save();
+            $child = tap(Entry::make()->collection('journal')->locale('default')->slug('child')->date(Carbon::parse('2024-10-26T12:00:00Z')))->save();
+            Collection::find('journal')->structure()->in('default')->tree([
+                ['entry' => $home->id()],
+                ['entry' => $parent->id(), 'children' => [['entry' => $child->id()]]],
+            ])->save();
+            forgetRedirects();
+
+            $parent->date(Carbon::parse('2024-10-27T00:30:45Z'))->save();
+
+            expect(Redirect::resolve('/2024-10-27-01-30-45/post/2024-10-26-12-00-00/child', 'default')?->destination)->toBe('http://localhost/2024-10-27-00-30-45/post/2024-10-26-12-00-00/child');
+        });
+
+        it('reconstructs ordinary changes when a missing URI index sees an edited cached entry', function (string $change, string $value, string $newPath) {
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse('2024-01-15T00:30:45Z')))->save();
+            Stache::store('entries')->store('journal')->index('uri')->clear();
+
+            $entry->{$change}($value)->save();
+
+            expect(Redirect::resolve('/2024-01-15-00-30-45/post', 'default')?->destination)->toBe('http://localhost'.$newPath);
+        })->with([
+            'slug' => ['slug', 'new', '/2024-01-15-00-30-45/new'],
+            'date' => ['date', '2024-01-16-013045', '/2024-01-16-00-30-45/post'],
+        ]);
+
+        it('reconstructs ordinary changes after clearing entry and URI caches', function (string $change, string $value, string $newPath) {
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse('2024-01-15T00:30:45Z')))->save();
+            $id = $entry->id();
+            $store = Stache::store('entries')->store('journal');
+            $store->index('uri')->clear();
+            $store->forgetItem($id);
+            Blink::flush();
+            $entry = Entry::find($id);
+
+            $entry->{$change}($value)->save();
+
+            expect(Redirect::resolve('/2024-01-15-00-30-45/post', 'default')?->destination)->toBe('http://localhost'.$newPath);
+        })->with([
+            'slug' => ['slug', 'new', '/2024-01-15-00-30-45/new'],
+            'date' => ['date', '2024-01-16-013045', '/2024-01-16-00-30-45/post'],
+        ]);
+
+        it('uses the canonical file URL after rebuilding a fully cold Stache', function () {
+            $entry = tap(Entry::make()->collection('journal')->locale('default')->slug('post')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
+            $store = Stache::store('entries')->store('journal');
+            $store->index('uri')->clear();
+            $store->forgetItem($entry->id());
+            Blink::flush();
+            $entry = Entry::findByUri('/2024-10-27-01-30-45/post', 'default');
+
+            expect($entry)->not->toBeNull();
+
+            $entry->date(Carbon::parse('2024-10-27T00:30:45Z'))->save();
+
+            expect(Redirect::resolve('/2024-10-27-01-30-45/post', 'default')?->destination)->toBe('http://localhost/2024-10-27-00-30-45/post');
+        });
+    });
+
     it('creates a redirect when a dated entry without a filename date gets an explicit date', function () {
         Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
         Blink::flush();
