@@ -339,7 +339,7 @@ class EntryUrlChange
         }
 
         return str_starts_with($uri, '/')
-            ? URL::tidy($entry->site()->absoluteUrl().'/'.$uri)
+            ? URL::assemble($entry->site()->absoluteUrl(), $uri)
             : $uri;
     }
 
