@@ -3,6 +3,7 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
@@ -15,25 +16,119 @@ use Statamic\Facades\YAML;
 class EntryUrlChange
 {
     /**
-     * Previous values that differ from the entry now.
-     * Route fields include tokens used by a localization route.
-     * Empty when none of those values changed.
+     * Capture the path before saving. The final URL comparison runs after saving.
      */
-    public function changedValues(Entry $entry): EntryUrlValues
+    public function originalPath(Entry $entry): ?string
     {
-        // The entry, its child pages, and its localizations each ask during this save.
-        return Blink::once($this->changedBlinkKey($entry), function () use ($entry) {
-            $original = $this->originalValues($entry);
-            $current = $this->currentValues($entry, $original);
+        $changed = $this->changedValues($entry);
+        $url = $this->isEloquentEntry($entry)
+            ? $this->eloquentOriginalUrl($entry)
+            : $this->stacheOriginalUrl($entry, $changed);
 
-            $changed = $original->diff($current);
+        return $url ? $entry->site()->relativePath($url) : null;
+    }
 
-            return new EntryUrlValues(
-                slug: $changed->slug,
-                date: $this->changedDate($entry, $original->date, $changed->date),
-                data: $changed->data,
-            );
-        });
+    /**
+     * Compare the captured path with the final URL after Statamic saves or rewrites it.
+     */
+    public function compare(Entry $entry, ?string $originalPath): EntryUrlChangeResult
+    {
+        $result = new EntryUrlChangeResult($originalPath, $this->currentPath($entry));
+
+        // Descendant saves may have read the origin's previous state again.
+        $this->forget($entry);
+
+        return $result;
+    }
+
+    private function currentPath(Entry $entry): ?string
+    {
+        Blink::store('entry-uris')->forget($entry->id());
+        Blink::store('structure-uris')->forget($entry->id());
+
+        $url = $entry->absoluteUrlWithoutRedirect();
+
+        return $url ? $entry->site()->relativePath($url) : null;
+    }
+
+    /**
+     * Select candidates for child and mount URI rewrites. Actual moves are
+     * determined by compare() after those rewrites, not by field differences.
+     */
+    public function mayAffectRelatedEntries(Entry $entry): bool
+    {
+        return ! $this->changedValues($entry)->isEmpty();
+    }
+
+    /**
+     * Localizations that inherit route values affected by this save.
+     *
+     * @return Collection<int|string, Entry>
+     */
+    public function affectedLocalizations(Entry $entry): Collection
+    {
+        $changed = $this->changedValues($entry);
+
+        if (! $changed->data && ! $changed->date) {
+            return collect();
+        }
+
+        return $entry->descendants()
+            ->filter(fn (Entry $localization) => $this->inheritsChangedValues($entry, $localization));
+    }
+
+    /**
+     * Call after capturing the localization's old paths. Eloquent copies an
+     * inherited date onto its row; clear it so its save uses the origin's new date.
+     */
+    public function prepareLocalizationForSave(Entry $origin, Entry $localization): void
+    {
+        if ($this->changedValues($origin)->date && $this->isEloquentEntry($localization) && $this->inheritsDate($origin, $localization)) {
+            $localization->date(null);
+        }
+    }
+
+    /**
+     * Stored paths remain authoritative during tree and mount moves, whose
+     * in-memory entries may already resolve to their new URLs.
+     */
+    public function storedPath(Entry $entry): ?string
+    {
+        if ($entry->initialPath()) {
+            $uri = Stache::store('entries')->store($entry->collectionHandle())->index('uri')->get($entry->id());
+        } elseif ($this->isEloquentEntry($entry)) {
+            $uri = $entry->model()->getAttribute('uri');
+        } else {
+            return null;
+        }
+
+        return is_string($uri) && $uri !== '' ? $uri : null;
+    }
+
+    /**
+     * The entry was publicly reachable before this save. The status on the
+     * entry itself is already the new one.
+     */
+    public function wasLive(Entry $entry): bool
+    {
+        if (! $this->wasPublished($entry)) {
+            return false;
+        }
+
+        $date = $this->parseDate($this->originalDate($entry));
+
+        $collection = $entry->collection();
+
+        // A dated collection can hide a published entry when its date is private.
+        if ($collection->dated() && $collection->futureDateBehavior() === 'private' && $date?->isFuture()) {
+            return false;
+        }
+
+        if ($collection->dated() && $collection->pastDateBehavior() === 'private' && $date?->isPast()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function forget(Entry $entry): void
@@ -45,13 +140,35 @@ class EntryUrlChange
     }
 
     /**
+     * Previous values that differ from the entry now.
+     * Route fields include tokens used by a localization route.
+     * Empty when none of those values changed.
+     */
+    private function changedValues(Entry $entry): EntryUrlValues
+    {
+        // The entry, its child pages, and its localizations each ask during this save.
+        return Blink::once($this->changedBlinkKey($entry), function () use ($entry) {
+            $original = $this->originalValues($entry);
+            $current = $this->currentValues($entry, $original);
+
+            $changed = $original->diff($current);
+
+            return new EntryUrlValues(
+                slug: $changed->slug,
+                date: $this->changedDate($entry, $original, $changed),
+                data: $changed->data,
+            );
+        });
+    }
+
+    /**
      * Stache: the file still contains the old data; getOriginal() has already
      * been replaced. Eloquent: there is no file, so getOriginal() still contains
      * the pre-save data. Reuse the snapshot until this entry's save has been stashed.
      *
      * @return array<string, mixed>
      */
-    public function originalData(Entry $entry): array
+    private function originalData(Entry $entry): array
     {
         return Blink::once($this->dataBlinkKey($entry), fn () => ($path = $entry->initialPath())
             ? YAML::file($path)->parse()
@@ -62,7 +179,7 @@ class EntryUrlChange
      * Keep the previous date until this entry's own save is stashed. Its origin
      * may already have been saved before a localization reaches EntrySaving.
      */
-    public function originalDate(Entry $entry): ?string
+    private function originalDate(Entry $entry): ?string
     {
         return Blink::once($this->dateBlinkKey($entry), fn () => $this->resolveOriginalDate($entry));
     }
@@ -93,13 +210,36 @@ class EntryUrlChange
     }
 
     /**
-     * The URL before this save, resolved using the entry's storage driver.
+     * Whether the entry was published before this save. The flag on the entry
+     * itself is already the new one.
      */
-    public function originalUrl(Entry $entry, EntryUrlValues $values): ?string
+    private function wasPublished(Entry $entry): bool
     {
-        return $this->isEloquentEntry($entry)
-            ? $this->eloquentOriginalUrl($entry)
-            : $this->stacheOriginalUrl($entry, $values);
+        return (bool) ($this->originalData($entry)['published'] ?? (bool) $entry->initialPath());
+    }
+
+    /**
+     * Parse a stored date string into a Carbon at the precision it was stored.
+     */
+    private function parseDate(?string $date): ?Carbon
+    {
+        if (! $date) {
+            return null;
+        }
+
+        $format = match (strlen($date)) {
+            10 => 'Y-m-d',
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+        };
+
+        $parsed = Carbon::createFromFormat($format, $date);
+
+        return match ($format) {
+            'Y-m-d' => $parsed->startOfDay(),
+            'Y-m-d-Hi' => $parsed->startOfMinute(),
+            'Y-m-d-His' => $parsed,
+        };
     }
 
     /**
@@ -107,7 +247,7 @@ class EntryUrlChange
      * so it uses the origin's value. A route field only counts when this
      * localization's route uses it.
      */
-    public function inheritsChangedValues(Entry $origin, Entry $localization): bool
+    private function inheritsChangedValues(Entry $origin, Entry $localization): bool
     {
         $changed = $this->changedValues($origin);
 
@@ -210,9 +350,27 @@ class EntryUrlChange
                     return [$token => $source[$token]];
                 }
 
-                return [$token => $this->inheritedRouteValue($entry, $token)];
+                return [$token => $this->inheritedOriginalRouteValue($entry, $token)];
             })
             ->all();
+    }
+
+    /**
+     * Resolve missing fields from the origin's saved snapshot. Its in-memory
+     * value can already be new while a localization is being saved.
+     */
+    private function inheritedOriginalRouteValue(Entry $entry, string $token): mixed
+    {
+        if (! $entry->hasOrigin()) {
+            return null;
+        }
+
+        $origin = $entry->origin();
+        $source = $this->originalData($origin);
+
+        return array_key_exists($token, $source)
+            ? $source[$token]
+            : $this->inheritedOriginalRouteValue($origin, $token);
     }
 
     /**
@@ -289,18 +447,49 @@ class EntryUrlChange
 
     /**
      * Include date changes hidden by identical formatted times during DST.
+     * Capture the Stache URI even for known changes: the filename loses the offset.
      */
-    private function changedDate(Entry $entry, ?string $originalDate, ?string $changedDate): ?string
+    private function changedDate(Entry $entry, EntryUrlValues $original, EntryUrlValues $changed): ?string
     {
-        if ($originalDate === null) {
+        if ($original->date === null) {
             return null;
         }
 
-        $dateChanged = $this->isEloquentEntry($entry)
-            ? $entry->isDirty('date')
-            : $this->stacheIndexedOriginalUrl($entry) !== null;
+        $eloquent = $this->isEloquentEntry($entry);
+        $url = $eloquent ? $this->eloquentOriginalUrl($entry) : $this->stacheIndexedOriginalUrl($entry);
 
-        return $changedDate ?? ($dateChanged ? $originalDate : null);
+        if ($changed->date !== null) {
+            return $changed->date;
+        }
+
+        if ($eloquent && $entry->isDirty('date')) {
+            return $original->date;
+        }
+
+        return $url && $this->dateChangedInUrl($entry, $original, $changed, $url)
+            ? $original->date
+            : null;
+    }
+
+    /**
+     * Hold the other route values at their saved values so a slug or field
+     * edit cannot be mistaken for a hidden date change. Keep the current
+     * date object, which still distinguishes the two repeated-hour instants.
+     */
+    private function dateChangedInUrl(Entry $entry, EntryUrlValues $original, EntryUrlValues $changed, string $originalUrl): bool
+    {
+        $copy = clone $entry;
+        $copy->slug($original->slug);
+        $copy->data($entry->data()->merge($changed->data ?? []));
+
+        $comparison = new EntryUrlChangeResult(
+            $entry->site()->relativePath($originalUrl),
+            $this->currentPath($copy),
+        );
+
+        $this->restoreEntryAfterCopy($entry);
+
+        return $comparison->moved();
     }
 
     /**
@@ -339,7 +528,7 @@ class EntryUrlChange
             return $url;
         }
 
-        if ($values->isEmpty()) {
+        if (! $entry->initialPath()) {
             return null;
         }
 
@@ -356,12 +545,24 @@ class EntryUrlChange
         $copy->data($this->originalData($entry));
 
         Blink::store('entry-uris')->forget($copy->id());
+        Blink::store('structure-uris')->forget($copy->id());
 
         $url = $copy->absoluteUrlWithoutRedirect();
 
-        Blink::store('entry-uris')->forget($entry->id());
+        $this->restoreEntryAfterCopy($entry);
 
         return $url;
+    }
+
+    /**
+     * URL copies share the entry id and structured Page. Restore the live entry
+     * and clear the Page's route data before another route can reuse the copy.
+     */
+    private function restoreEntryAfterCopy(Entry $entry): void
+    {
+        $entry->page()?->setEntry($entry);
+        Blink::store('entry-uris')->forget($entry->id());
+        Blink::store('structure-uris')->forget($entry->id());
     }
 
     /**
@@ -435,7 +636,7 @@ class EntryUrlChange
      * The localization's date follows the origin. A localized date on an
      * entry between them breaks the chain.
      */
-    public function inheritsDate(Entry $origin, Entry $localization): bool
+    private function inheritsDate(Entry $origin, Entry $localization): bool
     {
         $entry = $localization;
 

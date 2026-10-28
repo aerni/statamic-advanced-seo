@@ -5,6 +5,7 @@ use Aerni\AdvancedSeo\Enums\RedirectResponseCode;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Redirects\AutomaticRedirectWriter;
+use Aerni\AdvancedSeo\Redirects\EntryUrlChange;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -3016,3 +3017,103 @@ function redirectMap()
     return Redirect::query()->where('site', 'default')->get()
         ->mapWithKeys(fn ($redirect) => [$redirect->source() => $redirect->destination()]);
 }
+
+it('reports the actual saved URL change', function (?string $initialSlug, string $updatedSlug, string $route, ?string $oldPath, string $currentPath, bool $moved) {
+    Collection::make('comparison')->routes($route)->sites(['default'])->saveQuietly();
+    Blink::flush();
+    $entry = Entry::make()->collection('comparison')->locale('default');
+
+    if ($initialSlug !== null) {
+        $entry->slug($initialSlug)->saveQuietly();
+    }
+
+    $entry->slug($updatedSlug);
+    $urls = app(EntryUrlChange::class);
+    $originalPath = $urls->originalPath($entry);
+
+    $entry->saveQuietly();
+    $result = $urls->compare($entry, $originalPath);
+
+    expect($result->oldPath)->toBe($oldPath)
+        ->and($result->currentPath)->toBe($currentPath)
+        ->and($result->moved())->toBe($moved);
+})->with([
+    'new entry' => [null, 'new', '/{slug}', null, '/new', false],
+    'unchanged entry' => ['post', 'post', '/{slug}', '/post', '/post', false],
+    'changed URL' => ['old', 'new', '/{slug}', '/old', '/new', true],
+    'changed slug with unchanged URL' => ['old', 'new', '/fixed', '/fixed', '/fixed', false],
+]);
+
+it('redirects only the localization whose URL uses the inherited date', function () {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
+    ]);
+    Collection::make('articles')->dated(true)->routes([
+        'en' => '/{slug}',
+        'fr' => '/{year}/{slug}',
+    ])->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('my-post')->date('2024-01-15'))->save();
+    $en->makeLocalization('fr')->slug('mon-article')->save();
+    forgetRedirects();
+
+    $en->date('2025-01-15')->save();
+
+    expect($en->uri())->toBe('/my-post')
+        ->and(Redirect::query()->get())->toHaveCount(1)
+        ->and(Redirect::resolve('/2024/mon-article', 'fr')?->destination)->toBe('http://localhost/fr/2025/mon-article');
+});
+
+it('does not select localizations unaffected by an origin route edit', function (string $field) {
+    Site::setSites([
+        'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
+        'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
+    ]);
+    Collection::make('articles')->dated(true)->routes([
+        'en' => '/{year}/{category}/{slug}',
+        'fr' => '/{year}/{slug}',
+    ])->sites(['en', 'fr'])->saveQuietly();
+    Blink::flush();
+    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('old')->date('2024-01-15')->set('category', 'news'))->saveQuietly();
+    $en->makeLocalization('fr')->slug('article')->saveQuietly();
+
+    if ($field === 'slug') {
+        $en->slug('new');
+    } else {
+        $en->set('category', 'updates');
+    }
+
+    expect(app(EntryUrlChange::class)->affectedLocalizations($en))->toHaveCount(0);
+})->with(['slug', 'category']);
+
+it('keeps the live structured entry after probing related URL changes', function (bool $dated) {
+    Collection::make('articles')->dated($dated)->routes($dated ? '/{parent_uri}/{year}/{slug}' : '/{parent_uri}/{slug}')->sites(['default'])->structureContents(['root' => true])->saveQuietly();
+    Blink::flush();
+    $home = Entry::make()->collection('articles')->locale('default')->slug('home');
+    $entry = Entry::make()->collection('articles')->locale('default')->slug('old');
+
+    if ($dated) {
+        $home->date('2024-01-01');
+        $entry->date('2024-01-15');
+    }
+
+    $home->saveQuietly();
+    $entry->saveQuietly();
+    Collection::find('articles')->structure()->in('default')->tree([
+        ['entry' => $home->id()],
+        ['entry' => $entry->id()],
+    ])->save();
+    $entry->slug('new');
+    $entry->page()->setEntry($entry);
+
+    $urls = app(EntryUrlChange::class);
+
+    if ($dated) {
+        $urls->affectedLocalizations($entry);
+    } else {
+        $urls->originalPath($entry);
+    }
+
+    expect($entry->page()->entry()->slug())->toBe('new');
+})->with(['date probe' => true, 'original path capture' => false]);
