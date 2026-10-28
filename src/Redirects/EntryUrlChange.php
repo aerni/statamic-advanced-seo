@@ -27,21 +27,12 @@ class EntryUrlChange
             $current = $this->currentValues($entry, $original);
 
             $changed = $original->diff($current);
-            $stacheUrlChanged = $original->date !== null && $entry->initialPath() && $this->rememberStacheUrlChange($entry);
 
-            // Saved Stache URIs and Eloquent's native dirty-date flag can reveal
-            // a date move hidden by identical local times during DST.
-            if ($original->date !== null && $changed->date === null && (
-                $stacheUrlChanged || ($this->isEloquentEntry($entry) && $entry->isDirty('date'))
-            )) {
-                return new EntryUrlValues(
-                    slug: $changed->slug,
-                    date: $original->date,
-                    data: $changed->data,
-                );
-            }
-
-            return $changed;
+            return new EntryUrlValues(
+                slug: $changed->slug,
+                date: $this->changedDate($entry, $original->date, $changed->date),
+                data: $changed->data,
+            );
         });
     }
 
@@ -102,47 +93,13 @@ class EntryUrlChange
     }
 
     /**
-     * Use the saved Eloquent URI or a remembered Stache URI when available.
-     * A repeated DST hour can hide URL changes from formatted date values.
-     * Otherwise reconstruct file entries when their route values changed.
-     * The previous slug, date, and stored data are applied to a copy so the
-     * entry Statamic is about to save is left untouched. Restoring the data
-     * also preserves absent fields, which inherit rather than store null.
-     * The cached uri has to be flushed: the copy shares the entry id.
+     * The URL before this save, resolved using the entry's storage driver.
      */
     public function originalUrl(Entry $entry, EntryUrlValues $values): ?string
     {
-        if ($this->isEloquentEntry($entry)) {
-            return $this->eloquentOriginalUrl($entry);
-        }
-
-        if ($url = Blink::get($this->urlBlinkKey($entry))) {
-            return $url;
-        }
-
-        if ($values->isEmpty()) {
-            return null;
-        }
-
-        $copy = clone $entry;
-
-        if ($values->slug !== null) {
-            $copy->slug($values->slug);
-        }
-
-        if ($values->date !== null) {
-            $copy->date($values->date);
-        }
-
-        $copy->data($this->originalData($entry));
-
-        Blink::store('entry-uris')->forget($copy->id());
-
-        $url = $copy->absoluteUrlWithoutRedirect();
-
-        Blink::store('entry-uris')->forget($entry->id());
-
-        return $url;
+        return $this->isEloquentEntry($entry)
+            ? $this->eloquentOriginalUrl($entry)
+            : $this->stacheOriginalUrl($entry, $values);
     }
 
     /**
@@ -331,6 +288,22 @@ class EntryUrlChange
     }
 
     /**
+     * Include date changes hidden by identical formatted times during DST.
+     */
+    private function changedDate(Entry $entry, ?string $originalDate, ?string $changedDate): ?string
+    {
+        if ($originalDate === null) {
+            return null;
+        }
+
+        $dateChanged = $this->isEloquentEntry($entry)
+            ? $entry->isDirty('date')
+            : $this->stacheIndexedOriginalUrl($entry) !== null;
+
+        return $changedDate ?? ($dateChanged ? $originalDate : null);
+    }
+
+    /**
      * The public date when the filename has none. Statamic uses the last modified time.
      */
     private function lastModifiedDate(Entry $entry): string
@@ -355,35 +328,70 @@ class EntryUrlChange
     }
 
     /**
-     * The index can preserve the exact old URL when a filename loses its DST offset.
-     * A rebuilt index may already contain the new URI, so retain it only when it
-     * differs from a fresh route calculation. Otherwise keep the file fallback.
+     * Use the indexed URL captured while checking date changes. Otherwise
+     * reconstruct the URL from the previous slug, date, and stored data.
+     * Restoring the data preserves absent fields that inherit from an origin.
+     * The copy shares the entry id, so flush its URI cache before and after.
      */
-    private function rememberStacheUrlChange(Entry $entry): bool
+    private function stacheOriginalUrl(Entry $entry, EntryUrlValues $values): ?string
     {
-        $uri = Stache::store('entries')->store($entry->collectionHandle())->index('uri')->get($entry->id());
-
-        if (! $uri) {
-            return false;
+        if ($url = Blink::get($this->urlBlinkKey($entry))) {
+            return $url;
         }
 
-        Blink::store('entry-uris')->forget($entry->id());
-        Blink::store('structure-uris')->forget($entry->id());
-        $currentUri = $entry->uri();
-        Blink::store('entry-uris')->forget($entry->id());
-        Blink::store('structure-uris')->forget($entry->id());
-
-        if ($uri === $currentUri) {
-            return false;
+        if ($values->isEmpty()) {
+            return null;
         }
 
-        $url = str_starts_with($uri, '/')
-            ? URL::assemble($entry->site()->absoluteUrl(), $uri)
-            : $uri;
+        $copy = clone $entry;
 
-        Blink::put($this->urlBlinkKey($entry), $url);
+        if ($values->slug !== null) {
+            $copy->slug($values->slug);
+        }
 
-        return true;
+        if ($values->date !== null) {
+            $copy->date($values->date);
+        }
+
+        $copy->data($this->originalData($entry));
+
+        Blink::store('entry-uris')->forget($copy->id());
+
+        $url = $copy->absoluteUrlWithoutRedirect();
+
+        Blink::store('entry-uris')->forget($entry->id());
+
+        return $url;
+    }
+
+    /**
+     * The indexed URL distinguishes repeated DST times that filenames cannot.
+     * A rebuilt index may already contain the edited URI, so only retain a
+     * different URL.
+     */
+    private function stacheIndexedOriginalUrl(Entry $entry): ?string
+    {
+        return Blink::once($this->urlBlinkKey($entry), function () use ($entry) {
+            $uri = Stache::store('entries')->store($entry->collectionHandle())->index('uri')->get($entry->id());
+
+            if (! $uri) {
+                return null;
+            }
+
+            Blink::store('entry-uris')->forget($entry->id());
+            Blink::store('structure-uris')->forget($entry->id());
+            $currentUri = $entry->uri();
+            Blink::store('entry-uris')->forget($entry->id());
+            Blink::store('structure-uris')->forget($entry->id());
+
+            if ($uri === $currentUri) {
+                return null;
+            }
+
+            return str_starts_with($uri, '/')
+                ? URL::assemble($entry->site()->absoluteUrl(), $uri)
+                : $uri;
+        });
     }
 
     /**
