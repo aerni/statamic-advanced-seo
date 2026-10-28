@@ -10,8 +10,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
-use Statamic\Events\EntrySaved;
-use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -410,55 +408,6 @@ describe('entry redirects', function () {
         $entry->set('category', 'updates')->save();
 
         expect(Redirect::query()->where('site', 'default')->get())->toHaveCount(0);
-    });
-
-    // The Eloquent driver leaves initialPath() null but keeps getOriginal()
-    // reliable. An entry with a synced original and no initial path reproduces
-    // that condition without standing up the whole Eloquent entries driver.
-    it('captures the old url via getOriginal when there is no initial path', function () {
-        $entry = Entry::make()->id('abc')->collection('pages')->locale('default')->slug('old')->published(true);
-        $entry->syncOriginal();
-        $entry->slug('new');
-
-        event(new EntrySaving($entry));
-        event(new EntrySaved($entry));
-
-        $redirect = Redirect::query()->where('site', 'default')->where('source', '/old')->first();
-
-        expect($redirect)->not->toBeNull()
-            ->and($redirect->destination())->toBe('entry::abc');
-    });
-
-    it('captures the old dated url via getOriginal when there is no initial path', function () {
-        Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
-
-        $entry = Entry::make()->id('xyz')->collection('posts')->locale('default')->slug('post')->date('2024-01-15')->published(true);
-        $entry->syncOriginal();
-        $entry->date('2025-06-20');
-
-        event(new EntrySaving($entry));
-        event(new EntrySaved($entry));
-
-        $redirect = Redirect::query()->where('site', 'default')->where('source', '/blog/2024/post')->first();
-
-        expect($redirect)->not->toBeNull()
-            ->and($redirect->destination())->toBe('entry::xyz');
-    });
-
-    it('captures the old route token url via getOriginal when there is no initial path', function () {
-        Collection::find('pages')->routes('/{category}/{slug}')->save();
-
-        $entry = Entry::make()->id('abc')->collection('pages')->locale('default')->slug('post')->set('category', 'news')->published(true);
-        $entry->syncOriginal();
-        $entry->set('category', 'updates');
-
-        event(new EntrySaving($entry));
-        event(new EntrySaved($entry));
-
-        $redirect = Redirect::query()->where('site', 'default')->where('source', '/news/post')->first();
-
-        expect($redirect)->not->toBeNull()
-            ->and($redirect->destination())->toBe('entry::abc');
     });
 
     it('creates a prefix-stripped redirect in the entry site on a multisite collection', function () {

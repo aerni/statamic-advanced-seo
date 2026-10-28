@@ -58,12 +58,8 @@ class EntryUrlChange
             return $this->eloquentOriginalDate($entry);
         }
 
-        $originalPath = $entry->initialPath();
-
-        // Without a previously saved file, use any in-memory original date.
-        // A new entry with no original snapshot returns null here.
-        if (! $originalPath) {
-            return $entry->getOriginal('date');
+        if (! $originalPath = $entry->initialPath()) {
+            return null;
         }
 
         // Flat file: the previous date is still in the filename. A localization
