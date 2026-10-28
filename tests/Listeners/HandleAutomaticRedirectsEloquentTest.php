@@ -124,7 +124,6 @@ it('creates a redirect when an eloquent entry date changes by seconds', function
 describe('non-UTC entry dates', function () {
     beforeEach(function () {
         $this->originalPhpTimezone = date_default_timezone_get();
-        $this->travelTo(Carbon::parse('2024-02-01 12:00:00', 'UTC'));
 
         Collection::make('posts')->dated(true)->routes('/{{ date format="Y-m-d-H-i-s" }}/{{ slug }}')->sites(['default'])->saveQuietly();
 
@@ -155,6 +154,7 @@ describe('non-UTC entry dates', function () {
     it('creates no redirect when a non-UTC date is unchanged', function (string $timezone, bool $carbonDate) {
         config(['app.timezone' => $timezone]);
         date_default_timezone_set($timezone);
+        $this->travelTo(Carbon::parse('2024-02-01 12:00:00', $timezone));
 
         $date = $carbonDate ? Carbon::parse('2024-01-15 00:30:45', $timezone) : '2024-01-15-003045';
         $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date($date))->save();
@@ -171,6 +171,7 @@ describe('non-UTC entry dates', function () {
     it('redirects the original non-UTC URL when the slug changes', function (string $timezone, bool $carbonDate, string $siteUrl, string $destination) {
         config(['app.timezone' => $timezone]);
         date_default_timezone_set($timezone);
+        $this->travelTo(Carbon::parse('2024-02-01 12:00:00', $timezone));
         Site::setSites(['default' => ['name' => 'Default', 'url' => $siteUrl, 'locale' => 'en']]);
 
         $date = $carbonDate ? Carbon::parse('2024-01-15 00:30:45', $timezone) : '2024-01-15-003045';
@@ -191,6 +192,7 @@ describe('non-UTC entry dates', function () {
     it('redirects the original non-UTC URL when the date changes', function (string $timezone, bool $carbonDate) {
         config(['app.timezone' => $timezone]);
         date_default_timezone_set($timezone);
+        $this->travelTo(Carbon::parse('2024-02-01 12:00:00', $timezone));
 
         $date = $carbonDate ? Carbon::parse('2024-01-15 00:30:45', $timezone) : '2024-01-15-003045';
         $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date($date))->save();
@@ -207,6 +209,7 @@ describe('non-UTC entry dates', function () {
     it('keeps a reloaded non-UTC date unchanged at second precision', function (string $timezone) {
         config(['app.timezone' => $timezone]);
         date_default_timezone_set($timezone);
+        $this->travelTo(Carbon::parse('2024-02-01 12:00:00', $timezone));
 
         $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date(Carbon::parse('2024-01-15 00:30:45', $timezone)))->save();
         Blink::flush();

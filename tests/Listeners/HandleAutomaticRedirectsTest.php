@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Redirects\AutomaticRedirectWriter;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
@@ -191,6 +192,54 @@ describe('entry redirects', function () {
             config(['app.timezone' => $timezone]);
         }
     });
+
+    it('redirects control panel date changes independently of display timezones', function (string $appTimezone, string $cpTimezone, ?string $displayTimezone, string $input, string $oldPath, string $newPath) {
+        $originalTimezone = date_default_timezone_get();
+
+        try {
+            config([
+                'app.timezone' => $appTimezone,
+                'statamic.cp.default_timezone' => $cpTimezone,
+                'statamic.system.display_timezone' => $displayTimezone,
+            ]);
+            date_default_timezone_set($appTimezone);
+            $this->travelTo(Carbon::parse('2024-02-01 12:00:00', $appTimezone));
+
+            Collection::make('journal')->dated(true)->routes('/{{ date format="Y-m-d-H-i" }}/{{ slug }}')->sites(['default'])->saveQuietly();
+            Blueprint::make('collections.journal::journal')->setContents([
+                'tabs' => [
+                    'main' => [
+                        'sections' => [[
+                            'fields' => [[
+                                'handle' => 'date',
+                                'field' => [
+                                    'type' => 'date',
+                                    'time_enabled' => true,
+                                ],
+                            ]],
+                        ]],
+                    ],
+                ],
+            ])->save();
+            Blink::flush();
+
+            $entry = Entry::make()->collection('journal')->locale('default')->slug('post');
+            $fieldtype = $entry->blueprint()->field('date')->fieldtype();
+            $entry->date($fieldtype->augment($fieldtype->process($input)))->save();
+            $newDate = Carbon::parse($input)->addHour()->toIso8601String();
+
+            $entry->date($fieldtype->augment($fieldtype->process($newDate)))->save();
+
+            expect(Redirect::resolve($oldPath, 'default')?->destination)->toBe('http://localhost'.$newPath);
+        } finally {
+            date_default_timezone_set($originalTimezone);
+        }
+    })->with([
+        'UTC storage, Zurich CP' => ['UTC', 'Europe/Zurich', null, '2024-01-14T23:30:00Z', '/2024-01-14-23-30/post', '/2024-01-15-00-30/post'],
+        'Zurich storage, Zurich CP' => ['Europe/Zurich', 'Europe/Zurich', null, '2024-01-14T23:30:00Z', '/2024-01-15-00-30/post', '/2024-01-15-01-30/post'],
+        'separate frontend timezone' => ['UTC', 'Europe/Zurich', 'America/New_York', '2024-01-14T23:30:00Z', '/2024-01-14-18-30/post', '/2024-01-14-19-30/post'],
+        'three different timezones' => ['Europe/Zurich', 'America/New_York', 'UTC', '2024-01-15T05:30:00Z', '/2024-01-15-05-30/post', '/2024-01-15-06-30/post'],
+    ]);
 
     it('creates a redirect when a dated entry without a filename date gets an explicit date', function () {
         Collection::make('posts')->dated(true)->routes('/blog/{year}/{slug}')->sites(['default'])->saveQuietly();
