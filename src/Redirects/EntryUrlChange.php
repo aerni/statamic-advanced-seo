@@ -58,15 +58,18 @@ class EntryUrlChange
             return $this->eloquentOriginalDate($entry);
         }
 
-        // Flat file with no path. There is no datetime column, so use getOriginal().
-        if (! $path = $entry->initialPath()) {
+        $originalPath = $entry->initialPath();
+
+        // Without a previously saved file, use any in-memory original date.
+        // A new entry with no original snapshot returns null here.
+        if (! $originalPath) {
             return $entry->getOriginal('date');
         }
 
         // Flat file: the previous date is still in the filename. A localization
         // that inherits its date has none, so the origin's stored date is used.
         // getOriginal() has already been replaced.
-        if ($date = (new GetDateFromPath)($path)) {
+        if ($date = (new GetDateFromPath)($originalPath)) {
             return $date;
         }
 
