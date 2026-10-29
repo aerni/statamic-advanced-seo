@@ -35,6 +35,10 @@ Everything in Free, plus the tools to handle complex sites and advanced workflow
 - GraphQL API
 - Eloquent driver
 
+## Automatic redirects
+
+See the [automatic redirect coverage and behavior](docs/automatic-redirects.md) for supported save and move scenarios.
+
 ## Credits
 
 Developed by [Michael Aerni](https://www.michaelaerni.ch)

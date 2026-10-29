@@ -2,11 +2,15 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
+use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomyDeleting;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
@@ -16,13 +20,16 @@ class AutomaticRedirects
     public function __construct(
         private AutomaticEntryRedirects $entries,
         private AutomaticTermRedirects $terms,
+        private AutomaticTaxonomyRedirects $taxonomies,
     ) {}
 
-    public function stash(EntrySaving|TermSaving|CollectionTreeEntriesMovedOrRemoved $event): void
+    public function stash(EntrySaving|TermSaving|CollectionTreeEntriesMovedOrRemoved|TaxonomyDeleting|CollectionDeleting $event): void
     {
         match (true) {
             $event instanceof EntrySaving => $this->entries->stash($event->entry),
             $event instanceof TermSaving => $this->terms->stash($event->term),
+            $event instanceof TaxonomyDeleting => $this->taxonomies->stashDeletion($event->taxonomy),
+            $event instanceof CollectionDeleting => $this->taxonomies->stashDeletion($event->collection),
             $event instanceof CollectionTreeEntriesMovedOrRemoved => $this->entries->stashMovedByTree($event->moved),
         };
     }
@@ -36,11 +43,13 @@ class AutomaticRedirects
         };
     }
 
-    public function delete(EntryDeleted|TermDeleted $event): void
+    public function delete(EntryDeleted|TermDeleted|CollectionDeleted|TaxonomyDeleted $event): void
     {
         match (true) {
             $event instanceof EntryDeleted => $this->entries->delete($event->entry),
             $event instanceof TermDeleted => $this->terms->delete($event->term),
+            $event instanceof CollectionDeleted => $this->taxonomies->delete($event->collection),
+            $event instanceof TaxonomyDeleted => $this->taxonomies->delete($event->taxonomy),
         };
     }
 }

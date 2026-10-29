@@ -2,6 +2,7 @@
 
 namespace Aerni\AdvancedSeo\Redirects;
 
+use Aerni\AdvancedSeo\Concerns\ResolvesTaxonomyUrls;
 use Aerni\AdvancedSeo\Concerns\ResolvesTermUrls;
 use Aerni\AdvancedSeo\Contracts\Redirect;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
@@ -12,6 +13,7 @@ use Statamic\Facades\Term as TermFacade;
 
 class AutomaticRedirectWriter
 {
+    use ResolvesTaxonomyUrls;
     use ResolvesTermUrls;
 
     /**
@@ -82,7 +84,8 @@ class AutomaticRedirectWriter
     private function sourceIsOwnedByPublishedContent(string $source, string $site): bool
     {
         return $this->sourceIsOwnedByPublishedEntry($source, $site)
-            || $this->sourceIsOwnedByPublishedTerm($source, $site);
+            || $this->sourceIsOwnedByPublishedTerm($source, $site)
+            || $this->taxonomyIndexOwnsPath($source, $site);
     }
 
     private function sourceIsOwnedByPublishedEntry(string $source, string $site): bool
