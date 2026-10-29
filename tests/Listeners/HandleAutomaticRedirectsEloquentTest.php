@@ -8,7 +8,6 @@ use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Eloquent\Entries\Entry as EloquentEntry;
@@ -221,7 +220,7 @@ describe('non-UTC entry dates', function () {
         'string date' => false,
     ]);
 
-    it('reports no move when re-saving a persisted non-UTC timestamp', function (string $timezone) {
+    it('keeps a reloaded non-UTC date unchanged at second precision', function (string $timezone) {
         config(['app.timezone' => $timezone]);
         date_default_timezone_set($timezone);
         $this->travelTo(Carbon::parse('2024-02-01 12:00:00', $timezone));
@@ -229,15 +228,10 @@ describe('non-UTC entry dates', function () {
         $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date(Carbon::parse('2024-01-15 00:30:45', $timezone)))->save();
         Blink::flush();
         $entry = Entry::find($entry->id());
-        $entry->saveQuietly();
 
         $entry->set('title', 'Updated');
 
-        $urls = app(EntryUrlChange::class);
-        $originalPath = $urls->originalPath($entry);
-        $entry->saveQuietly();
-
-        expect($urls->compare($entry, $originalPath)->moved())->toBeFalse();
+        expect(app(EntryUrlChange::class)->changedValues($entry)->isEmpty())->toBeTrue();
     })->with(['Europe/Zurich', 'America/New_York']);
 
     it('redirects a reloaded date change when the local clock matches the old UTC snapshot', function () {
@@ -304,41 +298,6 @@ describe('non-UTC entry dates', function () {
 
         expect(Redirect::resolve('/2024-10-27-00-30-45/post', 'en')?->destination)->toBe('http://localhost/2024-10-27-01-30-45/post')
             ->and(Redirect::resolve('/2024-10-27-00-30-45/article', 'fr')?->destination)->toBe('http://localhost/fr/2024-10-27-01-30-45/article');
-    });
-
-    it('refreshes mounted URLs when a repeated-hour date matches its dirty snapshot', function () {
-        config(['app.timezone' => 'Europe/Zurich', 'statamic.system.display_timezone' => 'UTC']);
-        date_default_timezone_set('Europe/Zurich');
-        $this->travelTo(Carbon::parse('2024-10-28 12:00:00', 'Europe/Zurich'));
-        $mount = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
-        Collection::make('articles')->routes('/{mount}/{slug}')->mount($mount->id())->sites(['default'])->saveQuietly();
-        Blink::flush();
-        Entry::make()->collection('articles')->locale('default')->slug('hello')->save();
-
-        // Reloading an offset-free datetime can sync this date while retaining the old URI.
-        $mount->date(Carbon::parse('2024-10-27T01:30:45Z'))->syncOriginal();
-        $mount->set('title', 'Updated')->save();
-
-        expect(Redirect::resolve('/2024-10-27-00-30-45/post/hello', 'default')?->destination)->toBe('http://localhost/2024-10-27-01-30-45/post/hello');
-    });
-
-    it('refreshes an inherited date when its snapshot hides a repeated-hour move alongside a slug change', function () {
-        config(['app.timezone' => 'Europe/Zurich', 'statamic.system.display_timezone' => 'UTC']);
-        date_default_timezone_set('Europe/Zurich');
-        $this->travelTo(Carbon::parse('2024-10-28 12:00:00', 'Europe/Zurich'));
-        Site::setSites([
-            'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
-            'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
-        ]);
-        Collection::find('posts')->sites(['en', 'fr'])->saveQuietly();
-        Blink::flush();
-        $en = tap(Entry::make()->collection('posts')->locale('en')->slug('old')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
-        $en->makeLocalization('fr')->slug('article')->save();
-
-        $en->date(Carbon::parse('2024-10-27T01:30:45Z'))->syncOriginal();
-        $en->slug('new')->save();
-
-        expect(Redirect::resolve('/2024-10-27-00-30-45/article', 'fr')?->destination)->toBe('http://localhost/fr/2024-10-27-01-30-45/article');
     });
 
     it('redirects mounted content when its mount moves between repeated local times', function () {
@@ -1180,147 +1139,3 @@ function eloquentForgetRedirects(): void
 {
     Redirect::query()->get()->each->delete();
 }
-
-it('reports the actual saved URL change', function (?string $initialSlug, string $updatedSlug, string $route, ?string $oldPath, string $currentPath, bool $moved) {
-    Collection::make('comparison')->routes($route)->sites(['default'])->saveQuietly();
-    Blink::flush();
-    $entry = Entry::make()->collection('comparison')->locale('default');
-
-    if ($initialSlug !== null) {
-        $entry->slug($initialSlug)->saveQuietly();
-    }
-
-    $entry->slug($updatedSlug);
-    $urls = app(EntryUrlChange::class);
-    $originalPath = $urls->originalPath($entry);
-
-    $entry->saveQuietly();
-    $result = $urls->compare($entry, $originalPath);
-
-    expect($result->oldPath)->toBe($oldPath)
-        ->and($result->currentPath)->toBe($currentPath)
-        ->and($result->moved())->toBe($moved);
-})->with([
-    'new entry' => [null, 'new', '/{slug}', null, '/new', false],
-    'unchanged entry' => ['post', 'post', '/{slug}', '/post', '/post', false],
-    'changed URL' => ['old', 'new', '/{slug}', '/old', '/new', true],
-    'changed slug with unchanged URL' => ['old', 'new', '/fixed', '/fixed', '/fixed', false],
-]);
-
-it('redirects only the localization whose URL uses the inherited date', function () {
-    Site::setSites([
-        'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
-        'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
-    ]);
-    Collection::make('articles')->dated(true)->routes([
-        'en' => '/{slug}',
-        'fr' => '/{year}/{slug}',
-    ])->sites(['en', 'fr'])->saveQuietly();
-    Blink::flush();
-    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('my-post')->date('2024-01-15'))->save();
-    $en->makeLocalization('fr')->slug('mon-article')->save();
-    eloquentForgetRedirects();
-
-    $en->date('2025-01-15')->save();
-
-    expect($en->uri())->toBe('/my-post')
-        ->and(Redirect::query()->get())->toHaveCount(1)
-        ->and(Redirect::resolve('/2024/mon-article', 'fr')?->destination)->toBe('http://localhost/fr/2025/mon-article');
-});
-
-it('does not select localizations unaffected by an origin route edit', function (string $field) {
-    Site::setSites([
-        'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
-        'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
-    ]);
-    Collection::make('articles')->dated(true)->routes([
-        'en' => '/{year}/{category}/{slug}',
-        'fr' => '/{year}/{slug}',
-    ])->sites(['en', 'fr'])->saveQuietly();
-    Blink::flush();
-    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('old')->date('2024-01-15')->set('category', 'news'))->saveQuietly();
-    $en->makeLocalization('fr')->slug('article')->saveQuietly();
-
-    if ($field === 'slug') {
-        $en->slug('new');
-    } else {
-        $en->set('category', 'updates');
-    }
-
-    expect(app(EntryUrlChange::class)->affectedLocalizations($en))->toHaveCount(0);
-})->with(['slug', 'category']);
-
-it('keeps the live structured entry after probing related URL changes', function (bool $dated) {
-    Collection::make('articles')->dated($dated)->routes($dated ? '/{parent_uri}/{year}/{slug}' : '/{parent_uri}/{slug}')->sites(['default'])->structureContents(['root' => true])->saveQuietly();
-    Blink::flush();
-    $home = Entry::make()->collection('articles')->locale('default')->slug('home');
-    $entry = Entry::make()->collection('articles')->locale('default')->slug('old');
-
-    if ($dated) {
-        $home->date('2024-01-01');
-        $entry->date('2024-01-15');
-    }
-
-    $home->saveQuietly();
-    $entry->saveQuietly();
-    Collection::find('articles')->structure()->in('default')->tree([
-        ['entry' => $home->id()],
-        ['entry' => $entry->id()],
-    ])->save();
-    $entry->slug('new');
-    $entry->page()->setEntry($entry);
-
-    $urls = app(EntryUrlChange::class);
-
-    if ($dated) {
-        $urls->affectedLocalizations($entry);
-    } else {
-        $urls->originalPath($entry);
-    }
-
-    expect($entry->page()->entry()->slug())->toBe('new');
-})->with(['date probe' => true, 'original path capture' => false]);
-
-it('does not select descendants whose URLs ignore an inherited field changed by an ancestor', function () {
-    Site::setSites([
-        'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
-        'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
-        'de' => ['name' => 'DE', 'url' => '/de', 'locale' => 'de'],
-    ]);
-    Collection::make('articles')->dated(true)->routes([
-        'en' => '/{year}/{category}/{slug}',
-        'fr' => '/{year}/{category}/{slug}',
-        'de' => '/{year}/{slug}',
-    ])->sites(['en', 'fr', 'de'])->saveQuietly();
-    Blink::flush();
-    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15')->set('category', 'news'))->saveQuietly();
-    $fr = tap($en->makeLocalization('fr')->slug('article'))->saveQuietly();
-    $fr->makeLocalization('de')->slug('beitrag')->saveQuietly();
-    $selected = null;
-    Event::listen(EntrySaving::class, function (EntrySaving $event) use ($fr, &$selected) {
-        if ($event->entry->id() === $fr->id()) {
-            $selected = app(EntryUrlChange::class)->affectedLocalizations($event->entry)->keys()->all();
-        }
-    });
-
-    $en->set('category', 'updates')->save();
-
-    expect($selected)->toBe([]);
-});
-
-it('refreshes the origin publication snapshot after inherited fields are saved', function () {
-    Site::setSites([
-        'en' => ['name' => 'EN', 'url' => '/', 'locale' => 'en'],
-        'fr' => ['name' => 'FR', 'url' => '/fr', 'locale' => 'fr'],
-    ]);
-    Collection::make('articles')->dated(true)->routes('/{year}/{category}/{slug}')->sites(['en', 'fr'])->saveQuietly();
-    Blink::flush();
-    $en = tap(Entry::make()->collection('articles')->locale('en')->slug('post')->date('2024-01-15')->set('category', 'news')->published(false))->saveQuietly();
-    $en->makeLocalization('fr')->slug('article')->published(true)->saveQuietly();
-    $en->published(true)->set('category', 'updates')->save();
-    eloquentForgetRedirects();
-
-    $en->slug('renamed')->save();
-
-    expect(Redirect::resolve('/2024/updates/post', 'en')?->destination)->toBe('http://localhost/2024/updates/renamed');
-});

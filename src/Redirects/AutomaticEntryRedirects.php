@@ -5,6 +5,7 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Aerni\AdvancedSeo\Concerns\ResolvesTermUrls;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Contracts\Entries\Entry;
@@ -12,6 +13,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Term as TermFacade;
 use Statamic\Facades\URL;
 use Statamic\Structures\CollectionTree;
@@ -162,13 +164,76 @@ class AutomaticEntryRedirects
             return;
         }
 
-        if (! $this->urls->wasLive($entry)) {
+        if (! $this->wasLive($entry)) {
             return;
         }
 
-        if ($originalPath = $this->urls->originalPath($entry)) {
-            $this->entries[$entry->id()] ??= $originalPath;
+        $changed = $this->urls->changedValues($entry);
+
+        if (! $originalUrl = $this->urls->originalUrl($entry, $changed)) {
+            return;
         }
+
+        $this->entries[$entry->id()] ??= $entry->site()->relativePath($originalUrl);
+    }
+
+    /**
+     * The entry was publicly reachable before this save. The status on the
+     * entry itself is already the new one.
+     */
+    private function wasLive(Entry $entry): bool
+    {
+        if (! $this->wasPublished($entry)) {
+            return false;
+        }
+
+        $date = $this->parseDate($this->urls->originalDate($entry));
+
+        $collection = $entry->collection();
+
+        // A dated collection can hide a published entry when its date is private.
+        if ($collection->dated() && $collection->futureDateBehavior() === 'private' && $date?->isFuture()) {
+            return false;
+        }
+
+        if ($collection->dated() && $collection->pastDateBehavior() === 'private' && $date?->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Whether the entry was published before this save. The flag on the entry
+     * itself is already the new one.
+     */
+    private function wasPublished(Entry $entry): bool
+    {
+        return (bool) ($this->urls->originalData($entry)['published'] ?? (bool) $entry->initialPath());
+    }
+
+    /**
+     * Parse a stored date string into a Carbon at the precision it was stored.
+     */
+    private function parseDate(?string $date): ?Carbon
+    {
+        if (! $date) {
+            return null;
+        }
+
+        $format = match (strlen($date)) {
+            10 => 'Y-m-d',
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+        };
+
+        $parsed = Carbon::createFromFormat($format, $date);
+
+        return match ($format) {
+            'Y-m-d' => $parsed->startOfDay(),
+            'Y-m-d-Hi' => $parsed->startOfMinute(),
+            'Y-m-d-His' => $parsed,
+        };
     }
 
     /**
@@ -181,7 +246,7 @@ class AutomaticEntryRedirects
             return;
         }
 
-        if (! $this->urls->mayAffectRelatedEntries($entry)) {
+        if ($this->urls->changedValues($entry)->isEmpty()) {
             return;
         }
 
@@ -209,15 +274,30 @@ class AutomaticEntryRedirects
      */
     private function stashMovedByOrigin(Entry $entry): void
     {
-        foreach ($this->urls->affectedLocalizations($entry) as $localization) {
-            if ($this->urls->wasLive($localization)) {
+        $changed = $this->urls->changedValues($entry);
+
+        if (! $changed->data && ! $changed->date) {
+            return;
+        }
+
+        foreach ($entry->descendants() as $localization) {
+            if (! $this->urls->inheritsChangedValues($entry, $localization)) {
+                continue;
+            }
+
+            if ($this->wasLive($localization)) {
                 $this->entries += $this->stashOriginalPaths([$localization]);
             }
 
             $this->stashAffectedMounts($localization->id(), $localization);
             $this->stashChildPagePaths($localization);
 
-            $this->urls->prepareLocalizationForSave($entry, $localization);
+            // Eloquent copies the origin date onto the localization. Clear that
+            // copy so the save that follows writes the new date into the URI.
+            // The old path was already read above.
+            if ($changed->date && ! $localization->initialPath() && $this->urls->inheritsDate($entry, $localization)) {
+                $localization->date(null);
+            }
         }
     }
 
@@ -241,7 +321,7 @@ class AutomaticEntryRedirects
                 continue;
             }
 
-            if (! $path = $this->urls->storedPath($entry)) {
+            if (! $path = $this->originalPath($entry)) {
                 continue;
             }
 
@@ -249,6 +329,36 @@ class AutomaticEntryRedirects
         }
 
         return $paths;
+    }
+
+    /**
+     * Original site-relative path, read from storage rather than computed.
+     *
+     * By the time a tree move is observable, the in-memory
+     * entry already resolves to the new URL (and a fresh request has an empty
+     * Blink cache, so uri() cannot be trusted to return the old one). The
+     * Stache URI index and the Eloquent uri column are still the previous
+     * value until Statamic rewrites them after the save.
+     */
+    private function originalPath(Entry $entry): ?string
+    {
+        $initialPath = $entry->initialPath();
+
+        // Flat-file entries keep the previous URI in the Stache index.
+        if ($initialPath) {
+            $uri = Stache::store('entries')
+                ->store($entry->collectionHandle())
+                ->index('uri')
+                ->get($entry->id());
+        }
+
+        // Eloquent entries keep it on the uri column. A custom file entry
+        // may also define model(), so only read it when there is no file path.
+        if (! $initialPath && method_exists($entry, 'model')) {
+            $uri = $entry->model()->getAttribute('uri');
+        }
+
+        return is_string($uri) && $uri !== '' ? $uri : null;
     }
 
     /**
@@ -364,17 +474,21 @@ class AutomaticEntryRedirects
      */
     private function processEntryRedirect(Entry $entry, ?string $originalPath = null): void
     {
-        $change = $this->urls->compare($entry, $originalPath);
-
-        if (! $change->currentPath || ! $this->isRedirectable($entry)) {
+        if (! $currentPath = $this->currentPath($entry)) {
             return;
         }
 
-        $this->redirects->deleteBySource($change->currentPath, $entry->locale());
-
-        if ($change->moved()) {
-            $this->redirects->create($change->oldPath, "entry::{$entry->id()}", $entry->locale());
+        if (! $this->isRedirectable($entry)) {
+            return;
         }
+
+        $this->redirects->deleteBySource($currentPath, $entry->locale());
+
+        if (! $originalPath || $originalPath === $currentPath) {
+            return;
+        }
+
+        $this->redirects->create($originalPath, "entry::{$entry->id()}", $entry->locale());
     }
 
     /**
@@ -387,7 +501,7 @@ class AutomaticEntryRedirects
             return;
         }
 
-        if (! $this->urls->mayAffectRelatedEntries($entry)) {
+        if ($this->urls->changedValues($entry)->isEmpty()) {
             return;
         }
 
@@ -505,14 +619,14 @@ class AutomaticEntryRedirects
         $localization = TermFacade::find($stashed['term'])->in($stashed['site']);
         $collection = CollectionFacade::findByHandle($stashed['collection']);
 
-        $change = new EntryUrlChangeResult($stashed['path'], $this->collectionTermPath($localization, $collection));
+        $currentPath = $this->collectionTermPath($localization, $collection);
 
-        if (! $change->moved()) {
+        if (! $currentPath || $currentPath === $stashed['path']) {
             return;
         }
 
-        $this->redirects->deleteBySource($change->currentPath, $stashed['site']);
-        $this->redirects->create($change->oldPath, $change->currentPath, $stashed['site']);
+        $this->redirects->deleteBySource($currentPath, $stashed['site']);
+        $this->redirects->create($stashed['path'], $currentPath, $stashed['site']);
     }
 
     /**
@@ -523,7 +637,7 @@ class AutomaticEntryRedirects
      */
     private function affectedCollectionTermPaths(Entry $mount, StatamicCollection $collection): Collection
     {
-        $mountPath = $this->urls->storedPath($mount);
+        $mountPath = $this->originalPath($mount);
 
         if (! $mountPath) {
             return collect();
@@ -561,5 +675,15 @@ class AutomaticEntryRedirects
         return CollectionFacade::all()
             ->filter(fn (StatamicCollection $collection) => $collection->mount()?->in($entry->locale())?->id() === $entry->id())
             ->values();
+    }
+
+    private function currentPath(Entry $entry): ?string
+    {
+        // A URI blinked before this change would hide the new path.
+        Blink::store('entry-uris')->forget($entry->id());
+
+        $url = $entry->absoluteUrlWithoutRedirect();
+
+        return $url ? $entry->site()->relativePath($url) : null;
     }
 }
