@@ -4,10 +4,10 @@ A comprehensive SEO addon for Statamic. First-class Statamic package, not a gene
 
 ## Foundational Context
 
-- php - ^8.4
+- php - ^8.4 (tested on 8.4, 8.5, and 8.6)
 - laravel/framework - ^12.0
 - statamic/cms - ^6.0
-- pestphp/pest - ^4.0
+- pestphp/pest - ^4.0 || ^5.0
 - laravel/pint - ^1.26 (laravel preset)
 - spatie/browsershot - ^5.2
 - spatie/schema-org - ^3.23

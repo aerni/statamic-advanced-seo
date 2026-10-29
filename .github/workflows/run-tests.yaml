@@ -9,13 +9,22 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        php: [8.4, 8.5]
-        laravel: [12.*, 13.*]
+        php: [8.4, 8.5, 8.6]
+        # Laravel 13.32 implements SessionHandlerInterface::create_sid().
+        # PHP 8.6 warns when that method is missing, and the suite turns
+        # the warning into an exception. 13.* resolved to 13.30.0.
+        laravel: [12.*, "^13.32"]
         stability: [prefer-lowest, prefer-stable]
+        exclude:
+          # Testbench 10 conflicts with PHPUnit 13.2+, which Pest 5 needs
+          # on PHP 8.6. Pest 4 cannot be installed there because ParaTest
+          # does not declare PHP 8.6 support.
+          - php: 8.6
+            laravel: 12.*
         include:
           - laravel: 12.*
             testbench: ^10.8
-          - laravel: 13.*
+          - laravel: "^13.32"
             testbench: ^11.0
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
@@ -39,6 +48,9 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          if [ "${{ matrix.php }}" = "8.6" ]; then
+            composer require "pestphp/pest:^5.0" --dev --no-interaction --no-update
+          fi
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Execute tests
