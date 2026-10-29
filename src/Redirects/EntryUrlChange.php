@@ -8,6 +8,8 @@ use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Stache;
+use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 
 class EntryUrlChange
@@ -24,7 +26,13 @@ class EntryUrlChange
             $original = $this->originalValues($entry);
             $current = $this->currentValues($entry, $original);
 
-            return $original->diff($current);
+            $changed = $original->diff($current);
+
+            return new EntryUrlValues(
+                slug: $changed->slug,
+                date: $this->changedDate($entry, $original->date, $changed->date),
+                data: $changed->data,
+            );
         });
     }
 
@@ -32,6 +40,8 @@ class EntryUrlChange
     {
         Blink::forget($this->changedBlinkKey($entry));
         Blink::forget($this->dataBlinkKey($entry));
+        Blink::forget($this->urlBlinkKey($entry));
+        Blink::forget($this->dateBlinkKey($entry));
     }
 
     /**
@@ -49,26 +59,24 @@ class EntryUrlChange
     }
 
     /**
-     * The date stored before this save.
+     * Keep the previous date until this entry's own save is stashed. Its origin
+     * may already have been saved before a localization reaches EntrySaving.
      */
     public function originalDate(Entry $entry): ?string
     {
-        $path = $entry->initialPath();
+        return Blink::once($this->dateBlinkKey($entry), fn () => $this->resolveOriginalDate($entry));
+    }
 
-        // Flat file with no path. There is no datetime column, so use getOriginal().
-        if (! $path && ! method_exists($entry, 'model')) {
-            return $entry->getOriginal('date');
-        }
-
-        // Eloquent: there is no file, so getOriginal() is still the pre-save date.
-        if (! $path) {
+    private function resolveOriginalDate(Entry $entry): ?string
+    {
+        if ($this->isEloquentEntry($entry)) {
             return $this->eloquentOriginalDate($entry);
         }
 
         // Flat file: the previous date is still in the filename. A localization
         // that inherits its date has none, so the origin's stored date is used.
         // getOriginal() has already been replaced.
-        if ($date = (new GetDateFromPath)($path)) {
+        if ($date = (new GetDateFromPath)($entry->initialPath())) {
             return $date;
         }
 
@@ -85,33 +93,13 @@ class EntryUrlChange
     }
 
     /**
-     * Let the routing compute the URL the entry had before this save.
-     * The previous slug, date, and stored data are applied to a copy so the
-     * entry Statamic is about to save is left untouched. Restoring the data
-     * also preserves absent fields, which inherit rather than store null.
-     * The cached uri has to be flushed: the copy shares the entry id.
+     * The URL before this save, resolved using the entry's storage driver.
      */
     public function originalUrl(Entry $entry, EntryUrlValues $values): ?string
     {
-        $copy = clone $entry;
-
-        if ($values->slug !== null) {
-            $copy->slug($values->slug);
-        }
-
-        if ($values->date !== null) {
-            $copy->date($values->date);
-        }
-
-        $copy->data($this->originalData($entry));
-
-        Blink::store('entry-uris')->forget($copy->id());
-
-        $url = $copy->absoluteUrlWithoutRedirect();
-
-        Blink::store('entry-uris')->forget($entry->id());
-
-        return $url;
+        return $this->isEloquentEntry($entry)
+            ? $this->eloquentOriginalUrl($entry)
+            : $this->stacheOriginalUrl($entry, $values);
     }
 
     /**
@@ -144,6 +132,16 @@ class EntryUrlChange
     private function dataBlinkKey(Entry $entry): string
     {
         return "advanced-seo::automatic-redirects::data::{$entry->id()}::{$entry->locale()}";
+    }
+
+    private function dateBlinkKey(Entry $entry): string
+    {
+        return "advanced-seo::automatic-redirects::date::{$entry->id()}::{$entry->locale()}";
+    }
+
+    private function urlBlinkKey(Entry $entry): string
+    {
+        return "advanced-seo::automatic-redirects::url::{$entry->id()}::{$entry->locale()}";
     }
 
     /**
@@ -290,6 +288,21 @@ class EntryUrlChange
     }
 
     /**
+     * Include date changes hidden by identical formatted times during DST.
+     */
+    private function changedDate(Entry $entry, ?string $originalDate, ?string $changedDate): ?string
+    {
+        if ($originalDate === null) {
+            return null;
+        }
+
+        $dateChanged = $this->storedOriginalUrlIfChanged($entry) !== null
+            || ($this->isEloquentEntry($entry) && $entry->isDirty('date'));
+
+        return $changedDate ?? ($dateChanged ? $originalDate : null);
+    }
+
+    /**
      * The public date when the filename has none. Statamic uses the last modified time.
      */
     private function lastModifiedDate(Entry $entry): string
@@ -311,6 +324,96 @@ class EntryUrlChange
         }
 
         return $copy->date()->copy()->setTimezone(config('app.timezone'))->format($format);
+    }
+
+    /**
+     * Use the indexed URL captured while checking date changes. Otherwise
+     * reconstruct the URL from the previous slug, date, and stored data.
+     * Restoring the data preserves absent fields that inherit from an origin.
+     * The copy shares the entry id, so flush its URI cache before and after.
+     */
+    private function stacheOriginalUrl(Entry $entry, EntryUrlValues $values): ?string
+    {
+        if ($url = Blink::get($this->urlBlinkKey($entry))) {
+            return $url;
+        }
+
+        if ($values->isEmpty()) {
+            return null;
+        }
+
+        $copy = clone $entry;
+
+        if ($values->slug !== null) {
+            $copy->slug($values->slug);
+        }
+
+        if ($values->date !== null) {
+            $copy->date($values->date);
+        }
+
+        $copy->data($this->originalData($entry));
+
+        Blink::store('entry-uris')->forget($copy->id());
+
+        $url = $copy->absoluteUrlWithoutRedirect();
+
+        Blink::store('entry-uris')->forget($entry->id());
+
+        return $url;
+    }
+
+    /**
+     * The saved URI can reveal a date move hidden by identical local times.
+     * A rebuilt Stache index may already contain the edited URI, so only
+     * retain a different URL.
+     */
+    private function storedOriginalUrlIfChanged(Entry $entry): ?string
+    {
+        return Blink::once($this->urlBlinkKey($entry), function () use ($entry) {
+            $uri = $this->isEloquentEntry($entry)
+                ? $entry->model()?->getOriginal('uri')
+                : Stache::store('entries')->store($entry->collectionHandle())->index('uri')->get($entry->id());
+
+            if (! $uri) {
+                return null;
+            }
+
+            Blink::store('entry-uris')->forget($entry->id());
+            Blink::store('structure-uris')->forget($entry->id());
+            $currentUri = $entry->uri();
+            Blink::store('entry-uris')->forget($entry->id());
+            Blink::store('structure-uris')->forget($entry->id());
+
+            if ($uri === $currentUri) {
+                return null;
+            }
+
+            return str_starts_with($uri, '/')
+                ? URL::assemble($entry->site()->absoluteUrl(), $uri)
+                : $uri;
+        });
+    }
+
+    /**
+     * A file path takes precedence because custom file entries may also expose model().
+     */
+    private function isEloquentEntry(Entry $entry): bool
+    {
+        return ! $entry->initialPath() && method_exists($entry, 'model');
+    }
+
+    private function eloquentOriginalUrl(Entry $entry): ?string
+    {
+        $uri = $entry->model()?->getOriginal('uri');
+
+        if (! $uri) {
+            return null;
+        }
+
+        return str_starts_with($uri, '/')
+            ? URL::assemble($entry->site()->absoluteUrl(), $uri)
+            : $uri;
     }
 
     /**
