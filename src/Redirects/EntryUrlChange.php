@@ -296,9 +296,8 @@ class EntryUrlChange
             return null;
         }
 
-        $dateChanged = $this->isEloquentEntry($entry)
-            ? $entry->isDirty('date')
-            : $this->stacheIndexedOriginalUrl($entry) !== null;
+        $dateChanged = $this->storedOriginalUrlIfChanged($entry) !== null
+            || ($this->isEloquentEntry($entry) && $entry->isDirty('date'));
 
         return $changedDate ?? ($dateChanged ? $originalDate : null);
     }
@@ -365,14 +364,16 @@ class EntryUrlChange
     }
 
     /**
-     * The indexed URL distinguishes repeated DST times that filenames cannot.
-     * A rebuilt index may already contain the edited URI, so only retain a
-     * different URL.
+     * The saved URI can reveal a date move hidden by identical local times.
+     * A rebuilt Stache index may already contain the edited URI, so only
+     * retain a different URL.
      */
-    private function stacheIndexedOriginalUrl(Entry $entry): ?string
+    private function storedOriginalUrlIfChanged(Entry $entry): ?string
     {
         return Blink::once($this->urlBlinkKey($entry), function () use ($entry) {
-            $uri = Stache::store('entries')->store($entry->collectionHandle())->index('uri')->get($entry->id());
+            $uri = $this->isEloquentEntry($entry)
+                ? $entry->model()?->getOriginal('uri')
+                : Stache::store('entries')->store($entry->collectionHandle())->index('uri')->get($entry->id());
 
             if (! $uri) {
                 return null;

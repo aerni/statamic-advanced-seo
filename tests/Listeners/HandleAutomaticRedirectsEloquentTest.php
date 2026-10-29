@@ -3,7 +3,6 @@
 use Aerni\AdvancedSeo\Eloquent\Redirect as EloquentRedirect;
 use Aerni\AdvancedSeo\Enums\RedirectOrigin;
 use Aerni\AdvancedSeo\Facades\Redirect;
-use Aerni\AdvancedSeo\Redirects\EntryUrlChange;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesEloquentEntries;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Aerni\AdvancedSeo\Tests\Concerns\UseEloquentDriver;
@@ -220,18 +219,22 @@ describe('non-UTC entry dates', function () {
         'string date' => false,
     ]);
 
-    it('keeps a reloaded non-UTC date unchanged at second precision', function (string $timezone) {
+    it('redirects a reloaded timestamp only when its saved URL changes', function (string $timezone) {
         config(['app.timezone' => $timezone]);
         date_default_timezone_set($timezone);
         $this->travelTo(Carbon::parse('2024-02-01 12:00:00', $timezone));
 
         $entry = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date(Carbon::parse('2024-01-15 00:30:45', $timezone)))->save();
+        $oldPath = $entry->uri();
         Blink::flush();
         $entry = Entry::find($entry->id());
 
-        $entry->set('title', 'Updated');
+        $entry->set('title', 'Updated')->save();
 
-        expect(app(EntryUrlChange::class)->changedValues($entry)->isEmpty())->toBeTrue();
+        $moved = $oldPath !== $entry->uri();
+
+        expect(Redirect::query()->get())->toHaveCount($moved ? 1 : 0)
+            ->and(Redirect::resolve($oldPath, 'default')?->destination)->toBe($moved ? $entry->absoluteUrlWithoutRedirect() : null);
     })->with(['Europe/Zurich', 'America/New_York']);
 
     it('redirects a reloaded date change when the local clock matches the old UTC snapshot', function () {
@@ -298,6 +301,23 @@ describe('non-UTC entry dates', function () {
 
         expect(Redirect::resolve('/2024-10-27-00-30-45/post', 'en')?->destination)->toBe('http://localhost/2024-10-27-01-30-45/post')
             ->and(Redirect::resolve('/2024-10-27-00-30-45/article', 'fr')?->destination)->toBe('http://localhost/fr/2024-10-27-01-30-45/article');
+    });
+
+    it('redirects mounted content after reloading a repeated-hour date', function () {
+        config(['app.timezone' => 'Europe/Zurich', 'statamic.system.display_timezone' => 'UTC']);
+        date_default_timezone_set('Europe/Zurich');
+        $this->travelTo(Carbon::parse('2024-10-28 12:00:00', 'Europe/Zurich'));
+        $mount = tap(Entry::make()->collection('posts')->locale('default')->slug('post')->date(Carbon::parse('2024-10-27T00:30:45Z')))->save();
+        Collection::make('articles')->routes('/{mount}/{slug}')->mount($mount->id())->sites(['default'])->saveQuietly();
+        Blink::flush();
+        Entry::make()->collection('articles')->locale('default')->slug('hello')->save();
+
+        Blink::flush();
+        $mount = Entry::find($mount->id());
+        $mount->set('title', 'Updated')->save();
+
+        expect($mount->uri())->not->toBe('/2024-10-27-00-30-45/post')
+            ->and(Redirect::resolve('/2024-10-27-00-30-45/post/hello', 'default')?->destination)->toBe('http://localhost'.$mount->uri().'/hello');
     });
 
     it('redirects mounted content when its mount moves between repeated local times', function () {
