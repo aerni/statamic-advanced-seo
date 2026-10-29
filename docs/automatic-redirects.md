@@ -33,7 +33,7 @@ The current public URL is compared with the saved old URL before a redirect is c
 
 Manual redirects are preserved, and existing sources are not overwritten. A URL still owned by a public entry, term, or taxonomy index is protected from a new automatic redirect.
 
-Entry destinations use entry references so redirects follow later moves. Term and taxonomy-index destinations are updated to avoid redirect chains. When content reclaims an old URL, automatic redirects using that URL are removed. Deleting an entry, term, collection, or taxonomy removes the relevant automatic redirects to destinations that no longer exist; manual redirects are preserved.
+Entry destinations use entry references so redirects follow later moves. Term and taxonomy-index destinations are updated to avoid redirect chains. When content reclaims an old URL, automatic redirects using that URL are removed. Deleting an entry, term, collection, or taxonomy removes the relevant automatic redirects to destinations that no longer exist; manual redirects are preserved. Deleting a mount entry also cleans index and scoped-term redirects affected through that mount, including nested mounts, without changing sibling sites. A destination still served by public content is retained.
 
 ## Boundaries
 

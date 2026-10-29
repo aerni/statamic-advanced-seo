@@ -1478,4 +1478,84 @@ describe('collection taxonomy index lifecycle', function () {
                 ->and(Redirect::query()->where('site', 'default')->where('source', '/manual-term')->exists())->toBeTrue();
         });
     });
+
+    it('keeps redirects when a published entry still serves the deleted index destination', function (bool $deleteCollection) {
+        $mount = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($mount->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+
+        withEloquentTaxonomyViews(['posts.tags.index'], function () use ($mount, $deleteCollection) {
+            eloquentForgetRedirects();
+            $mount->slug('journal')->save();
+            Collection::make('landings')->routes('/journal/{slug}')->sites(['default'])->saveQuietly();
+            Blink::flush();
+            $landing = Entry::make()->collection('landings')->locale('default')->slug('tags');
+            $landing->saveQuietly();
+
+            $deleteCollection ? Collection::find('posts')->delete() : Taxonomy::find('tags')->delete();
+
+            expect(Redirect::query()->where('site', 'default')->where('source', '/blog/tags')->first()?->destination())->toBe('/journal/tags')
+                ->and(Entry::findByUri('/journal/tags', 'default')?->id())->toBe($landing->id());
+        });
+    })->with(['collection removed' => true, 'taxonomy removed' => false]);
+
+    it('cleans index and scoped term redirects after their mount entry disappears', function (bool $deleteCollection, bool $nested) {
+        $mount = tap(Entry::make()->collection('pages')->locale('default')->slug('blog'))->save();
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($mount->id())->taxonomies($nested ? [] : ['tags'])->sites(['default'])->saveQuietly();
+        Blink::flush();
+        if ($nested) {
+            $post = tap(Entry::make()->collection('posts')->locale('default')->slug('hello'))->save();
+            Collection::make('replies')->routes('/{mount}/{slug}')->mount($post->id())->taxonomies(['tags'])->sites(['default'])->saveQuietly();
+            Blink::flush();
+        }
+        $collection = $nested ? 'replies' : 'posts';
+        $oldPath = $nested ? '/blog/hello/tags' : '/blog/tags';
+        $currentPath = $nested ? '/journal/hello/tags' : '/journal/tags';
+
+        withEloquentTaxonomyViews([$collection.'.tags.index', $collection.'.tags.show'], function () use ($mount, $deleteCollection, $oldPath, $currentPath) {
+            tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('design')->data(['title' => 'Design']))->save();
+            eloquentForgetRedirects();
+            $mount->slug('journal')->save();
+            Redirect::make()->source('/manual-mount-index')->destination($currentPath)->site('default')->origin(RedirectOrigin::Manual)->save();
+            expect(Redirect::query()->where('site', 'default')->where('source', $oldPath)->exists())->toBeTrue();
+
+            $deleteCollection ? Collection::find('pages')->delete() : $mount->delete();
+
+            expect(Redirect::query()->where('site', 'default')->where('source', $oldPath)->exists())->toBeFalse()
+                ->and(Redirect::query()->where('site', 'default')->where('source', $oldPath.'/design')->exists())->toBeFalse()
+                ->and(Redirect::query()->where('site', 'default')->where('source', '/manual-mount-index')->exists())->toBeTrue();
+        });
+    })->with([
+        'mount entry deleted' => [false, false],
+        'mount collection deleted' => [true, false],
+        'nested mount entry deleted' => [false, true],
+        'nested mount collection deleted' => [true, true],
+    ]);
+
+    it('cleans a deleted translated mount without removing sibling-site index redirects', function () {
+        Site::setSites([
+            'en' => ['url' => 'https://example.com', 'locale' => 'en'],
+            'de' => ['url' => 'https://example.com/de', 'locale' => 'de'],
+        ]);
+        Collection::find('pages')->sites(['en', 'de'])->saveQuietly();
+        Taxonomy::find('tags')->sites(['en', 'de'])->saveQuietly();
+        Blink::flush();
+        $mount = tap(Entry::make()->collection('pages')->locale('en')->slug('blog'))->save();
+        $german = tap($mount->makeLocalization('de')->slug('artikel'))->save();
+        Collection::make('posts')->routes('/{mount}/{slug}')->mount($mount->id())->taxonomies(['tags'])->sites(['en', 'de'])->saveQuietly();
+        Blink::flush();
+
+        withEloquentTaxonomyViews(['posts.tags.index'], function () use ($mount, $german) {
+            eloquentForgetRedirects();
+            $mount->slug('news')->save();
+            $german = Entry::find($german->id());
+            $german->slug('neu')->save();
+            expect(Redirect::query()->where('site', 'de')->where('source', '/artikel/tags')->exists())->toBeTrue();
+
+            $german->delete();
+
+            expect(Redirect::query()->where('site', 'de')->where('source', '/artikel/tags')->exists())->toBeFalse()
+                ->and(Redirect::query()->where('site', 'en')->where('source', '/blog/tags')->first()?->destination())->toBe('/news/tags');
+        });
+    });
 });

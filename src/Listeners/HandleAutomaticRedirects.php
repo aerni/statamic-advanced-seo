@@ -8,6 +8,7 @@ use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Events\TaxonomyDeleted;
@@ -26,6 +27,11 @@ class HandleAutomaticRedirects
     public function handleEntrySaved(EntrySaved $event): void
     {
         Redirect::automatic()->create($event);
+    }
+
+    public function handleEntryDeleting(EntryDeleting $event): void
+    {
+        Redirect::automatic()->stash($event);
     }
 
     public function handleEntryDeleted(EntryDeleted $event): void

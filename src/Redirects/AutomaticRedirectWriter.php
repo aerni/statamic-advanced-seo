@@ -41,7 +41,7 @@ class AutomaticRedirectWriter
      */
     public function create(string $source, string $destination, string $site): void
     {
-        if ($this->sourceIsOwnedByPublishedContent($source, $site)) {
+        if ($this->hasPublicOwner($source, $site)) {
             return;
         }
 
@@ -78,14 +78,14 @@ class AutomaticRedirectWriter
     }
 
     /**
-     * A source still owned by published content must remain routable and
-     * must not be claimed by an automatic redirect.
+     * A path served by published content must remain routable, whether
+     * protecting a source or keeping a destination during deletion cleanup.
      */
-    private function sourceIsOwnedByPublishedContent(string $source, string $site): bool
+    public function hasPublicOwner(string $path, string $site): bool
     {
-        return $this->sourceIsOwnedByPublishedEntry($source, $site)
-            || $this->sourceIsOwnedByPublishedTerm($source, $site)
-            || $this->taxonomyIndexOwnsPath($source, $site);
+        return $this->sourceIsOwnedByPublishedEntry($path, $site)
+            || $this->sourceIsOwnedByPublishedTerm($path, $site)
+            || $this->taxonomyIndexOwnsPath($path, $site);
     }
 
     private function sourceIsOwnedByPublishedEntry(string $source, string $site): bool

@@ -3,21 +3,19 @@
 namespace Aerni\AdvancedSeo\Redirects;
 
 use Aerni\AdvancedSeo\Concerns\ResolvesTaxonomyUrls;
-use Aerni\AdvancedSeo\Concerns\ResolvesTermUrls;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
-use Statamic\Facades\Term as TermFacade;
 
 class AutomaticTaxonomyRedirects
 {
     use ResolvesTaxonomyUrls;
-    use ResolvesTermUrls;
 
     /** @var array<string, array<string, array{taxonomy: string, site: string, collection: string, path: string}>> */
     private array $paths = [];
@@ -73,9 +71,7 @@ class AutomaticTaxonomyRedirects
         }
 
         // Empty collections trigger no entry URI rewrite to clear these caches.
-        Blink::store('entry-uris')->flush();
-        Blink::store('structure-uris')->flush();
-        Blink::store('collection-mounts')->flush();
+        $this->forgetPathCaches();
 
         foreach ($paths as $stashed) {
             $taxonomy = TaxonomyFacade::find($stashed['taxonomy']);
@@ -103,26 +99,23 @@ class AutomaticTaxonomyRedirects
      * Keep paths before their collection associations disappear. Collection
      * deletion removes scoped term pages as well as taxonomy index pages.
      */
-    public function stashDeletion(StatamicCollection|Taxonomy $model): void
+    public function stashDeletion(Entry|StatamicCollection|Taxonomy $model): void
     {
         if (! RedirectsFeature::enabled()) {
             return;
         }
 
-        $scopes = $model instanceof StatamicCollection
-            ? $model->taxonomies()->map(fn (Taxonomy $taxonomy) => (clone $taxonomy)->collection($model))
-            : $model->collections()
-                ->map(fn (StatamicCollection $collection) => (clone $model)->collection($collection))
-                ->prepend((clone $model)->collection(null));
+        $scopes = $this->deletionScopes($model);
 
         $paths = [];
 
         foreach ($scopes as $scope) {
-            $terms = $model instanceof StatamicCollection
-                ? (clone $scope)->collection(null)->queryTerms()->get()
-                : collect();
+            $terms = $model instanceof Taxonomy
+                ? collect()
+                : (clone $scope)->collection(null)->queryTerms()->get();
+            $sites = $model instanceof Entry ? collect([$model->locale()]) : $scope->sites();
 
-            foreach ($scope->sites() as $site) {
+            foreach ($sites as $site) {
                 $paths[] = [
                     'site' => $site,
                     'path' => $this->taxonomyIndexPath($scope, $site, onlyPublicUrls: false),
@@ -131,7 +124,7 @@ class AutomaticTaxonomyRedirects
                 foreach ($terms as $term) {
                     $localized = $term->in($site);
 
-                    if ($localized && ($path = (clone $localized)->collection($model)->uri())) {
+                    if ($localized && ($path = (clone $localized)->collection($scope->collection())->uri())) {
                         $paths[] = ['site' => $site, 'path' => $path];
                     }
                 }
@@ -144,7 +137,7 @@ class AutomaticTaxonomyRedirects
             ->all();
     }
 
-    public function delete(StatamicCollection|Taxonomy $model): void
+    public function delete(Entry|StatamicCollection|Taxonomy $model): void
     {
         $key = $this->deletionKey($model);
         $paths = $this->deleting[$key] ?? [];
@@ -154,26 +147,85 @@ class AutomaticTaxonomyRedirects
             return;
         }
 
+        $this->forgetPathCaches();
+
+        if ($model instanceof StatamicCollection) {
+            Blink::forget('collection-handles');
+        }
+
+        if ($model instanceof Entry) {
+            $model->ancestors()->prepend($model)->each(function (Entry $entry) {
+                Blink::forget('entry-descendants-'.$entry->id());
+                Blink::forget('entry-all-descendants-'.$entry->id());
+            });
+        }
+
         foreach ($paths as $path) {
-            if ($this->taxonomyIndexOwnsPath($path['path'], $path['site'])) {
-                continue;
+            if (! $this->redirects->hasPublicOwner($path['path'], $path['site'])) {
+                $this->redirects->deleteByDestination($path['path'], $path['site']);
             }
-
-            $term = TermFacade::findByUri($path['path'], $path['site']);
-
-            if ($term && $this->termIsPublic($term) && $term->uri() === $path['path']) {
-                continue;
-            }
-
-            $this->redirects->deleteByDestination($path['path'], $path['site']);
         }
     }
 
-    private function deletionKey(StatamicCollection|Taxonomy $model): string
+    /** @return Collection<int, Taxonomy> */
+    private function deletionScopes(Entry|StatamicCollection|Taxonomy $model): Collection
     {
-        $type = $model instanceof StatamicCollection ? 'collection' : 'taxonomy';
+        if ($model instanceof Entry) {
+            return $this->collectionsAffectedBy($model)
+                ->flatMap(fn (StatamicCollection $collection) => $collection->taxonomies()
+                    ->map(fn (Taxonomy $taxonomy) => (clone $taxonomy)->collection($collection)));
+        }
 
-        return "{$type}|{$model->handle()}";
+        if ($model instanceof StatamicCollection) {
+            return $model->taxonomies()->map(fn (Taxonomy $taxonomy) => (clone $taxonomy)->collection($model));
+        }
+
+        return $model->collections()
+            ->map(fn (StatamicCollection $collection) => (clone $model)->collection($collection))
+            ->prepend((clone $model)->collection(null));
+    }
+
+    /** @return Collection<int, StatamicCollection> */
+    private function collectionsAffectedBy(Entry $entry): Collection
+    {
+        $collections = CollectionFacade::all();
+        $affected = [];
+
+        do {
+            $count = count($affected);
+
+            foreach ($collections as $collection) {
+                if (isset($affected[$collection->handle()])) {
+                    continue;
+                }
+
+                $mount = $collection->mount()?->in($entry->locale());
+
+                if ($mount && ((string) $mount->id() === (string) $entry->id() || isset($affected[$mount->collectionHandle()]))) {
+                    $affected[$collection->handle()] = $collection;
+                }
+            }
+        } while (count($affected) !== $count);
+
+        return collect($affected)->values();
+    }
+
+    private function deletionKey(Entry|StatamicCollection|Taxonomy $model): string
+    {
+        $type = match (true) {
+            $model instanceof Entry => 'entry',
+            $model instanceof StatamicCollection => 'collection',
+            default => 'taxonomy',
+        };
+
+        return "{$type}|{$model->id()}";
+    }
+
+    private function forgetPathCaches(): void
+    {
+        Blink::store('entry-uris')->flush();
+        Blink::store('structure-uris')->flush();
+        Blink::store('collection-mounts')->flush();
     }
 
     private function redirectsEnabled(Taxonomy $taxonomy): bool
