@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Sitemaps\Taxonomies\CollectionTaxonomySitemapUrl;
 use Aerni\AdvancedSeo\Sitemaps\Taxonomies\TaxonomySitemap;
 use Illuminate\Support\Facades\View;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -125,3 +126,58 @@ it('omits alternates when the taxonomy index template is missing', function () {
 
     expect($url->alternates())->toBeNull();
 });
+
+it('uses the mounted collection path for loc', function (string $mountRoute, string $site, string $taxonomyHandle, string $expected) {
+    Collection::make('pages')->routes($mountRoute)->sites(['english', 'german'])->saveQuietly();
+    $mount = Entry::make()->collection('pages')->locale('english')->slug('articles');
+    $mount->saveQuietly();
+    $mount->makeLocalization('german')->slug('artikel')->saveQuietly();
+    Collection::find('blog')->mount($mount->id())->taxonomies([$taxonomyHandle])->saveQuietly();
+    Taxonomy::make($taxonomyHandle)->sites(['english', 'german'])->saveQuietly();
+    flushBlink();
+    Site::setCurrent('german');
+    $taxonomy = Taxonomy::find($taxonomyHandle)->collection(Collection::find('blog'));
+
+    $url = new CollectionTaxonomySitemapUrl($taxonomy, $site);
+
+    expect($url->loc())->toBe($expected)
+        ->and(Site::current()->handle())->toBe('german');
+})->with([
+    'English mount' => ['/{slug}', 'english', 'tags', 'https://example.com/articles/tags'],
+    'translated mount' => ['/{slug}', 'german', 'tags', 'https://example.com/de/artikel/tags'],
+    'nested mount path' => ['/news/{slug}', 'english', 'tags', 'https://example.com/news/articles/tags'],
+    'site root mount' => ['/', 'english', 'tags', 'https://example.com/tags'],
+    'underscored taxonomy handle' => ['/news/{slug}', 'german', 'topic_tags', 'https://example.com/de/news/artikel/topic-tags'],
+]);
+
+it('uses localized mounted collection paths for sitemap alternates', function (string $germanUrl) {
+    Site::setSites([
+        'english' => ['url' => 'https://example.com', 'locale' => 'en'],
+        'german' => ['url' => $germanUrl, 'locale' => 'de'],
+    ]);
+    View::addLocation(__DIR__.'/../../__fixtures__/views');
+    Collection::make('pages')->routes('/news/{slug}')->sites(['english', 'german'])->saveQuietly();
+    $mount = Entry::make()->collection('pages')->locale('english')->slug('articles');
+    $mount->saveQuietly();
+    $mount->makeLocalization('german')->slug('artikel')->saveQuietly();
+    Collection::find('blog')->mount($mount->id())->saveQuietly();
+    Seo::find('site::defaults')->config()->set('hreflang_x_default', 'german')->save();
+    flushBlink();
+    $sitemap = Sitemap::index('english')->sitemaps()
+        ->first(fn ($sitemap) => $sitemap instanceof TaxonomySitemap && $sitemap->handle() === 'tags');
+    $taxonomy = Taxonomy::find('tags')->collection(Collection::find('blog'));
+    $url = new CollectionTaxonomySitemapUrl($taxonomy, 'english');
+    $url->sitemap($sitemap);
+    Site::setCurrent('german');
+
+    $alternates = $url->alternates();
+
+    expect(collect($alternates)->pluck('href', 'hreflang')->all())->toBe([
+        'en' => 'https://example.com/news/articles/tags',
+        'de' => $germanUrl.'/news/artikel/tags',
+        'x-default' => $germanUrl.'/news/artikel/tags',
+    ])->and(Site::current()->handle())->toBe('german');
+})->with([
+    'site prefix' => ['https://example.com/de'],
+    'separate domain' => ['https://example.de'],
+]);

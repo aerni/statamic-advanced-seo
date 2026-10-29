@@ -373,3 +373,38 @@ describe('taxonomy view availability', function () {
         'collection taxonomy' => true,
     ]);
 });
+
+it('uses localized mounted collection paths for head hreflang', function (string $germanUrl) {
+    config(['advanced-seo.crawling.environments' => ['testing']]);
+    Site::setSites([
+        'english' => ['url' => 'https://example.com', 'locale' => 'en'],
+        'german' => ['url' => $germanUrl, 'locale' => 'de'],
+    ]);
+    View::addLocation(__DIR__.'/../__fixtures__/views');
+    Collection::make('mounts')->routes('/news/{slug}')->sites(['english', 'german'])->saveQuietly();
+    $mount = Entry::make()->collection('mounts')->locale('english')->slug('articles');
+    $mount->saveQuietly();
+    $mount->makeLocalization('german')->slug('artikel')->saveQuietly();
+    $collection = Collection::make('blog')->routes('/blog/{slug}')->sites(['english', 'german'])->taxonomies(['tags'])->mount($mount->id());
+    $collection->saveQuietly();
+    $taxonomy = Taxonomy::find('tags')->collection($collection);
+    Seo::find('site::defaults')->config()->set('hreflang_x_default', 'german')->save();
+    flushBlink();
+    Site::setCurrent('german');
+    $cascade = ContextViewCascade::from(new Context(collect([
+        'page' => $taxonomy,
+        'current_url' => $germanUrl.'/news/artikel/tags',
+        'site' => Site::get('german'),
+    ])));
+
+    $hreflang = $cascade->hreflang();
+
+    expect(collect($hreflang)->pluck('url', 'locale')->all())->toBe([
+        'en' => 'https://example.com/news/articles/tags',
+        'de' => $germanUrl.'/news/artikel/tags',
+        'x-default' => $germanUrl.'/news/artikel/tags',
+    ])->and(Site::current()->handle())->toBe('german');
+})->with([
+    'site prefix' => ['https://example.com/de'],
+    'separate domain' => ['https://example.de'],
+]);

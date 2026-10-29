@@ -113,10 +113,11 @@ trait HasHreflang
     protected function collectionTaxonomyUrl(Taxonomy $taxonomy, string $site): string
     {
         $siteUrl = Site::get($site)->absoluteUrl();
-        $taxonomyHandle = $taxonomy->handle();
-        $collectionHandle = $taxonomy->collection()->handle();
+        $collection = $taxonomy->collection();
+        $collectionUri = $collection->uri($site) ?? $collection->handle();
+        $taxonomyHandle = str_replace('_', '-', $taxonomy->handle());
 
-        return URL::tidy("{$siteUrl}/{$collectionHandle}/{$taxonomyHandle}");
+        return URL::assemble($siteUrl, $collectionUri, $taxonomyHandle);
     }
 
     protected function shouldIncludeHreflang(Entry|LocalizedTerm $model): bool
