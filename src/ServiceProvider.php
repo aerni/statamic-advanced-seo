@@ -27,6 +27,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
 use Aerni\AdvancedSeo\Redirects\AutomaticEntryRedirects;
 use Aerni\AdvancedSeo\Redirects\AutomaticRedirects;
+use Aerni\AdvancedSeo\Redirects\AutomaticTaxonomyRedirects;
 use Aerni\AdvancedSeo\Redirects\AutomaticTermRedirects;
 use Aerni\AdvancedSeo\Redirects\RedirectDestinationEntries;
 use Aerni\AdvancedSeo\SeoSets\SeoSet;
@@ -122,6 +123,7 @@ class ServiceProvider extends AddonServiceProvider
         $this->app->scoped(RedirectDestinationEntries::class);
         $this->app->scoped(AutomaticEntryRedirects::class);
         $this->app->scoped(AutomaticTermRedirects::class);
+        $this->app->scoped(AutomaticTaxonomyRedirects::class);
         $this->app->scoped(AutomaticRedirects::class);
 
         Features\EloquentDriver::enabled() ? $this->registerEloquentDriver() : $this->registerFileDriver();

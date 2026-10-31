@@ -49,6 +49,7 @@ class AutomaticEntryRedirects
     public function __construct(
         private EntryUrlChange $urls,
         private AutomaticRedirectWriter $redirects,
+        private AutomaticTaxonomyRedirects $taxonomies,
     ) {}
 
     public function stash(Entry $entry): void
@@ -101,7 +102,7 @@ class AutomaticEntryRedirects
 
         unset($this->affectedEntries[$key], $this->affectedCollectionTerms[$key]);
 
-        if ($paths === [] && $terms === []) {
+        if ($paths === [] && $terms === [] && ! $this->taxonomies->hasStashedPaths($key)) {
             return;
         }
 
@@ -112,6 +113,7 @@ class AutomaticEntryRedirects
         $this->rewriteCollections($this->idsByCollection($paths, $tree->handle()));
 
         $this->redirectAffected($paths, $terms);
+        $this->taxonomies->create($key);
     }
 
     /**
@@ -383,7 +385,7 @@ class AutomaticEntryRedirects
 
         unset($this->affectedEntries[$entry->id()], $this->affectedCollectionTerms[$entry->id()]);
 
-        if ($paths === [] && $terms === []) {
+        if ($paths === [] && $terms === [] && ! $this->taxonomies->hasStashedPaths($entry->id())) {
             return;
         }
 
@@ -401,6 +403,7 @@ class AutomaticEntryRedirects
         }
 
         $this->redirectAffected($paths, $terms);
+        $this->taxonomies->create($entry->id());
     }
 
     /**
@@ -563,6 +566,7 @@ class AutomaticEntryRedirects
         }
 
         $this->stashAffectedCollectionTerms($key, $mount, $collections);
+        $this->taxonomies->stash($key, $mount->locale(), $collections, $this->originalPath($mount));
 
         $entries = EntryFacade::query()
             ->whereIn('collection', $collections->map->handle()->all())
