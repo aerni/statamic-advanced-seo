@@ -25,6 +25,7 @@ use Aerni\AdvancedSeo\GraphQL\Types\SitemapUrlType;
 use Aerni\AdvancedSeo\GraphQL\Types\SiteSetType;
 use Aerni\AdvancedSeo\GraphQL\Types\SocialImagePresetType;
 use Aerni\AdvancedSeo\GraphQL\Types\TaxonomySetType;
+use Aerni\AdvancedSeo\Redirects\AffectedContent;
 use Aerni\AdvancedSeo\Redirects\AutomaticEntryRedirects;
 use Aerni\AdvancedSeo\Redirects\AutomaticRedirects;
 use Aerni\AdvancedSeo\Redirects\AutomaticTaxonomyRedirects;
@@ -121,6 +122,7 @@ class ServiceProvider extends AddonServiceProvider
         app()->instance('advanced-seo.tokens', collect());
         app()->instance('advanced-seo.sitemaps', collect());
         $this->app->scoped(RedirectDestinationEntries::class);
+        $this->app->scoped(AffectedContent::class);
         $this->app->scoped(AutomaticEntryRedirects::class);
         $this->app->scoped(AutomaticTermRedirects::class);
         $this->app->scoped(AutomaticTaxonomyRedirects::class);

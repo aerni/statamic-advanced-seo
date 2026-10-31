@@ -5,7 +5,13 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Aerni\AdvancedSeo\Concerns\ResolvesTermUrls;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Features\Redirects as RedirectsFeature;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Entries\Collection as StatamicCollection;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Term as TermFacade;
+use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Taxonomies\LocalizedTerm;
 
@@ -15,6 +21,12 @@ class AutomaticTermRedirects
 
     /** @var array<string, array<string, string|null>> */
     private array $terms = [];
+
+    /** @var array<string, list<array{term: string, site: string, collection: string, path: string}>> */
+    private array $affectedCollectionTerms = [];
+
+    /** @var array<string, list<array{site: string, path: string}>> */
+    private array $deleting = [];
 
     public function __construct(private AutomaticRedirectWriter $redirects) {}
 
@@ -144,6 +156,74 @@ class AutomaticTermRedirects
         }
     }
 
+    public function stashAffected(AffectedUrls $change): void
+    {
+        foreach ($change->mounts as $mount) {
+            $this->affectedCollectionTerms[$change->key] = collect($this->affectedCollectionTerms[$change->key] ?? [])
+                ->concat($mount['collections']->flatMap(fn (StatamicCollection $collection) => $this->affectedCollectionTermPaths($mount['site'], $collection, $mount['path'])))
+                ->keyBy(fn (array $term) => "{$term['site']}|{$term['collection']}|{$term['term']}")
+                ->values()
+                ->all();
+        }
+    }
+
+    public function createAffected(AffectedUrls $change): void
+    {
+        $key = $change->key;
+        $terms = $this->affectedCollectionTerms[$key] ?? [];
+        unset($this->affectedCollectionTerms[$key]);
+
+        if (! RedirectsFeature::enabled()) {
+            return;
+        }
+
+        foreach ($terms as $term) {
+            $this->redirectAffectedCollectionTerm($term);
+        }
+    }
+
+    /** @param Collection<int, Taxonomy> $scopes */
+    public function stashDeletion(string $key, Collection $scopes, ?string $site = null): void
+    {
+        if (! RedirectsFeature::enabled()) {
+            return;
+        }
+
+        $paths = [];
+
+        foreach ($scopes as $scope) {
+            $terms = (clone $scope)->collection(null)->queryTerms()->get();
+
+            foreach ($site === null ? $scope->sites() : [$site] as $locale) {
+                foreach ($terms as $term) {
+                    $localized = $term->in($locale);
+
+                    if ($localized && ($path = (clone $localized)->collection($scope->collection())->uri())) {
+                        $paths[] = ['site' => $locale, 'path' => $path];
+                    }
+                }
+            }
+        }
+
+        $this->deleting[$key] = collect($paths)->unique(fn (array $path) => "{$path['site']}|{$path['path']}")->values()->all();
+    }
+
+    public function deleteAffected(string $key): void
+    {
+        $paths = $this->deleting[$key] ?? [];
+        unset($this->deleting[$key]);
+
+        if (! RedirectsFeature::enabled()) {
+            return;
+        }
+
+        foreach ($paths as $path) {
+            if (! $this->redirects->hasPublicOwner($path['path'], $path['site'])) {
+                $this->redirects->deleteByDestination($path['path'], $path['site']);
+            }
+        }
+    }
+
     /**
      * Redirects are enabled and this term is published.
      */
@@ -221,5 +301,57 @@ class AutomaticTermRedirects
                 ? "{$path['site']}.{$path['collection']}"
                 : $path['site'])
             ->all();
+    }
+
+    /**
+     * @param  array{term: string, site: string, collection: string, path: string}  $stashed
+     */
+    private function redirectAffectedCollectionTerm(array $stashed): void
+    {
+        $localization = TermFacade::find($stashed['term'])->in($stashed['site']);
+        $collection = CollectionFacade::findByHandle($stashed['collection']);
+
+        $currentPath = $this->collectionTermPath($localization, $collection);
+
+        if (! $currentPath || $currentPath === $stashed['path']) {
+            return;
+        }
+
+        $this->redirects->deleteBySource($currentPath, $stashed['site']);
+        $this->redirects->create($stashed['path'], $currentPath, $stashed['site']);
+    }
+
+    /**
+     * Old collection term paths. The mount entry already resolves to the new
+     * URL, so the old path is built from the URI still stored for it.
+     *
+     * @return Collection<int, array{term: string, site: string, collection: string, path: string}>
+     */
+    private function affectedCollectionTermPaths(string $site, StatamicCollection $collection, ?string $mountPath): Collection
+    {
+        if (! $mountPath) {
+            return collect();
+        }
+
+        return $collection->taxonomies()
+            ->filter(fn (Taxonomy $taxonomy) => $this->redirectsEnabled($taxonomy))
+            ->flatMap(function (Taxonomy $taxonomy) use ($collection, $site, $mountPath) {
+                $suffix = '/'.str_replace('_', '-', $taxonomy->handle());
+
+                return $taxonomy->queryTerms()->get()
+                    ->map(fn ($term) => $term->in($site))
+                    ->filter(fn (?LocalizedTerm $localized) => $localized && $this->collectionTermPath($localized, $collection) !== null)
+                    ->map(fn (LocalizedTerm $localized) => [
+                        'term' => $localized->id(),
+                        'site' => $site,
+                        'collection' => $collection->handle(),
+                        'path' => URL::tidy(url: $mountPath.$suffix.'/'.$localized->slug(), withTrailingSlash: false),
+                    ]);
+            });
+    }
+
+    private function redirectsEnabled(Taxonomy $taxonomy): bool
+    {
+        return (bool) Seo::find("taxonomies::{$taxonomy->handle()}")?->config()->value('redirects');
     }
 }
