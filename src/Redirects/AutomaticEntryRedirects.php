@@ -59,6 +59,12 @@ class AutomaticEntryRedirects
         $this->stashMovedByOrigin($entry);
         $this->stashMovedByMount($entry);
 
+        // origin($id) forgets the blinked origin. The id itself stays the same.
+        // Do this after the old URLs are captured, so the index update records the new URI.
+        if ($entry->hasOrigin()) {
+            $entry->origin($entry->origin()->id());
+        }
+
         // The next save() of this entry in this process has to read its own values.
         $this->urls->forget($entry);
     }
@@ -211,7 +217,7 @@ class AutomaticEntryRedirects
      */
     private function wasPublished(Entry $entry): bool
     {
-        return (bool) ($this->urls->originalData($entry)['published'] ?? (bool) $entry->initialPath());
+        return (bool) ($entry->getOriginal('published') ?? (bool) $entry->initialPath());
     }
 
     /**

@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Redirects\AutomaticRedirectWriter;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
@@ -24,6 +25,11 @@ use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
 
 beforeEach(function () {
+    // The array driver stores the entry object. A fetch during save then clears
+    // its snapshot. The file driver stores a copy, which is what production uses.
+    config(['cache.default' => 'file']);
+    Cache::store('file')->flush();
+
     Site::setSites([
         'default' => ['name' => 'Default', 'url' => '/', 'locale' => 'en'],
     ]);
