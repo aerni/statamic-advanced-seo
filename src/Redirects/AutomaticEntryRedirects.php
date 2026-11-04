@@ -19,6 +19,9 @@ use Statamic\Facades\URL;
 use Statamic\Structures\CollectionTree;
 use Statamic\Taxonomies\LocalizedTerm;
 
+/**
+ * @internal
+ */
 class AutomaticEntryRedirects
 {
     use ResolvesTermUrls;

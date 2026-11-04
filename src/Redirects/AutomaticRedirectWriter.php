@@ -11,6 +11,9 @@ use Aerni\AdvancedSeo\Facades\Redirect as RedirectFacade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Term as TermFacade;
 
+/**
+ * @internal
+ */
 class AutomaticRedirectWriter
 {
     use ResolvesTaxonomyUrls;

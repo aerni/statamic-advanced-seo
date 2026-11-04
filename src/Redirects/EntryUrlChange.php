@@ -12,6 +12,9 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 
+/**
+ * @internal
+ */
 class EntryUrlChange
 {
     /**
