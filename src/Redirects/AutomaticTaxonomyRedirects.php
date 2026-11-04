@@ -13,6 +13,9 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Taxonomy as TaxonomyFacade;
 
+/**
+ * @internal
+ */
 class AutomaticTaxonomyRedirects
 {
     use ResolvesTaxonomyUrls;

@@ -11,6 +11,9 @@ use Statamic\Facades\Entry as EntryRepository;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 
+/**
+ * @internal
+ */
 class EntryUrlChange
 {
     /**

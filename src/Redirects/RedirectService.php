@@ -25,6 +25,9 @@ class RedirectService
         return app(RedirectErrorRepository::class);
     }
 
+    /**
+     * @internal
+     */
     public function automatic(): AutomaticRedirects
     {
         return app(AutomaticRedirects::class);

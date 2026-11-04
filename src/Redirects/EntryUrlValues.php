@@ -5,6 +5,8 @@ namespace Aerni\AdvancedSeo\Redirects;
 /**
  * Previous slug, date, and entry data for an entry URL.
  * A null slug, date, or data means that part is absent.
+ *
+ * @internal
  */
 readonly class EntryUrlValues
 {

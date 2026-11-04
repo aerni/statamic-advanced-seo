@@ -9,6 +9,9 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\YAML;
 use Statamic\Taxonomies\LocalizedTerm;
 
+/**
+ * @internal
+ */
 class AutomaticTermRedirects
 {
     use ResolvesTermUrls;

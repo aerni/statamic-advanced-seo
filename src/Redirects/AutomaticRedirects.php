@@ -17,6 +17,9 @@ use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 
+/**
+ * @internal
+ */
 class AutomaticRedirects
 {
     public function __construct(
