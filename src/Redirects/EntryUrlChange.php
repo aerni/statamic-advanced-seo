@@ -38,20 +38,8 @@ class EntryUrlChange
     public function forget(Entry $entry): void
     {
         Blink::forget($this->changedBlinkKey($entry));
-        Blink::forget($this->dataBlinkKey($entry));
         Blink::forget($this->urlBlinkKey($entry));
         Blink::forget($this->dateBlinkKey($entry));
-    }
-
-    /**
-     * The snapshot taken the last time this entry was loaded or saved.
-     * Reuse it until this entry's save has been stashed.
-     *
-     * @return array<string, mixed>
-     */
-    public function originalData(Entry $entry): array
-    {
-        return Blink::once($this->dataBlinkKey($entry), fn () => $entry->getOriginal());
     }
 
     /**
@@ -125,11 +113,6 @@ class EntryUrlChange
         return "advanced-seo::automatic-redirects::changed::{$entry->id()}::{$entry->locale()}";
     }
 
-    private function dataBlinkKey(Entry $entry): string
-    {
-        return "advanced-seo::automatic-redirects::data::{$entry->id()}::{$entry->locale()}";
-    }
-
     private function dateBlinkKey(Entry $entry): string
     {
         return "advanced-seo::automatic-redirects::date::{$entry->id()}::{$entry->locale()}";
@@ -146,8 +129,8 @@ class EntryUrlChange
      */
     private function originalValues(Entry $entry): EntryUrlValues
     {
-        // First save. getOriginal() is still empty, and an Eloquent entry has no
-        // model yet. An empty result means this save changed nothing.
+        // getOriginal() has no slug until the entry has been saved. Reading the
+        // date and route fields here would make that first save look like a move.
         if (! array_key_exists('slug', $entry->getOriginal())) {
             return new EntryUrlValues;
         }
@@ -178,7 +161,7 @@ class EntryUrlChange
             return null;
         }
 
-        $source = $this->originalData($entry);
+        $source = $entry->getOriginal();
 
         // A stored null is its own value. An absent field inherits, so compare
         // the origin value instead of collapsing both to null.
@@ -289,8 +272,12 @@ class EntryUrlChange
         // Restore the stored data before resolving the fallback date.
         // updated_at is excluded from the snapshot, so read the previously saved entry.
         $copy = clone $entry;
-        $copy->data($this->originalData($entry));
-        $copy->set('updated_at', EntryRepository::find($entry->id())?->get('updated_at'));
+
+        $copy->data([
+            ...$entry->getOriginal(),
+            'updated_at' => EntryRepository::find($entry->id())?->get('updated_at'),
+        ]);
+
         $copy->date(null);
 
         $format = 'Y-m-d';
@@ -332,7 +319,7 @@ class EntryUrlChange
             $copy->date($values->date);
         }
 
-        $copy->data($this->originalData($entry));
+        $copy->data($entry->getOriginal());
 
         Blink::store('entry-uris')->forget($copy->id());
 
