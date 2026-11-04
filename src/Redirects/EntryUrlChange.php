@@ -5,12 +5,11 @@ namespace Aerni\AdvancedSeo\Redirects;
 use Carbon\Carbon;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\GetDateFromPath;
-use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Entry as EntryRepository;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
 
 class EntryUrlChange
 {
@@ -45,17 +44,14 @@ class EntryUrlChange
     }
 
     /**
-     * Stache: the file still contains the old data; getOriginal() has already
-     * been replaced. Eloquent: there is no file, so getOriginal() still contains
-     * the pre-save data. Reuse the snapshot until this entry's save has been stashed.
+     * The snapshot taken the last time this entry was loaded or saved.
+     * Reuse it until this entry's save has been stashed.
      *
      * @return array<string, mixed>
      */
     public function originalData(Entry $entry): array
     {
-        return Blink::once($this->dataBlinkKey($entry), fn () => ($path = $entry->initialPath())
-            ? YAML::file($path)->parse()
-            : $entry->getOriginal());
+        return Blink::once($this->dataBlinkKey($entry), fn () => $entry->getOriginal());
     }
 
     /**
@@ -75,7 +71,7 @@ class EntryUrlChange
 
         // Flat file: the previous date is still in the filename. A localization
         // that inherits its date has none, so the origin's stored date is used.
-        // getOriginal() has already been replaced.
+        // getOriginal('date') only keeps the minute.
         if ($date = (new GetDateFromPath)($entry->initialPath())) {
             return $date;
         }
@@ -150,23 +146,6 @@ class EntryUrlChange
      */
     private function originalValues(Entry $entry): EntryUrlValues
     {
-        // Flat file: the previous slug and date are still in the filename.
-        // getOriginal() has already been replaced with the new values.
-        if ($path = $entry->initialPath()) {
-            $slug = (new GetSlugFromPath)($path);
-
-            // A collection without slugs names the file after the id. That is no slug.
-            if (! $entry->collection()->requiresSlugs() && $slug === $entry->id()) {
-                $slug = null;
-            }
-
-            return new EntryUrlValues(
-                slug: $slug,
-                date: $this->originalDate($entry),
-                data: $this->routeFieldValues($entry),
-            );
-        }
-
         // First save. getOriginal() is still empty, and an Eloquent entry has no
         // model yet. An empty result means this save changed nothing.
         if (! array_key_exists('slug', $entry->getOriginal())) {
@@ -181,10 +160,9 @@ class EntryUrlChange
     }
 
     /**
-     * Route-field values from the file, or from getOriginal() when there is no file.
+     * Route-field values from the snapshot.
      * Tokens come from this entry's route and from localization routes, which
-     * can use a field this route does not. Null when nothing uses a field
-     * token, so the file is left unread.
+     * can use a field this route does not. Null when nothing uses a field token.
      *
      * @return array<string, mixed>|null
      */
@@ -309,8 +287,10 @@ class EntryUrlChange
     {
         // Both the date and updated_at may already have changed on the entry.
         // Restore the stored data before resolving the fallback date.
+        // updated_at is excluded from the snapshot, so read the previously saved entry.
         $copy = clone $entry;
         $copy->data($this->originalData($entry));
+        $copy->set('updated_at', EntryRepository::find($entry->id())?->get('updated_at'));
         $copy->date(null);
 
         $format = 'Y-m-d';

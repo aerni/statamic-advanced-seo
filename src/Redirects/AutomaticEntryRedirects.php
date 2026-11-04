@@ -59,6 +59,16 @@ class AutomaticEntryRedirects
         $this->stashMovedByOrigin($entry);
         $this->stashMovedByMount($entry);
 
+        // The cached entry blinks its indexed URI and a stale origin. Forget both
+        // after the old URLs are captured, so the index update records the URI it has now.
+        if ($id = $entry->id()) {
+            Blink::store('entry-uris')->forget($id);
+        }
+
+        if ($entry->hasOrigin()) {
+            $entry->origin($entry->origin()->id());
+        }
+
         // The next save() of this entry in this process has to read its own values.
         $this->urls->forget($entry);
     }
