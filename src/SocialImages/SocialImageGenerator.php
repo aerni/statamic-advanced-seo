@@ -215,14 +215,17 @@ class SocialImageGenerator
     }
 
     /**
-     * Drop a path from the container's cached file listing.
+     * Drop a path from the container's file listing.
      *
-     * Queue workers re-read that listing when Statamic saves it, so a forget
-     * made in memory is written back with the deleted path still present.
+     * The in-memory listing is what the current request reads. Statamic 6.40
+     * keeps it for queue workers too. Older workers re-read the cache on save
+     * and write a forgotten path back, so the cache is updated from a fresh read.
      */
     protected function forgetAssetListing(string $path): void
     {
         $contents = $this->container->contents();
+        $contents->forget($path);
+
         $store = $contents->cacheStore();
         $key = 'asset-list-contents-'.$this->container->handle();
         $ttl = Stache::isWatcherEnabled() ? 0 : null;
@@ -241,10 +244,6 @@ class SocialImageGenerator
             $store->lock('advanced-seo.asset-listing.'.$this->container->handle(), 5)->block(5, $forget);
         } catch (\Throwable) {
             $forget();
-        }
-
-        if (! Statamic::isWorker()) {
-            $contents->forget($path);
         }
     }
 
