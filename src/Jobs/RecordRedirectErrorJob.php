@@ -30,6 +30,12 @@ class RecordRedirectErrorJob implements ShouldBeUnique, ShouldQueue
         return "{$this->site}:{$this->url}";
     }
 
+    /**
+     * Recording a 404 is best-effort. Different paths share one write lock, so a
+     * scanner burst can hold it longer than this job is willing to wait. Try
+     * again a couple of times, then stop without failing. A real 404 in that
+     * burst can be missed until a later request.
+     */
     public function handle(): void
     {
         try {
