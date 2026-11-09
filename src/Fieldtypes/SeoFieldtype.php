@@ -122,7 +122,29 @@ class SeoFieldtype extends Fieldtype
 
     public function augment(mixed $data): mixed
     {
-        return $this->childFieldtype()->augment($this->resolveValue($data));
+        $fieldtype = $this->childFieldtype();
+        $augmented = $fieldtype->augment($this->resolveValue($data));
+
+        if ($augmented !== null || ! $fieldtype instanceof SocialImageFieldtype) {
+            return $augmented;
+        }
+
+        return $this->fallbackSocialImage($fieldtype);
+    }
+
+    /**
+     * A missing generated image should not take down the response.
+     * Use the site or collection default when that file is actually on disk.
+     */
+    protected function fallbackSocialImage(SocialImageFieldtype $fieldtype): mixed
+    {
+        $default = $this->defaultValueFromCascade();
+
+        if (! is_string($default) || $default === '') {
+            return null;
+        }
+
+        return $fieldtype->augmentWithoutGenerating($default);
     }
 
     public function preProcessIndex(mixed $data): array

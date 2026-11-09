@@ -7,6 +7,8 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
 use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Facades\Log;
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fieldtypes\Assets\Assets;
@@ -21,9 +23,19 @@ class SocialImageFieldtype extends Assets
 
     public function augment($value)
     {
-        return $this->shouldGenerateSocialImage()
+        $augmented = $this->shouldGenerateSocialImage()
             ? $this->augmentGeneratedSocialImage($value)
             : parent::augment($value);
+
+        return $this->withExistingFile($augmented);
+    }
+
+    /**
+     * Resolve an asset path without generating a replacement.
+     */
+    public function augmentWithoutGenerating(mixed $value): mixed
+    {
+        return $this->withExistingFile(parent::augment($value));
     }
 
     public function preProcessIndex($data)
@@ -46,8 +58,18 @@ class SocialImageFieldtype extends Assets
 
         // Resolve the existing asset or generate a new one on demand.
         // This ensures the first request always returns an image (e.g. social platform crawlers).
-        $generator = $this->generator($parent);
-        $asset = $generator->asset() ?? $generator->generate();
+        try {
+            $generator = $this->generator($parent);
+            $asset = $generator->asset() ?? $generator->generate();
+        } catch (\Throwable $e) {
+            Log::warning('Unable to generate a social image.', ['exception' => $e]);
+
+            return null;
+        }
+
+        if (! $asset instanceof Asset) {
+            return null;
+        }
 
         // Persist the asset path to the entry file so the image survives
         // if the generator is later disabled without requiring a manual save.
@@ -56,6 +78,19 @@ class SocialImageFieldtype extends Assets
                 $parent->set('seo_og_image', $asset->path());
                 $parent->saveQuietly();
             });
+        }
+
+        return $asset;
+    }
+
+    /**
+     * A record whose file is gone must not be augmented. Reading its meta
+     * asks Flysystem for the file size and takes down the response.
+     */
+    protected function withExistingFile(mixed $asset): mixed
+    {
+        if ($asset instanceof Asset && ! $asset->container()->disk()->exists($asset->path())) {
+            return null;
         }
 
         return $asset;
