@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Jobs;
 
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -17,6 +18,8 @@ class RecordRedirectErrorJob implements ShouldBeUnique, ShouldQueue
 
     public int $uniqueFor = 60;
 
+    public int $tries = 3;
+
     public function __construct(public string $url, public string $site)
     {
         $this->queue = config('advanced-seo.redirects.queue', 'default');
@@ -29,6 +32,16 @@ class RecordRedirectErrorJob implements ShouldBeUnique, ShouldQueue
 
     public function handle(): void
     {
-        Redirect::errors()->record($this->url, $this->site);
+        try {
+            Redirect::errors()->record($this->url, $this->site);
+        } catch (LockTimeoutException) {
+            if ($this->attempts() >= $this->tries) {
+                return;
+            }
+
+            // release() retries this same job. Dispatching a new one is dropped
+            // while the ShouldBeUnique lock from the original dispatch is held.
+            $this->release(random_int(5, 15));
+        }
     }
 }

@@ -2,9 +2,14 @@
 
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Jobs\RecordRedirectErrorJob;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Sleep;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class);
@@ -89,3 +94,117 @@ it('is unique per site and url to collapse duplicate recordings', function () {
     expect($job)->toBeInstanceOf(ShouldBeUnique::class)
         ->and($job->uniqueId())->toBe('default:/missing');
 });
+
+it('releases the job when the redirect error lock is held and records once the lock is free', function () {
+    bootRedirectErrorQueue();
+    Sleep::fake(syncWithCarbon: true);
+
+    try {
+        $lock = Cache::lock('advanced-seo::redirect-error', 60);
+        expect($lock->get())->toBeTrue();
+
+        RecordRedirectErrorJob::dispatch('/secrets.yml', 'default');
+
+        workNextRedirectErrorJob();
+
+        expect(DB::table('failed_jobs')->count())->toBe(0)
+            ->and(DB::table('jobs')->count())->toBe(1);
+
+        $delay = DB::table('jobs')->value('available_at') - Carbon::now()->getTimestamp();
+
+        expect($delay)->toBeGreaterThanOrEqual(5)
+            ->and($delay)->toBeLessThanOrEqual(15)
+            ->and(Redirect::errors()->findByUrl('/secrets.yml', 'default'))->toBeNull()
+            ->and(Cache::lock(UniqueLock::getKey(new RecordRedirectErrorJob('/secrets.yml', 'default')))->get())->toBeFalse();
+
+        $lock->forceRelease();
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(16));
+        workNextRedirectErrorJob();
+
+        expect(Redirect::errors()->findByUrl('/secrets.yml', 'default')->count())->toBe(1)
+            ->and(DB::table('failed_jobs')->count())->toBe(0)
+            ->and(DB::table('jobs')->count())->toBe(0);
+    } finally {
+        Sleep::fake(false);
+        Carbon::setTestNow();
+    }
+});
+
+it('gives up without failing when the redirect error lock stays busy', function () {
+    bootRedirectErrorQueue();
+    Sleep::fake(syncWithCarbon: true);
+
+    try {
+        $tries = (new RecordRedirectErrorJob('/telescope/requests', 'default'))->tries;
+
+        $lock = Cache::lock('advanced-seo::redirect-error', 120);
+        expect($lock->get())->toBeTrue();
+
+        RecordRedirectErrorJob::dispatch('/telescope/requests', 'default');
+
+        for ($attempt = 0; $attempt < $tries; $attempt++) {
+            Carbon::setTestNow(Carbon::now()->addSeconds(16));
+            workNextRedirectErrorJob();
+        }
+
+        expect($tries)->toBeGreaterThan(1)
+            ->and(DB::table('jobs')->count())->toBe(0)
+            ->and(DB::table('failed_jobs')->count())->toBe(0)
+            ->and(Redirect::errors()->findByUrl('/telescope/requests', 'default'))->toBeNull();
+    } finally {
+        Sleep::fake(false);
+        Carbon::setTestNow();
+    }
+});
+
+function bootRedirectErrorQueue(): void
+{
+    config([
+        'database.default' => 'sqlite',
+        'database.connections.sqlite' => [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ],
+        'queue.connections.database' => [
+            'driver' => 'database',
+            'connection' => 'sqlite',
+            'table' => 'jobs',
+            'queue' => 'default',
+            'retry_after' => 90,
+        ],
+        'queue.failed.driver' => 'database-uuids',
+        'queue.failed.database' => 'sqlite',
+        'queue.failed.table' => 'failed_jobs',
+    ]);
+
+    DB::purge('sqlite');
+    app('queue')->setDefaultDriver('database');
+
+    Schema::create('jobs', function ($table) {
+        $table->bigIncrements('id');
+        $table->string('queue')->index();
+        $table->longText('payload');
+        $table->unsignedSmallInteger('attempts');
+        $table->unsignedInteger('reserved_at')->nullable();
+        $table->unsignedInteger('available_at');
+        $table->unsignedInteger('created_at');
+    });
+
+    Schema::create('failed_jobs', function ($table) {
+        $table->id();
+        $table->string('uuid')->unique();
+        $table->string('connection');
+        $table->string('queue');
+        $table->longText('payload');
+        $table->longText('exception');
+        $table->timestamp('failed_at')->useCurrent();
+    });
+}
+
+function workNextRedirectErrorJob(): void
+{
+    app('queue.worker')->runNextJob('database', 'default', new WorkerOptions(sleep: 0, maxTries: 5));
+}
