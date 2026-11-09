@@ -3,7 +3,10 @@
 use Aerni\AdvancedSeo\Cascades\ContentCascade;
 use Aerni\AdvancedSeo\Facades\Seo;
 use Aerni\AdvancedSeo\Facades\SocialImage;
+use Aerni\AdvancedSeo\Jobs\GenerateSocialImagesJob;
 use Aerni\AdvancedSeo\Tests\Concerns\FakesComposerLock;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
@@ -157,6 +160,69 @@ it('treats a generated social image as dirty when its file is missing', function
         ->and($generator->asset())->toBeNull();
 });
 
+it('does not register an asset when the screenshot writes nothing', function () {
+    $entry = socialImageEntry();
+
+    socialImageScreenshotWrites(false);
+
+    expect(fn () => SocialImage::openGraph()->for($entry)->generate())
+        ->toThrow(RuntimeException::class);
+
+    expect(socialImageAssetPaths())->toBeEmpty();
+});
+
+it('does not register an asset when the screenshot writes an empty file', function () {
+    $entry = socialImageEntry();
+
+    socialImageScreenshotWrites('');
+
+    expect(fn () => SocialImage::openGraph()->for($entry)->generate())
+        ->toThrow(RuntimeException::class);
+
+    $directory = AssetContainer::find('assets')->disk()->path('social_images');
+
+    expect(socialImageAssetPaths())->toBeEmpty()
+        ->and(File::isDirectory($directory) ? File::allFiles($directory) : [])->toBeEmpty();
+});
+
+it('does not replace a social image while another generation for that entry holds the lock', function () {
+    $entry = socialImageEntry();
+    $asset = generateSocialImage($entry);
+    $png = $asset->container()->disk()->get($asset->path());
+
+    // Lock::block() waits on the real clock, and a lock taken under frozen
+    // time is already expired once the clock moves to today.
+    Carbon::setTestNow();
+
+    $lock = Cache::lock('advanced-seo.social-image.generate.'.$entry->id(), 10);
+
+    expect($lock->get())->toBeTrue();
+
+    socialImageScreenshotWrites(false);
+
+    expect(fn () => SocialImage::openGraph()->for($entry)->generate())
+        ->toThrow(LockTimeoutException::class);
+
+    expect($asset->container()->disk()->get($asset->path()))->toBe($png)
+        ->and($asset->container()->disk()->exists($asset->path()))->toBeTrue();
+
+    $lock->release();
+});
+
+it('releases a second generation job for the same entry instead of running it alongside the first', function () {
+    $entry = socialImageEntry();
+    $job = new GenerateSocialImagesJob($entry);
+
+    $middleware = collect($job->middleware())->first(
+        fn ($middleware) => $middleware instanceof WithoutOverlapping
+    );
+
+    expect($middleware)->not->toBeNull()
+        ->and($middleware->key)->toBe($entry->id())
+        ->and($middleware->releaseAfter)->toBeGreaterThan(0)
+        ->and($middleware->expiresAfter)->toBeGreaterThan(0);
+});
+
 it('does not read metadata while removing a social image that is already gone', function () {
     $entry = socialImageEntry();
     $asset = generateSocialImage($entry);
@@ -205,6 +271,37 @@ function removeSocialImageFile(Asset $asset): void
 function socialImagePng(): string
 {
     return base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+}
+
+function socialImageAssetPaths(): array
+{
+    return AssetContainer::find('assets')
+        ->queryAssets()
+        ->where('path', 'like', 'social_images/%')
+        ->get()
+        ->map->path()
+        ->all();
+}
+
+function socialImageScreenshotWrites(string|false $contents): void
+{
+    $screenshot = Mockery::mock(ScreenshotBuilder::class);
+    $screenshot->shouldReceive('url')->andReturnUsing(function () use ($contents) {
+        $builder = Mockery::mock(ScreenshotBuilder::class);
+        $builder->shouldReceive('width', 'height', 'deviceScaleFactor', 'withBrowsershot')->andReturnSelf();
+        $builder->shouldReceive('save')->andReturnUsing(function (string $path) use ($contents, $builder) {
+            if ($contents !== false) {
+                File::ensureDirectoryExists(dirname($path));
+                File::put($path, $contents);
+            }
+
+            return $builder;
+        });
+
+        return $builder;
+    });
+
+    Screenshot::swap($screenshot);
 }
 
 function socialImageScreenshotFails(): void

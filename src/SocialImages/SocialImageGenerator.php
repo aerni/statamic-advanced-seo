@@ -31,23 +31,31 @@ class SocialImageGenerator
 
     public function generate(): Asset
     {
-        $this->ensureDirectoryExists();
-        $this->deletePreviousImages();
+        // Page renders give up quickly and fall back. A queued job waits so it
+        // still writes the image after an in-request generation finishes.
+        $wait = Statamic::isWorker() ? 170 : 1;
 
-        Screenshot::url($this->templateUrl())
-            ->width($this->socialImage->width())
-            ->height($this->socialImage->height())
-            ->deviceScaleFactor(1)
-            ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
-            ->save($this->absolutePath());
+        return Cache::lock($this->generationLockKey(), 180)->block($wait, function () {
+            $this->ensureDirectoryExists();
 
-        $asset = $this->container->makeAsset($this->path());
+            Screenshot::url($this->templateUrl())
+                ->width($this->socialImage->width())
+                ->height($this->socialImage->height())
+                ->deviceScaleFactor(1)
+                ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
+                ->save($this->absolutePath());
 
-        $asset->save();
+            $this->assertImageWasWritten();
+            $this->deletePreviousImages();
 
-        $this->cacheContentHash();
+            $asset = $this->container->makeAsset($this->path());
 
-        return $asset;
+            $asset->save();
+
+            $this->cacheContentHash();
+
+            return $asset;
+        });
     }
 
     /**
@@ -151,7 +159,40 @@ class SocialImageGenerator
      */
     protected function deletePreviousImages(): void
     {
-        $this->matchingAssets()->each(fn (Asset $asset) => $this->removeAsset($asset));
+        $this->matchingAssets()
+            ->reject(fn (Asset $asset) => $asset->path() === $this->path())
+            ->each(fn (Asset $asset) => $this->removeAsset($asset));
+    }
+
+    /**
+     * A screenshot can return without creating a file. Saving the asset anyway
+     * leaves a listing entry that later renders throw on.
+     */
+    protected function assertImageWasWritten(): void
+    {
+        $disk = $this->container->disk();
+        $path = $this->path();
+
+        try {
+            $size = $disk->exists($path) ? $disk->size($path) : 0;
+        } catch (UnableToRetrieveMetadata) {
+            $size = 0;
+        }
+
+        if ($size > 0) {
+            return;
+        }
+
+        if ($disk->exists($path)) {
+            $disk->delete($path);
+        }
+
+        throw new \RuntimeException("Social image screenshot did not write a file to [{$path}].");
+    }
+
+    protected function generationLockKey(): string
+    {
+        return 'advanced-seo.social-image.generate.'.$this->id();
     }
 
     protected function removeAsset(Asset $asset): void
