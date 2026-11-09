@@ -45,8 +45,6 @@ class RecordRedirectErrorJob implements ShouldBeUnique, ShouldQueue
                 return;
             }
 
-            // release() retries this same job. Dispatching a new one is dropped
-            // while the ShouldBeUnique lock from the original dispatch is held.
             $this->release(random_int(5, 15));
         }
     }
