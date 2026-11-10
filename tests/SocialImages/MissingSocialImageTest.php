@@ -189,7 +189,7 @@ it('skips a screenshot when a later generation finds the same template', functio
         ->and($asset->container()->disk()->exists($asset->path()))->toBeTrue();
 });
 
-it('replaces a social image without queueing an asset reference update', function () {
+it('updates asset references when replacing a social image that is still on disk', function () {
     $entry = socialImageEntry();
     $first = generateSocialImage($entry);
 
@@ -202,12 +202,32 @@ it('replaces a social image without queueing an asset reference update', functio
 
     $again = SocialImage::openGraph()->for($entry)->generate();
 
-    Event::assertNotDispatched(AssetDeleted::class);
+    Event::assertDispatched(AssetDeleted::class);
 
     expect($again->path())->not->toBe($first->path())
         ->and($again->container()->disk()->exists($again->path()))->toBeTrue()
         ->and($first->container()->disk()->exists($first->path()))->toBeFalse()
         ->and($first->container()->files()->contains($first->path()))->toBeFalse();
+});
+
+it('drops a listed social image with no file without queueing an asset reference update', function () {
+    $entry = socialImageEntry();
+    $stale = generateSocialImage($entry);
+
+    removeSocialImageFile($stale);
+
+    Event::fake([AssetDeleted::class]);
+
+    Carbon::setTestNow('2026-11-09 11:00:00');
+    fakeSocialImageScreenshot();
+
+    $again = SocialImage::openGraph()->for($entry)->generate();
+
+    Event::assertNotDispatched(AssetDeleted::class);
+
+    expect($again->path())->not->toBe($stale->path())
+        ->and($again->container()->disk()->exists($again->path()))->toBeTrue()
+        ->and($stale->container()->files()->contains($stale->path()))->toBeFalse();
 });
 
 it('generates again when a later generation finds a changed template', function () {
