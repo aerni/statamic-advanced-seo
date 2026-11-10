@@ -154,12 +154,19 @@ class SocialImageGenerator
     /**
      * Delete previously generated images for this content.
      * The new file is excluded so a same-second run does not remove the PNG it just wrote.
+     *
+     * Quietly, so Statamic does not queue an asset reference update. On 6.40 that
+     * listener reads the file size of a path that is still listed after the file
+     * is gone, and the job fails. Use delete() again once a listed path with no
+     * file is treated as missing.
+     *
+     * @see https://github.com/statamic/cms/pull/15833
      */
     protected function deletePreviousImages(): void
     {
         $this->matchingAssets()
             ->reject(fn (Asset $asset) => $asset->path() === $this->path())
-            ->each->delete();
+            ->each->deleteQuietly();
     }
 
     /**

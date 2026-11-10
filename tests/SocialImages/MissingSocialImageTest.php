@@ -10,12 +10,14 @@ use Illuminate\Http\Client\Factory;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Spatie\LaravelScreenshot\Facades\Screenshot;
 use Spatie\LaravelScreenshot\ScreenshotBuilder;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Events\AssetDeleted;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry as EntryFacade;
@@ -185,6 +187,27 @@ it('skips a screenshot when a later generation finds the same template', functio
 
     expect($again->path())->toBe($asset->path())
         ->and($asset->container()->disk()->exists($asset->path()))->toBeTrue();
+});
+
+it('replaces a social image without queueing an asset reference update', function () {
+    $entry = socialImageEntry();
+    $first = generateSocialImage($entry);
+
+    Event::fake([AssetDeleted::class]);
+
+    Carbon::setTestNow('2026-11-09 11:00:00');
+    Http::swap(new Factory);
+    Http::fake(['*' => Http::response('<html>changed social image</html>')]);
+    fakeSocialImageScreenshot();
+
+    $again = SocialImage::openGraph()->for($entry)->generate();
+
+    Event::assertNotDispatched(AssetDeleted::class);
+
+    expect($again->path())->not->toBe($first->path())
+        ->and($again->container()->disk()->exists($again->path()))->toBeTrue()
+        ->and($first->container()->disk()->exists($first->path()))->toBeFalse()
+        ->and($first->container()->files()->contains($first->path()))->toBeFalse();
 });
 
 it('generates again when a later generation finds a changed template', function () {
