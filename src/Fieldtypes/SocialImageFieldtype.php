@@ -22,9 +22,11 @@ class SocialImageFieldtype extends Assets
 
     public function augment($value)
     {
-        return $this->shouldGenerateSocialImage()
+        $augmented = $this->shouldGenerateSocialImage()
             ? $this->augmentGeneratedSocialImage($value)
             : parent::augment($value);
+
+        return $this->withExistingFile($augmented);
     }
 
     public function preProcessIndex($data)
@@ -63,6 +65,19 @@ class SocialImageFieldtype extends Assets
                 $parent->set('seo_og_image', $asset->path());
                 $parent->saveQuietly();
             });
+        }
+
+        return $asset;
+    }
+
+    /**
+     * A record whose file is gone must not be augmented. Reading its meta
+     * asks Flysystem for the file size and takes down the response.
+     */
+    protected function withExistingFile(mixed $asset): mixed
+    {
+        if ($asset && ! $asset->container()->disk()->exists($asset->path())) {
+            return null;
         }
 
         return $asset;
