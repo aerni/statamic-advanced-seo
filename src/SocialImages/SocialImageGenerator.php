@@ -14,6 +14,7 @@ use Statamic\Contracts\Assets\AssetContainer as Container;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\AssetContainer;
+use Statamic\Statamic;
 
 class SocialImageGenerator
 {
@@ -26,25 +27,49 @@ class SocialImageGenerator
         $this->container = AssetContainer::find(config('advanced-seo.social_images.container', 'assets'));
     }
 
+    /**
+     * Generate the social image for this content.
+     *
+     * A page render and a queued job can both call this while a screenshot is
+     * still running. Each run writes a new file and then deletes the other
+     * files for this entry, so the second run removes the PNG the first run
+     * just wrote.
+     *
+     * A page render waits for the image, but gives up before PHP times out the
+     * request. A queued job waits so it still writes the image after an
+     * in-request generation finishes. A later run whose template still matches
+     * the stored hash returns the existing image. A template that changed
+     * since that hash still generates.
+     */
     public function generate(): Asset
     {
-        $this->ensureDirectoryExists();
-        $this->deletePreviousImages();
+        $lock = "advanced-seo.social-image.generate.{$this->id()}";
+        $wait = Statamic::isWorker() ? 170 : 20;
 
-        Screenshot::url($this->templateUrl())
-            ->width($this->socialImage->width())
-            ->height($this->socialImage->height())
-            ->deviceScaleFactor(1)
-            ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
-            ->save($this->absolutePath());
+        return Cache::lock($lock, 180)->block($wait, function () {
+            if (($existing = $this->asset()) && ! $this->isDirty()) {
+                return $existing;
+            }
 
-        $asset = $this->container->makeAsset($this->path());
+            $this->ensureDirectoryExists();
 
-        $asset->save();
+            Screenshot::url($this->templateUrl())
+                ->width($this->socialImage->width())
+                ->height($this->socialImage->height())
+                ->deviceScaleFactor(1)
+                ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
+                ->save($this->absolutePath());
 
-        $this->cacheContentHash();
+            $this->deletePreviousImages();
 
-        return $asset;
+            $asset = $this->container->makeAsset($this->path());
+
+            $asset->save();
+
+            $this->cacheContentHash();
+
+            return $asset;
+        });
     }
 
     /**
@@ -112,8 +137,6 @@ class SocialImageGenerator
     }
 
     /**
-     * Find all existing generated images for this content.
-     *
      * @return Collection<int, Asset>
      */
     protected function assets(): Collection
@@ -126,11 +149,14 @@ class SocialImageGenerator
     }
 
     /**
-     * Delete all previously generated images for this content.
+     * Delete previously generated images for this content.
+     * The new file is excluded so a same-second run does not remove the PNG it just wrote.
      */
     protected function deletePreviousImages(): void
     {
-        $this->assets()->each->delete();
+        $this->assets()
+            ->reject(fn (Asset $asset) => $asset->path() === $this->path())
+            ->each->delete();
     }
 
     protected function ensureDirectoryExists(): void
