@@ -60,11 +60,11 @@ class SocialImageGenerator
                 ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
                 ->save($this->absolutePath());
 
-            $this->deletePreviousImages();
-
             $asset = $this->container->makeAsset($this->path());
 
             $asset->save();
+
+            $this->replacePreviousImages($asset);
 
             $this->cacheContentHash();
 
@@ -152,30 +152,24 @@ class SocialImageGenerator
     }
 
     /**
-     * Delete previously generated images for this content.
-     * The new file is excluded so a same-second run does not remove the PNG it just wrote.
+     * Point previous generations at the asset just saved, then delete them.
      *
-     * A file that is still on disk is deleted normally, so asset references update.
-     * A listed path whose file is already gone is removed without that event. On
-     * Statamic 6.40 the reference listener reads the file size of that path and
-     * the job fails. Drop the quiet delete once a listed path with no file is
-     * treated as missing.
+     * The new file is excluded so a same-second run does not remove the PNG it just wrote.
+     * replace() turns the reference listener off, deletes the previous asset, turns
+     * the listener back on, and dispatches AssetReplaced. The queued handler reads
+     * both paths from that event, so a listed path whose file is already gone is not stat'd.
+     *
+     * A control panel delete, any other delete(), and a page render of a listed path
+     * whose file is missing still throw on Statamic 6.40 until a missing file is
+     * treated as gone.
      *
      * @see https://github.com/statamic/cms/pull/15833
      */
-    protected function deletePreviousImages(): void
+    protected function replacePreviousImages(Asset $asset): void
     {
         $this->matchingAssets()
-            ->reject(fn (Asset $asset) => $asset->path() === $this->path())
-            ->each(function (Asset $asset) {
-                if ($this->container->disk()->exists($asset->path())) {
-                    $asset->delete();
-
-                    return;
-                }
-
-                $asset->deleteQuietly();
-            });
+            ->reject(fn (Asset $previous) => $previous->path() === $asset->path())
+            ->each(fn (Asset $previous) => $asset->replace($previous, true));
     }
 
     /**
