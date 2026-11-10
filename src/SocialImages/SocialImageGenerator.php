@@ -60,11 +60,11 @@ class SocialImageGenerator
                 ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
                 ->save($this->absolutePath());
 
-            $this->deletePreviousImages();
-
             $asset = $this->container->makeAsset($this->path());
 
             $asset->save();
+
+            $this->replacePreviousImages($asset);
 
             $this->cacheContentHash();
 
@@ -152,14 +152,24 @@ class SocialImageGenerator
     }
 
     /**
-     * Delete previously generated images for this content.
+     * Point previous generations at the asset just saved, then delete them.
+     *
      * The new file is excluded so a same-second run does not remove the PNG it just wrote.
+     * replace() turns the reference listener off, deletes the previous asset, turns
+     * the listener back on, and dispatches AssetReplaced. The queued handler reads
+     * both paths from that event, so a listed path whose file is already gone is not stat'd.
+     *
+     * A control panel delete, any other delete(), and a page render of a listed path
+     * whose file is missing still throw on Statamic 6.40 until a missing file is
+     * treated as gone.
+     *
+     * @see https://github.com/statamic/cms/pull/15833
      */
-    protected function deletePreviousImages(): void
+    protected function replacePreviousImages(Asset $asset): void
     {
         $this->matchingAssets()
-            ->reject(fn (Asset $asset) => $asset->path() === $this->path())
-            ->each->delete();
+            ->reject(fn (Asset $previous) => $previous->path() === $asset->path())
+            ->each(fn (Asset $previous) => $asset->replace($previous, true));
     }
 
     /**

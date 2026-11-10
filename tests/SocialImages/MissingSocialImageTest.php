@@ -17,6 +17,8 @@ use Spatie\LaravelScreenshot\ScreenshotBuilder;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
@@ -187,6 +189,44 @@ it('skips a screenshot when a later generation finds the same template', functio
         ->and($asset->container()->disk()->exists($asset->path()))->toBeTrue();
 });
 
+it('updates asset references when replacing a social image that is still on disk', function () {
+    $entry = socialImageEntry();
+    $first = generateSocialImage($entry);
+    $referrer = entryReferencingSocialImage($first);
+
+    Carbon::setTestNow('2026-11-09 11:00:00');
+    Http::swap(new Factory);
+    Http::fake(['*' => Http::response('<html>changed social image</html>')]);
+    fakeSocialImageScreenshot();
+
+    $again = SocialImage::openGraph()->for($entry)->generate();
+
+    expect($again->path())->not->toBe($first->path())
+        ->and($again->container()->disk()->exists($again->path()))->toBeTrue()
+        ->and($first->container()->disk()->exists($first->path()))->toBeFalse()
+        ->and($first->container()->files()->contains($first->path()))->toBeFalse()
+        ->and(EntryFacade::find($referrer->id())->get('image'))->toBe([$again->path()]);
+});
+
+it('moves references when replacing a listed social image whose file is gone', function () {
+    $entry = socialImageEntry();
+    $stale = generateSocialImage($entry);
+    $referrer = entryReferencingSocialImage($stale);
+
+    removeSocialImageFile($stale);
+
+    Carbon::setTestNow('2026-11-09 11:00:00');
+    fakeSocialImageScreenshot();
+
+    $again = SocialImage::openGraph()->for($entry)->generate();
+
+    expect($again->path())->not->toBe($stale->path())
+        ->and($again->container()->disk()->exists($again->path()))->toBeTrue()
+        ->and($stale->container()->disk()->exists($stale->path()))->toBeFalse()
+        ->and($stale->container()->files()->contains($stale->path()))->toBeFalse()
+        ->and(EntryFacade::find($referrer->id())->get('image'))->toBe([$again->path()]);
+});
+
 it('generates again when a later generation finds a changed template', function () {
     $entry = socialImageEntry();
     $first = generateSocialImage($entry);
@@ -216,6 +256,36 @@ it('releases a second generation job for the same entry instead of running it al
         ->and($middleware->releaseAfter)->toBeGreaterThan(0)
         ->and($middleware->expiresAfter)->toBeGreaterThan(0);
 });
+
+function entryReferencingSocialImage(Asset $asset): Entry
+{
+    Blueprint::make('collections.pages::page')->setContents([
+        'tabs' => [
+            'main' => [
+                'sections' => [[
+                    'fields' => [[
+                        'handle' => 'image',
+                        'field' => [
+                            'type' => 'assets',
+                            'container' => 'assets',
+                        ],
+                    ]],
+                ]],
+            ],
+        ],
+    ])->save();
+
+    Blink::flush();
+
+    return tap(EntryFacade::make()
+        ->collection('pages')
+        ->locale('english')
+        ->slug('about')
+        ->data([
+            'title' => 'About',
+            'image' => [$asset->path()],
+        ]))->save();
+}
 
 function socialImageEntry(): Entry
 {
