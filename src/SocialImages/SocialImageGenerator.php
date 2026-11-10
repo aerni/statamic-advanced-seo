@@ -5,9 +5,7 @@ namespace Aerni\AdvancedSeo\SocialImages;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelScreenshot\Facades\Screenshot;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer as Container;
@@ -53,11 +51,10 @@ class SocialImageGenerator
 
             $this->ensureDirectoryExists();
 
-            Screenshot::url($this->templateUrl())
+            Screenshot::html($this->templateHtml())
                 ->width($this->socialImage->width())
                 ->height($this->socialImage->height())
                 ->deviceScaleFactor(1)
-                ->withBrowsershot(fn (Browsershot $browsershot) => $browsershot->preventUnsuccessfulResponse())
                 ->save($this->absolutePath());
 
             $asset = $this->container->makeAsset($this->path());
@@ -191,15 +188,6 @@ class SocialImageGenerator
         File::ensureDirectoryExists($directory);
     }
 
-    protected function templateUrl(): string
-    {
-        return $this->socialImage->url(
-            $this->content->seo_social_images_theme,
-            $this->content->id(),
-            $this->content->locale()
-        );
-    }
-
     /**
      * Cache the current content hash so isDirty() returns false until the content changes.
      */
@@ -215,7 +203,16 @@ class SocialImageGenerator
      */
     protected function contentHash(): string
     {
-        return md5(once(fn () => Http::timeout(10)->get($this->templateUrl())->throw()->body()));
+        return md5($this->templateHtml());
+    }
+
+    protected function templateHtml(): string
+    {
+        return once(fn () => (new SocialImageView(
+            $this->socialImage,
+            $this->content,
+            $this->content->seo_social_images_theme,
+        ))->render());
     }
 
     protected function contentHashCacheKey(): string

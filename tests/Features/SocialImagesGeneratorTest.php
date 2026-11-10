@@ -145,6 +145,7 @@ it('prevents the generate job on the free edition', function () {
 
 it('does not generate a social image when resolving the listing index', function () {
     Screenshot::shouldReceive('url')->never();
+    Screenshot::shouldReceive('html')->never();
 
     AssetContainer::make('assets')->disk('local')->saveQuietly();
 
