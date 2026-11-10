@@ -7,6 +7,7 @@ use Aerni\AdvancedSeo\Facades\SocialImage;
 use Aerni\AdvancedSeo\Features\SocialImagesGenerator;
 use Aerni\AdvancedSeo\SocialImages\SocialImageGenerator;
 use Aerni\AdvancedSeo\Support\Helpers;
+use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fieldtypes\Assets\Assets;
@@ -44,10 +45,16 @@ class SocialImageFieldtype extends Assets
     {
         $parent = $this->field->parent();
 
-        // Resolve the existing asset or generate a new one on demand.
-        // This ensures the first request always returns an image (e.g. social platform crawlers).
-        $generator = $this->generator($parent);
-        $asset = $generator->asset() ?? $generator->generate();
+        // Use the saved image, or generate one so the first response includes it.
+        // The lock wait and a failed screenshot throw. Return no image instead of a 500.
+        try {
+            $generator = $this->generator($parent);
+            $asset = $generator->asset() ?? $generator->generate();
+        } catch (\Exception $e) {
+            Log::warning('Unable to generate a social image.', ['exception' => $e]);
+
+            return null;
+        }
 
         // Persist the asset path to the entry file so the image survives
         // if the generator is later disabled without requiring a manual save.
