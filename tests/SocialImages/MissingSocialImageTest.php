@@ -39,6 +39,7 @@ beforeEach(function () {
     config(['advanced-seo.social_images.generator.enabled' => true]);
 
     File::ensureDirectoryExists(resource_path('views/social_images/default'));
+    File::put(resource_path('views/social_images/layout.antlers.html'), '{{ template_content }}');
     File::put(resource_path('views/social_images/default/open_graph.antlers.html'), 'social image');
 
     Seo::find('collections::pages')->config()->set('social_images_generator', true)->save();
@@ -176,6 +177,21 @@ it('does not replace a social image while another generation for that entry hold
     $lock->release();
 });
 
+it('generates a social image when the preview url responds with not found', function () {
+    $entry = socialImageEntry();
+
+    Http::swap(new Factory);
+    Http::fake(['*' => Http::response('missing', 404)]);
+    fakeSocialImageScreenshot();
+
+    $asset = SocialImage::openGraph()->for($entry)->generate();
+
+    Http::assertNothingSent();
+
+    expect($asset->container()->disk()->exists($asset->path()))->toBeTrue()
+        ->and($entry->get('seo_generate_social_images'))->toBeTrue();
+});
+
 it('skips a screenshot when a later generation finds the same template', function () {
     $entry = socialImageEntry();
     $asset = generateSocialImage($entry);
@@ -195,8 +211,7 @@ it('updates asset references when replacing a social image that is still on disk
     $referrer = entryReferencingSocialImage($first);
 
     Carbon::setTestNow('2026-11-09 11:00:00');
-    Http::swap(new Factory);
-    Http::fake(['*' => Http::response('<html>changed social image</html>')]);
+    File::put(resource_path('views/social_images/default/open_graph.antlers.html'), 'changed social image');
     fakeSocialImageScreenshot();
 
     $again = SocialImage::openGraph()->for($entry)->generate();
@@ -232,8 +247,7 @@ it('generates again when a later generation finds a changed template', function 
     $first = generateSocialImage($entry);
 
     Carbon::setTestNow('2026-11-09 11:00:00');
-    Http::swap(new Factory);
-    Http::fake(['*' => Http::response('<html>changed social image</html>')]);
+    File::put(resource_path('views/social_images/default/open_graph.antlers.html'), 'changed social image');
     fakeSocialImageScreenshot();
 
     $again = SocialImage::openGraph()->for($entry)->generate();
@@ -324,7 +338,7 @@ function socialImagePng(): string
 function socialImageScreenshotWrites(string|false $contents): void
 {
     $screenshot = Mockery::mock(ScreenshotBuilder::class);
-    $screenshot->shouldReceive('url')->andReturnUsing(function () use ($contents) {
+    $screenshot->shouldReceive('html')->andReturnUsing(function () use ($contents) {
         $builder = Mockery::mock(ScreenshotBuilder::class);
         $builder->shouldReceive('width', 'height', 'deviceScaleFactor', 'withBrowsershot')->andReturnSelf();
         $builder->shouldReceive('save')->andReturnUsing(function (string $path) use ($contents, $builder) {
@@ -345,7 +359,7 @@ function socialImageScreenshotWrites(string|false $contents): void
 function socialImageScreenshotFails(): void
 {
     $screenshot = Mockery::mock(ScreenshotBuilder::class);
-    $screenshot->shouldReceive('url')->andThrow(new RuntimeException('browsershot failed'));
+    $screenshot->shouldReceive('html')->andThrow(new RuntimeException('browsershot failed'));
 
     Screenshot::swap($screenshot);
 }
@@ -354,7 +368,7 @@ function fakeSocialImageScreenshot(): void
 {
     $png = socialImagePng();
 
-    Screenshot::shouldReceive('url')->andReturnUsing(function () use ($png) {
+    Screenshot::shouldReceive('html')->andReturnUsing(function () use ($png) {
         $builder = Mockery::mock(ScreenshotBuilder::class);
         $builder->shouldReceive('width', 'height', 'deviceScaleFactor', 'withBrowsershot')->andReturnSelf();
         $builder->shouldReceive('save')->andReturnUsing(function (string $path) use ($png, $builder) {
