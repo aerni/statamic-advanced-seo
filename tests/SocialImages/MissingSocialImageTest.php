@@ -64,15 +64,19 @@ it('renders the seo head when the generated social image file is missing', funct
 
     removeSocialImageFile($asset);
 
+    Carbon::setTestNow('2026-11-09 11:00:00');
+
     $html = view('advanced-seo::head', [
         'seo' => ContentCascade::from($entry),
     ])->render();
 
-    expect($html)->toBeString();
+    $replacement = SocialImage::openGraph()->for($entry)->asset();
 
-    if (str_contains($html, $asset->basename())) {
-        expect($asset->container()->disk()->exists($asset->path()))->toBeTrue();
-    }
+    expect($replacement)->not->toBeNull()
+        ->and($replacement->path())->not->toBe($asset->path())
+        ->and($replacement->container()->disk()->exists($replacement->path()))->toBeTrue()
+        ->and($html)->toContain($replacement->basename())
+        ->and($html)->not->toContain($asset->basename());
 });
 
 it('omits a missing social image when it cannot be regenerated', function () {
@@ -118,7 +122,7 @@ it('regenerates a social image when the previous file is missing from disk', fun
 
     expect($asset->container()->disk()->exists($asset->path()))->toBeTrue()
         ->and($asset->path())->not->toBe($stale->path())
-        ->and($stale->container()->disk()->exists($stale->path()))->toBeFalse();
+        ->and($stale->container()->files()->contains($stale->path()))->toBeFalse();
 });
 
 it('treats a generated social image as dirty when its file is missing', function () {
