@@ -58,6 +58,82 @@ afterEach(function () {
     File::deleteDirectory(resource_path('views/social_images'));
 });
 
+it('renders the seo head when the generated social image file is missing', function () {
+    $entry = socialImageEntry();
+    $asset = generateSocialImage($entry);
+
+    removeSocialImageFile($asset);
+
+    $html = view('advanced-seo::head', [
+        'seo' => ContentCascade::from($entry),
+    ])->render();
+
+    expect($html)->toBeString();
+
+    if (str_contains($html, $asset->basename())) {
+        expect($asset->container()->disk()->exists($asset->path()))->toBeTrue();
+    }
+});
+
+it('omits a missing social image when it cannot be regenerated', function () {
+    $entry = socialImageEntry();
+    $asset = generateSocialImage($entry);
+
+    removeSocialImageFile($asset);
+    socialImageScreenshotFails();
+
+    $html = view('advanced-seo::head', [
+        'seo' => ContentCascade::from($entry),
+    ])->render();
+
+    expect($html)->not->toContain($asset->basename());
+});
+
+it('renders the seo head when a selected social image file is missing', function () {
+    $entry = socialImageEntry();
+    $asset = generateSocialImage($entry);
+
+    $entry->set('seo_generate_social_images', false);
+    $entry->set('seo_og_image', $asset->path());
+    $entry->save();
+
+    removeSocialImageFile($asset);
+
+    $html = view('advanced-seo::head', [
+        'seo' => ContentCascade::from($entry),
+    ])->render();
+
+    expect($html)->not->toContain($asset->basename());
+});
+
+it('regenerates a social image when the previous file is missing from disk', function () {
+    $entry = socialImageEntry();
+    $stale = generateSocialImage($entry);
+
+    removeSocialImageFile($stale);
+
+    Carbon::setTestNow('2026-11-09 11:00:00');
+
+    $asset = SocialImage::openGraph()->for($entry)->generate();
+
+    expect($asset->container()->disk()->exists($asset->path()))->toBeTrue()
+        ->and($asset->path())->not->toBe($stale->path())
+        ->and($stale->container()->disk()->exists($stale->path()))->toBeFalse();
+});
+
+it('treats a generated social image as dirty when its file is missing', function () {
+    $entry = socialImageEntry();
+    $asset = generateSocialImage($entry);
+    $generator = SocialImage::openGraph()->for($entry);
+
+    expect($generator->isDirty())->toBeFalse();
+
+    removeSocialImageFile($asset);
+
+    expect($generator->isDirty())->toBeTrue()
+        ->and($generator->asset())->toBeNull();
+});
+
 it('renders the seo head when a social image cannot be generated', function () {
     $entry = socialImageEntry();
 
@@ -155,6 +231,15 @@ function generateSocialImage(Entry $entry): Asset
     fakeSocialImageScreenshot();
 
     return SocialImage::openGraph()->for($entry)->generate();
+}
+
+function removeSocialImageFile(Asset $asset): void
+{
+    $disk = $asset->container()->disk();
+
+    File::delete($disk->path($asset->path()));
+    File::delete($disk->path($asset->metaPath()));
+    Cache::forget($asset->metaCacheKey());
 }
 
 function socialImagePng(): string

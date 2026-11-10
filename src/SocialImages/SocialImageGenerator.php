@@ -137,15 +137,18 @@ class SocialImageGenerator
     }
 
     /**
+     * Find generated images whose files are still on disk.
+     *
+     * A listed path whose file is gone must not count as the current image,
+     * or the missing file is rendered and the page throws.
+     *
      * @return Collection<int, Asset>
      */
     protected function assets(): Collection
     {
-        $directory = pathinfo($this->path(), PATHINFO_DIRNAME);
-
-        return $this->container->queryAssets()
-            ->where('path', 'like', "{$directory}/{$this->id()}_%")
-            ->get();
+        return $this->matchingAssets()
+            ->filter(fn (Asset $asset) => $this->container->disk()->exists($asset->path()))
+            ->values();
     }
 
     /**
@@ -154,9 +157,21 @@ class SocialImageGenerator
      */
     protected function deletePreviousImages(): void
     {
-        $this->assets()
+        $this->matchingAssets()
             ->reject(fn (Asset $asset) => $asset->path() === $this->path())
             ->each->delete();
+    }
+
+    /**
+     * @return Collection<int, Asset>
+     */
+    protected function matchingAssets(): Collection
+    {
+        $directory = pathinfo($this->path(), PATHINFO_DIRNAME);
+
+        return $this->container->queryAssets()
+            ->where('path', 'like', "{$directory}/{$this->id()}_%")
+            ->get();
     }
 
     protected function ensureDirectoryExists(): void
