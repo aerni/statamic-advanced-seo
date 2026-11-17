@@ -4,8 +4,12 @@ use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
+use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Sleep;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
@@ -80,4 +84,61 @@ it('ignores enabled redirects for unknown sites', function () {
     Redirect::make()->source('/old')->destination('/new')->site('unknown')->save();
 
     $this->artisan('seo:prune-redirect-errors')->assertExitCode(0);
+});
+
+it('prunes after the redirect error lock is released', function () {
+    config(['advanced-seo.redirects.errors.purge_after_days' => 30]);
+
+    Redirect::errors()->make()->url('/old')->site('default')->count(1)
+        ->lastSeenAt(Carbon::now()->subDays(40)->timestamp)->save();
+
+    Sleep::fake(syncWithCarbon: true);
+
+    try {
+        $lock = Cache::lock('advanced-seo::redirect-error', 60);
+        expect($lock->get())->toBeTrue();
+
+        Sleep::whenFakingSleep(fn () => $lock->forceRelease());
+
+        $this->artisan('seo:prune-redirect-errors')
+            ->doesntExpectOutputToContain('write lock stayed busy')
+            ->assertExitCode(0);
+
+        expect(Redirect::errors()->findByUrl('/old', 'default'))->toBeNull();
+    } finally {
+        Sleep::fake(false);
+        Carbon::setTestNow();
+    }
+});
+
+it('warns and exits cleanly when the redirect error lock stays busy', function () {
+    config(['advanced-seo.redirects.errors.purge_after_days' => 30]);
+
+    Redirect::errors()->make()->url('/old')->site('default')->count(1)
+        ->lastSeenAt(Carbon::now()->subDays(40)->timestamp)->save();
+
+    $warnings = [];
+
+    Log::listen(function (MessageLogged $event) use (&$warnings) {
+        if ($event->level === 'warning') {
+            $warnings[] = $event->message;
+        }
+    });
+
+    Sleep::fake(syncWithCarbon: true);
+
+    try {
+        $lock = Cache::lock('advanced-seo::redirect-error', 120);
+        expect($lock->get())->toBeTrue();
+
+        $this->artisan('seo:prune-redirect-errors')
+            ->expectsOutputToContain('Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.')
+            ->assertExitCode(0);
+
+        expect(Redirect::errors()->findByUrl('/old', 'default'))->not->toBeNull()
+            ->and($warnings)->toContain('Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.');
+    } finally {
+        Sleep::fake(false);
+        Carbon::setTestNow();
+    }
 });

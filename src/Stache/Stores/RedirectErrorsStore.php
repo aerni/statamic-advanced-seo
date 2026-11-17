@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Contracts\RedirectError;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
 use Statamic\Support\Arr;
@@ -50,9 +51,18 @@ class RedirectErrorsStore extends BasicStore
             return;
         }
 
+        // paths() rebuilds the index from every file when the cache is cold.
+        // A chunked prune would do that rebuild while holding the write lock.
+        // The cached map is enough; otherwise the file is the id in this
+        // directory, which is the only path the store writes.
+        $this->resetMemoizedState();
+
+        $cached = collect(Stache::cacheStore()->get($this->pathsCacheKey(), []));
+
         $files = collect($keys)
-            ->map(fn ($key) => $this->getPath($key))
+            ->map(fn ($key) => $cached->get($key) ?: Path::assemble($this->directory(), "{$key}.yaml"))
             ->filter()
+            ->unique()
             ->values()
             ->all();
 

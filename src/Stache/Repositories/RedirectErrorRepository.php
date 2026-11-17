@@ -16,6 +16,13 @@ class RedirectErrorRepository implements Contract
 {
     use HasRedirectErrorLimits;
 
+    /**
+     * Record jobs wait 5 seconds and then give up. A prune that deletes the
+     * whole cap in one hold can outlast those tries. Each chunk takes the
+     * lock, deletes, and releases it so a record job can write in between.
+     */
+    private const DELETE_CHUNK_SIZE = 100;
+
     protected RedirectErrorsStore $store;
 
     public function __construct(protected Stache $stache)
@@ -74,7 +81,13 @@ class RedirectErrorRepository implements Contract
 
     public function deleteByIds(array $ids): void
     {
-        $this->lock(fn () => $this->store->deleteKeys($ids));
+        if ($ids === []) {
+            return;
+        }
+
+        foreach (array_chunk($ids, self::DELETE_CHUNK_SIZE) as $chunk) {
+            $this->lock(fn () => $this->store->deleteKeys($chunk));
+        }
     }
 
     /**
