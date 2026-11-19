@@ -27,18 +27,25 @@ class PruneRedirectErrors extends Command
 
     /**
      * Pruning is best-effort. The same lock guards record jobs, which only
-     * wait a few seconds, so a burst can still be holding it when this
-     * nightly run starts. Wait about a minute, then stop without failing
-     * the scheduler. Records already deleted stay deleted.
+     * wait a few seconds, so a burst can still be holding it when the nightly
+     * run starts. That run waits about a minute, then stops without failing
+     * the scheduler. A person at the terminal stops after one missed try.
+     * Records already deleted stay deleted.
      */
     public function handle(): int
     {
         try {
             $this->prune();
         } catch (LockTimeoutException) {
-            Log::warning('Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.');
+            $message = $this->invokedByHand()
+                ? 'Redirect error pruning did not finish because the write lock is busy.'
+                : 'Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.';
 
-            $this->warn('Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.');
+            Log::warning($message);
+
+            $this->warn($message);
+
+            return $this->invokedByHand() ? self::FAILURE : self::SUCCESS;
         }
 
         return self::SUCCESS;
@@ -46,7 +53,7 @@ class PruneRedirectErrors extends Command
 
     protected function prune(): void
     {
-        $attempts = self::lockAttempts();
+        $attempts = $this->invokedByHand() ? 1 : self::lockAttempts();
         $deadline = now()->addSeconds(self::LOCK_BUDGET_SECONDS);
 
         for ($attempt = 1; $attempt <= $attempts; $attempt++) {
@@ -71,6 +78,16 @@ class PruneRedirectErrors extends Command
     public static function lockAttempts(): int
     {
         return (int) ceil(self::LOCK_BUDGET_SECONDS / RedirectErrorRepository::LOCK_WAIT_SECONDS);
+    }
+
+    /**
+     * A terminal has someone waiting on it. The scheduler and other
+     * unattended runs do not, and those keep the full lock budget.
+     * Existing schedules call this command with no extra flag.
+     */
+    protected function invokedByHand(): bool
+    {
+        return stream_isatty(STDIN);
     }
 
     protected function purgeExpiredRecords(): void

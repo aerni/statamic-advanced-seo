@@ -6,6 +6,7 @@ use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Stache\Repositories\RedirectErrorRepository;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -126,6 +127,35 @@ it('prunes after the redirect error lock is released', function () {
     }
 });
 
+it('stops a direct run after one missed lock try', function () {
+    config(['advanced-seo.redirects.errors.purge_after_days' => 30]);
+
+    Redirect::errors()->make()->url('/old')->site('default')->count(1)
+        ->lastSeenAt(Carbon::now()->subDays(40)->timestamp)->save();
+
+    pruneRedirectErrorsAs(hand: true);
+
+    Sleep::fake(syncWithCarbon: true);
+
+    try {
+        $lock = Cache::lock('advanced-seo::redirect-error', 120);
+        expect($lock->get())->toBeTrue();
+
+        $started = Carbon::now();
+
+        $this->artisan('seo:prune-redirect-errors')
+            ->expectsOutputToContain('Redirect error pruning did not finish because the write lock is busy.')
+            ->doesntExpectOutputToContain('next schedule')
+            ->assertExitCode(1);
+
+        expect(Redirect::errors()->findByUrl('/old', 'default'))->not->toBeNull()
+            ->and(Carbon::now()->diffInSeconds($started, absolute: true))->toBeLessThan(RedirectErrorRepository::LOCK_WAIT_SECONDS + 1);
+    } finally {
+        Sleep::fake(false);
+        Carbon::setTestNow();
+    }
+});
+
 it('warns and exits cleanly when the redirect error lock stays busy', function () {
     config(['advanced-seo.redirects.errors.purge_after_days' => 30]);
 
@@ -139,6 +169,8 @@ it('warns and exits cleanly when the redirect error lock stays busy', function (
             $warnings[] = $event->message;
         }
     });
+
+    pruneRedirectErrorsAs(hand: false);
 
     Sleep::fake(syncWithCarbon: true);
 
@@ -157,3 +189,25 @@ it('warns and exits cleanly when the redirect error lock stays busy', function (
         Carbon::setTestNow();
     }
 });
+
+function pruneRedirectErrorsAs(bool $hand): void
+{
+    $kernel = app(Kernel::class);
+
+    $kernel->bootstrap();
+
+    $command = new class($hand) extends PruneRedirectErrors
+    {
+        public function __construct(private bool $hand)
+        {
+            parent::__construct();
+        }
+
+        protected function invokedByHand(): bool
+        {
+            return $this->hand;
+        }
+    };
+
+    invade($kernel)->getArtisan()->add($command);
+}
