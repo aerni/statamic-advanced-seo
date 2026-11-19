@@ -36,11 +36,9 @@ class PruneRedirectErrors extends Command
         try {
             $this->prune();
         } catch (LockTimeoutException) {
-            $message = 'Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.';
+            Log::warning('Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.');
 
-            Log::warning($message);
-
-            $this->warn($message);
+            $this->warn('Redirect error pruning did not finish because the write lock stayed busy. It will run again on the next schedule.');
         }
 
         return self::SUCCESS;
