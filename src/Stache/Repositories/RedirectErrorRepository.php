@@ -87,10 +87,6 @@ class RedirectErrorRepository implements Contract
 
     public function deleteByIds(array $ids): void
     {
-        if ($ids === []) {
-            return;
-        }
-
         foreach (array_chunk($ids, self::DELETE_CHUNK_SIZE) as $chunk) {
             $this->lock(fn () => $this->store->deleteKeys($chunk));
         }

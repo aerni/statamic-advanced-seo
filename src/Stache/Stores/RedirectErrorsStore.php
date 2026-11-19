@@ -51,16 +51,14 @@ class RedirectErrorsStore extends BasicStore
             return;
         }
 
-        // paths() rebuilds the index from every file when the cache is cold.
-        // A chunked prune would do that rebuild while holding the write lock.
-        // Drop the memoized map and read the cache; otherwise the file is the
-        // id in this directory, which is the only path the store writes.
-        $this->paths = null;
-
-        $cached = collect(Stache::cacheStore()->get($this->pathsCacheKey(), []));
+        // clear() calls paths(), which scans every file when it has no map.
+        // Hand it the cached map, including an empty one, so that scan does
+        // not run while the write lock is held. An id missing from the map
+        // is still {id}.yaml, the only path this store writes.
+        $this->paths = collect(Stache::cacheStore()->get($this->pathsCacheKey(), []));
 
         $files = collect($keys)
-            ->map(fn ($key) => $cached->get($key) ?: Path::assemble($this->directory(), "{$key}.yaml"))
+            ->map(fn ($key) => $this->paths->get($key) ?: Path::assemble($this->directory(), "{$key}.yaml"))
             ->filter()
             ->unique()
             ->values()
