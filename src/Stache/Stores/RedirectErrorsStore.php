@@ -45,16 +45,27 @@ class RedirectErrorsStore extends BasicStore
             ->lastSeenAt(Arr::get($data, 'last_seen_at'));
     }
 
+    /**
+     * Delete these error files and clear the path index.
+     *
+     * RedirectErrorRepository::deleteByIds() splits the ids into chunks and calls
+     * this once per chunk, while holding the write lock. clear() then asks
+     * paths() for the id-to-file map. paths() rebuilds that map by reading
+     * every error file when it is not already in memory or in the cache. The
+     * previous chunk's clear() wiped the cache, so the next chunk would do
+     * that rebuild under the lock.
+     *
+     * The cached map is stored on $this->paths first, including when the cache
+     * is empty. paths() returns that map instead of scanning. An id missing
+     * from the map is still {id}.yaml in this store's directory, which is the
+     * only path these records are written to.
+     */
     public function deleteKeys(array $keys): void
     {
         if ($keys === []) {
             return;
         }
 
-        // clear() calls paths(), which scans every file when it has no map.
-        // Hand it the cached map, including an empty one, so that scan does
-        // not run while the write lock is held. An id missing from the map
-        // is still {id}.yaml, the only path this store writes.
         $this->paths = collect(Stache::cacheStore()->get($this->pathsCacheKey(), []));
 
         $files = collect($keys)
