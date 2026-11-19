@@ -17,7 +17,13 @@ class RedirectErrorRepository implements Contract
     use HasRedirectErrorLimits;
 
     /**
-     * Record jobs wait 5 seconds and then give up. A prune that deletes the
+     * Record jobs give up after this wait. The prune command divides its
+     * budget by it, so a longer wait here shortens how many tries fit.
+     */
+    public const LOCK_WAIT_SECONDS = 5;
+
+    /**
+     * Record jobs give up after one lock wait. A prune that deletes the
      * whole cap in one hold can outlast those tries. Each chunk takes the
      * lock, deletes, and releases it so a record job can write in between.
      */
@@ -149,7 +155,7 @@ class RedirectErrorRepository implements Contract
 
     protected function lock(callable $callback): mixed
     {
-        return Cache::lock('advanced-seo::redirect-error', 60)->block(5, $callback);
+        return Cache::lock('advanced-seo::redirect-error', 60)->block(self::LOCK_WAIT_SECONDS, $callback);
     }
 
     public static function bindings(): array

@@ -4,6 +4,7 @@ namespace Aerni\AdvancedSeo\Commands;
 
 use Aerni\AdvancedSeo\Facades\Redirect;
 use Aerni\AdvancedSeo\Redirects\RedirectErrorInbox;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectErrorRepository;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Carbon;
@@ -15,11 +16,9 @@ class PruneRedirectErrors extends Command
     use RunsInPlease;
 
     /**
-     * Each try waits out the shared write lock, which blocks for 5 seconds.
-     * The attempt ceiling stops the loop if that wait does not move the clock.
+     * How long the nightly run keeps waiting for the shared write lock.
+     * Tries are this budget divided by the lock wait, so the two stay in step.
      */
-    private const LOCK_ATTEMPTS = 15;
-
     private const LOCK_BUDGET_SECONDS = 60;
 
     protected $signature = 'seo:prune-redirect-errors';
@@ -49,9 +48,10 @@ class PruneRedirectErrors extends Command
 
     protected function prune(): void
     {
+        $attempts = self::lockAttempts();
         $deadline = now()->addSeconds(self::LOCK_BUDGET_SECONDS);
 
-        for ($attempt = 1; $attempt <= self::LOCK_ATTEMPTS; $attempt++) {
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
             try {
                 $this->purgeExpiredRecords();
                 $this->deleteHandledRecords();
@@ -59,11 +59,20 @@ class PruneRedirectErrors extends Command
 
                 return;
             } catch (LockTimeoutException $e) {
-                if ($attempt === self::LOCK_ATTEMPTS || now()->greaterThanOrEqualTo($deadline)) {
+                if ($attempt === $attempts || now()->greaterThanOrEqualTo($deadline)) {
                     throw $e;
                 }
             }
         }
+    }
+
+    /**
+     * Enough tries that waiting out the shared lock covers the budget.
+     * One try can end a little early, so the count is rounded up.
+     */
+    public static function lockAttempts(): int
+    {
+        return (int) ceil(self::LOCK_BUDGET_SECONDS / RedirectErrorRepository::LOCK_WAIT_SECONDS);
     }
 
     protected function purgeExpiredRecords(): void

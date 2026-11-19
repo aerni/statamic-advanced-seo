@@ -1,8 +1,10 @@
 <?php
 
+use Aerni\AdvancedSeo\Commands\PruneRedirectErrors;
 use Aerni\AdvancedSeo\Events\RedirectCreated;
 use Aerni\AdvancedSeo\Events\RedirectSaved;
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectErrorRepository;
 use Aerni\AdvancedSeo\Tests\Concerns\EnablesRedirects;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Carbon;
@@ -13,6 +15,19 @@ use Illuminate\Support\Sleep;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 uses(PreventsSavingStacheItemsToDisk::class, EnablesRedirects::class);
+
+it('covers the lock budget with the shared lock wait', function () {
+    $wait = RedirectErrorRepository::LOCK_WAIT_SECONDS;
+    $budget = (new ReflectionClass(PruneRedirectErrors::class))
+        ->getReflectionConstant('LOCK_BUDGET_SECONDS')
+        ->getValue();
+    $attempts = PruneRedirectErrors::lockAttempts();
+
+    expect($wait)->toBeGreaterThan(0)
+        ->and($wait)->toBeLessThan($budget)
+        ->and($attempts)->toBe((int) ceil($budget / $wait))
+        ->and($attempts * $wait)->toBeGreaterThanOrEqual($budget);
+});
 
 it('deletes errors older than the retention window', function () {
     config(['advanced-seo.redirects.errors.purge_after_days' => 30]);
