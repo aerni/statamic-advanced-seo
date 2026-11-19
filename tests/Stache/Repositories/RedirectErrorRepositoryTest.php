@@ -1,6 +1,8 @@
 <?php
 
+use Aerni\AdvancedSeo\Contracts\RedirectErrorRepository as RedirectErrorRepositoryContract;
 use Aerni\AdvancedSeo\Facades\Redirect;
+use Aerni\AdvancedSeo\Stache\Repositories\RedirectErrorRepository as StacheRedirectErrorRepository;
 use Statamic\Facades\Site;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -46,9 +48,41 @@ it('bulk deletes errors by id', function () {
 it('no-ops when deleteByIds receives an empty id list', function () {
     Redirect::errors()->make()->url('/a')->site('default')->count(1)->save();
 
-    Redirect::errors()->deleteByIds([]);
+    $repo = redirectErrorRepositoryProbe();
 
-    expect(Redirect::errors()->all())->toHaveCount(1);
+    $repo->deleteByIds([]);
+
+    expect(Redirect::errors()->all())->toHaveCount(1)
+        ->and($repo->locks)->toBe(0);
+});
+
+it('releases the redirect error lock between delete chunks', function () {
+    $keep = Redirect::errors()->make()->url('/keep')->site('default')->count(5);
+    $keep->save();
+
+    $ids = collect(range(1, 101))->map(function ($i) {
+        $error = Redirect::errors()->make()->url("/old-{$i}")->site('default')->count(1);
+        $error->save();
+
+        return $error->id();
+    })->all();
+
+    $repo = redirectErrorRepositoryProbe();
+
+    $repo->beforeLock = function (int $locks) {
+        if ($locks === 2) {
+            Redirect::errors()->make()->url('/during')->site('default')->count(1)->save();
+        }
+    };
+
+    $repo->deleteByIds($ids);
+
+    $urls = Redirect::errors()->all()->map->url();
+
+    expect($repo->locks)->toBe(2)
+        ->and($urls)->toContain('/keep')->toContain('/during')
+        ->and($urls)->not->toContain('/old-1')->not->toContain('/old-101')
+        ->and(Redirect::errors()->all())->toHaveCount(2);
 });
 
 it('returns the configured max records', function () {
@@ -80,3 +114,28 @@ it('treats false purge_after_days as no age-out', function () {
 
     expect(Redirect::errors()->purgeAfterDays())->toBeNull();
 });
+
+function redirectErrorRepositoryProbe(): StacheRedirectErrorRepository
+{
+    $repo = new class(app('stache')) extends StacheRedirectErrorRepository
+    {
+        public int $locks = 0;
+
+        public $beforeLock = null;
+
+        protected function lock(callable $callback): mixed
+        {
+            $this->locks++;
+
+            if ($this->beforeLock) {
+                ($this->beforeLock)($this->locks);
+            }
+
+            return parent::lock($callback);
+        }
+    };
+
+    app()->instance(RedirectErrorRepositoryContract::class, $repo);
+
+    return $repo;
+}
